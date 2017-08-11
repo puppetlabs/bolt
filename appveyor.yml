@@ -1,0 +1,28 @@
+# See https://www.appveyor.com/docs/lang/ruby/
+version: 0.1.0.{build}-{branch}
+cache:
+  - .bundle
+
+matrix:
+  fast_finish: true
+
+environment:
+  matrix:
+    - RUBY_VERSION: 21
+    - RUBY_VERSION: 24
+
+install:
+  - set PATH=C:\Ruby%RUBY_VERSION%\bin;%PATH%
+  - bundle config --local path .bundle
+  - bundle install --jobs 3 --retry 3
+
+build: off
+
+before_test:
+  - ruby -v
+  - gem -v
+  - bundle -v
+  - type Gemfile.lock
+
+test_script:
+  - bundle exec rake spec
