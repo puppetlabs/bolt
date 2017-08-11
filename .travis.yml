@@ -19,4 +19,4 @@ before_script:
   - cat Gemfile.lock
 
 script:
-  - bundle exec rake spec
+  - bundle exec rspec --tag ~vagrant

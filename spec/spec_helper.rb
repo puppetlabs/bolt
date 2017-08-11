@@ -1,5 +1,7 @@
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 
+require 'bolt'
+
 RSpec.configure do |config|
 
   # rspec-expectations config
@@ -24,8 +26,6 @@ RSpec.configure do |config|
   # Allows RSpec to persist some state between runs in order to support
   # the `--only-failures` and `--next-failure` CLI options.
   config.example_status_persistence_file_path = "spec/examples.txt"
-
-  config.disable_monkey_patching!
 
   config.warnings = true
 end

@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+
+require 'bundler/setup'
+require 'bolt'
+require 'bolt/cli'
+
+cli = Bolt::CLI.new(ARGV)
+cli.execute
