@@ -22,9 +22,11 @@
 /lib/bundler/man/
 
 Gemfile.lock
+Gemfile.local
 .ruby-version
 .ruby-gemset
 
 .rvmrc
 
 .vagrant/
+.byebug_history
