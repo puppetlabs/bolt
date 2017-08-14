@@ -24,6 +24,12 @@ Issues are tracked at https://tickets.puppetlabs.com/browse/TASKS/
 
 Pull requests are welcome on GitHub at https://github.com/puppetlabs/bolt.
 
+## Testing
+
+Some tests expect a windows or linux vm to be running. Execute `vagrant up` to
+bring these up using the included Vagrantfile. Any tests requiring this are
+tagged with `:vagrant` in rspec.
+
 ## License
 
 The gem is available as open source under the terms of the [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0).
