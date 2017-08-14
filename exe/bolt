@@ -5,4 +5,10 @@ require 'bolt'
 require 'bolt/cli'
 
 cli = Bolt::CLI.new(ARGV)
-cli.execute
+begin
+  opts = cli.parse
+  cli.execute(opts)
+rescue Bolt::CLIError => e
+  $stderr.puts e.message
+  exit e.error_code
+end
