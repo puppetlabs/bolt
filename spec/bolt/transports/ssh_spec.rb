@@ -9,7 +9,7 @@ describe "ssh thingy" do
   let(:port) { 2224 }
   let(:command) { "pwd" }
 
-  it "executes a command on a host", :vagrant => true do
+  it "executes a command on a host", vagrant: true do
     expect {
       Bolt::Transports::SSH.execute(hostname, user, command, port, password)
     }.to output("/home/vagrant\n").to_stdout

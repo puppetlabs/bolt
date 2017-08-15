@@ -3,7 +3,6 @@
 require 'bolt'
 
 RSpec.configure do |config|
-
   # rspec-expectations config
   config.expect_with :rspec do |expectations|
     #     be_bigger_than(2).and_smaller_than(4).description
