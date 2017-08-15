@@ -14,6 +14,37 @@ describe "Bolt::CLI" do
     expect(cli.parse).to include(:leftovers => %w[exec])
   end
 
+  describe "help" do
+    it "generates help when no arguments are specified" do
+      cli = Bolt::CLI.new([])
+      expect {
+        expect {
+          cli.parse
+        }.to raise_error(Bolt::CLIExit)
+      }.to output(/Runs ad-hoc tasks on your hosts/).to_stdout
+    end
+
+    it "accepts --help" do
+      cli = Bolt::CLI.new(%w[--help])
+      expect {
+        expect {
+          cli.parse
+        }.to raise_error(Bolt::CLIExit)
+      }.to output(/Runs ad-hoc tasks on your hosts/).to_stdout
+    end
+  end
+
+  describe "version" do
+    it "emits a version string" do
+      cli = Bolt::CLI.new(%w[--version])
+      expect {
+        expect {
+          cli.parse
+        }.to raise_error(Bolt::CLIExit)
+      }.to output(/\d+\.\d+\.\d+/).to_stdout
+    end
+  end
+
   describe "hosts" do
     it "accepts a single host" do
       cli = Bolt::CLI.new(%w[exec --hosts foo])

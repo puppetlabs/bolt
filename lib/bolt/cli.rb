@@ -1,6 +1,7 @@
 require 'trollop'
 require 'uri'
 require 'bolt/transports'
+require 'bolt/version'
 
 class Bolt::CLIError < RuntimeError
   attr_reader :error_code
@@ -11,6 +12,9 @@ class Bolt::CLIError < RuntimeError
   end
 end
 
+class Bolt::CLIExit < StandardError
+end
+
 class Bolt::CLI
   def initialize(argv)
     @argv = argv
@@ -18,6 +22,9 @@ class Bolt::CLI
 
   def parse
     parser = Trollop::Parser.new do
+      banner "Runs ad-hoc tasks on your hosts over SSH and WinRM."
+      version Bolt::VERSION
+
       opt :hosts, "Hosts", :type => :strings, :required => true
       opt :user, "User", :type => :string
       opt :password, "Password", :type => :string
@@ -25,12 +32,20 @@ class Bolt::CLI
 
     task_options, global_options = @argv.partition { |arg| arg =~ /=/ }
     begin
+      raise Trollop::HelpNeeded if @argv.empty? # show help screen
+
       options = parser.parse(global_options)
       options[:leftovers] = parser.leftovers
       options[:task_options] = Hash[task_options.map { |arg| arg.split('=') }]
       options
     rescue Trollop::CommandlineError => e
       raise Bolt::CLIError.new(e.message, 1)
+    rescue Trollop::HelpNeeded
+      parser.educate
+      raise Bolt::CLIExit
+    rescue Trollop::VersionNeeded
+      puts parser.version
+      raise Bolt::CLIExit
     end
   end
 
