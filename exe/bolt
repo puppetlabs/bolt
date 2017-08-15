@@ -8,6 +8,8 @@ cli = Bolt::CLI.new(ARGV)
 begin
   opts = cli.parse
   cli.execute(opts)
+rescue Bolt::CLIExit
+  exit
 rescue Bolt::CLIError => e
   $stderr.puts e.message
   exit e.error_code
