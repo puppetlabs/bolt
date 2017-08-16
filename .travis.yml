@@ -12,3 +12,6 @@ before_script:
 script:
   - bundle exec rspec --tag ~vagrant
   - bundle exec rubocop
+
+notifications:
+  email: false
