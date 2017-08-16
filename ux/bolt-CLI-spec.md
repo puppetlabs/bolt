@@ -1,7 +1,7 @@
 ## bolt
 
 ### NAME
-`$ bolt` - Runs ad-hoc tasks on your hosts, without needing puppet infrastructure.
+`$ bolt` - Runs ad-hoc tasks on your hosts via ssh or winrm.
 
 ### SYNOPSIS
 ~~~
@@ -19,7 +19,7 @@ Option | Description
 ----------------------------- | --------------------------
 --format <br>-f | Specify an output format. (Options: TBD)
 --help <br>-h  | Show help page for bolt or for a specific task with <task-name>
-
+--shell | 'cmd' or 'powershell' when using winrm. We might have similar configuration for ssh transports.
 
 ### SELECT A TARGET
 
@@ -47,15 +47,15 @@ europa-1: 350
 **Execute "facter" on multiple systems**:
 This demonstrates how a command can be run on multiple systems, and how the results are displayed:
 ~~~
-$ bolt exec --nodes europa-1, europa-2 command='facter osfamily'
+$ bolt exec command='facter osfamily' --hosts europa-1, europa-2
 europa-2: Redhat
 europa-1: Redhat
 
 ~~~
-- Node names are comma-separated, or space separated so that you can do --nodes europa-{1,9}, and allow the shell to expand the node names. 
+- Host names are comma-separated, or space separated so that you can do --hosts europa-{1,9}, and allow the shell to expand the node names. 
 - we need a way of easily passing multiple hosts, something like:
 ~~~
-$ bolt exec command='facter ipaddress' <nodes.txt>
+$ bolt exec command='facter ipaddress' --hosts <hosts.txt>
 ~~~
 Passing one hostname per line works for a homogeneous environment, e.g. all *nix. But what about trying to execute a single command across *nix and Windows, like "facter whereami"? To support that the protocol/scheme probably needs to be specified per-host (optionally):
 
