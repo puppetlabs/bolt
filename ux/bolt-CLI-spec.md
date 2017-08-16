@@ -31,6 +31,7 @@ Option | Description
 
 ### EXAMPLES
 
+
 **Query a host for the number of SSL connections it’s handling**:
 ~~~
 $ bolt exec —nodes europa command=‘netstat -an | grep “:443.*ESTABLISHED” | wc -1’
@@ -65,3 +66,37 @@ winrm://win.ops.foo
 rhel2.ops.foo
 
 It could also support alternate ports, e.g. ssh://rhel.ops.foo:2222.
+
+
+--- 
+Placeholders for examples:
+
+**Run a single command**
+
+**Run a shell script**
+
+**Transfer files**
+
+**Install puppet**
+
+**Run puppet resource**
+
+**Run a Puppet task**
+
+**Run a Puppet task plan**
+
+**Forage for discovery info**
+
+
+**Output**
+
+**View output per host while task is running.**
+- Logs or streaming?
+
+**View task progress (failures) while task is running.**
+
+**View the response for each host when the host has finished.**
+- Save logs per node, not streaming output.
+
+**Stop a task while it is running.**
+- Stopping a task would continue in-progress runs, but skip anything that hasn't started yet.
