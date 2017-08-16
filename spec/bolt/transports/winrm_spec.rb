@@ -8,7 +8,7 @@ describe "winrm thingy" do
   let(:password) { "vagrant" }
   let(:command) { "echo $env:UserName" }
 
-  it "executes a command on a host", :vagrant => true do
+  it "executes a command on a host", vagrant: true do
     expect {
       Bolt::Transports::WinRM.execute(endpoint, user, command, password)
     }.to output("vagrant\r\n").to_stdout

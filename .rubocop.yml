@@ -1,0 +1,30 @@
+AllCops:
+  TargetRubyVersion: 2.1
+
+# Checks for if and unless statements that would fit on one line if written as a
+# modifier if/unless.
+Style/IfUnlessModifier:
+  Enabled: false
+
+Style/StringLiterals:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
+
+Style/BlockDelimiters:
+  Enabled: false
+
+Style/NumericLiterals:
+  Enabled: false
+
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*'
+
+Metrics/AbcSize:
+  Enabled: false
+
+# It might be nice to have this
+Metrics/MethodLength:
+  Enabled: false

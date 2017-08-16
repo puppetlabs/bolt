@@ -11,7 +11,7 @@ describe "Bolt::CLI" do
 
   it "includes unparsed arguments" do
     cli = Bolt::CLI.new(%w[exec --hosts foo])
-    expect(cli.parse).to include(:leftovers => %w[exec])
+    expect(cli.parse).to include(leftovers: %w[exec])
   end
 
   describe "help" do
@@ -48,12 +48,12 @@ describe "Bolt::CLI" do
   describe "hosts" do
     it "accepts a single host" do
       cli = Bolt::CLI.new(%w[exec --hosts foo])
-      expect(cli.parse).to include(:hosts => ['foo'])
+      expect(cli.parse).to include(hosts: ['foo'])
     end
 
     it "accepts multiple hosts" do
       cli = Bolt::CLI.new(%w[exec --hosts foo bar])
-      expect(cli.parse).to include(:hosts => ['foo', 'bar'])
+      expect(cli.parse).to include(hosts: %w[foo bar])
     end
 
     it "generates an error message if no hosts given" do
@@ -120,7 +120,7 @@ describe "Bolt::CLI" do
   describe "user" do
     it "accepts a user" do
       cli = Bolt::CLI.new(%w[exec --user root --hosts foo])
-      expect(cli.parse).to include(:user => 'root')
+      expect(cli.parse).to include(user: 'root')
     end
 
     it "generates an error message if no user value is given" do
@@ -134,7 +134,7 @@ describe "Bolt::CLI" do
   describe "password" do
     it "accepts a password" do
       cli = Bolt::CLI.new(%w[exec --password opensesame --hosts foo])
-      expect(cli.parse).to include(:password => 'opensesame')
+      expect(cli.parse).to include(password: 'opensesame')
     end
 
     it "generates an error message if no password value is given" do
@@ -148,7 +148,7 @@ describe "Bolt::CLI" do
   describe "command" do
     it "interprets command=whoami as a task option" do
       cli = Bolt::CLI.new(%w[exec --hosts foo command=whoami])
-      expect(cli.parse).to include(:task_options => { 'command' => 'whoami'})
+      expect(cli.parse).to include(task_options: { 'command' => 'whoami' })
       expect(cli.parse[:hosts]).to_not include('command=whoami')
       expect(cli.parse[:leftovers]).to_not include('command=whoami')
     end

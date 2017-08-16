@@ -1,4 +1,6 @@
-module Bolt::Transports
+module Bolt
+  module Transports
+  end
 end
 
 require 'bolt/transports/ssh'

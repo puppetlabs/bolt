@@ -1,4 +1,5 @@
 # coding: utf-8
+
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
@@ -8,12 +9,14 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Puppet"]
   spec.email         = ["puppet@puppet.com"]
 
-  spec.summary       = %q{Execute commands remotely over SSH and WinRM}
-  spec.description   = %q{Execute commands remotely over SSH and WinRM}
+  spec.summary       = "Execute commands remotely over SSH and WinRM"
+  spec.description   = "Execute commands remotely over SSH and WinRM"
   spec.homepage      = "https://github.com/puppetlabs/bolt"
   spec.license       = "Apache2"
 
-  spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
+  spec.files         = `git ls-files -z`.split("\x0").reject do |f|
+    f.match(%r{^(test|spec|features)/})
+  end
   spec.bindir        = "exe"
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
