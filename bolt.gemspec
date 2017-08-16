@@ -3,9 +3,11 @@
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
+require 'bolt/version'
+
 Gem::Specification.new do |spec|
   spec.name          = "bolt"
-  spec.version       = "0.1.0"
+  spec.version       = Bolt::VERSION
   spec.authors       = ["Puppet"]
   spec.email         = ["puppet@puppet.com"]
 
