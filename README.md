@@ -29,7 +29,9 @@ Pull requests are welcome on GitHub at https://github.com/puppetlabs/bolt.
 
 Some tests expect a windows or linux vm to be running. Execute `vagrant up` to
 bring these up using the included Vagrantfile. Any tests requiring this are
-tagged with `:vagrant` in rspec.
+tagged with `:vagrant` in rspec. To exclude these tests run:
+
+    $ bundle exec rspec spec --tag ~vagrant
 
 ## License
 
