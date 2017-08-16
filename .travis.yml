@@ -1,17 +1,19 @@
-# See https://docs.travis-ci.com/user/languages/ruby/
 sudo: false
 language: ruby
 cache: bundler
 rvm:
-  - 2.4.1
-  - 2.1
-
+- 2.4.1
+- 2.1
 before_script:
-  - cat Gemfile.lock
-
+- cat Gemfile.lock
 script:
-  - bundle exec rspec --tag ~vagrant
-  - bundle exec rubocop
-
+- bundle exec rspec --tag ~vagrant
+- bundle exec rubocop
 notifications:
   email: false
+  hipchat:
+    rooms:
+      secure: g7ViGa4EwzqVmbiu2RXk6BXJi3nfLIAMwCojJkD7d2OZ6hmButPP15jB4KaZ/3WTDKNO0elo1wcIdVCJBnZpELPAC32xdcQ43Ft6W5NVDaJwxO4xl836OLboIStSd+7W8raVcarCh5UTDvZbm/9B13o6uaL+GaP2Lpilr2GKZRAABw2hjC58vUBFMZvUN6q7oQ96up1NG6vpsZ3uCitPEvVemGn4kqC9dkLOWGZGRx21fTyL10ttQ5R21kQsp9efdlxyHqU3m96CNItw2yDHOKH3Z6FUtFwKyD+xzqOOAESt5ZgtT/g3XJK8koW2oKALSXwq+9eCfAisHQpotRciZY4pGoalVu3Zp000w26dJm0kDBdAmJ7LWVL3QK/qBxw00S+ODh1Du2WKLm+zAFYZ1O79LlnKQeDeqvL/Z+It8kMJrA/JUoQuyRrMouy5NAzjlGzZlC9kr2HUYzK2eBcxHfF8gJN0bnzalLnsR36RBgyDtLyuuIKouXo5GUkD/wDL+WbSuwejvWTDUxBATby5xq/VNwvgGJnXrAgs2HOR+k+V/dBeYjW5Ow4eqpGsnDT2EN4o6kmJDRubAMu6NIkJus5WKdyl/Q6BCvt7Gathzz1vUvhwhCt0elrkpeXYrq/g+MIHuLGl3IRbjTOy9gpcgbjRapRhwp/AzXY2EDqoGJM=
+    template:
+      - '<a href="https://github.com/%{repository_slug}">%{repository_name}</a>#<a href="%{build_url}">%{build_number}</a> (<a href="%{compare_url}">%{branch} - %{commit} : %{author}</a>): %{message}'
+    format: html
