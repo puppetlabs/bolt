@@ -15,7 +15,10 @@ module Bolt
       options[:password] = @password if @password
 
       Net::SSH.start(@host, @user, **options) do |ssh|
-        puts ssh.exec!(command)
+        ssh.exec!(command) do |_, stream, data|
+          $stdout << data if stream == :stdout
+          $stderr << data if stream == :stderr
+        end
       end
     end
   end
