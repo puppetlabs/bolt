@@ -10,7 +10,7 @@ describe "Bolt::CLI" do
   end
 
   it "includes unparsed arguments" do
-    cli = Bolt::CLI.new(%w[exec --hosts foo])
+    cli = Bolt::CLI.new(%w[exec --nodes foo])
     expect(cli.parse).to include(leftovers: %w[exec])
   end
 
@@ -21,7 +21,7 @@ describe "Bolt::CLI" do
         expect {
           cli.parse
         }.to raise_error(Bolt::CLIExit)
-      }.to output(/Runs ad-hoc tasks on your hosts/).to_stdout
+      }.to output(/Runs ad-hoc tasks on your nodes/).to_stdout
     end
 
     it "accepts --help" do
@@ -30,7 +30,7 @@ describe "Bolt::CLI" do
         expect {
           cli.parse
         }.to raise_error(Bolt::CLIExit)
-      }.to output(/Runs ad-hoc tasks on your hosts/).to_stdout
+      }.to output(/Runs ad-hoc tasks on your nodes/).to_stdout
     end
   end
 
@@ -45,29 +45,29 @@ describe "Bolt::CLI" do
     end
   end
 
-  describe "hosts" do
-    it "accepts a single host" do
-      cli = Bolt::CLI.new(%w[exec --hosts foo])
-      expect(cli.parse).to include(hosts: ['foo'])
+  describe "nodes" do
+    it "accepts a single node" do
+      cli = Bolt::CLI.new(%w[exec --nodes foo])
+      expect(cli.parse).to include(nodes: ['foo'])
     end
 
-    it "accepts multiple hosts" do
-      cli = Bolt::CLI.new(%w[exec --hosts foo bar])
-      expect(cli.parse).to include(hosts: %w[foo bar])
+    it "accepts multiple nodes" do
+      cli = Bolt::CLI.new(%w[exec --nodes foo bar])
+      expect(cli.parse).to include(nodes: %w[foo bar])
     end
 
-    it "generates an error message if no hosts given" do
-      cli = Bolt::CLI.new(%w[exec --hosts])
+    it "generates an error message if no nodes given" do
+      cli = Bolt::CLI.new(%w[exec --nodes])
       expect {
         cli.parse
-      }.to raise_error(Bolt::CLIError, /option '--hosts' needs a parameter/)
+      }.to raise_error(Bolt::CLIError, /option '--nodes' needs a parameter/)
     end
 
-    it "generates an error message if hosts is omitted" do
+    it "generates an error message if nodes is omitted" do
       cli = Bolt::CLI.new(%w[exec])
       expect {
         cli.parse
-      }.to raise_error(Bolt::CLIError, /option --hosts must be specified/)
+      }.to raise_error(Bolt::CLIError, /option --nodes must be specified/)
     end
 
     describe "with winrm" do
@@ -119,12 +119,12 @@ describe "Bolt::CLI" do
 
   describe "user" do
     it "accepts a user" do
-      cli = Bolt::CLI.new(%w[exec --user root --hosts foo])
+      cli = Bolt::CLI.new(%w[exec --user root --nodes foo])
       expect(cli.parse).to include(user: 'root')
     end
 
     it "generates an error message if no user value is given" do
-      cli = Bolt::CLI.new(%w[exec --user --hosts foo])
+      cli = Bolt::CLI.new(%w[exec --user --nodes foo])
       expect {
         cli.parse
       }.to raise_error(Bolt::CLIError, /option '--user' needs a parameter/)
@@ -133,12 +133,12 @@ describe "Bolt::CLI" do
 
   describe "password" do
     it "accepts a password" do
-      cli = Bolt::CLI.new(%w[exec --password opensesame --hosts foo])
+      cli = Bolt::CLI.new(%w[exec --password opensesame --nodes foo])
       expect(cli.parse).to include(password: 'opensesame')
     end
 
     it "generates an error message if no password value is given" do
-      cli = Bolt::CLI.new(%w[exec --password --hosts foo])
+      cli = Bolt::CLI.new(%w[exec --password --nodes foo])
       expect {
         cli.parse
       }.to raise_error(Bolt::CLIError, /option '--password' needs a parameter/)
@@ -147,9 +147,9 @@ describe "Bolt::CLI" do
 
   describe "command" do
     it "interprets command=whoami as a task option" do
-      cli = Bolt::CLI.new(%w[exec --hosts foo command=whoami])
+      cli = Bolt::CLI.new(%w[exec --nodes foo command=whoami])
       expect(cli.parse).to include(task_options: { 'command' => 'whoami' })
-      expect(cli.parse[:hosts]).to_not include('command=whoami')
+      expect(cli.parse[:nodes]).to_not include('command=whoami')
       expect(cli.parse[:leftovers]).to_not include('command=whoami')
     end
   end
