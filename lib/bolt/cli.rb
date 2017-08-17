@@ -1,6 +1,6 @@
 require 'trollop'
 require 'uri'
-require 'bolt/transports'
+require 'bolt/node'
 require 'bolt/version'
 
 module Bolt
@@ -76,14 +76,14 @@ END
         uri = self.class.parse_uri(node)
         if uri.scheme == 'winrm'
           endpoint = "http://#{uri.host}:#{uri.port}/wsman"
-          Bolt::Transports::WinRM.new(endpoint,
-                                      options[:user],
-                                      options[:password])
+          Bolt::WinRM.new(endpoint,
+                          options[:user],
+                          options[:password])
         else
-          Bolt::Transports::SSH.new(uri.host,
-                                    options[:user],
-                                    uri.port,
-                                    options[:password])
+          Bolt::SSH.new(uri.host,
+                        options[:user],
+                        uri.port,
+                        options[:password])
         end
       end
 

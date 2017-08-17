@@ -1,3 +1,3 @@
 module Bolt
-  require 'bolt/transports'
+  require 'bolt/node'
 end
