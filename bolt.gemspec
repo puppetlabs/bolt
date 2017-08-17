@@ -6,7 +6,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'bolt/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "bolt"
+  spec.name          = "puppet-bolt"
   spec.version       = Bolt::VERSION
   spec.authors       = ["Puppet"]
   spec.email         = ["puppet@puppet.com"]

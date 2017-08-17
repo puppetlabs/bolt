@@ -19,6 +19,23 @@ systems using ssh and winrm.
 * Linux, OSX, Windows
 * Ruby 2.1+
 
+## Getting started
+
+Install it with [RubyGems](https://rubygems.org).
+
+    gem install puppet-bolt
+
+Or add this to your Gemfile if you are using [Bundler](https://bundler.io).
+
+    gem 'puppet-bolt'
+
+Or to run from source
+
+    bundle install --path .bundle
+    bundle exec bolt --nodes <name> command=id
+
+See `bolt --help` for more details.
+
 ## Contributing
 
 Issues are tracked at https://tickets.puppetlabs.com/browse/TASKS/

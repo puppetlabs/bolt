@@ -22,12 +22,19 @@ module Bolt
 
     def parse
       parser = Trollop::Parser.new do
-        banner "Runs ad-hoc tasks on your nodes over SSH and WinRM."
+        banner <<-END
+Runs ad-hoc tasks on your nodes over SSH and WinRM.
+
+Usage:
+       bolt exec [options] command=<command>
+
+where [options] are:
+END
         version Bolt::VERSION
 
         opt :nodes, "Nodes to connect to", type: :strings, required: true
-        opt :user, "User", type: :string
-        opt :password, "Password", type: :string
+        opt :user, "User to authenticate as (Optional)", type: :string
+        opt :password, "Password to authenticate as (Optional)", type: :string
       end
 
       task_options, global_options = @argv.partition { |arg| arg =~ /=/ }
