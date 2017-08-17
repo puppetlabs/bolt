@@ -72,23 +72,23 @@ END
     end
 
     def execute(options)
-      options[:nodes].each do |node|
+      nodes = options[:nodes].map do |node|
         uri = self.class.parse_uri(node)
-
         if uri.scheme == 'winrm'
           endpoint = "http://#{uri.host}:#{uri.port}/wsman"
-          # endpoint user command password
-          Bolt::Transports::WinRM.execute(endpoint,
-                                          options[:user],
-                                          options[:task_options]['command'],
-                                          options[:password])
+          Bolt::Transports::WinRM.new(endpoint,
+                                      options[:user],
+                                      options[:password])
         else
-          # host user command port password
-          Bolt::Transports::SSH.execute(uri.host, options[:user],
-                                        options[:task_options]['command'],
-                                        uri.port,
-                                        options[:password])
+          Bolt::Transports::SSH.new(uri.host,
+                                    options[:user],
+                                    uri.port,
+                                    options[:password])
         end
+      end
+
+      nodes.each do |node|
+        node.execute(options[:task_options]["command"])
       end
     end
   end
