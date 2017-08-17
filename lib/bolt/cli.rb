@@ -2,6 +2,7 @@ require 'trollop'
 require 'uri'
 require 'bolt/node'
 require 'bolt/version'
+require 'bolt/executor'
 
 module Bolt
   class CLIError < RuntimeError
@@ -87,9 +88,7 @@ END
         end
       end
 
-      nodes.each do |node|
-        node.execute(options[:task_options]["command"])
-      end
+      Bolt::Executor.new(nodes).execute(options[:task_options]["command"])
     end
   end
 end
