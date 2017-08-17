@@ -28,3 +28,6 @@ Metrics/AbcSize:
 # It might be nice to have this
 Metrics/MethodLength:
   Enabled: false
+
+Layout/IndentHeredoc:
+  Enabled: false
