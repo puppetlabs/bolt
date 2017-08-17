@@ -1,4 +1,5 @@
 require 'net/ssh'
+require 'net/sftp'
 
 module Bolt
   class SSH < Node
@@ -25,6 +26,12 @@ module Bolt
       @session.exec!(command) do |_, stream, data|
         $stdout << data if stream == :stdout
         $stderr << data if stream == :stderr
+      end
+    end
+
+    def copy(source, destination)
+      Net::SFTP::Session.new(@session).connect! do |sftp|
+        sftp.upload!(source, destination)
       end
     end
   end

@@ -17,4 +17,21 @@ describe Bolt::SSH do
       ssh.disconnect
     }.to output("/home/vagrant\n").to_stdout
   end
+
+  it "can copy a file to a host", vagrant: true do
+    contents = "kljhdfg"
+    Tempfile.open('copy-test') do |file|
+      file.write(contents)
+      file.flush
+      ssh.connect
+      ssh.copy(file.path, "/home/vagrant/copy-test")
+
+      expect {
+        ssh.execute("cat /home/vagrant/copy-test")
+      }.to output(contents).to_stdout
+
+      ssh.execute("rm /home/vagrant/copy-test")
+      ssh.disconnect
+    end
+  end
 end
