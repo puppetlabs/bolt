@@ -22,10 +22,10 @@ module Bolt
 
     def parse
       parser = Trollop::Parser.new do
-        banner "Runs ad-hoc tasks on your hosts over SSH and WinRM."
+        banner "Runs ad-hoc tasks on your nodes over SSH and WinRM."
         version Bolt::VERSION
 
-        opt :hosts, "Hosts", type: :strings, required: true
+        opt :nodes, "Nodes to connect to", type: :strings, required: true
         opt :user, "User", type: :string
         opt :password, "Password", type: :string
       end
@@ -49,24 +49,24 @@ module Bolt
       end
     end
 
-    def self.parse_uri(host)
-      case host
+    def self.parse_uri(node)
+      case node
       when %r{^(ssh|winrm)://.*:\d+$}
-        URI(host)
+        URI(node)
       when %r{^(ssh|winrm)://}
-        uri = URI(host)
+        uri = URI(node)
         uri.port = uri.scheme == 'ssh' ? 22 : 5985
         uri
       when /.*:\d+$/
-        URI("ssh://#{host}")
+        URI("ssh://#{node}")
       else
-        URI("ssh://#{host}:22")
+        URI("ssh://#{node}:22")
       end
     end
 
     def execute(options)
-      options[:hosts].each do |host|
-        uri = self.class.parse_uri(host)
+      options[:nodes].each do |node|
+        uri = self.class.parse_uri(node)
 
         if uri.scheme == 'winrm'
           endpoint = "http://#{uri.host}:#{uri.port}/wsman"
