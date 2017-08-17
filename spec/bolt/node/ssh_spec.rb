@@ -12,7 +12,9 @@ describe Bolt::SSH do
 
   it "executes a command on a host", vagrant: true do
     expect {
+      ssh.connect
       ssh.execute(command)
+      ssh.disconnect
     }.to output("/home/vagrant\n").to_stdout
   end
 end

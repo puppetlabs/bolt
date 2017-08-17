@@ -9,16 +9,22 @@ module Bolt
       @password = password
     end
 
-    def execute(command)
+    def connect
       options = {}
       options[:port] = @port if @port
       options[:password] = @password if @password
 
-      Net::SSH.start(@host, @user, **options) do |ssh|
-        ssh.exec!(command) do |_, stream, data|
-          $stdout << data if stream == :stdout
-          $stderr << data if stream == :stderr
-        end
+      @session = Net::SSH.start(@host, @user, **options)
+    end
+
+    def disconnect
+      @session.close if @session && !@session.closed?
+    end
+
+    def execute(command)
+      @session.exec!(command) do |_, stream, data|
+        $stdout << data if stream == :stdout
+        $stderr << data if stream == :stderr
       end
     end
   end
