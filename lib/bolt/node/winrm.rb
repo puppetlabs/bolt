@@ -1,4 +1,5 @@
 require 'winrm'
+require 'winrm-fs'
 
 module Bolt
   class WinRM < Node
@@ -25,6 +26,11 @@ module Bolt
         print stdout
         print stderr
       end
+    end
+
+    def copy(source, destination)
+      fs = ::WinRM::FS::FileManager.new(@connection)
+      fs.upload(source, destination)
     end
   end
 end
