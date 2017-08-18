@@ -11,7 +11,9 @@ describe "winrm thingy" do
 
   it "executes a command on a host", vagrant: true do
     expect {
+      winrm.connect
       winrm.execute(command)
+      winrm.disconnect
     }.to output("vagrant\r\n").to_stdout
   end
 end

@@ -24,6 +24,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "net-ssh", "~> 4.0"
+  spec.add_dependency "net-sftp", "~> 2.0"
   spec.add_dependency "winrm", "~> 2.0"
   spec.add_dependency "trollop", "~> 2.0"
   spec.add_dependency "concurrent-ruby", "~> 1.0"

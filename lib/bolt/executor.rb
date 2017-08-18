@@ -10,7 +10,12 @@ module Bolt
       pool = Concurrent::FixedThreadPool.new(5)
       @nodes.map { |node|
         pool.post do
-          node.execute(command)
+          node.connect
+          begin
+            node.execute(command)
+          ensure
+            node.disconnect
+          end
         end
       }
       pool.shutdown
