@@ -1,8 +1,8 @@
 require 'trollop'
 require 'uri'
-require 'bolt/node'
-require 'bolt/version'
-require 'bolt/executor'
+require 'puppet_bolt/node'
+require 'puppet_bolt/version'
+require 'puppet_bolt/executor'
 
 module Bolt
   class CLIError < RuntimeError

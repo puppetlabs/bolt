@@ -1,6 +1,6 @@
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 
-require 'bolt'
+require 'puppet_bolt'
 
 RSpec.configure do |config|
   # rspec-expectations config

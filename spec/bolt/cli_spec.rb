@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'bolt/cli'
+require 'puppet_bolt/cli'
 
 describe "Bolt::CLI" do
   it "generates an error message if an unknown argument is given" do

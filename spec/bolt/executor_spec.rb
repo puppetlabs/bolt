@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'bolt/executor'
+require 'puppet_bolt/executor'
 
 describe "Bolt::Executor" do
   let(:command) { "hostname" }

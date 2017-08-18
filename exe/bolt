@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby
 
 require 'bundler/setup'
-require 'bolt'
-require 'bolt/cli'
+require 'puppet_bolt'
+require 'puppet_bolt/cli'
 
 cli = Bolt::CLI.new(ARGV)
 begin

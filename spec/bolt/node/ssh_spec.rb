@@ -1,6 +1,6 @@
 require 'spec_helper'
-require 'bolt/node'
-require 'bolt/node/ssh'
+require 'puppet_bolt/node'
+require 'puppet_bolt/node/ssh'
 
 describe Bolt::SSH do
   let(:hostname) { "localhost" }

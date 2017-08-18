@@ -3,7 +3,7 @@
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
-require 'bolt/version'
+require 'puppet_bolt/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "puppet-bolt"

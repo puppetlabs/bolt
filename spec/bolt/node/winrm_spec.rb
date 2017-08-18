@@ -1,6 +1,6 @@
 require 'spec_helper'
-require 'bolt/node'
-require 'bolt/node/winrm'
+require 'puppet_bolt/node'
+require 'puppet_bolt/node/winrm'
 
 describe "winrm thingy" do
   let(:endpoint) { "http://localhost:55985/wsman" }
