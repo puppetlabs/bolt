@@ -34,4 +34,20 @@ describe Bolt::SSH do
       ssh.disconnect
     end
   end
+
+  it "can run a script remotely", vagrant: true do
+    contents = <<-EOS
+#!/bin/sh
+echo "hellote"
+EOS
+    Tempfile.open('script test') do |file|
+      file.write(contents)
+      file.flush
+      ssh.connect
+      expect {
+        ssh.run_script(file.path)
+      }.to output("hellote\n").to_stdout
+      ssh.disconnect
+    end
+  end
 end

@@ -34,5 +34,18 @@ module Bolt
         sftp.upload!(source, destination)
       end
     end
+
+    def make_tempdir
+      @session.exec!('mktemp -d').chomp
+    end
+
+    def run_script(script)
+      dir = make_tempdir
+      remote_path = "#{dir}/#{File.basename(script)}"
+      copy(script, remote_path)
+      execute("chmod u+x \"#{remote_path}\"")
+      execute("\"#{remote_path}\"")
+      execute("rm -rf \"#{dir}\"")
+    end
   end
 end
