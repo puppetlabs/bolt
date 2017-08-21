@@ -99,7 +99,13 @@ END
         end
       end
 
-      Bolt::Executor.new(nodes).execute(options[:task_options]["command"])
+      executor = Bolt::Executor.new(nodes)
+      case options[:mode]
+      when 'exec'
+        executor.execute(options[:task_options]["command"])
+      when 'script'
+        executor.run_script(options[:task_options]["script"])
+      end
     end
   end
 end
