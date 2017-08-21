@@ -23,11 +23,11 @@ systems using ssh and winrm.
 
 Install it with [RubyGems](https://rubygems.org).
 
-    gem install puppet-bolt
+    gem install bolt
 
 Or add this to your Gemfile if you are using [Bundler](https://bundler.io).
 
-    gem 'puppet-bolt'
+    gem 'bolt'
 
 Or to run from source
 
