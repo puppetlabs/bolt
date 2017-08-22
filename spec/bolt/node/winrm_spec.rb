@@ -1,16 +1,11 @@
 require 'spec_helper'
+require 'bolt_spec/files'
 require 'bolt/node'
 require 'bolt/node/winrm'
 
-def with_tempfile_containing(name, contents)
-  Tempfile.open(name) do |file|
-    file.write(contents)
-    file.flush
-    yield file
-  end
-end
-
 describe Bolt::WinRM do
+  include BoltSpec::Files
+
   let(:endpoint) { "http://localhost:55985/wsman" }
   let(:user) { "vagrant" }
   let(:password) { "vagrant" }
