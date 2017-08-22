@@ -21,6 +21,8 @@ module Bolt
       @argv = argv
     end
 
+    MODES = %w[run exec script].freeze
+
     def parse
       parser = Trollop::Parser.new do
         banner <<-END
@@ -44,6 +46,7 @@ END
 
         options = parser.parse(global_options)
         options[:leftovers] = parser.leftovers
+        options[:mode] = get_mode(parser.leftovers)
         options[:task_options] = Hash[task_options.map { |arg| arg.split('=') }]
         options
       rescue Trollop::CommandlineError => e
@@ -54,6 +57,14 @@ END
       rescue Trollop::VersionNeeded
         puts parser.version
         raise Bolt::CLIExit
+      end
+    end
+
+    def get_mode(args)
+      if MODES.include?(args[0])
+        args.shift
+      else
+        raise Bolt::CLIError.new("Expected a mode of run, exec, or script", 1)
       end
     end
 
@@ -88,7 +99,13 @@ END
         end
       end
 
-      Bolt::Executor.new(nodes).execute(options[:task_options]["command"])
+      executor = Bolt::Executor.new(nodes)
+      case options[:mode]
+      when 'exec'
+        executor.execute(options[:task_options]["command"])
+      when 'script'
+        executor.run_script(options[:task_options]["script"])
+      end
     end
   end
 end

@@ -3,15 +3,15 @@ require 'bolt/cli'
 
 describe "Bolt::CLI" do
   it "generates an error message if an unknown argument is given" do
-    cli = Bolt::CLI.new(%w[--unknown])
+    cli = Bolt::CLI.new(%w[exec --unknown])
     expect {
       cli.parse
     }.to raise_error(Bolt::CLIError, /unknown argument '--unknown'/)
   end
 
   it "includes unparsed arguments" do
-    cli = Bolt::CLI.new(%w[exec --nodes foo])
-    expect(cli.parse).to include(leftovers: %w[exec])
+    cli = Bolt::CLI.new(%w[exec what --nodes foo])
+    expect(cli.parse).to include(leftovers: %w[what])
   end
 
   describe "help" do
@@ -152,5 +152,10 @@ describe "Bolt::CLI" do
       expect(cli.parse[:nodes]).to_not include('command=whoami')
       expect(cli.parse[:leftovers]).to_not include('command=whoami')
     end
+  end
+
+  it "distinguishes subcommands" do
+    cli = Bolt::CLI.new(%w[script --nodes foo])
+    expect(cli.parse).to include(mode: 'script')
   end
 end

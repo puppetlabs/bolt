@@ -31,3 +31,6 @@ Metrics/MethodLength:
 
 Layout/IndentHeredoc:
   Enabled: false
+
+Style/GuardClause:
+  Enabled: false

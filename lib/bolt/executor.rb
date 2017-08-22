@@ -6,13 +6,13 @@ module Bolt
       @nodes = nodes
     end
 
-    def execute(command)
+    def on_each
       pool = Concurrent::FixedThreadPool.new(5)
       @nodes.map { |node|
         pool.post do
           node.connect
           begin
-            node.execute(command)
+            yield node
           ensure
             node.disconnect
           end
@@ -20,6 +20,18 @@ module Bolt
       }
       pool.shutdown
       pool.wait_for_termination
+    end
+
+    def execute(command)
+      on_each do |node|
+        node.execute(command)
+      end
+    end
+
+    def run_script(script)
+      on_each do |node|
+        node.run_script(script)
+      end
     end
   end
 end
