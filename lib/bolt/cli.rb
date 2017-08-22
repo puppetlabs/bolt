@@ -93,8 +93,8 @@ END
                           options[:password])
         else
           Bolt::SSH.new(uri.host,
-                        options[:user],
                         uri.port,
+                        options[:user],
                         options[:password])
         end
       end
