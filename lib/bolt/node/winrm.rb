@@ -32,5 +32,24 @@ module Bolt
       fs = ::WinRM::FS::FileManager.new(@connection)
       fs.upload(source, destination)
     end
+
+    def make_tempdir
+      execute(<<-EOS).stdout.chomp
+$parent = [System.IO.Path]::GetTempPath()
+$name = [System.IO.Path]::GetRandomFileName()
+$path = Join-Path $parent $name
+New-Item -ItemType Directory -Path $path | Out-Null
+$path
+EOS
+    end
+
+    def run_script(script)
+      dir = make_tempdir
+      remote_path = "#{dir}\\#{File.basename(script, File.extname(script))}.ps1"
+      copy(script, remote_path)
+      args = '-NoProfile -NonInteractive -NoLogo -ExecutionPolicy Bypass'
+      execute("powershell.exe #{args} -File '#{remote_path}'")
+      execute("Remove-Item -force -recurse '#{dir}'")
+    end
   end
 end
