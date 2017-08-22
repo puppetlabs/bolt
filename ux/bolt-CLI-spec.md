@@ -10,6 +10,65 @@ $ bolt exec command='<command>' [<target-pattern>]
 $ bolt exec script='<path>' [<target-pattern>]
 ~~~
 
+#### Options for invoking primary actions
+This is focused on the structure for how to invoke the primary actions of tasks, plans, commands and scripts, not the parameters, target patterns, or other options. Listing the options we've discussed so we can better compare pros and cons. 
+
+##### Option A
+Use run for tasks and plans; use exec for commands and scripts.
+- Running tasks is consistent with PE CLI
+- Running commands is short, but not consistent with PE CLI (would have to use `run`)
+- Using run and exec may be confusing to user
+~~~
+$ bolt run <task-name> [<parameter>=<value> ...] 
+$ bolt run <task-plan> [<parameter>=<value> ...] 
+$ bolt exec command='<command>'
+$ bolt exec script='<path>' 
+~~~
+
+##### Option B
+Use run for all options. Short version.
+- Using run for all options may be more clear to user
+- Running tasks is inconsistent with PE CLI
+- Running commands is inconsistent with PE CLI
+~~~
+$ bolt run task='<task-name>' [<parameter>=<value> ...] 
+$ bolt run plan='<plan-name>' [<parameter>=<value> ...] 
+$ bolt run command='<command>' 
+$ bolt run script='<path>' 
+~~~
+
+##### Option C
+Use run for all options. Long version. 
+- Running tasks is consistent with PE CLI
+- Running commands is inconsistent with PE CLI, but close
+- Possibly longer way to run commands and scripts than just `bolt exec command='<command>'`
+~~~
+$ bolt run task <task-name> [<parameter>=<value> ...]  
+$ bolt run plan <task-plan> [<parameter>=<value> ...] 
+$ bolt run command command='<command>'  
+    OR $ bolt run command '<command>'
+$ bolt run script path='<path>'
+    OR $ bolt run script '<path>'
+~~~
+
+##### Option D
+Use run for all options. Long version combined with exec. 
+- The most consistent with PE CLI.
+- Longest way to run command or script.
+~~~
+$ bolt run task <task-name> [<parameter>=<value> ...]  
+$ bolt run plan <task-plan> [<parameter>=<value> ...] 
+$ bolt run exec command='<command>' 
+$ bolt run exec script='<path>'
+~~~
+
+##### Compare to PE CLI
+~~~
+$ puppet task run <task-name> [<parameter>=<value> ...] 
+$ puppet task run exec command='<command>' 
+~~~
+
+
 ### DESCRIPTION
 `$ bolt` runs ad-hoc tasks on your nodes via ssh or winrm. Restart a service with the service task, run a script with 'exec script', or issue a command with 'exec command'.   
 
