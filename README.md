@@ -29,12 +29,17 @@ Or add this to your Gemfile if you are using [Bundler](https://bundler.io).
 
     gem 'bolt'
 
-Or to run from source
+Or run from source
 
     bundle install --path .bundle
-    bundle exec bolt --nodes <name> command=id
+    bundle exec bolt exec --nodes <name> command='hostname -f'
 
 See `bolt --help` for more details.
+
+## Kudos
+
+Thank you to [Marcin Bunsch](https://github.com/marcinbunsch) for allowing
+Puppet to use the `bolt` gem name.
 
 ## Contributing
 
