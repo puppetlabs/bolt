@@ -4,13 +4,14 @@ require 'winrm-fs'
 module Bolt
   class WinRM < Node
     def initialize(host, port, user, password, shell = :powershell)
-      @endpoint = "http://#{host}:#{port}/wsman"
-      @user = user
-      @password = password
+      super(host, port, user, password)
+
       @shell = shell
+      @endpoint = "http://#{host}:#{port}/wsman"
       @connection = ::WinRM::Connection.new(endpoint: @endpoint,
                                             user: @user,
                                             password: @password)
+      @connection.logger = @transport_logger
     end
 
     def connect

@@ -10,9 +10,11 @@ module Bolt
       pool = Concurrent::FixedThreadPool.new(5)
       @nodes.map { |node|
         pool.post do
-          node.connect
           begin
+            node.connect
             yield node
+          rescue StandardError => ex
+            node.logger.error(ex)
           ensure
             node.disconnect
           end

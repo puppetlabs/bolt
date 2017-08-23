@@ -3,19 +3,12 @@ require 'net/sftp'
 
 module Bolt
   class SSH < Node
-    def initialize(host, port = nil, user = nil, password = nil)
-      @host = host
-      @user = user
-      @port = port
-      @password = password
-    end
-
     def connect
-      options = {}
+      options = { logger: @transport_logger }
       options[:port] = @port if @port
       options[:password] = @password if @password
 
-      @session = Net::SSH.start(@host, @user, **options)
+      @session = Net::SSH.start(@host, @user, options)
     end
 
     def disconnect
