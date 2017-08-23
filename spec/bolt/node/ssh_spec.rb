@@ -1,16 +1,11 @@
 require 'spec_helper'
+require 'bolt_spec/files'
 require 'bolt/node'
 require 'bolt/node/ssh'
 
-def with_tempfile_containing(name, contents)
-  Tempfile.open(name) do |file|
-    file.write(contents)
-    file.flush
-    yield file
-  end
-end
-
 describe Bolt::SSH do
+  include BoltSpec::Files
+
   let(:hostname) { "localhost" }
   let(:user) { "vagrant" }
   let(:password) { "vagrant" }

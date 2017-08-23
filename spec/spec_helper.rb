@@ -2,6 +2,9 @@
 
 require 'bolt'
 
+dir = File.expand_path(File.dirname(__FILE__))
+$LOAD_PATH.unshift File.join(dir, 'lib')
+
 RSpec.configure do |config|
   # rspec-expectations config
   config.expect_with :rspec do |expectations|

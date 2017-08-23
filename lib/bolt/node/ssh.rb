@@ -45,7 +45,8 @@ module Bolt
       copy(script, remote_path)
       execute("chmod u+x \"#{remote_path}\"")
       execute("\"#{remote_path}\"")
-      execute("rm -rf \"#{dir}\"")
+      execute("rm -f \"#{remote_path}\"")
+      execute("rmdir \"#{dir}\"")
     end
   end
 end
