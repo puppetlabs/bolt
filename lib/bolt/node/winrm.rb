@@ -49,7 +49,10 @@ EOS
       copy(script, remote_path)
       args = '-NoProfile -NonInteractive -NoLogo -ExecutionPolicy Bypass'
       execute("powershell.exe #{args} -File '#{remote_path}'")
-      execute("Remove-Item -force -recurse '#{dir}'")
+      execute(<<-EOS)
+Remove-Item -Force "#{remote_path}"
+Remove-Item -Force "#{dir}"
+EOS
     end
   end
 end
