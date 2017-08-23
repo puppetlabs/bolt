@@ -6,11 +6,12 @@ require 'bolt/node/winrm'
 describe Bolt::WinRM do
   include BoltSpec::Files
 
-  let(:endpoint) { "http://localhost:55985/wsman" }
+  let(:host) { 'localhost' }
+  let(:port) { 55985 }
   let(:user) { "vagrant" }
   let(:password) { "vagrant" }
   let(:command) { "echo $env:UserName" }
-  let(:winrm) { Bolt::WinRM.new(endpoint, user, password) }
+  let(:winrm) { Bolt::WinRM.new(host, port, user, password) }
 
   before(:each) { winrm.connect }
   after(:each) { winrm.disconnect }

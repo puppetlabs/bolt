@@ -3,8 +3,8 @@ require 'winrm-fs'
 
 module Bolt
   class WinRM < Node
-    def initialize(endpoint, user, password, shell = :powershell)
-      @endpoint = endpoint
+    def initialize(host, port, user, password, shell = :powershell)
+      @endpoint = "http://#{host}:#{port}/wsman"
       @user = user
       @password = password
       @shell = shell
