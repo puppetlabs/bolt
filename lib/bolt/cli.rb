@@ -68,35 +68,9 @@ END
       end
     end
 
-    def self.parse_uri(node)
-      case node
-      when %r{^(ssh|winrm)://.*:\d+$}
-        URI(node)
-      when %r{^(ssh|winrm)://}
-        uri = URI(node)
-        uri.port = uri.scheme == 'ssh' ? 22 : 5985
-        uri
-      when /.*:\d+$/
-        URI("ssh://#{node}")
-      else
-        URI("ssh://#{node}:22")
-      end
-    end
-
     def execute(options)
       nodes = options[:nodes].map do |node|
-        uri = self.class.parse_uri(node)
-        if uri.scheme == 'winrm'
-          endpoint = "http://#{uri.host}:#{uri.port}/wsman"
-          Bolt::WinRM.new(endpoint,
-                          options[:user],
-                          options[:password])
-        else
-          Bolt::SSH.new(uri.host,
-                        options[:user],
-                        uri.port,
-                        options[:password])
-        end
+        Bolt::Node.from_uri(node, options[:user], options[:password])
       end
 
       executor = Bolt::Executor.new(nodes)

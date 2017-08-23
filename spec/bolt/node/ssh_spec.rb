@@ -11,7 +11,7 @@ describe Bolt::SSH do
   let(:password) { "vagrant" }
   let(:port) { 2224 }
   let(:command) { "pwd" }
-  let(:ssh) { Bolt::SSH.new(hostname, user, port, password) }
+  let(:ssh) { Bolt::SSH.new(hostname, port, user, password) }
 
   before(:each) { ssh.connect }
   after(:each) { ssh.disconnect }

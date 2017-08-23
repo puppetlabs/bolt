@@ -3,7 +3,7 @@ require 'net/sftp'
 
 module Bolt
   class SSH < Node
-    def initialize(host, user, port = nil, password = nil)
+    def initialize(host, port = nil, user = nil, password = nil)
       @host = host
       @user = user
       @port = port
