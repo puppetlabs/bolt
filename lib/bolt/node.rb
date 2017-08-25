@@ -27,7 +27,7 @@ module Bolt
       klass.new(uri.host, uri.port, user, password)
     end
 
-    attr_reader :logger
+    attr_reader :logger, :host
 
     def initialize(host, port = nil, user = nil, password = nil)
       @host = host

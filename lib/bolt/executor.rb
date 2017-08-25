@@ -1,4 +1,5 @@
 require 'concurrent'
+require 'bolt/result'
 
 module Bolt
   class Executor
@@ -15,6 +16,7 @@ module Bolt
             yield node
           rescue StandardError => ex
             node.logger.error(ex)
+            Bolt::ExceptionFailure.new(ex)
           ensure
             node.disconnect
           end
@@ -25,15 +27,23 @@ module Bolt
     end
 
     def execute(command)
+      results = Concurrent::Map.new
+
       on_each do |node|
-        node.execute(command)
+        results[node] = node.execute(command)
       end
+
+      results
     end
 
     def run_script(script)
+      results = Concurrent::Map.new
+
       on_each do |node|
-        node.run_script(script)
+        results[node] = node.run_script(script)
       end
+
+      results
     end
   end
 end

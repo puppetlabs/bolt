@@ -17,9 +17,7 @@ describe Bolt::SSH do
   after(:each) { ssh.disconnect }
 
   it "executes a command on a host", vagrant: true do
-    expect {
-      ssh.execute(command)
-    }.to output("/home/vagrant\n").to_stdout
+    expect(ssh.execute(command).value).to eq("/home/vagrant\n")
   end
 
   it "can copy a file to a host", vagrant: true do
@@ -27,9 +25,7 @@ describe Bolt::SSH do
     with_tempfile_containing('copy-test', contents) do |file|
       ssh.copy(file.path, "/home/vagrant/copy-test")
 
-      expect {
-        ssh.execute("cat /home/vagrant/copy-test")
-      }.to output(contents).to_stdout
+      expect(ssh.execute("cat /home/vagrant/copy-test").value).to eq(contents)
 
       ssh.execute("rm /home/vagrant/copy-test")
     end
@@ -38,9 +34,7 @@ describe Bolt::SSH do
   it "can run a script remotely", vagrant: true do
     contents = "#!/bin/sh\necho hellote"
     with_tempfile_containing('script test', contents) do |file|
-      expect {
-        ssh.run_script(file.path)
-      }.to output("hellote\n").to_stdout
+      expect(ssh.run_script(file.path).value).to eq("hellote\n")
     end
   end
 end
