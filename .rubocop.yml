@@ -34,3 +34,6 @@ Layout/IndentHeredoc:
 
 Style/GuardClause:
   Enabled: false
+
+Style/MultilineBlockChain:
+  Enabled: false

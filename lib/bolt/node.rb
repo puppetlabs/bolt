@@ -1,3 +1,5 @@
+require 'logger'
+
 module Bolt
   class Node
     def self.parse_uri(node)
@@ -23,6 +25,27 @@ module Bolt
                 Bolt::SSH
               end
       klass.new(uri.host, uri.port, user, password)
+    end
+
+    attr_reader :logger, :host
+
+    def initialize(host, port = nil, user = nil, password = nil)
+      @host = host
+      @user = user
+      @port = port
+      @password = password
+
+      @logger = init_logger(STDERR, Logger::DEBUG)
+      @transport_logger = init_logger(STDERR, Logger::WARN)
+    end
+
+    def init_logger(destination = STDERR, level = Logger::WARN)
+      logger = Logger.new(destination)
+      logger.level = level
+      logger.formatter = proc do |severity, datetime, _, msg|
+        "#{datetime} #{severity} #{@host}: #{msg}\n"
+      end
+      logger
     end
   end
 end

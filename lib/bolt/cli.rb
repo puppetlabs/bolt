@@ -74,11 +74,17 @@ END
       end
 
       executor = Bolt::Executor.new(nodes)
-      case options[:mode]
-      when 'exec'
-        executor.execute(options[:task_options]["command"])
-      when 'script'
-        executor.run_script(options[:task_options]["script"])
+      results =
+        case options[:mode]
+        when 'exec'
+          executor.execute(options[:task_options]["command"])
+        when 'script'
+          executor.run_script(options[:task_options]["script"])
+        end
+
+      results.each_pair do |node, result|
+        $stdout.print "#{node.host}: "
+        result.print_to_stream($stdout)
       end
     end
   end

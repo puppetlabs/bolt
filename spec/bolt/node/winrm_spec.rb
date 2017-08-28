@@ -17,9 +17,7 @@ describe Bolt::WinRM do
   after(:each) { winrm.disconnect }
 
   it "executes a command on a host", vagrant: true do
-    expect {
-      winrm.execute(command)
-    }.to output("vagrant\r\n").to_stdout
+    expect(winrm.execute(command).value).to eq("vagrant\r\n")
   end
 
   it "can copy a file to a host", vagrant: true do
@@ -28,9 +26,9 @@ describe Bolt::WinRM do
     with_tempfile_containing('copy-test-winrm', contents) do |file|
       winrm.copy(file.path, remote_path)
 
-      expect {
-        winrm.execute("type #{remote_path}")
-      }.to output("#{contents}\r\n").to_stdout
+      expect(
+        winrm.execute("type #{remote_path}").value
+      ).to eq("#{contents}\r\n")
 
       winrm.execute("del #{remote_path}")
     end
@@ -39,9 +37,7 @@ describe Bolt::WinRM do
   it "can run a script remotely", vagrant: true do
     contents = 'Write-Output "hellote"'
     with_tempfile_containing('script-test-winrm', contents) do |file|
-      expect {
-        winrm.run_script(file.path)
-      }.to output(/hellote\r\n/).to_stdout
+      expect(winrm.run_script(file.path).value).to match(/hellote\r\n/)
     end
   end
 end
