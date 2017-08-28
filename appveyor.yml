@@ -25,4 +25,4 @@ before_test:
   - type Gemfile.lock
 
 test_script:
-  - bundle exec rspec spec --tag ~vagrant
+  - bundle exec rake unit

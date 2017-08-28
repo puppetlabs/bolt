@@ -7,8 +7,7 @@ rvm:
 before_script:
 - cat Gemfile.lock
 script:
-- bundle exec rspec --tag ~vagrant
-- bundle exec rubocop
+- bundle exec rake unit rubocop
 notifications:
   email: false
   hipchat:
