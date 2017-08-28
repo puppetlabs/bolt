@@ -34,11 +34,11 @@ describe "Bolt::Executor" do
     end
   end
 
-  it "returns an exception result if the command raises" do
+  it "returns an exception result if the connect raises" do
     logger = double('logger', error: nil)
     node = mock_node 'node'
     allow(node).to receive(:logger).and_return(logger)
-    expect(node).to receive(:execute).with(command).and_raise("reset")
+    expect(node).to receive(:connect).and_raise("reset")
 
     results = Bolt::Executor.new([node]).execute(command)
     results.each_pair do |_, result|
