@@ -24,7 +24,7 @@ module Bolt
     end
 
     def execute(command)
-      result_output = Bolt::ResultOutput.new # dir?
+      result_output = Bolt::ResultOutput.new
       output = @session.run(command) do |stdout, stderr|
         result_output.stdout << stdout
         result_output.stderr << stderr

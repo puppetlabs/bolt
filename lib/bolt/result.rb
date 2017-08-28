@@ -27,6 +27,17 @@ module Bolt
     def then
       yield @value
     end
+
+    def print_to_stream(stream)
+      if @output
+        @output.stdout.rewind
+        IO.copy_stream(@output.stdout, stream)
+        @output.stderr.rewind
+        IO.copy_stream(@output.stderr, stream)
+      else
+        stream.puts @value
+      end
+    end
   end
 
   class Failure < Result
@@ -40,13 +51,24 @@ module Bolt
     def then
       self
     end
+
+    def print_to_stream(stream)
+      if @output
+        @output.stdout.rewind
+        IO.copy_stream(@output.stdout, stream)
+        @output.stderr.rewind
+        IO.copy_stream(@output.stderr, stream)
+      else
+        stream.puts @value
+      end
+    end
   end
 
   class ExceptionFailure < Failure
     attr_reader :exception
 
     def initialize(exception)
-      super(exception.message)
+      super(1, exception.message)
       @exception = exception
     end
   end

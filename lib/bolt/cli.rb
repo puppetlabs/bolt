@@ -84,10 +84,7 @@ END
 
       results.each_pair do |node, result|
         $stdout.print "#{node.host}: "
-        result.output.stdout.rewind
-        IO.copy_stream(result.output.stdout, $stdout)
-        result.output.stderr.rewind
-        IO.copy_stream(result.output.stderr, $stdout)
+        result.print_to_stream($stdout)
       end
     end
   end
