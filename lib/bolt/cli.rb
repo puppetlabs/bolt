@@ -80,6 +80,8 @@ END
           executor.execute(options[:task_options]["command"])
         when 'script'
           executor.run_script(options[:task_options]["script"])
+        when 'run'
+          executor.run_task(options[:leftovers][0], options[:task_options])
         end
 
       results.each_pair do |node, result|
