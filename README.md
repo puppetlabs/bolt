@@ -45,8 +45,6 @@ Bolt relies on gems with native extensions, and the process for building them va
 
 ### Fedora 25
 
-In addition to the above packages, Fedora requires:
-
     dnf install -y make gcc redhat-rpm-config ruby-devel rubygem-rdoc
 
 ### Debian 9/Ubuntu 16.04
