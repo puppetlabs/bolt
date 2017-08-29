@@ -55,26 +55,46 @@ EOS
       result.then { |stdout| Bolt::Success.new(stdout.chomp) }
     end
 
-    def run_script(script)
+    def with_remote_file(file)
       dest = ''
       dir = ''
       result = nil
 
       make_tempdir.then do |value|
         dir = value
-        dest = "#{dir}\\#{File.basename(script, '.*')}.ps1"
+        dest = "#{dir}\\#{File.basename(file, '.*')}.ps1"
         Bolt::Success.new
       end.then do
-        copy(script, dest)
+        copy(file, dest)
       end.then do
-        args = '-NoProfile -NonInteractive -NoLogo -ExecutionPolicy Bypass'
-        result = execute("powershell.exe #{args} -File '#{dest}'")
+        result = yield dest
       end.then do
         execute(<<-EOS)
 Remove-Item -Force "#{dest}"
 Remove-Item -Force "#{dir}"
 EOS
         result
+      end
+    end
+
+    def run_script(script)
+      with_remote_file(script) do |remote_path|
+        args = '-NoProfile -NonInteractive -NoLogo -ExecutionPolicy Bypass'
+        execute("powershell.exe #{args} -File '#{remote_path}'")
+      end
+    end
+
+    def run_task(task, arguments)
+      arguments.reduce(Bolt::Success.new) do |result, (arg, value)|
+        result.then do
+          cmd = "[Environment]::SetEnvironmentVariable('PT_#{arg}', '#{value}')"
+          execute(cmd)
+        end
+      end.then do
+        with_remote_file(task) do |remote_path|
+          args = '-NoProfile -NonInteractive -NoLogo -ExecutionPolicy Bypass'
+          execute("powershell.exe #{args} -File '#{remote_path}'")
+        end
       end
     end
   end
