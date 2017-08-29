@@ -68,8 +68,12 @@ module Bolt
     attr_reader :exception
 
     def initialize(exception)
-      super(1, exception.message)
+      super(1, nil)
       @exception = exception
+    end
+
+    def print_to_stream(stream)
+      stream.puts @exception.message
     end
   end
 end
