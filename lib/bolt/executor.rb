@@ -42,5 +42,11 @@ module Bolt
         node.run_script(script)
       end
     end
+
+    def run_task(task, arguments)
+      on_each do |node|
+        node.run_task(task, arguments)
+      end
+    end
   end
 end

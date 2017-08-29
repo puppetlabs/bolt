@@ -40,4 +40,14 @@ describe Bolt::WinRM do
       expect(winrm.run_script(file.path).value).to match(/hellote\r\n/)
     end
   end
+
+  it "can run a script remotely", vagrant: true do
+    contents = 'Write-Output "$env:PT_message_one" ${env:PT_message two}'
+    arguments = { :message_one => 'task is running',
+                  :"message two" => 'task has run' }
+    with_tempfile_containing('task-test-winrm', contents) do |file|
+      expect(winrm.run_task(file.path, arguments).value)
+        .to eq("task is running\r\ntask has run\r\n")
+    end
+  end
 end

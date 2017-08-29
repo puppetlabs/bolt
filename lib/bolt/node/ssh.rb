@@ -44,26 +44,39 @@ module Bolt
       Bolt::ExceptionFailure.new(e)
     end
 
-    def run_script(script)
+    def with_remote_file(file)
       remote_path = ''
       dir = ''
       result = nil
 
       make_tempdir.then do |value|
         dir = value
-        remote_path = "#{dir}/#{File.basename(script)}"
+        remote_path = "#{dir}/#{File.basename(file)}"
         Bolt::Success.new
       end.then do
-        copy(script, remote_path)
+        copy(file, remote_path)
       end.then do
         execute("chmod u+x '#{remote_path}'")
       end.then do
-        result = execute("'#{remote_path}'")
+        result = yield remote_path
       end.then do
         execute("rm -f '#{remote_path}'")
       end.then do
         execute("rmdir '#{dir}'")
         result
+      end
+    end
+
+    def run_script(script)
+      with_remote_file(script) do |remote_path|
+        execute("'#{remote_path}'")
+      end
+    end
+
+    def run_task(task, arguments)
+      export_args = arguments.map { |env, val| "PT_#{env}='#{val}'" }.join(' ')
+      with_remote_file(task) do |remote_path|
+        execute("export #{export_args} && '#{remote_path}'")
       end
     end
   end

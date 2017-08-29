@@ -47,7 +47,7 @@ END
         options = parser.parse(global_options)
         options[:leftovers] = parser.leftovers
         options[:mode] = get_mode(parser.leftovers)
-        options[:task_options] = Hash[task_options.map { |arg| arg.split('=') }]
+        options[:task_options] = Hash[task_options.map { |a| a.split('=', 2) }]
         options
       rescue Trollop::CommandlineError => e
         raise Bolt::CLIError.new(e.message, 1)
@@ -80,6 +80,8 @@ END
           executor.execute(options[:task_options]["command"])
         when 'script'
           executor.run_script(options[:task_options]["script"])
+        when 'run'
+          executor.run_task(options[:leftovers][0], options[:task_options])
         end
 
       results.each_pair do |node, result|

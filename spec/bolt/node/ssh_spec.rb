@@ -37,4 +37,13 @@ describe Bolt::SSH do
       expect(ssh.run_script(file.path).value).to eq("hellote\n")
     end
   end
+
+  it "can run a task", vagrant: true do
+    contents = "#!/bin/sh\necho -n ${PT_message_one} ${PT_message_two}"
+    arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
+    with_tempfile_containing('tasks test', contents) do |file|
+      expect(ssh.run_task(file.path, arguments).value)
+        .to eq('Hello from task Goodbye')
+    end
+  end
 end
