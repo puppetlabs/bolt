@@ -187,5 +187,23 @@ describe "Bolt::CLI" do
       }
       cli.execute(options)
     end
+
+    it "runs an init task given a module name" do
+      task_name = 'sample'
+      task_params = { 'message' => 'hi' }
+      expect(executor)
+        .to receive(:run_task)
+        .with(%r{modules/sample/tasks/init.sh$}, task_params).and_return({})
+      expect(cli).to receive(:task_file?).with(task_name).and_return(false)
+
+      options = {
+        nodes: nodes,
+        mode: 'task',
+        leftovers: [task_name],
+        task_options: task_params,
+        modules: File.join(__FILE__, '../../fixtures/modules')
+      }
+      cli.execute(options)
+    end
   end
 end
