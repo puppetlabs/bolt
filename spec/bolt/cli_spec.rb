@@ -99,6 +99,20 @@ describe "Bolt::CLI" do
     end
   end
 
+  describe "modules" do
+    it "accepts a modules directory" do
+      cli = Bolt::CLI.new(%w[exec --modules ./modules --nodes foo])
+      expect(cli.parse).to include(modules: './modules')
+    end
+
+    it "generates an error message if no value is given" do
+      cli = Bolt::CLI.new(%w[exec --modules --nodes foo])
+      expect {
+        cli.parse
+      }.to raise_error(Bolt::CLIError, /option '--modules' needs a parameter/)
+    end
+  end
+
   describe "command" do
     it "interprets command=whoami as a task option" do
       cli = Bolt::CLI.new(%w[exec --nodes foo command=whoami])
@@ -111,5 +125,67 @@ describe "Bolt::CLI" do
   it "distinguishes subcommands" do
     cli = Bolt::CLI.new(%w[script --nodes foo])
     expect(cli.parse).to include(mode: 'script')
+  end
+
+  describe "execute" do
+    let(:executor) { double('executor') }
+    let(:cli) { Bolt::CLI.new({}) }
+    let(:nodes) { ['foo'] }
+
+    before :each do
+      allow(Bolt::Executor).to receive(:new).and_return(executor)
+    end
+
+    it "executes the 'whoami' command" do
+      expect(executor).to receive(:execute).with('whoami').and_return({})
+
+      options = {
+        nodes: nodes, mode: 'exec', task_options: { 'command' => 'whoami' }
+      }
+      cli.execute(options)
+    end
+
+    it "runs a script" do
+      expect(executor).to receive(:run_script).with('bar.sh').and_return({})
+
+      options = {
+        nodes: nodes, mode: 'script', task_options: { 'script' => 'bar.sh' }
+      }
+      cli.execute(options)
+    end
+
+    it "runs a task" do
+      task_path = '/path/to/task'
+      task_params = { 'name' => 'apache', 'action' => 'restart' }
+      expect(executor)
+        .to receive(:run_task).with(task_path, task_params).and_return({})
+      expect(cli).to receive(:task_file?).with(task_path).and_return(true)
+
+      options = {
+        nodes: nodes,
+        mode: 'task',
+        leftovers: [task_path],
+        task_options: task_params
+      }
+      cli.execute(options)
+    end
+
+    it "runs a task given a name" do
+      task_name = 'sample::echo'
+      task_params = { 'message' => 'hi' }
+      expect(executor)
+        .to receive(:run_task)
+        .with(%r{modules/sample/tasks/echo.sh$}, task_params).and_return({})
+      expect(cli).to receive(:task_file?).with(task_name).and_return(false)
+
+      options = {
+        nodes: nodes,
+        mode: 'task',
+        leftovers: [task_name],
+        task_options: task_params,
+        modules: File.join(__FILE__, '../../fixtures/modules')
+      }
+      cli.execute(options)
+    end
   end
 end
