@@ -42,7 +42,7 @@ Option | Description
 
 Option | Description
 ----------------------------- | --------------------------
---params <br>-p | Enter a list of parameters. (Comma-separated. No quotes.) <br> `@<file-name>` Or provide a file with JSON formatted parameters. 
+--params <br>-p | Enter a string containing JSON parameters  <br> `@<file-name>` Or provide a file with JSON parameters. 
 
 
 ### EXAMPLES
