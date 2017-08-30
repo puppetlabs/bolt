@@ -21,7 +21,7 @@ module Bolt
       @argv = argv
     end
 
-    MODES = %w[run exec script].freeze
+    MODES = %w[run exec script task].freeze
 
     def parse
       parser = Trollop::Parser.new do
@@ -38,6 +38,7 @@ END
         opt :nodes, "Nodes to connect to", type: :strings, required: true
         opt :user, "User to authenticate as (Optional)", type: :string
         opt :password, "Password to authenticate as (Optional)", type: :string
+        opt :modules, "Path to modules directory", type: :string
       end
 
       task_options, global_options = @argv.partition { |arg| arg =~ /=/ }
@@ -80,14 +81,55 @@ END
           executor.execute(options[:task_options]["command"])
         when 'script'
           executor.run_script(options[:task_options]["script"])
-        when 'run'
-          executor.run_task(options[:leftovers][0], options[:task_options])
+        when 'task'
+          name = options[:leftovers][0]
+          unless task_file?(name)
+            name = load_task_file(name, options[:modules])
+            if name.nil?
+              raise Bolt::CLIError.new(
+                "Failed to load task file for #{name}", 1
+              )
+            end
+          end
+          executor.run_task(name, options[:task_options])
         end
 
       results.each_pair do |node, result|
         $stdout.print "#{node.host}: "
         result.print_to_stream($stdout)
       end
+    end
+
+    def task_file?(path)
+      File.exist?(path)
+    end
+
+    def load_task_file(name, modules)
+      if modules.nil?
+        raise Bolt::CLIError.new(
+          "The '--modules' option must be specified to run a task", 1
+        )
+      end
+
+      begin
+        require 'puppet'
+      rescue LoadError
+        "Puppet must be installed to execute tasks"
+      end
+
+      module_name, file_name = name.split('::', 2)
+      path = File.expand_path(File.join(modules, module_name))
+      mod = Puppet::Module.new(module_name, path, nil)
+      if mod.nil?
+        raise Bolt::CLIError.new("Failed to load module: #{module_name}", 1)
+      end
+
+      task = mod.tasks.find { |t| t.name == name }
+      if task.nil?
+        raise Bolt::CLIError.new("Failed to load task: #{name}", 1)
+      end
+
+      task.files.find { |f| File.basename(f, '.*') == file_name }
     end
   end
 end
