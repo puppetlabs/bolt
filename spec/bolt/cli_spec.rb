@@ -112,4 +112,46 @@ describe "Bolt::CLI" do
     cli = Bolt::CLI.new(%w[script --nodes foo])
     expect(cli.parse).to include(mode: 'script')
   end
+
+  describe "execute" do
+    let(:executor) { double('executor') }
+    let(:cli) { Bolt::CLI.new({}) }
+
+    before :each do
+      allow(Bolt::Executor).to receive(:new).and_return(executor)
+    end
+
+    it "executes the 'whoami' command" do
+      expect(executor).to receive(:execute).with('whoami').and_return({})
+
+      options = {
+        nodes: ['foo'], mode: 'exec', task_options: { 'command' => 'whoami' }
+      }
+      cli.execute(options)
+    end
+
+    it "runs a script" do
+      expect(executor).to receive(:run_script).with('bar.sh').and_return({})
+
+      options = {
+        nodes: ['foo'], mode: 'script', task_options: { 'script' => 'bar.sh' }
+      }
+      cli.execute(options)
+    end
+
+    it "runs a task" do
+      task_path = '/path/to/task'
+      task_params = { 'name' => 'apache', 'action' => 'restart' }
+      expect(executor)
+        .to receive(:run_task).with(task_path, task_params).and_return({})
+
+      options = {
+        nodes: ['foo'],
+        mode: 'run',
+        leftovers: [task_path],
+        task_options: task_params
+      }
+      cli.execute(options)
+    end
+  end
 end
