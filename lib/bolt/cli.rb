@@ -113,23 +113,21 @@ END
 
       begin
         require 'puppet'
+        require 'puppet/node/environment'
+        require 'puppet/info_service'
       rescue LoadError
-        "Puppet must be installed to execute tasks"
+        raise Bolt::CLIError.new("Puppet must be installed to execute tasks", 1)
       end
 
       module_name, file_name = name.split('::', 2)
-      path = File.expand_path(File.join(modules, module_name))
-      mod = Puppet::Module.new(module_name, path, nil)
-      if mod.nil?
-        raise Bolt::CLIError.new("Failed to load module: #{module_name}", 1)
-      end
 
-      task = mod.tasks.find { |t| t.name == name }
-      if task.nil?
-        raise Bolt::CLIError.new("Failed to load task: #{name}", 1)
+      env = Puppet::Node::Environment.create('bolt', [modules])
+      Puppet.override(environments: Puppet::Environments::Static.new(env)) do
+        data = Puppet::InfoService::TaskInformationService.task_data(
+          env.name, module_name, name
+        )
+        data[:files].find { |f| File.basename(f, '.*') == file_name }
       end
-
-      task.files.find { |f| File.basename(f, '.*') == file_name }
     end
   end
 end
