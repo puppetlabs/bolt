@@ -84,12 +84,13 @@ END
         when 'task'
           name = options[:leftovers][0]
           unless task_file?(name)
-            name = load_task_file(name, options[:modules])
-            if name.nil?
+            path = load_task_file(name, options[:modules])
+            if path.nil?
               raise Bolt::CLIError.new(
-                "Failed to load task file for #{name}", 1
+                "Failed to load task file for '#{name}'", 1
               )
             end
+            name = path
           end
           executor.run_task(name, options[:task_options])
         end
@@ -120,6 +121,7 @@ END
       end
 
       module_name, file_name = name.split('::', 2)
+      file_name ||= 'init'
 
       env = Puppet::Node::Environment.create('bolt', [modules])
       Puppet.override(environments: Puppet::Environments::Static.new(env)) do
