@@ -18,10 +18,24 @@ module Bolt
     def execute(command)
       result_output = Bolt::ResultOutput.new
       status = {}
-      @session.exec!(command, status: status) do |_, stream, data|
-        result_output.stdout << data if stream == :stdout
-        result_output.stderr << data if stream == :stderr
+
+      session_channel = @session.open_channel do |channel|
+        channel.exec(command) do |_, success|
+          raise "could not execute command: #{command.inspect}" unless success
+
+          channel.on_data do |_, data|
+            result_output.stdout << data
+          end
+          channel.on_extended_data do |_, data|
+            result_output.stderr << data
+          end
+          channel.on_request "exit-status" do |_, data|
+            status[:exit_code] = data.read_long
+          end
+        end
       end
+      session_channel.wait
+
       if status[:exit_code].zero?
         Bolt::Success.new(result_output.stdout.string, result_output)
       else
