@@ -87,10 +87,22 @@ module Bolt
       end
     end
 
-    def run_task(task, arguments)
-      export_args = arguments.map { |env, val| "PT_#{env}='#{val}'" }.join(' ')
+    def run_task(task, input_method, arguments)
+      export_args = {}
+
+      if ENVIRONMENT_METHODS.include?(input_method)
+        export_args = arguments.map do |env, val|
+          "PT_#{env}='#{val}'"
+        end.join(' ')
+      end
+
       with_remote_file(task) do |remote_path|
-        execute("export #{export_args} && '#{remote_path}'")
+        command = if export_args.empty?
+                    "'#{remote_path}'"
+                  else
+                    "export #{export_args} && '#{remote_path}'"
+                  end
+        execute(command)
       end
     end
   end

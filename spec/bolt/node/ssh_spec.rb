@@ -42,7 +42,7 @@ describe Bolt::SSH do
     contents = "#!/bin/sh\necho -n ${PT_message_one} ${PT_message_two}"
     arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
     with_tempfile_containing('tasks test', contents) do |file|
-      expect(ssh.run_task(file.path, arguments).value)
+      expect(ssh.run_task(file.path, 'environment', arguments).value)
         .to eq('Hello from task Goodbye')
     end
   end
