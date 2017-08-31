@@ -5,6 +5,8 @@ describe "Bolt::Executor" do
   let(:command) { "hostname" }
   let(:script) { '/path/to/script.sh' }
   let(:success) { Bolt::Success.new }
+  let(:task) { 'service::restart' }
+  let(:task_arguments) { { 'name' => 'apache' } }
 
   def mock_node(name)
     node = double(name)
@@ -29,6 +31,25 @@ describe "Bolt::Executor" do
     expect(node2).to receive(:run_script).with(script).and_return(success)
 
     results = Bolt::Executor.new([node1, node2]).run_script(script)
+    results.each_pair do |_, result|
+      expect(result).to be_instance_of(Bolt::Success)
+    end
+  end
+
+  it "runs a task on all nodes" do
+    node1 = mock_node 'node1'
+    expect(node1)
+      .to receive(:run_task)
+      .with(task, 'both', task_arguments)
+      .and_return(success)
+    node2 = mock_node 'node2'
+    expect(node2)
+      .to receive(:run_task)
+      .with(task, 'both', task_arguments)
+      .and_return(success)
+
+    results = Bolt::Executor.new([node1, node2])
+                            .run_task(task, 'both', task_arguments)
     results.each_pair do |_, result|
       expect(result).to be_instance_of(Bolt::Success)
     end

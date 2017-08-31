@@ -82,17 +82,16 @@ END
         when 'script'
           executor.run_script(options[:task_options]["script"])
         when 'task'
-          name = options[:leftovers][0]
-          unless task_file?(name)
-            path = load_task_file(name, options[:modules])
-            if path.nil?
-              raise Bolt::CLIError.new(
-                "Failed to load task file for '#{name}'", 1
-              )
-            end
-            name = path
+          path = options[:leftovers][0]
+          input_method = nil
+
+          unless task_file?(path)
+            path, metadata = load_task_data(path, options[:modules])
+            input_method = metadata['input_method']
           end
-          executor.run_task(name, options[:task_options])
+
+          input_method ||= 'both'
+          executor.run_task(path, input_method, options[:task_options])
         end
 
       results.each_pair do |node, result|
@@ -105,7 +104,7 @@ END
       File.exist?(path)
     end
 
-    def load_task_file(name, modules)
+    def load_task_data(name, modules)
       if modules.nil?
         raise Bolt::CLIError.new(
           "The '--modules' option must be specified to run a task", 1
@@ -128,7 +127,22 @@ END
         data = Puppet::InfoService::TaskInformationService.task_data(
           env.name, module_name, name
         )
-        data[:files].find { |f| File.basename(f, '.*') == file_name }
+
+        file = data[:files].find { |f| File.basename(f, '.*') == file_name }
+        if file.nil?
+          raise Bolt::CLIError.new(
+            "Failed to load task file for '#{name}'", 1
+          )
+        end
+
+        metadata =
+          if data[:metadata_file]
+            JSON.parse(File.read(data[:metadata_file]))
+          else
+            {}
+          end
+
+        [file, metadata]
       end
     end
   end
