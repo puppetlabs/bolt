@@ -46,4 +46,13 @@ describe Bolt::SSH do
         .to eq('Hello from task Goodbye')
     end
   end
+
+  it "can run a task passing input on stdin", vagrant: true do
+    contents = "#!/bin/sh\ngrep 'message_one'"
+    arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
+    with_tempfile_containing('tasks test stdin', contents) do |file|
+      expect(ssh.run_task(file.path, 'stdin', arguments).value)
+        .to match(/{"message_one":"Hello from task","message_two":"Goodbye"}/)
+    end
+  end
 end

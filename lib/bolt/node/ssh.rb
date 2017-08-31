@@ -1,5 +1,6 @@
 require 'net/ssh'
 require 'net/sftp'
+require 'json'
 
 module Bolt
   class SSH < Node
@@ -15,7 +16,7 @@ module Bolt
       @session.close if @session && !@session.closed?
     end
 
-    def execute(command)
+    def execute(command, options = {})
       result_output = Bolt::ResultOutput.new
       status = {}
 
@@ -31,6 +32,11 @@ module Bolt
           end
           channel.on_request "exit-status" do |_, data|
             status[:exit_code] = data.read_long
+          end
+
+          if options[:stdin]
+            channel.send_data(options[:stdin])
+            channel.eof!
           end
         end
       end
@@ -89,6 +95,11 @@ module Bolt
 
     def run_task(task, input_method, arguments)
       export_args = {}
+      stdin = nil
+
+      if STDIN_METHODS.include?(input_method)
+        stdin = JSON.dump(arguments)
+      end
 
       if ENVIRONMENT_METHODS.include?(input_method)
         export_args = arguments.map do |env, val|
@@ -102,7 +113,7 @@ module Bolt
                   else
                     "export #{export_args} && '#{remote_path}'"
                   end
-        execute(command)
+        execute(command, stdin: stdin)
       end
     end
   end
