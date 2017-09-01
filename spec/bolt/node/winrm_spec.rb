@@ -58,8 +58,11 @@ Write-Output $line
 END
     arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
     with_tempfile_containing('tasks-test-stdin-winrm', contents) do |file|
-      expect(winrm.run_task(file.path, 'stdin', arguments).value).to eq(
-        "{\"message_one\":\"Hello from task\",\"message_two\":\"Goodbye\"}\r\n"
+      expect {
+        winrm.run_task(file.path, 'stdin', arguments)
+      }.to raise_error(
+        NotImplementedError,
+        "Sending task arguments via stdin to PowerShell is not supported"
       )
     end
   end
@@ -72,10 +75,10 @@ Write-Output $line
 END
     arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
     with_tempfile_containing('tasks-test-both-winrm', contents) do |file|
-      expect(winrm.run_task(file.path, 'both', arguments).value).to eq(<<END)
-Hello from task\r\n\Goodbye\r\n{\"message_one\":\
-\"Hello from task\",\"message_two\":\"Goodbye\"}\r
-END
+      # we only get args from environment, since stdin isn't yet supported
+      expect(
+        winrm.run_task(file.path, 'both', arguments).value
+      ).to eq("Hello from task\r\nGoodbye\r\n")
     end
   end
 end

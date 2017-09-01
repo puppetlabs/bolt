@@ -23,14 +23,8 @@ module Bolt
       @session.close if @session
     end
 
-    def execute(command, options = {})
+    def execute(command, _ = {})
       result_output = Bolt::ResultOutput.new
-
-      if options[:stdin]
-        # powershell uses backtick to escape quotes
-        escaped_stdin = options[:stdin].gsub(/"/, '`"')
-        command = "cmd.exe /c echo \"#{escaped_stdin}\" | #{command}"
-      end
 
       output = @session.run(command) do |stdout, stderr|
         result_output.stdout << stdout
@@ -92,21 +86,20 @@ EOS
     end
 
     def run_task(task, input_method, arguments)
-      stdin = STDIN_METHODS.include?(input_method) ? JSON.dump(arguments) : nil
+      if input_method == 'stdin'
+        raise NotImplementedError,
+              "Sending task arguments via stdin to PowerShell is not supported"
+      end
 
       arguments.reduce(Bolt::Success.new) do |result, (arg, val)|
         result.then do
-          if ENVIRONMENT_METHODS.include?(input_method)
-            cmd = "[Environment]::SetEnvironmentVariable('PT_#{arg}', '#{val}')"
-            execute(cmd)
-          else
-            result
-          end
+          cmd = "[Environment]::SetEnvironmentVariable('PT_#{arg}', '#{val}')"
+          execute(cmd)
         end
       end.then do
         with_remote_file(task) do |remote_path|
           args = '-NoProfile -NonInteractive -NoLogo -ExecutionPolicy Bypass'
-          execute("powershell.exe #{args} -File '#{remote_path}'", stdin: stdin)
+          execute("powershell.exe #{args} -File '#{remote_path}'")
         end
       end
     end
