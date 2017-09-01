@@ -2,6 +2,9 @@ require 'logger'
 
 module Bolt
   class Node
+    STDIN_METHODS       = %w[both stdin].freeze
+    ENVIRONMENT_METHODS = %w[both environment].freeze
+
     def self.parse_uri(node)
       case node
       when %r{^(ssh|winrm)://.*:\d+$}

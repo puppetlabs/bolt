@@ -1,5 +1,6 @@
 require 'net/ssh'
 require 'net/sftp'
+require 'json'
 
 module Bolt
   class SSH < Node
@@ -15,13 +16,32 @@ module Bolt
       @session.close if @session && !@session.closed?
     end
 
-    def execute(command)
+    def execute(command, options = {})
       result_output = Bolt::ResultOutput.new
       status = {}
-      @session.exec!(command, status: status) do |_, stream, data|
-        result_output.stdout << data if stream == :stdout
-        result_output.stderr << data if stream == :stderr
+
+      session_channel = @session.open_channel do |channel|
+        channel.exec(command) do |_, success|
+          raise "could not execute command: #{command.inspect}" unless success
+
+          channel.on_data do |_, data|
+            result_output.stdout << data
+          end
+          channel.on_extended_data do |_, data|
+            result_output.stderr << data
+          end
+          channel.on_request "exit-status" do |_, data|
+            status[:exit_code] = data.read_long
+          end
+
+          if options[:stdin]
+            channel.send_data(options[:stdin])
+            channel.eof!
+          end
+        end
       end
+      session_channel.wait
+
       if status[:exit_code].zero?
         Bolt::Success.new(result_output.stdout.string, result_output)
       else
@@ -73,10 +93,27 @@ module Bolt
       end
     end
 
-    def run_task(task, arguments)
-      export_args = arguments.map { |env, val| "PT_#{env}='#{val}'" }.join(' ')
+    def run_task(task, input_method, arguments)
+      export_args = {}
+      stdin = nil
+
+      if STDIN_METHODS.include?(input_method)
+        stdin = JSON.dump(arguments)
+      end
+
+      if ENVIRONMENT_METHODS.include?(input_method)
+        export_args = arguments.map do |env, val|
+          "PT_#{env}='#{val}'"
+        end.join(' ')
+      end
+
       with_remote_file(task) do |remote_path|
-        execute("export #{export_args} && '#{remote_path}'")
+        command = if export_args.empty?
+                    "'#{remote_path}'"
+                  else
+                    "export #{export_args} && '#{remote_path}'"
+                  end
+        execute(command, stdin: stdin)
       end
     end
   end

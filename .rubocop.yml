@@ -29,6 +29,9 @@ Metrics/AbcSize:
 Metrics/MethodLength:
   Enabled: false
 
+Metrics/ClassLength:
+  Max: 150
+
 Layout/IndentHeredoc:
   Enabled: false
 

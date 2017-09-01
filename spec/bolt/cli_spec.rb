@@ -157,8 +157,12 @@ describe "Bolt::CLI" do
     it "runs a task" do
       task_path = '/path/to/task'
       task_params = { 'name' => 'apache', 'action' => 'restart' }
+      input_method = 'both'
+
       expect(executor)
-        .to receive(:run_task).with(task_path, task_params).and_return({})
+        .to receive(:run_task)
+        .with(task_path, input_method, task_params)
+        .and_return({})
       expect(cli).to receive(:task_file?).with(task_path).and_return(true)
 
       options = {
@@ -173,9 +177,12 @@ describe "Bolt::CLI" do
     it "runs a task given a name" do
       task_name = 'sample::echo'
       task_params = { 'message' => 'hi' }
+      input_method = 'both'
+
       expect(executor)
         .to receive(:run_task)
-        .with(%r{modules/sample/tasks/echo.sh$}, task_params).and_return({})
+        .with(%r{modules/sample/tasks/echo.sh$}, input_method, task_params)
+        .and_return({})
       expect(cli).to receive(:task_file?).with(task_name).and_return(false)
 
       options = {
@@ -191,9 +198,54 @@ describe "Bolt::CLI" do
     it "runs an init task given a module name" do
       task_name = 'sample'
       task_params = { 'message' => 'hi' }
+      input_method = 'both'
+
       expect(executor)
         .to receive(:run_task)
-        .with(%r{modules/sample/tasks/init.sh$}, task_params).and_return({})
+        .with(%r{modules/sample/tasks/init.sh$}, input_method, task_params)
+        .and_return({})
+      expect(cli).to receive(:task_file?).with(task_name).and_return(false)
+
+      options = {
+        nodes: nodes,
+        mode: 'task',
+        leftovers: [task_name],
+        task_options: task_params,
+        modules: File.join(__FILE__, '../../fixtures/modules')
+      }
+      cli.execute(options)
+    end
+
+    it "runs a task passing input on stdin" do
+      task_name = 'sample::stdin'
+      task_params = { 'message' => 'hi' }
+      input_method = 'stdin'
+
+      expect(executor)
+        .to receive(:run_task)
+        .with(%r{modules/sample/tasks/stdin.sh$}, input_method, task_params)
+        .and_return({})
+      expect(cli).to receive(:task_file?).with(task_name).and_return(false)
+
+      options = {
+        nodes: nodes,
+        mode: 'task',
+        leftovers: [task_name],
+        task_options: task_params,
+        modules: File.join(__FILE__, '../../fixtures/modules')
+      }
+      cli.execute(options)
+    end
+
+    it "runs a powershell task passing input on stdin" do
+      task_name = 'sample::winstdin'
+      task_params = { 'message' => 'hi' }
+      input_method = 'stdin'
+
+      expect(executor)
+        .to receive(:run_task)
+        .with(%r{modules/sample/tasks/winstdin.ps1$}, input_method, task_params)
+        .and_return({})
       expect(cli).to receive(:task_file?).with(task_name).and_return(false)
 
       options = {

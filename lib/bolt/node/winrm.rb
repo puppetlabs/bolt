@@ -23,8 +23,9 @@ module Bolt
       @session.close if @session
     end
 
-    def execute(command)
+    def execute(command, _ = {})
       result_output = Bolt::ResultOutput.new
+
       output = @session.run(command) do |stdout, stderr|
         result_output.stdout << stdout
         result_output.stderr << stderr
@@ -84,10 +85,15 @@ EOS
       end
     end
 
-    def run_task(task, arguments)
-      arguments.reduce(Bolt::Success.new) do |result, (arg, value)|
+    def run_task(task, input_method, arguments)
+      if input_method == 'stdin'
+        raise NotImplementedError,
+              "Sending task arguments via stdin to PowerShell is not supported"
+      end
+
+      arguments.reduce(Bolt::Success.new) do |result, (arg, val)|
         result.then do
-          cmd = "[Environment]::SetEnvironmentVariable('PT_#{arg}', '#{value}')"
+          cmd = "[Environment]::SetEnvironmentVariable('PT_#{arg}', '#{val}')"
           execute(cmd)
         end
       end.then do

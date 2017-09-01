@@ -42,8 +42,32 @@ describe Bolt::SSH do
     contents = "#!/bin/sh\necho -n ${PT_message_one} ${PT_message_two}"
     arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
     with_tempfile_containing('tasks test', contents) do |file|
-      expect(ssh.run_task(file.path, arguments).value)
+      expect(ssh.run_task(file.path, 'environment', arguments).value)
         .to eq('Hello from task Goodbye')
+    end
+  end
+
+  it "can run a task passing input on stdin", vagrant: true do
+    contents = "#!/bin/sh\ngrep 'message_one'"
+    arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
+    with_tempfile_containing('tasks test stdin', contents) do |file|
+      expect(ssh.run_task(file.path, 'stdin', arguments).value)
+        .to match(/{"message_one":"Hello from task","message_two":"Goodbye"}/)
+    end
+  end
+
+  it "can run a task passing input on stdin and environment", vagrant: true do
+    contents = <<END
+#!/bin/sh
+echo -n ${PT_message_one} ${PT_message_two}
+grep 'message_one'
+END
+    arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
+    with_tempfile_containing('tasks-test-both', contents) do |file|
+      expect(ssh.run_task(file.path, 'both', arguments).value).to eq(<<END)
+Hello from task Goodbye{\"message_one\":\
+\"Hello from task\",\"message_two\":\"Goodbye\"}
+END
     end
   end
 end

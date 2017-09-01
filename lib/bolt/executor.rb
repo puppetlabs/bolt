@@ -43,9 +43,9 @@ module Bolt
       end
     end
 
-    def run_task(task, arguments)
+    def run_task(task, input_method, arguments)
       on_each do |node|
-        node.run_task(task, arguments)
+        node.run_task(task, input_method, arguments)
       end
     end
   end
