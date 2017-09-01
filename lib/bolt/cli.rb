@@ -35,7 +35,7 @@ where [options] are:
 END
         version Bolt::VERSION
 
-        opt :nodes, "Nodes to connect to", type: :strings, required: true
+        opt :nodes, "Nodes to connect to", type: :string, required: true
         opt :user, "User to authenticate as (Optional)", type: :string
         opt :password, "Password to authenticate as (Optional)", type: :string
         opt :modules, "Path to modules directory", type: :string
@@ -49,6 +49,7 @@ END
         options[:leftovers] = parser.leftovers
         options[:mode] = get_mode(parser.leftovers)
         options[:task_options] = Hash[task_options.map { |a| a.split('=', 2) }]
+        options[:nodes] = options[:nodes].split(',')
         options
       rescue Trollop::CommandlineError => e
         raise Bolt::CLIError.new(e.message, 1)

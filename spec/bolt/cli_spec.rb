@@ -52,7 +52,7 @@ describe "Bolt::CLI" do
     end
 
     it "accepts multiple nodes" do
-      cli = Bolt::CLI.new(%w[exec --nodes foo bar])
+      cli = Bolt::CLI.new(%w[exec --nodes foo,bar])
       expect(cli.parse).to include(nodes: %w[foo bar])
     end
 
