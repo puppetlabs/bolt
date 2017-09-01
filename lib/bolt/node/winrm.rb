@@ -94,10 +94,14 @@ EOS
     def run_task(task, input_method, arguments)
       stdin = STDIN_METHODS.include?(input_method) ? JSON.dump(arguments) : nil
 
-      arguments.reduce(Bolt::Success.new) do |result, (arg, value)|
+      arguments.reduce(Bolt::Success.new) do |result, (arg, val)|
         result.then do
-          cmd = "[Environment]::SetEnvironmentVariable('PT_#{arg}', '#{value}')"
-          execute(cmd)
+          if ENVIRONMENT_METHODS.include?(input_method)
+            cmd = "[Environment]::SetEnvironmentVariable('PT_#{arg}', '#{val}')"
+            execute(cmd)
+          else
+            result
+          end
         end
       end.then do
         with_remote_file(task) do |remote_path|

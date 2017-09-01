@@ -63,4 +63,19 @@ END
       )
     end
   end
+
+  it "can run a task passing input on stdin and environment", vagrant: true do
+    contents = <<END
+Write-Output "$env:PT_message_one" "$env:PT_message_two"
+$line = [Console]::In.ReadLine()
+Write-Output $line
+END
+    arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
+    with_tempfile_containing('tasks-test-both-winrm', contents) do |file|
+      expect(winrm.run_task(file.path, 'both', arguments).value).to eq(<<END)
+Hello from task\r\n\Goodbye\r\n{\"message_one\":\
+\"Hello from task\",\"message_two\":\"Goodbye\"}\r
+END
+    end
+  end
 end

@@ -55,4 +55,19 @@ describe Bolt::SSH do
         .to match(/{"message_one":"Hello from task","message_two":"Goodbye"}/)
     end
   end
+
+  it "can run a task passing input on stdin and environment", vagrant: true do
+    contents = <<END
+#!/bin/sh
+echo -n ${PT_message_one} ${PT_message_two}
+grep 'message_one'
+END
+    arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
+    with_tempfile_containing('tasks-test-both', contents) do |file|
+      expect(ssh.run_task(file.path, 'both', arguments).value).to eq(<<END)
+Hello from task Goodbye{\"message_one\":\
+\"Hello from task\",\"message_two\":\"Goodbye\"}
+END
+    end
+  end
 end
