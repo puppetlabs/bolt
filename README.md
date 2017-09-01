@@ -59,10 +59,11 @@ Either install XCode or the Command Line Tools. The latter can be done from the 
 
 ### Windows
 
-Install [Chocolatey](https://chocolatey.org/install), then install `ruby` and `ruby.devkit`:
+Install [Chocolatey](https://chocolatey.org/install), then install `ruby`. It isn't necessary
+to install `ruby.devkit`, as ffi already publishes precompiled gems for Windows x86 and x64.
 
     choco install ruby
-    choco install ruby.devkit
+    refreshenv
 
 ## Kudos
 
