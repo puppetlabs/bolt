@@ -236,5 +236,26 @@ describe "Bolt::CLI" do
       }
       cli.execute(options)
     end
+
+    it "runs a powershell task passing input on stdin" do
+      task_name = 'sample::winstdin'
+      task_params = { 'message' => 'hi' }
+      input_method = 'stdin'
+
+      expect(executor)
+        .to receive(:run_task)
+        .with(%r{modules/sample/tasks/winstdin.ps1$}, input_method, task_params)
+        .and_return({})
+      expect(cli).to receive(:task_file?).with(task_name).and_return(false)
+
+      options = {
+        nodes: nodes,
+        mode: 'task',
+        leftovers: [task_name],
+        task_options: task_params,
+        modules: File.join(__FILE__, '../../fixtures/modules')
+      }
+      cli.execute(options)
+    end
   end
 end

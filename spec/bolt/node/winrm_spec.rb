@@ -46,8 +46,21 @@ describe Bolt::WinRM do
     arguments = { :message_one => 'task is running',
                   :"message two" => 'task has run' }
     with_tempfile_containing('task-test-winrm', contents) do |file|
-      expect(winrm.run_task(file.path, arguments).value)
+      expect(winrm.run_task(file.path, 'environment', arguments).value)
         .to eq("task is running\r\ntask has run\r\n")
+    end
+  end
+
+  it "can run a task passing input on stdin", vagrant: true do
+    contents = <<END
+$line = [Console]::In.ReadLine()
+Write-Output $line
+END
+    arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
+    with_tempfile_containing('tasks-test-stdin-winrm', contents) do |file|
+      expect(winrm.run_task(file.path, 'stdin', arguments).value).to eq(
+        "{\"message_one\":\"Hello from task\",\"message_two\":\"Goodbye\"}\r\n"
+      )
     end
   end
 end
