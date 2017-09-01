@@ -8,7 +8,7 @@ module Bolt
   class CLIError < RuntimeError
     attr_reader :error_code
 
-    def initialize(msg, error_code)
+    def initialize(msg, error_code: 1)
       super(msg)
       @error_code = error_code
     end
@@ -52,7 +52,7 @@ END
         options[:nodes] = options[:nodes].split(',')
         options
       rescue Trollop::CommandlineError => e
-        raise Bolt::CLIError.new(e.message, 1)
+        raise Bolt::CLIError, e.message
       rescue Trollop::HelpNeeded
         parser.educate
         raise Bolt::CLIExit
@@ -66,7 +66,7 @@ END
       if MODES.include?(args[0])
         args.shift
       else
-        raise Bolt::CLIError.new("Expected a mode of run, exec, or script", 1)
+        raise Bolt::CLIError, "Expected a mode of run, exec, or script"
       end
     end
 
@@ -107,9 +107,8 @@ END
 
     def load_task_data(name, modules)
       if modules.nil?
-        raise Bolt::CLIError.new(
-          "The '--modules' option must be specified to run a task", 1
-        )
+        raise Bolt::CLIError,
+              "The '--modules' option must be specified to run a task"
       end
 
       begin
@@ -117,7 +116,7 @@ END
         require 'puppet/node/environment'
         require 'puppet/info_service'
       rescue LoadError
-        raise Bolt::CLIError.new("Puppet must be installed to execute tasks", 1)
+        raise Bolt::CLIError, "Puppet must be installed to execute tasks"
       end
 
       module_name, file_name = name.split('::', 2)
@@ -131,9 +130,7 @@ END
 
         file = data[:files].find { |f| File.basename(f, '.*') == file_name }
         if file.nil?
-          raise Bolt::CLIError.new(
-            "Failed to load task file for '#{name}'", 1
-          )
+          raise Bolt::CLIError, "Failed to load task file for '#{name}'"
         end
 
         metadata =
