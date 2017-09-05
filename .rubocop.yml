@@ -30,7 +30,7 @@ Metrics/MethodLength:
   Enabled: false
 
 Metrics/ClassLength:
-  Max: 150
+  Enabled: false
 
 Layout/IndentHeredoc:
   Enabled: false
