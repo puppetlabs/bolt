@@ -27,7 +27,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "net-sftp", "~> 2.0"
   spec.add_dependency "winrm", "~> 2.0"
   spec.add_dependency "winrm-fs", "~> 1.0"
-  spec.add_dependency "trollop", "~> 2.0"
   spec.add_dependency "concurrent-ruby", "~> 1.0"
 
   spec.add_development_dependency "bundler", "~> 1.14"

@@ -1,5 +1,5 @@
-require 'trollop'
 require 'uri'
+require 'optparse'
 require 'bolt/node'
 require 'bolt/version'
 require 'bolt/executor'
@@ -17,57 +17,143 @@ module Bolt
   class CLIExit < StandardError; end
 
   class CLI
+    BANNER = <<-END.freeze
+Usage: bolt <subcommand> <action> [options]
+
+Available subcommands:
+    bolt command run <command>       Run a command remotely
+    bolt script run <script>         Upload a local script and run it remotely
+    bolt task run <task> [params]    Run a Puppet Task
+
+where [options] are:
+END
+
+    TASK_HELP = <<-END.freeze
+Usage: bolt task <action> [options] [parameters]
+
+Available actions are:
+    run                              Run a task
+
+Parameters are of the form <parameter>=<value>.
+
+Available options are:
+END
+
+    COMMAND_HELP = <<-END.freeze
+Usage: bolt command <action> <command> [options]
+
+Available actions are:
+    run                              Run a command remotely
+
+Available options are:
+END
+
+    SCRIPT_HELP = <<-END.freeze
+Usage: bolt script <action> <script> [options]
+
+Available actions are:
+    run                              Upload a local script and run it remotely
+
+Available options are:
+END
+
     def initialize(argv)
       @argv = argv
     end
 
-    MODES = %w[run exec script task].freeze
+    MODES = %w[command script task file].freeze
+    ACTIONS = %w[run upload download].freeze
 
     def parse
-      parser = Trollop::Parser.new do
-        banner <<-END
-Runs ad-hoc tasks on your nodes over SSH and WinRM.
+      options = {}
 
-Usage:
-       bolt exec [options] command=<command>
-
-where [options] are:
-END
-        version Bolt::VERSION
-
-        opt :nodes, "Nodes to connect to", type: :string, required: true
-        opt :user, "User to authenticate as (Optional)", type: :string
-        opt :password, "Password to authenticate as (Optional)", type: :string
-        opt :modules, "Path to modules directory", type: :string
+      global = OptionParser.new('') do |opts|
+        opts.on('-n', '--nodes x,y,z', Array, 'Nodes to connect to') do |nodes|
+          options[:nodes] = nodes
+        end
+        opts.on('-u', '--user USER',
+                "User to authenticate as (Optional)") do |user|
+          options[:user] = user
+        end
+        opts.on('-p', '--password PASSWORD',
+                "Password to authenticate as (Optional)") do |password|
+          options[:password] = password
+        end
+        opts.on('--modules MODULES', "Path to modules directory") do |modules|
+          options[:modules] = modules
+        end
+        opts.on_tail('-h', '--help', 'Display help') do |_|
+          options[:help] = true
+        end
+        opts.on_tail('--version', 'Display the version') do |_|
+          puts Bolt::VERSION
+          raise Bolt::CLIExit
+        end
       end
 
-      task_options, global_options = @argv.partition { |arg| arg =~ /=/ }
-      begin
-        raise Trollop::HelpNeeded if @argv.empty? # show help screen
+      if @argv.empty?
+        options[:help] = true
+      end
 
-        options = parser.parse(global_options)
-        options[:leftovers] = parser.leftovers
-        options[:mode] = get_mode(parser.leftovers)
-        options[:task_options] = Hash[task_options.map { |a| a.split('=', 2) }]
-        options[:nodes] = options[:nodes].split(',')
-        options
-      rescue Trollop::CommandlineError => e
-        raise Bolt::CLIError, e.message
-      rescue Trollop::HelpNeeded
-        parser.educate
+      remaining = handle_parser_errors do
+        global.permute(@argv)
+      end
+
+      options[:mode] = remaining.shift
+      options[:action] = remaining.shift
+      options[:object] = remaining.shift
+
+      if options[:help]
+        global.banner = case options[:mode]
+                        when 'task'
+                          TASK_HELP
+                        when 'command'
+                          COMMAND_HELP
+                        when 'script'
+                          SCRIPT_HELP
+                        else
+                          BANNER
+                        end
+        puts global.help
         raise Bolt::CLIExit
-      rescue Trollop::VersionNeeded
-        puts parser.version
-        raise Bolt::CLIExit
+      end
+
+      task_options, remaining = remaining.partition { |s| s =~ /.+=/ }
+      options[:task_options] = Hash[task_options.map { |a| a.split('=', 2) }]
+
+      options[:leftovers] = remaining
+
+      validate(options)
+
+      options
+    end
+
+    def validate(options)
+      unless options[:nodes]
+        raise Bolt::CLIError, "option --nodes must be specified"
+      end
+
+      unless options[:leftovers].empty?
+        raise Bolt::CLIError,
+              "unknown argument(s) #{options[:leftovers].join(', ')}"
+      end
+
+      unless MODES.include?(options[:mode])
+        raise Bolt::CLIError, "Expected mode to be one of #{MODES.join(', ')}"
+      end
+
+      unless ACTIONS.include?(options[:action])
+        raise Bolt::CLIError,
+              "Expected action to be one of #{ACTIONS.join(', ')}"
       end
     end
 
-    def get_mode(args)
-      if MODES.include?(args[0])
-        args.shift
-      else
-        raise Bolt::CLIError, "Expected a mode of run, exec, or script"
-      end
+    def handle_parser_errors
+      yield
+    rescue OptionParser::MissingArgument => e
+      raise Bolt::CLIError, "option '#{e.args.first}' needs a parameter"
+    rescue OptionParser::InvalidOption => e
+      raise Bolt::CLIError, "unknown argument '#{e.args.first}'"
     end
 
     def execute(options)
@@ -78,12 +164,12 @@ END
       executor = Bolt::Executor.new(nodes)
       results =
         case options[:mode]
-        when 'exec'
-          executor.execute(options[:task_options]["command"])
+        when 'command'
+          executor.execute(options[:object])
         when 'script'
-          executor.run_script(options[:task_options]["script"])
+          executor.run_script(options[:object])
         when 'task'
-          path = options[:leftovers][0]
+          path = options[:object]
           input_method = nil
 
           unless task_file?(path)

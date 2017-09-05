@@ -3,16 +3,16 @@ require 'bolt/cli'
 
 describe "Bolt::CLI" do
   it "generates an error message if an unknown argument is given" do
-    cli = Bolt::CLI.new(%w[exec --unknown])
+    cli = Bolt::CLI.new(%w[command run --unknown])
     expect {
       cli.parse
     }.to raise_error(Bolt::CLIError, /unknown argument '--unknown'/)
   end
 
-  it "includes unparsed arguments" do
-    cli = Bolt::CLI.new(%w[exec what --nodes foo])
-    expect(cli.parse).to include(leftovers: %w[what])
-  end
+  # it "includes unparsed arguments" do
+  #   cli = Bolt::CLI.new(%w[exec run what --nodes foo])
+  #   expect(cli.parse).to include(leftovers: %w[what])
+  # end
 
   describe "help" do
     it "generates help when no arguments are specified" do
@@ -21,7 +21,7 @@ describe "Bolt::CLI" do
         expect {
           cli.parse
         }.to raise_error(Bolt::CLIExit)
-      }.to output(/Runs ad-hoc tasks on your nodes/).to_stdout
+      }.to output(/Usage: bolt/).to_stdout
     end
 
     it "accepts --help" do
@@ -30,7 +30,7 @@ describe "Bolt::CLI" do
         expect {
           cli.parse
         }.to raise_error(Bolt::CLIExit)
-      }.to output(/Runs ad-hoc tasks on your nodes/).to_stdout
+      }.to output(/Usage: bolt/).to_stdout
     end
   end
 
@@ -47,24 +47,24 @@ describe "Bolt::CLI" do
 
   describe "nodes" do
     it "accepts a single node" do
-      cli = Bolt::CLI.new(%w[exec --nodes foo])
+      cli = Bolt::CLI.new(%w[command run --nodes foo])
       expect(cli.parse).to include(nodes: ['foo'])
     end
 
     it "accepts multiple nodes" do
-      cli = Bolt::CLI.new(%w[exec --nodes foo,bar])
+      cli = Bolt::CLI.new(%w[command run --nodes foo,bar])
       expect(cli.parse).to include(nodes: %w[foo bar])
     end
 
     it "generates an error message if no nodes given" do
-      cli = Bolt::CLI.new(%w[exec --nodes])
+      cli = Bolt::CLI.new(%w[command run --nodes])
       expect {
         cli.parse
       }.to raise_error(Bolt::CLIError, /option '--nodes' needs a parameter/)
     end
 
     it "generates an error message if nodes is omitted" do
-      cli = Bolt::CLI.new(%w[exec])
+      cli = Bolt::CLI.new(%w[command run])
       expect {
         cli.parse
       }.to raise_error(Bolt::CLIError, /option --nodes must be specified/)
@@ -73,12 +73,12 @@ describe "Bolt::CLI" do
 
   describe "user" do
     it "accepts a user" do
-      cli = Bolt::CLI.new(%w[exec --user root --nodes foo])
+      cli = Bolt::CLI.new(%w[command run --user root --nodes foo])
       expect(cli.parse).to include(user: 'root')
     end
 
     it "generates an error message if no user value is given" do
-      cli = Bolt::CLI.new(%w[exec --user --nodes foo])
+      cli = Bolt::CLI.new(%w[command run --nodes foo --user])
       expect {
         cli.parse
       }.to raise_error(Bolt::CLIError, /option '--user' needs a parameter/)
@@ -87,12 +87,12 @@ describe "Bolt::CLI" do
 
   describe "password" do
     it "accepts a password" do
-      cli = Bolt::CLI.new(%w[exec --password opensesame --nodes foo])
+      cli = Bolt::CLI.new(%w[command run --password opensesame --nodes foo])
       expect(cli.parse).to include(password: 'opensesame')
     end
 
     it "generates an error message if no password value is given" do
-      cli = Bolt::CLI.new(%w[exec --password --nodes foo])
+      cli = Bolt::CLI.new(%w[command run --nodes foo --password])
       expect {
         cli.parse
       }.to raise_error(Bolt::CLIError, /option '--password' needs a parameter/)
@@ -101,12 +101,12 @@ describe "Bolt::CLI" do
 
   describe "modules" do
     it "accepts a modules directory" do
-      cli = Bolt::CLI.new(%w[exec --modules ./modules --nodes foo])
+      cli = Bolt::CLI.new(%w[command run --modules ./modules --nodes foo])
       expect(cli.parse).to include(modules: './modules')
     end
 
     it "generates an error message if no value is given" do
-      cli = Bolt::CLI.new(%w[exec --modules --nodes foo])
+      cli = Bolt::CLI.new(%w[command run --nodes foo --modules])
       expect {
         cli.parse
       }.to raise_error(Bolt::CLIError, /option '--modules' needs a parameter/)
@@ -114,16 +114,14 @@ describe "Bolt::CLI" do
   end
 
   describe "command" do
-    it "interprets command=whoami as a task option" do
-      cli = Bolt::CLI.new(%w[exec --nodes foo command=whoami])
-      expect(cli.parse).to include(task_options: { 'command' => 'whoami' })
-      expect(cli.parse[:nodes]).to_not include('command=whoami')
-      expect(cli.parse[:leftovers]).to_not include('command=whoami')
+    it "interprets whoami as the command" do
+      cli = Bolt::CLI.new(%w[command run --nodes foo whoami])
+      expect(cli.parse[:object]).to eq('whoami')
     end
   end
 
   it "distinguishes subcommands" do
-    cli = Bolt::CLI.new(%w[script --nodes foo])
+    cli = Bolt::CLI.new(%w[script run --nodes foo])
     expect(cli.parse).to include(mode: 'script')
   end
 
@@ -140,7 +138,7 @@ describe "Bolt::CLI" do
       expect(executor).to receive(:execute).with('whoami').and_return({})
 
       options = {
-        nodes: nodes, mode: 'exec', task_options: { 'command' => 'whoami' }
+        nodes: nodes, mode: 'command', action: 'run', object: 'whoami'
       }
       cli.execute(options)
     end
@@ -149,7 +147,7 @@ describe "Bolt::CLI" do
       expect(executor).to receive(:run_script).with('bar.sh').and_return({})
 
       options = {
-        nodes: nodes, mode: 'script', task_options: { 'script' => 'bar.sh' }
+        nodes: nodes, mode: 'script', action: 'run', object: 'bar.sh'
       }
       cli.execute(options)
     end
@@ -168,7 +166,8 @@ describe "Bolt::CLI" do
       options = {
         nodes: nodes,
         mode: 'task',
-        leftovers: [task_path],
+        action: 'run',
+        object: task_path,
         task_options: task_params
       }
       cli.execute(options)
@@ -188,7 +187,8 @@ describe "Bolt::CLI" do
       options = {
         nodes: nodes,
         mode: 'task',
-        leftovers: [task_name],
+        action: 'run',
+        object: task_name,
         task_options: task_params,
         modules: File.join(__FILE__, '../../fixtures/modules')
       }
@@ -209,7 +209,8 @@ describe "Bolt::CLI" do
       options = {
         nodes: nodes,
         mode: 'task',
-        leftovers: [task_name],
+        action: 'run',
+        object: task_name,
         task_options: task_params,
         modules: File.join(__FILE__, '../../fixtures/modules')
       }
@@ -230,7 +231,8 @@ describe "Bolt::CLI" do
       options = {
         nodes: nodes,
         mode: 'task',
-        leftovers: [task_name],
+        action: 'run',
+        object: task_name,
         task_options: task_params,
         modules: File.join(__FILE__, '../../fixtures/modules')
       }
@@ -251,7 +253,8 @@ describe "Bolt::CLI" do
       options = {
         nodes: nodes,
         mode: 'task',
-        leftovers: [task_name],
+        action: 'run',
+        object: task_name,
         task_options: task_params,
         modules: File.join(__FILE__, '../../fixtures/modules')
       }
