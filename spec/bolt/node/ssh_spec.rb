@@ -20,6 +20,10 @@ describe Bolt::SSH do
     expect(ssh.execute(command).value).to eq("/home/vagrant\n")
   end
 
+  it "captures stderr from a host", vagrant: true do
+    expect(ssh.execute("ssh -V").output.stderr.string).to match(/OpenSSH/)
+  end
+
   it "can copy a file to a host", vagrant: true do
     contents = "kljhdfg"
     with_tempfile_containing('copy-test', contents) do |file|

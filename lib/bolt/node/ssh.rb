@@ -27,10 +27,12 @@ module Bolt
           channel.on_data do |_, data|
             result_output.stdout << data
           end
-          channel.on_extended_data do |_, data|
+
+          channel.on_extended_data do |_, _, data|
             result_output.stderr << data
           end
-          channel.on_request "exit-status" do |_, data|
+
+          channel.on_request("exit-status") do |_, data|
             status[:exit_code] = data.read_long
           end
 
