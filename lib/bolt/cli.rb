@@ -129,15 +129,6 @@ END
     end
 
     def validate(options)
-      unless options[:nodes]
-        raise Bolt::CLIError, "option --nodes must be specified"
-      end
-
-      unless options[:leftovers].empty?
-        raise Bolt::CLIError,
-              "unknown argument(s) #{options[:leftovers].join(', ')}"
-      end
-
       unless MODES.include?(options[:mode])
         raise Bolt::CLIError, "Expected mode to be one of #{MODES.join(', ')}"
       end
@@ -145,6 +136,15 @@ END
       unless ACTIONS.include?(options[:action])
         raise Bolt::CLIError,
               "Expected action to be one of #{ACTIONS.join(', ')}"
+      end
+
+      unless options[:leftovers].empty?
+        raise Bolt::CLIError,
+              "unknown argument(s) #{options[:leftovers].join(', ')}"
+      end
+
+      unless options[:nodes]
+        raise Bolt::CLIError, "option --nodes must be specified"
       end
     end
 
