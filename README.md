@@ -65,6 +65,74 @@ to install `ruby.devkit`, as ffi already publishes precompiled gems for Windows 
     choco install ruby
     refreshenv
 
+## Examples
+
+### Get help
+
+    $ bolt --help
+    Usage: bolt <subcommand> <action> [options]
+    ...
+
+### Run a command over SSH
+
+    $ bolt command run 'ssh -V' --nodes neptune
+    neptune: OpenSSH_5.3p1, OpenSSL 1.0.1e-fips 11 Feb 2013
+
+### Run a command over SSH against multiple hosts
+
+    $ bolt command run 'ssh -V' --nodes neptune,mars
+    neptune: OpenSSH_5.3p1, OpenSSL 1.0.1e-fips 11 Feb 2013
+    mars: OpenSSH_6.6.1p1, OpenSSL 1.0.1e-fips 11 Feb 2013
+
+### Run a command over WinRM
+
+    $ bolt command run 'gpupdate /force' --nodes winrm://pluto --user Administrator --password <password>
+    pluto: Updating policy...
+    
+    Computer Policy update has completed successfully.
+    
+    User Policy update has completed successfully.
+
+### Run a command over WinRM against multiple hosts
+
+    $ bolt command run '(Get-CimInstance Win32_OperatingSystem).version' --nodes winrm://pluto,winrm://mercury --user Administrator --password <password>
+    pluto: 6.3.9600
+    mercury: 10.0.14393
+
+### Run a bash script
+
+    $ bolt script run ./install-puppet-agent.sh --nodes neptune
+    neptune: Installed puppet-agent 5.1.0
+
+### Run a PowerShell script
+
+    $ bolt script run Get-WUServiceManager.ps1 --nodes winrm://pluto --user Administrator --password <password>
+    pluto:
+    Name                  : Windows Server Update Service
+    ContentValidationCert : {}
+    ExpirationDate        : 6/18/5254 9:21:00 PM
+    IsManaged             : True
+    IsRegisteredWithAU    : True
+    IssueDate             : 1/1/2003 12:00:00 AM
+    OffersWindowsUpdates  : True
+    RedirectUrls          : System.__ComObject
+    ServiceID             : 3da21691-e39d-4da6-8a4b-b43877bcb1b7
+    IsScanPackageService  : False
+    CanRegisterWithAU     : True
+    ServiceUrl            :
+    SetupPrefix           :
+    IsDefaultAUService    : True
+
+### Run a task from a module
+
+    $ bolt task run package::status name=openssl --nodes neptune --modules ~/modules
+    neptune: openssl-1.0.1e-16.el6_5.7.x86_64
+
+### Run the `service::init` task from a module
+
+    $ bolt task run service name=apache --nodes neptune --modules ~/modules
+    neptune: { status: 'running', enabled: true }
+
 ## Kudos
 
 Thank you to [Marcin Bunsch](https://github.com/marcinbunsch) for allowing
