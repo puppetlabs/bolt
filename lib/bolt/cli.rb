@@ -172,7 +172,7 @@ END
           path = options[:object]
           input_method = nil
 
-          unless task_file?(path)
+          unless file_exist?(path)
             path, metadata = load_task_data(path, options[:modules])
             input_method = metadata['input_method']
           end
@@ -187,7 +187,7 @@ END
       end
     end
 
-    def task_file?(path)
+    def file_exist?(path)
       File.exist?(path)
     end
 

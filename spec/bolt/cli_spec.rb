@@ -161,7 +161,7 @@ describe "Bolt::CLI" do
         .to receive(:run_task)
         .with(task_path, input_method, task_params)
         .and_return({})
-      expect(cli).to receive(:task_file?).with(task_path).and_return(true)
+      expect(cli).to receive(:file_exist?).with(task_path).and_return(true)
 
       options = {
         nodes: nodes,
@@ -182,7 +182,7 @@ describe "Bolt::CLI" do
         .to receive(:run_task)
         .with(%r{modules/sample/tasks/echo.sh$}, input_method, task_params)
         .and_return({})
-      expect(cli).to receive(:task_file?).with(task_name).and_return(false)
+      expect(cli).to receive(:file_exist?).with(task_name).and_return(false)
 
       options = {
         nodes: nodes,
@@ -204,7 +204,7 @@ describe "Bolt::CLI" do
         .to receive(:run_task)
         .with(%r{modules/sample/tasks/init.sh$}, input_method, task_params)
         .and_return({})
-      expect(cli).to receive(:task_file?).with(task_name).and_return(false)
+      expect(cli).to receive(:file_exist?).with(task_name).and_return(false)
 
       options = {
         nodes: nodes,
@@ -226,7 +226,7 @@ describe "Bolt::CLI" do
         .to receive(:run_task)
         .with(%r{modules/sample/tasks/stdin.sh$}, input_method, task_params)
         .and_return({})
-      expect(cli).to receive(:task_file?).with(task_name).and_return(false)
+      expect(cli).to receive(:file_exist?).with(task_name).and_return(false)
 
       options = {
         nodes: nodes,
@@ -248,7 +248,7 @@ describe "Bolt::CLI" do
         .to receive(:run_task)
         .with(%r{modules/sample/tasks/winstdin.ps1$}, input_method, task_params)
         .and_return({})
-      expect(cli).to receive(:task_file?).with(task_name).and_return(false)
+      expect(cli).to receive(:file_exist?).with(task_name).and_return(false)
 
       options = {
         nodes: nodes,
