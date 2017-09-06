@@ -37,7 +37,7 @@ module Bolt
       end
     end
 
-    def copy(source, destination)
+    def upload(source, destination)
       fs = ::WinRM::FS::FileManager.new(@connection)
       fs.upload(source, destination)
       Bolt::Success.new
@@ -66,7 +66,7 @@ EOS
         dest = "#{dir}\\#{File.basename(file, '.*')}.ps1"
         Bolt::Success.new
       end.then do
-        copy(file, dest)
+        upload(file, dest)
       end.then do
         result = yield dest
       end.then do

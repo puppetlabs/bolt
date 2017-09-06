@@ -20,11 +20,11 @@ describe Bolt::WinRM do
     expect(winrm.execute(command).value).to eq("vagrant\r\n")
   end
 
-  it "can copy a file to a host", vagrant: true do
+  it "can upload a file to a host", vagrant: true do
     contents = "934jklnvf"
-    remote_path = 'C:\Users\vagrant\copy-test-winrm'
-    with_tempfile_containing('copy-test-winrm', contents) do |file|
-      winrm.copy(file.path, remote_path)
+    remote_path = 'C:\Users\vagrant\upload-test-winrm'
+    with_tempfile_containing('upload-test-winrm', contents) do |file|
+      winrm.upload(file.path, remote_path)
 
       expect(
         winrm.execute("type #{remote_path}").value
