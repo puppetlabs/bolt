@@ -32,6 +32,9 @@ Metrics/MethodLength:
 Metrics/ClassLength:
   Enabled: false
 
+Metrics/CyclomaticComplexity:
+  Enabled: false
+
 Layout/IndentHeredoc:
   Enabled: false
 

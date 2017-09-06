@@ -24,6 +24,7 @@ Available subcommands:
     bolt command run <command>       Run a command remotely
     bolt script run <script>         Upload a local script and run it remotely
     bolt task run <task> [params]    Run a Puppet Task
+    bolt file upload <src> <dest>    Upload a local file
 
 where [options] are:
 END
@@ -53,6 +54,15 @@ Usage: bolt script <action> <script> [options]
 
 Available actions are:
     run                              Upload a local script and run it remotely
+
+Available options are:
+END
+
+    FILE_HELP = <<-END.freeze
+Usage: bolt file <action> [options]
+
+Available actions are:
+    upload                           Upload a local file
 
 Available options are:
 END
@@ -111,6 +121,8 @@ END
                           COMMAND_HELP
                         when 'script'
                           SCRIPT_HELP
+                        when 'file'
+                          FILE_HELP
                         else
                           BANNER
                         end
@@ -138,7 +150,7 @@ END
               "Expected action to be one of #{ACTIONS.join(', ')}"
       end
 
-      unless options[:leftovers].empty?
+      if options[:mode] != 'file' && !options[:leftovers].empty?
         raise Bolt::CLIError,
               "unknown argument(s) #{options[:leftovers].join(', ')}"
       end
@@ -179,6 +191,15 @@ END
 
           input_method ||= 'both'
           executor.run_task(path, input_method, options[:task_options])
+        when 'file'
+          src = options[:object]
+          dest = options[:leftovers].first
+
+          unless file_exist?(src)
+            raise Bolt::CLIError, "The source file '#{src}' does not exist"
+          end
+
+          executor.file_upload(src, dest)
         end
 
       results.each_pair do |node, result|

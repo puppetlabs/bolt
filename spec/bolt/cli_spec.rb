@@ -125,6 +125,17 @@ describe "Bolt::CLI" do
     expect(cli.parse).to include(mode: 'script')
   end
 
+  describe "file" do
+    describe "upload" do
+      it "uploads a file" do
+        cli = Bolt::CLI.new(%w[file upload ./src /path/dest --nodes foo])
+        result = cli.parse
+        expect(result[:object]).to eq('./src')
+        expect(result[:leftovers].first).to eq('/path/dest')
+      end
+    end
+  end
+
   describe "execute" do
     let(:executor) { double('executor') }
     let(:cli) { Bolt::CLI.new({}) }
@@ -259,6 +270,49 @@ describe "Bolt::CLI" do
         modules: File.join(__FILE__, '../../fixtures/modules')
       }
       cli.execute(options)
+    end
+
+    describe "file uploading" do
+      it "uploads a file via scp" do
+        expect(executor)
+          .to receive(:file_upload)
+          .with('/path/to/local', '/path/to/remote')
+          .and_return({})
+        expect(cli)
+          .to receive(:file_exist?)
+          .with('/path/to/local')
+          .and_return(true)
+
+        options = {
+          nodes: nodes,
+          mode: 'file',
+          action: 'upload',
+          object: '/path/to/local',
+          leftovers: ['/path/to/remote']
+        }
+        cli.execute(options)
+      end
+
+      it "raises if the local file doesn't exist" do
+        expect(cli)
+          .to receive(:file_exist?)
+          .with('/path/to/local')
+          .and_return(false)
+
+        options = {
+          nodes: nodes,
+          mode: 'file',
+          action: 'upload',
+          object: '/path/to/local',
+          leftovers: ['/path/to/remote']
+        }
+        expect {
+          cli.execute(options)
+        }.to raise_error(
+          Bolt::CLIError,
+          %r{The source file '/path/to/local' does not exist}
+        )
+      end
     end
   end
 end
