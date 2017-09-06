@@ -33,7 +33,6 @@ Or add this to your Gemfile if you are using [Bundler](https://bundler.io).
 Or run from source
 
     bundle install --path .bundle
-    bundle exec bolt exec --nodes <name> command='hostname -f'
 
 See `bolt --help` for more details.
 
