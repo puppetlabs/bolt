@@ -62,7 +62,7 @@ END
 Usage: bolt file <action> [options]
 
 Available actions are:
-    upload                           Upload a local file
+    upload <src> <dest>              Upload local file <src> to <dest> on each node
 
 Available options are:
 END
@@ -195,7 +195,9 @@ END
           src = options[:object]
           dest = options[:leftovers].first
 
-          unless file_exist?(src)
+          if dest.nil?
+            raise Bolt::CLIError, "A destination path must be specified"
+          elsif !file_exist?(src)
             raise Bolt::CLIError, "The source file '#{src}' does not exist"
           end
 
