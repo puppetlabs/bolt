@@ -20,49 +20,78 @@ systems using ssh and winrm.
 * Linux, OSX, Windows
 * Ruby 2.1+
 
-## Getting started
+## Overview
 
-Install it with [RubyGems](https://rubygems.org).
+Bolt provides the ability to execute commands, scripts, and tasks on remote
+systems using ssh and winrm.
 
-    gem install bolt
+### Commands
 
-Or add this to your Gemfile if you are using [Bundler](https://bundler.io).
+Bolt can execute arbitrary commands:
 
-    gem 'bolt'
+    $ bolt command run <command>
 
-Or run from source
+If the command contains spaces or shell special characters, then you must single
+quote the command:
 
-    bundle install --path .bundle
+    $ bolt command run '<command> <arg1> ... <argN>'
 
-See `bolt --help` for more details.
+### Scripts
 
-Bolt relies on gems with native extensions, and the process for building them varies by platform:
+Bolt can copy a script from the local system to the remote system, and execute
+it. The script can be written in any language provided the appropriate
+interpreter is installed on the remote system, e.g. bash, powershell, python,
+etc. Bolt relies on shebang lines when executing the script on remote *nix
+systems. Bolt currently only supports PowerShell scripts on remote Windows
+systems. On *nix, bolt ensures that the script is executable on the remote
+system before executing it.
 
-### CentOS 7/Redhat 7
+### Tasks
 
-    yum install -y make gcc ruby-devel
+Tasks are similar to scripts, except that tasks expect to receive input in a
+specific way. Tasks are also distributed in Puppet modules, making it easy to
+write, publish, and download tasks for common operations. Bolt uses Puppet to
+discover and load locally installed modules, so Puppet must be installed on
+the local controller node for tasks to work.
 
-### Fedora 25
+Tasks receive input either as environment variables or as a JSON hash on
+standard input. For example, when executing the task:
 
-    dnf install -y make gcc redhat-rpm-config ruby-devel rubygem-rdoc
+    $ bolt task run package::status name=openssl
 
-### Debian 9/Ubuntu 16.04
+Bolt will set the `PT_name` environment variable to `openssl` prior to executing
+the `status` task in the `package` module.
 
-    apt-get install -y make gcc ruby-dev
+Bolt will also submit the parameters as JSON to stdin, for example:
 
-### OSX
+```json
+{
+  "name":"openssl"
+}
+```
 
-Either install XCode or the Command Line Tools. The latter can be done from the command line:
+By default, bolt submits parameters via environment variables and stdin. The
+task can specify how it wants to receive metadata by setting `input_method` in
+its metadata.
 
-     xcode-select --install
+When executing the `package::status` task from above, the `--modules` option
+must be specified as the directory containing the `package` module. For example,
+the option `--modules /path/to/modules` should correspond to a directory
+structure:
 
-### Windows
+    /path/to/modules/
+      package/
+        tasks/
+          status
 
-Install [Chocolatey](https://chocolatey.org/install), then install `ruby`. It isn't necessary
-to install `ruby.devkit`, as ffi already publishes precompiled gems for Windows x86 and x64.
+## Installation
 
-    choco install ruby
-    refreshenv
+The most common way of installing bolt is to install from [RubyGems](https://rubygems.org).
+
+    $ gem install bolt
+
+Make sure to read [INSTALL.md](./INSTALL.md) for other ways of installing bolt,
+and how to build native extensions that bolt depends on.
 
 ## Examples
 
@@ -122,12 +151,12 @@ to install `ruby.devkit`, as ffi already publishes precompiled gems for Windows 
     SetupPrefix           :
     IsDefaultAUService    : True
 
-### Run a task from a module
+### Run the `status` task from the `package` module
 
     $ bolt task run package::status name=openssl --nodes neptune --modules ~/modules
     neptune: openssl-1.0.1e-16.el6_5.7.x86_64
 
-### Run the `service::init` task from a module
+### Run the special `init` task from the `service` module
 
     $ bolt task run service name=apache --nodes neptune --modules ~/modules
     neptune: { status: 'running', enabled: true }
@@ -159,6 +188,35 @@ tagged with `:vagrant` in rspec. To run all tests use:
 To exclude tests that rely on vagrant run:
 
     $ bundle exec rake unit
+
+## FAQ
+
+### Bolt requires ruby >= 2.1
+
+Trying to install bolt on ruby 1.9 or 2.0 will fail. You must use ruby 2.1 or
+greater.
+
+### Bolt fails to install
+
+```
+ERROR:  Error installing bolt:
+	ERROR: Failed to build gem native extension.
+```
+
+See [Native Extensions](./INSTALL.md#native-extensions).
+
+### Bolt fails to execute a task
+
+The `puppet` gem must be installed on the controller node in order to run tasks.
+If it is not installed, then you will receive an error:
+
+    Puppet must be installed to execute tasks
+
+See [installing Puppet](./INSTALL.md#installing-puppet) for more information.
+
+### Bolt does not support submitting task arguments via stdin to PowerShell
+
+Tasks written in PowerShell will only receive arguments as environment variables.
 
 ## License
 
