@@ -18,15 +18,25 @@ Style/BlockDelimiters:
 Style/NumericLiterals:
   Enabled: false
 
-Metrics/BlockLength:
-  Exclude:
-    - 'spec/**/*'
+Layout/IndentHeredoc:
+  Enabled: false
+
+Style/GuardClause:
+  Enabled: false
+
+Style/MultilineBlockChain:
+  Enabled: false
+
+
+# Disable nearly all Metrics checks. These seem better off left to judgement.
 
 Metrics/AbcSize:
   Enabled: false
 
-# It might be nice to have this
-Metrics/MethodLength:
+Metrics/BlockLength:
+  Enabled: false
+
+Metrics/BlockNesting:
   Enabled: false
 
 Metrics/ClassLength:
@@ -35,11 +45,14 @@ Metrics/ClassLength:
 Metrics/CyclomaticComplexity:
   Enabled: false
 
-Layout/IndentHeredoc:
+Metrics/MethodLength:
   Enabled: false
 
-Style/GuardClause:
+Metrics/ModuleLength:
   Enabled: false
 
-Style/MultilineBlockChain:
+Metrics/ParameterLists:
+  Enabled: false
+
+Metrics/PerceivedComplexity:
   Enabled: false
