@@ -143,6 +143,7 @@ describe "Bolt::CLI" do
 
     before :each do
       allow(Bolt::Executor).to receive(:new).and_return(executor)
+      allow(cli).to receive(:print_results)
     end
 
     it "executes the 'whoami' command" do

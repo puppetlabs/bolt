@@ -5,7 +5,8 @@ require 'json'
 module Bolt
   class SSH < Node
     def connect
-      options = { logger: @transport_logger }
+      options = { logger: @transport_logger,
+                  non_interactive: true }
       options[:port] = @port if @port
       options[:password] = @password if @password
 

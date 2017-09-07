@@ -104,28 +104,50 @@ and how to build native extensions that bolt depends on.
 ### Run a command over SSH
 
     $ bolt command run 'ssh -V' --nodes neptune
-    neptune: OpenSSH_5.3p1, OpenSSL 1.0.1e-fips 11 Feb 2013
+    neptune:
+
+    OpenSSH_5.3p1, OpenSSL 1.0.1e-fips 11 Feb 2013
+
+    Ran on 1 node in 0.27 seconds
 
 ### Run a command over SSH against multiple hosts
 
     $ bolt command run 'ssh -V' --nodes neptune,mars
-    neptune: OpenSSH_5.3p1, OpenSSL 1.0.1e-fips 11 Feb 2013
-    mars: OpenSSH_6.6.1p1, OpenSSL 1.0.1e-fips 11 Feb 2013
+    neptune:
+
+    OpenSSH_5.3p1, OpenSSL 1.0.1e-fips 11 Feb 2013
+
+    mars:
+
+    OpenSSH_6.6.1p1, OpenSSL 1.0.1e-fips 11 Feb 2013
+
+    Ran on 2 nodes in 0.27 seconds
 
 ### Run a command over WinRM
 
     $ bolt command run 'gpupdate /force' --nodes winrm://pluto --user Administrator --password <password>
-    pluto: Updating policy...
+    pluto:
+
+    Updating policy...
     
     Computer Policy update has completed successfully.
     
     User Policy update has completed successfully.
 
+    Ran on 1 node in 11.21 seconds
+
 ### Run a command over WinRM against multiple hosts
 
     $ bolt command run '(Get-CimInstance Win32_OperatingSystem).version' --nodes winrm://pluto,winrm://mercury --user Administrator --password <password>
-    pluto: 6.3.9600
-    mercury: 10.0.14393
+    pluto:
+
+    6.3.9600
+
+    mercury:
+
+    10.0.14393
+
+    Ran on 2 nodes in 6.03 seconds
 
 ### Run a bash script
 
@@ -136,6 +158,7 @@ and how to build native extensions that bolt depends on.
 
     $ bolt script run Get-WUServiceManager.ps1 --nodes winrm://pluto --user Administrator --password <password>
     pluto:
+
     Name                  : Windows Server Update Service
     ContentValidationCert : {}
     ExpirationDate        : 6/18/5254 9:21:00 PM
@@ -154,17 +177,23 @@ and how to build native extensions that bolt depends on.
 ### Run the `status` task from the `package` module
 
     $ bolt task run package::status name=openssl --nodes neptune --modules ~/modules
-    neptune: openssl-1.0.1e-16.el6_5.7.x86_64
+    neptune:
+
+    openssl-1.0.1e-16.el6_5.7.x86_64
 
 ### Run the special `init` task from the `service` module
 
     $ bolt task run service name=apache --nodes neptune --modules ~/modules
-    neptune: { status: 'running', enabled: true }
+    neptune:
+
+    { status: 'running', enabled: true }
 
 ### Upload a file
 
     $ bolt file upload /local/path /remote/path --nodes neptune
-    neptune: Uploaded file '/local/path' to 'neptune:/remote/path'
+    neptune:
+
+    Uploaded file '/local/path' to 'neptune:/remote/path'
 
 ## Kudos
 
