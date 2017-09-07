@@ -38,6 +38,12 @@ module Bolt
         stream.puts @value
       end
     end
+
+    def colorize(stream)
+      stream.print "\033[32m" if stream.isatty
+      yield
+      stream.print "\033[0m" if stream.isatty
+    end
   end
 
   class Failure < Result
@@ -61,6 +67,12 @@ module Bolt
       else
         stream.puts @value
       end
+    end
+
+    def colorize(stream)
+      stream.print "\033[31m" if stream.isatty
+      yield
+      stream.print "\033[0m" if stream.isatty
     end
   end
 

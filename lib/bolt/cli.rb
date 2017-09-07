@@ -1,5 +1,6 @@
 require 'uri'
 require 'optparse'
+require 'benchmark'
 require 'bolt/node'
 require 'bolt/version'
 require 'bolt/executor'
@@ -173,41 +174,55 @@ END
         Bolt::Node.from_uri(node, options[:user], options[:password])
       end
 
-      executor = Bolt::Executor.new(nodes)
-      results =
-        case options[:mode]
-        when 'command'
-          executor.execute(options[:object])
-        when 'script'
-          executor.run_script(options[:object])
-        when 'task'
-          path = options[:object]
-          input_method = nil
+      results = nil
+      elapsed_time = Benchmark.realtime do
+        executor = Bolt::Executor.new(nodes)
+        results =
+          case options[:mode]
+          when 'command'
+            executor.execute(options[:object])
+          when 'script'
+            executor.run_script(options[:object])
+          when 'task'
+            path = options[:object]
+            input_method = nil
 
-          unless file_exist?(path)
-            path, metadata = load_task_data(path, options[:modules])
-            input_method = metadata['input_method']
+            unless file_exist?(path)
+              path, metadata = load_task_data(path, options[:modules])
+              input_method = metadata['input_method']
+            end
+
+            input_method ||= 'both'
+            executor.run_task(path, input_method, options[:task_options])
+          when 'file'
+            src = options[:object]
+            dest = options[:leftovers].first
+
+            if dest.nil?
+              raise Bolt::CLIError, "A destination path must be specified"
+            elsif !file_exist?(src)
+              raise Bolt::CLIError, "The source file '#{src}' does not exist"
+            end
+
+            executor.file_upload(src, dest)
           end
-
-          input_method ||= 'both'
-          executor.run_task(path, input_method, options[:task_options])
-        when 'file'
-          src = options[:object]
-          dest = options[:leftovers].first
-
-          if dest.nil?
-            raise Bolt::CLIError, "A destination path must be specified"
-          elsif !file_exist?(src)
-            raise Bolt::CLIError, "The source file '#{src}' does not exist"
-          end
-
-          executor.file_upload(src, dest)
-        end
-
-      results.each_pair do |node, result|
-        $stdout.print "#{node.host}: "
-        result.print_to_stream($stdout)
       end
+
+      print_results(results, elapsed_time)
+    end
+
+    def print_results(results, elapsed_time)
+      results.each_pair do |node, result|
+        result.colorize($stdout) { $stdout.puts "#{node.host}:" }
+        $stdout.puts
+        result.print_to_stream($stdout)
+        $stdout.puts
+      end
+
+      $stdout.puts format("Ran on %d node%s in %.2f seconds",
+                          results.size,
+                          results.size > 1 ? 's' : '',
+                          elapsed_time)
     end
 
     def file_exist?(path)
