@@ -1,25 +1,11 @@
 # Installation
 
-Bolt can be installed 3 ways depending on your use case. The most common case is
-to install from [RubyGems](https://rubygems.org).
+To use Bolt, you'll need to install:
 
-    gem install bolt
-
-Since bolt is not public yet, you will need to install the gem from our internal
-mirror, and specify a version to ensure you get the latest version:
-
-    gem install --source http://rubygems.delivery.puppetlabs.net bolt -v '> 0.0.1'
-
-Or add this to your Gemfile if you are using [Bundler](https://bundler.io).
-
-    gem 'bolt'
-
-Or if running from source
-
-    bundle install --path .bundle
-    bundle exec bolt ...
-
-See `bolt --help` for more details.
+* Ruby 2.1 or greater
+* gcc and related dependencies (except on Windows)
+* Bolt gem
+* Puppet gem (optional dependency to run tasks)
 
 ## Native Extensions
 
@@ -52,6 +38,30 @@ to install `ruby.devkit`, as ffi already publishes precompiled gems for Windows 
 
     choco install ruby
     refreshenv
+
+## Installing Bolt
+
+Bolt can be installed 3 ways depending on your use case. The most common case is
+to install from [RubyGems](https://rubygems.org).
+
+    gem install bolt
+
+Since bolt is not public yet, you will need to install the gem from our internal
+mirror, and specify a version to ensure you get the latest version:
+
+    gem install --source http://rubygems.delivery.puppetlabs.net bolt -v '> 0.0.1'
+
+Or add this to your Gemfile if you are using [Bundler](https://bundler.io), and
+specify your gem `source` as `http://rubygems.delivery.puppetlabs.net`
+
+    gem 'bolt'
+
+Or if running from source
+
+    bundle install --path .bundle
+    bundle exec bolt ...
+
+See `bolt --help` for more details.
 
 ## Installing Puppet
 
