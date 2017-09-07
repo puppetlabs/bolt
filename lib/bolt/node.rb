@@ -7,9 +7,9 @@ module Bolt
 
     def self.parse_uri(node)
       case node
-      when %r{^(ssh|winrm)://.*:\d+$}
+      when %r{^(ssh|winrm|docker)://.*:\d+$}
         URI(node)
-      when %r{^(ssh|winrm)://}
+      when %r{^(ssh|winrm|docker)://}
         uri = URI(node)
         uri.port = uri.scheme == 'ssh' ? 22 : 5985
         uri
@@ -24,6 +24,8 @@ module Bolt
       uri = parse_uri(uri_string)
       klass = if uri.scheme == 'winrm'
                 Bolt::WinRM
+              elsif uri.scheme == 'docker'
+                Bolt::Docker
               else
                 Bolt::SSH
               end
@@ -55,3 +57,4 @@ end
 
 require 'bolt/node/ssh'
 require 'bolt/node/winrm'
+require 'bolt/node/docker'
