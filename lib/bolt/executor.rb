@@ -48,5 +48,18 @@ module Bolt
         node.run_task(task, input_method, arguments)
       end
     end
+
+    def file_upload(source, destination)
+      on_each do |node|
+        result = node.upload(source, destination)
+        if result.is_a?(Bolt::Success)
+          Bolt::Success.new(
+            "Uploaded '#{source}' to '#{node.host}:#{destination}'"
+          )
+        else
+          result
+        end
+      end
+    end
   end
 end

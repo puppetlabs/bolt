@@ -132,6 +132,11 @@ to install `ruby.devkit`, as ffi already publishes precompiled gems for Windows 
     $ bolt task run service name=apache --nodes neptune --modules ~/modules
     neptune: { status: 'running', enabled: true }
 
+### Upload a file
+
+    $ bolt file upload /local/path /remote/path --nodes neptune
+    neptune: Uploaded file '/local/path' to 'neptune:/remote/path'
+
 ## Kudos
 
 Thank you to [Marcin Bunsch](https://github.com/marcinbunsch) for allowing

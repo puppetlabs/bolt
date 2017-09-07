@@ -51,7 +51,7 @@ module Bolt
       end
     end
 
-    def copy(source, destination)
+    def upload(source, destination)
       Net::SFTP::Session.new(@session).connect! do |sftp|
         sftp.upload!(source, destination)
       end
@@ -76,7 +76,7 @@ module Bolt
         remote_path = "#{dir}/#{File.basename(file)}"
         Bolt::Success.new
       end.then do
-        copy(file, remote_path)
+        upload(file, remote_path)
       end.then do
         execute("chmod u+x '#{remote_path}'")
       end.then do

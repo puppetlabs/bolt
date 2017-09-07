@@ -24,14 +24,14 @@ describe Bolt::SSH do
     expect(ssh.execute("ssh -V").output.stderr.string).to match(/OpenSSH/)
   end
 
-  it "can copy a file to a host", vagrant: true do
+  it "can upload a file to a host", vagrant: true do
     contents = "kljhdfg"
-    with_tempfile_containing('copy-test', contents) do |file|
-      ssh.copy(file.path, "/home/vagrant/copy-test")
+    with_tempfile_containing('upload-test', contents) do |file|
+      ssh.upload(file.path, "/home/vagrant/upload-test")
 
-      expect(ssh.execute("cat /home/vagrant/copy-test").value).to eq(contents)
+      expect(ssh.execute("cat /home/vagrant/upload-test").value).to eq(contents)
 
-      ssh.execute("rm /home/vagrant/copy-test")
+      ssh.execute("rm /home/vagrant/upload-test")
     end
   end
 
