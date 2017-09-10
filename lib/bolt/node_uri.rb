@@ -6,7 +6,9 @@ module Bolt
 
     def parse(string)
       case string
-      when %r{^(ssh|winrm)://.*:\d+$}
+      when %r{^(ssh|winrm|pcp)://.*:\d+$}
+        URI(string)
+      when %r{^pcp://}
         URI(string)
       when %r{^(ssh|winrm)://}
         uri = URI(string)

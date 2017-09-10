@@ -10,6 +10,11 @@ RSpec::Core::RakeTask.new(:unit) do |t|
   t.rspec_opts = '--tag ~vagrant'
 end
 
+desc "Run RSpec tests that don't require VM fixtures or orchestrator"
+RSpec::Core::RakeTask.new(:windows) do |t|
+  t.rspec_opts = '--tag ~vagrant --tag ~orchestrator'
+end
+
 RuboCop::RakeTask.new(:rubocop) do |t|
   t.options = ['--display-cop-names', '--display-style-guide']
 end

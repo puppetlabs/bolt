@@ -11,8 +11,11 @@ module Bolt
     def self.from_uri(uri_string, default_user = nil, default_password = nil,
                       **kwargs)
       uri = NodeURI.new(uri_string)
-      klass = if uri.scheme == 'winrm'
+      klass = case uri.scheme
+              when 'winrm'
                 Bolt::WinRM
+              when 'pcp'
+                Bolt::Orch
               else
                 Bolt::SSH
               end
@@ -73,3 +76,4 @@ end
 
 require 'bolt/node/ssh'
 require 'bolt/node/winrm'
+require 'bolt/node/orch'
