@@ -144,7 +144,7 @@ Tasks can receive input as either environment variables or a JSON hash on standa
 
 When executing the task, specify the parameter value on the command line in the format `parameter=value`. Pass multiple parameters as a space-separated list.
 
-For example, to run mysql tasks against a database called 'mydatabase', specify the database parameter as `database=mydatabase`. 
+For example, to run mysql tasks against a database called 'mydatabase', specify the database parameter as `database=mydatabase`.
 
 When you run a command with this parameter, Bolt sets the task's `database` value to mydatabase before it executes the task. It also submits the parameters as JSON to stdin:
 
@@ -169,6 +169,19 @@ For example, in your `params.json` file, specify:
 ```
 
 Then specify that file on the command line with the parameters flag: `--params @params.json`
+
+### Configuring Puppet Orchestrator for Bolt
+
+Bolt can use the Puppet orchestrator to target nodes using the `pcp` protocol when running on linux.
+
+1. Configure `~/.puppetlabs/client-tools/orchestrator.conf` to include
+   service-url and cacert options to connect to you puppet master.
+1. Store a PE RBAC token in `~/.puppetlabs/token`.
+1. Install the bolt helper task `tasks/init` by installing this repository into
+   the production environment on your puppet master. Without this task the
+   exec, script and file commands will not work in Bolt.
+1. To run tasks over orchestrator the tasks must be installed both on the bolt
+   node and into the production environment on the master
 
 ## Usage examples
 
@@ -206,9 +219,9 @@ Then specify that file on the command line with the parameters flag: `--params @
     pluto:
 
     Updating policy...
-    
+
     Computer Policy update has completed successfully.
-    
+
     User Policy update has completed successfully.
 
     Ran on 1 node in 11.21 seconds
