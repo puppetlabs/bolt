@@ -30,3 +30,4 @@ Gemfile.local
 
 .vagrant/
 .byebug_history
+bolt
