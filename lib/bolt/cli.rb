@@ -72,7 +72,7 @@ HELP
       @argv = argv
     end
 
-    MODES = %w[command script task file].freeze
+    MODES = %w[command script task plan file].freeze
     ACTIONS = %w[run upload download].freeze
 
     def parse
@@ -160,7 +160,7 @@ HELP
               "unknown argument(s) #{options[:leftovers].join(', ')}"
       end
 
-      unless options[:nodes]
+      unless options[:nodes] || options[:mode] == 'plan'
         raise Bolt::CLIError, "option --nodes must be specified"
       end
     end
@@ -174,46 +174,57 @@ HELP
     end
 
     def execute(options)
-      nodes = options[:nodes].map do |node|
-        Bolt::Node.from_uri(node,
-                            options[:user], options[:password], options[:tty])
-      end
+      if options[:mode] == 'plan'
+        execute_plan(options)
+      else
+        nodes = options[:nodes].map do |node|
+          Bolt::Node.from_uri(node,
+                              options[:user], options[:password], options[:tty])
+        end
 
-      results = nil
-      elapsed_time = Benchmark.realtime do
-        executor = Bolt::Executor.new(nodes)
-        results =
-          case options[:mode]
-          when 'command'
-            executor.execute(options[:object])
-          when 'script'
-            executor.run_script(options[:object])
-          when 'task'
-            path = options[:object]
-            input_method = nil
+        results = nil
+        elapsed_time = Benchmark.realtime do
+          executor = Bolt::Executor.new(nodes)
+          results =
+            case options[:mode]
+            when 'command'
+              executor.execute(options[:object])
+            when 'script'
+              executor.run_script(options[:object])
+            when 'task'
+              path = options[:object]
+              input_method = nil
 
-            unless file_exist?(path)
-              path, metadata = load_task_data(path, options[:modules])
-              input_method = metadata['input_method']
+              unless file_exist?(path)
+                path, metadata = load_task_data(path, options[:modules])
+                input_method = metadata['input_method']
+              end
+
+              input_method ||= 'both'
+              executor.run_task(path, input_method, options[:task_options])
+            when 'file'
+              src = options[:object]
+              dest = options[:leftovers].first
+
+              if dest.nil?
+                raise Bolt::CLIError, "A destination path must be specified"
+              elsif !file_exist?(src)
+                raise Bolt::CLIError, "The source file '#{src}' does not exist"
+              end
+
+              executor.file_upload(src, dest)
             end
+        end
 
-            input_method ||= 'both'
-            executor.run_task(path, input_method, options[:task_options])
-          when 'file'
-            src = options[:object]
-            dest = options[:leftovers].first
-
-            if dest.nil?
-              raise Bolt::CLIError, "A destination path must be specified"
-            elsif !file_exist?(src)
-              raise Bolt::CLIError, "The source file '#{src}' does not exist"
-            end
-
-            executor.file_upload(src, dest)
-          end
+        print_results(results, elapsed_time)
       end
+    end
 
-      print_results(results, elapsed_time)
+    def execute_plan(options)
+      result = run_plan(options[:object],
+                        options[:task_options],
+                        options[:modules])
+      puts result
     end
 
     def print_results(results, elapsed_time)
@@ -270,6 +281,22 @@ HELP
           end
 
         [file, metadata]
+      end
+    end
+
+    def run_plan(plan, args, modules)
+      begin
+        require 'puppet_pal'
+        require 'puppet'
+      rescue LoadError
+        raise Bolt::CLIError, "Puppet must be installed to execute tasks"
+      end
+
+      modulepath = modules ? [modules] : []
+
+      Puppet.initialize_settings
+      Puppet::Pal.in_tmp_environment('bolt', modulepath: modulepath) do |pal|
+        puts pal.run_plan(plan, plan_args: args)
       end
     end
   end
