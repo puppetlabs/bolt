@@ -94,7 +94,7 @@ HELP
           options[:modules] = modules
         end
         opts.on_tail('--[no-]tty',
-                     "Reuqest a pseudo TTY on nodes that support it") do |tty|
+                     "Request a pseudo TTY on nodes that support it") do |tty|
           options[:tty] = tty
         end
         opts.on_tail('-h', '--help', 'Display help') do |_|
