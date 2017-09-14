@@ -93,6 +93,10 @@ HELP
         opts.on('--modules MODULES', "Path to modules directory") do |modules|
           options[:modules] = modules
         end
+        opts.on_tail('--[no-]tty',
+                     "Reuqest a pseudo TTY on nodes that support it") do |tty|
+          options[:tty] = tty
+        end
         opts.on_tail('-h', '--help', 'Display help') do |_|
           options[:help] = true
         end
@@ -171,7 +175,8 @@ HELP
 
     def execute(options)
       nodes = options[:nodes].map do |node|
-        Bolt::Node.from_uri(node, options[:user], options[:password])
+        Bolt::Node.from_uri(node,
+                            options[:user], options[:password], options[:tty])
       end
 
       results = nil

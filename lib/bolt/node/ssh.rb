@@ -22,6 +22,9 @@ module Bolt
       status = {}
 
       session_channel = @session.open_channel do |channel|
+        # Request a pseudo tty
+        channel.request_pty if @tty
+
         channel.exec(command) do |_, success|
           raise "could not execute command: #{command.inspect}" unless success
 

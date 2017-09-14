@@ -20,23 +20,24 @@ module Bolt
       end
     end
 
-    def self.from_uri(uri_string, user, password)
+    def self.from_uri(uri_string, user, password, tty)
       uri = parse_uri(uri_string)
       klass = if uri.scheme == 'winrm'
                 Bolt::WinRM
               else
                 Bolt::SSH
               end
-      klass.new(uri.host, uri.port, user, password)
+      klass.new(uri.host, uri.port, user, password, tty)
     end
 
     attr_reader :logger, :host
 
-    def initialize(host, port = nil, user = nil, password = nil)
+    def initialize(host, port = nil, user = nil, password = nil, tty = nil)
       @host = host
       @user = user
       @port = port
       @password = password
+      @tty = tty
 
       @logger = init_logger(STDERR, Logger::DEBUG)
       @transport_logger = init_logger(STDERR, Logger::WARN)
