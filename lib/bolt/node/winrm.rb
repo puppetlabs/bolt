@@ -41,18 +41,18 @@ module Bolt
       fs = ::WinRM::FS::FileManager.new(@connection)
       fs.upload(source, destination)
       Bolt::Success.new
-    rescue => ex
+    rescue StandardError => ex
       Bolt::ExceptionFailure.new(ex)
     end
 
     def make_tempdir
-      result = execute(<<-EOS)
+      result = execute(<<-PS)
 $parent = [System.IO.Path]::GetTempPath()
 $name = [System.IO.Path]::GetRandomFileName()
 $path = Join-Path $parent $name
 New-Item -ItemType Directory -Path $path | Out-Null
 $path
-EOS
+PS
       result.then { |stdout| Bolt::Success.new(stdout.chomp) }
     end
 
@@ -70,10 +70,10 @@ EOS
       end.then do
         result = yield dest
       end.then do
-        execute(<<-EOS)
+        execute(<<-PS)
 Remove-Item -Force "#{dest}"
 Remove-Item -Force "#{dir}"
-EOS
+PS
         result
       end
     end

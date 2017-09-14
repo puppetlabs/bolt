@@ -52,10 +52,10 @@ describe Bolt::WinRM do
   end
 
   it "can run a task passing input on stdin", vagrant: true do
-    contents = <<END
+    contents = <<PS
 $line = [Console]::In.ReadLine()
 Write-Output $line
-END
+PS
     arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
     with_tempfile_containing('tasks-test-stdin-winrm', contents) do |file|
       expect {
@@ -68,11 +68,11 @@ END
   end
 
   it "can run a task passing input on stdin and environment", vagrant: true do
-    contents = <<END
+    contents = <<PS
 Write-Output "$env:PT_message_one" "$env:PT_message_two"
 $line = [Console]::In.ReadLine()
 Write-Output $line
-END
+PS
     arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
     with_tempfile_containing('tasks-test-both-winrm', contents) do |file|
       # we only get args from environment, since stdin isn't yet supported

@@ -18,7 +18,7 @@ module Bolt
   class CLIExit < StandardError; end
 
   class CLI
-    BANNER = <<-END.freeze
+    BANNER = <<-HELP.freeze
 Usage: bolt <subcommand> <action> [options]
 
 Available subcommands:
@@ -28,9 +28,9 @@ Available subcommands:
     bolt file upload <src> <dest>    Upload a local file
 
 where [options] are:
-END
+HELP
 
-    TASK_HELP = <<-END.freeze
+    TASK_HELP = <<-HELP.freeze
 Usage: bolt task <action> [options] [parameters]
 
 Available actions are:
@@ -39,34 +39,34 @@ Available actions are:
 Parameters are of the form <parameter>=<value>.
 
 Available options are:
-END
+HELP
 
-    COMMAND_HELP = <<-END.freeze
+    COMMAND_HELP = <<-HELP.freeze
 Usage: bolt command <action> <command> [options]
 
 Available actions are:
     run                              Run a command remotely
 
 Available options are:
-END
+HELP
 
-    SCRIPT_HELP = <<-END.freeze
+    SCRIPT_HELP = <<-HELP.freeze
 Usage: bolt script <action> <script> [options]
 
 Available actions are:
     run                              Upload a local script and run it remotely
 
 Available options are:
-END
+HELP
 
-    FILE_HELP = <<-END.freeze
+    FILE_HELP = <<-HELP.freeze
 Usage: bolt file <action> [options]
 
 Available actions are:
     upload <src> <dest>              Upload local file <src> to <dest> on each node
 
 Available options are:
-END
+HELP
 
     def initialize(argv)
       @argv = argv

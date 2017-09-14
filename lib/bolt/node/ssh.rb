@@ -57,13 +57,13 @@ module Bolt
         sftp.upload!(source, destination)
       end
       Bolt::Success.new
-    rescue => e
+    rescue StandardError => e
       Bolt::ExceptionFailure.new(e)
     end
 
     def make_tempdir
       Bolt::Success.new(@session.exec!('mktemp -d').chomp)
-    rescue => e
+    rescue StandardError => e
       Bolt::ExceptionFailure.new(e)
     end
 
