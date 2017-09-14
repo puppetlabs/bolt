@@ -11,7 +11,7 @@ describe Bolt::WinRM do
   let(:user) { "vagrant" }
   let(:password) { "vagrant" }
   let(:command) { "echo $env:UserName" }
-  let(:winrm) { Bolt::WinRM.new(host, port, user, password) }
+  let(:winrm) { Bolt::WinRM.new(host, port, user, password, false) }
 
   before(:each) { winrm.connect }
   after(:each) { winrm.disconnect }
