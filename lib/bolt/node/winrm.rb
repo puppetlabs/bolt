@@ -4,8 +4,9 @@ require 'bolt/result'
 
 module Bolt
   class WinRM < Node
-    def initialize(host, port, user, password, tty, shell = :powershell)
-      super(host, port, user, password, tty)
+    def initialize(host, port, user, password, tty,
+                   uri = nil, shell = :powershell)
+      super(host, port, user, password, tty, uri)
 
       @shell = shell
       @endpoint = "http://#{host}:#{port}/wsman"

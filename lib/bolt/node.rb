@@ -30,14 +30,16 @@ module Bolt
       klass.new(uri.host, uri.port, user, password, tty)
     end
 
-    attr_reader :logger, :host
+    attr_reader :logger, :host, :uri
 
-    def initialize(host, port = nil, user = nil, password = nil, tty = nil)
+    def initialize(host, port = nil, user = nil,
+                   password = nil, tty = nil, uri = nil)
       @host = host
       @user = user
       @port = port
       @password = password
       @tty = tty
+      @uri = uri
 
       @logger = init_logger(STDERR, Logger::DEBUG)
       @transport_logger = init_logger(STDERR, Logger::WARN)
