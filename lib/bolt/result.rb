@@ -24,6 +24,10 @@ module Bolt
       @value = value
     end
 
+    def success?
+      true
+    end
+
     def then
       yield @value
     end
@@ -52,6 +56,10 @@ module Bolt
     def initialize(exit_code, output)
       super(output)
       @exit_code = exit_code
+    end
+
+    def success?
+      false
     end
 
     def then
