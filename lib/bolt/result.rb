@@ -14,6 +14,12 @@ module Bolt
     def initialize(output)
       @output = output
     end
+
+    def output_string
+      str = StringIO.new
+      print_to_stream(str)
+      str.string
+    end
   end
 
   class Success < Result
