@@ -35,9 +35,9 @@ module Bolt
       results
     end
 
-    def execute(command)
+    def run_command(command)
       on_each do |node|
-        node.execute(command)
+        node.run_command(command)
       end
     end
 

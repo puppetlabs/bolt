@@ -1,11 +1,16 @@
 require 'uri'
 require 'optparse'
 require 'benchmark'
+require 'logger'
 require 'bolt/node'
 require 'bolt/version'
 require 'bolt/executor'
 
 module Bolt
+  class << self
+    attr_accessor :log_level
+  end
+
   class CLIError < RuntimeError
     attr_reader :error_code
 
@@ -77,6 +82,7 @@ HELP
 
     def parse
       options = {}
+      Bolt.log_level = Logger::WARN
 
       global = OptionParser.new('') do |opts|
         opts.on('-n', '--nodes x,y,z', Array, 'Nodes to connect to') do |nodes|
@@ -99,6 +105,12 @@ HELP
         end
         opts.on_tail('-h', '--help', 'Display help') do |_|
           options[:help] = true
+        end
+        opts.on_tail('--verbose', 'Display verbose logging') do |_|
+          Bolt.log_level = Logger::INFO
+        end
+        opts.on_tail('--debug', 'Display verbose logging') do |_|
+          Bolt.log_level = Logger::DEBUG
         end
         opts.on_tail('--version', 'Display the version') do |_|
           puts Bolt::VERSION
@@ -188,7 +200,7 @@ HELP
           results =
             case options[:mode]
             when 'command'
-              executor.execute(options[:object])
+              executor.run_command(options[:object])
             when 'script'
               executor.run_script(options[:object])
             when 'task'
