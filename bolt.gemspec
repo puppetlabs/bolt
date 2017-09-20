@@ -3,6 +3,13 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 require 'bolt/version'
 
+# --recurse-submodules only available in newer git
+output = `git submodule -q foreach 'git ls-files lib | sed "s|^|$path/|"'`
+vendored_files = output.split
+bolt_files = `git ls-files -z`.split("\x0").reject do |f|
+  f.match(%r{^(test|spec|features)/})
+end
+
 Gem::Specification.new do |spec|
   spec.name          = "bolt"
   spec.version       = Bolt::VERSION
@@ -13,10 +20,7 @@ Gem::Specification.new do |spec|
   spec.description   = "Execute commands remotely over SSH and WinRM"
   spec.homepage      = "https://github.com/puppetlabs/bolt"
   spec.license       = "Apache-2.0"
-
-  spec.files         = `git ls-files -z`.split("\x0").reject do |f|
-    f.match(%r{^(test|spec|features)/})
-  end
+  spec.files         = bolt_files + vendored_files
   spec.bindir        = "exe"
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]

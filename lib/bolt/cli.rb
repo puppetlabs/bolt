@@ -186,6 +186,16 @@ HELP
     end
 
     def execute(options)
+      if options[:mode] == 'plan' || options[:mode] == 'task'
+        basedir = File.join(File.dirname(__FILE__), '../..')
+        $LOAD_PATH.unshift(File.absolute_path('vendored/puppet/lib', basedir))
+        $LOAD_PATH.unshift(File.absolute_path('vendored/facter/lib', basedir))
+        $LOAD_PATH.unshift(File.absolute_path('vendored/hiera/lib', basedir))
+
+        require 'puppet'
+        require 'puppet_pal'
+      end
+
       if options[:mode] == 'plan'
         execute_plan(options)
       else
