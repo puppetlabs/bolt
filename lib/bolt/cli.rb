@@ -109,7 +109,7 @@ HELP
         opts.on_tail('--verbose', 'Display verbose logging') do |_|
           Bolt.log_level = Logger::INFO
         end
-        opts.on_tail('--debug', 'Display verbose logging') do |_|
+        opts.on_tail('--debug', 'Display debug logging') do |_|
           Bolt.log_level = Logger::DEBUG
         end
         opts.on_tail('--version', 'Display the version') do |_|
