@@ -195,6 +195,12 @@ and how to build native extensions that bolt depends on.
 
     Uploaded file '/local/path' to 'neptune:/remote/path'
 
+### Run the `deploy` plan from the `webserver` module
+
+    $ bolt plan run webserver::deploy version=1.2 --modules ~/modules
+
+    Deployed app version 1.2.
+
 ## Kudos
 
 Thank you to [Marcin Bunsch](https://github.com/marcinbunsch) for allowing
