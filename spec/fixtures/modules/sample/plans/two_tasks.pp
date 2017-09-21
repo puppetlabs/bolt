@@ -1,9 +1,11 @@
-# one line plan to show we can run a task by name
-plan sample::two_tasks($nodes = Hash) {
+plan sample::two_tasks($nodes) {
 
-  run_task(mymodule::mytask, $nodes['webservers'],
-    param1 => $task1_value,
-    param2 => $task2_value,
+  run_task(sample::echo, $nodes,
+    message => "first task",
+  )
+
+  run_task(sample::echo, $nodes,
+    message => "second task",
   )
 
 }
