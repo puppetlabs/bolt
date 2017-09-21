@@ -199,6 +199,15 @@ and how to build native extensions that bolt depends on.
 
     Deployed app version 1.2.
 
+Note the `--nodes` option is not used with plans, as they can contain more
+complex logic about where code is run. A plan can use normal parameters to
+accept nodes when applicable, as in the next example.
+
+### Run the `single_task` plan from the `sample` module in this repo
+
+    $ bolt plan run sample::single_task nodes=neptune --modules spec/fixtures/modules
+    neptune got passed the message: hi there
+
 ## Kudos
 
 Thank you to [Marcin Bunsch](https://github.com/marcinbunsch) for allowing
@@ -241,6 +250,12 @@ See [Native Extensions](./INSTALL.md#native-extensions).
 ### Bolt does not support submitting task arguments via stdin to PowerShell
 
 Tasks written in PowerShell will only receive arguments as environment variables.
+
+### Bolt user and password cannot be specified when running plans
+
+In order to execute a plan, bolt must be able to ssh (typically using ssh-agent)
+to each node. For Windows hosts requiring winrm, plan execution will fail. See
+[BOLT-85](https://tickets.puppet.com/browse/BOLT-85).
 
 ## License
 
