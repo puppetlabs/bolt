@@ -45,8 +45,48 @@ Option | Description
 --params <br>-p | Enter a string containing JSON parameters  <br> `@<file-name>` Or provide a file with JSON parameters. 
 
 
-### EXAMPLES
+### OUTPUT
 
+**Human format (default)**
+
+**View output per node while task/command/script is running on single or multiple nodes.**
+- stdout and stderr are interleaved as they are output
+- each stdout and stderr line are prefixed with node name and timestamp
+- (optionally) each stdoout and stderr line are prefixed with `err` or `out` 
+- tasks will have status when finished        # commands and scripts will not?
+~~~
+$ bolt [task/command/script] run [options...]
+Starting [task/command/script]...             # should we call this a job, like PE does? will it have an ID?
+Nodes: 3
+
+Started on node-1...
+node-1 | [timestamp] | err | [stderr output]
+node-1 | [timestamp] | out | [stdout output]
+Started on node-2...
+Started on node-3...
+node-1 | [timestamp] | out | [stdout output]
+node-2 | [timestamp] | out | [stdout output]
+Finished on node-1
+  status: restarted                           # for tasks only
+node-3 | [timestamp] | out | [stdout output]
+node-3 | [timestamp] | out | [stdout output]
+node-3 | [timestamp] | out | [stdout output]
+node-2 | [timestamp] | out | [stdout output]
+Finished on node-3
+  status: failed                              # for tasks only
+Finished on node-2
+  status: failed                              # for tasks only
+
+3 of 3 nodes completed. 1 of 3 nodes succeeded, 2 of 3 nodes failed.
+Duration: [duration]
+
+~~~
+
+**View output per node while task plan is running.**
+- TBD
+
+
+### EXAMPLES
 
 **Query a node for the number of SSL connections it’s handling**:
 ~~~
@@ -66,30 +106,6 @@ europa-1: Redhat
 ~~~
 
 **OUTPUT**
-
-**View output per node while task is running on multiple nodes.**
-~~~
-$ puppet task run service name=httpd action=restart -n covfefe-1,covfefe-2,covfefe-3
-Starting job...
-New job ID: 234
-Nodes: 3
-
-Started on covfefe-1...
-Started on covfefe-2...
-Started on covfefe-3...
-Finished on covfefe-1
-  status: restarted
-Finished on covfefe-2
-  status: restarted
-Finished on covfefe-3
-  status: restarted
-
-Job completed. 3/3 nodes succeeded.
-Duration: 27 sec
-~~~
-- colors should match `puppet job run` output for started, finished, and errors.
-- capitalization of the finished node results comes from module (eg. status vs. Status).
-
 
 ****View the response for each node when the node has finished (unstructured STDOUT):**
 ~~~
