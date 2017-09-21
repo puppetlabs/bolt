@@ -50,9 +50,7 @@ system before executing it.
 
 Tasks are similar to scripts, except that tasks expect to receive input in a
 specific way. Tasks are also distributed in Puppet modules, making it easy to
-write, publish, and download tasks for common operations. Bolt uses Puppet to
-discover and load locally installed modules, so Puppet must be installed on
-the local controller node for tasks to work.
+write, publish, and download tasks for common operations.
 
 Tasks receive input either as environment variables or as a JSON hash on
 standard input. For example, when executing the task:
@@ -208,7 +206,7 @@ Puppet to use the `bolt` gem name.
 
 ## Contributing
 
-Issues are tracked at https://tickets.puppetlabs.com/browse/TASKS/
+Issues are tracked at https://tickets.puppetlabs.com/browse/BOLT/
 
 Pull requests are welcome on GitHub at https://github.com/puppetlabs/bolt.
 
@@ -239,15 +237,6 @@ ERROR:  Error installing bolt:
 ```
 
 See [Native Extensions](./INSTALL.md#native-extensions).
-
-### Bolt fails to execute a task
-
-The `puppet` gem must be installed on the controller node in order to run tasks.
-If it is not installed, then you will receive an error:
-
-    Puppet must be installed to execute tasks
-
-See [installing Puppet](./INSTALL.md#installing-puppet) for more information.
 
 ### Bolt does not support submitting task arguments via stdin to PowerShell
 
