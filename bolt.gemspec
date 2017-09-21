@@ -33,6 +33,10 @@ Gem::Specification.new do |spec|
   spec.add_dependency "winrm-fs", "~> 1.0"
   spec.add_dependency "concurrent-ruby", "~> 1.0"
 
+  # Dependencies of our vendored puppet, etc
+  spec.add_dependency "gettext-setup", "< 1", ">= 0.10"
+  spec.add_dependency "locale", "~> 2.1"
+
   spec.add_development_dependency "bundler", "~> 1.14"
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "rspec", "~> 3.0"
