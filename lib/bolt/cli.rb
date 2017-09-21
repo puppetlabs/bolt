@@ -187,13 +187,11 @@ HELP
 
     def execute(options)
       if options[:mode] == 'plan' || options[:mode] == 'task'
-        basedir = File.join(File.dirname(__FILE__), '../..')
-        $LOAD_PATH.unshift(File.absolute_path('vendored/puppet/lib', basedir))
-        $LOAD_PATH.unshift(File.absolute_path('vendored/facter/lib', basedir))
-        $LOAD_PATH.unshift(File.absolute_path('vendored/hiera/lib', basedir))
-
-        require 'puppet'
-        require 'puppet_pal'
+        begin
+          require_relative '../../vendored/require_vendored'
+        rescue LoadError
+          raise Bolt::CLIError, "Puppet must be installed to execute tasks"
+        end
       end
 
       if options[:mode] == 'plan'
@@ -273,14 +271,6 @@ HELP
               "The '--modules' option must be specified to run a task"
       end
 
-      begin
-        require 'puppet'
-        require 'puppet/node/environment'
-        require 'puppet/info_service'
-      rescue LoadError
-        raise Bolt::CLIError, "Puppet must be installed to execute tasks"
-      end
-
       module_name, file_name = name.split('::', 2)
       file_name ||= 'init'
 
@@ -307,13 +297,6 @@ HELP
     end
 
     def run_plan(plan, args, modules)
-      begin
-        require 'puppet_pal'
-        require 'puppet'
-      rescue LoadError
-        raise Bolt::CLIError, "Puppet must be installed to execute tasks"
-      end
-
       modulepath = modules ? [modules] : []
 
       Puppet.initialize_settings
