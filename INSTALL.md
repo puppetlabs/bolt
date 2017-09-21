@@ -2,7 +2,7 @@
 
 To use Bolt, you'll need to install:
 
-* Ruby 2.1 or greater
+* Ruby 2.0 or greater
 * gcc and related dependencies (except on Windows)
 * Bolt gem
 * Puppet gem (optional dependency to run tasks)

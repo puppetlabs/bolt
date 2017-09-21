@@ -18,7 +18,7 @@ systems using ssh and winrm.
 ## Supported Platforms
 
 * Linux, OSX, Windows
-* Ruby 2.1+
+* Ruby 2.0+
 
 ## Overview
 
@@ -220,9 +220,9 @@ To exclude tests that rely on vagrant run:
 
 ## FAQ
 
-### Bolt requires ruby >= 2.1
+### Bolt requires ruby >= 2.0
 
-Trying to install bolt on ruby 1.9 or 2.0 will fail. You must use ruby 2.1 or
+Trying to install bolt on ruby 1.9 will fail. You must use ruby 2.0 or
 greater.
 
 ### Bolt fails to install
