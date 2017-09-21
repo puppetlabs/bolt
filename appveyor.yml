@@ -8,7 +8,7 @@ matrix:
 
 environment:
   matrix:
-    - RUBY_VERSION: 21
+    - RUBY_VERSION: 200
     - RUBY_VERSION: 24
 
 install:
