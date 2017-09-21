@@ -206,6 +206,14 @@ HELP
     end
 
     def execute(options)
+      if options[:mode] == 'plan' || options[:mode] == 'task'
+        begin
+          require_relative '../../vendored/require_vendored'
+        rescue LoadError
+          raise Bolt::CLIError, "Puppet must be installed to execute tasks"
+        end
+      end
+
       if options[:mode] == 'plan'
         execute_plan(options)
       else
@@ -283,14 +291,6 @@ HELP
               "The '--modules' option must be specified to run a task"
       end
 
-      begin
-        require 'puppet'
-        require 'puppet/node/environment'
-        require 'puppet/info_service'
-      rescue LoadError
-        raise Bolt::CLIError, "Puppet must be installed to execute tasks"
-      end
-
       module_name, file_name = name.split('::', 2)
       file_name ||= 'init'
 
@@ -317,13 +317,6 @@ HELP
     end
 
     def run_plan(plan, args, modules)
-      begin
-        require 'puppet_pal'
-        require 'puppet'
-      rescue LoadError
-        raise Bolt::CLIError, "Puppet must be installed to execute tasks"
-      end
-
       modulepath = modules ? [modules] : []
 
       Puppet.initialize_settings
