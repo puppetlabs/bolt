@@ -2,6 +2,7 @@ require 'uri'
 require 'optparse'
 require 'benchmark'
 require 'logger'
+require 'json'
 require 'bolt/node'
 require 'bolt/version'
 require 'bolt/executor'
@@ -111,6 +112,10 @@ HELP
         opts.on('--modules MODULES', "Path to modules directory") do |modules|
           options[:modules] = modules
         end
+        opts.on('--params PARAMETERS',
+                "Parameters to a task or plan") do |params|
+          options[:task_options] = parse_params(params)
+        end
         opts.on_tail('--[no-]tty',
                      "Request a pseudo TTY on nodes that support it") do |tty|
           options[:tty] = tty
@@ -168,13 +173,44 @@ HELP
       end
 
       task_options, remaining = remaining.partition { |s| s =~ /.+=/ }
-      options[:task_options] = Hash[task_options.map { |a| a.split('=', 2) }]
+      unless task_options.empty?
+        if options[:task_options]
+          raise Bolt::CLIError,
+                "Parameters must be specified through either the --params " \
+                "option or param=value pairs, not both"
+        end
+        options[:task_options] = Hash[task_options.map { |a| a.split('=', 2) }]
+      end
 
       options[:leftovers] = remaining
 
       validate(options)
 
       options
+    end
+
+    def parse_params(params)
+      json = get_arg_input(params)
+      JSON.parse(json)
+    rescue JSON::ParserError => err
+      raise Bolt::CLIError, "Unable to parse --params value as JSON: #{err}"
+    end
+
+    def get_arg_input(value)
+      if value.start_with?('@')
+        file = value.sub(/^@/, '')
+        read_arg_file(file)
+      elsif value == '-'
+        STDIN.read
+      else
+        value
+      end
+    end
+
+    def read_arg_file(file)
+      File.read(file)
+    rescue StandardError => err
+      raise Bolt::CLIError, "Error attempting to read #{file}: #{err}"
     end
 
     def validate(options)

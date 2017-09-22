@@ -1,7 +1,10 @@
 require 'spec_helper'
+require 'bolt_spec/files'
 require 'bolt/cli'
 
 describe "Bolt::CLI" do
+  include BoltSpec::Files
+
   it "generates an error message if an unknown argument is given" do
     cli = Bolt::CLI.new(%w[command run --unknown])
     expect {
@@ -133,6 +136,70 @@ describe "Bolt::CLI" do
         expect(result[:object]).to eq('./src')
         expect(result[:leftovers].first).to eq('/path/dest')
       end
+    end
+  end
+
+  describe "handling parameters" do
+    it "reads params on the command line" do
+      cli = Bolt::CLI.new(%w[plan run my::plan kj=2hv iuhg=iube 2whf=lcv])
+      result = cli.parse
+      expect(result[:task_options]).to eq('kj' => '2hv',
+                                          'iuhg' => 'iube',
+                                          '2whf' => 'lcv')
+    end
+
+    it "reads params in json with the params flag" do
+      json_args = '{"kj":"2hv","iuhg":"iube","2whf":"lcv"}'
+      cli = Bolt::CLI.new(['plan', 'run', 'my::plan', '--params', json_args])
+      result = cli.parse
+      expect(result[:task_options]).to eq('kj' => '2hv',
+                                          'iuhg' => 'iube',
+                                          '2whf' => 'lcv')
+    end
+
+    it "raises a cli error when json parsing fails" do
+      json_args = '{"k'
+      cli = Bolt::CLI.new(['plan', 'run', 'my::plan', '--params', json_args])
+      expect {
+        cli.parse
+      }.to raise_error(Bolt::CLIError, /unexpected token/)
+    end
+
+    it "raises a cli error when specifying params both ways" do
+      cli = Bolt::CLI.new(%w[plan run my::plan --params {"a":"b"} c=d])
+      expect {
+        cli.parse
+      }.to raise_error(Bolt::CLIError, /not both/)
+    end
+
+    it "reads json from a file when --params starts with @" do
+      json_args = '{"kj":"2hv","iuhg":"iube","2whf":"lcv"}'
+      with_tempfile_containing('json-args', json_args) do |file|
+        cli = Bolt::CLI.new(%W[plan run my::plan --params @#{file.path}])
+        result = cli.parse
+        expect(result[:task_options]).to eq('kj' => '2hv',
+                                            'iuhg' => 'iube',
+                                            '2whf' => 'lcv')
+      end
+    end
+
+    it "raises a cli error when reading the params file fails" do
+      Dir.mktmpdir do |dir|
+        cli = Bolt::CLI.new(%W[plan run my::plan --params @#{dir}/nope])
+        expect {
+          cli.parse
+        }.to raise_error(Bolt::CLIError, /No such file/)
+      end
+    end
+
+    it "reads json from stdin when --params is just '-'" do
+      json_args = '{"kj":"2hv","iuhg":"iube","2whf":"lcv"}'
+      cli = Bolt::CLI.new(%w[plan run my::plan --params -])
+      allow(STDIN).to receive(:read).and_return(json_args)
+      result = cli.parse
+      expect(result[:task_options]).to eq('kj' => '2hv',
+                                          'iuhg' => 'iube',
+                                          '2whf' => 'lcv')
     end
   end
 
