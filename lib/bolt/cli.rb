@@ -319,9 +319,15 @@ HELP
     def run_plan(plan, args, modules)
       modulepath = modules ? [modules] : []
 
-      Puppet.initialize_settings
-      Puppet::Pal.in_tmp_environment('bolt', modulepath: modulepath) do |pal|
-        puts pal.run_plan(plan, plan_args: args)
+      Dir.mktmpdir('bolt') do |dir|
+        cli = []
+        Puppet::Settings::REQUIRED_APP_SETTINGS.each do |setting|
+          cli << "--#{setting}" << dir
+        end
+        Puppet.initialize_settings(cli)
+        Puppet::Pal.in_tmp_environment('bolt', modulepath: modulepath) do |pal|
+          puts pal.run_plan(plan, plan_args: args)
+        end
       end
     end
   end
