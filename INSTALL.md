@@ -48,7 +48,7 @@ to install from [RubyGems](https://rubygems.org).
 Since bolt is not public yet, you will need to install the gem from our internal
 mirror, and specify a version to ensure you get the latest version:
 
-    gem install --source http://rubygems.delivery.puppetlabs.net bolt -v '> 0.0.1'
+    gem install bolt --source http://rubygems.delivery.puppetlabs.net
 
 Or add this to your Gemfile if you are using [Bundler](https://bundler.io), and
 specify your gem `source` as `http://rubygems.delivery.puppetlabs.net`
@@ -57,6 +57,7 @@ specify your gem `source` as `http://rubygems.delivery.puppetlabs.net`
 
 Or if running from source
 
+    git submodule update --init --recursive
     bundle install --path .bundle
     bundle exec bolt ...
 
