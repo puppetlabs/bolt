@@ -4,15 +4,14 @@
 [![Appveyor Status](https://ci.appveyor.com/api/projects/status/m7dhiwxk455mkw2d/branch/master?svg=true)](https://ci.appveyor.com/project/puppetlabs/bolt/branch/master)
 [![Gem Version](https://badge.fury.io/rb/bolt.svg)](https://badge.fury.io/rb/bolt)
 
-Bolt is a ruby command-line tool for executing commands and scripts on remote
-systems using ssh and winrm.
+Bolt is a Ruby command-line tool for executing commands and scripts on remote systems using SSH and WinRM.
 
 ## Goals
 
-* Execute commands on remote *nix and Windows systems
-* Distribute and execute scripts, e.g. bash, powershell, python
-* Scale to upwards of 1000 concurrent connections
-* Support industry standard protocols (ssh/scp, winrm/psrp) and authentication
+* Execute commands on remote *nix and Windows systems.
+* Distribute and execute scripts, such as Bash, PowerShell, Python.
+* Scale to 1000 or more concurrent connections.
+* Support industry standard protocols (SSH/SCP, WinRM/PSRP) and authentication
   methods (password, publickey)
 
 ## Supported Platforms
@@ -22,8 +21,7 @@ systems using ssh and winrm.
 
 ## Overview
 
-Bolt provides the ability to execute commands, scripts, and tasks on remote
-systems using ssh and winrm.
+Bolt provides the ability to execute commands, scripts, and tasks on remote systems using SSH and WinRM.
 
 ### Commands
 
@@ -38,31 +36,24 @@ quote the command:
 
 ### Scripts
 
-Bolt can copy a script from the local system to the remote system, and execute
-it. The script can be written in any language provided the appropriate
-interpreter is installed on the remote system, e.g. bash, powershell, python,
-etc. Bolt relies on shebang lines when executing the script on remote *nix
-systems. Bolt currently only supports PowerShell scripts on remote Windows
-systems. On *nix, bolt ensures that the script is executable on the remote
-system before executing it.
+Bolt can copy a script from the local system to the remote system, and then execute it on the remote system. The script can be written in any language (such as Bash, PowerShell, Python), providing the appropriate interpreter is installed on the remote system. Bolt relies on shebang lines [TODO: relies on them for what? More details here would be great, probably just a bit more] when executing the script on remote *nix systems.
+
+On *nix, Bolt ensures that the script is executable on the remote system before executing it. On remote Windows systems, Bolt currently supports only PowerShell scripts.
 
 ### Tasks
 
-Tasks are similar to scripts, except that tasks expect to receive input in a
-specific way. Tasks are also distributed in Puppet modules, making it easy to
-write, publish, and download tasks for common operations. Bolt uses Puppet to
-discover and load locally installed modules, so Puppet must be installed on
-the local controller node for tasks to work.
+Tasks are similar to scripts, except that tasks expect to receive input in a specific way. Tasks are also distributed in Puppet modules, so you can write, publish, and download tasks for common operations. Bolt uses Puppet to discover and load locally installed modules, so Puppet must be installed on the local controller node for tasks to work.
 
-Tasks receive input either as environment variables or as a JSON hash on
-standard input. For example, when executing the task:
+Tasks receive input either as environment variables or as a JSON hash on standard input. For example, when executing the task:
+
+[TODO this is three possible ways to do this, not a description of the first thing]
 
     $ bolt task run package::status name=openssl
 
-Bolt will set the `PT_name` environment variable to `openssl` prior to executing
+Bolt sets the `PT_name` environment variable to `openssl` prior to executing
 the `status` task in the `package` module.
 
-Bolt will also submit the parameters as JSON to stdin, for example:
+Bolt also submits the parameters as JSON to stdin, for example:
 
 ```json
 {
@@ -70,14 +61,9 @@ Bolt will also submit the parameters as JSON to stdin, for example:
 }
 ```
 
-By default, bolt submits parameters via environment variables and stdin. The
-task can specify how it wants to receive metadata by setting `input_method` in
-its metadata.
+By default, Bolt submits parameters via environment variables and stdin. You can specify how the task should receive metadata by setting `input_method` in the task's metadata.
 
-When executing the `package::status` task from above, the `--modules` option
-must be specified as the directory containing the `package` module. For example,
-the option `--modules /path/to/modules` should correspond to a directory
-structure:
+When executing the `package::status` task from above, you must specify the `--modules` option as the directory containing the `package` module. [TODO: why? the example does not specify this?] For example, the option `--modules /path/to/modules` should correspond to a directory structure:
 
     /path/to/modules/
       package/
@@ -86,12 +72,11 @@ structure:
 
 ## Installation
 
-The most common way of installing bolt is to install from [RubyGems](https://rubygems.org).
+The most common way of installing Bolt is to install from [RubyGems](https://rubygems.org).
 
     $ gem install bolt
 
-Make sure to read [INSTALL.md](./INSTALL.md) for other ways of installing bolt,
-and how to build native extensions that bolt depends on.
+Make sure to read [INSTALL.md](./INSTALL.md) for other ways of installing Bolt, and how to build the native extensions that Bolt depends on.
 
 ## Examples
 
@@ -208,13 +193,11 @@ Pull requests are welcome on GitHub at https://github.com/puppetlabs/bolt.
 
 ## Testing
 
-Some tests expect a windows or linux vm to be running. Execute `vagrant up` to
-bring these up using the included Vagrantfile. Any tests requiring this are
-tagged with `:vagrant` in rspec. To run all tests use:
+Some tests expect a windows or Linux VM to be running. Execute `vagrant up` to bring these up with the Vagrantfile included with the `bolt` gem. Any tests that require this are tagged with `:vagrant` in rspec. To run all tests, run:
 
     $ bundle exec rake test
 
-To exclude tests that rely on vagrant run:
+To exclude tests that rely on Vagrant, run:
 
     $ bundle exec rake unit
 
@@ -222,14 +205,13 @@ To exclude tests that rely on vagrant run:
 
 ### Bolt requires ruby >= 2.1
 
-Trying to install bolt on ruby 1.9 or 2.0 will fail. You must use ruby 2.1 or
-greater.
+Trying to install Bolt on Ruby 1.9 or 2.0 will fail. You must use Ruby 2.1 or greater.
 
 ### Bolt fails to install
 
 ```
 ERROR:  Error installing bolt:
-	ERROR: Failed to build gem native extension.
+    ERROR: Failed to build gem native extension.
 ```
 
 See [Native Extensions](./INSTALL.md#native-extensions).
@@ -245,7 +227,11 @@ See [installing Puppet](./INSTALL.md#installing-puppet) for more information.
 
 ### Bolt does not support submitting task arguments via stdin to PowerShell
 
-Tasks written in PowerShell will only receive arguments as environment variables.
+Tasks written in PowerShell receive arguments only as environment variables.
+
+## Reference
+
+TODO: add list of commands, any arguments they accept, and any options they accept.
 
 ## License
 
