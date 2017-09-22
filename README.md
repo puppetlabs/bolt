@@ -4,58 +4,142 @@
 [![Appveyor Status](https://ci.appveyor.com/api/projects/status/m7dhiwxk455mkw2d/branch/master?svg=true)](https://ci.appveyor.com/project/puppetlabs/bolt/branch/master)
 [![Gem Version](https://badge.fury.io/rb/bolt.svg)](https://badge.fury.io/rb/bolt)
 
-Bolt is a Ruby command-line tool for executing commands and scripts on remote systems using SSH and WinRM.
+Bolt is a Ruby command-line tool for executing commands, scripts, and tasks on remote systems using SSH and WinRM.
 
-## Goals
+* Executes commands on remote *nix and Windows systems.
+* Distributes and execute scripts, such as Bash, PowerShell, Python.
+* Scales to more than 1000 concurrent connections.
+* Supports industry standard protocols (SSH/SCP, WinRM/PSRP) and authentication methods (password, publickey).
 
-* Execute commands on remote *nix and Windows systems.
-* Distribute and execute scripts, such as Bash, PowerShell, Python.
-* Scale to 1000 or more concurrent connections.
-* Support industry standard protocols (SSH/SCP, WinRM/PSRP) and authentication
-  methods (password, publickey)
-
-## Supported Platforms
+## Supported platforms
 
 * Linux, OSX, Windows
 * Ruby 2.0+
 
-## Overview
+## Installation
 
-Bolt provides the ability to execute commands, scripts, and tasks on remote systems using SSH and WinRM.
+Install Bolt as a gem by running `gem install bolt`.
 
-### Commands
+See [INSTALL.md](./INSTALL.md) for other ways of installing Bolt and for how to build the native extensions that Bolt depends on.
 
-Bolt can execute arbitrary commands:
+## Running `bolt` commands
 
-    $ bolt command run <command>
+Bolt executes ad hoc commands, runs scripts, transfers files, and runs tasks or task plans on remote nodes from a controller node, such as your laptop or workstation.
 
-If the command contains spaces or shell special characters, then you must single
-quote the command:
+When you run `bolt` commands, you must specify the nodes that you want Bolt to execute commands on. You can also specify your username and password for nodes that require credentials.
 
-    $ bolt command run '<command> <arg1> ... <argN>'
+Bolt connects to remote nodes over SSH by default. To connect over WinRM, you must specify the WinRM protocol when you specify target nodes.
 
-### Scripts
+### Specifying nodes
 
-Bolt can copy a script from the local system to the remote system, and then execute it on the remote system. The script can be written in any language (such as Bash, PowerShell, Python), providing the appropriate interpreter is installed on the remote system. Bolt relies on shebang lines [TODO: relies on them for what? More details here would be great, probably just a bit more] when executing the script on remote *nix systems.
+You must specify the target nodes on which to execute `bolt` commands.
+
+For most `bolt` commands, specify the target nodes with the `--nodes` flag when you run the command. Multiple nodes should be comma-separated, such as `--nodes neptune,saturn,mars`. When targeting WinRM machines, you must specify the WinRM protocol in the nodes string. For example, `--nodes winrm://mywindowsnode.mydomain`
+
+The `bolt run plan` command does not accept the `--nodes` flag. For plans, specify nodes as a list within the task plan itself or specify them as regular parameters, like `nodes=neptune`.
+
+### Specifying connection credentials
+
+If you're running `bolt` commands targeting nodes that require a username and password, you must pass those credentials as options on the command line.
+
+Bolt connects to remote nodes with either SSH or WinRM. You can manage SSH connections with an SSH configuration file (`~/.ssh/config`) on the controller node or specify the username and password on the command line. WinRM connections always require you to pass the username and password with the `bolt` command.
+
+For example, this command targets a WinRM node:
+
+```
+bolt command run 'gpupdate /force' --nodes winrm://pluto --user Administrator --password <password>
+```
+
+## Running arbitrary commands
+
+Bolt can execute arbitrary commands on remote nodes. Specify the command you want to run and what nodes to run the command on.
+
+Specify nodes with node flag, `--nodes` or `-n`. When executing against WinRM nodes, specify the WinRM protocol in the nodes string.
+
+    bolt command run <COMMAND> --nodes <NODE>
+
+    bolt command run <COMMAND> --nodes winrm://mywindowsnode.mydomain --user <USERNAME> --password <PASSWORD>
+
+If the command contains spaces or shell special characters, then you must single quote the command:
+
+    bolt command run '<COMMAND> <ARG1> ... <ARGN>' --nodes <NODE>
+
+## Running scripts
+
+Bolt can copy a script from the local system to the remote system, and then execute it on the remote system.
+
+You can write the script in any language (such as Bash, PowerShell, or Python), providing the appropriate interpreter is installed on the remote system. You must specify the interpreter with a shebang line to execute the script on remote *nix systems.
+
+For example, for a script written in bash, indicate the bash interpreter with a shebang line:
+
+```
+#!/bin/bash
+
+echo hello
+```
+
+To run the script, specify the path to the script and what nodes to run it on. When running a script on WinRM nodes, specify the WinRM protocol in the nodes string.
+
+```
+bolt script run <PATH/TO/SCRIPT> --nodes <NODE>
+```
+
+```
+bolt script run <PATH/TO/SCRIPT> --nodes winrm://<NODE> --user <USERNAME> --password <PASSWORD>
+```
 
 On *nix, Bolt ensures that the script is executable on the remote system before executing it. On remote Windows systems, Bolt currently supports only PowerShell scripts.
 
-### Tasks
+## Copying files
 
-Tasks are similar to scripts, except that tasks expect to receive input in a specific way. Tasks are also distributed in Puppet modules, so you can write, publish, and download tasks for common operations. Bolt uses Puppet to discover and load locally installed modules, so Puppet must be installed on the local controller node for tasks to work.
-specific way. Tasks are also distributed in Puppet modules, making it easy to
-write, publish, and download tasks for common operations.
+Bolt can transfer files from the controller node to specified target nodes.
 
-Tasks receive input either as environment variables or as a JSON hash on standard input. For example, when executing the task:
+To transfer a file, run `bolt file upload`, specifying the local path to the file and the destination location on the target node: `bolt file upload <SOURCE> <DESTINATION`
 
-[TODO this is three possible ways to do this, not a description of the first thing]
+For example:
 
-    $ bolt task run package::status name=openssl
+```
+bolt file upload my_file.txt /tmp/remote_file.txt -n node1,node2
+```
 
-Bolt sets the `PT_name` environment variable to `openssl` prior to executing
-the `status` task in the `package` module.
+## Running tasks
 
-Bolt also submits the parameters as JSON to stdin, for example:
+Tasks are similar to scripts, except that tasks must receive input in a specific way. Tasks are also distributed in Puppet modules, so you can write, publish, and download tasks for common operations.
+
+To execute a task, run `bolt task run`, specifying:
+
+* The full name of the task, formatted as <MODULE::TASK>.
+* Any task parameters, as `parameter=value`.
+* The nodes to run the task on and the protocol, if WinRM, with the `--nodes` flag.
+* The module path that contains the task, with the `--modules` flag.
+* If required, the username and password to connect to the node, with the `--username` and `--password` flags.
+
+For example, to run the status task from the package module on the openssl package on the `neptune` node:
+
+```
+bolt task run package::status name=openssl --nodes neptune --modules ~/modules
+```
+
+### Specifying the module path
+
+When executing tasks or plans, you must specify the `--modules` option as the directory containing the module. Specify this option in the format `--modules /path/to/modules`, should correspond to a directory structure:
+
+```
+/path/to/modules/
+  package/
+    tasks/
+      status
+```
+
+### Specifying parameters
+
+Tasks can receive input as either environment variables or a JSON hash on standard input. By default, Bolt submits parameters as both environment variables and stdin.
+
+When executing the task, specify the parameter value on the command line in the format `parameter=value`. Pass multiple parameters as a space-separated list.
+
+For example, to run package tasks against the openssl package, specify the package name parameter as `name=openssl`. 
+
+When you run a command with this parameter, Bolt sets the task's `name` value to openssl before it executes the task. It also submits the parameters as JSON to stdin:
 
 ```json
 {
@@ -63,24 +147,23 @@ Bolt also submits the parameters as JSON to stdin, for example:
 }
 ```
 
-By default, Bolt submits parameters via environment variables and stdin. You can specify how the task should receive metadata by setting `input_method` in the task's metadata.
+Alternatively, you can specify parameters as either a JSON blob or a parameter file with the `--params` flag.
 
-When executing the `package::status` task from above, you must specify the `--modules` option as the directory containing the `package` module. [TODO: why? the example does not specify this?] For example, the option `--modules /path/to/modules` should correspond to a directory structure:
+To specify parameters as a JSON blob, use the parameters flag: `--params '{"name": "openssl"}'`
 
-    /path/to/modules/
-      package/
-        tasks/
-          status
+To set parameters in a file, create a file called `params.json` and specify parameters there in JSON format.
 
-## Installation
+For example, in your `params.json` file, specify:
 
-The most common way of installing Bolt is to install from [RubyGems](https://rubygems.org).
+```json
+{
+  "name":"openssl"
+}
+```
 
-    $ gem install bolt
+Then specify that file on the command line with the parameters flag: `--params @params.json`
 
-Make sure to read [INSTALL.md](./INSTALL.md) for other ways of installing Bolt, and how to build the native extensions that Bolt depends on.
-
-## Examples
+## Usage examples
 
 ### Get help
 
@@ -188,9 +271,7 @@ Make sure to read [INSTALL.md](./INSTALL.md) for other ways of installing Bolt, 
 
     Deployed app version 1.2.
 
-Note the `--nodes` option is not used with plans, as they can contain more
-complex logic about where code is run. A plan can use normal parameters to
-accept nodes when applicable, as in the next example.
+Note the `--nodes` option is not used with plans, as they can contain more complex logic about where code is run. A plan can use normal parameters to accept nodes when applicable, as in the next example.
 
 ### Run the `single_task` plan from the `sample` module in this repo
 
@@ -199,18 +280,19 @@ accept nodes when applicable, as in the next example.
 
 ## Kudos
 
-Thank you to [Marcin Bunsch](https://github.com/marcinbunsch) for allowing
-Puppet to use the `bolt` gem name.
+Thank you to [Marcin Bunsch](https://github.com/marcinbunsch) for allowing Puppet to use the `bolt` gem name.
 
 ## Contributing
 
 Issues are tracked at https://tickets.puppetlabs.com/browse/BOLT/
 
-Pull requests are welcome on GitHub at https://github.com/puppetlabs/bolt.
+Pull requests are welcome on GitHub at https://github.com/puppetlabs/bolt
 
 ## Testing
 
-Some tests expect a windows or Linux VM to be running. Execute `vagrant up` to bring these up with the Vagrantfile included with the `bolt` gem. Any tests that require this are tagged with `:vagrant` in rspec. To run all tests, run:
+Some tests require a Windows or Linux VM. Execute `vagrant up` to bring these up with the Vagrantfile included with the `bolt` gem. Any tests that require this are tagged with `:vagrant` in rspec.
+
+To run all tests, run:
 
     $ bundle exec rake test
 
@@ -220,18 +302,20 @@ To exclude tests that rely on Vagrant, run:
 
 ## FAQ
 
-### Bolt requires ruby >= 2.0
+### Bolt requires Ruby >= 2.0
 
-Trying to install bolt on ruby 1.9 will fail. You must use ruby 2.0 or
+Trying to install Bolt on Ruby 1.9 fails. You must use Ruby 2.0 or greater.
 
 ### Bolt fails to install
+
+If you do not have the native extensions Bolt requires, you might get an error like:
 
 ```
 ERROR:  Error installing bolt:
     ERROR: Failed to build gem native extension.
 ```
 
-See [Native Extensions](./INSTALL.md#native-extensions).
+See [Native Extensions](./INSTALL.md#native-extensions) for installation instructions.
 
 ### Bolt does not support submitting task arguments via stdin to PowerShell
 
@@ -239,13 +323,7 @@ Tasks written in PowerShell can receive arguments only as environment variables.
 
 ### Bolt user and password cannot be specified when running plans
 
-In order to execute a plan, bolt must be able to ssh (typically using ssh-agent)
-to each node. For Windows hosts requiring winrm, plan execution will fail. See
-[BOLT-85](https://tickets.puppet.com/browse/BOLT-85).
-
-## Reference
-
-TODO: add list of commands, any arguments they accept, and any options they accept.
+In order to execute a plan, Bolt must be able to SSH (typically using ssh-agent) to each node. For Windows hosts requiring WinRM, plan execution will fail. See [BOLT-85](https://tickets.puppet.com/browse/BOLT-85).
 
 ## License
 
