@@ -208,6 +208,16 @@ accept nodes when applicable, as in the next example.
     $ bolt plan run sample::single_task nodes=neptune --modules spec/fixtures/modules
     neptune got passed the message: hi there
 
+### Run the `single_task` plan passing nodes with JSON
+
+The `--params` can be used to specify plan and task arguments using JSON.
+
+    $ bolt plan run sample::single_task --modules spec/fixtures/modules --params '{"nodes": ["neptune"]}'
+
+If the value passed to `--params` starts with `@`, it will be treated as the
+name of a file containing JSON arguments. If it is a single `-`, the JSON will
+be read from standard input.
+
 ## Kudos
 
 Thank you to [Marcin Bunsch](https://github.com/marcinbunsch) for allowing
