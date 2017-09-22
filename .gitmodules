@@ -1,0 +1,12 @@
+[submodule "vendored/puppet"]
+	path = vendored/puppet
+	url = https://github.com/puppetlabs/puppet
+	branch = feature_puppet-tasks
+[submodule "vendored/hiera"]
+	path = vendored/hiera
+	url = https://github.com/puppetlabs/hiera
+	branch = 3.4.x
+[submodule "vendored/facter"]
+	path = vendored/facter
+	url = https://github.com/puppetlabs/facter
+	branch = 2.x

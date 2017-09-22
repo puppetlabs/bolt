@@ -1,11 +1,16 @@
 require 'uri'
 require 'optparse'
 require 'benchmark'
+require 'logger'
 require 'bolt/node'
 require 'bolt/version'
 require 'bolt/executor'
 
 module Bolt
+  class << self
+    attr_accessor :log_level
+  end
+
   class CLIError < RuntimeError
     attr_reader :error_code
 
@@ -18,19 +23,20 @@ module Bolt
   class CLIExit < StandardError; end
 
   class CLI
-    BANNER = <<-END.freeze
+    BANNER = <<-HELP.freeze
 Usage: bolt <subcommand> <action> [options]
 
 Available subcommands:
     bolt command run <command>       Run a command remotely
     bolt script run <script>         Upload a local script and run it remotely
     bolt task run <task> [params]    Run a Puppet Task
+    bolt plan run <plan> [params]    Run a plan
     bolt file upload <src> <dest>    Upload a local file
 
 where [options] are:
-END
+HELP
 
-    TASK_HELP = <<-END.freeze
+    TASK_HELP = <<-HELP.freeze
 Usage: bolt task <action> [options] [parameters]
 
 Available actions are:
@@ -39,44 +45,56 @@ Available actions are:
 Parameters are of the form <parameter>=<value>.
 
 Available options are:
-END
+HELP
 
-    COMMAND_HELP = <<-END.freeze
+    COMMAND_HELP = <<-HELP.freeze
 Usage: bolt command <action> <command> [options]
 
 Available actions are:
     run                              Run a command remotely
 
 Available options are:
-END
+HELP
 
-    SCRIPT_HELP = <<-END.freeze
+    SCRIPT_HELP = <<-HELP.freeze
 Usage: bolt script <action> <script> [options]
 
 Available actions are:
     run                              Upload a local script and run it remotely
 
 Available options are:
-END
+HELP
 
-    FILE_HELP = <<-END.freeze
+    PLAN_HELP = <<-HELP.freeze
+Usage: bolt plan <action> <plan> [options] [parameters]
+
+Available actions are:
+    run                              Run a plan
+
+Parameters are of the form <parameter>=<value>.
+
+Available options are:
+HELP
+
+    FILE_HELP = <<-HELP.freeze
 Usage: bolt file <action> [options]
 
 Available actions are:
     upload <src> <dest>              Upload local file <src> to <dest> on each node
 
 Available options are:
-END
+HELP
 
     def initialize(argv)
       @argv = argv
     end
 
-    MODES = %w[command script task file].freeze
+    MODES = %w[command script task plan file].freeze
     ACTIONS = %w[run upload download].freeze
 
     def parse
       options = {}
+      Bolt.log_level = Logger::WARN
 
       global = OptionParser.new('') do |opts|
         opts.on('-n', '--nodes x,y,z', Array, 'Nodes to connect to') do |nodes|
@@ -93,8 +111,18 @@ END
         opts.on('--modules MODULES', "Path to modules directory") do |modules|
           options[:modules] = modules
         end
+        opts.on_tail('--[no-]tty',
+                     "Request a pseudo TTY on nodes that support it") do |tty|
+          options[:tty] = tty
+        end
         opts.on_tail('-h', '--help', 'Display help') do |_|
           options[:help] = true
+        end
+        opts.on_tail('--verbose', 'Display verbose logging') do |_|
+          Bolt.log_level = Logger::INFO
+        end
+        opts.on_tail('--debug', 'Display debug logging') do |_|
+          Bolt.log_level = Logger::DEBUG
         end
         opts.on_tail('--version', 'Display the version') do |_|
           puts Bolt::VERSION
@@ -111,6 +139,12 @@ END
       end
 
       options[:mode] = remaining.shift
+
+      if options[:mode] == 'help'
+        options[:help] = true
+        options[:mode] = remaining.shift
+      end
+
       options[:action] = remaining.shift
       options[:object] = remaining.shift
 
@@ -124,6 +158,8 @@ END
                           SCRIPT_HELP
                         when 'file'
                           FILE_HELP
+                        when 'plan'
+                          PLAN_HELP
                         else
                           BANNER
                         end
@@ -156,7 +192,7 @@ END
               "unknown argument(s) #{options[:leftovers].join(', ')}"
       end
 
-      unless options[:nodes]
+      unless options[:nodes] || options[:mode] == 'plan'
         raise Bolt::CLIError, "option --nodes must be specified"
       end
     end
@@ -170,45 +206,65 @@ END
     end
 
     def execute(options)
-      nodes = options[:nodes].map do |node|
-        Bolt::Node.from_uri(node, options[:user], options[:password])
+      if options[:mode] == 'plan' || options[:mode] == 'task'
+        begin
+          require_relative '../../vendored/require_vendored'
+        rescue LoadError
+          raise Bolt::CLIError, "Puppet must be installed to execute tasks"
+        end
       end
 
-      results = nil
-      elapsed_time = Benchmark.realtime do
-        executor = Bolt::Executor.new(nodes)
-        results =
-          case options[:mode]
-          when 'command'
-            executor.execute(options[:object])
-          when 'script'
-            executor.run_script(options[:object])
-          when 'task'
-            path = options[:object]
-            input_method = nil
+      if options[:mode] == 'plan'
+        execute_plan(options)
+      else
+        nodes = options[:nodes].map do |node|
+          Bolt::Node.from_uri(node,
+                              options[:user], options[:password], options[:tty])
+        end
 
-            unless file_exist?(path)
-              path, metadata = load_task_data(path, options[:modules])
-              input_method = metadata['input_method']
+        results = nil
+        elapsed_time = Benchmark.realtime do
+          executor = Bolt::Executor.new(nodes)
+          results =
+            case options[:mode]
+            when 'command'
+              executor.run_command(options[:object])
+            when 'script'
+              executor.run_script(options[:object])
+            when 'task'
+              path = options[:object]
+              input_method = nil
+
+              unless file_exist?(path)
+                path, metadata = load_task_data(path, options[:modules])
+                input_method = metadata['input_method']
+              end
+
+              input_method ||= 'both'
+              executor.run_task(path, input_method, options[:task_options])
+            when 'file'
+              src = options[:object]
+              dest = options[:leftovers].first
+
+              if dest.nil?
+                raise Bolt::CLIError, "A destination path must be specified"
+              elsif !file_exist?(src)
+                raise Bolt::CLIError, "The source file '#{src}' does not exist"
+              end
+
+              executor.file_upload(src, dest)
             end
+        end
 
-            input_method ||= 'both'
-            executor.run_task(path, input_method, options[:task_options])
-          when 'file'
-            src = options[:object]
-            dest = options[:leftovers].first
-
-            if dest.nil?
-              raise Bolt::CLIError, "A destination path must be specified"
-            elsif !file_exist?(src)
-              raise Bolt::CLIError, "The source file '#{src}' does not exist"
-            end
-
-            executor.file_upload(src, dest)
-          end
+        print_results(results, elapsed_time)
       end
+    end
 
-      print_results(results, elapsed_time)
+    def execute_plan(options)
+      result = run_plan(options[:object],
+                        options[:task_options],
+                        options[:modules])
+      puts result
     end
 
     def print_results(results, elapsed_time)
@@ -235,14 +291,6 @@ END
               "The '--modules' option must be specified to run a task"
       end
 
-      begin
-        require 'puppet'
-        require 'puppet/node/environment'
-        require 'puppet/info_service'
-      rescue LoadError
-        raise Bolt::CLIError, "Puppet must be installed to execute tasks"
-      end
-
       module_name, file_name = name.split('::', 2)
       file_name ||= 'init'
 
@@ -265,6 +313,15 @@ END
           end
 
         [file, metadata]
+      end
+    end
+
+    def run_plan(plan, args, modules)
+      modulepath = modules ? [modules] : []
+
+      Puppet.initialize_settings
+      Puppet::Pal.in_tmp_environment('bolt', modulepath: modulepath) do |pal|
+        puts pal.run_plan(plan, plan_args: args)
       end
     end
   end

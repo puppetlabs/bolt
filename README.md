@@ -17,7 +17,7 @@ Bolt is a Ruby command-line tool for executing commands and scripts on remote sy
 ## Supported Platforms
 
 * Linux, OSX, Windows
-* Ruby 2.1+
+* Ruby 2.0+
 
 ## Overview
 
@@ -43,6 +43,8 @@ On *nix, Bolt ensures that the script is executable on the remote system before 
 ### Tasks
 
 Tasks are similar to scripts, except that tasks expect to receive input in a specific way. Tasks are also distributed in Puppet modules, so you can write, publish, and download tasks for common operations. Bolt uses Puppet to discover and load locally installed modules, so Puppet must be installed on the local controller node for tasks to work.
+specific way. Tasks are also distributed in Puppet modules, making it easy to
+write, publish, and download tasks for common operations.
 
 Tasks receive input either as environment variables or as a JSON hash on standard input. For example, when executing the task:
 
@@ -180,6 +182,21 @@ Make sure to read [INSTALL.md](./INSTALL.md) for other ways of installing Bolt, 
 
     Uploaded file '/local/path' to 'neptune:/remote/path'
 
+### Run the `deploy` plan from the `webserver` module
+
+    $ bolt plan run webserver::deploy version=1.2 --modules ~/modules
+
+    Deployed app version 1.2.
+
+Note the `--nodes` option is not used with plans, as they can contain more
+complex logic about where code is run. A plan can use normal parameters to
+accept nodes when applicable, as in the next example.
+
+### Run the `single_task` plan from the `sample` module in this repo
+
+    $ bolt plan run sample::single_task nodes=neptune --modules spec/fixtures/modules
+    neptune got passed the message: hi there
+
 ## Kudos
 
 Thank you to [Marcin Bunsch](https://github.com/marcinbunsch) for allowing
@@ -187,7 +204,7 @@ Puppet to use the `bolt` gem name.
 
 ## Contributing
 
-Issues are tracked at https://tickets.puppetlabs.com/browse/TASKS/
+Issues are tracked at https://tickets.puppetlabs.com/browse/BOLT/
 
 Pull requests are welcome on GitHub at https://github.com/puppetlabs/bolt.
 
@@ -203,9 +220,9 @@ To exclude tests that rely on Vagrant, run:
 
 ## FAQ
 
-### Bolt requires ruby >= 2.1
+### Bolt requires ruby >= 2.0
 
-Trying to install Bolt on Ruby 1.9 or 2.0 will fail. You must use Ruby 2.1 or greater.
+Trying to install bolt on ruby 1.9 will fail. You must use ruby 2.0 or
 
 ### Bolt fails to install
 
@@ -216,18 +233,15 @@ ERROR:  Error installing bolt:
 
 See [Native Extensions](./INSTALL.md#native-extensions).
 
-### Bolt fails to execute a task
-
-The `puppet` gem must be installed on the controller node in order to run tasks.
-If it is not installed, then you will receive an error:
-
-    Puppet must be installed to execute tasks
-
-See [installing Puppet](./INSTALL.md#installing-puppet) for more information.
-
 ### Bolt does not support submitting task arguments via stdin to PowerShell
 
-Tasks written in PowerShell receive arguments only as environment variables.
+Tasks written in PowerShell can receive arguments only as environment variables.
+
+### Bolt user and password cannot be specified when running plans
+
+In order to execute a plan, bolt must be able to ssh (typically using ssh-agent)
+to each node. For Windows hosts requiring winrm, plan execution will fail. See
+[BOLT-85](https://tickets.puppet.com/browse/BOLT-85).
 
 ## Reference
 

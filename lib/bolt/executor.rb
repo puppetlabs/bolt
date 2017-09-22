@@ -3,6 +3,10 @@ require 'bolt/result'
 
 module Bolt
   class Executor
+    def self.from_uris(uris)
+      new(uris.map { |uri| Bolt::Node.from_uri(uri, nil, nil, nil) })
+    end
+
     def initialize(nodes)
       @nodes = nodes
     end
@@ -31,9 +35,9 @@ module Bolt
       results
     end
 
-    def execute(command)
+    def run_command(command)
       on_each do |node|
-        node.execute(command)
+        node.run_command(command)
       end
     end
 

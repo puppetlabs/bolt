@@ -8,11 +8,12 @@ matrix:
 
 environment:
   matrix:
-    - RUBY_VERSION: 21
+    - RUBY_VERSION: 200
     - RUBY_VERSION: 24
 
 install:
   - set PATH=C:\Ruby%RUBY_VERSION%\bin;%PATH%
+  - git submodule update --init --recursive
   - bundle config --local path .bundle
   - bundle install --jobs 3 --retry 3
 

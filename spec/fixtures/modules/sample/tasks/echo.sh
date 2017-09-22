@@ -1,3 +1,3 @@
 #!/bin/sh
 
-echo $PT_message
+echo $(hostname) got passed the message: $PT_message

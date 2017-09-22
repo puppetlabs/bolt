@@ -4,8 +4,9 @@ require 'bolt/result'
 
 module Bolt
   class WinRM < Node
-    def initialize(host, port, user, password, shell = :powershell)
-      super(host, port, user, password)
+    def initialize(host, port, user, password, tty,
+                   uri = nil, shell = :powershell)
+      super(host, port, user, password, tty, uri)
 
       @shell = shell
       @endpoint = "http://#{host}:#{port}/wsman"
@@ -17,42 +18,51 @@ module Bolt
 
     def connect
       @session = @connection.shell(@shell)
+      @logger.debug { "Opened session" }
     end
 
     def disconnect
       @session.close if @session
+      @logger.debug { "Closed session" }
     end
 
     def execute(command, _ = {})
       result_output = Bolt::ResultOutput.new
 
+      @logger.debug { "Executing command: #{command}" }
+
       output = @session.run(command) do |stdout, stderr|
         result_output.stdout << stdout
+        @logger.debug { "stdout: #{stdout}" }
         result_output.stderr << stderr
+        @logger.debug { "stderr: #{stderr}" }
       end
       if output.exitcode.zero?
+        @logger.debug { "Command returned successfully" }
         Bolt::Success.new(result_output.stdout.string, result_output)
       else
+        @logger.info { "Command failed with exit code #{output.exitcode}" }
         Bolt::Failure.new(output.exitcode, result_output)
       end
     end
 
     def upload(source, destination)
+      @logger.debug { "Uploading #{source} to #{destination}" }
       fs = ::WinRM::FS::FileManager.new(@connection)
       fs.upload(source, destination)
       Bolt::Success.new
-    rescue => ex
+    rescue StandardError => ex
       Bolt::ExceptionFailure.new(ex)
     end
 
     def make_tempdir
-      result = execute(<<-EOS)
+      result = execute(<<-PS)
 $parent = [System.IO.Path]::GetTempPath()
 $name = [System.IO.Path]::GetRandomFileName()
 $path = Join-Path $parent $name
 New-Item -ItemType Directory -Path $path | Out-Null
 $path
-EOS
+PS
       result.then { |stdout| Bolt::Success.new(stdout.chomp) }
     end
 
@@ -70,15 +80,16 @@ EOS
       end.then do
         result = yield dest
       end.then do
-        execute(<<-EOS)
+        execute(<<-PS)
 Remove-Item -Force "#{dest}"
 Remove-Item -Force "#{dir}"
-EOS
+PS
         result
       end
     end
 
     def run_script(script)
+      @logger.info { "Running script '#{script}'" }
       with_remote_file(script) do |remote_path|
         args = '-NoProfile -NonInteractive -NoLogo -ExecutionPolicy Bypass'
         execute("powershell.exe #{args} -File '#{remote_path}'")
@@ -86,6 +97,9 @@ EOS
     end
 
     def run_task(task, input_method, arguments)
+      @logger.info { "Running task '#{task}'" }
+      @logger.debug { "arguments: #{arguments}\ninput_method: #{input_method}" }
+
       if input_method == 'stdin'
         raise NotImplementedError,
               "Sending task arguments via stdin to PowerShell is not supported"

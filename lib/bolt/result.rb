@@ -14,6 +14,12 @@ module Bolt
     def initialize(output)
       @output = output
     end
+
+    def output_string
+      str = StringIO.new
+      print_to_stream(str)
+      str.string
+    end
   end
 
   class Success < Result
@@ -22,6 +28,10 @@ module Bolt
     def initialize(value = '', output = nil)
       super(output)
       @value = value
+    end
+
+    def success?
+      true
     end
 
     def then
@@ -52,6 +62,10 @@ module Bolt
     def initialize(exit_code, output)
       super(output)
       @exit_code = exit_code
+    end
+
+    def success?
+      false
     end
 
     def then

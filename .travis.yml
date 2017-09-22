@@ -2,8 +2,8 @@ sudo: false
 language: ruby
 cache: bundler
 rvm:
-- 2.4.1
-- 2.1
+- 2.4
+- 2.0
 before_script:
 - cat Gemfile.lock
 script:

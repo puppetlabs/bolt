@@ -20,35 +20,44 @@ module Bolt
       end
     end
 
-    def self.from_uri(uri_string, user, password)
+    def self.from_uri(uri_string, user, password, tty)
       uri = parse_uri(uri_string)
       klass = if uri.scheme == 'winrm'
                 Bolt::WinRM
               else
                 Bolt::SSH
               end
-      klass.new(uri.host, uri.port, user, password)
+      klass.new(uri.host, uri.port, user, password, tty)
     end
 
-    attr_reader :logger, :host
+    attr_reader :logger, :host, :uri
 
-    def initialize(host, port = nil, user = nil, password = nil)
+    def initialize(host, port = nil, user = nil,
+                   password = nil, tty = nil, uri = nil,
+                   log_level: Bolt.log_level)
       @host = host
       @user = user
       @port = port
       @password = password
+      @tty = tty
+      @uri = uri
 
-      @logger = init_logger(STDERR, Logger::DEBUG)
-      @transport_logger = init_logger(STDERR, Logger::WARN)
+      @logger = init_logger(level: log_level)
+      @transport_logger = init_logger(level: Logger::WARN)
     end
 
-    def init_logger(destination = STDERR, level = Logger::WARN)
+    def init_logger(destination: STDERR, level: Logger::WARN)
       logger = Logger.new(destination)
       logger.level = level
       logger.formatter = proc do |severity, datetime, _, msg|
         "#{datetime} #{severity} #{@host}: #{msg}\n"
       end
       logger
+    end
+
+    def run_command(command)
+      @logger.info { "Running command: #{command}" }
+      execute(command)
     end
   end
 end

@@ -2,10 +2,9 @@
 
 To use Bolt, you'll need to install:
 
-* Ruby 2.1 or greater
+* Ruby 2.0 or greater
 * gcc and related dependencies (except on Windows)
 * Bolt gem
-* Puppet gem (optional dependency to run tasks)
 
 ## Native Extensions
 
@@ -49,7 +48,7 @@ to install from [RubyGems](https://rubygems.org).
 Since bolt is not public yet, you will need to install the gem from our internal
 mirror, and specify a version to ensure you get the latest version:
 
-    gem install --source http://rubygems.delivery.puppetlabs.net bolt -v '> 0.0.1'
+    gem install bolt --source http://rubygems.delivery.puppetlabs.net
 
 Or add this to your Gemfile if you are using [Bundler](https://bundler.io), and
 specify your gem `source` as `http://rubygems.delivery.puppetlabs.net`
@@ -58,6 +57,7 @@ specify your gem `source` as `http://rubygems.delivery.puppetlabs.net`
 
 Or if running from source
 
+    git submodule update --init --recursive
     bundle install --path .bundle
     bundle exec bolt ...
 
@@ -65,11 +65,6 @@ See `bolt --help` for more details.
 
 ## Installing Puppet
 
-Bolt relies on an unreleased version of Puppet 5.2 to execute tasks. As a
-temporary workaround you can clone bolt and run it using bundler
-
-    git clone git@github.com:puppetlabs/bolt
-    cd bolt
-    bundle install --path .bundle
-    bundle exec bolt task run <name> --modules ~/modules ...
-
+Bolt vendors a version of puppet that supports executing tasks and plans, so you do not need
+to install puppet. If you happen to already have puppet installed, then the vendored version
+will take precedence and will not conflict with the already installed version.

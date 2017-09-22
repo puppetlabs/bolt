@@ -17,11 +17,11 @@ describe "Bolt::Executor" do
 
   it "executes a command on all nodes" do
     node1 = mock_node 'node1'
-    expect(node1).to receive(:execute).with(command).and_return(success)
+    expect(node1).to receive(:run_command).with(command).and_return(success)
     node2 = mock_node 'node2'
-    expect(node2).to receive(:execute).with(command).and_return(success)
+    expect(node2).to receive(:run_command).with(command).and_return(success)
 
-    Bolt::Executor.new([node1, node2]).execute(command)
+    Bolt::Executor.new([node1, node2]).run_command(command)
   end
 
   it "runs a script on all nodes" do
@@ -61,7 +61,7 @@ describe "Bolt::Executor" do
     allow(node).to receive(:logger).and_return(logger)
     expect(node).to receive(:connect).and_raise("reset")
 
-    results = Bolt::Executor.new([node]).execute(command)
+    results = Bolt::Executor.new([node]).run_command(command)
     results.each_pair do |_, result|
       expect(result).to be_instance_of(Bolt::ExceptionFailure)
     end

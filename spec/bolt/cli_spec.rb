@@ -147,7 +147,7 @@ describe "Bolt::CLI" do
     end
 
     it "executes the 'whoami' command" do
-      expect(executor).to receive(:execute).with('whoami').and_return({})
+      expect(executor).to receive(:run_command).with('whoami').and_return({})
 
       options = {
         nodes: nodes, mode: 'command', action: 'run', object: 'whoami'
