@@ -53,29 +53,27 @@ Option | Description
 - stdout and stderr are interleaved as they are output
 - each stdout and stderr line are prefixed with node name and timestamp
 - (optionally) each stdoout and stderr line are prefixed with `err` or `out` 
-- tasks will have status when finished        # commands and scripts will not?
+- tasks will have status when finished     
 ~~~
 $ bolt [task/command/script] run [options...]
-Starting [task/command/script]...             # should we call this a job, like PE does? will it have an ID?
+Starting [task/command/script]...            
 Nodes: 3
 
-Started on node-1...
+node-1 | [timestamp] | msg | started 
 node-1 | [timestamp] | err | [stderr output]
 node-1 | [timestamp] | out | [stdout output]
-Started on node-2...
-Started on node-3...
+node-2 | [timestamp] | msg | started 
+node-1 | [timestamp] | msg | started 
 node-1 | [timestamp] | out | [stdout output]
 node-2 | [timestamp] | out | [stdout output]
-Finished on node-1
-  status: restarted                           # for tasks only
+node-1 | [timestamp] | msg | finished, succeeded
 node-3 | [timestamp] | out | [stdout output]
 node-3 | [timestamp] | out | [stdout output]
 node-3 | [timestamp] | out | [stdout output]
 node-2 | [timestamp] | out | [stdout output]
-Finished on node-3
-  status: failed                              # for tasks only
-Finished on node-2
-  status: failed                              # for tasks only
+node-3 | [timestamp] | msg | finished, failed
+node-2 | [timestamp] | msg | finished, succeeded
+
 
 3 of 3 nodes completed. 1 of 3 nodes succeeded, 2 of 3 nodes failed.
 Duration: [duration]
