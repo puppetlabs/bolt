@@ -1,4 +1,5 @@
 require 'logger'
+require 'bolt/node/formatter'
 
 module Bolt
   class Node
@@ -49,9 +50,7 @@ module Bolt
     def init_logger(destination: STDERR, level: Logger::WARN)
       logger = Logger.new(destination)
       logger.level = level
-      logger.formatter = proc do |severity, datetime, _, msg|
-        "#{datetime} #{severity} #{@host}: #{msg}\n"
-      end
+      logger.formatter = Bolt::Node::Formatter.new(@host)
       logger
     end
 
