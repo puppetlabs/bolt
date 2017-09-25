@@ -173,12 +173,13 @@ HELP
       end
 
       task_options, remaining = remaining.partition { |s| s =~ /.+=/ }
-      unless task_options.empty?
-        if options[:task_options]
+      if options[:task_options]
+        unless task_options.empty?
           raise Bolt::CLIError,
                 "Parameters must be specified through either the --params " \
                 "option or param=value pairs, not both"
         end
+      else
         options[:task_options] = Hash[task_options.map { |a| a.split('=', 2) }]
       end
 
