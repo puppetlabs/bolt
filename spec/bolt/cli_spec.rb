@@ -140,6 +140,12 @@ describe "Bolt::CLI" do
   end
 
   describe "handling parameters" do
+    it "returns {} if none are specified" do
+      cli = Bolt::CLI.new(%w[plan run my::plan])
+      result = cli.parse
+      expect(result[:task_options]).to eq({})
+    end
+
     it "reads params on the command line" do
       cli = Bolt::CLI.new(%w[plan run my::plan kj=2hv iuhg=iube 2whf=lcv])
       result = cli.parse
