@@ -298,8 +298,13 @@ HELP
     end
 
     def execute_plan(options)
+      planOptions = options[:task_options] || {}
+      nodes = planOptions[:nodes]
+
+      # :nodes must be an array, either empty or containing non empty strings
+      planOptions['nodes'] = nodes == nil ? [] : nodes.reject { |node| node == nil || node == '' }
       result = run_plan(options[:object],
-                        options[:task_options],
+                        planOptions,
                         options[:modules])
       puts result
     end
