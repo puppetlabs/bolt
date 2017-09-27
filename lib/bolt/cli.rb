@@ -331,7 +331,8 @@ HELP
                                 user: options[:user],
                                 password: options[:password],
                                 tty: options[:tty],
-                                insecure: options[:insecure])
+                                insecure: options[:insecure],
+                                transport: options[:transport])
       executor = Bolt::Executor.new(config)
 
       if options[:mode] == 'plan'

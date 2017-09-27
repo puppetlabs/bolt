@@ -92,6 +92,13 @@ describe Bolt::NodeURI do
       expect(uri.hostname).to eq('neptune')
       expect(uri.port).to eq(5985)
     end
+
+    it "uses 'winrm' when it's the default transport" do
+      uri = Bolt::NodeURI.new('neptune', 'winrm')
+      expect(uri.scheme).to eq('winrm')
+      expect(uri.hostname).to eq('neptune')
+      expect(uri.port).to eq(5985)
+    end
   end
 
   describe "with ssh" do
