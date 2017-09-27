@@ -20,6 +20,49 @@ module Bolt
       print_to_stream(str)
       str.string
     end
+
+    def stdout
+      @stdout ||=
+        if @output && @output.stdout
+          @output.stdout.rewind
+          @output.stdout.read
+        else
+          ''
+        end
+    end
+
+    def stderr
+      @stderr ||=
+        if @output && @output.stderr
+          @output.stderr.rewind
+          @output.stderr.read
+        else
+          ''
+        end
+    end
+
+    def result_hash
+      res = nil
+      begin
+        res = JSON.parse(stdout)
+        if res.class != Hash
+          res = nil
+        end
+      rescue JSON::ParserError
+      end
+
+      res ||= { 'output' => stdout }
+
+      if self.class == Bolt::Failure && !res['_error']
+        msg = "Task exited with #{@exit_code}"
+        msg += "\n#{stderr}" if stdout.empty?
+        res['_error'] = {'kind': 'task_error',
+                         'msg': msg,
+                         'details': {'exit_code': @exit_code } }
+      end
+
+      res
+    end
   end
 
   class Success < Result
