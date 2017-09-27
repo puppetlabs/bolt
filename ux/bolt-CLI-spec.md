@@ -50,32 +50,40 @@ Option | Description
 **Human format (default)**
 
 **View output per node while task/command/script is running on single or multiple nodes.**
-- stdout and stderr are interleaved as they are output
-- each stdout and stderr line are prefixed with node name and timestamp
-- (optionally) each stdoout and stderr line are prefixed with `err` or `out` 
-- tasks will have status when finished     
+- stdout, stderr and messages from bolt are interleaved as they are output
+- each line is prefixed with node name, timestamp, and `err`, `out`, or `msg` accordingly.
+- nodename, timestamp and output type are space separated, the line is terminated with a colon.
+- timestamp format is HH:MM:SS
+- output follows on a new line, indented 2 spaces. This makes multi-line output easier to read and does not impact readability of single line output.
+
 ~~~
 $ bolt [task/command/script] run [options...]
 Starting [task/command/script]...            
 Nodes: 3
 
-node-1 | [timestamp] | msg | started 
-node-1 | [timestamp] | err | [stderr output]
-node-1 | [timestamp] | out | [stdout output]
-node-2 | [timestamp] | msg | started 
-node-1 | [timestamp] | msg | started 
-node-1 | [timestamp] | out | [stdout output]
-node-2 | [timestamp] | out | [stdout output]
-node-1 | [timestamp] | msg | finished, succeeded
-node-3 | [timestamp] | out | [stdout output]
-node-3 | [timestamp] | out | [stdout output]
-node-3 | [timestamp] | out | [stdout output]
-node-2 | [timestamp] | out | [stdout output]
-node-3 | [timestamp] | msg | finished, failed
-node-2 | [timestamp] | msg | finished, succeeded
+node-1 HH:MM:SS msg:
+  started 
+node-1 HH:MM:SS err:
+  [stderr output]
+node-1 HH:MM:SS out: 
+  [stdout output]
+node-2 HH:MM:SS msg:
+  started
+node-3 HH:MM:SS msg:
+  started
+node-2 HH:MM:SS out: 
+  [stdout output]
+node-1 HH:MM:SS msg: 
+  finished, succeeded
+node-3 HH:MM:SS out: 
+  [stdout output]
+node-3 HH:MM:SS msg:
+  finished, failed
+node-2 HH:MM:SS msg:
+  finished, succeeded
 
 
-3 of 3 nodes completed. 1 of 3 nodes succeeded, 2 of 3 nodes failed.
+3 of 3 nodes completed. 2 of 3 nodes succeeded, 1 of 3 nodes failed.
 Duration: [duration]
 
 ~~~
