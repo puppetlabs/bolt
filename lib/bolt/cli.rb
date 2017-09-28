@@ -8,10 +8,6 @@ require 'bolt/version'
 require 'bolt/executor'
 
 module Bolt
-  class << self
-    attr_accessor :log_level
-  end
-
   class CLIError < RuntimeError
     attr_reader :error_code
 
@@ -255,8 +251,8 @@ HELP
         execute_plan(options)
       else
         nodes = options[:nodes].map do |node|
-          Bolt::Node.from_uri(node,
-                              options[:user], options[:password], options[:tty])
+          Bolt::Node.from_uri(node, options[:user], options[:password],
+                              tty: options[:tty])
         end
 
         results = nil

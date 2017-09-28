@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'bolt'
 require 'bolt/node'
 
 describe Bolt::Node do
@@ -45,6 +46,14 @@ describe Bolt::Node do
       expect(uri.scheme).to eq('ssh')
       expect(uri.host).to eq('pluto')
       expect(uri.port).to eq(22)
+    end
+  end
+
+  describe "initializing nodes from uri" do
+    it "understands user and password" do
+      node = Bolt::Node.from_uri('ssh://iuyergkj:123456@whitehouse.gov')
+      expect(node.user).to eq('iuyergkj')
+      expect(node.password).to eq('123456')
     end
   end
 end
