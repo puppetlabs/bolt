@@ -8,10 +8,6 @@ require 'bolt/version'
 require 'bolt/executor'
 
 module Bolt
-  class << self
-    attr_accessor :log_level
-  end
-
   class CLIError < RuntimeError
     attr_reader :error_code
 
@@ -86,42 +82,45 @@ Available actions are:
 Available options are:
 HELP
 
-    def initialize(argv)
-      @argv = argv
-    end
-
     MODES = %w[command script task plan file].freeze
     ACTIONS = %w[run upload download].freeze
 
-    def parse
-      options = {}
-      Bolt.log_level = Logger::WARN
+    attr_reader :parser
+    attr_accessor :options
 
-      global = OptionParser.new('') do |opts|
+    def initialize(argv)
+      @argv = argv
+      @options = {}
+
+      @parser = create_option_parser(@options)
+    end
+
+    def create_option_parser(results)
+      OptionParser.new('') do |opts|
         opts.on('-n', '--nodes x,y,z', Array, 'Nodes to connect to') do |nodes|
-          options[:nodes] = nodes
+          results[:nodes] = nodes
         end
         opts.on('-u', '--user USER',
                 "User to authenticate as (Optional)") do |user|
-          options[:user] = user
+          results[:user] = user
         end
         opts.on('-p', '--password PASSWORD',
                 "Password to authenticate as (Optional)") do |password|
-          options[:password] = password
+          results[:password] = password
         end
         opts.on('--modules MODULES', "Path to modules directory") do |modules|
-          options[:modules] = modules
+          results[:modules] = modules
         end
         opts.on('--params PARAMETERS',
                 "Parameters to a task or plan") do |params|
-          options[:task_options] = parse_params(params)
+          results[:task_options] = parse_params(params)
         end
         opts.on_tail('--[no-]tty',
                      "Request a pseudo TTY on nodes that support it") do |tty|
-          options[:tty] = tty
+          results[:tty] = tty
         end
         opts.on_tail('-h', '--help', 'Display help') do |_|
-          options[:help] = true
+          results[:help] = true
         end
         opts.on_tail('--verbose', 'Display verbose logging') do |_|
           Bolt.log_level = Logger::INFO
@@ -134,13 +133,17 @@ HELP
           raise Bolt::CLIExit
         end
       end
+    end
+
+    def parse
+      Bolt.log_level = Logger::WARN
 
       if @argv.empty?
         options[:help] = true
       end
 
       remaining = handle_parser_errors do
-        global.permute(@argv)
+        parser.permute(@argv)
       end
 
       options[:mode] = remaining.shift
@@ -154,21 +157,7 @@ HELP
       options[:object] = remaining.shift
 
       if options[:help]
-        global.banner = case options[:mode]
-                        when 'task'
-                          TASK_HELP
-                        when 'command'
-                          COMMAND_HELP
-                        when 'script'
-                          SCRIPT_HELP
-                        when 'file'
-                          FILE_HELP
-                        when 'plan'
-                          PLAN_HELP
-                        else
-                          BANNER
-                        end
-        puts global.help
+        print_help(options[:mode])
         raise Bolt::CLIExit
       end
 
@@ -188,6 +177,24 @@ HELP
       validate(options)
 
       options
+    end
+
+    def print_help(mode)
+      parser.banner = case mode
+                      when 'task'
+                        TASK_HELP
+                      when 'command'
+                        COMMAND_HELP
+                      when 'script'
+                        SCRIPT_HELP
+                      when 'file'
+                        FILE_HELP
+                      when 'plan'
+                        PLAN_HELP
+                      else
+                        BANNER
+                      end
+      puts parser.help
     end
 
     def parse_params(params)
@@ -255,8 +262,8 @@ HELP
         execute_plan(options)
       else
         nodes = options[:nodes].map do |node|
-          Bolt::Node.from_uri(node,
-                              options[:user], options[:password], options[:tty])
+          Bolt::Node.from_uri(node, options[:user], options[:password],
+                              tty: options[:tty])
         end
 
         results = nil
@@ -298,6 +305,7 @@ HELP
     end
 
     def execute_plan(options)
+      Bolt.config = options
       result = run_plan(options[:object],
                         options[:task_options],
                         options[:modules])

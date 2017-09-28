@@ -21,21 +21,26 @@ module Bolt
       end
     end
 
-    def self.from_uri(uri_string, user, password, tty)
+    def self.from_uri(uri_string, default_user = nil, default_password = nil,
+                      **kwargs)
       uri = parse_uri(uri_string)
       klass = if uri.scheme == 'winrm'
                 Bolt::WinRM
               else
                 Bolt::SSH
               end
-      klass.new(uri.host, uri.port, user, password, tty)
+      klass.new(uri.host,
+                uri.port,
+                uri.user || default_user || Bolt.config['user'],
+                uri.password || default_password || Bolt.config['password'],
+                **kwargs)
     end
 
-    attr_reader :logger, :host, :uri
+    attr_reader :logger, :host, :uri, :user, :password
 
     def initialize(host, port = nil, user = nil,
-                   password = nil, tty = nil, uri = nil,
-                   log_level: Bolt.log_level)
+                   password = nil, tty: false, uri: nil,
+                   log_level: Bolt.log_level || Logger::WARN)
       @host = host
       @user = user
       @port = port
