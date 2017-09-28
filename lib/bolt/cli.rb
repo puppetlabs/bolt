@@ -305,6 +305,7 @@ HELP
     end
 
     def execute_plan(options)
+      Bolt.config = options
       result = run_plan(options[:object],
                         options[:task_options],
                         options[:modules])
