@@ -32,7 +32,7 @@ module Bolt
       pool.shutdown
       pool.wait_for_termination
 
-      results
+      results_to_hash(results)
     end
 
     def run_command(command)
@@ -64,6 +64,14 @@ module Bolt
           result
         end
       end
+    end
+
+    private
+
+    def results_to_hash(results)
+      result_hash = {}
+      results.each_pair { |k, v| result_hash[k] = v }
+      result_hash
     end
   end
 end
