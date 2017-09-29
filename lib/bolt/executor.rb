@@ -4,7 +4,7 @@ require 'bolt/result'
 module Bolt
   class Executor
     def self.from_uris(uris)
-      new(uris.map { |uri| Bolt::Node.from_uri(uri, nil, nil, nil) })
+      new(uris.map { |uri| Bolt::Node.from_uri(uri) })
     end
 
     def initialize(nodes)

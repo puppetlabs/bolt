@@ -66,4 +66,11 @@ describe "Bolt::Executor" do
       expect(result).to be_instance_of(Bolt::ExceptionFailure)
     end
   end
+
+  it "can be created with a list of uris" do
+    expect(Bolt::SSH).to receive(:new).with('a.net', any_args)
+    expect(Bolt::WinRM).to receive(:new).with('b.com', any_args)
+
+    Bolt::Executor.from_uris(['ssh://a.net', 'winrm://b.com'])
+  end
 end
