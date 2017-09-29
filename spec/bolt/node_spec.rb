@@ -29,5 +29,11 @@ describe Bolt::Node do
       expect(node.user).to eq('toor')
       expect(node.password).to eq('better')
     end
+
+    it "strips brackets from ipv6 addresses in a uri" do
+      expect(Bolt::SSH).to receive(:new).with('::1', any_args)
+
+      Bolt::Node.from_uri('ssh://[::1]:22')
+    end
   end
 end

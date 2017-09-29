@@ -15,7 +15,7 @@ module Bolt
               else
                 Bolt::SSH
               end
-      klass.new(uri.host,
+      klass.new(uri.hostname,
                 uri.port,
                 uri.user || default_user || Bolt.config[:user],
                 uri.password || default_password || Bolt.config[:password],

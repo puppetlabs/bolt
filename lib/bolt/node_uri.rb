@@ -19,8 +19,8 @@ module Bolt
       end
     end
 
-    def host
-      @uri.host
+    def hostname
+      @uri.hostname
     end
 
     def port
