@@ -1,0 +1,50 @@
+require 'spec_helper'
+require 'bolt/node_uri'
+
+describe Bolt::NodeURI do
+  describe "with winrm" do
+    it "accepts 'winrm://host:port'" do
+      uri = Bolt::NodeURI.new('winrm://neptune:55985')
+      expect(uri.scheme).to eq('winrm')
+      expect(uri.host).to eq('neptune')
+      expect(uri.port).to eq(55985)
+    end
+
+    it "defaults the winrm port to 5985" do
+      uri = Bolt::NodeURI.new('winrm://neptune')
+      expect(uri.scheme).to eq('winrm')
+      expect(uri.host).to eq('neptune')
+      expect(uri.port).to eq(5985)
+    end
+  end
+
+  describe "with ssh" do
+    it "accepts 'ssh://host:port'" do
+      uri = Bolt::NodeURI.new('ssh://pluto:2224')
+      expect(uri.scheme).to eq('ssh')
+      expect(uri.host).to eq('pluto')
+      expect(uri.port).to eq(2224)
+    end
+
+    it "defaults the ssh port to 22" do
+      uri = Bolt::NodeURI.new('ssh://pluto')
+      expect(uri.scheme).to eq('ssh')
+      expect(uri.host).to eq('pluto')
+      expect(uri.port).to eq(22)
+    end
+
+    it "accepts 'host:port' without a scheme" do
+      uri = Bolt::NodeURI.new('pluto:2224')
+      expect(uri.scheme).to eq('ssh')
+      expect(uri.host).to eq('pluto')
+      expect(uri.port).to eq(2224)
+    end
+
+    it "defaults the ssh port to 22 without a scheme" do
+      uri = Bolt::NodeURI.new('pluto')
+      expect(uri.scheme).to eq('ssh')
+      expect(uri.host).to eq('pluto')
+      expect(uri.port).to eq(22)
+    end
+  end
+end

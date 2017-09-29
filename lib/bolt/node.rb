@@ -1,4 +1,5 @@
 require 'logger'
+require 'bolt/node_uri'
 require 'bolt/node/formatter'
 
 module Bolt
@@ -6,24 +7,9 @@ module Bolt
     STDIN_METHODS       = %w[both stdin].freeze
     ENVIRONMENT_METHODS = %w[both environment].freeze
 
-    def self.parse_uri(node)
-      case node
-      when %r{^(ssh|winrm)://.*:\d+$}
-        URI(node)
-      when %r{^(ssh|winrm)://}
-        uri = URI(node)
-        uri.port = uri.scheme == 'ssh' ? 22 : 5985
-        uri
-      when /.*:\d+$/
-        URI("ssh://#{node}")
-      else
-        URI("ssh://#{node}:22")
-      end
-    end
-
     def self.from_uri(uri_string, default_user = nil, default_password = nil,
                       **kwargs)
-      uri = parse_uri(uri_string)
+      uri = NodeURI.new(uri_string)
       klass = if uri.scheme == 'winrm'
                 Bolt::WinRM
               else
