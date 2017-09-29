@@ -57,8 +57,8 @@ describe Bolt::Node do
     end
 
     it "defaults to globally set user and password" do
-      config = { 'user' => 'somebody',
-                 'password' => 'very secure' }
+      config = { user: 'somebody',
+                 password: 'very secure' }
       allow(Bolt).to receive(:config).and_return(config)
 
       node = Bolt::Node.from_uri('ssh://localhost')
@@ -67,8 +67,8 @@ describe Bolt::Node do
     end
 
     it "uri overrides global user and password" do
-      config = { 'user' => 'somebody',
-                 'password' => 'very secure' }
+      config = { user: 'somebody',
+                 password: 'very secure' }
       allow(Bolt).to receive(:config).and_return(config)
 
       node = Bolt::Node.from_uri('ssh://toor:better@localhost')

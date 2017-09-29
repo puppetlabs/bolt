@@ -31,8 +31,8 @@ module Bolt
               end
       klass.new(uri.host,
                 uri.port,
-                uri.user || default_user || Bolt.config['user'],
-                uri.password || default_password || Bolt.config['password'],
+                uri.user || default_user || Bolt.config[:user],
+                uri.password || default_password || Bolt.config[:password],
                 **kwargs)
     end
 
