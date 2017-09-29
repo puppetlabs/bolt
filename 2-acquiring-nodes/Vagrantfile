@@ -1,9 +1,17 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-Vagrant.configure("2") do |config|
-  config.vm.box = "centos/7"
+$nodes_count = 1
 
-  config.vm.define "node1"
-  config.vm.define "node2"
+if ENV['NODES'].to_i > 0 && ENV['NODES']
+  $nodes_count = ENV['NODES'].to_i
+end
+
+Vagrant.configure('2') do |config|
+  config.vm.box = 'centos/7'
+  config.ssh.forward_agent = true
+
+  (1..$nodes_count).each do |i|
+    config.vm.define "node#{i}"
+  end
 end
