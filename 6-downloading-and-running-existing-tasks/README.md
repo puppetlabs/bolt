@@ -4,24 +4,74 @@
 
 > **Time**: Approximately 10 minutes
 
-In this lab you will ...
+In this lab you will explore some existing tasks, including several tasks that take advantage of Puppet under-the-hood.
 
-- [Download tasks from Forge](#download-tasks-from-forge)
-- [Install Puppet using a Task](#install-puppet-using-a-task)
+> **Note:** Some of the following content will be available on The Forge soon.
+
+- [Install Puppet using Bolt](#install-puppet-using-bolt)
 - [Use package task to check status of package](#use-package-task-to-check-status-of-package)
 - [Use package task to install a package](#use-package-task-to-install-a-package)
 - [The Tasks Playground](#more-tips-tricks-and-ideas-on-the-tasks-playground)
 
 # Prerequisites
 
-You will need the following to complete this lab:
+For the following exercises you should already have `bolt` installed and have a few nodes (either Windows or Linux) available to run commands against. The following guides will help:
 
-# Download tasks from GitHub
+1. [Installing Bolt](../1-installing-bolt)
+1. [Acquiring nodes](../2-acquiring-nodes)
 
-# Install Puppet using a Task
+It is also useful to have some familiarity with running commands with `bolt` so you understand passing nodes and credentials. The following lab is recommended:
+
+1. [Running Commands](../3-running-commands)
+
+# Install Puppet using Bolt
+
+[puppet-install-shell](https://github.com/petems/puppet-install-shell) is a project to maintain a set of scripts which install Puppet on a range of different Linux flavors.
+
+The script can be downloaded and piped to `sh` as indicated in the documentation, alternatively you can download the script locally and then use `bolt script` to upload and run it.
+
+```
+wget https://raw.githubusercontent.com/petems/puppet-install-shell/master/install_puppet_5_agent.sh
+bolt script run install_puppet_5_agent.sh --nodes <nodes>
+```
+
+That should output various installation steps and result in Puppet being installed from the official Puppet packages on the target nodes. You can verify that with bolt itself.
+
+```
+$ bolt command run "/opt/puppetlabs/bin/puppet --version" --nodes <nodes>
+node1:
+
+5.2.0
+
+Ran on 1 node in 0.68 seconds
+```
 
 # Use package task to check status of package
 
+With Puppet installed on the node we can use some of the tasks that expose Puppet resources, like the package task from the package module. Let's quickly check on the status of a specific package using `bolt`:
+
+```
+bolt task run package action=status package=bash --nodes <nodes> --modules ./modules
+node1:
+
+{"status":"up to date","version":"4.3-7ubuntu1.7"}
+
+Ran on 1 node in 3.81 seconds
+```
+
 # Use package task to install a package
 
+The package task also supports other actions, including ensuring a package is installed. Let's install a package across all of our nodes using that action:
+
+```
+bolt task run package action=install package=vim --nodes <nodes> --modules ./modules
+node1:
+
+{"status":"installed","version":"2:7.4.052-1ubuntu3.1"}
+
+Ran on 1 node in 15.26 seconds
+```
+
 # More tips, tricks and ideas on the Tasks Playground
+
+We've really only scratched the surface of Tasks in these lab excercises. You'll find lots more tips, tricks, examples and hacks on the [Puppet Tasks Playground](https://github.com/puppetlabs/tasks-playground).
