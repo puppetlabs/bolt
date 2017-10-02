@@ -45,9 +45,9 @@ You can check everything has been installed correctly by running `bolt --help`.
 
 # Installing Bolt on Linux
 
-`bolt` is packaged as a Ruby gem, so you will need a Ruby environment installed. It also makes use of gems with native dependencies so you'll need a compiler toolchain. The commands to install these dependencies vary based on which flavour of Linus you are running.
+`bolt` is packaged as a Ruby gem, so you will need a Ruby environment installed. It also makes use of gems with native dependencies so you'll need a compiler toolchain. The commands to install these dependencies vary based on which flavor of Linux you are running.
 
-## CentOS 7/Redhat 7
+## CentOS 7/RHEL 7
 
 ```
 yum install -y make gcc ruby-devel

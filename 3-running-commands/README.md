@@ -4,12 +4,12 @@
 
 > **Time**: Approximately 5 minutes
 
-At the most basic level `bolt' can be used to run arbitrary commands on a set of remote hosts. Let's see that in practice before we move on to more useful higher-level features. In particular we'll look at: 
+At the most basic level `bolt` can be used to run arbitrary commands on a set of remote hosts. Let's see that in practice before we move on to more useful higher-level features. In particular we'll look at: 
 
 - [Running shell commands on Linux nodes](#running-shell-commands-on-linux-nodes)
 - [Running PowerShell commands on Windows nodes](#running-powershell-commands-on-windows-nodes)
 
-Feel free to just run one of these exercises depending on your prefered  operating system environment.
+Feel free to just run one of these exercises depending on your operating system environment.
 
 # Prerequisites
 

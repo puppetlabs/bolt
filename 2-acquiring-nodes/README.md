@@ -45,7 +45,7 @@ This will by default launch one node. Run the following command. We are assuming
 vagrant up
 ```
 
-If you would like to run more than one SSH server then you can set the `NODES` environment variable and run `vagrant up` again. With a linux shell this is:
+If you would like to run more than one SSH server then you can set the `NODES` environment variable and run `vagrant up` again. With a Linux shell this is:
 
 ```
 NODES=3 vagrant up
@@ -58,7 +58,7 @@ $env:NODES = 3
 vagrant up
 ```
 
-Finally you can generate the SSH config so `bolt` knows how to authenticate with the SSH daemon. The following command will output the required configuratil. 
+Finally you can generate the SSH configuration so `bolt` knows how to authenticate with the SSH daemon. The following command will output the required details. 
 
 ```
 vagrant ssh-config
@@ -71,7 +71,7 @@ mkdir ~/.ssh
 vagrant ssh-config >> ~/.ssh/config
 ``` 
 
-You'll also want to remeber the IP addresses for the new nodes, so we can access them later. Look a the configuration output by the above command. For each node launched you should see a value for `HostName`.
+You'll also want to remember the IP addresses for the new nodes, so we can access them later. Look a the configuration output by the above command. For each node launched you should see a value for `HostName`.
 
 ```
 Host node1
@@ -116,7 +116,7 @@ docker-compose ps
 
 Note the `Ports` column. We are forwarding a local port to the SSH server running in the container. So you should be able to SSH to `127.0.0.1:32768` (in the example above). 
 
-The image sets the username to `root` and the password` to `root`. Test the connection out if you have a local SSH client like so, changing the port to one you get from running the `docker-compose ps` command above.
+The image sets the username to `root` and the password to `root`. Test the connection out if you have a local SSH client like so, changing the port to one you get from running the `docker-compose ps` command above.
 
 ```
 ssh root@127.0.0.1:32768
