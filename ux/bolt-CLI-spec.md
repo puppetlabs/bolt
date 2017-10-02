@@ -47,40 +47,71 @@ Option | Description
 
 ### OUTPUT
 
-**Human format (default)**
+
 
 **View output per node while task/command/script is running on single or multiple nodes.**
+
+**--human format (default)**
+
+~~~
+$ bolt [task/command/script] run [options...]
+Starting [task/command/script]...
+Nodes: 3
+
+Started on node-1...
+Started on node-2...
+Started on node-3...
+Finished on node-1
+  status: restarted
+  STDOUT:
+    [stdout output...]
+Finished on node-2
+  status: restarted
+  STDOUT:
+    [stdout output...]
+Finished on node-3
+  status: restarted
+  STDOUT:
+    [stdout output...]
+    
+  
+
+[Task/Command/Script] completed. 3/3 nodes succeeded.
+Duration: 27 sec
+~~~
+
+- colors should match puppet job run output for started, finished, and errors.
+- For tasks, capitalization of the finished node results comes from module (eg. status vs. Status).
+
+
+
+
+
+**View output per node while task/command/script is running on single or multiple nodes.**
+
+**--oneline format**
+
 - stdout, stderr and messages from bolt are interleaved as they are output
-- each line is prefixed with node name, timestamp, and `err`, `out`, or `msg` accordingly.
-- nodename, timestamp and output type are space separated, the line is terminated with a colon.
+- every line is prefixed with node name, timestamp, and `err`, `out`, or `msg` accordingly.
+- nodename, timestamp and output type are space separated.
 - timestamp format is HH:MM:SS
-- output follows on a new line, indented 2 spaces. This makes multi-line output easier to read and does not impact readability of single line output.
+
 
 ~~~
 $ bolt [task/command/script] run [options...]
 Starting [task/command/script]...            
 Nodes: 3
 
-node-1 HH:MM:SS msg:
-  started 
-node-1 HH:MM:SS err:
-  [stderr output]
-node-1 HH:MM:SS out: 
-  [stdout output]
-node-2 HH:MM:SS msg:
-  started
-node-3 HH:MM:SS msg:
-  started
-node-2 HH:MM:SS out: 
-  [stdout output]
-node-1 HH:MM:SS msg: 
-  finished, succeeded
-node-3 HH:MM:SS out: 
-  [stdout output]
-node-3 HH:MM:SS msg:
-  finished, failed
-node-2 HH:MM:SS msg:
-  finished, succeeded
+node-1 HH:MM:SS msg started 
+node-1 HH:MM:SS err [stderr output]
+node-1 HH:MM:SS out [stdout output]
+node-2 HH:MM:SS msg started
+node-3 HH:MM:SS msg started
+node-2 HH:MM:SS out [stdout output]
+node-1 HH:MM:SS msg finished, succeeded
+node-3 HH:MM:SS out [stdout output]
+node-3 HH:MM:SS msg finished, failed
+node-2 HH:MM:SS msg finished, succeeded
 
 
 3 of 3 nodes completed. 2 of 3 nodes succeeded, 1 of 3 nodes failed.
@@ -88,32 +119,9 @@ Duration: [duration]
 
 ~~~
 
-**View output per node while task plan is running.**
-- TBD
 
 
-### EXAMPLES
-
-**Query a node for the number of SSL connections it’s handling**:
-~~~
-$ bolt command run ‘netstat -an | grep “:443.*ESTABLISHED” | wc -1’ --nodes europa
-europa-1: 350
-
-~~~
-
-
-
-**Execute "facter" on multiple systems**:
-This demonstrates how a command can be run on multiple systems, and how the results are displayed:
-~~~
-$ bolt command run 'facter osfamily' --nodes europa-1,europa-2
-europa-2: Redhat
-europa-1: Redhat
-~~~
-
-**OUTPUT**
-
-****View the response for each node when the node has finished (unstructured STDOUT):**
+**View the response for each node when the node has finished (unstructured STDOUT):**
 ~~~
 ...
 
@@ -172,32 +180,5 @@ Finished on covfefe-2
     Complete!
 ~~~
 
-
-
-
---- 
-Placeholders for examples:
-
-**Run a single command**
-
-**Run a shell script**
-
-**Transfer files**
-
-**Install puppet**
-
-**Run puppet resource**
-
-**Run a Puppet task**
-
-**Run a Puppet task plan**
-
-**Forage for discovery info**
-
-
-**Output**
-
-**View task progress (failures) while task is running.**
-
-**Stop a task while it is running.**
-- Stopping a task would continue in-progress runs, but skip anything that hasn't started yet.
+**View output per node while task plan is running.**
+- TBD
