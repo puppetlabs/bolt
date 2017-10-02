@@ -1,6 +1,7 @@
 require 'net/ssh'
 require 'net/sftp'
 require 'json'
+require 'bolt/node/result'
 
 module Bolt
   class SSH < Node
@@ -22,7 +23,7 @@ module Bolt
     end
 
     def execute(command, options = {})
-      result_output = Bolt::ResultOutput.new
+      result_output = Bolt::Node::ResultOutput.new
       status = {}
 
       @logger.debug { "Executing: #{command}" }
@@ -58,27 +59,26 @@ module Bolt
 
       if status[:exit_code].zero?
         @logger.debug { "Command returned successfully" }
-        Bolt::Success.new(result_output.stdout.string, result_output)
+        Bolt::Node::Success.new(result_output.stdout.string, result_output)
       else
         @logger.info { "Command failed with exit code #{status[:exit_code]}" }
-        Bolt::Failure.new(status[:exit_code], result_output)
+        Bolt::Node::Failure.new(status[:exit_code], result_output)
       end
     end
 
-    def upload(source, destination)
-      @logger.debug { "Uploading #{source} to #{destination}" }
+    def _upload(source, destination)
       Net::SFTP::Session.new(@session).connect! do |sftp|
         sftp.upload!(source, destination)
       end
-      Bolt::Success.new
+      Bolt::Node::Success.new
     rescue StandardError => e
-      Bolt::ExceptionFailure.new(e)
+      Bolt::Node::ExceptionFailure.new(e)
     end
 
     def make_tempdir
-      Bolt::Success.new(@session.exec!('mktemp -d').chomp)
+      Bolt::Node::Success.new(@session.exec!('mktemp -d').chomp)
     rescue StandardError => e
-      Bolt::ExceptionFailure.new(e)
+      Bolt::Node::ExceptionFailure.new(e)
     end
 
     def with_remote_file(file)
@@ -89,9 +89,9 @@ module Bolt
       make_tempdir.then do |value|
         dir = value
         remote_path = "#{dir}/#{File.basename(file)}"
-        Bolt::Success.new
+        Bolt::Node::Success.new
       end.then do
-        upload(file, remote_path)
+        _upload(file, remote_path)
       end.then do
         execute("chmod u+x '#{remote_path}'")
       end.then do
@@ -104,14 +104,18 @@ module Bolt
       end
     end
 
-    def run_script(script)
+    def _run_command(command)
+      execute(command)
+    end
+
+    def _run_script(script)
       @logger.info { "Running script '#{script}'" }
       with_remote_file(script) do |remote_path|
         execute("'#{remote_path}'")
       end
     end
 
-    def run_task(task, input_method, arguments)
+    def _run_task(task, input_method, arguments)
       export_args = {}
       stdin = nil
 

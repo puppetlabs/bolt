@@ -1,105 +1,115 @@
+require 'json'
+
 module Bolt
-  class ResultOutput
-    attr_reader :stdout, :stderr
-
-    def initialize
-      @stdout = StringIO.new
-      @stderr = StringIO.new
-    end
-  end
-
   class Result
-    attr_reader :output
-
-    def initialize(output)
-      @output = output
+    def value
+      nil
     end
 
-    def output_string
-      str = StringIO.new
-      print_to_stream(str)
-      str.string
+    def error
+      nil
+    end
+
+    def to_h
+      { 'value' => value }
     end
   end
 
-  class Success < Result
-    attr_reader :value
+  class CommandResult < Result
+    def initialize(stdout, stderr, exit_code)
+      @stdout = stdout
+      @stderr = stderr
+      @exit_code = exit_code
+    end
 
-    def initialize(value = '', output = nil)
-      super(output)
-      @value = value
+    def value
+      {
+        'stdout' => @stdout,
+        'stderr' => @stderr,
+        'exit_code' => @exit_code
+      }
     end
 
     def success?
-      true
-    end
-
-    def then
-      yield @value
-    end
-
-    def print_to_stream(stream)
-      if @output
-        @output.stdout.rewind
-        IO.copy_stream(@output.stdout, stream)
-        @output.stderr.rewind
-        IO.copy_stream(@output.stderr, stream)
-      else
-        stream.puts @value
-      end
-    end
-
-    def colorize(stream)
-      stream.print "\033[32m" if stream.isatty
-      yield
-      stream.print "\033[0m" if stream.isatty
+      @exit_code.zero?
     end
   end
 
-  class Failure < Result
-    attr_reader :exit_code
+  class TaskResult < CommandResult
+    attr_reader :error
 
-    def initialize(exit_code, output)
-      super(output)
-      @exit_code = exit_code
+    def initialize(stdout, stderr, exit_code)
+      super(stdout, stderr, exit_code)
+      @object = output_to_json_hash(stdout)
+      @error = @object.delete('_error') if @object
+    end
+
+    def value
+      @object || { '_output' => @stdout }
+    end
+
+    def to_h
+      hash = super
+      hash['_error'] = error if error
+      hash
+    end
+
+    private
+
+    def output_to_json_hash(output)
+      obj = JSON.parse(output)
+      if obj.is_a? Hash
+        obj
+      end
+    rescue JSON::ParserError
+      nil
+    end
+  end
+
+  class TaskSuccess < TaskResult
+    def success?
+      true
+    end
+  end
+
+  class TaskFailure < TaskResult
+    def initialize(stdout, stderr, exit_code)
+      super(stdout, stderr, exit_code)
+      @error ||= generate_error
     end
 
     def success?
       false
     end
 
-    def then
-      self
-    end
+    private
 
-    def print_to_stream(stream)
-      if @output
-        @output.stdout.rewind
-        IO.copy_stream(@output.stdout, stream)
-        @output.stderr.rewind
-        IO.copy_stream(@output.stderr, stream)
-      else
-        stream.puts @value
-      end
-    end
-
-    def colorize(stream)
-      stream.print "\033[31m" if stream.isatty
-      yield
-      stream.print "\033[0m" if stream.isatty
+    def generate_error
+      {
+        'kind' => 'puppetlabs.tasks/task-error',
+        'issue_code' => 'TASK_ERROR',
+        'msg' => "The task failed with exit code #{@exit_code}",
+        'details' => { 'exit_code' => @exit_code }
+      }
     end
   end
 
-  class ExceptionFailure < Failure
-    attr_reader :exception
-
+  class ExceptionResult < Result
     def initialize(exception)
-      super(1, nil)
       @exception = exception
     end
 
-    def print_to_stream(stream)
-      stream.puts @exception.message
+    def error
+      {
+        'kind' => 'puppetlabs.tasks/exception-error',
+        'issue_code' => 'EXCEPTION',
+        'msg' => @exception.message,
+        'details' => { 'stack_trace' => @exception.backtrace.join('\n') }
+      }
+    end
+
+    def to_h
+      { '_error' => error }
     end
   end
 end

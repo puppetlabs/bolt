@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'json'
 require 'bolt'
 require 'bolt/node'
 
@@ -34,6 +35,107 @@ describe Bolt::Node do
       expect(Bolt::SSH).to receive(:new).with('::1', any_args)
 
       Bolt::Node.from_uri('ssh://[::1]:22')
+    end
+  end
+
+  def mock_success(stdout, stderr = nil)
+    output = Bolt::Node::ResultOutput.new
+    output.stdout << stdout
+    output.stderr << stderr if stderr
+    Bolt::Node::Success.new('', output)
+  end
+
+  def mock_failure(exit_code, stdout, stderr = nil)
+    output = Bolt::Node::ResultOutput.new
+    output.stdout << stdout
+    output.stderr << stderr if stderr
+    Bolt::Node::Failure.new(exit_code, output)
+  end
+
+  describe "returning results from tasks" do
+    it "on success converts json on stdout" do
+      result = mock_success({ hostname: "frogstar" }.to_json)
+
+      node = Bolt::SSH.new('localhost')
+      expect(node).to receive(:_run_task).and_return(result)
+
+      expect(node.run_task('generic', 'stdin', {}).to_h)
+        .to eq('value' => { 'hostname' => 'frogstar' })
+    end
+
+    it "stores stdout in _output if it cannot be parsed as json" do
+      result = mock_success("some output")
+
+      node = Bolt::SSH.new('localhost')
+      expect(node).to receive(:_run_task).and_return(result)
+
+      expect(node.run_task('generic', 'stdin', {}).to_h)
+        .to eq('value' => { '_output' => 'some output' })
+    end
+
+    it "on failure converts json on stdout if it conforms to expectations" do
+      error_hash = { 'return' => 'info',
+                     '_error' => { 'kind' => 'mytask/oops',
+                                   'msg' => 'messed up, sorry',
+                                   'details' => {} } }
+      result = mock_failure(1, error_hash.to_json)
+
+      node = Bolt::SSH.new('localhost')
+      expect(node).to receive(:_run_task).and_return(result)
+
+      expect(node.run_task('generic', 'stdin', {}).to_h)
+        .to eq('value' => { 'return' => 'info' },
+               '_error' => { 'kind' => 'mytask/oops',
+                             'msg' => 'messed up, sorry',
+                             'details' => {} })
+    end
+
+    it "on failure generates an error hash if the task does not provide one" do
+      result = mock_failure(1, "an error occurred")
+
+      node = Bolt::SSH.new('localhost')
+      expect(node).to receive(:_run_task).and_return(result)
+
+      expect(node.run_task('generic', 'stdin', {}).to_h)
+        .to eq('value' => { '_output' => 'an error occurred' },
+               '_error' => { 'kind' => 'puppetlabs.tasks/task-error',
+                             'issue_code' => 'TASK_ERROR',
+                             'msg' => 'The task failed with exit code 1',
+                             'details' => { 'exit_code' => 1 } })
+    end
+  end
+
+  describe "returning results from commands" do
+    it "on success returns a result with stdout, stderr, and exit_code" do
+      result = mock_success("standard out", "less standard")
+      node = Bolt::SSH.new('localhost')
+      expect(node).to receive(:_run_command).and_return(result)
+
+      expect(node.run_command('ls').to_h['value'])
+        .to eq('stdout' => 'standard out',
+               'stderr' => 'less standard',
+               'exit_code' => 0)
+    end
+
+    it "on failure returns a result with stdout, stderr, and exit_code" do
+      result = mock_failure(27, "standard out", "less standard")
+      node = Bolt::SSH.new('localhost')
+      expect(node).to receive(:_run_command).and_return(result)
+
+      expect(node.run_command('ls').to_h['value'])
+        .to eq('stdout' => 'standard out',
+               'stderr' => 'less standard',
+               'exit_code' => 27)
+    end
+  end
+
+  describe "returning results from upload" do
+    it "on success returns a result with value nil" do
+      result = Bolt::Node::Success.new
+      node = Bolt::SSH.new('localhost')
+      expect(node).to receive(:_upload).and_return(result)
+
+      expect(node.upload('here', 'there').to_h).to eq('value' => nil)
     end
   end
 end

@@ -4,7 +4,7 @@ require 'bolt/executor'
 describe "Bolt::Executor" do
   let(:command) { "hostname" }
   let(:script) { '/path/to/script.sh' }
-  let(:success) { Bolt::Success.new }
+  let(:success) { Bolt::Node::Success.new }
   let(:task) { 'service::restart' }
   let(:task_arguments) { { 'name' => 'apache' } }
 
@@ -32,7 +32,7 @@ describe "Bolt::Executor" do
 
     results = Bolt::Executor.new([node1, node2]).run_script(script)
     results.each_pair do |_, result|
-      expect(result).to be_instance_of(Bolt::Success)
+      expect(result).to be_instance_of(Bolt::Node::Success)
     end
   end
 
@@ -51,7 +51,7 @@ describe "Bolt::Executor" do
     results = Bolt::Executor.new([node1, node2])
                             .run_task(task, 'both', task_arguments)
     results.each_pair do |_, result|
-      expect(result).to be_instance_of(Bolt::Success)
+      expect(result).to be_instance_of(Bolt::Node::Success)
     end
   end
 
@@ -63,7 +63,7 @@ describe "Bolt::Executor" do
 
     results = Bolt::Executor.new([node]).run_command(command)
     results.each_pair do |_, result|
-      expect(result).to be_instance_of(Bolt::ExceptionFailure)
+      expect(result).to be_instance_of(Bolt::Node::ExceptionFailure)
     end
   end
 

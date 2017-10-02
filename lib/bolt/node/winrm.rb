@@ -26,7 +26,7 @@ module Bolt
     end
 
     def execute(command, _ = {})
-      result_output = Bolt::ResultOutput.new
+      result_output = Bolt::Node::ResultOutput.new
 
       @logger.debug { "Executing command: #{command}" }
 
@@ -38,20 +38,20 @@ module Bolt
       end
       if output.exitcode.zero?
         @logger.debug { "Command returned successfully" }
-        Bolt::Success.new(result_output.stdout.string, result_output)
+        Bolt::Node::Success.new(result_output.stdout.string, result_output)
       else
         @logger.info { "Command failed with exit code #{output.exitcode}" }
-        Bolt::Failure.new(output.exitcode, result_output)
+        Bolt::Node::Failure.new(output.exitcode, result_output)
       end
     end
 
-    def upload(source, destination)
+    def _upload(source, destination)
       @logger.debug { "Uploading #{source} to #{destination}" }
       fs = ::WinRM::FS::FileManager.new(@connection)
       fs.upload(source, destination)
-      Bolt::Success.new
+      Bolt::Node::Success.new
     rescue StandardError => ex
-      Bolt::ExceptionFailure.new(ex)
+      Bolt::Node::ExceptionFailure.new(ex)
     end
 
     def make_tempdir
@@ -62,7 +62,7 @@ $path = Join-Path $parent $name
 New-Item -ItemType Directory -Path $path | Out-Null
 $path
 PS
-      result.then { |stdout| Bolt::Success.new(stdout.chomp) }
+      result.then { |stdout| Bolt::Node::Success.new(stdout.chomp) }
     end
 
     def with_remote_file(file)
@@ -73,9 +73,9 @@ PS
       make_tempdir.then do |value|
         dir = value
         dest = "#{dir}\\#{File.basename(file, '.*')}.ps1"
-        Bolt::Success.new
+        Bolt::Node::Success.new
       end.then do
-        upload(file, dest)
+        _upload(file, dest)
       end.then do
         result = yield dest
       end.then do
@@ -87,7 +87,11 @@ PS
       end
     end
 
-    def run_script(script)
+    def _run_command(command)
+      execute(command)
+    end
+
+    def _run_script(script)
       @logger.info { "Running script '#{script}'" }
       with_remote_file(script) do |remote_path|
         args = '-NoProfile -NonInteractive -NoLogo -ExecutionPolicy Bypass'
@@ -95,7 +99,7 @@ PS
       end
     end
 
-    def run_task(task, input_method, arguments)
+    def _run_task(task, input_method, arguments)
       @logger.info { "Running task '#{task}'" }
       @logger.debug { "arguments: #{arguments}\ninput_method: #{input_method}" }
 
@@ -104,7 +108,7 @@ PS
               "Sending task arguments via stdin to PowerShell is not supported"
       end
 
-      arguments.reduce(Bolt::Success.new) do |result, (arg, val)|
+      arguments.reduce(Bolt::Node::Success.new) do |result, (arg, val)|
         result.then do
           cmd = "[Environment]::SetEnvironmentVariable('PT_#{arg}', '#{val}')"
           execute(cmd)
