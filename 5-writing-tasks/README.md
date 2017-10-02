@@ -58,7 +58,7 @@ Try running the `bolt` command with a different value for `message` and you shou
 
 # Write your first task in PowerShell
 
-If you're targetting Windows nodes then you might prefer to implement the task in PowerShell. Let's save the following file as `modules/sample/tasks/print.ps1`
+If you're targeting Windows nodes then you might prefer to implement the task in PowerShell. Let's save the following file as `modules/sample/tasks/print.ps1`
 
 ```powershell
 Write-Output "$env:computername received the message: $env:PT_message"
@@ -107,5 +107,5 @@ google.com is available at 216.58.204.14 on node1
 Ran on 1 node in 0.36 seconds
 ```
 
-The important thing to node above is that our task is just a standard Python script, in this case using parts of the Python standard library. Apart from accepting arguments as `PT`-prefixed environment variables, which will work outside Puppet Tasks too, the script is exactly what you would write to achive the same task outside Puppet Tasks. `bolt` just gives you the ability to run that script across a large number of nodes quickly and easily. No configuration files or rewriting
+The important thing to node above is that our task is just a standard Python script, in this case using parts of the Python standard library. Apart from accepting arguments as `PT`-prefixed environment variables, which will work outside Puppet Tasks too, the script is exactly what you would write to achieve the same task outside Puppet Tasks. `bolt` just gives you the ability to run that script across a large number of nodes quickly and easily. No configuration files or rewriting
 required.

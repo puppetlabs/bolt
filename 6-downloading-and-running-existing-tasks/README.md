@@ -74,4 +74,4 @@ Ran on 1 node in 15.26 seconds
 
 # More tips, tricks and ideas on the Tasks Playground
 
-We've really only scratched the surface of Tasks in these lab excercises. You'll find lots more tips, tricks, examples and hacks on the [Puppet Tasks Playground](https://github.com/puppetlabs/tasks-playground).
+We've really only scratched the surface of Tasks in these lab exercises. You'll find lots more tips, tricks, examples and hacks on the [Puppet Tasks Playground](https://github.com/puppetlabs/tasks-playground).
