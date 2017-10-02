@@ -86,6 +86,7 @@ Save the following as `modules/sample/gethost.py`:
 ```python
 #!/usr/bin/env python
 import socket
+import sys
 import os
 
 host = os.environ.get('PT_host')
@@ -94,6 +95,7 @@ if host:
     print("%s is available at %s on %s" % (host, socket.gethostbyname(host), socket.gethostname()))
 else:
     print('No host argument passed')
+    sys.exit(1)
 ```
 
 We can then run the task against our nodes like so:
@@ -107,5 +109,5 @@ google.com is available at 216.58.204.14 on node1
 Ran on 1 node in 0.36 seconds
 ```
 
-The important thing to node above is that our task is just a standard Python script, in this case using parts of the Python standard library. Apart from accepting arguments as `PT`-prefixed environment variables, which will work outside Puppet Tasks too, the script is exactly what you would write to achieve the same task outside Puppet Tasks. `bolt` just gives you the ability to run that script across a large number of nodes quickly and easily. No configuration files or rewriting
+The important thing to note above is that our task is just a standard Python script, in this case using parts of the Python standard library. Apart from accepting arguments as `PT_`-prefixed environment variables, which will work outside Puppet Tasks too, the script is exactly what you would write to achieve the same task outside Puppet Tasks. `bolt` just gives you the ability to run that script across a large number of nodes quickly and easily. No configuration files or rewriting
 required.
