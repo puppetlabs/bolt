@@ -20,6 +20,54 @@ module Bolt
       print_to_stream(str)
       str.string
     end
+
+    def stdout
+      @stdout ||=
+        if @output && @output.stdout
+          @output.stdout.rewind
+          @output.stdout.read
+        else
+          ''
+        end
+    end
+
+    def stderr
+      @stderr ||=
+        if @output && @output.stderr
+          @output.stderr.rewind
+          @output.stderr.read
+        else
+          ''
+        end
+    end
+
+    # Converts the result into a hash according to the tasks spec
+    def result_hash
+      res = nil
+      begin
+        res = JSON.parse(stdout)
+        if res.class != Hash
+          res = nil
+        end
+      rescue JSON::ParserError
+        res = nil
+      end
+
+      res ||= { '_output' => stdout }
+
+      unless res['_error']
+        err = error_as_hash
+        res['_error'] = err if err
+      end
+
+      res
+    end
+
+    # Turns any error indication into a hash as described in the task
+    # spec. If there was no error, returns +nil+
+    def error_as_hash
+      nil
+    end
   end
 
   class Success < Result
@@ -88,6 +136,16 @@ module Bolt
       yield
       stream.print "\033[0m" if stream.isatty
     end
+
+    def error_as_hash
+      msg = "Task exited with #{@exit_code}"
+      msg += "\n#{stderr}" if stdout.empty?
+      {
+        'kind' => 'task_error',
+        'msg' => msg,
+        'details' => { 'exit_code' => @exit_code }
+      }
+    end
   end
 
   class ExceptionFailure < Failure
@@ -100,6 +158,23 @@ module Bolt
 
     def print_to_stream(stream)
       stream.puts @exception.message
+    end
+
+    def error_as_hash
+      # We assume here that ExceptionFailure is only used when we truly
+      # encounter an exception, and that things like failing to connect, or
+      # losing the connection is surfaced as another kind of failure. For
+      # those failures, we really want +kind+ to indicate in more detail
+      # what went wrong, and should not expose the exception class name to
+      # callers as that is really an implementation detail
+      {
+        'kind' => 'task_exception',
+        'msg' => exception.message,
+        'details' => {
+          'class' => exception.class.name,
+          'backtrace' => exception.backtrace
+        }
+      }
     end
   end
 end
