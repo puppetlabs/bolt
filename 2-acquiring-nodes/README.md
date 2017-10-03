@@ -64,12 +64,24 @@ Finally you can generate the SSH configuration so `bolt` knows how to authentica
 vagrant ssh-config
 ```
 
+Note that if you've created more than one SSH server as above, this should be:
+
+```
+NODES=3 vagrant ssh-config
+```
+
 You can save that so it will be automatically picked up by SSH clients like so:
 
 ```
 mkdir ~/.ssh
 vagrant ssh-config >> ~/.ssh/config
 ``` 
+
+or
+
+```
+NODES=3 vagrant ssh-config >> ~/.ssh/config
+```
 
 You'll also want to remember the IP addresses for the new nodes, so we can access them later. Look a the configuration output by the above command. For each node launched you should see a value for `HostName`.
 
