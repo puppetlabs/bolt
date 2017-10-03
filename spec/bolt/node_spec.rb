@@ -70,24 +70,24 @@ describe Bolt::Node do
       expect(node).to receive(:_run_task).and_return(result)
 
       expect(node.run_task('generic', 'stdin', {}).to_h)
-        .to eq('value' => { '_output' => 'some output' })
+        .to eq('value' => 'some output')
     end
 
     it "on failure converts json on stdout if it conforms to expectations" do
-      error_hash = { 'return' => 'info',
-                     '_error' => { 'kind' => 'mytask/oops',
-                                   'msg' => 'messed up, sorry',
-                                   'details' => {} } }
-      result = mock_failure(1, error_hash.to_json)
+      task_output = { 'return' => 'info',
+                      '_error' => { 'kind' => 'mytask/oops',
+                                    'msg' => 'messed up, sorry',
+                                    'details' => {} } }
+      result = mock_failure(1, task_output.to_json)
 
       node = Bolt::SSH.new('localhost')
       expect(node).to receive(:_run_task).and_return(result)
 
       expect(node.run_task('generic', 'stdin', {}).to_h)
         .to eq('value' => { 'return' => 'info' },
-               '_error' => { 'kind' => 'mytask/oops',
-                             'msg' => 'messed up, sorry',
-                             'details' => {} })
+               'error' => { 'kind' => 'mytask/oops',
+                            'msg' => 'messed up, sorry',
+                            'details' => {} })
     end
 
     it "on failure generates an error hash if the task does not provide one" do
@@ -97,11 +97,11 @@ describe Bolt::Node do
       expect(node).to receive(:_run_task).and_return(result)
 
       expect(node.run_task('generic', 'stdin', {}).to_h)
-        .to eq('value' => { '_output' => 'an error occurred' },
-               '_error' => { 'kind' => 'puppetlabs.tasks/task-error',
-                             'issue_code' => 'TASK_ERROR',
-                             'msg' => 'The task failed with exit code 1',
-                             'details' => { 'exit_code' => 1 } })
+        .to eq('value' => 'an error occurred',
+               'error' => { 'kind' => 'puppetlabs.tasks/task-error',
+                            'issue_code' => 'TASK_ERROR',
+                            'msg' => 'The task failed with exit code 1',
+                            'details' => { 'exit_code' => 1 } })
     end
   end
 
@@ -122,10 +122,26 @@ describe Bolt::Node do
       node = Bolt::SSH.new('localhost')
       expect(node).to receive(:_run_command).and_return(result)
 
-      expect(node.run_command('ls').to_h['value'])
-        .to eq('stdout' => 'standard out',
-               'stderr' => 'less standard',
-               'exit_code' => 27)
+      expect(node.run_command('ls').to_h)
+        .to eq('value' => { 'stdout' => 'standard out',
+                            'stderr' => 'less standard',
+                            'exit_code' => 27 })
+    end
+
+    it "on exception returns a result with an exception message" do
+      node = Bolt::SSH.new('localhost')
+      ex = RuntimeError.new('something went wrong')
+      ex.set_backtrace('/path/to/bolt/node.rb:42')
+      expect(node).to receive(:_run_command)
+        .and_return(Bolt::Node::ExceptionFailure.new(ex))
+
+      expect(node.run_command('ls').to_h)
+        .to eq('error' => {
+                 'kind' => 'puppetlabs.tasks/exception-error',
+                 'issue_code' => 'EXCEPTION',
+                 'msg' => 'something went wrong',
+                 'details' => { 'stack_trace' => '/path/to/bolt/node.rb:42' }
+               })
     end
   end
 
