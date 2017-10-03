@@ -1,0 +1,10 @@
+.vagrant
+.bundle
+Gemfile.lock
+local_options.rb
+log
+junit
+id_rsa-acceptance
+id_rsa-acceptance.pub
+merged_options.rb
+tmp
