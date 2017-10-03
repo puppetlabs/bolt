@@ -312,11 +312,18 @@ HELP
       puts result
     end
 
+    def colorize(result, stream)
+      color = result.success? ? "\033[32m" : "\033[31m"
+      stream.print color if stream.isatty
+      yield
+      stream.print "\033[0m" if stream.isatty
+    end
+
     def print_results(results, elapsed_time)
       results.each_pair do |node, result|
-        result.colorize($stdout) { $stdout.puts "#{node.host}:" }
+        colorize(result, $stdout) { $stdout.puts "#{node.host}:" }
         $stdout.puts
-        result.print_to_stream($stdout)
+        $stdout.puts result.message
         $stdout.puts
       end
 

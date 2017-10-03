@@ -63,7 +63,7 @@ describe "Bolt::Executor" do
 
     results = Bolt::Executor.new([node]).run_command(command)
     results.each_pair do |_, result|
-      expect(result).to be_instance_of(Bolt::Node::ExceptionFailure)
+      expect(result).to be_instance_of(Bolt::ExceptionResult)
     end
   end
 

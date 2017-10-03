@@ -56,23 +56,6 @@ module Bolt
         yield @value
       end
 
-      def print_to_stream(stream)
-        if @output
-          @output.stdout.rewind
-          IO.copy_stream(@output.stdout, stream)
-          @output.stderr.rewind
-          IO.copy_stream(@output.stderr, stream)
-        else
-          stream.puts @value
-        end
-      end
-
-      def colorize(stream)
-        stream.print "\033[32m" if stream.isatty
-        yield
-        stream.print "\033[0m" if stream.isatty
-      end
-
       def to_task_result
         Bolt::TaskSuccess.new(output.stdout.string,
                               output.stderr.string,
@@ -96,23 +79,6 @@ module Bolt
         self
       end
 
-      def print_to_stream(stream)
-        if @output
-          @output.stdout.rewind
-          IO.copy_stream(@output.stdout, stream)
-          @output.stderr.rewind
-          IO.copy_stream(@output.stderr, stream)
-        else
-          stream.puts @value
-        end
-      end
-
-      def colorize(stream)
-        stream.print "\033[31m" if stream.isatty
-        yield
-        stream.print "\033[0m" if stream.isatty
-      end
-
       def to_task_result
         Bolt::TaskFailure.new(output.stdout.string,
                               output.stderr.string,
@@ -126,10 +92,6 @@ module Bolt
       def initialize(exception)
         super(1, nil)
         @exception = exception
-      end
-
-      def print_to_stream(stream)
-        stream.puts @exception.message
       end
 
       def to_result

@@ -2,6 +2,12 @@ require 'json'
 
 module Bolt
   class Result
+    attr_reader :message
+
+    def initialize(message)
+      @message = message
+    end
+
     def value
       nil
     end
@@ -13,9 +19,15 @@ module Bolt
     def to_h
       { 'value' => value }
     end
+
+    def success?
+      true
+    end
   end
 
   class CommandResult < Result
+    attr_reader :stdout, :stderr, :exit_code
+
     def initialize(stdout, stderr, exit_code)
       @stdout = stdout
       @stderr = stderr
@@ -32,6 +44,10 @@ module Bolt
 
     def success?
       @exit_code.zero?
+    end
+
+    def message
+      [stdout, stderr].join("\n")
     end
   end
 
@@ -110,6 +126,14 @@ module Bolt
 
     def to_h
       { '_error' => error }
+    end
+
+    def message
+      @exception.message
+    end
+
+    def success?
+      false
     end
   end
 end

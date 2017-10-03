@@ -48,7 +48,12 @@ module Bolt
 
     def upload(source, destination)
       @logger.debug { "Uploading #{source} to #{destination}" }
-      _upload(source, destination).to_result
+      result = _upload(source, destination)
+      if result.success?
+        Bolt::Result.new("Uploaded '#{source}' to '#{host}:#{destination}'")
+      else
+        result.to_result
+      end
     end
 
     def run_command(command)
