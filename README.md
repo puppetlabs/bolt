@@ -94,7 +94,7 @@ On *nix, Bolt ensures that the script is executable on the remote system before 
 
 Bolt can transfer files from the controller node to specified target nodes.
 
-To transfer a file, run `bolt file upload`, specifying the local path to the file and the destination location on the target node: `bolt file upload <SOURCE> <DESTINATION`
+To transfer a file, run `bolt file upload`, specifying the local path to the file and the destination location on the target node: `bolt file upload <SOURCE> <DESTINATION>`
 
 For example:
 
@@ -108,16 +108,23 @@ Tasks are similar to scripts, except that tasks must receive input in a specific
 
 To execute a task, run `bolt task run`, specifying:
 
-* The full name of the task, formatted as <MODULE::TASK>.
+* The full name of the task, formatted as `<MODULE::TASK>`, or as `<MODULE>` for `init` tasks.
 * Any task parameters, as `parameter=value`.
 * The nodes to run the task on and the protocol, if WinRM, with the `--nodes` flag.
 * The module path that contains the task, with the `--modules` flag.
 * If required, the username and password to connect to the node, with the `--username` and `--password` flags.
 
-For example, to run the status task from the package module on the openssl package on the `neptune` node:
+
+For example, to run the sql task from the mysql module on the `neptune` node:
 
 ```
-bolt task run package::status name=openssl --nodes neptune --modules ~/modules
+bolt task run mysql::sql database=mydatabase sql="SHOW TABLES" --nodes neptune --modules ~/modules
+```
+
+To run an `init` task, call the task by the module name only, and set the task parameters. For example, to run the status action from the package module:
+
+```
+bolt run package action=status package=vim --nodes neptune --modules ~/modules
 ```
 
 ### Specifying the module path
@@ -126,9 +133,9 @@ When executing tasks or plans, you must specify the `--modules` option as the di
 
 ```
 /path/to/modules/
-  package/
+  mysql/
     tasks/
-      status
+      sql
 ```
 
 ### Specifying parameters
@@ -137,19 +144,19 @@ Tasks can receive input as either environment variables or a JSON hash on standa
 
 When executing the task, specify the parameter value on the command line in the format `parameter=value`. Pass multiple parameters as a space-separated list.
 
-For example, to run package tasks against the openssl package, specify the package name parameter as `name=openssl`. 
+For example, to run mysql tasks against a database called 'mydatabase', specify the database parameter as `database=mydatabase`. 
 
-When you run a command with this parameter, Bolt sets the task's `name` value to openssl before it executes the task. It also submits the parameters as JSON to stdin:
+When you run a command with this parameter, Bolt sets the task's `database` value to mydatabase before it executes the task. It also submits the parameters as JSON to stdin:
 
 ```json
 {
-  "name":"openssl"
+  "database":"mydatabase"
 }
 ```
 
 Alternatively, you can specify parameters as either a JSON blob or a parameter file with the `--params` flag.
 
-To specify parameters as a JSON blob, use the parameters flag: `--params '{"name": "openssl"}'`
+To specify parameters as a JSON blob, use the parameters flag: `--params '{"database": "mydatabase"}'`
 
 To set parameters in a file, create a file called `params.json` and specify parameters there in JSON format.
 
@@ -157,7 +164,7 @@ For example, in your `params.json` file, specify:
 
 ```json
 {
-  "name":"openssl"
+  "database":"mydatabase"
 }
 ```
 
@@ -244,12 +251,9 @@ Then specify that file on the command line with the parameters flag: `--params @
     SetupPrefix           :
     IsDefaultAUService    : True
 
-### Run the `status` task from the `package` module
+### Run the `sql` task from the `mysql` module
 
-    $ bolt task run package::status name=openssl --nodes neptune --modules ~/modules
-    neptune:
-
-    openssl-1.0.1e-16.el6_5.7.x86_64
+    $ bolt task run mysql::sql database=mydatabase sql="SHOW TABLES" --nodes neptune --modules ~/modules
 
 ### Run the special `init` task from the `service` module
 
