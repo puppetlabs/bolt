@@ -4,7 +4,7 @@
 
 > **Time**: Approximately 10 minutes
 
-In this lab you will install `bolt` so you can get started with Puppet Tasks. Just pick one of the following guides for your chosen operating system.
+In this exercise you will install `bolt` so you can get started with Puppet Tasks. Just pick one of the following guides for your chosen operating system.
 
 - [Installing Bolt on Windows](#installing-bolt-on-windows)
 - [Installing Bolt on macOS](#installing-bolt-on-macos)

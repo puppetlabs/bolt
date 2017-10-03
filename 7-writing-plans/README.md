@@ -4,7 +4,7 @@
 
 > **Time**: Approximately 10 minutes
 
-In this lab you will ...
+In this exercise you will ...
 
 - [Write a plan using commands](#write-a-plan-using-commands)
 - [Write a plan using scripts](#write-a-plan-using-scripts)

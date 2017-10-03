@@ -4,7 +4,7 @@
 
 > **Time**: Approximately 10 minutes
 
-In this lab you will explore some existing tasks, including several tasks that take advantage of Puppet under-the-hood.
+In this exercise you will explore some existing tasks, including several tasks that take advantage of Puppet under-the-hood.
 
 > **Note:** Some of the following content will be available on The Forge soon.
 
@@ -20,7 +20,7 @@ For the following exercises you should already have `bolt` installed and have a 
 1. [Installing Bolt](../1-installing-bolt)
 1. [Acquiring nodes](../2-acquiring-nodes)
 
-It is also useful to have some familiarity with running commands with `bolt` so you understand passing nodes and credentials. The following lab is recommended:
+It is also useful to have some familiarity with running commands with `bolt` so you understand passing nodes and credentials. The following exercise is recommended:
 
 1. [Running Commands](../3-running-commands)
 
@@ -74,4 +74,4 @@ Ran on 1 node in 15.26 seconds
 
 # More tips, tricks and ideas on the Tasks Playground
 
-We've really only scratched the surface of Tasks in these lab exercises. You'll find lots more tips, tricks, examples and hacks on the [Puppet Tasks Playground](https://github.com/puppetlabs/tasks-playground).
+We've really only scratched the surface of Tasks in these exercises. You'll find lots more tips, tricks, examples and hacks on the [Puppet Tasks Playground](https://github.com/puppetlabs/tasks-playground).

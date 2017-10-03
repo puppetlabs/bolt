@@ -4,7 +4,7 @@
 
 > **Time**: Approximately 5 minutes
 
-In this lab you will create nodes with which you can experiment with `bolt`. We have provided multiple options below as examples, feel free to pick one.
+In this exercise you will create nodes with which you can experiment with `bolt`. We have provided multiple options below as examples, feel free to pick one.
 
 - [Existing nodes](#existing-nodes)
 - [Using Vagrant](#using-vagrant)
@@ -20,7 +20,7 @@ If you already have, or can easily launch, a few Linux or Windows nodes then you
 
 # Using Vagrant
 
-Save the following as `Vagrantfile`, or use the file accompanying this lab.
+Save the following as `Vagrantfile`, or use the file accompanying this exercise.
 
 ```ruby
 $nodes_count = 1
@@ -122,4 +122,4 @@ The image sets the username to `root` and the password to `root`. Test the conne
 ssh root@127.0.0.1:32768
 ```
 
-We'll need that list of ports in the next stages of this lab.
+We'll need that list of ports in the next stages of this exercise.

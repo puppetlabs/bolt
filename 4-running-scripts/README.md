@@ -4,7 +4,7 @@
 
 > **Time**: Approximately 10 minutes
 
-In this lab you will run existing scripts against remote nodes using `bolt`.
+In this exercise you will run existing scripts against remote nodes using `bolt`.
 
 - [Test Linux nodes for ShellShock](#test-linux-nodes-for-shellshock)
 - [Test Windows external connectivity](#test-windows-external-connectivity) 
@@ -16,7 +16,7 @@ For the following exercises you should already have `bolt` installed and have a 
 1. [Installing Bolt](../1-installing-bolt)
 1. [Acquiring nodes](../2-acquiring-nodes)
 
-It is also useful to have some familiarity with running commands with `bolt` so you understand passing nodes and credentials. The following lab is recommended:
+It is also useful to have some familiarity with running commands with `bolt` so you understand passing nodes and credentials. The following exercise is recommended:
 
 1. [Running Commands](../3-running-commands)
 

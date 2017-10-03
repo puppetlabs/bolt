@@ -4,7 +4,7 @@
 
 > **Time**: Approximately 15 minutes
 
-In this lab you will write your first Puppet Tasks for use with `bolt`.
+In this exercise you will write your first Puppet Tasks for use with `bolt`.
 
 - [Write your first task in Bash](#write-your-first-task-in-bash)
 - [Write your first task in PowerShell](#write-your-first-task-in-powershell)
@@ -17,7 +17,7 @@ For the following exercises you should already have `bolt` installed and have a 
 1. [Installing Bolt](../1-installing-bolt)
 1. [Acquiring nodes](../2-acquiring-nodes)
 
-It is also useful to have some familiarity with running commands with `bolt` so you understand passing nodes and credentials. The following lab is recommended:
+It is also useful to have some familiarity with running commands with `bolt` so you understand passing nodes and credentials. The following exercise is recommended:
 
 1. [Running Commands](../3-running-commands)
 
