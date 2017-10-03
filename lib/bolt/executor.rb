@@ -23,7 +23,7 @@ module Bolt
               yield node
             rescue StandardError => ex
               node.logger.error(ex)
-              Bolt::ExceptionFailure.new(ex)
+              Bolt::ExceptionResult.new(ex)
             ensure
               node.disconnect
             end
@@ -55,14 +55,7 @@ module Bolt
 
     def file_upload(source, destination)
       on_each do |node|
-        result = node.upload(source, destination)
-        if result.is_a?(Bolt::Success)
-          Bolt::Success.new(
-            "Uploaded '#{source}' to '#{node.host}:#{destination}'"
-          )
-        else
-          result
-        end
+        node.upload(source, destination)
       end
     end
 

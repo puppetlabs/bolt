@@ -38,7 +38,7 @@ describe Bolt::SSH do
   it "can run a script remotely", vagrant: true do
     contents = "#!/bin/sh\necho hellote"
     with_tempfile_containing('script test', contents) do |file|
-      expect(ssh.run_script(file.path).value).to eq("hellote\n")
+      expect(ssh._run_script(file.path).value).to eq("hellote\n")
     end
   end
 
@@ -46,7 +46,7 @@ describe Bolt::SSH do
     contents = "#!/bin/sh\necho -n ${PT_message_one} ${PT_message_two}"
     arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
     with_tempfile_containing('tasks test', contents) do |file|
-      expect(ssh.run_task(file.path, 'environment', arguments).value)
+      expect(ssh._run_task(file.path, 'environment', arguments).value)
         .to eq('Hello from task Goodbye')
     end
   end
@@ -55,7 +55,7 @@ describe Bolt::SSH do
     contents = "#!/bin/sh\ngrep 'message_one'"
     arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
     with_tempfile_containing('tasks test stdin', contents) do |file|
-      expect(ssh.run_task(file.path, 'stdin', arguments).value)
+      expect(ssh._run_task(file.path, 'stdin', arguments).value)
         .to match(/{"message_one":"Hello from task","message_two":"Goodbye"}/)
     end
   end
@@ -68,7 +68,7 @@ grep 'message_one'
 SHELL
     arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
     with_tempfile_containing('tasks-test-both', contents) do |file|
-      expect(ssh.run_task(file.path, 'both', arguments).value).to eq(<<SHELL)
+      expect(ssh._run_task(file.path, 'both', arguments).value).to eq(<<SHELL)
 Hello from task Goodbye{\"message_one\":\
 \"Hello from task\",\"message_two\":\"Goodbye\"}
 SHELL

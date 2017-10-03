@@ -37,7 +37,7 @@ describe Bolt::WinRM do
   it "can run a script remotely", vagrant: true do
     contents = 'Write-Output "hellote"'
     with_tempfile_containing('script-test-winrm', contents) do |file|
-      expect(winrm.run_script(file.path).value).to match(/hellote\r\n/)
+      expect(winrm._run_script(file.path).value).to match(/hellote\r\n/)
     end
   end
 
@@ -46,7 +46,7 @@ describe Bolt::WinRM do
     arguments = { :message_one => 'task is running',
                   :"message two" => 'task has run' }
     with_tempfile_containing('task-test-winrm', contents) do |file|
-      expect(winrm.run_task(file.path, 'environment', arguments).value)
+      expect(winrm._run_task(file.path, 'environment', arguments).value)
         .to eq("task is running\r\ntask has run\r\n")
     end
   end
@@ -59,7 +59,7 @@ PS
     arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
     with_tempfile_containing('tasks-test-stdin-winrm', contents) do |file|
       expect {
-        winrm.run_task(file.path, 'stdin', arguments)
+        winrm._run_task(file.path, 'stdin', arguments)
       }.to raise_error(
         NotImplementedError,
         "Sending task arguments via stdin to PowerShell is not supported"
@@ -77,7 +77,7 @@ PS
     with_tempfile_containing('tasks-test-both-winrm', contents) do |file|
       # we only get args from environment, since stdin isn't yet supported
       expect(
-        winrm.run_task(file.path, 'both', arguments).value
+        winrm._run_task(file.path, 'both', arguments).value
       ).to eq("Hello from task\r\nGoodbye\r\n")
     end
   end

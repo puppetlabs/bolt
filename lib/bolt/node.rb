@@ -1,6 +1,7 @@
 require 'logger'
 require 'bolt/node_uri'
 require 'bolt/node/formatter'
+require 'bolt/result'
 
 module Bolt
   class Node
@@ -45,9 +46,27 @@ module Bolt
       logger
     end
 
+    def upload(source, destination)
+      @logger.debug { "Uploading #{source} to #{destination}" }
+      result = _upload(source, destination)
+      if result.success?
+        Bolt::Result.new("Uploaded '#{source}' to '#{host}:#{destination}'")
+      else
+        result.to_result
+      end
+    end
+
     def run_command(command)
       @logger.info { "Running command: #{command}" }
-      execute(command)
+      _run_command(command).to_command_result
+    end
+
+    def run_script(script)
+      _run_script(script).to_command_result
+    end
+
+    def run_task(task, input_method, arguments)
+      _run_task(task, input_method, arguments).to_task_result
     end
   end
 end
