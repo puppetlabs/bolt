@@ -61,12 +61,12 @@ module Bolt
     end
 
     def value
-      @object || { '_output' => @stdout }
+      @object || @stdout
     end
 
     def to_h
       hash = super
-      hash['_error'] = error if error
+      hash['error'] = error if error
       hash
     end
 
@@ -125,7 +125,7 @@ module Bolt
     end
 
     def to_h
-      { '_error' => error }
+      { 'error' => error }
     end
 
     def message
