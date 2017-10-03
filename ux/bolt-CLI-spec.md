@@ -62,17 +62,14 @@ Started on node-1...
 Started on node-2...
 Started on node-3...
 Finished on node-1
-  status: restarted
-  STDOUT:
-    [stdout output...]
+  status: [succeeded/failed/<task-specific staus>]
+    [stdout/stderr output...]
 Finished on node-2
-  status: restarted
-  STDOUT:
-    [stdout output...]
+  status: [succeeded/failed/<task-specific staus>]
+    [stdout/stderr output...]
 Finished on node-3
-  status: restarted
-  STDOUT:
-    [stdout output...]
+  status: [succeeded/failed/<task-specific staus>]
+    [stdout/stderr output...]
     
   
 
@@ -82,7 +79,7 @@ Duration: 27 sec
 
 - colors should match puppet job run output for started, finished, and errors.
 - For tasks, capitalization of the finished node results comes from module (eg. status vs. Status).
-
+- status will b
 
 
 
@@ -95,7 +92,6 @@ Duration: 27 sec
 - every line is prefixed with node name, timestamp, and `err`, `out`, or `msg` accordingly.
 - nodename, timestamp and output type are space separated.
 - timestamp format is HH:MM:SS
-
 
 ~~~
 $ bolt [task/command/script] run [options...]
@@ -114,9 +110,8 @@ node-3 HH:MM:SS msg finished, failed
 node-2 HH:MM:SS msg finished, succeeded
 
 
-3 of 3 nodes completed. 2 of 3 nodes succeeded, 1 of 3 nodes failed.
+[Task/Command/Script] completed. 2/3 nodes succeeded.
 Duration: [duration]
-
 ~~~
 
 
@@ -127,7 +122,6 @@ Duration: [duration]
 
 Finished on covfefe-2
   Status: completed
-  STDOUT:
     Loaded plugins: fastestmirror
     Loading mirror speeds from cached hostfile
     * base: mirror.web-ster.com
