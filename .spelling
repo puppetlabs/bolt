@@ -10,4 +10,10 @@ toolchain
 RHEL
 Lua
 stdin
+stdout
 runtime
+reindexing
+parameterize
+filename
+_command
+_task
