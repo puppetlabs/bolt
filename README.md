@@ -288,9 +288,15 @@ Thank you to [Marcin Bunsch](https://github.com/marcinbunsch) for allowing Puppe
 
 ## Contributing
 
-Issues are tracked at https://tickets.puppetlabs.com/browse/BOLT/
+Please submit new issues on the GitHub issue tracker: https://github.com/puppetlabs/bolt/issues
 
-Pull requests are welcome on GitHub at https://github.com/puppetlabs/bolt
+Pull requests are also welcome on GitHub: https://github.com/puppetlabs/bolt
+
+As with other open-source projects managed by Puppet, Inc we require contributors to digitally sign the Contributor 
+License Agreement before we can accept your pull request: https://cla.puppet.com
+
+Internally, Puppet uses JIRA for tracking work, so nontrivial bugs or enhancement requests may migrate to JIRA tickets 
+in the "BOLT" project: https://tickets.puppetlabs.com/browse/BOLT/ 
 
 ## Testing
 
