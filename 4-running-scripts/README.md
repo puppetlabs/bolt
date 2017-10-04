@@ -2,7 +2,7 @@
 
 > **Difficulty**: Basic
 
-> **Time**: Approximately 10 minutes
+> **Time**: Approximately 5 minutes
 
 In this exercise you will run existing scripts against remote nodes using `bolt`.
 
