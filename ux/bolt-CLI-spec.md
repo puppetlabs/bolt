@@ -63,15 +63,23 @@ Started on node-2...
 Started on node-3...
 Finished on node-1
   status: [succeeded/failed/<task-specific staus>]
-    [stdout/stderr output...]
+    STDOUT:
+      [stdout output...]
+    STDERR:
+      [stderr output...]
 Finished on node-2
   status: [succeeded/failed/<task-specific staus>]
-    [stdout/stderr output...]
+   STDOUT:
+      [stdout output...]
+    STDERR:
+      [stderr output...] 
 Finished on node-3
   status: [succeeded/failed/<task-specific staus>]
-    [stdout/stderr output...]
-    
-  
+    STDOUT:
+      [stdout output...]
+    STDERR:
+      [stderr output...] 
+      
 
 [Task/Command/Script] completed. 3/3 nodes succeeded.
 Duration: 27 sec
@@ -79,8 +87,8 @@ Duration: 27 sec
 
 - colors should match puppet job run output for started, finished, and errors.
 - For tasks, capitalization of the finished node results comes from module (eg. status vs. Status).
-- status will b
-
+- status will be succeeded or failed for command and scripts; task status may be something else specified by task.
+- STDOUT or STDERR labels will be printed only if the outout from that stream is non-empty.
 
 
 
