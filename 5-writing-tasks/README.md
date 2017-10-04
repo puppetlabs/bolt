@@ -111,3 +111,9 @@ Ran on 1 node in 0.36 seconds
 
 The important thing to note above is that our task is just a standard Python script, in this case using parts of the Python standard library. Apart from accepting arguments as `PT_`-prefixed environment variables, which will work outside Puppet Tasks too, the script is exactly what you would write to achieve the same task outside Puppet Tasks. `bolt` just gives you the ability to run that script across a large number of nodes quickly and easily. No configuration files or rewriting
 required.
+
+# Next steps
+
+Now you know how to write tasks you can move on to:
+
+1. [Downloading and running existing tasks](../6-downloading-and-running-existing-tasks)

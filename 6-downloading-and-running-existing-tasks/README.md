@@ -75,3 +75,9 @@ Ran on 1 node in 15.26 seconds
 # More tips, tricks and ideas on the Tasks Playground
 
 We've really only scratched the surface of Tasks in these exercises. You'll find lots more tips, tricks, examples and hacks on the [Puppet Tasks Playground](https://github.com/puppetlabs/tasks-playground).
+
+# Next steps
+
+Now you know how to download and run third party tasks with `bolt` you can move on to:
+
+1. [Writing Plans](../7-writing-plans)

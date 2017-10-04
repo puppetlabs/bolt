@@ -34,7 +34,16 @@ Vagrant.configure('2') do |config|
   config.ssh.forward_agent = true
 
   (1..$nodes_count).each do |i|
-    config.vm.define "node#{i}"
+    config.vm.define "node#{i}" do |node|
+      ip = "192.168.50.#{i+100}"
+      node.vm.network "private_network", ip: ip
+      ['vmware_fusion', 'vmware_workstation', 'virtualbox'].each do |provider|
+        config.vm.provider provider do |_, override|
+          override.ssh.host = ip
+          override.ssh.port = 22
+        end unless ENV['BOOT']
+      end
+    end
   end
 end
 ```
@@ -42,14 +51,16 @@ end
 This will by default launch one node. Run the following command. We are assuming you have some familiarity with Vagrant and have a suitable hypervisor configured.
 
 ```
-vagrant up
+BOOT=true vagrant up
 ```
 
 If you would like to run more than one SSH server then you can set the `NODES` environment variable and run `vagrant up` again. With a Linux shell this is:
 
 ```
-NODES=3 vagrant up
+NODES=3 BOOT=true vagrant up
 ```
+
+Note that the `BOOT` environment variable is only required when launching new nodes with `vagrant up` and should be left out when running other commands like `vagrant ssh` or `vagrant ssh-config`.
 
 On Windows you can do the same thing with PowerShell:
 
@@ -78,17 +89,21 @@ vagrant ssh-config >> ~/.ssh/config
 ``` 
 
 or
+<<<<<<< HEAD
 
 ```
 NODES=3 vagrant ssh-config >> ~/.ssh/config
 ```
 
 You'll also want to remember the IP addresses for the new nodes, so we can access them later. Look a the configuration output by the above command. For each node launched you should see a value for `HostName`.
+=======
+>>>>>>> 537df0c720394d1cc22c411fb6c446eb0489b32a
 
 ```
-Host node1
-  HostName <ip-address>
+NODES=3 vagrant ssh-config >> ~/.ssh/config
 ```
+
+When passing nodes to `bolt` in the following exercises you will use something like `--nodes node1,node2`, up to the number of nodes you decided to launch.
 
 
 # Using Docker
@@ -131,7 +146,13 @@ Note the `Ports` column. We are forwarding a local port to the SSH server runnin
 The image sets the username to `root` and the password to `root`. Test the connection out if you have a local SSH client like so, changing the port to one you get from running the `docker-compose ps` command above.
 
 ```
-ssh root@127.0.0.1:32768
+ssh root@127.0.0.1 -p32768
 ```
 
-We'll need that list of ports in the next stages of this exercise.
+When passing nodes to `bolt` in the next section you will use `--nodes 127.0.0.1:32768,127.0.0.1:32769`, replacing the ports with those you see when you run the `docker-compose ps` command shown above. 
+
+# Next steps
+
+Now you have nodes with which to experiment with `bolt` you can move on to:
+
+1. [Running Commands](../3-running-commands)

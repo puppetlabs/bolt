@@ -12,6 +12,18 @@ Vagrant.configure('2') do |config|
   config.ssh.forward_agent = true
 
   (1..$nodes_count).each do |i|
-    config.vm.define "node#{i}"
+    config.vm.define "node#{i}" do |node|
+      ip = "192.168.50.#{i+100}"
+      node.vm.network "private_network", ip: ip
+      # We apply the following only to providers that support private networks
+      # for instance Hyper-V will ignore the above network configuration
+      # and should therefore ignore the SSH configuration too
+      ['vmware_fusion', 'vmware_workstation', 'virtualbox'].each do |provider|
+        config.vm.provider provider do |_, override|
+          override.ssh.host = ip
+          override.ssh.port = 22
+        end unless ENV['BOOT']
+      end
+    end
   end
 end
