@@ -10,6 +10,7 @@ end
 Vagrant.configure('2') do |config|
   config.vm.box = 'centos/7'
   config.ssh.forward_agent = true
+  config.vm.network "private_network", type: "dhcp"
 
   (1..$nodes_count).each do |i|
     config.vm.define "node#{i}"

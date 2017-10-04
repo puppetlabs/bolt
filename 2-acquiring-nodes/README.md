@@ -32,6 +32,7 @@ end
 Vagrant.configure('2') do |config|
   config.vm.box = 'centos/7'
   config.ssh.forward_agent = true
+  config.vm.network "private_network", type: "dhcp"
 
   (1..$nodes_count).each do |i|
     config.vm.define "node#{i}"
@@ -78,6 +79,8 @@ Host node1
   HostName <ip-address>
 ```
 
+When passing nodes to `bolt` in the following exercises you will use `--nodes <ip-address>,<ip-address>`. 
+
 
 # Using Docker
 
@@ -122,4 +125,4 @@ The image sets the username to `root` and the password to `root`. Test the conne
 ssh root@127.0.0.1:32768
 ```
 
-We'll need that list of ports in the next stages of this exercise.
+When passing nodes to `bolt` in the next section you will use `--nodes 127.0.0.1:32768,127.0.0.1:32769`, replacing the ports with those you see when you run the `docker-compose ps` command shown above. 
