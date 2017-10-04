@@ -26,11 +26,11 @@ describe Bolt::NodeURI do
       expect(uri.port).to eq(2224)
     end
 
-    it "defaults the ssh port to 22" do
+    it "does not default the ssh port" do
       uri = Bolt::NodeURI.new('ssh://pluto')
       expect(uri.scheme).to eq('ssh')
       expect(uri.hostname).to eq('pluto')
-      expect(uri.port).to eq(22)
+      expect(uri.port).to be_nil
     end
 
     it "accepts 'host:port' without a scheme" do
@@ -40,11 +40,11 @@ describe Bolt::NodeURI do
       expect(uri.port).to eq(2224)
     end
 
-    it "defaults the ssh port to 22 without a scheme" do
+    it "does not default the ssh port without a scheme" do
       uri = Bolt::NodeURI.new('pluto')
       expect(uri.scheme).to eq('ssh')
       expect(uri.hostname).to eq('pluto')
-      expect(uri.port).to eq(22)
+      expect(uri.port).to be_nil
     end
   end
 end
