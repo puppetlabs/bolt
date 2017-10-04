@@ -94,14 +94,7 @@ or
 NODES=3 vagrant ssh-config >> ~/.ssh/config
 ```
 
-You'll also want to remember the IP addresses for the new nodes, so we can access them later. Look a the configuration output by the above command. For each node launched you should see a value for `HostName`.
-
-```
-Host node1
-  HostName <ip-address>
-```
-
-When passing nodes to `bolt` in the following exercises you will use `--nodes <ip-address>,<ip-address>`. 
+When passing nodes to `bolt` in the following exercises you will use something like `--nodes node1,node2`, up to the number of nodes you decided to launch.
 
 
 # Using Docker
