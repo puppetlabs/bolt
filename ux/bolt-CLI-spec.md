@@ -45,6 +45,22 @@ Option | Description
 --params <br>-p | Enter a string containing JSON parameters  <br> `@<file-name>` Or provide a file with JSON parameters. 
 
 
+###OUTPUT
+
+**View progress as commands/scripts/tasks/plans are running. For both single and multi-node runs.**
+- Progress bar presented on a line that remains visible while output is scrolling past.
+- Give user an indication that bolt is still working (spinner or other continuous moving element) 
+~~~
+/ 
+~~~
+
+- For multi-node runs only: give user an indication of how much has been completed (x of n nodes).
+~~~
+\ 2 of 299 nodes finished.
+~~~
+
+
+
 ### EXAMPLES
 
 
@@ -64,6 +80,7 @@ $ bolt command run 'facter osfamily' --nodes europa-1,europa-2
 europa-2: Redhat
 europa-1: Redhat
 ~~~
+
 
 **OUTPUT**
 
