@@ -9,6 +9,7 @@ describe Bolt::Node do
       node = Bolt::Node.from_uri('ssh://iuyergkj:123456@whitehouse.gov')
       expect(node.user).to eq('iuyergkj')
       expect(node.password).to eq('123456')
+      expect(node.uri).to eq('ssh://iuyergkj:123456@whitehouse.gov')
     end
 
     it "defaults to globally set user and password" do

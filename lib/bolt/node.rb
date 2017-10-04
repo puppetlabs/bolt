@@ -20,7 +20,7 @@ module Bolt
                 uri.port,
                 uri.user || default_user || Bolt.config[:user],
                 uri.password || default_password || Bolt.config[:password],
-                **kwargs)
+                uri: uri_string, **kwargs)
     end
 
     attr_reader :logger, :host, :uri, :user, :password
