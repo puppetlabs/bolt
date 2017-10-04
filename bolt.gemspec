@@ -32,6 +32,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "winrm", "~> 2.0"
   spec.add_dependency "winrm-fs", "~> 1.0"
   spec.add_dependency "concurrent-ruby", "~> 1.0"
+  spec.add_dependency "orchestrator_client", "~> 0.2.1"
 
   # Dependencies of our vendored puppet, etc
   spec.add_dependency "gettext-setup", "< 1", ">= 0.10"
