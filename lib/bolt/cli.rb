@@ -256,6 +256,13 @@ HELP
         rescue LoadError
           raise Bolt::CLIError, "Puppet must be installed to execute tasks"
         end
+
+        Puppet::Util::Log.newdestination(:console)
+        Puppet[:log_level] = if Bolt.log_level == Logger::DEBUG
+                               'debug'
+                             else
+                               'notice'
+                             end
       end
 
       if options[:mode] == 'plan'
