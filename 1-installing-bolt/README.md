@@ -67,3 +67,9 @@ gem install bolt
 apt-get install -y make gcc ruby-dev
 gem install bolt
 ```
+
+# Next steps
+
+Now you have `bolt` installed you can move on to:
+
+1. [Acquiring nodes](../2-acquiring-nodes)

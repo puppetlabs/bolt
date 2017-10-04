@@ -141,3 +141,9 @@ ssh root@127.0.0.1:32768
 ```
 
 When passing nodes to `bolt` in the next section you will use `--nodes 127.0.0.1:32768,127.0.0.1:32769`, replacing the ports with those you see when you run the `docker-compose ps` command shown above. 
+
+# Next steps
+
+Now you have nodes with which to experiment with `bolt` you can move on to:
+
+1. [Running Commands](../3-running-commands)

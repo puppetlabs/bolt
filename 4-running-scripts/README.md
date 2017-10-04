@@ -75,3 +75,9 @@ DESKTOP-G9... example.com     93.184.216.34                                     
 DESKTOP-G9... example.com     93.184.216.34                                             256      85
 DESKTOP-G9... example.com     93.184.216.34                                             256      86
 ```
+
+# Next steps
+
+Now you know how to run existing scripts with `bolt` you can move on to:
+
+1. [Writing Tasks](../5-writing-tasks)

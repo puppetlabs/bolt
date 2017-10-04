@@ -90,3 +90,9 @@ The above example accesses a single node. You can also provide a command separat
 ```
 bolt command run <command> --nodes winrm://<node>,winrm://<node> --user <user> --password <password>
 ```
+
+# Next steps
+
+Now you know how to run adhoc commands with `bolt` you can move on to:
+
+1. [Running Scripts](../4-running-scripts)
