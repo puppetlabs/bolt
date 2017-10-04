@@ -146,7 +146,7 @@ Note the `Ports` column. We are forwarding a local port to the SSH server runnin
 The image sets the username to `root` and the password to `root`. Test the connection out if you have a local SSH client like so, changing the port to one you get from running the `docker-compose ps` command above.
 
 ```
-ssh root@127.0.0.1 -p32768
+ssh root@127.0.0.1 -p 32768
 ```
 
 When passing nodes to `bolt` in the next section you will use `--nodes 127.0.0.1:32768,127.0.0.1:32769`, replacing the ports with those you see when you run the `docker-compose ps` command shown above. 
