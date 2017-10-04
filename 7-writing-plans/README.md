@@ -139,3 +139,12 @@ Note:
 * When running multiple steps in a plan only the last step will generate output
 
 Plans should be used whenever you want to run several commands together, often based on the output of previous commands and across multiple nodes. For instance removing a node from a load balancer before deploying the new version of the application, or clearing a cache after reindexing a search engine.
+
+# Next steps
+
+Congratulations, you should now have a basic understanding of `bolt` and Puppet Tasks. Here are a few ideas for what to do next:
+
+* Explore content on the [Puppet Tasks Playground](https://github.com/puppetlabs/tasks-playground)
+* Start writing Tasks for one of your existing Puppet modules
+* Head over to the [Puppet Slack](https://slack.puppet.com/) and talk to the `bolt` developers and other users
+* Try out the [Puppet Development Kit](https://docs.puppet.com/pdk/latest/index.html) which has a few features to make authoring tasks even easier
