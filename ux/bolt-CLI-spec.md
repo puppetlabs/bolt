@@ -45,59 +45,91 @@ Option | Description
 --params <br>-p | Enter a string containing JSON parameters  <br> `@<file-name>` Or provide a file with JSON parameters. 
 
 
-### EXAMPLES
+### OUTPUT
 
 
-**Query a node for the number of SSL connections it’s handling**:
+
+**View output per node while task/command/script is running on single or multiple nodes.**
+
+**--human format (default)**
+
 ~~~
-$ bolt command run ‘netstat -an | grep “:443.*ESTABLISHED” | wc -1’ --nodes europa
-europa-1: 350
-
-~~~
-
-
-
-**Execute "facter" on multiple systems**:
-This demonstrates how a command can be run on multiple systems, and how the results are displayed:
-~~~
-$ bolt command run 'facter osfamily' --nodes europa-1,europa-2
-europa-2: Redhat
-europa-1: Redhat
-~~~
-
-**OUTPUT**
-
-**View output per node while task is running on multiple nodes.**
-~~~
-$ puppet task run service name=httpd action=restart -n covfefe-1,covfefe-2,covfefe-3
-Starting job...
-New job ID: 234
+$ bolt [task/command/script] run [options...]
+Starting [task/command/script]...
 Nodes: 3
 
-Started on covfefe-1...
-Started on covfefe-2...
-Started on covfefe-3...
-Finished on covfefe-1
-  status: restarted
-Finished on covfefe-2
-  status: restarted
-Finished on covfefe-3
-  status: restarted
+Started on node-1...
+Started on node-2...
+Started on node-3...
+Finished on node-1
+  status: [succeeded/failed/<task-specific staus>]
+    STDOUT:
+      [stdout output...]
+    STDERR:
+      [stderr output...]
+Finished on node-2
+  status: [succeeded/failed/<task-specific staus>]
+   STDOUT:
+      [stdout output...]
+    STDERR:
+      [stderr output...] 
+Finished on node-3
+  status: [succeeded/failed/<task-specific staus>]
+    STDOUT:
+      [stdout output...]
+    STDERR:
+      [stderr output...] 
+      
 
-Job completed. 3/3 nodes succeeded.
+[Task/Command/Script] completed. 3/3 nodes succeeded.
 Duration: 27 sec
 ~~~
-- colors should match `puppet job run` output for started, finished, and errors.
-- capitalization of the finished node results comes from module (eg. status vs. Status).
+
+- colors should match puppet job run output for started, finished, and errors.
+- For tasks, capitalization of the finished node results comes from module (eg. status vs. Status).
+- status will be succeeded or failed for command and scripts; task status may be something else specified by task.
+- STDOUT or STDERR labels will be printed only if the outout from that stream is non-empty.
 
 
-****View the response for each node when the node has finished (unstructured STDOUT):**
+
+**View output per node while task/command/script is running on single or multiple nodes.**
+
+**--oneline format**
+
+- stdout, stderr and messages from bolt are interleaved as they are output
+- every line is prefixed with node name, timestamp, and `err`, `out`, or `msg` accordingly.
+- nodename, timestamp and output type are space separated.
+- timestamp format is HH:MM:SS
+
+~~~
+$ bolt [task/command/script] run [options...]
+Starting [task/command/script]...            
+Nodes: 3
+
+node-1 HH:MM:SS msg started 
+node-1 HH:MM:SS err [stderr output]
+node-1 HH:MM:SS out [stdout output]
+node-2 HH:MM:SS msg started
+node-3 HH:MM:SS msg started
+node-2 HH:MM:SS out [stdout output]
+node-1 HH:MM:SS msg finished, succeeded
+node-3 HH:MM:SS out [stdout output]
+node-3 HH:MM:SS msg finished, failed
+node-2 HH:MM:SS msg finished, succeeded
+
+
+[Task/Command/Script] completed. 2/3 nodes succeeded.
+Duration: [duration]
+~~~
+
+
+
+**View the response for each node when the node has finished (unstructured STDOUT):**
 ~~~
 ...
 
 Finished on covfefe-2
   Status: completed
-  STDOUT:
     Loaded plugins: fastestmirror
     Loading mirror speeds from cached hostfile
     * base: mirror.web-ster.com
@@ -150,32 +182,5 @@ Finished on covfefe-2
     Complete!
 ~~~
 
-
-
-
---- 
-Placeholders for examples:
-
-**Run a single command**
-
-**Run a shell script**
-
-**Transfer files**
-
-**Install puppet**
-
-**Run puppet resource**
-
-**Run a Puppet task**
-
-**Run a Puppet task plan**
-
-**Forage for discovery info**
-
-
-**Output**
-
-**View task progress (failures) while task is running.**
-
-**Stop a task while it is running.**
-- Stopping a task would continue in-progress runs, but skip anything that hasn't started yet.
+**View output per node while task plan is running.**
+- TBD
