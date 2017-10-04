@@ -15,8 +15,8 @@ Feel free to just run one of these exercises depending on your operating system 
 
 For the following exercises you should already have `bolt` installed and have a few nodes (either Windows or Linux) available to run commands against. The following guides will help:
 
-1. [Installing Bolt](1-installing-bolt)
-1. [Acquiring nodes](2-acquiring-nodes)
+1. [Installing Bolt](../1-installing-bolt)
+1. [Acquiring nodes](../2-acquiring-nodes)
 
 # Running shell commands on Linux nodes
 
