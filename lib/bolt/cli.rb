@@ -117,6 +117,11 @@ HELP
                 "Password to authenticate as (Optional)") do |password|
           results[:password] = password
         end
+        results[:concurrency] = 100
+        opts.on('-c', '--concurrency CONCURRENCY', Integer,
+                "Maximum number of simultaneous connections (Optional, defaults to 100)") do |concurrency|
+          results[:concurrency] = concurrency
+        end
         opts.on('--modules MODULES', "Path to modules directory") do |modules|
           results[:modules] = modules
         end
@@ -284,7 +289,7 @@ HELP
 
         results = nil
         elapsed_time = Benchmark.realtime do
-          executor = Bolt::Executor.new(nodes)
+          executor = Bolt::Executor.new(nodes, options[:concurrency])
           results =
             case options[:mode]
             when 'command'
