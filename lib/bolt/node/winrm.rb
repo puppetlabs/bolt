@@ -45,6 +45,33 @@ module Bolt
       end
     end
 
+    # 10 minutes in milliseconds
+    DEFAULT_EXECUTION_TIMEOUT = 10 * 60 * 1000
+
+    def execute_process(path, arguments, timeout_ms = DEFAULT_EXECUTION_TIMEOUT)
+      # streams must have .ReadToEnd() called prior to process .WaitForExit()
+      # to prevent deadlocks per MSDN
+      # https://msdn.microsoft.com/en-us/library/system.diagnostics.process.standarderror(v=vs.110).aspx#Anchor_2
+      script = <<-PS
+$startInfo = New-Object System.Diagnostics.ProcessStartInfo("#{path}", "#{arguments.gsub('"', '""')}")
+$startInfo.UseShellExecute = $false
+$startInfo.RedirectStandardOutput = $true
+$startInfo.RedirectStandardError = $true
+
+$process = [System.Diagnostics.Process]::Start($startInfo)
+
+Write-Output $process.StandardOutput.ReadToEnd()
+$stderr = $process.StandardError.ReadToEnd()
+if ($stderr) { Write-Error $stderr }
+$process.WaitForExit(#{timeout_ms}) | Out-Null
+
+# winrm gem relies on $LASTEXITCODE
+$LASTEXITCODE = $process.ExitCode
+PS
+
+      execute(script)
+    end
+
     def _upload(source, destination)
       @logger.debug { "Uploading #{source} to #{destination}" }
       fs = ::WinRM::FS::FileManager.new(@connection)
@@ -94,8 +121,8 @@ PS
     def _run_script(script)
       @logger.info { "Running script '#{script}'" }
       with_remote_file(script) do |remote_path|
-        args = '-NoProfile -NonInteractive -NoLogo -ExecutionPolicy Bypass'
-        execute("powershell.exe #{args} -File '#{remote_path}'")
+        args = "-NoProfile -NonInteractive -NoLogo -ExecutionPolicy Bypass -File \"#{remote_path}\""
+        execute_process('powershell.exe', args)
       end
     end
 
@@ -115,8 +142,8 @@ PS
         end
       end.then do
         with_remote_file(task) do |remote_path|
-          args = '-NoProfile -NonInteractive -NoLogo -ExecutionPolicy Bypass'
-          execute("powershell.exe #{args} -File '#{remote_path}'")
+          args = "-NoProfile -NonInteractive -NoLogo -ExecutionPolicy Bypass -File \"#{remote_path}\""
+          execute_process('powershell.exe', args)
         end
       end
     end
