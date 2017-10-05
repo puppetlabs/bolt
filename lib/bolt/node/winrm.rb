@@ -55,7 +55,16 @@ function Invoke-Interpreter
   $startInfo.RedirectStandardOutput = $true
   $startInfo.RedirectStandardError = $true
 
-  $process = [System.Diagnostics.Process]::Start($startInfo)
+  try
+  {
+    $process = [System.Diagnostics.Process]::Start($startInfo)
+  }
+  catch
+  {
+    Write-Error $_
+    return 1
+  }
+
   if ($StdinInput)
   {
     $process.StandardInput.WriteLine($StdinInput)
