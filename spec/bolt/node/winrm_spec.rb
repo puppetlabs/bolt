@@ -47,7 +47,7 @@ describe Bolt::WinRM do
                   :"message two" => 'task has run' }
     with_tempfile_containing('task-test-winrm', contents) do |file|
       expect(winrm._run_task(file.path, 'environment', arguments).value)
-        .to eq("task is running\r\ntask has run\r\n")
+        .to eq("task is running\r\ntask has run\r\n\r\n")
     end
   end
 
@@ -58,12 +58,8 @@ Write-Output $line
 PS
     arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
     with_tempfile_containing('tasks-test-stdin-winrm', contents) do |file|
-      expect {
-        winrm._run_task(file.path, 'stdin', arguments)
-      }.to raise_error(
-        NotImplementedError,
-        "Sending task arguments via stdin to PowerShell is not supported"
-      )
+      expect(winrm._run_task(file.path, 'stdin', arguments).value)
+        .to match(/{"message_one":"Hello from task","message_two":"Goodbye"}/)
     end
   end
 
@@ -75,10 +71,9 @@ Write-Output $line
 PS
     arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
     with_tempfile_containing('tasks-test-both-winrm', contents) do |file|
-      # we only get args from environment, since stdin isn't yet supported
       expect(
         winrm._run_task(file.path, 'both', arguments).value
-      ).to eq("Hello from task\r\nGoodbye\r\n")
+      ).to eq("Hello from task\r\nGoodbye\r\n{\"message_one\":\"Hello from task\",\"message_two\":\"Goodbye\"}\r\n\r\n")
     end
   end
 end
