@@ -28,6 +28,9 @@ module Bolt
     def shell_init
       return Bolt::Node::Success.new if @shell_initialized
       result = execute(<<-PS)
+
+$ENV:PATH += ";${ENV:ProgramFiles}\\Puppet Labs\\Puppet\\sys\\ruby\\bin\\"
+
 function Invoke-Interpreter
 {
   [CmdletBinding()]
