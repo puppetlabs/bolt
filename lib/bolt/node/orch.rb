@@ -5,6 +5,7 @@ require 'orchestrator_client'
 module Bolt
   class Orch < Node
     CONF_FILE = File.expand_path('~/.puppetlabs/client-tools/orchestrator.conf')
+    BOLT_MOCK_FILE = 'bolt/tasks/init'.freeze
 
     def connect; end
 
@@ -18,8 +19,23 @@ module Bolt
       @client ||= make_client
     end
 
+    # This avoids a refactor to pass more task data around
+    def task_name_from_path(path)
+      parts = File.absolute_path(path).split(File::Separator)
+      if parts.length < 3 || parts[-2] != 'tasks'
+        raise ArgumentError, "Task path was not inside a module."
+      end
+      mod = parts[-3]
+      name = File.basename(path).split('.')[0]
+      if name == 'init'
+        mod
+      else
+        "#{mod}::#{name}"
+      end
+    end
+
     def _run_task(task, _input_method, arguments)
-      body = { task: task,
+      body = { task: task_name_from_path(task),
                params: arguments,
                scope: {
                  nodes: [@host]
@@ -67,7 +83,7 @@ module Bolt
     end
 
     def _run_command(command, options = {})
-      result = _run_task('bolt', 'stdin', action: 'command', command: command, options: options)
+      result = _run_task(BOLT_MOCK_FILE, 'stdin', action: 'command', command: command, options: options)
       unwrap_bolt_result(result)
     end
 
@@ -81,7 +97,7 @@ module Bolt
         content: content,
         mode: mode
       }
-      _run_task('bolt', 'stdin', params)
+      _run_task(BOLT_MOCK_FILE, 'stdin', params)
     end
 
     def _run_script(script)
@@ -91,7 +107,7 @@ module Bolt
         action: 'script',
         content: content
       }
-      unwrap_bolt_result(_run_task('bolt', 'stdin', params))
+      unwrap_bolt_result(_run_task(BOLT_MOCK_FILE, 'stdin', params))
     end
   end
 end

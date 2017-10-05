@@ -26,6 +26,7 @@ describe Bolt::Orch, orchestrator: true do
   before(:each) do
     Bolt.log_level = Logger::WARN
     @task = "foo"
+    @taskpath = "foo/tasks/init"
     @params =  { param: 'val' }
     @scope = { nodes: [@hostname] }
     @result_state = 'finished'
@@ -85,15 +86,29 @@ describe Bolt::Orch, orchestrator: true do
     @params = { action: 'script', content: content }
   end
 
+  describe :task_name_from_path do
+    it 'finds a namespaced task' do
+      expect(orch.task_name_from_path('foo/tasks/bar.sh')).to eq('foo::bar')
+    end
+
+    it 'finds the init task' do
+      expect(orch.task_name_from_path('foo/tasks/init.sh')).to eq('foo')
+    end
+
+    it 'errors when not in a module' do
+      expect { orch.task_name_from_path('foo/nottasks/init.sh') }.to raise_error(ArgumentError)
+    end
+  end
+
   describe :_run_task do
     it "executes a task on a host" do
       mock_client
-      expect(orch._run_task(@task, 'stdin', @params).value).to eq(@result.to_json)
+      expect(orch._run_task(@taskpath, 'stdin', @params).value).to eq(@result.to_json)
     end
 
     it "returns a success" do
       mock_client
-      expect(orch._run_task(@task, 'stdin', @params).class).to eq(Bolt::Node::Success)
+      expect(orch._run_task(@taskpath, 'stdin', @params).class).to eq(Bolt::Node::Success)
     end
 
     context "the task failed" do
@@ -101,18 +116,18 @@ describe Bolt::Orch, orchestrator: true do
 
       it "returns a failure for failed" do
         mock_client
-        expect(orch._run_task(@task, 'stdin', @params).class).to eq(Bolt::Node::Failure)
+        expect(orch._run_task(@taskpath, 'stdin', @params).class).to eq(Bolt::Node::Failure)
       end
 
       it "adds an unkown exitcode when absent" do
         mock_client
-        expect(orch._run_task(@task, 'stdin', @params).exit_code).to eq('unknown')
+        expect(orch._run_task(@taskpath, 'stdin', @params).exit_code).to eq('unknown')
       end
 
       it "uses the exitcode when present" do
         @result = { '_error' => { 'details' => { 'exit_code' => '3' } } }
         mock_client
-        expect(orch._run_task(task, 'stdin', params).exit_code).to eq('3')
+        expect(orch._run_task(@taskpath, 'stdin', params).exit_code).to eq('3')
       end
     end
   end
