@@ -115,10 +115,15 @@ $LASTEXITCODE = Invoke-Interpreter @invokeArgs
 PS
     end
 
-    VALID_EXTENSIONS = ['.ps1'].freeze
+    VALID_EXTENSIONS = ['.ps1', '.rb'].freeze
 
     def process_from_extension(path)
       case Pathname(path).extname.downcase
+      when '.rb'
+        [
+          'ruby.exe',
+          "-S \"#{path}\""
+        ]
       when '.ps1'
         [
           'powershell.exe',
