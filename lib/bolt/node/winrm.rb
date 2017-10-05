@@ -115,6 +115,8 @@ $LASTEXITCODE = Invoke-Interpreter @invokeArgs
 PS
     end
 
+    VALID_EXTENSIONS = ['.ps1'].freeze
+
     def process_from_extension(path)
       case Pathname(path).extname.downcase
       when '.ps1'
@@ -152,7 +154,9 @@ PS
 
       make_tempdir.then do |value|
         dir = value
-        dest = "#{dir}\\#{File.basename(file, '.*')}.ps1"
+        ext = File.extname(file)
+        ext = VALID_EXTENSIONS.include?(ext) ? ext : '.ps1'
+        dest = "#{dir}\\#{File.basename(file, '.*')}#{ext}"
         Bolt::Node::Success.new
       end.then do
         _upload(file, dest)
