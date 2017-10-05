@@ -30,6 +30,10 @@ module Bolt
       result = execute(<<-PS)
 
 $ENV:PATH += ";${ENV:ProgramFiles}\\Puppet Labs\\Puppet\\sys\\ruby\\bin\\"
+$ENV:RUBYLIB = "${ENV:ProgramFiles}\\Puppet Labs\\Puppet\\puppet\\lib;" +
+  "${ENV:ProgramFiles}\\Puppet Labs\\Puppet\\facter\\lib;" +
+  "${ENV:ProgramFiles}\\Puppet Labs\\Puppet\\hiera\\lib;" +
+  $ENV:RUBYLIB
 
 function Invoke-Interpreter
 {
