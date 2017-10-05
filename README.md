@@ -344,10 +344,6 @@ See [Native Extensions](./INSTALL.md#native-extensions) for installation instruc
 
 When using the bolt gem from source, you may receive the error `Puppet must be installed to execute tasks` when trying to run tasks or plans. See [INSTALL.md](./INSTALL.md) on how to install Bolt from source.
 
-### Bolt does not support submitting task arguments via stdin to PowerShell
-
-Tasks written in PowerShell can receive arguments only as environment variables.
-
 ### Bolt user and password cannot be specified when running plans
 
 In order to execute a plan, Bolt must be able to SSH (typically using ssh-agent) to each node. For Windows hosts requiring WinRM, plan execution will fail. See [BOLT-85](https://tickets.puppet.com/browse/BOLT-85).

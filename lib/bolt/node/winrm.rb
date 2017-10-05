@@ -48,17 +48,26 @@ module Bolt
     # 10 minutes in milliseconds
     DEFAULT_EXECUTION_TIMEOUT = 10 * 60 * 1000
 
-    def execute_process(path, arguments, timeout_ms = DEFAULT_EXECUTION_TIMEOUT)
+    def execute_process(path, arguments, stdin = nil, timeout_ms = DEFAULT_EXECUTION_TIMEOUT)
       # streams must have .ReadToEnd() called prior to process .WaitForExit()
       # to prevent deadlocks per MSDN
       # https://msdn.microsoft.com/en-us/library/system.diagnostics.process.standarderror(v=vs.110).aspx#Anchor_2
       script = <<-PS
 $startInfo = New-Object System.Diagnostics.ProcessStartInfo("#{path}", "#{arguments.gsub('"', '""')}")
 $startInfo.UseShellExecute = $false
+
+$stdin = #{stdin.nil? ? '$null' : "@'\n" + stdin + "\n'@"}
+
+if ($stdin) { $startInfo.RedirectStandardInput = $true }
 $startInfo.RedirectStandardOutput = $true
 $startInfo.RedirectStandardError = $true
 
 $process = [System.Diagnostics.Process]::Start($startInfo)
+
+if ($stdin) {
+  $process.StandardInput.WriteLine($stdin)
+  $process.StandardInput.Close()
+}
 
 Write-Output $process.StandardOutput.ReadToEnd()
 $stderr = $process.StandardError.ReadToEnd()
@@ -130,20 +139,23 @@ PS
       @logger.info { "Running task '#{task}'" }
       @logger.debug { "arguments: #{arguments}\ninput_method: #{input_method}" }
 
-      if input_method == 'stdin'
-        raise NotImplementedError,
-              "Sending task arguments via stdin to PowerShell is not supported"
+      if STDIN_METHODS.include?(input_method)
+        stdin = JSON.dump(arguments)
       end
 
-      arguments.reduce(Bolt::Node::Success.new) do |result, (arg, val)|
-        result.then do
-          cmd = "[Environment]::SetEnvironmentVariable('PT_#{arg}', '#{val}')"
-          execute(cmd)
+      if ENVIRONMENT_METHODS.include?(input_method)
+        arguments.reduce(Bolt::Node::Success.new) do |result, (arg, val)|
+          result.then do
+            cmd = "[Environment]::SetEnvironmentVariable('PT_#{arg}', '#{val}')"
+            execute(cmd)
+          end
         end
+      else
+        Bolt::Node::Success.new
       end.then do
         with_remote_file(task) do |remote_path|
           args = "-NoProfile -NonInteractive -NoLogo -ExecutionPolicy Bypass -File \"#{remote_path}\""
-          execute_process('powershell.exe', args)
+          execute_process('powershell.exe', args, stdin)
         end
       end
     end
