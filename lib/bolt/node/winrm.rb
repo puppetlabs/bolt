@@ -25,6 +25,59 @@ module Bolt
       @logger.debug { "Closed session" }
     end
 
+    def shell_init
+      return Bolt::Node::Success.new if @shell_initialized
+      result = execute(<<-PS)
+function Invoke-Interpreter
+{
+  [CmdletBinding()]
+  Param (
+    [Parameter()]
+    [String]
+    $Path,
+
+    [Parameter()]
+    [String]
+    $Arguments,
+
+    [Parameter()]
+    [Int32]
+    $Timeout,
+
+    [Parameter()]
+    [String]
+    $StdinInput = $Null
+  )
+
+  $startInfo = New-Object System.Diagnostics.ProcessStartInfo($Path, $Arguments)
+  $startInfo.UseShellExecute = $false
+  if ($StdinInput) { $startInfo.RedirectStandardInput = $true }
+  $startInfo.RedirectStandardOutput = $true
+  $startInfo.RedirectStandardError = $true
+
+  $process = [System.Diagnostics.Process]::Start($startInfo)
+  if ($StdinInput)
+  {
+    $process.StandardInput.WriteLine($StdinInput)
+    $process.StandardInput.Close()
+  }
+
+  # streams must have .ReadToEnd() called prior to process .WaitForExit()
+  # to prevent deadlocks per MSDN
+  # https://msdn.microsoft.com/en-us/library/system.diagnostics.process.standarderror(v=vs.110).aspx#Anchor_2
+  $process.StandardOutput.ReadToEnd() | Out-Host
+  $stderr = $process.StandardError.ReadToEnd()
+  if ($stderr) { Write-Error $stderr }
+  $process.WaitForExit($Timeout) | Out-Null
+
+  return $process.ExitCode
+}
+PS
+      @shell_initialized = true
+
+      result
+    end
+
     def execute(command, _ = {})
       result_output = Bolt::Node::ResultOutput.new
 
@@ -48,37 +101,18 @@ module Bolt
     # 10 minutes in milliseconds
     DEFAULT_EXECUTION_TIMEOUT = 10 * 60 * 1000
 
-    def execute_process(path, arguments, stdin = nil, timeout_ms = DEFAULT_EXECUTION_TIMEOUT)
-      # streams must have .ReadToEnd() called prior to process .WaitForExit()
-      # to prevent deadlocks per MSDN
-      # https://msdn.microsoft.com/en-us/library/system.diagnostics.process.standarderror(v=vs.110).aspx#Anchor_2
-      script = <<-PS
-$startInfo = New-Object System.Diagnostics.ProcessStartInfo("#{path}", "#{arguments.gsub('"', '""')}")
-$startInfo.UseShellExecute = $false
-
-$stdin = #{stdin.nil? ? '$null' : "@'\n" + stdin + "\n'@"}
-
-if ($stdin) { $startInfo.RedirectStandardInput = $true }
-$startInfo.RedirectStandardOutput = $true
-$startInfo.RedirectStandardError = $true
-
-$process = [System.Diagnostics.Process]::Start($startInfo)
-
-if ($stdin) {
-  $process.StandardInput.WriteLine($stdin)
-  $process.StandardInput.Close()
+    def execute_process(path = '', arguments = '', stdin = nil, timeout_ms = DEFAULT_EXECUTION_TIMEOUT)
+      execute(<<-PS)
+$invokeArgs = @{
+  Path = "#{path}"
+  Arguments = "#{arguments.gsub('"', '""')}"
+  Timeout = #{timeout_ms}
+  #{stdin.nil? ? '' : "StdinInput = @'\n" + stdin + "\n'@"}
 }
 
-Write-Output $process.StandardOutput.ReadToEnd()
-$stderr = $process.StandardError.ReadToEnd()
-if ($stderr) { Write-Error $stderr }
-$process.WaitForExit(#{timeout_ms}) | Out-Null
-
 # winrm gem relies on $LASTEXITCODE
-$LASTEXITCODE = $process.ExitCode
+$LASTEXITCODE = Invoke-Interpreter @invokeArgs
 PS
-
-      execute(script)
     end
 
     def _upload(source, destination)
@@ -112,6 +146,8 @@ PS
         Bolt::Node::Success.new
       end.then do
         _upload(file, dest)
+      end.then do
+        shell_init
       end.then do
         result = yield dest
       end.then do
