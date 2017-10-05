@@ -28,6 +28,9 @@ module Bolt
     def shell_init
       return Bolt::Node::Success.new if @shell_initialized
       result = execute(<<-PS)
+
+$ENV:PATH += ";${ENV:ProgramFiles}\\Puppet Labs\\Puppet\\sys\\ruby\\bin\\"
+
 function Invoke-Interpreter
 {
   [CmdletBinding()]
@@ -55,7 +58,16 @@ function Invoke-Interpreter
   $startInfo.RedirectStandardOutput = $true
   $startInfo.RedirectStandardError = $true
 
-  $process = [System.Diagnostics.Process]::Start($startInfo)
+  try
+  {
+    $process = [System.Diagnostics.Process]::Start($startInfo)
+  }
+  catch
+  {
+    Write-Error $_
+    return 1
+  }
+
   if ($StdinInput)
   {
     $process.StandardInput.WriteLine($StdinInput)
@@ -115,6 +127,23 @@ $LASTEXITCODE = Invoke-Interpreter @invokeArgs
 PS
     end
 
+    VALID_EXTENSIONS = ['.ps1', '.rb'].freeze
+
+    def process_from_extension(path)
+      case Pathname(path).extname.downcase
+      when '.rb'
+        [
+          'ruby.exe',
+          "-S \"#{path}\""
+        ]
+      when '.ps1'
+        [
+          'powershell.exe',
+          "-NoProfile -NonInteractive -NoLogo -ExecutionPolicy Bypass -File \"#{path}\""
+        ]
+      end
+    end
+
     def _upload(source, destination)
       @logger.debug { "Uploading #{source} to #{destination}" }
       fs = ::WinRM::FS::FileManager.new(@connection)
@@ -142,7 +171,9 @@ PS
 
       make_tempdir.then do |value|
         dir = value
-        dest = "#{dir}\\#{File.basename(file, '.*')}.ps1"
+        ext = File.extname(file)
+        ext = VALID_EXTENSIONS.include?(ext) ? ext : '.ps1'
+        dest = "#{dir}\\#{File.basename(file, '.*')}#{ext}"
         Bolt::Node::Success.new
       end.then do
         _upload(file, dest)
@@ -190,8 +221,7 @@ PS
         Bolt::Node::Success.new
       end.then do
         with_remote_file(task) do |remote_path|
-          args = "-NoProfile -NonInteractive -NoLogo -ExecutionPolicy Bypass -File \"#{remote_path}\""
-          execute_process('powershell.exe', args, stdin)
+          execute_process(*process_from_extension(remote_path), stdin)
         end
       end
     end
