@@ -322,9 +322,13 @@ HELP
 
     def execute_plan(options)
       Bolt.config = options
-      result = run_plan(options[:object],
-                        options[:task_options],
-                        options[:modules])
+      begin
+        result = run_plan(options[:object],
+                          options[:task_options],
+                          options[:modules])
+      rescue Puppet::Error
+        raise Bolt::CLIError, "Exiting because of an error in Puppet code"
+      end
       puts result
     end
 
