@@ -115,6 +115,16 @@ $LASTEXITCODE = Invoke-Interpreter @invokeArgs
 PS
     end
 
+    def process_from_extension(path)
+      case Pathname(path).extname.downcase
+      when '.ps1'
+        [
+          'powershell.exe',
+          "-NoProfile -NonInteractive -NoLogo -ExecutionPolicy Bypass -File \"#{path}\""
+        ]
+      end
+    end
+
     def _upload(source, destination)
       @logger.debug { "Uploading #{source} to #{destination}" }
       fs = ::WinRM::FS::FileManager.new(@connection)
@@ -190,8 +200,7 @@ PS
         Bolt::Node::Success.new
       end.then do
         with_remote_file(task) do |remote_path|
-          args = "-NoProfile -NonInteractive -NoLogo -ExecutionPolicy Bypass -File \"#{remote_path}\""
-          execute_process('powershell.exe', args, stdin)
+          execute_process(*process_from_extension(remote_path), stdin)
         end
       end
     end
