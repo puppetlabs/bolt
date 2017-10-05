@@ -102,6 +102,25 @@ describe "Bolt::CLI" do
     end
   end
 
+  describe "concurrency" do
+    it "accepts a concurrency limit" do
+      cli = Bolt::CLI.new(%w[command run --concurrency 10 --nodes foo])
+      expect(cli.parse).to include(concurrency: 10)
+    end
+
+    it "defaults to 100" do
+      cli = Bolt::CLI.new(%w[command run --nodes foo])
+      expect(cli.parse).to include(concurrency: 100)
+    end
+
+    it "generates an error message if no concurrency value is given" do
+      cli = Bolt::CLI.new(%w[command run --nodes foo --concurrency])
+      expect {
+        cli.parse
+      }.to raise_error(Bolt::CLIError, /option '--concurrency' needs a parameter/)
+    end
+  end
+
   describe "modules" do
     it "accepts a modules directory" do
       cli = Bolt::CLI.new(%w[command run --modules ./modules --nodes foo])

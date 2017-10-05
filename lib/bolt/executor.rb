@@ -7,14 +7,15 @@ module Bolt
       new(uris.map { |uri| Bolt::Node.from_uri(uri) })
     end
 
-    def initialize(nodes)
+    def initialize(nodes, max_threads = 100)
       @nodes = nodes
+      @poolsize = [nodes.length, max_threads].min
     end
 
     def on_each
       results = Concurrent::Map.new
 
-      pool = Concurrent::FixedThreadPool.new(5)
+      pool = Concurrent::FixedThreadPool.new(@poolsize)
       @nodes.each { |node|
         pool.post do
           results[node] =
