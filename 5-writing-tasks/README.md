@@ -6,6 +6,7 @@
 
 In this exercise you will write your first Puppet Tasks for use with `bolt`.
 
+- [How do tasks work?](#how-do-tasks-work)
 - [Write your first task in Bash](#write-your-first-task-in-bash)
 - [Write your first task in PowerShell](#write-your-first-task-in-powershell)
 - [Write your first task in Python](#write-your-first-task-in-python)
@@ -21,13 +22,19 @@ It is also useful to have some familiarity with running commands with `bolt` so 
 
 1. [Running Commands](../3-running-commands)
 
-# Write your first task in Bash 
+
+# How do tasks work?
 
 Tasks allow you to share commonly used commands as Puppet modules. This means they can be uploaded and downloaded from the Forge, as well as managed using all the existing Puppet tools. You can also just use them from GitHub or as a way of organizing regularly used commands locally. 
 
 By default tasks take arguments as environment variables, prefixed with `PT` (short for Puppet Tasks). Tasks are stored in the `tasks` directory of a module, a module being a directory with a unique name. You can have several tasks per module, but the `init` task is special and will be run by default if a task name is not specified. All of that will make more sense if we see it in action.
 
-Note that tasks can be implemented in any language which will run on the target nodes. We'll use `sh` here purely as a simple demonstration, but you could use Perl, Python, Lua, JavaScript, etc. as long as it can read environment variables or take content on stdin.
+Note that tasks can be implemented in any language which will run on the target nodes. 
+
+
+# Write your first task in Bash 
+
+For our first example we'll use `sh` here purely as a simple demonstration, but you could use Perl, Python, Lua, JavaScript, etc. as long as it can read environment variables or take content on stdin.
 
 Save the following file to `modules/exercise5/tasks/init.sh`:
 
