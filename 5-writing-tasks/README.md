@@ -37,7 +37,7 @@ Save the following file to `modules/exercise5/tasks/init.sh`:
 echo $(hostname) received the message: $PT_message
 ```
 
-We can then run that task using `bolt`. Note the `message` argument. This will be expanded to the `PT_message` environment variable expected by our task.
+We can then run that task using `bolt`. Note the `message` argument. This will be expanded to the `PT_message` environment variable expected by our task. By naming parameters explictly it's easier for others to use your tasks.
 
 ```
 bolt task run exercise5 message=hello --nodes <nodes> --modules ./modules
@@ -74,12 +74,13 @@ Note:
 
 * The name of the file on disk (minus any file extension) translates to the name of the task when run via `bolt`, in this case `print`
 * The name of the module/directory is also used to find the relevant task, in this case `exercise5`
+* As with the Bash example above, we name parameters so that they're more easily understood by users of the task
 
 # Write your first task in Python
 
 The above examples are obviously very simple. Lets implement something slightly more interesting and useful. We'll use Python for this example but remember Puppet Tasks can be implemented in any language which can be run on the target node.
 
-Note that `bolt` assumes that the required runtime is already available on the target nodes. So for the following examples to work the target nodes should have Python already installed.
+Note that `bolt` assumes that the required runtime is already available on the target nodes. So for the following examples to work the target nodes should have Python 2 or 3 already installed. This task will also work on Windows system with Python 2 or 3 installed on them.
 
 Save the following as `modules/exercise5/gethost.py`: 
 
