@@ -81,24 +81,14 @@ Note that if you've created more than one SSH server as above, this should be:
 NODES=3 vagrant ssh-config
 ```
 
-You can save that so it will be automatically picked up by SSH clients like so:
+You can save that so it will be automatically picked up by most SSH clients, including `bolt`. This uses the ability to specify hosts along with there connection details in a [configuration file](https://linux.die.net/man/5/ssh_config).
 
 ```
 mkdir ~/.ssh
-vagrant ssh-config >> ~/.ssh/config
+NODES=3 vagrant ssh-config >> ~/.ssh/config
 ``` 
 
-```
-NODES=3 vagrant ssh-config >> ~/.ssh/config
-```
-
-You'll also want to remember the IP addresses for the new nodes, so we can access them later. Look a the configuration output by the above command. For each node launched you should see a value for `HostName`.
-
-```
-NODES=3 vagrant ssh-config >> ~/.ssh/config
-```
-
-When passing nodes to `bolt` in the following exercises you will use something like `--nodes node1,node2`, up to the number of nodes you decided to launch.
+When passing nodes to `bolt` in the following exercises you will use something like `--nodes node1,node2`, up to the number of nodes you decided to launch. The reason you can use the node name, rather than the IP address, is the above SSH configuration file.
 
 
 # Using Docker
