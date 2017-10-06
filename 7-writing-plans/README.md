@@ -147,4 +147,4 @@ Congratulations, you should now have a basic understanding of `bolt` and Puppet 
 * Explore content on the [Puppet Tasks Playground](https://github.com/puppetlabs/tasks-playground)
 * Start writing Tasks for one of your existing Puppet modules
 * Head over to the [Puppet Slack](https://slack.puppet.com/) and talk to the `bolt` developers and other users
-* Try out the [Puppet Development Kit](https://docs.puppet.com/pdk/latest/index.html) which has a few features to make authoring tasks even easier
+* Try out the [Puppet Development Kit](https://puppet.com/download-puppet-development-kit) [(docs)](https://docs.puppet.com/pdk/latest/index.html) which has a few features to make authoring tasks even easier
