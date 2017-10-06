@@ -88,16 +88,11 @@ mkdir ~/.ssh
 vagrant ssh-config >> ~/.ssh/config
 ``` 
 
-or
-<<<<<<< HEAD
-
 ```
 NODES=3 vagrant ssh-config >> ~/.ssh/config
 ```
 
 You'll also want to remember the IP addresses for the new nodes, so we can access them later. Look a the configuration output by the above command. For each node launched you should see a value for `HostName`.
-=======
->>>>>>> 537df0c720394d1cc22c411fb6c446eb0489b32a
 
 ```
 NODES=3 vagrant ssh-config >> ~/.ssh/config
