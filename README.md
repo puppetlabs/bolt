@@ -111,7 +111,7 @@ To execute a task, run `bolt task run`, specifying:
 * The full name of the task, formatted as `<MODULE::TASK>`, or as `<MODULE>` for `init` tasks.
 * Any task parameters, as `parameter=value`.
 * The nodes to run the task on and the protocol, if WinRM, with the `--nodes` flag.
-* The module path that contains the task, with the `--modules` flag.
+* The module path that contains the task module, with the `--modules` flag.
 * If required, the username and password to connect to the node, with the `--username` and `--password` flags.
 
 
@@ -125,6 +125,24 @@ To run an `init` task, call the task by the module name only, and set the task p
 
 ```
 bolt run package action=status package=vim --nodes neptune --modules ~/modules
+```
+
+## Running plans
+
+Plans allow you to string several tasks together, and can include additional logic to trigger specific tasks.
+
+To execute a plan, run `bolt plan run`, specifying:
+
+* The full name of the plan, formatted as `<MODULE::PLAN>`.
+* Any plan parameters, as `parameter=value`.
+* The nodes to run the plan on and the protocol, if WinRM, with the `--nodes` flag.
+* The module path that contains the plan module, with the `--modules` flag.
+* If required, the username and password to connect to the node, with the `--username` and `--password` flags.
+
+For example, if  a plan defined in `mymodule/plans/myplan.pp` accepts a `load_balancer` parameter to specify a node on which to run tasks or functions in the plan, run:
+
+```
+bolt plan run mymodule::myplan --modules ./PATH/TO/MODULES load_balancer=lb.myorg.com​
 ```
 
 ### Specifying the module path
