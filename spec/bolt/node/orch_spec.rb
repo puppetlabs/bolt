@@ -91,8 +91,12 @@ describe Bolt::Orch, orchestrator: true do
       expect(orch.task_name_from_path('foo/tasks/bar.sh')).to eq('foo::bar')
     end
 
-    it 'finds the init task' do
+    it 'finds the init task with extension' do
       expect(orch.task_name_from_path('foo/tasks/init.sh')).to eq('foo')
+    end
+
+    it 'finds the init task without extension' do
+      expect(orch.task_name_from_path('foo/tasks/init')).to eq('foo')
     end
 
     it 'errors when not in a module' do
