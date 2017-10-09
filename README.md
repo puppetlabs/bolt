@@ -20,4 +20,5 @@ These step through the basic functionality of Puppet Tasks and focus on simple c
 1. [Writing Tasks](5-writing-tasks)
 1. [Downloading and running existing Tasks](6-downloading-and-running-existing-tasks)
 1. [Writing Plans](7-writing-plans)
+1. [Writing advanced Plans](8-writing-advanced-plans)
 
