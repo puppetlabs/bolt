@@ -24,6 +24,9 @@ test_name "C100549: \
     case bolt['platform']
     when /windows/
       result = on(bolt, powershell(bolt_command))
+    when /osx/
+      env = 'source /etc/profile  ~/.bash_profile ~/.bash_login ~/.profile && '
+      result = on(bolt, env + bolt_command)
     else
       result = on(bolt, bolt_command)
     end

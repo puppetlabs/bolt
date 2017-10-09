@@ -18,6 +18,9 @@ test_name "C100546: \
     case bolt['platform']
     when /windows/
       result = execute_powershell_script_on(bolt, bolt_command)
+    when /osx/
+      env = 'source /etc/profile  ~/.bash_profile ~/.bash_login ~/.profile && '
+      result = on(bolt, env + bolt_command)
     else
       result = on(bolt, bolt_command)
     end
