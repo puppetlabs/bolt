@@ -30,7 +30,7 @@ You can download `bashcheck` using `wget` or similar like so:
 curl -O https://raw.githubusercontent.com/hannob/bashcheck/master/bashcheck
 ```
 
-Next we run the script using `bolt script run`. This will upload the script to all specified nodes, ensure it's executable and finally run it, returning the output to the console.
+Next we run the script using `bolt script run <script-name>`. This will upload the script specified to all specified nodes, ensure it's executable and finally run it, returning the output to the console. An example of running that with `bashcheck` looks like:
 
 ```
 $ bolt script run bashcheck -n <nodes>
