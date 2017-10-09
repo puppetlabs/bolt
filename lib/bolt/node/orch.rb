@@ -21,7 +21,8 @@ module Bolt
 
     # This avoids a refactor to pass more task data around
     def task_name_from_path(path)
-      parts = File.absolute_path(path).split(File::Separator)
+      path = File.absolute_path(path)
+      parts = path.split(File::Separator)
       if parts.length < 3 || parts[-2] != 'tasks'
         raise ArgumentError, "Task path was not inside a module."
       end

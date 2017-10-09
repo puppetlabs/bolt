@@ -297,13 +297,10 @@ HELP
             when 'script'
               executor.run_script(options[:object])
             when 'task'
-              path = options[:object]
-              input_method = nil
+              task_name = options[:object]
 
-              unless file_exist?(path)
-                path, metadata = load_task_data(path, options[:modules])
-                input_method = metadata['input_method']
-              end
+              path, metadata = load_task_data(task_name, options[:modules])
+              input_method = metadata['input_method']
 
               input_method ||= 'both'
               executor.run_task(path, input_method, options[:task_options])
