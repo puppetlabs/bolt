@@ -48,7 +48,23 @@ Ran on 1 node in 0.68 seconds
 
 # Use package task to check status of package
 
-With Puppet installed on the node we can use some of the tasks that expose Puppet resources, like the package task from the package module. Let's quickly check on the status of a specific package using `bolt`:
+With Puppet installed on the node we can use some of the tasks that expose Puppet resources, like the package task.
+
+The `package` task is one of a number of tasks written to accompany the launch of `bolt`. These tasks will shortly be available from the Forge, but for the moment you can find it in the repository for this lab. Let's download it from there:
+
+```bash
+mkdir -p modules/package/tasks
+wget https://raw.githubusercontent.com/puppetlabs/tasks-hands-on-lab/master/6-downloading-and-running-existing-tasks/modules/package/tasks/init.rb
+```
+
+Or the same on Windows with PowerShell:
+
+```powershell
+mkdir modules/package/tasks
+wget https://raw.githubusercontent.com/puppetlabs/tasks-hands-on-lab/master/6-downloading-and-running-existing-tasks/modules/package/tasks/init.rb --outfile modules/package/tasks/init.rb
+```
+
+Let's quickly check on the status of a specific package using `bolt`:
 
 ```
 bolt task run package action=status package=bash --nodes <nodes> --modules ./modules
