@@ -117,7 +117,8 @@ describe "Bolt::CLI" do
       cli = Bolt::CLI.new(%w[command run --nodes foo --concurrency])
       expect {
         cli.parse
-      }.to raise_error(Bolt::CLIError, /option '--concurrency' needs a parameter/)
+      }.to raise_error(Bolt::CLIError,
+                       /option '--concurrency' needs a parameter/)
     end
   end
 

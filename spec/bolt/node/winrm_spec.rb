@@ -73,7 +73,10 @@ PS
     with_tempfile_containing('tasks-test-both-winrm', contents) do |file|
       expect(
         winrm._run_task(file.path, 'both', arguments).value
-      ).to eq("Hello from task\r\nGoodbye\r\n{\"message_one\":\"Hello from task\",\"message_two\":\"Goodbye\"}\r\n\r\n")
+      ).to eq(['Hello from task',
+               'Goodbye',
+               '{"message_one":"Hello from task","message_two":"Goodbye"}',
+               "\r\n"].join("\r\n"))
     end
   end
 end

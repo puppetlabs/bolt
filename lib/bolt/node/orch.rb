@@ -84,7 +84,11 @@ module Bolt
     end
 
     def _run_command(command, options = {})
-      result = _run_task(BOLT_MOCK_FILE, 'stdin', action: 'command', command: command, options: options)
+      result = _run_task(BOLT_MOCK_FILE,
+                         'stdin',
+                         action: 'command',
+                         command: command,
+                         options: options)
       unwrap_bolt_result(result)
     end
 

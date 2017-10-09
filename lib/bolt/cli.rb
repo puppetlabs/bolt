@@ -119,7 +119,8 @@ HELP
         end
         results[:concurrency] = 100
         opts.on('-c', '--concurrency CONCURRENCY', Integer,
-                "Maximum number of simultaneous connections (Optional, defaults to 100)") do |concurrency|
+                "Maximum number of simultaneous connections " \
+                "(Optional, defaults to 100)") do |concurrency|
           results[:concurrency] = concurrency
         end
         opts.on('--modules MODULES', "Path to modules directory") do |modules|

@@ -100,19 +100,21 @@ describe Bolt::Orch, orchestrator: true do
     end
 
     it 'errors when not in a module' do
-      expect { orch.task_name_from_path('foo/nottasks/init.sh') }.to raise_error(ArgumentError)
+      expect { orch.task_name_from_path('foo/nottasks/init.sh') }
+        .to raise_error(ArgumentError)
     end
   end
 
   describe :_run_task do
     it "executes a task on a host" do
       mock_client
-      expect(orch._run_task(@taskpath, 'stdin', @params).value).to eq(@result.to_json)
+      expect(orch._run_task(@taskpath, 'stdin', @params).value)
+        .to eq(@result.to_json)
     end
 
     it "returns a success" do
       mock_client
-      expect(orch._run_task(@taskpath, 'stdin', @params).class).to eq(Bolt::Node::Success)
+      expect(orch._run_task(@taskpath, 'stdin', @params)).to be_success
     end
 
     context "the task failed" do
@@ -120,12 +122,13 @@ describe Bolt::Orch, orchestrator: true do
 
       it "returns a failure for failed" do
         mock_client
-        expect(orch._run_task(@taskpath, 'stdin', @params).class).to eq(Bolt::Node::Failure)
+        expect(orch._run_task(@taskpath, 'stdin', @params)).not_to be_success
       end
 
       it "adds an unkown exitcode when absent" do
         mock_client
-        expect(orch._run_task(@taskpath, 'stdin', @params).exit_code).to eq('unknown')
+        expect(orch._run_task(@taskpath, 'stdin', @params).exit_code)
+          .to eq('unknown')
       end
 
       it "uses the exitcode when present" do
@@ -149,7 +152,7 @@ describe Bolt::Orch, orchestrator: true do
       end
 
       it 'it is a success' do
-        expect(orch._run_command(@command).class).to eq(Bolt::Node::Success)
+        expect(orch._run_command(@command)).to be_success
       end
 
       it 'captures stderr' do
@@ -166,7 +169,7 @@ describe Bolt::Orch, orchestrator: true do
         bolt_task_client
       end
       it 'is a failure' do
-        expect(orch._run_command(@command).class).to eq(Bolt::Node::Failure)
+        expect(orch._run_command(@command)).not_to be_success
       end
 
       it 'captures the exit_code' do
@@ -190,14 +193,15 @@ describe Bolt::Orch, orchestrator: true do
   describe :_upload do
     it 'should write the file' do
       Dir.mktmpdir(nil, '/tmp') do |dir|
-        source_path = File.join(base_path, 'spec', 'fixtures', 'scripts', 'success.sh')
+        source_path = File.join(base_path, 'spec', 'fixtures',
+                                'scripts', 'success.sh')
         dest_path = File.join(dir, "success.sh")
 
         set_upload_params(source_path, dest_path)
         bolt_task_client
         result = orch._upload(source_path, dest_path)
 
-        expect(result.class).to eq(Bolt::Node::Success)
+        expect(result).to be_success
 
         source_mode = File.stat(source_path).mode
         dest_mode = File.stat(dest_path).mode
@@ -213,7 +217,7 @@ describe Bolt::Orch, orchestrator: true do
   describe :_run_script do
     context "the script succeeds" do
       let(:script_path) do
-        File.expand_path(File.join(base_path, 'spec', 'fixtures', 'scripts', 'success.sh'))
+        File.join(base_path, 'spec', 'fixtures', 'scripts', 'success.sh')
       end
 
       before(:each) do
@@ -222,7 +226,7 @@ describe Bolt::Orch, orchestrator: true do
       end
 
       it 'is a success' do
-        expect(orch._run_script(script_path).class).to eq(Bolt::Node::Success)
+        expect(orch._run_script(script_path)).to be_success
       end
 
       it 'captures stdout' do
@@ -238,7 +242,7 @@ describe Bolt::Orch, orchestrator: true do
 
     context "when the script fails" do
       let(:script_path) do
-        File.expand_path(File.join(base_path, 'spec', 'fixtures', 'scripts', 'failure.sh'))
+        File.join(base_path, 'spec', 'fixtures', 'scripts', 'failure.sh')
       end
 
       before(:each) do
@@ -247,7 +251,7 @@ describe Bolt::Orch, orchestrator: true do
       end
 
       it 'returns a failure' do
-        expect(orch._run_script(script_path).class).to eq(Bolt::Node::Failure)
+        expect(orch._run_script(script_path)).not_to be_success
       end
 
       it 'captures exit_code' do

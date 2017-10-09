@@ -59,6 +59,3 @@ Metrics/ParameterLists:
 
 Metrics/PerceivedComplexity:
   Enabled: false
-
-Metrics/LineLength:
-    Max: 130

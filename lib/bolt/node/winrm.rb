@@ -117,7 +117,8 @@ PS
     # 10 minutes in milliseconds
     DEFAULT_EXECUTION_TIMEOUT = 10 * 60 * 1000
 
-    def execute_process(path = '', arguments = '', stdin = nil, timeout_ms = DEFAULT_EXECUTION_TIMEOUT)
+    def execute_process(path = '', arguments = '', stdin = nil,
+                        timeout_ms = DEFAULT_EXECUTION_TIMEOUT)
       execute(<<-PS)
 $invokeArgs = @{
   Path = "#{path}"
@@ -133,6 +134,9 @@ PS
 
     VALID_EXTENSIONS = ['.ps1', '.rb'].freeze
 
+    PS_ARGS =
+      '-NoProfile -NonInteractive -NoLogo -ExecutionPolicy Bypass'.freeze
+
     def process_from_extension(path)
       case Pathname(path).extname.downcase
       when '.rb'
@@ -143,7 +147,7 @@ PS
       when '.ps1'
         [
           'powershell.exe',
-          "-NoProfile -NonInteractive -NoLogo -ExecutionPolicy Bypass -File \"#{path}\""
+          "#{PS_ARGS} -File \"#{path}\""
         ]
       end
     end
@@ -201,7 +205,7 @@ PS
     def _run_script(script)
       @logger.info { "Running script '#{script}'" }
       with_remote_file(script) do |remote_path|
-        args = "-NoProfile -NonInteractive -NoLogo -ExecutionPolicy Bypass -File \"#{remote_path}\""
+        args = "#{PS_ARGS} -File \"#{remote_path}\""
         execute_process('powershell.exe', args)
       end
     end
