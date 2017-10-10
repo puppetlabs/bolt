@@ -1,0 +1,55 @@
+require 'rototiller'
+
+
+desc "Generate Beaker Host config"
+rototiller_task :host_config do |task|
+  task.add_env({:name     => 'BOLT_CONTROLLER', :default => 'centos7-64'})
+  task.add_env({:name     => 'BOLT_NODES', :default => 'ubuntu1604-64,osx1012-64,windows10ent-64'})
+  ns = [ENV['BOLT_CONTROLLER'],ENV['BOLT_NODES']].join(',')
+  n  = ns.split(',')
+  n_new = []
+  n.each_with_index do |node, i|
+    roles = []
+    if i == 0 then
+      roles << 'bolt'
+    end
+    if /win/ =~ node then
+      roles << 'winrm'
+    else
+      roles << 'ssh'
+    end
+    node = node + roles.join(',') + '.'
+    n_new << node
+  end
+  nodes_final = n_new.join('-')
+  generate = "bundle exec beaker-hostgenerator"
+  generate += " #{nodes_final}"
+  generate += " > hosts.yaml"
+  sh generate
+  sh "cat hosts.yaml"
+end
+
+
+
+namespace :ci do
+  namespace :test do
+
+    desc "Run bolt acceptance tests against a published gem"
+    task gem: :host_config
+    rototiller_task :gem do |task|
+      # most method initializers take either a hash, or block syntax (see next task)
+      task.add_env({:name     => 'GEM_VERSION', :default => '> 0.1.0'})
+      task.add_env({:name     => 'GEM_SOURCE', :default => 'https://rubygems.org'})
+      task.add_env({:name     => 'SSH_USER', :default => 'root'})
+      task.add_env({:name     => 'SSH_PASSWORD'})
+      task.add_env({:name     => 'WINRM_USER', :default => 'Administrator'})
+      task.add_env({:name     => 'WINRM_PASSWORD'})
+      cmd  = "bundle exec beaker"
+      cmd += " -o config/gem/options.rb"
+      cmd += " -h hosts.yaml"
+      cmd += " -t tests"
+      task.add_command({:name => cmd})
+    end
+
+  end
+end
