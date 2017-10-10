@@ -144,6 +144,10 @@ HELP
                 "(Optional, defaults to 100)") do |concurrency|
           results[:concurrency] = concurrency
         end
+        opts.on('--timeout TIMEOUT', Integer,
+                "Connection timeout (Optional)") do |timeout|
+          results[:timeout] = timeout
+        end
         opts.on('--modulepath MODULES',
                 "List of directories containing modules, " \
                 "separated by #{File::PATH_SEPARATOR}") do |modulepath|

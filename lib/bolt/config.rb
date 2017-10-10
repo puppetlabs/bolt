@@ -20,9 +20,10 @@ module Bolt
       log_destination: STDERR
     }.freeze
 
-    TRANSPORT_OPTIONS = %i[insecure password run_as sudo sudo_password key tty user].freeze
+    TRANSPORT_OPTIONS = %i[insecure password run_as sudo sudo_password key tty user timeout].freeze
 
     TRANSPORT_DEFAULTS = {
+      timeout: 1,
       insecure: false,
       tty: false
     }.freeze

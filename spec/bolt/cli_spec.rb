@@ -256,17 +256,25 @@ NODES
       end
     end
 
+    describe "timeout" do
+      it "accepts a specific timeout" do
+        cli = Bolt::CLI.new(%w[command run --timeout 123 --nodes foo])
+        expect(cli.parse).to include(timeout: 123)
+      end
+
+      it "generates an error message if no timeout value is given" do
+        cli = Bolt::CLI.new(%w[command run --nodes foo --timeout])
+        expect {
+          cli.parse
+        }.to raise_error(Bolt::CLIError,
+                         /Option '--timeout' needs a parameter/)
+      end
+    end
+
     describe "modulepath" do
       it "accepts a modulepath directory" do
         cli = Bolt::CLI.new(%w[command run --modulepath ./modules --nodes foo])
         expect(cli.parse).to include(modulepath: ['./modules'])
-      end
-
-      it "accepts a list of module directories" do
-        modulepath = %w[modules more].join(File::PATH_SEPARATOR)
-        cli = Bolt::CLI.new(%W[command run --modulepath #{modulepath}
-                               --nodes foo])
-        expect(cli.parse).to include(modulepath: %w[modules more])
       end
 
       it "generates an error message if no value is given" do
