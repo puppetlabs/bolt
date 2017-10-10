@@ -319,27 +319,8 @@ Thank you to [Marcin Bunsch](https://github.com/marcinbunsch) for allowing Puppe
 
 ## Contributing
 
-Please submit new issues on the GitHub issue tracker: https://github.com/puppetlabs/bolt/issues
-
-Pull requests are also welcome on GitHub: https://github.com/puppetlabs/bolt
-
-As with other open-source projects managed by Puppet, Inc we require contributors to digitally sign the Contributor 
-License Agreement before we can accept your pull request: https://cla.puppet.com
-
-Internally, Puppet uses JIRA for tracking work, so nontrivial bugs or enhancement requests may migrate to JIRA tickets 
-in the "BOLT" project: https://tickets.puppetlabs.com/browse/BOLT/ 
-
-## Testing
-
-Some tests require a Windows or Linux VM. Execute `vagrant up` to bring these up with the Vagrantfile included with the `bolt` gem. Any tests that require this are tagged with `:vagrant` in rspec.
-
-To run all tests, run:
-
-    $ bundle exec rake test
-
-To exclude tests that rely on Vagrant, run:
-
-    $ bundle exec rake unit
+We welcome error reports and pull requests to Bolt. See
+[CONTRIBUTING.md](./CONTRIBUTING.md) for how to help.
 
 ## FAQ
 
