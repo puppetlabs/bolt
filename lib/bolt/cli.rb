@@ -123,6 +123,10 @@ HELP
                 "(Optional, defaults to 100)") do |concurrency|
           results[:concurrency] = concurrency
         end
+        opts.on('-t', '--timeout TIMEOUT', Integer,
+                "Connection timeout (Optional)") do |timeout|
+          results[:timeout] = timeout
+        end
         opts.on('--modules MODULES', "Path to modules directory") do |modules|
           results[:modules] = modules
         end
@@ -285,7 +289,7 @@ HELP
       else
         nodes = options[:nodes].map do |node|
           Bolt::Node.from_uri(node, options[:user], options[:password],
-                              tty: options[:tty])
+                              tty: options[:tty], timeout: options[:timeout])
         end
 
         results = nil

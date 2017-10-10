@@ -26,16 +26,17 @@ module Bolt
                 uri: uri_string, **kwargs)
     end
 
-    attr_reader :logger, :host, :uri, :user, :password
+    attr_reader :logger, :host, :uri, :user, :password, :timeout
 
     def initialize(host, port = nil, user = nil,
-                   password = nil, tty: false, uri: nil,
+                   password = nil, tty: false, uri: nil, timeout: nil,
                    log_level: Bolt.log_level || Logger::WARN)
       @host = host
       @user = user
       @port = port
       @password = password
       @tty = tty
+      @timeout = timeout
       @uri = uri
 
       @logger = init_logger(level: log_level)
