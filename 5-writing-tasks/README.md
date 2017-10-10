@@ -89,7 +89,7 @@ The above examples are obviously very simple. Lets implement something slightly 
 
 Note that `bolt` assumes that the required runtime is already available on the target nodes. So for the following examples to work the target nodes should have Python 2 or 3 already installed. This task will also work on Windows system with Python 2 or 3 installed on them.
 
-Save the following as `modules/exercise5/gethost.py`: 
+Save the following as `modules/exercise5/tasks/gethost.py`: 
 
 ```python
 #!/usr/bin/env python
