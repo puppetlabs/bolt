@@ -10,6 +10,9 @@ module Bolt
                   non_interactive: true }
       options[:port] = @port if @port
       options[:password] = @password if @password
+      if @timeout then
+        options[:timeout] = @timeout
+      end
 
       @session = Net::SSH.start(@host, @user, options)
       @logger.debug { "Opened session" }
