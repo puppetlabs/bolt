@@ -114,19 +114,36 @@ BASH
       end
     end
 
-    it "takes > 2 seconds if connection fails to non-SSH port", ssh: true do
-      bogus_port = 5555
-      Process.spawn("nc -l #{bogus_port}")
-      # CLI failures present on a dead port like:
-      # Failed to connect to ssh://localhost:2222:
-      #   connection closed by remote host
-      #
-      # Ran on 1 node in 438.96 seconds
-      ssh = Bolt::SSH.new(hostname, bogus_port, 'bad', 'password')
+    it "takes < 2 seconds to fail by default when connecting to a non-SSH port", ssh: true do
+      TCPServer.open(0) do |server|
+        server.addr[1]
 
-      expect {
-        Timeout.timeout(2) { ssh.connect }
-      }.to raise_error(Timeout::Error)
+        # CLI failures present on a dead port like:
+        # Failed to connect to ssh://localhost:2222:
+        #   connection closed by remote host
+        #
+        # Ran on 1 node in 438.96 seconds
+        ssh = Bolt::SSH.new(hostname, port, 'bad', 'password')
+
+        expect {
+          Timeout.timeout(2) { ssh.connect }
+        }.to raise_error(Bolt::Node::ConnectError)
+      end
+    end
+
+    it "adheres to specified connection timeout when connecting to a non-SSH port", ssh: true do
+      TCPServer.open(0) do |server|
+        port = server.addr[1]
+
+        timeout = { config: Bolt::Config.new(transports: { ssh: { timeout: 2 } }) }
+        ssh = Bolt::SSH.new(hostname, port, 'bad', 'password', **timeout)
+
+        exec_time = Time.now
+        expect {
+          ssh.connect
+        }.to raise_error(Bolt::Node::ConnectError)
+        expect(Time.now - exec_time).to be > 2
+      end
     end
   end
 
