@@ -48,33 +48,29 @@ PS
     it "raises Node::ConnectError if the connection is refused" do
       winrm = Bolt::WinRM.new(host, 65535, user, password)
 
-      stub_winrm_to_raise(
-        Errno::ECONNREFUSED,
-        "Connection refused - connect(2) for \"#{host}\" port #{port}"
-      )
-
-      expect_node_error(Bolt::Node::ConnectError,
-                        'CONNECT_ERROR',
-                        /Failed to connect to/) do
-        winrm.connect
+      # timeout will never occur given default 1 second connection timeout
+      Timeout.timeout(2) do
+        expect_node_error(Bolt::Node::ConnectError,
+                          'CONNECT_ERROR',
+                          /Failed to connect to/) do
+          winrm.connect
+        end
       end
     end
 
-    it "takes > 2 seconds to raise Node::ConnectError for connection refused" do
-      winrm = Bolt::WinRM.new(host, 65535, user, password)
-      expect {
-        Timeout.timeout(2) { winrm.connect }
-      }.to raise_error(Timeout::Error)
-    end
-
     it "raises Node::ConnectError if the connection times out" do
-      winrm = Bolt::WinRM.new(host, port, user, password)
-      stub_winrm_to_raise(HTTPClient::ConnectTimeoutError, 'execution expired')
+      TCPServer.open(0) do |server|
+        port = server.addr[1]
 
-      expect_node_error(Bolt::Node::ConnectError,
-                        'CONNECT_ERROR',
-                        /Failed to connect to/) do
-        winrm.connect
+        winrm = Bolt::WinRM.new(host, port, user, password)
+
+        Timeout.timeout(3) do
+        expect_node_error(Bolt::Node::ConnectError,
+                          'CONNECT_ERROR',
+                          /Failed to connect to/) do
+          winrm.connect
+        end
+        end
       end
     end
 

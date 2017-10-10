@@ -17,9 +17,17 @@ module Bolt
     end
 
     def connect
-      @connection = ::WinRM::Connection.new(endpoint: @endpoint,
-                                            user: @user,
-                                            password: @password)
+      options = { endpoint: @endpoint,
+                  user: @user,
+                  password: @password,
+                  retry_limit: 1 }
+
+      if @timeout
+        options[:receive_timeout] = @timeout + 1
+        # NOTE: must be set to at least 1, else winrm gem throws an error (boo)
+        options[:operation_timeout] = @timeout
+      end
+      @connection = ::WinRM::Connection.new(options)
       @connection.logger = @transport_logger
 
       @session = @connection.shell(@shell)
