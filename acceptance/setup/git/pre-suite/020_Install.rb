@@ -24,6 +24,9 @@ test_name "Install Bolt via git" do
     when /windows/
       execute_powershell_script_on(bolt, install_command)
       result = on(bolt, powershell(cmd))
+    when /osx/
+      env = 'source /etc/profile  ~/.bash_profile ~/.bash_login ~/.profile && '
+      result = on(bolt, env + cmd)
     else
       result = on(bolt, cmd)
     end
