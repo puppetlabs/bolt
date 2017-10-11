@@ -1,9 +1,11 @@
 require 'spec_helper'
+require 'bolt_spec/errors'
 require 'bolt_spec/files'
 require 'bolt/node'
 require 'bolt/node/ssh'
 
 describe Bolt::SSH do
+  include BoltSpec::Errors
   include BoltSpec::Files
 
   let(:hostname) { "localhost" }
@@ -39,34 +41,42 @@ describe Bolt::SSH do
     end
 
     it "rejects the connection if host key verification fails" do
-      expect {
+      expect_node_error(Bolt::Node::ConnectError,
+                        'HOST_KEY_ERROR',
+                        /Host key verification failed/) do
         ssh.connect
-      }.to raise_error do |ex|
-        expect(ex).to be_a(Bolt::Node::ConnectError)
-        expect(ex.issue_code).to eq('HOST_KEY_ERROR')
-        expect(ex.message).to match(/Host key verification failed/)
+      end
+    end
+
+    it "raises ConnectError if authentication fails" do
+      ssh = Bolt::SSH.new(hostname, port, user, password, insecure: true)
+
+      allow(Net::SSH)
+        .to receive(:start)
+        .and_raise(Net::SSH::AuthenticationFailed,
+                   "Authentication failed for foo@bar.com")
+      expect_node_error(Bolt::Node::ConnectError,
+                        'AUTH_ERROR',
+                        /Authentication failed for foo@bar.com/) do
+        ssh.connect
       end
     end
 
     it "returns Node::ConnectError if the node name can't be resolved" do
       ssh = Bolt::SSH.new('totally-not-there', port)
-      expect {
+      expect_node_error(Bolt::Node::ConnectError,
+                        'CONNECT_ERROR',
+                        /Failed to connect to/) do
         ssh.connect
-      }.to raise_error do |ex|
-        expect(ex).to be_a(Bolt::Node::ConnectError)
-        expect(ex.issue_code).to eq('CONNECT_ERROR')
-        expect(ex.message).to match(/Failed to connect to/)
       end
     end
 
     it "returns Node::ConnectError if the connection is refused" do
       ssh = Bolt::SSH.new(hostname, 65535, user, password, insecure: true)
-      expect {
+      expect_node_error(Bolt::Node::ConnectError,
+                        'CONNECT_ERROR',
+                        /Failed to connect to/) do
         ssh.connect
-      }.to raise_error do |ex|
-        expect(ex).to be_a(Bolt::Node::ConnectError)
-        expect(ex.issue_code).to eq('CONNECT_ERROR')
-        expect(ex.message).to match(/Failed to connect to/)
       end
     end
   end

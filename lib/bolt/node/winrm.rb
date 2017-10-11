@@ -24,6 +24,11 @@ module Bolt
         "Failed to connect to #{@uri}: #{e.message}",
         'CONNECT_ERROR'
       )
+    rescue ::WinRM::WinRMAuthorizationError
+      raise Bolt::Node::ConnectError.new(
+        "Authentication failed for #{@endpoint}",
+        'AUTH_ERROR'
+      )
     end
 
     def disconnect
