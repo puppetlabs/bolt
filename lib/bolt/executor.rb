@@ -22,6 +22,8 @@ module Bolt
             begin
               node.connect
               yield node
+            rescue Bolt::Node::BaseError => ex
+              Bolt::ErrorResult.new(ex.message, ex.issue_code, ex.kind)
             rescue StandardError => ex
               node.logger.error(ex)
               Bolt::ExceptionResult.new(ex)

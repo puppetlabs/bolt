@@ -25,6 +25,28 @@ module Bolt
     end
   end
 
+  class ErrorResult < Result
+    def initialize(message, issue_code, kind)
+      super(message)
+      @issue_code = issue_code
+      @kind = kind
+    end
+
+    def to_h
+      {
+        'error' => {
+          'issue_code' => @issue_code,
+          'kind' => @kind,
+          'msg' => @message
+        }
+      }
+    end
+
+    def success?
+      false
+    end
+  end
+
   class CommandResult < Result
     attr_reader :stdout, :stderr, :exit_code
 

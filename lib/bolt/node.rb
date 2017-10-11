@@ -74,6 +74,7 @@ module Bolt
   end
 end
 
+require 'bolt/node/errors'
 require 'bolt/node/ssh'
 require 'bolt/node/winrm'
 require 'bolt/node/orch'
