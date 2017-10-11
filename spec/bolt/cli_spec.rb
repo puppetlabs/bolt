@@ -12,6 +12,20 @@ describe "Bolt::CLI" do
     }.to raise_error(Bolt::CLIError, /unknown argument '--unknown'/)
   end
 
+  it "generates an error message if an unknown subcommand is given" do
+    cli = Bolt::CLI.new(%w[-n bolt1 bolt2 command run whoami])
+    expect {
+      cli.parse
+    }.to raise_error(Bolt::CLIError, /Expected subcommand 'bolt2' to be one of/)
+  end
+
+  it "generates an error message if an unknown action is given" do
+    cli = Bolt::CLI.new(%w[-n bolt1 command oops whoami])
+    expect {
+      cli.parse
+    }.to raise_error(Bolt::CLIError, /Expected action 'oops' to be one of/)
+  end
+
   # it "includes unparsed arguments" do
   #   cli = Bolt::CLI.new(%w[exec run what --nodes foo])
   #   expect(cli.parse).to include(leftovers: %w[what])

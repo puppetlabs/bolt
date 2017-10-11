@@ -238,12 +238,15 @@ HELP
 
     def validate(options)
       unless MODES.include?(options[:mode])
-        raise Bolt::CLIError, "Expected mode to be one of #{MODES.join(', ')}"
+        raise Bolt::CLIError,
+              "Expected subcommand '#{options[:mode]}' to be one of " \
+              "#{MODES.join(', ')}"
       end
 
       unless ACTIONS.include?(options[:action])
         raise Bolt::CLIError,
-              "Expected action to be one of #{ACTIONS.join(', ')}"
+              "Expected action '#{options[:action]}' to be one of " \
+              "#{ACTIONS.join(', ')}"
       end
 
       if options[:mode] != 'file' && !options[:leftovers].empty?
