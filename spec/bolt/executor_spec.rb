@@ -55,7 +55,21 @@ describe "Bolt::Executor" do
     end
   end
 
-  it "returns an exception result if the connect raises" do
+  it "returns an error result if the connect raises a base error" do
+    node = mock_node 'node'
+    expect(node)
+      .to receive(:connect)
+      .and_raise(
+        Bolt::Node::ConnectError.new('Authentication failed', 'AUTH_ERROR')
+      )
+
+    results = Bolt::Executor.new([node]).run_command(command)
+    results.each_pair do |_, result|
+      expect(result).to be_instance_of(Bolt::ErrorResult)
+    end
+  end
+
+  it "returns an exception result if the connect raises an unhandled error" do
     logger = double('logger', error: nil)
     node = mock_node 'node'
     allow(node).to receive(:logger).and_return(logger)
