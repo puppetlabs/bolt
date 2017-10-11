@@ -29,4 +29,8 @@ RSpec.configure do |config|
   config.example_status_persistence_file_path = "spec/examples.txt"
 
   # config.warnings = true
+
+  config.before :each do |_|
+    Bolt.config.clear
+  end
 end

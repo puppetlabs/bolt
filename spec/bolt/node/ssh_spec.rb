@@ -13,7 +13,42 @@ describe Bolt::SSH do
   let(:command) { "pwd" }
   let(:ssh) { Bolt::SSH.new(hostname, port, user, password) }
 
+  context "when connecting", vagrant: true do
+    it "performs secure host key verification by default" do
+      allow(Net::SSH)
+        .to receive(:start)
+        .with(anything,
+              anything,
+              hash_including(
+                verify_host_key: instance_of(Net::SSH::Verifiers::Secure)
+              ))
+      ssh.connect
+    end
+
+    it "downgrades to lenient if insecure is true" do
+      ssh = Bolt::SSH.new(hostname, port, user, password, insecure: true)
+
+      allow(Net::SSH)
+        .to receive(:start)
+        .with(anything,
+              anything,
+              hash_including(
+                verify_host_key: instance_of(Net::SSH::Verifiers::Lenient)
+              ))
+      ssh.connect
+    end
+
+    it "rejects the connection if host key verification fails" do
+      expect {
+        ssh.connect
+      }.to raise_error(Bolt::Node::ConnectError,
+                       /Host key verification failed/)
+    end
+  end
+
   context "when executing" do
+    let(:ssh) { Bolt::SSH.new(hostname, port, user, password, insecure: true) }
+
     before(:each) { ssh.connect }
     after(:each) { ssh.disconnect }
 

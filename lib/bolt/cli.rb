@@ -130,6 +130,11 @@ HELP
                 "Parameters to a task or plan") do |params|
           results[:task_options] = parse_params(params)
         end
+        results[:insecure] = false
+        opts.on('-k', '--insecure',
+                "Whether to connect insecurely ") do |insecure|
+          results[:insecure] = insecure
+        end
         opts.on_tail('--[no-]tty',
                      "Request a pseudo TTY on nodes that support it") do |tty|
           results[:tty] = tty
@@ -285,7 +290,7 @@ HELP
       else
         nodes = options[:nodes].map do |node|
           Bolt::Node.from_uri(node, options[:user], options[:password],
-                              tty: options[:tty])
+                              tty: options[:tty], insecure: options[:insecure])
         end
 
         results = nil
