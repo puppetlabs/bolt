@@ -168,6 +168,23 @@ NODES
     end
   end
 
+  describe "insecure" do
+    it "accepts `-k`" do
+      cli = Bolt::CLI.new(%w[command run -k --nodes foo])
+      expect(cli.parse).to include(insecure: true)
+    end
+
+    it "accepts `--insecure`" do
+      cli = Bolt::CLI.new(%w[command run --insecure --nodes foo])
+      expect(cli.parse).to include(insecure: true)
+    end
+
+    it "defaults to false" do
+      cli = Bolt::CLI.new(%w[command run --nodes foo])
+      expect(cli.parse).to include(insecure: false)
+    end
+  end
+
   describe "modules" do
     it "accepts a modules directory" do
       cli = Bolt::CLI.new(%w[command run --modules ./modules --nodes foo])

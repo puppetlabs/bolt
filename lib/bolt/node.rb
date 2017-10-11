@@ -30,12 +30,14 @@ module Bolt
 
     def initialize(host, port = nil, user = nil,
                    password = nil, tty: false, uri: nil,
+                   insecure: false,
                    log_level: Bolt.log_level || Logger::WARN)
       @host = host
       @user = user
       @port = port
       @password = password
       @tty = tty
+      @insecure = insecure
       @uri = uri
 
       @logger = init_logger(level: log_level)

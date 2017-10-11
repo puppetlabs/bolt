@@ -6,13 +6,26 @@ require 'bolt/node/result'
 module Bolt
   class SSH < Node
     def connect
-      options = { logger: @transport_logger,
-                  non_interactive: true }
+      options = {
+        logger: @transport_logger,
+        non_interactive: true
+      }
+
       options[:port] = @port if @port
       options[:password] = @password if @password
+      options[:verify_host_key] = if @insecure
+                                    Net::SSH::Verifiers::Lenient.new
+                                  else
+                                    Net::SSH::Verifiers::Secure.new
+                                  end
 
       @session = Net::SSH.start(@host, @user, options)
       @logger.debug { "Opened session" }
+    rescue Net::SSH::HostKeyError => e
+      raise Bolt::Node::ConnectError.new(
+        "Host key verification failed for #{@uri}: #{e.message}",
+        'HOST_KEY_ERROR'
+      )
     end
 
     def disconnect
