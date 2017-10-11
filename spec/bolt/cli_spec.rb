@@ -73,6 +73,38 @@ describe "Bolt::CLI" do
       expect(cli.parse).to include(nodes: %w[foo bar])
     end
 
+    it "reads from stdin when --nodes is '-'" do
+      nodes = <<NODES
+foo
+bar
+NODES
+      cli = Bolt::CLI.new(%w[command run --nodes -])
+      allow(STDIN).to receive(:read).and_return(nodes)
+      result = cli.parse
+      expect(result[:nodes]).to eq(%w[foo bar])
+    end
+
+    it "reads from a file when --nodes starts with @" do
+      nodes = <<NODES
+foo
+bar
+NODES
+      with_tempfile_containing('nodes-args', nodes) do |file|
+        cli = Bolt::CLI.new(%W[command run --nodes @#{file.path}])
+        result = cli.parse
+        expect(result[:nodes]).to eq(%w[foo bar])
+      end
+    end
+
+    it "strips leading and trailing whitespace" do
+      nodes = "  foo\nbar  \nbaz\nqux  "
+      with_tempfile_containing('nodes-args', nodes) do |file|
+        cli = Bolt::CLI.new(%W[command run --nodes @#{file.path}])
+        result = cli.parse
+        expect(result[:nodes]).to eq(%w[foo bar baz qux])
+      end
+    end
+
     it "generates an error message if no nodes given" do
       cli = Bolt::CLI.new(%w[command run --nodes])
       expect {

@@ -98,16 +98,18 @@ HELP
     def create_option_parser(results)
       OptionParser.new('') do |opts|
         opts.on(
-          '-n', '--nodes x,y,z', Array,
+          '-n', '--nodes NODES',
           'Node(s) to connect to in URI format [protocol://]host[:port]',
           'Eg. --nodes bolt.puppet.com',
           'Eg. --nodes localhost,ssh://nix.com:2222,winrm://windows.puppet.com',
           "\n",
+          '* NODES can either be comma-separated, \'@<file>\' to read',
+          '* nodes from a file, or \'-\' to read from stdin',
           '* Windows nodes must specify protocol with winrm://',
           '* protocol is `ssh` by default, may be `ssh` or `winrm`',
           '* port is `22` by default for SSH, `5985` for winrm (Optional)'
         ) do |nodes|
-          results[:nodes] = nodes
+          results[:nodes] = parse_nodes(nodes)
         end
         opts.on('-u', '--user USER',
                 "User to authenticate as (Optional)") do |user|
@@ -210,6 +212,11 @@ HELP
                         BANNER
                       end
       puts parser.help
+    end
+
+    def parse_nodes(nodes)
+      list = get_arg_input(nodes)
+      list.split(/[[:space:],]+/).reject(&:empty?)
     end
 
     def parse_params(params)
