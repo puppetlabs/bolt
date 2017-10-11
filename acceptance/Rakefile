@@ -56,6 +56,7 @@ namespace :ci do
       task.add_env({:name     => 'GIT_SERVER', :default => 'https://github.com'})
       task.add_env({:name     => 'GIT_FORK', :default => 'puppetlabs/bolt.git'})
       task.add_env({:name     => 'GIT_BRANCH', :default => 'master'})
+      task.add_env({:name     => 'GIT_SHA', :default => ''})
       task.add_env({:name     => 'SSH_USER', :default => 'root'})
       task.add_env({:name     => 'SSH_PASSWORD'})
       task.add_env({:name     => 'WINRM_USER', :default => 'Administrator'})
