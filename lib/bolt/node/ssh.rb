@@ -21,6 +21,11 @@ module Bolt
 
       @session = Net::SSH.start(@host, @user, options)
       @logger.debug { "Opened session" }
+    rescue SocketError, SystemCallError => e
+      raise Bolt::Node::ConnectError.new(
+        "Failed to connect to #{@uri}: #{e.message}",
+        'CONNECT_ERROR'
+      )
     rescue Net::SSH::HostKeyError => e
       raise Bolt::Node::ConnectError.new(
         "Host key verification failed for #{@uri}: #{e.message}",

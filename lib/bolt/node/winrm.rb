@@ -17,7 +17,13 @@ module Bolt
 
     def connect
       @session = @connection.shell(@shell)
+      @session.run('$PSVersionTable.PSVersion')
       @logger.debug { "Opened session" }
+    rescue SocketError, SystemCallError => e
+      raise Bolt::Node::ConnectError.new(
+        "Failed to connect to #{@uri}: #{e.message}",
+        'CONNECT_ERROR'
+      )
     end
 
     def disconnect

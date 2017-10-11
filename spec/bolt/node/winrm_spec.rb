@@ -16,6 +16,31 @@ describe Bolt::WinRM do
   before(:each) { winrm.connect }
   after(:each) { winrm.disconnect }
 
+  context "when connecting fails", vagrant: true do
+    it "raises Node::ConnectError if the node name can't be resolved" do
+      winrm = Bolt::WinRM.new('totally-not-there', port, user, password)
+      expect {
+        winrm.connect
+      }.to raise_error do |ex|
+        expect(ex).to be_a(Bolt::Node::ConnectError)
+        expect(ex.issue_code).to eq('CONNECT_ERROR')
+        expect(ex.message).to match(/Failed to connect to/)
+      end
+    end
+
+    it "raises Node::ConnectError if the connection is refused" do
+      skip("Test takes too long due to long connection timeout")
+      winrm = Bolt::WinRM.new(host, 65535, user, password)
+      expect {
+        winrm.connect
+      }.to raise_error do |ex|
+        expect(ex).to be_a(Bolt::Node::ConnectError)
+        expect(ex.issue_code).to eq('CONNECT_ERROR')
+        expect(ex.message).to match(/Failed to connect to/)
+      end
+    end
+  end
+
   it "executes a command on a host", vagrant: true do
     expect(winrm.execute(command).value).to eq("vagrant\r\n")
   end

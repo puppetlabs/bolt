@@ -41,8 +41,33 @@ describe Bolt::SSH do
     it "rejects the connection if host key verification fails" do
       expect {
         ssh.connect
-      }.to raise_error(Bolt::Node::ConnectError,
-                       /Host key verification failed/)
+      }.to raise_error do |ex|
+        expect(ex).to be_a(Bolt::Node::ConnectError)
+        expect(ex.issue_code).to eq('HOST_KEY_ERROR')
+        expect(ex.message).to match(/Host key verification failed/)
+      end
+    end
+
+    it "returns Node::ConnectError if the node name can't be resolved" do
+      ssh = Bolt::SSH.new('totally-not-there', port)
+      expect {
+        ssh.connect
+      }.to raise_error do |ex|
+        expect(ex).to be_a(Bolt::Node::ConnectError)
+        expect(ex.issue_code).to eq('CONNECT_ERROR')
+        expect(ex.message).to match(/Failed to connect to/)
+      end
+    end
+
+    it "returns Node::ConnectError if the connection is refused" do
+      ssh = Bolt::SSH.new(hostname, 65535, user, password, insecure: true)
+      expect {
+        ssh.connect
+      }.to raise_error do |ex|
+        expect(ex).to be_a(Bolt::Node::ConnectError)
+        expect(ex.issue_code).to eq('CONNECT_ERROR')
+        expect(ex.message).to match(/Failed to connect to/)
+      end
     end
   end
 
