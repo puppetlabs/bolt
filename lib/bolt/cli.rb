@@ -107,6 +107,15 @@ HELP
           '* protocol is `ssh` by default, may be `ssh` or `winrm`',
           '* port is `22` by default for SSH, `5985` for winrm (Optional)'
         ) do |nodes|
+          # Reject simple mistakes in nodes. Failures are unclear when the
+          # arguemnt to the next (consumed) option is reported as invalid
+          #
+          # simple checking has to happen here instead of validate
+          nodes.each do |node|
+            if ['-u','-p','-c','-h'].include?(node)
+              raise Bolt::CLIError, "#{node.inspect} does not look like a node"
+            end
+          end
           results[:nodes] = nodes
         end
         opts.on('-u', '--user USER',
@@ -257,6 +266,8 @@ HELP
       unless options[:nodes] || options[:mode] == 'plan'
         raise Bolt::CLIError, "option --nodes must be specified"
       end
+
+
     end
 
     def handle_parser_errors
