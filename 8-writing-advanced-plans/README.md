@@ -53,7 +53,7 @@ plan exercise8::yesorno(String $nodes) {
 
 In the above plan we:
 
-* Aceept a comma-separated list of nodes
+* Accept a comma-separated list of nodes
 * Run the `exercise8::yesorno` task from above on all of our nodes
 * Store the results of running the task in the variable `$results`. This will contain a `Struct` containing the node names and the data parsed from the JSON response from the task
 * We filter the list of nodes into the `$subset` variable for only those that answered `true`
