@@ -1,7 +1,8 @@
-test_name "C100546: bolt command run should execute command on remote hosts via ssh" do
+test_name "C100546: bolt command run should execute command on remote hosts\
+           via ssh" do
   step "execute `bolt command run` via SSH" do
-    ssh_nodes = select_hosts({:roles => ['ssh']})
-    nodes_csv = ssh_nodes.map { |host| host.hostname }.join(',')
+    ssh_nodes = select_hosts(roles: ['ssh'])
+    nodes_csv = ssh_nodes.map(&:hostname).join(',')
     command = 'hostname -f'
     bolt_command = "bolt command run --nodes #{nodes_csv} '#{command}'"
     case bolt['platform']

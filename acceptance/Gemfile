@@ -1,21 +1,26 @@
 source ENV['GEM_SOURCE'] || "https://rubygems.org"
 
 def location_for(place, fake_version = nil)
-  if place =~ /^(git:[^#]*)#(.*)/
-    [fake_version, { :git => $1, :branch => $2, :require => false }].compact
-  elsif place =~ /^file:\/\/(.*)/
-    ['>= 0', { :path => File.expand_path($1), :require => false }]
+  git_match = place.match(/^(git:[^#]*)#(.*)/)
+  file_match = place.match(%r{^file://(.*)})
+  if git_match
+    git, branch = git_match.captures
+    [fake_version, { git: git, branch: branch, require: false }].compact
+  elsif file_match
+    file_path = file_match[1]
+    ['>= 0', { path: File.expand_path(file_path), require: false }]
   else
-    [place, { :require => false }]
+    [place, { require: false }]
   end
 end
 
 gem "beaker", *location_for(ENV['BEAKER_VERSION'] || "~> 3.10")
-gem "beaker-hostgenerator", *location_for(ENV['BEAKER_HOSTGENERATOR_VERSION'] || "~> 0.3")
 gem "beaker-abs", *location_for(ENV['BEAKER_ABS_VERSION'] || "~> 0.2")
+gem "beaker-hostgenerator",
+    *location_for(ENV['BEAKER_HOSTGENERATOR_VERSION'] || "~> 0.3")
 gem 'rake', "~> 10.1.0"
 gem 'rototiller'
 
-if File.exists? "#{__FILE__}.local"
-  eval(File.read("#{__FILE__}.local"), binding)
+if File.exist? "Gemfile.local"
+  eval_gemfile "Gemfile.local"
 end
