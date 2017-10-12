@@ -168,6 +168,21 @@ NODES
     end
   end
 
+  describe "timeout" do
+    it "accepts a specific timeout" do
+      cli = Bolt::CLI.new(%w[command run --timeout 123 --nodes foo])
+      expect(cli.parse).to include(timeout: 123)
+    end
+
+    it "generates an error message if no timeout value is given" do
+      cli = Bolt::CLI.new(%w[command run --nodes foo --timeout])
+      expect {
+        cli.parse
+      }.to raise_error(Bolt::CLIError,
+                       /option '--timeout' needs a parameter/)
+    end
+  end
+
   describe "modules" do
     it "accepts a modules directory" do
       cli = Bolt::CLI.new(%w[command run --modules ./modules --nodes foo])

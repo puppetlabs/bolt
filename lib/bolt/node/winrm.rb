@@ -9,9 +9,14 @@ module Bolt
 
       @shell = shell
       @endpoint = "http://#{host}:#{port}/wsman"
-      @connection = ::WinRM::Connection.new(endpoint: @endpoint,
-                                            user: @user,
-                                            password: @password)
+      options = { endpoint: @endpoint,
+                  user: @user,
+                  password: @password }
+      if @timeout then
+        options[:receive_timeout] = @timeout
+        options[:operation_timeout] = @timeout
+      end
+      @connection = ::WinRM::Connection.new(options)
       @connection.logger = @transport_logger
     end
 
