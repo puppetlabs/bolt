@@ -73,6 +73,11 @@ describe "Bolt::CLI" do
       expect(cli.parse).to include(nodes: %w[foo bar])
     end
 
+    it "accepts multiple nodes across multiple declarations" do
+      cli = Bolt::CLI.new(%w[command run --nodes foo,bar --nodes bar,more,bars])
+      expect(cli.parse).to include(nodes: %w[foo bar more bars])
+    end
+
     it "reads from stdin when --nodes is '-'" do
       nodes = <<NODES
 foo
@@ -255,7 +260,7 @@ NODES
       cli = Bolt::CLI.new(%w[plan run my::plan kj=2hv iuhg=iube 2whf=lcv
                              --modulepath .])
       result = cli.parse
-      expect(result[:task_options]).to eq('kj' => '2hv',
+      expect(result[:task_options]).to eq('kj'   => '2hv',
                                           'iuhg' => 'iube',
                                           '2whf' => 'lcv')
     end
@@ -265,7 +270,7 @@ NODES
       cli = Bolt::CLI.new(['plan', 'run', 'my::plan', '--params', json_args,
                            '--modulepath', '.'])
       result = cli.parse
-      expect(result[:task_options]).to eq('kj' => '2hv',
+      expect(result[:task_options]).to eq('kj'   => '2hv',
                                           'iuhg' => 'iube',
                                           '2whf' => 'lcv')
     end
@@ -292,7 +297,7 @@ NODES
         cli = Bolt::CLI.new(%W[plan run my::plan --params @#{file.path}
                                --modulepath .])
         result = cli.parse
-        expect(result[:task_options]).to eq('kj' => '2hv',
+        expect(result[:task_options]).to eq('kj'   => '2hv',
                                             'iuhg' => 'iube',
                                             '2whf' => 'lcv')
       end
@@ -313,7 +318,7 @@ NODES
       cli = Bolt::CLI.new(%w[plan run my::plan --params - --modulepath .])
       allow(STDIN).to receive(:read).and_return(json_args)
       result = cli.parse
-      expect(result[:task_options]).to eq('kj' => '2hv',
+      expect(result[:task_options]).to eq('kj'   => '2hv',
                                           'iuhg' => 'iube',
                                           '2whf' => 'lcv')
     end
