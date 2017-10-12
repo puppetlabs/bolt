@@ -1,9 +1,11 @@
 require 'spec_helper'
+require 'bolt_spec/errors'
 require 'bolt_spec/files'
 require 'bolt/node'
 require 'bolt/node/winrm'
 
 describe Bolt::WinRM do
+  include BoltSpec::Errors
   include BoltSpec::Files
 
   let(:host) { 'localhost' }
@@ -15,6 +17,52 @@ describe Bolt::WinRM do
 
   before(:each) { winrm.connect }
   after(:each) { winrm.disconnect }
+
+  def stub_winrm_to_raise(klass, message)
+    shell = double('powershell')
+    allow_any_instance_of(WinRM::Connection)
+      .to receive(:shell).and_return(shell)
+    allow(shell).to receive(:run).and_raise(klass, message)
+  end
+
+  context "when connecting fails", vagrant: true do
+    it "raises Node::ConnectError if the node name can't be resolved" do
+      winrm = Bolt::WinRM.new('totally-not-there', port, user, password)
+      expect_node_error(Bolt::Node::ConnectError,
+                        'CONNECT_ERROR',
+                        /Failed to connect to/) do
+        winrm.connect
+      end
+    end
+
+    it "raises Node::ConnectError if the connection is refused" do
+      winrm = Bolt::WinRM.new(host, 65535, user, password)
+
+      stub_winrm_to_raise(
+        Errno::ECONNREFUSED,
+        "Connection refused - connect(2) for \"#{host}\" port #{port}"
+      )
+
+      expect_node_error(Bolt::Node::ConnectError,
+                        'CONNECT_ERROR',
+                        /Failed to connect to/) do
+        winrm.connect
+      end
+    end
+
+    it "raises Node::ConnectError if authentication fails" do
+      winrm = Bolt::WinRM.new(host, port, user, 'whoops wrong password')
+
+      stub_winrm_to_raise(::WinRM::WinRMAuthorizationError, "")
+
+      expect_node_error(
+        Bolt::Node::ConnectError, 'AUTH_ERROR',
+        %r{Authentication failed for http://#{host}:#{port}/wsman}
+      ) do
+        winrm.connect
+      end
+    end
+  end
 
   it "executes a command on a host", vagrant: true do
     expect(winrm.execute(command).value).to eq("vagrant\r\n")
@@ -41,7 +89,7 @@ describe Bolt::WinRM do
     end
   end
 
-  it "can run a script remotely", vagrant: true do
+  it "can run a task remotely", vagrant: true do
     contents = 'Write-Output "$env:PT_message_one" ${env:PT_message two}'
     arguments = { :message_one => 'task is running',
                   :"message two" => 'task has run' }
