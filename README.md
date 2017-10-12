@@ -209,6 +209,16 @@ Bolt can use the Puppet orchestrator to target nodes using the `pcp` protocol wh
     Usage: bolt <subcommand> <action> [options]
     ...
 
+### Run a command locally
+
+    $ bolt command run 'ssh -V' --nodes local://localhost
+    localhost:
+
+    OpenSSH_5.3p1, OpenSSL 1.0.1e-fips 11 Feb 2013
+
+    Ran on 1 node in 0.27 seconds
+
+
 ### Run a command over SSH
 
     $ bolt command run 'ssh -V' --nodes neptune
