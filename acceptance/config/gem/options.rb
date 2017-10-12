@@ -1,6 +1,6 @@
 {
-  :pre_suite => [
-    'setup/common/pre-suite/010_Install_ruby.rb',
-    'setup/gem/pre-suite/020_Install.rb',
-  ],
+  pre_suite: [
+    'setup/common/pre-suite/010_install_ruby.rb',
+    'setup/gem/pre-suite/020_install.rb'
+  ]
 }
