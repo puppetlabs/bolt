@@ -168,6 +168,14 @@ NODES
     end
   end
 
+  describe "log level" do
+    it "is not sensitive to ordering of debug and verbose" do
+      cli = Bolt::CLI.new(%w[command run --nodes foo --debug --verbose])
+      cli.parse
+      expect(Bolt.log_level).to eq(Logger::DEBUG)
+    end
+  end
+
   describe "insecure" do
     it "accepts `-k`" do
       cli = Bolt::CLI.new(%w[command run -k --nodes foo])

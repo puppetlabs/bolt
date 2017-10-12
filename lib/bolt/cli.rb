@@ -145,10 +145,10 @@ HELP
           results[:help] = true
         end
         opts.on_tail('--verbose', 'Display verbose logging') do |_|
-          Bolt.log_level = Logger::INFO
+          results[:verbose] = true
         end
         opts.on_tail('--debug', 'Display debug logging') do |_|
-          Bolt.log_level = Logger::DEBUG
+          results[:debug] = true
         end
         opts.on_tail('--version', 'Display the version') do |_|
           puts Bolt::VERSION
@@ -177,6 +177,12 @@ HELP
 
       options[:action] = remaining.shift
       options[:object] = remaining.shift
+
+      if options[:debug]
+        Bolt.log_level = Logger::DEBUG
+      elsif options[:verbose]
+        Bolt.log_level = Logger::INFO
+      end
 
       if options[:help]
         print_help(options[:mode])
