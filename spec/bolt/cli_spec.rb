@@ -73,6 +73,11 @@ describe "Bolt::CLI" do
       expect(cli.parse).to include(nodes: %w[foo bar])
     end
 
+    it "accepts multiple --nodes arguments" do
+      cli = Bolt::CLI.new(%w[command run --nodes a --nodes b])
+      expect(cli.parse).to include(nodes: %w[a b])
+    end
+
     it "reads from stdin when --nodes is '-'" do
       nodes = <<NODES
 foo
