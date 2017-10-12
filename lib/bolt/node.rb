@@ -16,6 +16,8 @@ module Bolt
                 Bolt::WinRM
               when 'pcp'
                 Bolt::Orch
+              when 'local'
+                Bolt::Local
               else
                 Bolt::SSH
               end

@@ -56,7 +56,7 @@ module Bolt
     end
 
     def with_remote_file(file)
-      remote_path = ''
+      local_path = ''
       dir = ''
       result = nil
 
