@@ -127,7 +127,7 @@ PS
     with_tempfile_containing('script-test-winrm', contents) do |file|
       expect(
         winrm._run_script(file.path, []).value
-      ).to eq("hellote\r\n\r\n")
+      ).to eq("hellote\r\n")
     end
   end
 
@@ -150,7 +150,6 @@ with spaces\r
 'a b'\r
 a 'b' c\r
 a 'b' c\r
-\r
 QUOTED
     end
   end
@@ -172,7 +171,6 @@ a\r
 b\r
 a b c\r
 a b c\r
-\r
 QUOTED
     end
   end
@@ -186,8 +184,18 @@ QUOTED
         ).value
       ).to eq(<<SHELLWORDS)
 echo $env:path\r
-\r
 SHELLWORDS
+    end
+  end
+
+  it "does not deadlock scripts that write > 4k to stderr", winrm: true do
+    contents = <<-PS
+    $bytes_in_k = (1024 * 4) + 1
+    [Text.Encoding]::UTF8.GetString((New-Object Byte[] ($bytes_in_k))) | Write-Error
+    PS
+
+    with_tempfile_containing('script-test-winrm', contents) do |file|
+      expect(winrm._run_script(file.path, [])).to be_success
     end
   end
 
@@ -197,7 +205,7 @@ SHELLWORDS
                   :"message two" => 'task has run' }
     with_tempfile_containing('task-test-winrm', contents) do |file|
       expect(winrm._run_task(file.path, 'environment', arguments).value)
-        .to eq("task is running\r\ntask has run\r\n\r\n")
+        .to eq("task is running\r\ntask has run\r\n")
     end
   end
 
@@ -223,10 +231,11 @@ PS
     with_tempfile_containing('tasks-test-both-winrm', contents) do |file|
       expect(
         winrm._run_task(file.path, 'both', arguments).value
-      ).to eq(['Hello from task',
-               'Goodbye',
-               '{"message_one":"Hello from task","message_two":"Goodbye"}',
-               "\r\n"].join("\r\n"))
+      ).to eq([
+        "Hello from task\r\n",
+        "Goodbye\r\n",
+        "{\"message_one\":\"Hello from task\",\"message_two\":\"Goodbye\"}\r\n"
+      ].join(''))
     end
   end
 

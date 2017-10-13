@@ -77,13 +77,30 @@ function Invoke-Interpreter
   $startInfo.RedirectStandardOutput = $true
   $startInfo.RedirectStandardError = $true
 
+  $stdoutHandler = { if (-not ([String]::IsNullOrEmpty($EventArgs.Data))) { $Host.UI.WriteLine($EventArgs.Data) } }
+  $stderrHandler = { if (-not ([String]::IsNullOrEmpty($EventArgs.Data))) { $Host.UI.WriteErrorLine($EventArgs.Data) } }
+
   try
   {
-    $process = [System.Diagnostics.Process]::Start($startInfo)
+    $process = New-Object System.Diagnostics.Process
+    $process.StartInfo = $startInfo
+    $process.EnableRaisingEvents = $true
+
+    # https://msdn.microsoft.com/en-us/library/system.diagnostics.process.standarderror(v=vs.110).aspx#Anchor_2
+    $stdoutEvent = Register-ObjectEvent -InputObject $process -EventName 'OutputDataReceived' -Action $stdoutHandler
+    $stderrEvent = Register-ObjectEvent -InputObject $process -EventName 'ErrorDataReceived' -Action $stderrHandler
+
+    $process.Start() | Out-Null
+
+    $process.BeginOutputReadLine()
+    $process.BeginErrorReadLine()
   }
   catch
   {
     $Host.UI.WriteErrorLine($_)
+    @($stdoutEvent, $stderrEvent) |
+      ? { $_ -ne $Null } |
+      % { Unregister-Event -SourceIdentifier $_.Name }
     if ($process -ne $Null) { $process.Dispose() }
     return 1
   }
@@ -94,13 +111,9 @@ function Invoke-Interpreter
     $process.StandardInput.Close()
   }
 
-  # streams must have .ReadToEnd() called prior to process .WaitForExit()
-  # to prevent deadlocks per MSDN
-  # https://msdn.microsoft.com/en-us/library/system.diagnostics.process.standarderror(v=vs.110).aspx#Anchor_2
-  $process.StandardOutput.ReadToEnd() | Out-Host
-  $stderr = $process.StandardError.ReadToEnd()
-  if ($stderr) { $Host.UI.WriteErrorLine($stderr) }
   $process.WaitForExit($Timeout) | Out-Null
+
+  @($stdoutEvent, $stderrEvent) | % { Unregister-Event -SourceIdentifier $_.Name }
 
   if (! ($process.HasExited))
   {
