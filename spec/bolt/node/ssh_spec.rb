@@ -79,6 +79,19 @@ describe Bolt::SSH do
         ssh.connect
       end
     end
+
+    it "returns Node::ConnectError if the connection times out" do
+      allow(Net::SSH)
+        .to receive(:start)
+        .and_raise(Net::SSH::ConnectionTimeout)
+
+      ssh = Bolt::SSH.new(hostname, port, user, password, insecure: true)
+      expect_node_error(Bolt::Node::ConnectError,
+                        'CONNECT_ERROR',
+                        /Failed to connect to/) do
+        ssh.connect
+      end
+    end
   end
 
   context "when executing" do
