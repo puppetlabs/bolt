@@ -2,7 +2,9 @@ source ENV['GEM_SOURCE'] || 'https://rubygems.org'
 
 gemspec
 
-gem "rubocop", require: false
+group(:test) do
+  gem "rubocop", require: false
+end
 
 if File.exist? "Gemfile.local"
   eval_gemfile "Gemfile.local"
