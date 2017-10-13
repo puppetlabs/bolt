@@ -5,18 +5,13 @@ module Bolt
     end
 
     def parse(string)
-      case string
-      when %r{^(ssh|winrm|pcp)://.*:\d+$}
-        URI(string)
-      when %r{^pcp://}
-        URI(string)
-      when %r{^(ssh|winrm)://}
-        uri = URI(string)
-        uri.port = 5985 if uri.scheme == 'winrm'
-        uri
-      else
-        URI("ssh://#{string}")
-      end
+      uri = if string =~ %r{^(ssh|winrm|pcp)://}
+              Addressable::URI.parse(string)
+            else
+              Addressable::URI.parse("ssh://#{string}")
+            end
+      uri.port ||= 5985 if uri.scheme == 'winrm'
+      uri
     end
 
     def hostname
