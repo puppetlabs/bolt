@@ -38,6 +38,13 @@ to install `ruby.devkit`, as ffi already publishes precompiled gems for Windows 
     choco install ruby
     refreshenv
 
+If you wish to use `rubocop` on Windows it is necessary to install the `ruby.devkit` and the
+MSYS2 base package.
+
+    choco install ruby.devkit
+    refreshenv
+    ridk install    # Choose the base install and complete the Wizard selections.
+
 ## Installing Bolt
 
 Bolt can be installed 3 ways depending on your use case. The most common case is
@@ -52,8 +59,12 @@ Or add this to your Gemfile if you are using [Bundler](https://bundler.io)
 Or if running from source
 
     git submodule update --init --recursive
-    bundle install --path .bundle
+    bundle install --path .bundle --without test
     bundle exec bolt ...
+
+If you wish to use `rubocop`, perform the bundle install with no exclusions
+
+    bundle install --path .bundle
 
 See `bolt --help` for more details.
 
