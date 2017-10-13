@@ -1,3 +1,5 @@
+require 'addressable'
+
 module Bolt
   class NodeURI
     def initialize(string)
@@ -23,11 +25,15 @@ module Bolt
     end
 
     def user
-      @uri.user
+      Addressable::URI.unencode_component(
+        @uri.user
+      )
     end
 
     def password
-      @uri.password
+      Addressable::URI.unencode_component(
+        @uri.password
+      )
     end
 
     def scheme
