@@ -47,4 +47,20 @@ describe Bolt::NodeURI do
       expect(uri.port).to be_nil
     end
   end
+
+  describe "with pcp" do
+    it "accepts 'pcp://pluto:666'" do
+      uri = Bolt::NodeURI.new('pcp://pluto:666')
+      expect(uri.scheme).to eq('pcp')
+      expect(uri.hostname).to eq('pluto')
+      expect(uri.port).to eq(666)
+    end
+
+    it "accepts 'pcp://pluto' without a port" do
+      uri = Bolt::NodeURI.new('pcp://pluto')
+      expect(uri.scheme).to eq('pcp')
+      expect(uri.hostname).to eq('pluto')
+      expect(uri.port).to be_nil
+    end
+  end
 end
