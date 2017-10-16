@@ -26,18 +26,18 @@ Usage: bolt <subcommand> <action> [options]
 Available subcommands:
     bolt command run <command>       Run a command remotely
     bolt script run <script>         Upload a local script and run it remotely
-    bolt task run <task> [params]    Run a Puppet Task
-    bolt plan run <plan> [params]    Run a plan
+    bolt task run <task> [params]    Run a Puppet task
+    bolt plan run <plan> [params]    Run a Puppet task plan
     bolt file upload <src> <dest>    Upload a local file
 
 where [options] are:
 HELP
 
     TASK_HELP = <<-HELP.freeze
-Usage: bolt task <action> [options] [parameters]
+Usage: bolt task <action> <task> [options] [parameters]
 
 Available actions are:
-    run                              Run a task
+    run                              Run a Puppet task
 
 Parameters are of the form <parameter>=<value>.
 
@@ -66,7 +66,7 @@ HELP
 Usage: bolt plan <action> <plan> [options] [parameters]
 
 Available actions are:
-    run                              Run a plan
+    run                              Run a Puppet task plan
 
 Parameters are of the form <parameter>=<value>.
 
