@@ -105,6 +105,11 @@ NODES
       end
     end
 
+    it "accepts multiple nodes but is uniq" do
+      cli = Bolt::CLI.new(%w[command run --nodes foo,bar,foo])
+      expect(cli.parse).to include(nodes: %w[foo bar])
+    end
+
     it "generates an error message if no nodes given" do
       cli = Bolt::CLI.new(%w[command run --nodes])
       expect {

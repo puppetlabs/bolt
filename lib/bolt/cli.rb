@@ -227,7 +227,7 @@ HELP
 
     def parse_nodes(nodes)
       list = get_arg_input(nodes)
-      list.split(/[[:space:],]+/).reject(&:empty?)
+      list.split(/[[:space:],]+/).reject(&:empty?).uniq
     end
 
     def parse_params(params)
