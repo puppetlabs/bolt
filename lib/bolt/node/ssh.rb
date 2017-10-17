@@ -31,7 +31,7 @@ module Bolt
         "Host key verification failed for #{@uri}: #{e.message}",
         'HOST_KEY_ERROR'
       )
-    rescue Net::SSH::Exception, SocketError, SystemCallError => e
+    rescue StandardError => e
       raise Bolt::Node::ConnectError.new(
         "Failed to connect to #{@uri}: #{e.message}",
         'CONNECT_ERROR'

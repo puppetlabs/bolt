@@ -19,15 +19,15 @@ module Bolt
       @session = @connection.shell(@shell)
       @session.run('$PSVersionTable.PSVersion')
       @logger.debug { "Opened session" }
-    rescue SocketError, SystemCallError => e
-      raise Bolt::Node::ConnectError.new(
-        "Failed to connect to #{@uri}: #{e.message}",
-        'CONNECT_ERROR'
-      )
     rescue ::WinRM::WinRMAuthorizationError
       raise Bolt::Node::ConnectError.new(
         "Authentication failed for #{@endpoint}",
         'AUTH_ERROR'
+      )
+    rescue StandardError => e
+      raise Bolt::Node::ConnectError.new(
+        "Failed to connect to #{@uri}: #{e.message}",
+        'CONNECT_ERROR'
       )
     end
 
