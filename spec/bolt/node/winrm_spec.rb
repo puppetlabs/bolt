@@ -3,6 +3,7 @@ require 'bolt_spec/errors'
 require 'bolt_spec/files'
 require 'bolt/node'
 require 'bolt/node/winrm'
+require 'httpclient'
 
 describe Bolt::WinRM do
   include BoltSpec::Errors
@@ -42,6 +43,17 @@ describe Bolt::WinRM do
         Errno::ECONNREFUSED,
         "Connection refused - connect(2) for \"#{host}\" port #{port}"
       )
+
+      expect_node_error(Bolt::Node::ConnectError,
+                        'CONNECT_ERROR',
+                        /Failed to connect to/) do
+        winrm.connect
+      end
+    end
+
+    it "raises Node::ConnectError if the connection times out" do
+      winrm = Bolt::WinRM.new(host, port, user, password)
+      stub_winrm_to_raise(HTTPClient::ConnectTimeoutError, 'execution expired')
 
       expect_node_error(Bolt::Node::ConnectError,
                         'CONNECT_ERROR',
