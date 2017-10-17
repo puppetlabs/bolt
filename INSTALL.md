@@ -29,6 +29,10 @@ gcc compiler and related dependencies (except for Windows).
 Either install XCode or the Command Line Tools. The latter can be done from the command line:
 
      xcode-select --install
+     
+Don't forget to accept the xcode license (or you will still get native extension build errors). This can be done from the command line using the following command:
+     
+     xcodebuild -license accept
 
 ### Windows
 
