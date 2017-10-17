@@ -29,7 +29,7 @@ Bolt depends on gems containing native extensions. To install Bolt on *nix platf
    * On CentOS 7 or Red Hat Enterprise Linux 7, run `yum install -y make gcc ruby-devel`
    * On Fedora 25, run `dnf install -y make gcc redhat-rpm-config ruby-devel rubygem-rdoc`
    * On Debian 9 or Ubuntu 16.04, run `apt-get install -y make gcc ruby-dev`
-   * On Mac OS X, run `xcode-select --install`
+   * On Mac OS X, run `xcode-select --install`, and then accept the xcode license by running `xcodebuild -license accept`
 
 2. Install Bolt as a gem by running `gem install bolt`
 
