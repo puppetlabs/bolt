@@ -6,6 +6,7 @@ require 'json'
 require 'bolt/node'
 require 'bolt/version'
 require 'bolt/executor'
+require 'io/console'
 
 module Bolt
   class CLIError < RuntimeError
@@ -115,9 +116,15 @@ HELP
                 "User to authenticate as (Optional)") do |user|
           results[:user] = user
         end
-        opts.on('-p', '--password PASSWORD',
+        opts.on('-p', '--password [PASSWORD]',
                 "Password to authenticate as (Optional)") do |password|
-          results[:password] = password
+          if password.nil?
+            STDOUT.print "Please enter your password: "
+            results[:password] = STDIN.noecho(&:gets).chomp
+            STDOUT.puts
+          else
+            results[:password] = password
+          end
         end
         results[:concurrency] = 100
         opts.on('-c', '--concurrency CONCURRENCY', Integer,
