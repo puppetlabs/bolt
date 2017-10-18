@@ -23,15 +23,16 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = "~> 2.0"
 
-  spec.add_dependency "net-ssh", "~> 4.0"
+  spec.add_dependency "addressable", "~> 2.5"
+  spec.add_dependency "concurrent-ruby", "~> 1.0"
   spec.add_dependency "net-sftp", "~> 2.0"
+  spec.add_dependency "net-ssh", "~> 4.0"
+  spec.add_dependency "orchestrator_client", "~> 0.2.1"
   spec.add_dependency "winrm", "~> 2.0"
   spec.add_dependency "winrm-fs", "~> 1.0"
-  spec.add_dependency "concurrent-ruby", "~> 1.0"
-  spec.add_dependency "addressable", "~> 2.5"
-  spec.add_dependency "orchestrator_client", "~> 0.2.1"
 
   # Dependencies of our vendored puppet, etc
+  spec.add_dependency "CFPropertyList", "~> 2.2"
   spec.add_dependency "gettext-setup", "< 1", ">= 0.10"
   spec.add_dependency "locale", "~> 2.1"
   spec.add_dependency "minitar", "~> 0.6.1"
@@ -39,7 +40,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "win32-process", "= 0.7.5"
   spec.add_dependency "win32-security", "= 0.2.5"
   spec.add_dependency "win32-service", "= 0.8.8"
-  spec.add_dependency "CFPropertyList", "~> 2.2"
 
   spec.add_development_dependency "bundler", "~> 1.14"
   spec.add_development_dependency "rake", "~> 10.0"

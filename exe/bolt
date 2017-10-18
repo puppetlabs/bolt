@@ -10,6 +10,6 @@ begin
 rescue Bolt::CLIExit
   exit
 rescue Bolt::CLIError => e
-  $stderr.puts e.message
+  warn e.message
   exit e.error_code
 end
