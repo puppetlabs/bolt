@@ -2,14 +2,14 @@ require 'logger'
 require 'bolt/node_uri'
 require 'bolt/node/formatter'
 require 'bolt/result'
+require 'bolt/config'
 
 module Bolt
   class Node
     STDIN_METHODS       = %w[both stdin].freeze
     ENVIRONMENT_METHODS = %w[both environment].freeze
 
-    def self.from_uri(uri_string, default_user = nil, default_password = nil,
-                      **kwargs)
+    def self.from_uri(uri_string, **kwargs)
       uri = NodeURI.new(uri_string)
       klass = case uri.scheme
               when 'winrm'
@@ -21,23 +21,23 @@ module Bolt
               end
       klass.new(uri.hostname,
                 uri.port,
-                uri.user || default_user || Bolt.config[:user],
-                uri.password || default_password || Bolt.config[:password],
-                uri: uri_string, **kwargs)
+                uri.user,
+                uri.password,
+                uri: uri_string,
+                **kwargs)
     end
 
     attr_reader :logger, :host, :uri, :user, :password
 
-    def initialize(host, port = nil, user = nil,
-                   password = nil, tty: false, uri: nil,
-                   insecure: false,
+    def initialize(host, port = nil, user = nil, password = nil, uri: nil,
+                   config: Bolt::Config.new,
                    log_level: Bolt.log_level || Logger::WARN)
       @host = host
-      @user = user
       @port = port
-      @password = password
-      @tty = tty
-      @insecure = insecure
+      @user = user || config[:user]
+      @password = password || config[:password]
+      @tty = config[:tty]
+      @insecure = config[:insecure]
       @uri = uri
 
       @logger = init_logger(level: log_level)

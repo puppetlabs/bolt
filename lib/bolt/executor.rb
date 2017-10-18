@@ -1,22 +1,25 @@
 require 'concurrent'
 require 'bolt/result'
+require 'bolt/config'
 
 module Bolt
   class Executor
-    def self.from_uris(uris)
-      new(uris.map { |uri| Bolt::Node.from_uri(uri) })
+    def initialize(config = Bolt::Config.new)
+      @config = config
     end
 
-    def initialize(nodes, max_threads = 100)
-      @nodes = nodes
-      @poolsize = [nodes.length, max_threads].min
+    def from_uris(nodes)
+      nodes.map do |node|
+        Bolt::Node.from_uri(node, config: @config)
+      end
     end
 
-    def on_each
+    def on(nodes)
       results = Concurrent::Map.new
 
-      pool = Concurrent::FixedThreadPool.new(@poolsize)
-      @nodes.each { |node|
+      poolsize = [nodes.length, @config[:concurrency]].min
+      pool = Concurrent::FixedThreadPool.new(poolsize)
+      nodes.each { |node|
         pool.post do
           results[node] =
             begin
@@ -38,26 +41,26 @@ module Bolt
       results_to_hash(results)
     end
 
-    def run_command(command)
-      on_each do |node|
+    def run_command(nodes, command)
+      on(nodes) do |node|
         node.run_command(command)
       end
     end
 
-    def run_script(script)
-      on_each do |node|
+    def run_script(nodes, script)
+      on(nodes) do |node|
         node.run_script(script)
       end
     end
 
-    def run_task(task, input_method, arguments)
-      on_each do |node|
+    def run_task(nodes, task, input_method, arguments)
+      on(nodes) do |node|
         node.run_task(task, input_method, arguments)
       end
     end
 
-    def file_upload(source, destination)
-      on_each do |node|
+    def file_upload(nodes, source, destination)
+      on(nodes) do |node|
         node.upload(source, destination)
       end
     end

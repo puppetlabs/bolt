@@ -12,22 +12,17 @@ describe Bolt::Node do
       expect(node.uri).to eq('ssh://iuyergkj:123456@whitehouse.gov')
     end
 
-    it "defaults to globally set user and password" do
-      config = { user: 'somebody',
-                 password: 'very secure' }
-      allow(Bolt).to receive(:config).and_return(config)
-
-      node = Bolt::Node.from_uri('ssh://localhost')
+    it "defaults to specified user and password" do
+      config = Bolt::Config.new(user: 'somebody', password: 'very secure')
+      node = Bolt::Node.from_uri('ssh://localhost', config: config)
       expect(node.user).to eq('somebody')
       expect(node.password).to eq('very secure')
     end
 
-    it "uri overrides global user and password" do
-      config = { user: 'somebody',
-                 password: 'very secure' }
-      allow(Bolt).to receive(:config).and_return(config)
+    it "uri overrides specified user and password" do
+      config = Bolt::Config.new(user: 'somebody', password: 'very secure')
 
-      node = Bolt::Node.from_uri('ssh://toor:better@localhost')
+      node = Bolt::Node.from_uri('ssh://toor:better@localhost', config: config)
       expect(node.user).to eq('toor')
       expect(node.password).to eq('better')
     end

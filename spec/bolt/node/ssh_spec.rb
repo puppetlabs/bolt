@@ -3,6 +3,7 @@ require 'bolt_spec/errors'
 require 'bolt_spec/files'
 require 'bolt/node'
 require 'bolt/node/ssh'
+require 'bolt/config'
 
 describe Bolt::SSH do
   include BoltSpec::Errors
@@ -14,6 +15,7 @@ describe Bolt::SSH do
   let(:port) { 2224 }
   let(:command) { "pwd" }
   let(:ssh) { Bolt::SSH.new(hostname, port, user, password) }
+  let(:insecure) { { config: Bolt::Config.new(insecure: true) } }
 
   context "when connecting", vagrant: true do
     it "performs secure host key verification by default" do
@@ -28,7 +30,7 @@ describe Bolt::SSH do
     end
 
     it "downgrades to lenient if insecure is true" do
-      ssh = Bolt::SSH.new(hostname, port, user, password, insecure: true)
+      ssh = Bolt::SSH.new(hostname, port, user, password, **insecure)
 
       allow(Net::SSH)
         .to receive(:start)
@@ -49,7 +51,7 @@ describe Bolt::SSH do
     end
 
     it "raises ConnectError if authentication fails" do
-      ssh = Bolt::SSH.new(hostname, port, user, password, insecure: true)
+      ssh = Bolt::SSH.new(hostname, port, user, password, **insecure)
 
       allow(Net::SSH)
         .to receive(:start)
@@ -72,7 +74,7 @@ describe Bolt::SSH do
     end
 
     it "returns Node::ConnectError if the connection is refused" do
-      ssh = Bolt::SSH.new(hostname, 65535, user, password, insecure: true)
+      ssh = Bolt::SSH.new(hostname, 65535, user, password)
       expect_node_error(Bolt::Node::ConnectError,
                         'CONNECT_ERROR',
                         /Failed to connect to/) do
@@ -84,8 +86,6 @@ describe Bolt::SSH do
       allow(Net::SSH)
         .to receive(:start)
         .and_raise(Net::SSH::ConnectionTimeout)
-
-      ssh = Bolt::SSH.new(hostname, port, user, password, insecure: true)
       expect_node_error(Bolt::Node::ConnectError,
                         'CONNECT_ERROR',
                         /Failed to connect to/) do
@@ -95,7 +95,7 @@ describe Bolt::SSH do
   end
 
   context "when executing" do
-    let(:ssh) { Bolt::SSH.new(hostname, port, user, password, insecure: true) }
+    let(:ssh) { Bolt::SSH.new(hostname, port, user, password, **insecure) }
 
     before(:each) { ssh.connect }
     after(:each) { ssh.disconnect }

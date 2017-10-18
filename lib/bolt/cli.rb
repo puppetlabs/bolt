@@ -6,6 +6,7 @@ require 'json'
 require 'bolt/node'
 require 'bolt/version'
 require 'bolt/executor'
+require 'bolt/config'
 require 'io/console'
 
 module Bolt
@@ -308,23 +309,26 @@ HELP
                              end
       end
 
+      config = Bolt::Config.new(concurrency: options[:concurrency],
+                                user: options[:user],
+                                password: options[:password],
+                                tty: options[:tty],
+                                insecure: options[:insecure])
+      executor = Bolt::Executor.new(config)
+
       if options[:mode] == 'plan'
-        execute_plan(options)
+        execute_plan(executor, options)
       else
-        nodes = options[:nodes].map do |node|
-          Bolt::Node.from_uri(node, options[:user], options[:password],
-                              tty: options[:tty], insecure: options[:insecure])
-        end
+        nodes = executor.from_uris(options[:nodes])
 
         results = nil
         elapsed_time = Benchmark.realtime do
-          executor = Bolt::Executor.new(nodes, options[:concurrency])
           results =
             case options[:mode]
             when 'command'
-              executor.run_command(options[:object])
+              executor.run_command(nodes, options[:object])
             when 'script'
-              executor.run_script(options[:object])
+              executor.run_script(nodes, options[:object])
             when 'task'
               task_name = options[:object]
 
@@ -332,7 +336,9 @@ HELP
               input_method = metadata['input_method']
 
               input_method ||= 'both'
-              executor.run_task(path, input_method, options[:task_options])
+              executor.run_task(
+                nodes, path, input_method, options[:task_options]
+              )
             when 'file'
               src = options[:object]
               dest = options[:leftovers].first
@@ -343,7 +349,7 @@ HELP
                 raise Bolt::CLIError, "The source file '#{src}' does not exist"
               end
 
-              executor.file_upload(src, dest)
+              executor.file_upload(nodes, src, dest)
             end
         end
 
@@ -351,16 +357,15 @@ HELP
       end
     end
 
-    def execute_plan(options)
-      Bolt.config = options
-      begin
-        result = run_plan(options[:object],
-                          options[:task_options],
-                          options[:modules])
-      rescue Puppet::Error
-        raise Bolt::CLIError, "Exiting because of an error in Puppet code"
+    def execute_plan(executor, options)
+      result = Puppet.override(bolt_executor: executor) do
+        run_plan(options[:object],
+                 options[:task_options],
+                 options[:modules])
       end
       puts result
+    rescue Puppet::Error
+      raise Bolt::CLIError, "Exiting because of an error in Puppet code"
     end
 
     def colorize(result, stream)
