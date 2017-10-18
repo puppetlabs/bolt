@@ -3,29 +3,20 @@ require 'bolt/result'
 
 module Bolt
   class Executor
-    def initialize(concurrency: 100, user: nil, password: nil,
-                   tty: false, insecure: false)
-      @concurrency = concurrency
-      @user = user
-      @password = password
-      @tty = tty
-      @insecure = insecure
+    def initialize(config)
+      @config = config
     end
 
     def from_uris(nodes)
       nodes.map do |node|
-        Bolt::Node.from_uri(node,
-                            user: @user,
-                            password: @password,
-                            tty: @tty,
-                            insecure: @insecure)
+        Bolt::Node.from_uri(node, config: @config)
       end
     end
 
     def on(nodes)
       results = Concurrent::Map.new
 
-      poolsize = [nodes.length, @concurrency].min
+      poolsize = [nodes.length, @config[:concurrency]].min
       pool = Concurrent::FixedThreadPool.new(poolsize)
       nodes.each { |node|
         pool.post do

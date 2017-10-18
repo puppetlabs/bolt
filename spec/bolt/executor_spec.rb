@@ -2,7 +2,8 @@ require 'spec_helper'
 require 'bolt/executor'
 
 describe "Bolt::Executor" do
-  let(:executor) { Bolt::Executor.new }
+  let(:config) { Bolt::Config.new }
+  let(:executor) { Bolt::Executor.new(config) }
   let(:command) { "hostname" }
   let(:script) { '/path/to/script.sh' }
   let(:success) { Bolt::Node::Success.new }

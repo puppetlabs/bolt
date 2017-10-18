@@ -13,18 +13,16 @@ describe Bolt::Node do
     end
 
     it "defaults to specified user and password" do
-      config = { user: 'somebody',
-                 password: 'very secure' }
-      node = Bolt::Node.from_uri('ssh://localhost', config)
+      config = Bolt::Config.new(user: 'somebody', password: 'very secure')
+      node = Bolt::Node.from_uri('ssh://localhost', config: config)
       expect(node.user).to eq('somebody')
       expect(node.password).to eq('very secure')
     end
 
     it "uri overrides specified user and password" do
-      config = { user: 'somebody',
-                 password: 'very secure' }
+      config = Bolt::Config.new(user: 'somebody', password: 'very secure')
 
-      node = Bolt::Node.from_uri('ssh://toor:better@localhost', config)
+      node = Bolt::Node.from_uri('ssh://toor:better@localhost', config: config)
       expect(node.user).to eq('toor')
       expect(node.password).to eq('better')
     end
