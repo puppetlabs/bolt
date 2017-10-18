@@ -147,6 +147,8 @@ NODES
 
     it "prompts the user for password if not specified" do
       allow(STDIN).to receive(:noecho).and_return('opensesame')
+      allow(STDOUT).to receive(:print).with('Please enter your password: ')
+      allow(STDOUT).to receive(:puts)
       cli = Bolt::CLI.new(%w[command run --nodes foo --password])
       expect(cli.parse).to include(password: 'opensesame')
     end

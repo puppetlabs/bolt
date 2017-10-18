@@ -119,8 +119,9 @@ HELP
         opts.on('-p', '--password [PASSWORD]',
                 "Password to authenticate as (Optional)") do |password|
           if password.nil?
-            puts "Please enter your password:"
+            STDOUT.print "Please enter your password: "
             results[:password] = STDIN.noecho(&:gets).chomp
+            STDOUT.puts
           else
             results[:password] = password
           end
