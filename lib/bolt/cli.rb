@@ -6,6 +6,7 @@ require 'json'
 require 'bolt/node'
 require 'bolt/version'
 require 'bolt/executor'
+require 'io/console'
 
 module Bolt
   class CLIError < RuntimeError
@@ -299,6 +300,11 @@ HELP
                              else
                                'notice'
                              end
+      end
+
+      if !options[:user].nil? && options[:passowrd].nil?
+        puts "Please enter your password:"
+        options[:password] = STDIN.noecho(&:gets).chomp
       end
 
       if options[:mode] == 'plan'
