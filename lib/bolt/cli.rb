@@ -6,7 +6,6 @@ require 'json'
 require 'bolt/node'
 require 'bolt/version'
 require 'bolt/executor'
-require 'io/console'
 
 module Bolt
   class CLIError < RuntimeError
