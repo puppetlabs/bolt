@@ -145,11 +145,10 @@ NODES
       expect(cli.parse).to include(password: 'opensesame')
     end
 
-    it "generates an error message if no password value is given" do
+    it "prompts the user for password if not specified" do
+      allow(STDIN).to receive(:noecho).and_return('opensesame')
       cli = Bolt::CLI.new(%w[command run --nodes foo --password])
-      expect {
-        cli.parse
-      }.to raise_error(Bolt::CLIError, /option '--password' needs a parameter/)
+      expect(cli.parse).to include(password: 'opensesame')
     end
   end
 
