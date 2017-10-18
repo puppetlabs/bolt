@@ -72,7 +72,7 @@ describe Bolt::SSH do
     end
 
     it "returns Node::ConnectError if the connection is refused" do
-      ssh = Bolt::SSH.new(hostname, 65535, user, password, insecure: true)
+      ssh = Bolt::SSH.new(hostname, 65535, user, password)
       expect_node_error(Bolt::Node::ConnectError,
                         'CONNECT_ERROR',
                         /Failed to connect to/) do
@@ -84,8 +84,6 @@ describe Bolt::SSH do
       allow(Net::SSH)
         .to receive(:start)
         .and_raise(Net::SSH::ConnectionTimeout)
-
-      ssh = Bolt::SSH.new(hostname, port, user, password, insecure: true)
       expect_node_error(Bolt::Node::ConnectError,
                         'CONNECT_ERROR',
                         /Failed to connect to/) do

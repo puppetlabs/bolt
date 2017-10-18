@@ -8,8 +8,7 @@ module Bolt
     STDIN_METHODS       = %w[both stdin].freeze
     ENVIRONMENT_METHODS = %w[both environment].freeze
 
-    def self.from_uri(uri_string, default_user = nil, default_password = nil,
-                      **kwargs)
+    def self.from_uri(uri_string, user: nil, password: nil, **kwargs)
       uri = NodeURI.new(uri_string)
       klass = case uri.scheme
               when 'winrm'
@@ -21,9 +20,10 @@ module Bolt
               end
       klass.new(uri.hostname,
                 uri.port,
-                uri.user || default_user || Bolt.config[:user],
-                uri.password || default_password || Bolt.config[:password],
-                uri: uri_string, **kwargs)
+                uri.user || user,
+                uri.password || password,
+                uri: uri_string,
+                **kwargs)
     end
 
     attr_reader :logger, :host, :uri, :user, :password

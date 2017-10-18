@@ -309,27 +309,35 @@ NODES
   describe "execute" do
     let(:executor) { double('executor') }
     let(:cli) { Bolt::CLI.new({}) }
-    let(:nodes) { ['foo'] }
+    let(:node_names) { ['foo'] }
+    let(:nodes) { [double('node', host: 'foo')] }
 
     before :each do
       allow(Bolt::Executor).to receive(:new).and_return(executor)
+      allow(executor).to receive(:from_uris).and_return(nodes)
       allow(cli).to receive(:print_results)
     end
 
     it "executes the 'whoami' command" do
-      expect(executor).to receive(:run_command).with('whoami').and_return({})
+      expect(executor)
+        .to receive(:run_command)
+        .with(nodes, 'whoami')
+        .and_return({})
 
       options = {
-        nodes: nodes, mode: 'command', action: 'run', object: 'whoami'
+        nodes: node_names, mode: 'command', action: 'run', object: 'whoami'
       }
       cli.execute(options)
     end
 
     it "runs a script" do
-      expect(executor).to receive(:run_script).with('bar.sh').and_return({})
+      expect(executor)
+        .to receive(:run_script)
+        .with(nodes, 'bar.sh')
+        .and_return({})
 
       options = {
-        nodes: nodes, mode: 'script', action: 'run', object: 'bar.sh'
+        nodes: node_names, mode: 'script', action: 'run', object: 'bar.sh'
       }
       cli.execute(options)
     end
@@ -341,11 +349,13 @@ NODES
 
       expect(executor)
         .to receive(:run_task)
-        .with(%r{modules/sample/tasks/echo.sh$}, input_method, task_params)
-        .and_return({})
+        .with(
+          nodes,
+          %r{modules/sample/tasks/echo.sh$}, input_method, task_params
+        ).and_return({})
 
       options = {
-        nodes: nodes,
+        nodes: node_names,
         mode: 'task',
         action: 'run',
         object: task_name,
@@ -362,11 +372,13 @@ NODES
 
       expect(executor)
         .to receive(:run_task)
-        .with(%r{modules/sample/tasks/init.sh$}, input_method, task_params)
-        .and_return({})
+        .with(
+          nodes,
+          %r{modules/sample/tasks/init.sh$}, input_method, task_params
+        ).and_return({})
 
       options = {
-        nodes: nodes,
+        nodes: node_names,
         mode: 'task',
         action: 'run',
         object: task_name,
@@ -383,11 +395,12 @@ NODES
 
       expect(executor)
         .to receive(:run_task)
-        .with(%r{modules/sample/tasks/stdin.sh$}, input_method, task_params)
+        .with(nodes,
+              %r{modules/sample/tasks/stdin.sh$}, input_method, task_params)
         .and_return({})
 
       options = {
-        nodes: nodes,
+        nodes: node_names,
         mode: 'task',
         action: 'run',
         object: task_name,
@@ -404,11 +417,12 @@ NODES
 
       expect(executor)
         .to receive(:run_task)
-        .with(%r{modules/sample/tasks/winstdin.ps1$}, input_method, task_params)
+        .with(nodes,
+              %r{modules/sample/tasks/winstdin.ps1$}, input_method, task_params)
         .and_return({})
 
       options = {
-        nodes: nodes,
+        nodes: node_names,
         mode: 'task',
         action: 'run',
         object: task_name,
@@ -422,7 +436,7 @@ NODES
       it "uploads a file via scp" do
         expect(executor)
           .to receive(:file_upload)
-          .with('/path/to/local', '/path/to/remote')
+          .with(nodes, '/path/to/local', '/path/to/remote')
           .and_return({})
         expect(cli)
           .to receive(:file_exist?)
@@ -430,7 +444,7 @@ NODES
           .and_return(true)
 
         options = {
-          nodes: nodes,
+          nodes: node_names,
           mode: 'file',
           action: 'upload',
           object: '/path/to/local',
@@ -446,7 +460,7 @@ NODES
           .and_return(false)
 
         options = {
-          nodes: nodes,
+          nodes: node_names,
           mode: 'file',
           action: 'upload',
           object: '/path/to/local',
