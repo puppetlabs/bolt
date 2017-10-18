@@ -1,9 +1,10 @@
 require 'concurrent'
 require 'bolt/result'
+require 'bolt/config'
 
 module Bolt
   class Executor
-    def initialize(config)
+    def initialize(config = Bolt::Config.new)
       @config = config
     end
 
