@@ -9,13 +9,14 @@ module Bolt
 
       @shell = shell
       @endpoint = "http://#{host}:#{port}/wsman"
+    end
+
+    def connect
       @connection = ::WinRM::Connection.new(endpoint: @endpoint,
                                             user: @user,
                                             password: @password)
       @connection.logger = @transport_logger
-    end
 
-    def connect
       @session = @connection.shell(@shell)
       @session.run('$PSVersionTable.PSVersion')
       @logger.debug { "Opened session" }
@@ -26,7 +27,7 @@ module Bolt
       )
     rescue StandardError => e
       raise Bolt::Node::ConnectError.new(
-        "Failed to connect to #{@uri}: #{e.message}",
+        "Failed to connect to #{@endpoint}: #{e.message}",
         'CONNECT_ERROR'
       )
     end
