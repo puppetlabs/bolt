@@ -74,6 +74,28 @@ describe Bolt::WinRM do
         winrm.connect
       end
     end
+
+    it "raises Node::ConnectError if user is absent" do
+      winrm = Bolt::WinRM.new(host, port, nil, password)
+
+      expect_node_error(
+        Bolt::Node::ConnectError, 'CONNECT_ERROR',
+        /Failed to connect to .*: user is a required option/
+      ) do
+        winrm.connect
+      end
+    end
+
+    it "raises Node::ConnectError if password is absent" do
+      winrm = Bolt::WinRM.new(host, port, user, nil)
+
+      expect_node_error(
+        Bolt::Node::ConnectError, 'CONNECT_ERROR',
+        /Failed to connect to .*: password is a required option/
+      ) do
+        winrm.connect
+      end
+    end
   end
 
   it "executes a command on a host", vagrant: true do

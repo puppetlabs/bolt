@@ -118,7 +118,8 @@ HELP
           results[:user] = user
         end
         opts.on('-p', '--password [PASSWORD]',
-                "Password to authenticate as (Optional)") do |password|
+                'Password to authenticate with (Optional).',
+                'Omit the value to prompt for the password.') do |password|
           if password.nil?
             STDOUT.print "Please enter your password: "
             results[:password] = STDIN.noecho(&:gets).chomp
