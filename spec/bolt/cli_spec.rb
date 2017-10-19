@@ -140,15 +140,17 @@ NODES
   end
 
   describe "password" do
-    it "accepts a password" do
-      cli = Bolt::CLI.new(%w[command run --password opensesame --nodes foo])
-      expect(cli.parse).to include(password: 'opensesame')
-    end
-
     it "prompts the user for password if not specified" do
       allow(STDIN).to receive(:noecho).and_return('opensesame')
       allow(STDOUT).to receive(:print).with('Please enter your password: ')
       allow(STDOUT).to receive(:puts)
+      cli = Bolt::CLI.new(%w[command run --nodes foo --password])
+      expect(cli.parse).to include(password: 'opensesame')
+    end
+
+    it "reads the password from stdin if there is no tty" do
+      allow(STDIN).to receive(:tty?).and_return(false)
+      allow(STDIN).to receive(:read).and_return('opensesame')
       cli = Bolt::CLI.new(%w[command run --nodes foo --password])
       expect(cli.parse).to include(password: 'opensesame')
     end

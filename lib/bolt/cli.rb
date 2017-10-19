@@ -117,14 +117,14 @@ HELP
                 "User to authenticate as (Optional)") do |user|
           results[:user] = user
         end
-        opts.on('-p', '--password [PASSWORD]',
-                "Password to authenticate as (Optional)") do |password|
-          if password.nil?
+        opts.on('-p', '--password',
+                "To prompt for the password to authenticate as (Optional)") do
+          if STDIN.tty?
             STDOUT.print "Please enter your password: "
             results[:password] = STDIN.noecho(&:gets).chomp
             STDOUT.puts
           else
-            results[:password] = password
+            results[:password] = STDIN.read.chomp
           end
         end
         results[:concurrency] = 100

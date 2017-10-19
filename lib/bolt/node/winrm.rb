@@ -9,26 +9,42 @@ module Bolt
 
       @shell = shell
       @endpoint = "http://#{host}:#{port}/wsman"
-      @connection = ::WinRM::Connection.new(endpoint: @endpoint,
-                                            user: @user,
-                                            password: @password)
-      @connection.logger = @transport_logger
     end
 
     def connect
-      @session = @connection.shell(@shell)
-      @session.run('$PSVersionTable.PSVersion')
-      @logger.debug { "Opened session" }
-    rescue ::WinRM::WinRMAuthorizationError
-      raise Bolt::Node::ConnectError.new(
-        "Authentication failed for #{@endpoint}",
-        'AUTH_ERROR'
-      )
-    rescue StandardError => e
-      raise Bolt::Node::ConnectError.new(
-        "Failed to connect to #{@uri}: #{e.message}",
-        'CONNECT_ERROR'
-      )
+      if @user.nil?
+        raise Bolt::Node::ConnectError.new(
+          "A user must be specified when using WinRM",
+          'AUTH_ERROR'
+        )
+      end
+
+      if @password.nil?
+        raise Bolt::Node::ConnectError.new(
+          "A password must be specified when using WinRM",
+          'AUTH_ERROR'
+        )
+      end
+
+      begin
+        @connection = ::WinRM::Connection.new(endpoint: @endpoint,
+                                              user: @user,
+                                              password: @password)
+        @connection.logger = @transport_logger
+        @session = @connection.shell(@shell)
+        @session.run('$PSVersionTable.PSVersion')
+        @logger.debug { "Opened session" }
+      rescue ::WinRM::WinRMAuthorizationError
+        raise Bolt::Node::ConnectError.new(
+          "Authentication failed for #{@endpoint}",
+          'AUTH_ERROR'
+        )
+      rescue StandardError => e
+        raise Bolt::Node::ConnectError.new(
+          "Failed to connect to #{@uri}: #{e.message}",
+          'CONNECT_ERROR'
+        )
+      end
     end
 
     def disconnect
