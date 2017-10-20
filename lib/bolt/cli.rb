@@ -135,7 +135,7 @@ HELP
           results[:concurrency] = concurrency
         end
         opts.on('--modules MODULES', "Path to modules directory") do |modules|
-          results[:modules] = modules
+          results[:modules] = modules.split(File::PATH_SEPARATOR)
         end
         opts.on('--params PARAMETERS',
                 "Parameters to a task or plan") do |params|
@@ -284,6 +284,11 @@ HELP
       unless options[:nodes] || options[:mode] == 'plan'
         raise Bolt::CLIError, "option --nodes must be specified"
       end
+
+      if %w[task plan].include?(options[:mode]) && options[:modules].nil?
+        raise Bolt::CLIError,
+              "option --modules must be specified when running a task or plan"
+      end
     end
 
     def handle_parser_errors
@@ -395,15 +400,10 @@ HELP
     end
 
     def load_task_data(name, modules)
-      if modules.nil?
-        raise Bolt::CLIError,
-              "The '--modules' option must be specified to run a task"
-      end
-
       module_name, file_name = name.split('::', 2)
       file_name ||= 'init'
 
-      env = Puppet::Node::Environment.create('bolt', [modules])
+      env = Puppet::Node::Environment.create('bolt', modules)
       Puppet.override(environments: Puppet::Environments::Static.new(env)) do
         data = Puppet::InfoService::TaskInformationService.task_data(
           env.name, module_name, name
@@ -426,15 +426,13 @@ HELP
     end
 
     def run_plan(plan, args, modules)
-      modulepath = modules ? [modules] : []
-
       Dir.mktmpdir('bolt') do |dir|
         cli = []
         Puppet::Settings::REQUIRED_APP_SETTINGS.each do |setting|
           cli << "--#{setting}" << dir
         end
         Puppet.initialize_settings(cli)
-        Puppet::Pal.in_tmp_environment('bolt', modulepath: modulepath) do |pal|
+        Puppet::Pal.in_tmp_environment('bolt', modulepath: modules) do |pal|
           puts pal.run_plan(plan, plan_args: args)
         end
       end
