@@ -95,7 +95,8 @@ HELP
       @argv    = argv
       @options = {
         nodes: [],
-        transport: 'ssh'
+        transport: 'ssh',
+        insecure: false
       }
       @parser = create_option_parser(@options)
     end
@@ -147,7 +148,6 @@ HELP
                 "Parameters to a task or plan") do |params|
           results[:task_options] = parse_params(params)
         end
-        results[:insecure] = false
         opts.on('-k', '--insecure',
                 "Whether to connect insecurely ") do |insecure|
           results[:insecure] = insecure
