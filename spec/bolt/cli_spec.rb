@@ -199,23 +199,25 @@ NODES
     end
   end
 
-  describe "modules" do
-    it "accepts a modules directory" do
-      cli = Bolt::CLI.new(%w[command run --modules ./modules --nodes foo])
-      expect(cli.parse).to include(modules: ['./modules'])
+  describe "modulepath" do
+    it "accepts a modulepath directory" do
+      cli = Bolt::CLI.new(%w[command run --modulepath ./modules --nodes foo])
+      expect(cli.parse).to include(modulepath: ['./modules'])
     end
 
     it "accepts a list of module directories" do
       modulepath = %w[modules more].join(File::PATH_SEPARATOR)
-      cli = Bolt::CLI.new(%W[command run --modules #{modulepath} --nodes foo])
-      expect(cli.parse).to include(modules: %w[modules more])
+      cli = Bolt::CLI.new(%W[command run --modulepath #{modulepath}
+                             --nodes foo])
+      expect(cli.parse).to include(modulepath: %w[modules more])
     end
 
     it "generates an error message if no value is given" do
-      cli = Bolt::CLI.new(%w[command run --nodes foo --modules])
+      cli = Bolt::CLI.new(%w[command run --nodes foo --modulepath])
       expect {
         cli.parse
-      }.to raise_error(Bolt::CLIError, /option '--modules' needs a parameter/)
+      }.to raise_error(Bolt::CLIError,
+                       /option '--modulepath' needs a parameter/)
     end
   end
 
@@ -244,14 +246,14 @@ NODES
 
   describe "handling parameters" do
     it "returns {} if none are specified" do
-      cli = Bolt::CLI.new(%w[plan run my::plan --modules .])
+      cli = Bolt::CLI.new(%w[plan run my::plan --modulepath .])
       result = cli.parse
       expect(result[:task_options]).to eq({})
     end
 
     it "reads params on the command line" do
       cli = Bolt::CLI.new(%w[plan run my::plan kj=2hv iuhg=iube 2whf=lcv
-                             --modules .])
+                             --modulepath .])
       result = cli.parse
       expect(result[:task_options]).to eq('kj' => '2hv',
                                           'iuhg' => 'iube',
@@ -261,7 +263,7 @@ NODES
     it "reads params in json with the params flag" do
       json_args = '{"kj":"2hv","iuhg":"iube","2whf":"lcv"}'
       cli = Bolt::CLI.new(['plan', 'run', 'my::plan', '--params', json_args,
-                           '--modules', '.'])
+                           '--modulepath', '.'])
       result = cli.parse
       expect(result[:task_options]).to eq('kj' => '2hv',
                                           'iuhg' => 'iube',
@@ -278,7 +280,7 @@ NODES
 
     it "raises a cli error when specifying params both ways" do
       cli = Bolt::CLI.new(%w[plan run my::plan --params {"a":"b"} c=d
-                             --modules .])
+                             --modulepath .])
       expect {
         cli.parse
       }.to raise_error(Bolt::CLIError, /not both/)
@@ -288,7 +290,7 @@ NODES
       json_args = '{"kj":"2hv","iuhg":"iube","2whf":"lcv"}'
       with_tempfile_containing('json-args', json_args) do |file|
         cli = Bolt::CLI.new(%W[plan run my::plan --params @#{file.path}
-                               --modules .])
+                               --modulepath .])
         result = cli.parse
         expect(result[:task_options]).to eq('kj' => '2hv',
                                             'iuhg' => 'iube',
@@ -299,7 +301,7 @@ NODES
     it "raises a cli error when reading the params file fails" do
       Dir.mktmpdir do |dir|
         cli = Bolt::CLI.new(%W[plan run my::plan --params @#{dir}/nope
-                               --modules .])
+                               --modulepath .])
         expect {
           cli.parse
         }.to raise_error(Bolt::CLIError, /No such file/)
@@ -308,7 +310,7 @@ NODES
 
     it "reads json from stdin when --params is just '-'" do
       json_args = '{"kj":"2hv","iuhg":"iube","2whf":"lcv"}'
-      cli = Bolt::CLI.new(%w[plan run my::plan --params - --modules .])
+      cli = Bolt::CLI.new(%w[plan run my::plan --params - --modulepath .])
       allow(STDIN).to receive(:read).and_return(json_args)
       result = cli.parse
       expect(result[:task_options]).to eq('kj' => '2hv',
@@ -371,7 +373,7 @@ NODES
         action: 'run',
         object: task_name,
         task_options: task_params,
-        modules: [File.join(__FILE__, '../../fixtures/modules')]
+        modulepath: [File.join(__FILE__, '../../fixtures/modules')]
       }
       cli.execute(options)
     end
@@ -394,7 +396,7 @@ NODES
         action: 'run',
         object: task_name,
         task_options: task_params,
-        modules: [File.join(__FILE__, '../../fixtures/modules')]
+        modulepath: [File.join(__FILE__, '../../fixtures/modules')]
       }
       cli.execute(options)
     end
@@ -416,7 +418,7 @@ NODES
         action: 'run',
         object: task_name,
         task_options: task_params,
-        modules: [File.join(__FILE__, '../../fixtures/modules')]
+        modulepath: [File.join(__FILE__, '../../fixtures/modules')]
       }
       cli.execute(options)
     end
@@ -438,7 +440,7 @@ NODES
         action: 'run',
         object: task_name,
         task_options: task_params,
-        modules: [File.join(__FILE__, '../../fixtures/modules')]
+        modulepath: [File.join(__FILE__, '../../fixtures/modules')]
       }
       cli.execute(options)
     end

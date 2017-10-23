@@ -134,8 +134,10 @@ HELP
                 "(Optional, defaults to 100)") do |concurrency|
           results[:concurrency] = concurrency
         end
-        opts.on('--modules MODULES', "Path to modules directory") do |modules|
-          results[:modules] = modules.split(File::PATH_SEPARATOR)
+        opts.on('--modulepath MODULES',
+                "List of directories containing modules, " \
+                "separated by #{File::PATH_SEPARATOR}") do |modulepath|
+          results[:modulepath] = modulepath.split(File::PATH_SEPARATOR)
         end
         opts.on('--params PARAMETERS',
                 "Parameters to a task or plan") do |params|
@@ -285,9 +287,10 @@ HELP
         raise Bolt::CLIError, "option --nodes must be specified"
       end
 
-      if %w[task plan].include?(options[:mode]) && options[:modules].nil?
+      if %w[task plan].include?(options[:mode]) && options[:modulepath].nil?
         raise Bolt::CLIError,
-              "option --modules must be specified when running a task or plan"
+              "option --modulepath must be specified when running" \
+              " a task or plan"
       end
     end
 
@@ -338,7 +341,7 @@ HELP
             when 'task'
               task_name = options[:object]
 
-              path, metadata = load_task_data(task_name, options[:modules])
+              path, metadata = load_task_data(task_name, options[:modulepath])
               input_method = metadata['input_method']
 
               input_method ||= 'both'
@@ -367,7 +370,7 @@ HELP
       result = Puppet.override(bolt_executor: executor) do
         run_plan(options[:object],
                  options[:task_options],
-                 options[:modules])
+                 options[:modulepath])
       end
       puts result
     rescue Puppet::Error
@@ -399,11 +402,11 @@ HELP
       File.exist?(path)
     end
 
-    def load_task_data(name, modules)
+    def load_task_data(name, modulepath)
       module_name, file_name = name.split('::', 2)
       file_name ||= 'init'
 
-      env = Puppet::Node::Environment.create('bolt', modules)
+      env = Puppet::Node::Environment.create('bolt', modulepath)
       Puppet.override(environments: Puppet::Environments::Static.new(env)) do
         data = Puppet::InfoService::TaskInformationService.task_data(
           env.name, module_name, name
@@ -425,14 +428,14 @@ HELP
       end
     end
 
-    def run_plan(plan, args, modules)
+    def run_plan(plan, args, modulepath)
       Dir.mktmpdir('bolt') do |dir|
         cli = []
         Puppet::Settings::REQUIRED_APP_SETTINGS.each do |setting|
           cli << "--#{setting}" << dir
         end
         Puppet.initialize_settings(cli)
-        Puppet::Pal.in_tmp_environment('bolt', modulepath: modules) do |pal|
+        Puppet::Pal.in_tmp_environment('bolt', modulepath: modulepath) do |pal|
           puts pal.run_plan(plan, plan_args: args)
         end
       end
