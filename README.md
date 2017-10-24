@@ -127,12 +127,12 @@ To install and use Bolt on Windows systems, you must also install Ruby. You can 
 
 ### Run the `sql` task from the `mysql` module
 
-    $ bolt task run mysql::sql database=mydatabase sql="SHOW TABLES" --nodes neptune --modules ~/modules
+    $ bolt task run mysql::sql database=mydatabase sql="SHOW TABLES" --nodes neptune --modulepath ~/modules
 
 
 ### Run the `deploy` plan from the `webserver` module
 
-    $ bolt plan run webserver::deploy version=1.2 --modules ~/modules
+    $ bolt plan run webserver::deploy version=1.2 --modulepath ~/modules
 
     Deployed app version 1.2.
 
@@ -140,7 +140,7 @@ Note the `--nodes` option is not used with plans, as they can contain more compl
 
 ### Run the `single_task` plan from the `sample` module in this repo
 
-    $ bolt plan run sample::single_task nodes=neptune --modules spec/fixtures/modules
+    $ bolt plan run sample::single_task nodes=neptune --modulepath spec/fixtures/modules
     neptune got passed the message: hi there
 
 ## Kudos
