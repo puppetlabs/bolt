@@ -23,7 +23,7 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = "~> 2.0"
 
-  spec.add_dependency "addressable", "~> 2.4"
+  spec.add_dependency "addressable", '< 2.5.0'
   spec.add_dependency "concurrent-ruby", "~> 1.0"
   spec.add_dependency "net-sftp", "~> 2.0"
   spec.add_dependency "net-ssh", "~> 4.2"
