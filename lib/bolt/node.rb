@@ -1,6 +1,6 @@
 require 'logger'
 require 'bolt/node_uri'
-require 'bolt/node/formatter'
+require 'bolt/formatter'
 require 'bolt/result'
 require 'bolt/config'
 
@@ -45,8 +45,9 @@ module Bolt
 
     def init_logger(destination, level)
       logger = Logger.new(destination)
+      logger.progname = @host
       logger.level = level
-      logger.formatter = Bolt::Node::Formatter.new(@host)
+      logger.formatter = Bolt::Formatter.new
       logger
     end
 
