@@ -88,16 +88,17 @@ HELP
     ACTIONS = %w[run upload download].freeze
     TRANSPORTS = %w[ssh winrm pcp].freeze
 
-    attr_reader :parser
+    attr_reader :parser, :config
     attr_accessor :options
 
     def initialize(argv)
       @argv    = argv
       @options = {
         nodes: [],
-        transport: 'ssh',
-        insecure: false
+        insecure: false,
+        transport: 'ssh'
       }
+      @config = Bolt::Config.new
       @parser = create_option_parser(@options)
     end
 
@@ -177,8 +178,6 @@ HELP
     end
 
     def parse
-      Bolt.log_level = Logger::WARN
-
       if @argv.empty?
         options[:help] = true
       end
@@ -198,9 +197,9 @@ HELP
       options[:object] = remaining.shift
 
       if options[:debug]
-        Bolt.log_level = Logger::DEBUG
+        @config[:log_level] = Logger::DEBUG
       elsif options[:verbose]
-        Bolt.log_level = Logger::INFO
+        @config[:log_level] = Logger::INFO
       end
 
       if options[:help]
@@ -328,6 +327,10 @@ HELP
     end
 
     def execute(options)
+      %i[concurrency user password tty insecure transport].each do |key|
+        config[key] = options[key]
+      end
+
       if options[:mode] == 'plan' || options[:mode] == 'task'
         begin
           require_relative '../../vendored/require_vendored'
@@ -336,20 +339,14 @@ HELP
         end
 
         Puppet::Util::Log.newdestination(:console)
-        Puppet[:log_level] = if Bolt.log_level == Logger::DEBUG
+        Puppet[:log_level] = if @config[:log_level] == Logger::DEBUG
                                'debug'
                              else
                                'notice'
                              end
       end
 
-      config = Bolt::Config.new(concurrency: options[:concurrency],
-                                user: options[:user],
-                                password: options[:password],
-                                tty: options[:tty],
-                                insecure: options[:insecure],
-                                transport: options[:transport])
-      executor = Bolt::Executor.new(config)
+      executor = Bolt::Executor.new(@config)
 
       if options[:mode] == 'plan'
         execute_plan(executor, options)

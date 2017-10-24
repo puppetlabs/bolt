@@ -24,7 +24,6 @@ describe Bolt::Orch, orchestrator: true do
   end
 
   before(:each) do
-    Bolt.log_level = Logger::WARN
     @task = "foo"
     @taskpath = "foo/tasks/init"
     @params =  { param: 'val' }

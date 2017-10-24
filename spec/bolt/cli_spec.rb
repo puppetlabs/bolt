@@ -183,7 +183,7 @@ NODES
     it "is not sensitive to ordering of debug and verbose" do
       cli = Bolt::CLI.new(%w[command run --nodes foo --debug --verbose])
       cli.parse
-      expect(Bolt.log_level).to eq(Logger::DEBUG)
+      expect(cli.config[:log_level]).to eq(Logger::DEBUG)
     end
   end
 

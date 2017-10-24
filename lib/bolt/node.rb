@@ -30,8 +30,7 @@ module Bolt
     attr_reader :logger, :host, :uri, :user, :password
 
     def initialize(host, port = nil, user = nil, password = nil, uri: nil,
-                   config: Bolt::Config.new,
-                   log_level: Bolt.log_level || Logger::WARN)
+                   config: Bolt::Config.new)
       @host = host
       @port = port
       @user = user || config[:user]
@@ -40,11 +39,11 @@ module Bolt
       @insecure = config[:insecure]
       @uri = uri
 
-      @logger = init_logger(level: log_level)
-      @transport_logger = init_logger(level: Logger::WARN)
+      @logger = init_logger(config[:log_destination], config[:log_level])
+      @transport_logger = init_logger(config[:log_destination], Logger::WARN)
     end
 
-    def init_logger(destination: STDERR, level: Logger::WARN)
+    def init_logger(destination, level)
       logger = Logger.new(destination)
       logger.level = level
       logger.formatter = Bolt::Node::Formatter.new(@host)
