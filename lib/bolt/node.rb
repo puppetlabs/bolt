@@ -27,6 +27,8 @@ module Bolt
                 **kwargs)
     end
 
+    def self.initialize_transport(_logger); end
+
     attr_reader :logger, :host, :uri, :user, :password
 
     def initialize(host, port = nil, user = nil, password = nil, uri: nil,

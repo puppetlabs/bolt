@@ -5,6 +5,14 @@ require 'bolt/node/result'
 
 module Bolt
   class SSH < Node
+    def self.initialize_transport(logger)
+      require 'net/ssh/krb'
+    rescue LoadError
+      logger.debug {
+        "Authentication method 'gssapi-with-mic' is not available"
+      }
+    end
+
     def connect
       options = {
         logger: @transport_logger,

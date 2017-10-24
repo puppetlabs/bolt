@@ -27,6 +27,10 @@ module Bolt
       pool = Concurrent::FixedThreadPool.new(poolsize)
       @logger.debug { "Started with #{poolsize} thread(s)" }
 
+      nodes.map(&:class).uniq.each do |klass|
+        klass.initialize_transport(@logger)
+      end
+
       nodes.each { |node|
         pool.post do
           results[node] =
