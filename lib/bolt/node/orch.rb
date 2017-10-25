@@ -105,12 +105,13 @@ module Bolt
       _run_task(BOLT_MOCK_FILE, 'stdin', params)
     end
 
-    def _run_script(script, _)
+    def _run_script(script, arguments)
       content = File.open(script, &:read)
       content = Base64.encode64(content)
       params = {
         action: 'script',
-        content: content
+        content: content,
+        arguments: arguments
       }
       unwrap_bolt_result(_run_task(BOLT_MOCK_FILE, 'stdin', params))
     end
