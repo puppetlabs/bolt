@@ -117,9 +117,15 @@ describe Bolt::WinRM do
   end
 
   it "can run a script remotely", vagrant: true do
-    contents = 'Write-Output "hellote"'
+    contents = <<PS
+Write-Output "hellote"
+Write-Output $args[0]
+Write-Output $args[1]
+PS
     with_tempfile_containing('script-test-winrm', contents) do |file|
-      expect(winrm._run_script(file.path).value).to match(/hellote\r\n/)
+      expect(
+        winrm._run_script(file.path, ['with spaces', 'nospaces']).value
+      ).to eq("hellote\r\nwith spaces\r\nnospaces\r\n\r\n")
     end
   end
 

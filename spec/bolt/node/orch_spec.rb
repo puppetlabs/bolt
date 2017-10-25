@@ -226,15 +226,15 @@ describe Bolt::Orch, orchestrator: true do
       end
 
       it 'is a success' do
-        expect(orch._run_script(script_path)).to be_success
+        expect(orch._run_script(script_path, [])).to be_success
       end
 
       it 'captures stdout' do
-        expect(orch._run_script(script_path).value).to eq("standard out\n")
+        expect(orch._run_script(script_path, []).value).to eq("standard out\n")
       end
 
       it 'captures stderr' do
-        result = orch._run_script(script_path)
+        result = orch._run_script(script_path, [])
         result.output.stderr.rewind
         expect(result.output.stderr.read).to eq("standard error\n")
       end
@@ -251,21 +251,21 @@ describe Bolt::Orch, orchestrator: true do
       end
 
       it 'returns a failure' do
-        expect(orch._run_script(script_path)).not_to be_success
+        expect(orch._run_script(script_path, [])).not_to be_success
       end
 
       it 'captures exit_code' do
-        expect(orch._run_script(script_path).exit_code).to eq(34)
+        expect(orch._run_script(script_path, []).exit_code).to eq(34)
       end
 
       it 'captures stdout' do
-        result = orch._run_script(script_path)
+        result = orch._run_script(script_path, [])
         result.output.stdout.rewind
         expect(result.output.stdout.read).to eq("standard out\n")
       end
 
       it 'captures stderr' do
-        result = orch._run_script(script_path)
+        result = orch._run_script(script_path, [])
         result.output.stderr.rewind
         expect(result.output.stderr.read).to eq("standard error\n")
       end

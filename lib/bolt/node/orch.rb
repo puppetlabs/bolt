@@ -105,7 +105,7 @@ module Bolt
       _run_task(BOLT_MOCK_FILE, 'stdin', params)
     end
 
-    def _run_script(script)
+    def _run_script(script, _)
       content = File.open(script, &:read)
       content = Base64.encode64(content)
       params = {

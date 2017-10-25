@@ -56,7 +56,7 @@ Available options are:
 HELP
 
     SCRIPT_HELP = <<-HELP.freeze
-Usage: bolt script <action> <script> [options]
+Usage: bolt script <action> <script> [[arg1] ... [argN]] [options]
 
 Available actions are:
     run                              Upload a local script and run it remotely
@@ -278,7 +278,8 @@ HELP
               "#{ACTIONS.join(', ')}"
       end
 
-      if options[:mode] != 'file' && !options[:leftovers].empty?
+      if options[:mode] != 'file' && options[:mode] != 'script' &&
+         !options[:leftovers].empty?
         raise Bolt::CLIError,
               "unknown argument(s) #{options[:leftovers].join(', ')}"
       end
@@ -337,7 +338,7 @@ HELP
             when 'command'
               executor.run_command(nodes, options[:object])
             when 'script'
-              executor.run_script(nodes, options[:object])
+              executor.run_script(nodes, options[:object], options[:leftovers])
             when 'task'
               task_name = options[:object]
 

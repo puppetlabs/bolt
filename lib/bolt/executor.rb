@@ -47,9 +47,9 @@ module Bolt
       end
     end
 
-    def run_script(nodes, script)
+    def run_script(nodes, script, arguments)
       on(nodes) do |node|
-        node.run_script(script)
+        node.run_script(script, arguments)
       end
     end
 

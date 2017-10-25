@@ -28,11 +28,11 @@ describe "Bolt::Executor" do
 
   it "runs a script on all nodes" do
     node1 = mock_node 'node1'
-    expect(node1).to receive(:run_script).with(script).and_return(success)
+    expect(node1).to receive(:run_script).with(script, []).and_return(success)
     node2 = mock_node 'node2'
-    expect(node2).to receive(:run_script).with(script).and_return(success)
+    expect(node2).to receive(:run_script).with(script, []).and_return(success)
 
-    results = executor.run_script([node1, node2], script)
+    results = executor.run_script([node1, node2], script, [])
     results.each_pair do |_, result|
       expect(result).to be_instance_of(Bolt::Node::Success)
     end

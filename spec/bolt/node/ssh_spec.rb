@@ -122,9 +122,11 @@ describe Bolt::SSH do
     end
 
     it "can run a script remotely", vagrant: true do
-      contents = "#!/bin/sh\necho hellote"
+      contents = "#!/bin/sh\necho hellote\necho $1"
       with_tempfile_containing('script test', contents) do |file|
-        expect(ssh._run_script(file.path).value).to eq("hellote\n")
+        expect(
+          ssh._run_script(file.path, ['arg']).value
+        ).to eq("hellote\narg\n")
       end
     end
 

@@ -346,11 +346,12 @@ NODES
     it "runs a script" do
       expect(executor)
         .to receive(:run_script)
-        .with(nodes, 'bar.sh')
+        .with(nodes, 'bar.sh', [])
         .and_return({})
 
       options = {
-        nodes: node_names, mode: 'script', action: 'run', object: 'bar.sh'
+        nodes: node_names, mode: 'script', action: 'run', object: 'bar.sh',
+        leftovers: []
       }
       cli.execute(options)
     end

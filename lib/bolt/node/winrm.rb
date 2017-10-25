@@ -214,11 +214,18 @@ PS
       execute(command)
     end
 
-    def _run_script(script)
+    def _run_script(script, arguments)
       @logger.info { "Running script '#{script}'" }
       with_remote_file(script) do |remote_path|
-        args = "#{PS_ARGS} -File \"#{remote_path}\""
-        execute_process('powershell.exe', args)
+        args = [PS_ARGS, '-File', "\"#{remote_path}\""]
+        args += arguments.map do |arg|
+          if arg =~ / /
+            "\"#{arg}\""
+          else
+            arg
+          end
+        end
+        execute_process('powershell.exe', args.join(' '))
       end
     end
 

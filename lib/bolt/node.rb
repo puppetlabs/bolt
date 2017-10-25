@@ -66,8 +66,8 @@ module Bolt
       _run_command(command).to_command_result
     end
 
-    def run_script(script)
-      _run_script(script).to_command_result
+    def run_script(script, arguments)
+      _run_script(script, arguments).to_command_result
     end
 
     def run_task(task, input_method, arguments)

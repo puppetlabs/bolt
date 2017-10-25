@@ -131,10 +131,19 @@ module Bolt
       execute(command)
     end
 
-    def _run_script(script)
+    def _run_script(script, arguments)
       @logger.info { "Running script '#{script}'" }
+      @logger.debug { "arguments: #{arguments}" }
+
       with_remote_file(script) do |remote_path|
-        execute("'#{remote_path}'")
+        # should each arg be quoted?
+        command = "'#{remote_path}'"
+        unless arguments.empty?
+          command += " "
+          command += arguments.join(' ')
+        end
+
+        execute(command)
       end
     end
 
