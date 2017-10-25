@@ -136,14 +136,15 @@ module Bolt
       @logger.debug { "arguments: #{arguments}" }
 
       with_remote_file(script) do |remote_path|
-        # should each arg be quoted?
-        command = "'#{remote_path}'"
-        unless arguments.empty?
-          command += " "
-          command += arguments.join(' ')
+        command = ["'#{remote_path}'"]
+        command += arguments.map do |arg|
+          if arg =~ / /
+            "\"#{arg}\""
+          else
+            arg
+          end
         end
-
-        execute(command)
+        execute(command.join(' '))
       end
     end
 
