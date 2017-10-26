@@ -196,13 +196,19 @@ beaker directly. The beaker options file will also need to be specified for
 the type of bolt installation that should be performed (gem or git).
 
 Example of running test suite using gem install using an existing hosts file:
+1. Initialize beaker with supplied options file for gem configuration.
+```
+bundle exec beaker init -h hosts.yaml -o config/gem/options.rb
+```
+1. Provision hosts
+```
+bundle exec beaker provision
+```
+1. Run tests with specified environment variables
 ```
 SSH_USER=root                      \
 SSH_PASSWORD='S3@ret3'             \
 WINRM_USER=Administator            \
 WINRM_PASSWORD='S3@ret3'           \
-  bundle exec beaker               \
-      -o config/gem/options.rb     \
-      -h hosts.yaml                \
-      -t tests
+bundle exec beaker exec ./tests
 ```
