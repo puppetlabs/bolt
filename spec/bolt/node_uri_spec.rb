@@ -146,4 +146,13 @@ describe Bolt::NodeURI do
       expect(uri.port).to be_nil
     end
   end
+
+  describe "with unsupported http scheme" do
+    it "accepts 'http://pluto:666'" do
+      uri = Bolt::NodeURI.new('http://pluto:666')
+      expect(uri.scheme).to eq('http')
+      expect(uri.hostname).to eq('pluto')
+      expect(uri.port).to eq(666)
+    end
+  end
 end
