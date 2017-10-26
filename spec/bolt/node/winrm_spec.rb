@@ -15,6 +15,12 @@ describe Bolt::WinRM do
   let(:password) { "vagrant" }
   let(:command) { "echo $env:UserName" }
   let(:winrm) { Bolt::WinRM.new(host, port, user, password) }
+  let(:echo_script) { <<PS }
+foreach ($i in $args)
+{
+    Write-Output $i
+}
+PS
 
   before(:each) { winrm.connect }
   after(:each) { winrm.disconnect }
@@ -117,15 +123,58 @@ describe Bolt::WinRM do
   end
 
   it "can run a script remotely", vagrant: true do
-    contents = <<PS
-Write-Output "hellote"
-Write-Output $args[0]
-Write-Output $args[1]
-PS
+    contents = "Write-Output \"hellote\""
     with_tempfile_containing('script-test-winrm', contents) do |file|
       expect(
-        winrm._run_script(file.path, ['with spaces', 'nospaces']).value
-      ).to eq("hellote\r\nwith spaces\r\nnospaces\r\n\r\n")
+        winrm._run_script(file.path, []).value
+      ).to eq("hellote\r\n\r\n")
+    end
+  end
+
+  it "can run a script remotely with quoted arguments", vagrant: true do
+    pending("inner quotes are not escaped correctly")
+    with_tempfile_containing('script-test-winrm-quotes', echo_script) do |file|
+      expect(
+        winrm._run_script(
+          file.path,
+          ['nospaces',
+           'with spaces',
+           "\"double double\"",
+           "'double single'",
+           '\'single single\'',
+           '"single double"',
+           "double \"double\" double",
+           "double 'single' double",
+           'single "double" single',
+           'single \'single\' single']
+        ).value
+      ).to eq(<<QUOTED)
+nospaces\r
+with spaces\r
+'double double'\r
+'double single'\r
+'single single'\r
+'single double'\r
+double "double" double\r
+double 'single' double\r
+single "double" single\r
+single 'single' single\r
+\r
+QUOTED
+    end
+  end
+
+  it "escapes unsafe shellwords", vagrant: true do
+    pending("shell words are not escaped")
+    with_tempfile_containing('script-test-winrm-escape', echo_script) do |file|
+      expect(
+        winrm._run_script(
+          file.path,
+          ['echo $env:path']
+        ).value
+      ).to eq(<<SHELLWORDS)
+echo $env:path\r
+SHELLWORDS
     end
   end
 

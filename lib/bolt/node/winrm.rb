@@ -146,8 +146,10 @@ PS
 
     VALID_EXTENSIONS = ['.ps1', '.rb'].freeze
 
-    PS_ARGS =
-      '-NoProfile -NonInteractive -NoLogo -ExecutionPolicy Bypass'.freeze
+    PS_ARGS = %w[
+      -NoProfile -NonInteractive -NoLogo -ExecutionPolicy Bypass
+    ].freeze
+    PS_ARGS_STRING = PS_ARGS.join(' ').freeze
 
     def process_from_extension(path)
       case Pathname(path).extname.downcase
@@ -159,7 +161,7 @@ PS
       when '.ps1'
         [
           'powershell.exe',
-          "#{PS_ARGS} -File \"#{path}\""
+          "#{PS_ARGS_STRING} -File \"#{path}\""
         ]
       end
     end
@@ -218,13 +220,7 @@ PS
       @logger.info { "Running script '#{script}'" }
       with_remote_file(script) do |remote_path|
         args = [PS_ARGS, '-File', "\"#{remote_path}\""]
-        args += arguments.map do |arg|
-          if arg =~ / /
-            "\"#{arg}\""
-          else
-            arg
-          end
-        end
+        args += escape_arguments(arguments)
         execute_process('powershell.exe', args.join(' '))
       end
     end
@@ -249,6 +245,16 @@ PS
       end.then do
         with_remote_file(task) do |remote_path|
           execute_process(*process_from_extension(remote_path), stdin)
+        end
+      end
+    end
+
+    def escape_arguments(arguments)
+      arguments.map do |arg|
+        if arg =~ / /
+          "\"#{arg}\""
+        else
+          arg
         end
       end
     end
