@@ -5,23 +5,26 @@ require 'bolt/node'
 
 describe Bolt::Node do
   describe "initializing nodes from uri" do
+    let(:config) { Bolt::Config.new }
     it "understands user and password" do
-      node = Bolt::Node.from_uri('ssh://iuyergkj:123456@whitehouse.gov')
+      node = Bolt::Node.from_uri('ssh://iuyergkj:123456@whitehouse.gov',
+                                 config: config)
       expect(node.user).to eq('iuyergkj')
       expect(node.password).to eq('123456')
       expect(node.uri).to eq('ssh://iuyergkj:123456@whitehouse.gov')
     end
 
     it "defaults to specified user and password" do
-      config = Bolt::Config.new(user: 'somebody', password: 'very secure')
+      config[:user] = 'somebody'
+      config[:password] = 'very secure'
       node = Bolt::Node.from_uri('ssh://localhost', config: config)
       expect(node.user).to eq('somebody')
       expect(node.password).to eq('very secure')
     end
 
     it "uri overrides specified user and password" do
-      config = Bolt::Config.new(user: 'somebody', password: 'very secure')
-
+      config[:user] = 'somebody'
+      config[:password] = 'very secure'
       node = Bolt::Node.from_uri('ssh://toor:better@localhost', config: config)
       expect(node.user).to eq('toor')
       expect(node.password).to eq('better')
@@ -30,7 +33,7 @@ describe Bolt::Node do
     it "strips brackets from ipv6 addresses in a uri" do
       expect(Bolt::SSH).to receive(:new).with('::1', any_args)
 
-      Bolt::Node.from_uri('ssh://[::1]:22')
+      Bolt::Node.from_uri('ssh://[::1]:22', config: config)
     end
   end
 

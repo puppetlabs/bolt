@@ -92,6 +92,13 @@ describe Bolt::NodeURI do
       expect(uri.hostname).to eq('neptune')
       expect(uri.port).to eq(5985)
     end
+
+    it "uses 'winrm' when it's the default transport" do
+      uri = Bolt::NodeURI.new('neptune', 'winrm')
+      expect(uri.scheme).to eq('winrm')
+      expect(uri.hostname).to eq('neptune')
+      expect(uri.port).to eq(5985)
+    end
   end
 
   describe "with ssh" do
@@ -137,6 +144,15 @@ describe Bolt::NodeURI do
       expect(uri.scheme).to eq('pcp')
       expect(uri.hostname).to eq('pluto')
       expect(uri.port).to be_nil
+    end
+  end
+
+  describe "with unsupported http scheme" do
+    it "accepts 'http://pluto:666'" do
+      uri = Bolt::NodeURI.new('http://pluto:666')
+      expect(uri.scheme).to eq('http')
+      expect(uri.hostname).to eq('pluto')
+      expect(uri.port).to eq(666)
     end
   end
 end

@@ -86,6 +86,7 @@ HELP
 
     MODES = %w[command script task plan file].freeze
     ACTIONS = %w[run upload download].freeze
+    TRANSPORTS = %w[ssh winrm pcp].freeze
 
     attr_reader :parser
     attr_accessor :options
@@ -93,9 +94,10 @@ HELP
     def initialize(argv)
       @argv    = argv
       @options = {
-        nodes: []
+        nodes: [],
+        transport: 'ssh',
+        insecure: false
       }
-
       @parser = create_option_parser(@options)
     end
 
@@ -146,10 +148,13 @@ HELP
                 "Parameters to a task or plan") do |params|
           results[:task_options] = parse_params(params)
         end
-        results[:insecure] = false
         opts.on('-k', '--insecure',
                 "Whether to connect insecurely ") do |insecure|
           results[:insecure] = insecure
+        end
+        opts.on('--transport TRANSPORT', TRANSPORTS,
+                "Specify a default transport: #{TRANSPORTS.join(', ')}") do |t|
+          options[:transport] = t
         end
         opts.on_tail('--[no-]tty',
                      "Request a pseudo TTY on nodes that support it") do |tty|
@@ -342,7 +347,8 @@ HELP
                                 user: options[:user],
                                 password: options[:password],
                                 tty: options[:tty],
-                                insecure: options[:insecure])
+                                insecure: options[:insecure],
+                                transport: options[:transport])
       executor = Bolt::Executor.new(config)
 
       if options[:mode] == 'plan'

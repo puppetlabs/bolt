@@ -226,6 +226,36 @@ NODES
     end
   end
 
+  describe "transport" do
+    it "defaults to 'ssh'" do
+      cli = Bolt::CLI.new(%w[command run --nodes foo whoami])
+      expect(cli.parse[:transport]).to eq('ssh')
+    end
+
+    it "accepts ssh" do
+      cli = Bolt::CLI.new(%w[command run --transport ssh --nodes foo id])
+      expect(cli.parse[:transport]).to eq('ssh')
+    end
+
+    it "accepts winrm" do
+      cli = Bolt::CLI.new(%w[command run --transport winrm --nodes foo id])
+      expect(cli.parse[:transport]).to eq('winrm')
+    end
+
+    it "accepts pcp" do
+      cli = Bolt::CLI.new(%w[command run --transport pcp --nodes foo id])
+      expect(cli.parse[:transport]).to eq('pcp')
+    end
+
+    it "rejects invalid transports" do
+      cli = Bolt::CLI.new(%w[command run --transport holodeck --nodes foo id])
+      expect {
+        cli.parse
+      }.to raise_error(OptionParser::InvalidArgument,
+                       /invalid argument: --transport holodeck/)
+    end
+  end
+
   describe "command" do
     it "interprets whoami as the command" do
       cli = Bolt::CLI.new(%w[command run --nodes foo whoami])

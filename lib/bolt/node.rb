@@ -10,7 +10,7 @@ module Bolt
     ENVIRONMENT_METHODS = %w[both environment].freeze
 
     def self.from_uri(uri_string, **kwargs)
-      uri = NodeURI.new(uri_string)
+      uri = NodeURI.new(uri_string, kwargs[:config][:transport])
       klass = case uri.scheme
               when 'winrm'
                 Bolt::WinRM

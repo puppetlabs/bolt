@@ -3,12 +3,14 @@ module Bolt
                       :user,
                       :password,
                       :tty,
-                      :insecure) do
+                      :insecure,
+                      :transport) do
 
     DEFAULTS = {
       concurrency: 100,
       tty: false,
-      insecure: false
+      insecure: false,
+      transport: 'ssh'
     }.freeze
 
     def initialize(**kwargs)

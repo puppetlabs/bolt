@@ -2,19 +2,20 @@ require 'addressable'
 
 module Bolt
   class NodeURI
-    def initialize(string)
-      @uri = parse(string)
+    def initialize(string, transport = 'ssh')
+      @uri = parse(string, transport)
     end
 
-    def parse(string)
-      uri = if string =~ %r{^(ssh|winrm|pcp)://}
+    def parse(string, transport)
+      uri = if string =~ %r{^[^:]+://}
               Addressable::URI.parse(string)
             else
-              Addressable::URI.parse("ssh://#{string}")
+              Addressable::URI.parse("#{transport}://#{string}")
             end
       uri.port ||= 5985 if uri.scheme == 'winrm'
       uri
     end
+    private :parse
 
     def hostname
       @uri.hostname
