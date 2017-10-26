@@ -91,8 +91,10 @@ HELP
     attr_accessor :options
 
     def initialize(argv)
-      @argv = argv
-      @options = {}
+      @argv    = argv
+      @options = {
+        nodes: []
+      }
 
       @parser = create_option_parser(@options)
     end
@@ -111,7 +113,8 @@ HELP
           '* protocol is `ssh` by default, may be `ssh` or `winrm`',
           '* port is `22` by default for SSH, `5985` for winrm (Optional)'
         ) do |nodes|
-          results[:nodes] = parse_nodes(nodes)
+          results[:nodes] += parse_nodes(nodes)
+          results[:nodes].uniq!
         end
         opts.on('-u', '--user USER',
                 "User to authenticate as (Optional)") do |user|
@@ -284,7 +287,7 @@ HELP
               "unknown argument(s) #{options[:leftovers].join(', ')}"
       end
 
-      unless options[:nodes] || options[:mode] == 'plan'
+      unless !options[:nodes].empty? || options[:mode] == 'plan'
         raise Bolt::CLIError, "option --nodes must be specified"
       end
 
