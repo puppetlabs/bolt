@@ -416,6 +416,42 @@ NODES
       cli.execute(options)
     end
 
+    it "errors for non-existent modules" do
+      task_name = 'dne::task1'
+      task_params = { 'message' => 'hi' }
+
+      options = {
+        nodes: node_names,
+        mode: 'task',
+        action: 'run',
+        object: task_name,
+        task_options: task_params,
+        modulepath: [File.join(__FILE__, '../../fixtures/modules')]
+      }
+      expect { cli.execute(options) }.to raise_error(
+        Bolt::CLIError,
+        /Could not find module/
+      )
+    end
+
+    it "errors for non-existent tasks" do
+      task_name = 'sample::dne'
+      task_params = { 'message' => 'hi' }
+
+      options = {
+        nodes: node_names,
+        mode: 'task',
+        action: 'run',
+        object: task_name,
+        task_options: task_params,
+        modulepath: [File.join(__FILE__, '../../fixtures/modules')]
+      }
+      expect { cli.execute(options) }.to raise_error(
+        Bolt::CLIError,
+        /Task .* not found/
+      )
+    end
+
     it "runs an init task given a module name" do
       task_name = 'sample'
       task_params = { 'message' => 'hi' }

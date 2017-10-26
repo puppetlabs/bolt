@@ -420,25 +420,32 @@ HELP
       module_name, file_name = name.split('::', 2)
       file_name ||= 'init'
 
-      env = Puppet::Node::Environment.create('bolt', modulepath)
-      Puppet.override(environments: Puppet::Environments::Static.new(env)) do
-        data = Puppet::InfoService::TaskInformationService.task_data(
-          env.name, module_name, name
-        )
+      begin
+        env = Puppet::Node::Environment.create('bolt', modulepath)
+        Puppet.override(environments: Puppet::Environments::Static.new(env)) do
+          data = Puppet::InfoService::TaskInformationService.task_data(
+            env.name, module_name, name
+          )
 
-        file = data[:files].find { |f| File.basename(f, '.*') == file_name }
-        if file.nil?
-          raise Bolt::CLIError, "Failed to load task file for '#{name}'"
-        end
-
-        metadata =
-          if data[:metadata_file]
-            JSON.parse(File.read(data[:metadata_file]))
-          else
-            {}
+          file = data[:files].find { |f| File.basename(f, '.*') == file_name }
+          if file.nil?
+            raise Bolt::CLIError, "Failed to load task file for '#{name}'"
           end
 
-        [file, metadata]
+          metadata =
+            if data[:metadata_file]
+              JSON.parse(File.read(data[:metadata_file]))
+            else
+              {}
+            end
+
+          [file, metadata]
+        end
+      rescue Puppet::Module::Task::TaskNotFound => e
+        raise  Bolt::CLIError, e.message
+      rescue Puppet::Module::MissingModule
+        # Generate message so we don't expose "bolt environment"
+        raise  Bolt::CLIError, "Could not find module: #{module_name}"
       end
     end
 
