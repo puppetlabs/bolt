@@ -324,6 +324,38 @@ NODES
     end
   end
 
+  describe 'task' do
+    it "errors without a task" do
+      cli = Bolt::CLI.new(%w[task run -n example.com --modulepath .])
+      expect {
+        cli.parse
+      }.to raise_error(Bolt::CLIError, /must specify/)
+    end
+
+    it "errors if task is a parameter" do
+      cli = Bolt::CLI.new(%w[task run -n example.com --modulepath . p1=v1])
+      expect {
+        cli.parse
+      }.to raise_error(Bolt::CLIError, /invalid task/)
+    end
+  end
+
+  describe 'plan' do
+    it "errors without a plan" do
+      cli = Bolt::CLI.new(%w[plan run -n example.com --modulepath .])
+      expect {
+        cli.parse
+      }.to raise_error(Bolt::CLIError, /must specify/)
+    end
+
+    it "errors if plan is a parameter" do
+      cli = Bolt::CLI.new(%w[plan run -n example.com --modulepath . p1=v1])
+      expect {
+        cli.parse
+      }.to raise_error(Bolt::CLIError, /invalid plan/)
+    end
+  end
+
   describe "execute" do
     let(:executor) { double('executor') }
     let(:cli) { Bolt::CLI.new({}) }

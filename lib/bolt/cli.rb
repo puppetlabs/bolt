@@ -287,6 +287,16 @@ HELP
               "unknown argument(s) #{options[:leftovers].join(', ')}"
       end
 
+      if %w[task plan].include?(options[:mode])
+        if options[:object].nil?
+          raise Bolt::CLIError, "must specify a #{options[:mode]} to run"
+        end
+        # This may mean that we parsed a parameter as the object
+        unless options[:object] =~ /\A([a-z][a-z0-9_]*)?(::[a-z][a-z0-9_]*)*\Z/
+          raise Bolt::CLIError, "invalid #{options[:mode]}: #{options[:object]}"
+        end
+      end
+
       unless !options[:nodes].empty? || options[:mode] == 'plan'
         raise Bolt::CLIError, "option --nodes must be specified"
       end
