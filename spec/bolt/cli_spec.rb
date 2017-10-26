@@ -324,6 +324,38 @@ NODES
     end
   end
 
+  describe 'task' do
+    it "errors without a task" do
+      cli = Bolt::CLI.new(%w[task run -n example.com --modulepath .])
+      expect {
+        cli.parse
+      }.to raise_error(Bolt::CLIError, /must specify/)
+    end
+
+    it "errors if task is a parameter" do
+      cli = Bolt::CLI.new(%w[task run -n example.com --modulepath . p1=v1])
+      expect {
+        cli.parse
+      }.to raise_error(Bolt::CLIError, /invalid task/)
+    end
+  end
+
+  describe 'plan' do
+    it "errors without a plan" do
+      cli = Bolt::CLI.new(%w[plan run -n example.com --modulepath .])
+      expect {
+        cli.parse
+      }.to raise_error(Bolt::CLIError, /must specify/)
+    end
+
+    it "errors if plan is a parameter" do
+      cli = Bolt::CLI.new(%w[plan run -n example.com --modulepath . p1=v1])
+      expect {
+        cli.parse
+      }.to raise_error(Bolt::CLIError, /invalid plan/)
+    end
+  end
+
   describe "execute" do
     let(:executor) { double('executor') }
     let(:cli) { Bolt::CLI.new({}) }
@@ -382,6 +414,42 @@ NODES
         modulepath: [File.join(__FILE__, '../../fixtures/modules')]
       }
       cli.execute(options)
+    end
+
+    it "errors for non-existent modules" do
+      task_name = 'dne::task1'
+      task_params = { 'message' => 'hi' }
+
+      options = {
+        nodes: node_names,
+        mode: 'task',
+        action: 'run',
+        object: task_name,
+        task_options: task_params,
+        modulepath: [File.join(__FILE__, '../../fixtures/modules')]
+      }
+      expect { cli.execute(options) }.to raise_error(
+        Bolt::CLIError,
+        /Could not find module/
+      )
+    end
+
+    it "errors for non-existent tasks" do
+      task_name = 'sample::dne'
+      task_params = { 'message' => 'hi' }
+
+      options = {
+        nodes: node_names,
+        mode: 'task',
+        action: 'run',
+        object: task_name,
+        task_options: task_params,
+        modulepath: [File.join(__FILE__, '../../fixtures/modules')]
+      }
+      expect { cli.execute(options) }.to raise_error(
+        Bolt::CLIError,
+        /Task .* not found/
+      )
     end
 
     it "runs an init task given a module name" do

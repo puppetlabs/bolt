@@ -287,6 +287,16 @@ HELP
               "unknown argument(s) #{options[:leftovers].join(', ')}"
       end
 
+      if %w[task plan].include?(options[:mode])
+        if options[:object].nil?
+          raise Bolt::CLIError, "must specify a #{options[:mode]} to run"
+        end
+        # This may mean that we parsed a parameter as the object
+        unless options[:object] =~ /\A([a-z][a-z0-9_]*)?(::[a-z][a-z0-9_]*)*\Z/
+          raise Bolt::CLIError, "invalid #{options[:mode]}: #{options[:object]}"
+        end
+      end
+
       unless !options[:nodes].empty? || options[:mode] == 'plan'
         raise Bolt::CLIError, "option --nodes must be specified"
       end
@@ -410,25 +420,32 @@ HELP
       module_name, file_name = name.split('::', 2)
       file_name ||= 'init'
 
-      env = Puppet::Node::Environment.create('bolt', modulepath)
-      Puppet.override(environments: Puppet::Environments::Static.new(env)) do
-        data = Puppet::InfoService::TaskInformationService.task_data(
-          env.name, module_name, name
-        )
+      begin
+        env = Puppet::Node::Environment.create('bolt', modulepath)
+        Puppet.override(environments: Puppet::Environments::Static.new(env)) do
+          data = Puppet::InfoService::TaskInformationService.task_data(
+            env.name, module_name, name
+          )
 
-        file = data[:files].find { |f| File.basename(f, '.*') == file_name }
-        if file.nil?
-          raise Bolt::CLIError, "Failed to load task file for '#{name}'"
-        end
-
-        metadata =
-          if data[:metadata_file]
-            JSON.parse(File.read(data[:metadata_file]))
-          else
-            {}
+          file = data[:files].find { |f| File.basename(f, '.*') == file_name }
+          if file.nil?
+            raise Bolt::CLIError, "Failed to load task file for '#{name}'"
           end
 
-        [file, metadata]
+          metadata =
+            if data[:metadata_file]
+              JSON.parse(File.read(data[:metadata_file]))
+            else
+              {}
+            end
+
+          [file, metadata]
+        end
+      rescue Puppet::Module::Task::TaskNotFound => e
+        raise  Bolt::CLIError, e.message
+      rescue Puppet::Module::MissingModule
+        # Generate message so we don't expose "bolt environment"
+        raise  Bolt::CLIError, "Could not find module: #{module_name}"
       end
     end
 
