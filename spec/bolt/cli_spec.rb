@@ -9,7 +9,7 @@ describe "Bolt::CLI" do
     cli = Bolt::CLI.new(%w[command run --unknown])
     expect {
       cli.parse
-    }.to raise_error(Bolt::CLIError, /unknown argument '--unknown'/)
+    }.to raise_error(Bolt::CLIError, /Unknown argument '--unknown'/)
   end
 
   it "generates an error message if an unknown subcommand is given" do
@@ -119,14 +119,14 @@ NODES
       cli = Bolt::CLI.new(%w[command run --nodes])
       expect {
         cli.parse
-      }.to raise_error(Bolt::CLIError, /option '--nodes' needs a parameter/)
+      }.to raise_error(Bolt::CLIError, /Option '--nodes' needs a parameter/)
     end
 
     it "generates an error message if nodes is omitted" do
       cli = Bolt::CLI.new(%w[command run])
       expect {
         cli.parse
-      }.to raise_error(Bolt::CLIError, /option --nodes must be specified/)
+      }.to raise_error(Bolt::CLIError, /Option '--nodes' must be specified/)
     end
   end
 
@@ -140,7 +140,7 @@ NODES
       cli = Bolt::CLI.new(%w[command run --nodes foo --user])
       expect {
         cli.parse
-      }.to raise_error(Bolt::CLIError, /option '--user' needs a parameter/)
+      }.to raise_error(Bolt::CLIError, /Option '--user' needs a parameter/)
     end
   end
 
@@ -175,7 +175,7 @@ NODES
       expect {
         cli.parse
       }.to raise_error(Bolt::CLIError,
-                       /option '--concurrency' needs a parameter/)
+                       /Option '--concurrency' needs a parameter/)
     end
   end
 
@@ -222,7 +222,7 @@ NODES
       expect {
         cli.parse
       }.to raise_error(Bolt::CLIError,
-                       /option '--modulepath' needs a parameter/)
+                       /Option '--modulepath' needs a parameter/)
     end
   end
 
@@ -324,6 +324,38 @@ NODES
     end
   end
 
+  describe 'task' do
+    it "errors without a task" do
+      cli = Bolt::CLI.new(%w[task run -n example.com --modulepath .])
+      expect {
+        cli.parse
+      }.to raise_error(Bolt::CLIError, /Must specify/)
+    end
+
+    it "errors if task is a parameter" do
+      cli = Bolt::CLI.new(%w[task run -n example.com --modulepath . p1=v1])
+      expect {
+        cli.parse
+      }.to raise_error(Bolt::CLIError, /Invalid task/)
+    end
+  end
+
+  describe 'plan' do
+    it "errors without a plan" do
+      cli = Bolt::CLI.new(%w[plan run -n example.com --modulepath .])
+      expect {
+        cli.parse
+      }.to raise_error(Bolt::CLIError, /Must specify/)
+    end
+
+    it "errors if plan is a parameter" do
+      cli = Bolt::CLI.new(%w[plan run -n example.com --modulepath . p1=v1])
+      expect {
+        cli.parse
+      }.to raise_error(Bolt::CLIError, /Invalid plan/)
+    end
+  end
+
   describe "execute" do
     let(:executor) { double('executor') }
     let(:cli) { Bolt::CLI.new({}) }
@@ -382,6 +414,42 @@ NODES
         modulepath: [File.join(__FILE__, '../../fixtures/modules')]
       }
       cli.execute(options)
+    end
+
+    it "errors for non-existent modules" do
+      task_name = 'dne::task1'
+      task_params = { 'message' => 'hi' }
+
+      options = {
+        nodes: node_names,
+        mode: 'task',
+        action: 'run',
+        object: task_name,
+        task_options: task_params,
+        modulepath: [File.join(__FILE__, '../../fixtures/modules')]
+      }
+      expect { cli.execute(options) }.to raise_error(
+        Bolt::CLIError,
+        /Could not find module/
+      )
+    end
+
+    it "errors for non-existent tasks" do
+      task_name = 'sample::dne'
+      task_params = { 'message' => 'hi' }
+
+      options = {
+        nodes: node_names,
+        mode: 'task',
+        action: 'run',
+        object: task_name,
+        task_options: task_params,
+        modulepath: [File.join(__FILE__, '../../fixtures/modules')]
+      }
+      expect { cli.execute(options) }.to raise_error(
+        Bolt::CLIError,
+        /Could not find task '#{task_name}' in module 'sample'/
+      )
     end
 
     it "runs an init task given a module name" do

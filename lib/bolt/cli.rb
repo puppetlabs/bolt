@@ -275,6 +275,11 @@ HELP
               "#{MODES.join(', ')}"
       end
 
+      if options[:action].nil?
+        raise Bolt::CLIError,
+              "Expected an action of the form 'bolt #{options[:mode]} <action>'"
+      end
+
       unless ACTIONS.include?(options[:action])
         raise Bolt::CLIError,
               "Expected action '#{options[:action]}' to be one of " \
@@ -284,16 +289,27 @@ HELP
       if options[:mode] != 'file' && options[:mode] != 'script' &&
          !options[:leftovers].empty?
         raise Bolt::CLIError,
-              "unknown argument(s) #{options[:leftovers].join(', ')}"
+              "Unknown argument(s) #{options[:leftovers].join(', ')}"
+      end
+
+      if %w[task plan].include?(options[:mode])
+        if options[:object].nil?
+          raise Bolt::CLIError, "Must specify a #{options[:mode]} to run"
+        end
+        # This may mean that we parsed a parameter as the object
+        unless options[:object] =~ /\A([a-z][a-z0-9_]*)?(::[a-z][a-z0-9_]*)*\Z/
+          raise Bolt::CLIError,
+                "Invalid #{options[:mode]} '#{options[:object]}'"
+        end
       end
 
       unless !options[:nodes].empty? || options[:mode] == 'plan'
-        raise Bolt::CLIError, "option --nodes must be specified"
+        raise Bolt::CLIError, "Option '--nodes' must be specified"
       end
 
       if %w[task plan].include?(options[:mode]) && options[:modulepath].nil?
         raise Bolt::CLIError,
-              "option --modulepath must be specified when running" \
+              "Option '--modulepath' must be specified when running" \
               " a task or plan"
       end
     end
@@ -301,9 +317,9 @@ HELP
     def handle_parser_errors
       yield
     rescue OptionParser::MissingArgument => e
-      raise Bolt::CLIError, "option '#{e.args.first}' needs a parameter"
+      raise Bolt::CLIError, "Option '#{e.args.first}' needs a parameter"
     rescue OptionParser::InvalidOption => e
-      raise Bolt::CLIError, "unknown argument '#{e.args.first}'"
+      raise Bolt::CLIError, "Unknown argument '#{e.args.first}'"
     end
 
     def execute(options)
@@ -410,25 +426,33 @@ HELP
       module_name, file_name = name.split('::', 2)
       file_name ||= 'init'
 
-      env = Puppet::Node::Environment.create('bolt', modulepath)
-      Puppet.override(environments: Puppet::Environments::Static.new(env)) do
-        data = Puppet::InfoService::TaskInformationService.task_data(
-          env.name, module_name, name
-        )
+      begin
+        env = Puppet::Node::Environment.create('bolt', modulepath)
+        Puppet.override(environments: Puppet::Environments::Static.new(env)) do
+          data = Puppet::InfoService::TaskInformationService.task_data(
+            env.name, module_name, name
+          )
 
-        file = data[:files].find { |f| File.basename(f, '.*') == file_name }
-        if file.nil?
-          raise Bolt::CLIError, "Failed to load task file for '#{name}'"
-        end
-
-        metadata =
-          if data[:metadata_file]
-            JSON.parse(File.read(data[:metadata_file]))
-          else
-            {}
+          file = data[:files].find { |f| File.basename(f, '.*') == file_name }
+          if file.nil?
+            raise Bolt::CLIError, "Failed to load task file for '#{name}'"
           end
 
-        [file, metadata]
+          metadata =
+            if data[:metadata_file]
+              JSON.parse(File.read(data[:metadata_file]))
+            else
+              {}
+            end
+
+          [file, metadata]
+        end
+      rescue Puppet::Module::Task::TaskNotFound
+        raise  Bolt::CLIError,
+               "Could not find task '#{name}' in module '#{module_name}'"
+      rescue Puppet::Module::MissingModule
+        # Generate message so we don't expose "bolt environment"
+        raise  Bolt::CLIError, "Could not find module '#{module_name}'"
       end
     end
 
