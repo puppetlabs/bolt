@@ -16,6 +16,12 @@ describe Bolt::SSH do
   let(:command) { "pwd" }
   let(:ssh) { Bolt::SSH.new(hostname, port, user, password) }
   let(:insecure) { { config: Bolt::Config.new(insecure: true) } }
+  let(:echo_script) { <<BASH }
+for var in "$@"
+do
+    echo $var
+done
+BASH
 
   context "when connecting", vagrant: true do
     it "performs secure host key verification by default" do
@@ -122,11 +128,55 @@ describe Bolt::SSH do
     end
 
     it "can run a script remotely", vagrant: true do
-      contents = "#!/bin/sh\necho hellote\necho $1"
+      contents = "#!/bin/sh\necho hellote"
       with_tempfile_containing('script test', contents) do |file|
         expect(
-          ssh._run_script(file.path, ['arg']).value
-        ).to eq("hellote\narg\n")
+          ssh._run_script(file.path, []).value
+        ).to eq("hellote\n")
+      end
+    end
+
+    it "can run a script remotely with quoted arguments", vagrant: true do
+      with_tempfile_containing('script-test-ssh-quotes', echo_script) do |file|
+        expect(
+          ssh._run_script(
+            file.path,
+            ['nospaces',
+             'with spaces',
+             "\"double double\"",
+             "'double single'",
+             '\'single single\'',
+             '"single double"',
+             "double \"double\" double",
+             "double 'single' double",
+             'single "double" single',
+             'single \'single\' single']
+          ).value
+        ).to eq(<<QUOTED)
+nospaces
+with spaces
+"double double"
+'double single'
+'single single'
+"single double"
+double "double" double
+double 'single' double
+single "double" single
+single 'single' single
+QUOTED
+      end
+    end
+
+    it "escapes unsafe shellwords in arguments", vagrant: true do
+      with_tempfile_containing('script-test-ssh-escape', echo_script) do |file|
+        expect(
+          ssh._run_script(
+            file.path,
+            ['echo $HOME; cat /etc/passwd']
+          ).value
+        ).to eq(<<SHELLWORDS)
+echo $HOME; cat /etc/passwd
+SHELLWORDS
       end
     end
 

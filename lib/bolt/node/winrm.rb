@@ -129,12 +129,20 @@ PS
     # 10 minutes in milliseconds
     DEFAULT_EXECUTION_TIMEOUT = 10 * 60 * 1000
 
-    def execute_process(path = '', arguments = '', stdin = nil,
+    def execute_process(path = '', arguments = [], stdin = nil,
                         timeout_ms = DEFAULT_EXECUTION_TIMEOUT)
+      quoted_args = arguments.map do |arg|
+        "'" + arg.gsub("'", "''") + "'"
+      end.join(',')
+
       execute(<<-PS)
+$quoted_array = @(
+  #{quoted_args}
+)
+
 $invokeArgs = @{
   Path = "#{path}"
-  Arguments = "#{arguments.gsub('"', '""')}"
+  Arguments = $quoted_array -Join ' '
   Timeout = #{timeout_ms}
   #{stdin.nil? ? '' : "StdinInput = @'\n" + stdin + "\n'@"}
 }
@@ -146,20 +154,21 @@ PS
 
     VALID_EXTENSIONS = ['.ps1', '.rb', '.pp'].freeze
 
-    PS_ARGS =
-      '-NoProfile -NonInteractive -NoLogo -ExecutionPolicy Bypass'.freeze
+    PS_ARGS = %w[
+      -NoProfile -NonInteractive -NoLogo -ExecutionPolicy Bypass
+    ].freeze
 
     def process_from_extension(path)
       case Pathname(path).extname.downcase
       when '.rb'
         [
           'ruby.exe',
-          "-S \"#{path}\""
+          ['-S', path]
         ]
       when '.ps1'
         [
           'powershell.exe',
-          "#{PS_ARGS} -File \"#{path}\""
+          [*PS_ARGS, '-File', path]
         ]
       when '.pp'
         [
@@ -222,15 +231,9 @@ PS
     def _run_script(script, arguments)
       @logger.info { "Running script '#{script}'" }
       with_remote_file(script) do |remote_path|
-        args = [PS_ARGS, '-File', "\"#{remote_path}\""]
-        args += arguments.map do |arg|
-          if arg =~ / /
-            "\"#{arg}\""
-          else
-            arg
-          end
-        end
-        execute_process('powershell.exe', args.join(' '))
+        args = [*PS_ARGS, '-File', remote_path]
+        args += escape_arguments(arguments)
+        execute_process('powershell.exe', args)
       end
     end
 
@@ -254,6 +257,16 @@ PS
       end.then do
         with_remote_file(task) do |remote_path|
           execute_process(*process_from_extension(remote_path), stdin)
+        end
+      end
+    end
+
+    def escape_arguments(arguments)
+      arguments.map do |arg|
+        if arg =~ / /
+          "\"#{arg}\""
+        else
+          arg
         end
       end
     end

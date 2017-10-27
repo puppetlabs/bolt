@@ -1,6 +1,7 @@
+require 'json'
+require 'shellwords'
 require 'net/ssh'
 require 'net/sftp'
-require 'json'
 require 'bolt/node/result'
 
 module Bolt
@@ -136,14 +137,7 @@ module Bolt
       @logger.debug { "arguments: #{arguments}" }
 
       with_remote_file(script) do |remote_path|
-        # should each arg be quoted?
-        command = "'#{remote_path}'"
-        unless arguments.empty?
-          command += " "
-          command += arguments.join(' ')
-        end
-
-        execute(command)
+        execute("'#{remote_path}' #{Shellwords.join(arguments)}")
       end
     end
 
