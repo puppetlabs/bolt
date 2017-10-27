@@ -6,17 +6,13 @@
 ### SYNOPSIS
 ~~~
 $ bolt task run <task-name> [<parameter>=<value> ...] [<target-pattern>] [--help, -h] [--format, -f <output-format>]
+$ bolt task show
+$ bolt task show <task-name>
 $ bolt plan run <plan-file> 
 $ bolt command run '<command>'
 $ bolt script run '<path>'
 $ bolt file upload
 $ bolt file download
-~~~
-
-##### Compare to PE CLI
-~~~
-$ puppet task run <task-name> [<parameter>=<value> ...] 
-$ puppet task run exec command='<command>' 
 ~~~
 
 
@@ -45,7 +41,48 @@ Option | Description
 --params <br>-p | Enter a string containing JSON parameters  <br> `@<file-name>` Or provide a file with JSON parameters. 
 
 
+
 ### OUTPUT
+
+** View the list of installed tasks **
+
+~~~
+$ bolt task show
+aos_login           Login to AOS server for session token                                                         
+aos_rack_type       Manage AOS Rack Type                                                                          
+aos_template        Manage AOS Template                                                                           
+apache2_mod_proxy   Set and/or get members' attributes of an Apache httpd 2.4 mod_proxy balancer pool             
+apache2_module      enables/disables a module of the Apache2 webserver                                            
+apk                 -                                                                          
+apt                 Manages apt-packages                                                                          
+apt_key             Add or remove an apt key                                                                      
+apt_repository      Add and remove APT repositories                                                               
+apt_rpm             apt_rpm package manager                                    
+
+Use `bolt task show <task-name>` to view details and parameters for a specific task.
+~~~
+
+**View documentation about a particular task**
+
+~~~
+$ bolt task show package
+ 
+package - Manage and inspect the state of packages
+ 
+USAGE:
+$ bolt task run --nodes, -n <node-names> package action=<value> package=<value> [provider=<value>] [version=<value>] [--noop]
+ 
+PARAMETERS:
+- action : Enum[install, status, uninstall, upgrade]
+    The operation (install, status, uninstall and upgrade) to perform on the package
+- package : String[1]
+    The name of the package to be manipulated
+- provider : Optional[String[1]]
+    The provider to use to manage or inspect the package, defaults to the system package manager
+- version : Optional[String[1]]
+    Version numbers must match the full version to install, including release if the provider uses a release moniker. Ranges or semver patterns are not accepted except for the gem package provider. For example, to install the bash package from the rpm bash-4.1.2-29.el6.x86_64.rpm, use the string '4.1.2-29.el6'.
+~~~
+
 
 
 
