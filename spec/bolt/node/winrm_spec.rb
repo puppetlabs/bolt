@@ -167,4 +167,23 @@ PS
                "\r\n"].join("\r\n"))
     end
   end
+
+  it "can apply a puppet manifest for a '.pp' task", vagrant: true do
+    output = <<OUTPUT
+Notice: Scope(Class[main]): hi
+Notice: Compiled catalog for x.y.z in environment production in 0.04 seconds
+Notice: Applied catalog in 0.04 seconds
+OUTPUT
+    allow(winrm)
+      .to receive(:execute_process)
+      .with("C:\\Program Files\\Puppet Labs\\Puppet\\bin\\puppet.bat",
+            /apply/,
+            anything)
+      .and_return(Bolt::Node::Success.new(output))
+    with_tempfile_containing('task-pp-winrm', "notice('hi)", '.pp') do |file|
+      expect(
+        winrm._run_task(file.path, 'stdin', {}).value
+      ).to eq(output)
+    end
+  end
 end
