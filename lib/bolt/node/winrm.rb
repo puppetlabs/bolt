@@ -144,7 +144,7 @@ $LASTEXITCODE = Invoke-Interpreter @invokeArgs
 PS
     end
 
-    VALID_EXTENSIONS = ['.ps1', '.rb'].freeze
+    VALID_EXTENSIONS = ['.ps1', '.rb', '.pp'].freeze
 
     PS_ARGS =
       '-NoProfile -NonInteractive -NoLogo -ExecutionPolicy Bypass'.freeze
@@ -160,6 +160,11 @@ PS
         [
           'powershell.exe',
           "#{PS_ARGS} -File \"#{path}\""
+        ]
+      when '.pp'
+        [
+          'C:\Program Files\Puppet Labs\Puppet\bin\puppet.bat',
+          "apply \"#{path}\""
         ]
       end
     end
