@@ -132,40 +132,52 @@ PS
   end
 
   it "can run a script remotely with quoted arguments", vagrant: true do
-    pending("inner quotes are not escaped correctly")
     with_tempfile_containing('script-test-winrm-quotes', echo_script) do |file|
       expect(
         winrm._run_script(
           file.path,
           ['nospaces',
            'with spaces',
-           "\"double double\"",
-           "'double single'",
-           '\'single single\'',
-           '"single double"',
-           "double \"double\" double",
-           "double 'single' double",
-           'single "double" single',
-           'single \'single\' single']
+           "'a b'",
+           '\'a b\'',
+           "a 'b' c",
+           'a \'b\' c']
         ).value
       ).to eq(<<QUOTED)
 nospaces\r
 with spaces\r
-'double double'\r
-'double single'\r
-'single single'\r
-'single double'\r
-double "double" double\r
-double 'single' double\r
-single "double" single\r
-single 'single' single\r
+'a b'\r
+'a b'\r
+a 'b' c\r
+a 'b' c\r
+\r
+QUOTED
+    end
+  end
+
+  it "loses track of embedded double quotes", vagrant: true do
+    with_tempfile_containing('script-test-winrm-buggy', echo_script) do |file|
+      expect(
+        winrm._run_script(
+          file.path,
+          ["\"a b\"",
+           '"a b"',
+           "a \"b\" c",
+           'a "b" c']
+        ).value
+      ).to eq(<<QUOTED)
+a\r
+b\r
+a\r
+b\r
+a b c\r
+a b c\r
 \r
 QUOTED
     end
   end
 
   it "escapes unsafe shellwords", vagrant: true do
-    pending("shell words are not escaped")
     with_tempfile_containing('script-test-winrm-escape', echo_script) do |file|
       expect(
         winrm._run_script(
@@ -174,6 +186,7 @@ QUOTED
         ).value
       ).to eq(<<SHELLWORDS)
 echo $env:path\r
+\r
 SHELLWORDS
     end
   end

@@ -129,12 +129,20 @@ PS
     # 10 minutes in milliseconds
     DEFAULT_EXECUTION_TIMEOUT = 10 * 60 * 1000
 
-    def execute_process(path = '', arguments = '', stdin = nil,
+    def execute_process(path = '', arguments = [], stdin = nil,
                         timeout_ms = DEFAULT_EXECUTION_TIMEOUT)
+      quoted_args = arguments.map do |arg|
+        "'" + arg.gsub("'", "''") + "'"
+      end.join(',')
+
       execute(<<-PS)
+$quoted_array = @(
+  #{quoted_args}
+)
+
 $invokeArgs = @{
   Path = "#{path}"
-  Arguments = "#{arguments.gsub('"', '""')}"
+  Arguments = $quoted_array -Join ' '
   Timeout = #{timeout_ms}
   #{stdin.nil? ? '' : "StdinInput = @'\n" + stdin + "\n'@"}
 }
@@ -149,19 +157,18 @@ PS
     PS_ARGS = %w[
       -NoProfile -NonInteractive -NoLogo -ExecutionPolicy Bypass
     ].freeze
-    PS_ARGS_STRING = PS_ARGS.join(' ').freeze
 
     def process_from_extension(path)
       case Pathname(path).extname.downcase
       when '.rb'
         [
           'ruby.exe',
-          "-S \"#{path}\""
+          ['-S', path]
         ]
       when '.ps1'
         [
           'powershell.exe',
-          "#{PS_ARGS_STRING} -File \"#{path}\""
+          [*PS_ARGS, '-File', path]
         ]
       end
     end
@@ -219,9 +226,9 @@ PS
     def _run_script(script, arguments)
       @logger.info { "Running script '#{script}'" }
       with_remote_file(script) do |remote_path|
-        args = [PS_ARGS, '-File', "\"#{remote_path}\""]
+        args = [*PS_ARGS, '-File', remote_path]
         args += escape_arguments(arguments)
-        execute_process('powershell.exe', args.join(' '))
+        execute_process('powershell.exe', args)
       end
     end
 
