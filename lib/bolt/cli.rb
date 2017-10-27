@@ -363,7 +363,11 @@ HELP
             when 'command'
               executor.run_command(nodes, options[:object])
             when 'script'
-              executor.run_script(nodes, options[:object], options[:leftovers])
+              script = options[:object]
+              unless file_exist?(script)
+                raise Bolt::CLIError, "The script '#{script}' does not exist"
+              end
+              executor.run_script(nodes, script, options[:leftovers])
             when 'task'
               task_name = options[:object]
 

@@ -411,6 +411,7 @@ NODES
     end
 
     it "runs a script" do
+      allow(cli).to receive(:file_exist?).with('bar.sh').and_return(true)
       expect(executor)
         .to receive(:run_script)
         .with(nodes, 'bar.sh', [])
@@ -421,6 +422,19 @@ NODES
         leftovers: []
       }
       cli.execute(options)
+    end
+
+    it "errors for non-existent scripts" do
+      options = {
+        nodes: node_names, mode: 'script', action: 'run', object: 'bar.sh',
+        leftovers: []
+      }
+      expect {
+        cli.execute(options)
+      }.to raise_error(
+        Bolt::CLIError,
+        /The script 'bar.sh' does not exist/
+      )
     end
 
     it "runs a task given a name" do
