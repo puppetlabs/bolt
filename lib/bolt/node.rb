@@ -37,6 +37,7 @@ module Bolt
       @port = port
       @user = user || config[:user]
       @password = password || config[:password]
+      @key = config[:key]
       @tty = config[:tty]
       @insecure = config[:insecure]
       @uri = uri
