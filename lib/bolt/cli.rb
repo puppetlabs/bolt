@@ -138,6 +138,10 @@ HELP
           end
         end
         results[:concurrency] = 100
+        opts.on('--private-key KEY',
+                "Private ssh key to authenticate with (Optional)") do |key|
+          results[:key] = key
+        end
         opts.on('-c', '--concurrency CONCURRENCY', Integer,
                 "Maximum number of simultaneous connections " \
                 "(Optional, defaults to 100)") do |concurrency|
