@@ -1,11 +1,17 @@
+require 'logger'
 require 'concurrent'
 require 'bolt/result'
 require 'bolt/config'
+require 'bolt/formatter'
 
 module Bolt
   class Executor
     def initialize(config = Bolt::Config.new)
       @config = config
+      @logger = Logger.new(config[:log_destination])
+      @logger.progname = 'executor'
+      @logger.level = config[:log_level]
+      @logger.formatter = Bolt::Formatter.new
     end
 
     def from_uris(nodes)
@@ -19,6 +25,12 @@ module Bolt
 
       poolsize = [nodes.length, @config[:concurrency]].min
       pool = Concurrent::FixedThreadPool.new(poolsize)
+      @logger.debug { "Started with #{poolsize} thread(s)" }
+
+      nodes.map(&:class).uniq.each do |klass|
+        klass.initialize_transport(@logger)
+      end
+
       nodes.each { |node|
         pool.post do
           results[node] =

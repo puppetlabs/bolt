@@ -11,7 +11,11 @@ describe "Bolt::Executor" do
   let(:task_arguments) { { 'name' => 'apache' } }
 
   def mock_node(name)
+    transport = double('holodeck')
+    allow(transport).to receive(:initialize_transport)
+
     node = double(name)
+    allow(node).to receive(:class).and_return(transport)
     allow(node).to receive(:connect)
     allow(node).to receive(:disconnect)
     node
