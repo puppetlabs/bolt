@@ -84,6 +84,7 @@ function Invoke-Interpreter
   catch
   {
     $Host.UI.WriteErrorLine($_)
+    if ($process -ne $Null) { $process.Dispose() }
     return 1
   }
 
@@ -105,10 +106,14 @@ function Invoke-Interpreter
   {
     $Host.UI.WriteErrorLine("Process $Path did not complete in $($Timeout / 1000) seconds")
     try { $process.Kill() } catch { $Host.UI.WriteErrorLine("Failed To Kill Process $Path") }
+    $process.Dispose()
     return 1
   }
 
-  return $process.ExitCode
+  $exitCode = $process.ExitCode
+  $process.Dispose()
+
+  return $exitCode
 }
 PS
       @shell_initialized = true
