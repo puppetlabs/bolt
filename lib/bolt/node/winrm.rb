@@ -69,20 +69,20 @@ function Invoke-Interpreter
     $StdinInput = $Null
   )
 
-  $startInfo = New-Object System.Diagnostics.ProcessStartInfo($Path, $Arguments)
-  $startInfo.UseShellExecute = $false
-  $startInfo.WorkingDirectory = Split-Path -Parent (Get-Command $Path).Path
-  $startInfo.CreateNoWindow = $true
-  if ($StdinInput) { $startInfo.RedirectStandardInput = $true }
-  $startInfo.RedirectStandardOutput = $true
-  $startInfo.RedirectStandardError = $true
-
-  $stdoutHandler = { if (-not ([String]::IsNullOrEmpty($EventArgs.Data))) { $Host.UI.WriteLine($EventArgs.Data) } }
-  $stderrHandler = { if (-not ([String]::IsNullOrEmpty($EventArgs.Data))) { $Host.UI.WriteErrorLine($EventArgs.Data) } }
-  $invocationId = [Guid]::NewGuid().ToString()
-
   try
   {
+    $startInfo = New-Object System.Diagnostics.ProcessStartInfo($Path, $Arguments)
+    $startInfo.UseShellExecute = $false
+    $startInfo.WorkingDirectory = Split-Path -Parent (Get-Command $Path).Path
+    $startInfo.CreateNoWindow = $true
+    if ($StdinInput) { $startInfo.RedirectStandardInput = $true }
+    $startInfo.RedirectStandardOutput = $true
+    $startInfo.RedirectStandardError = $true
+
+    $stdoutHandler = { if (-not ([String]::IsNullOrEmpty($EventArgs.Data))) { $Host.UI.WriteLine($EventArgs.Data) } }
+    $stderrHandler = { if (-not ([String]::IsNullOrEmpty($EventArgs.Data))) { $Host.UI.WriteErrorLine($EventArgs.Data) } }
+    $invocationId = [Guid]::NewGuid().ToString()
+
     $process = New-Object System.Diagnostics.Process
     $process.StartInfo = $startInfo
     $process.EnableRaisingEvents = $true
@@ -96,41 +96,44 @@ function Invoke-Interpreter
 
     $process.BeginOutputReadLine()
     $process.BeginErrorReadLine()
+
+    if ($StdinInput)
+    {
+      $process.StandardInput.WriteLine($StdinInput)
+      $process.StandardInput.Close()
+    }
+
+    # park current thread until the PS event is signaled upon process exit
+    # OR the timeout has elapsed
+    $waitResult = Wait-Event -SourceIdentifier $invocationId -Timeout $Timeout
+    if (! $process.HasExited)
+    {
+      $Host.UI.WriteErrorLine("Process $Path did not complete in $Timeout seconds")
+      return 1
+    }
+
+    return $process.ExitCode
   }
   catch
   {
     $Host.UI.WriteErrorLine($_)
+    return 1
+  }
+  finally
+  {
     @($stdoutEvent, $stderrEvent, $exitedEvent) |
       ? { $_ -ne $Null } |
       % { Unregister-Event -SourceIdentifier $_.Name }
-    if ($process -ne $Null) { $process.Dispose() }
-    return 1
+
+    if ($process -ne $Null)
+    {
+      if (($process.Handle -ne $Null) -and (! $process.HasExited))
+      {
+        try { $process.Kill() } catch { $Host.UI.WriteErrorLine("Failed To Kill Process $Path") }
+      }
+      $process.Dispose()
+    }
   }
-
-  if ($StdinInput)
-  {
-    $process.StandardInput.WriteLine($StdinInput)
-    $process.StandardInput.Close()
-  }
-
-  # park current thread until the PS event is signaled upon process exit
-  # OR the timeout has elapsed
-  $waitResult = Wait-Event -SourceIdentifier $invocationId -Timeout $Timeout
-
-  @($stdoutEvent, $stderrEvent, $exitedEvent) | % { Unregister-Event -SourceIdentifier $_.Name }
-
-  if (! ($process.HasExited))
-  {
-    $Host.UI.WriteErrorLine("Process $Path did not complete in $Timeout seconds")
-    try { $process.Kill() } catch { $Host.UI.WriteErrorLine("Failed To Kill Process $Path") }
-    $process.Dispose()
-    return 1
-  }
-
-  $exitCode = $process.ExitCode
-  $process.Dispose()
-
-  return $exitCode
 }
 PS
       @shell_initialized = true
