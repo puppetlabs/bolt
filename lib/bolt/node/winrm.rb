@@ -115,13 +115,13 @@ function Invoke-Interpreter
 
   # park current thread until the PS event is signaled upon process exit
   # OR the timeout has elapsed
-  $waitResult = Wait-Event -SourceIdentifier $invocationId -Timeout ($Timeout / 1000)
+  $waitResult = Wait-Event -SourceIdentifier $invocationId -Timeout $Timeout
 
   @($stdoutEvent, $stderrEvent, $exitedEvent) | % { Unregister-Event -SourceIdentifier $_.Name }
 
   if (! ($process.HasExited))
   {
-    $Host.UI.WriteErrorLine("Process $Path did not complete in $($Timeout / 1000) seconds")
+    $Host.UI.WriteErrorLine("Process $Path did not complete in $Timeout seconds")
     try { $process.Kill() } catch { $Host.UI.WriteErrorLine("Failed To Kill Process $Path") }
     $process.Dispose()
     return 1
@@ -158,11 +158,11 @@ PS
       end
     end
 
-    # 10 minutes in milliseconds
-    DEFAULT_EXECUTION_TIMEOUT = 10 * 60 * 1000
+    # 10 minutes in seconds
+    DEFAULT_EXECUTION_TIMEOUT = 10 * 60
 
     def execute_process(path = '', arguments = [], stdin = nil,
-                        timeout_ms = DEFAULT_EXECUTION_TIMEOUT)
+                        timeout = DEFAULT_EXECUTION_TIMEOUT)
       quoted_args = arguments.map do |arg|
         "'" + arg.gsub("'", "''") + "'"
       end.join(',')
@@ -175,7 +175,7 @@ $quoted_array = @(
 $invokeArgs = @{
   Path = "#{path}"
   Arguments = $quoted_array -Join ' '
-  Timeout = #{timeout_ms}
+  Timeout = #{timeout}
   #{stdin.nil? ? '' : "StdinInput = @'\n" + stdin + "\n'@"}
 }
 
