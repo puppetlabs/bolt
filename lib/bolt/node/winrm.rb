@@ -101,6 +101,13 @@ function Invoke-Interpreter
   if ($stderr) { $Host.UI.WriteErrorLine($stderr) }
   $process.WaitForExit($Timeout) | Out-Null
 
+  if (! ($process.HasExited))
+  {
+    $Host.UI.WriteErrorLine("Process $Path did not complete in $($Timeout / 1000) seconds")
+    try { $process.Kill() } catch { $Host.UI.WriteErrorLine("Failed To Kill Process $Path") }
+    return 1
+  }
+
   return $process.ExitCode
 }
 PS
