@@ -5,6 +5,30 @@ require 'bolt/cli'
 describe "Bolt::CLI" do
   include BoltSpec::Files
 
+  def stub_file(path)
+    stat = double('stat', readable?: true, file?: true)
+
+    allow(cli).to receive(:file_stat).with(path).and_return(stat)
+  end
+
+  def stub_non_existent_file(path)
+    allow(cli).to receive(:file_stat).with(path).and_raise(
+      Errno::ENOENT, "No such file or directory @ rb_file_s_stat - #{path}"
+    )
+  end
+
+  def stub_unreadable_file(path)
+    stat = double('stat', readable?: false, file?: true)
+
+    allow(cli).to receive(:file_stat).with(path).and_return(stat)
+  end
+
+  def stub_directory(path)
+    stat = double('stat', readable?: true, file?: false)
+
+    allow(cli).to receive(:file_stat).with(path).and_return(stat)
+  end
+
   it "generates an error message if an unknown argument is given" do
     cli = Bolt::CLI.new(%w[command run --unknown])
     expect {
@@ -410,17 +434,47 @@ NODES
       cli.execute(options)
     end
 
-    it "runs a script" do
-      expect(executor)
-        .to receive(:run_script)
-        .with(nodes, 'bar.sh', [])
-        .and_return({})
-
-      options = {
-        nodes: node_names, mode: 'script', action: 'run', object: 'bar.sh',
-        leftovers: []
+    describe "when running a script" do
+      let(:script) { 'bar.sh' }
+      let(:options) {
+        { nodes: node_names, mode: 'script', action: 'run', object: script,
+          leftovers: [] }
       }
-      cli.execute(options)
+
+      it "runs a script" do
+        stub_file(script)
+
+        expect(executor)
+          .to receive(:run_script)
+          .with(nodes, script, [])
+          .and_return({})
+
+        cli.execute(options)
+      end
+
+      it "errors for non-existent scripts" do
+        stub_non_existent_file(script)
+
+        expect { cli.execute(options) }.to raise_error(
+          Bolt::CLIError, /The script '#{script}' does not exist/
+        )
+      end
+
+      it "errors for unreadable scripts" do
+        stub_unreadable_file(script)
+
+        expect { cli.execute(options) }.to raise_error(
+          Bolt::CLIError, /The script '#{script}' is unreadable/
+        )
+      end
+
+      it "errors for scripts that aren't files" do
+        stub_directory(script)
+
+        expect { cli.execute(options) }.to raise_error(
+          Bolt::CLIError, /The script '#{script}' is not a file/
+        )
+      end
     end
 
     it "runs a task given a name" do
@@ -459,8 +513,7 @@ NODES
         modulepath: [File.join(__FILE__, '../../fixtures/modules')]
       }
       expect { cli.execute(options) }.to raise_error(
-        Bolt::CLIError,
-        /Could not find module/
+        Bolt::CLIError, /Could not find module/
       )
     end
 
@@ -550,44 +603,50 @@ NODES
     end
 
     describe "file uploading" do
-      it "uploads a file via scp" do
-        expect(executor)
-          .to receive(:file_upload)
-          .with(nodes, '/path/to/local', '/path/to/remote')
-          .and_return({})
-        expect(cli)
-          .to receive(:file_exist?)
-          .with('/path/to/local')
-          .and_return(true)
-
-        options = {
+      let(:source) { '/path/to/local' }
+      let(:dest) { '/path/to/remote' }
+      let(:options) {
+        {
           nodes: node_names,
           mode: 'file',
           action: 'upload',
-          object: '/path/to/local',
-          leftovers: ['/path/to/remote']
+          object: source,
+          leftovers: [dest]
         }
+      }
+
+      it "uploads a file via scp" do
+        stub_file(source)
+
+        expect(executor)
+          .to receive(:file_upload)
+          .with(nodes, source, dest)
+          .and_return({})
+
         cli.execute(options)
       end
 
       it "raises if the local file doesn't exist" do
-        expect(cli)
-          .to receive(:file_exist?)
-          .with('/path/to/local')
-          .and_return(false)
+        stub_non_existent_file(source)
 
-        options = {
-          nodes: node_names,
-          mode: 'file',
-          action: 'upload',
-          object: '/path/to/local',
-          leftovers: ['/path/to/remote']
-        }
-        expect {
-          cli.execute(options)
-        }.to raise_error(
-          Bolt::CLIError,
-          %r{The source file '/path/to/local' does not exist}
+        expect { cli.execute(options) }.to raise_error(
+          Bolt::CLIError, /The source file '#{source}' does not exist/
+        )
+      end
+
+      it "errors if the local file is unreadable" do
+        stub_unreadable_file(source)
+
+        expect { cli.execute(options) }.to raise_error(
+          Bolt::CLIError, /The source file '#{source}' is unreadable/
+        )
+      end
+
+      it "errors if the local file is a directory" do
+        stub_directory(source)
+
+        expect { cli.execute(options) }.to raise_error(
+          Bolt::CLIError, /The source file '#{source}' is not a file/
         )
       end
     end

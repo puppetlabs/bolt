@@ -360,7 +360,9 @@ HELP
             when 'command'
               executor.run_command(nodes, options[:object])
             when 'script'
-              executor.run_script(nodes, options[:object], options[:leftovers])
+              script = options[:object]
+              validate_file('script', script)
+              executor.run_script(nodes, script, options[:leftovers])
             when 'task'
               task_name = options[:object]
 
@@ -377,10 +379,8 @@ HELP
 
               if dest.nil?
                 raise Bolt::CLIError, "A destination path must be specified"
-              elsif !file_exist?(src)
-                raise Bolt::CLIError, "The source file '#{src}' does not exist"
               end
-
+              validate_file('source file', src)
               executor.file_upload(nodes, src, dest)
             end
         end
@@ -421,8 +421,24 @@ HELP
                           elapsed_time)
     end
 
-    def file_exist?(path)
-      File.exist?(path)
+    def validate_file(type, path)
+      if path.nil?
+        raise Bolt::CLIError, "A #{type} must be specified"
+      end
+
+      stat = file_stat(path)
+
+      if !stat.readable?
+        raise Bolt::CLIError, "The #{type} '#{path}' is unreadable"
+      elsif !stat.file?
+        raise Bolt::CLIError, "The #{type} '#{path}' is not a file"
+      end
+    rescue Errno::ENOENT
+      raise Bolt::CLIError, "The #{type} '#{path}' does not exist"
+    end
+
+    def file_stat(path)
+      File.stat(path)
     end
 
     def load_task_data(name, modulepath)
