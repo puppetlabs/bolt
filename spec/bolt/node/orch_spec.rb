@@ -214,7 +214,7 @@ describe Bolt::Orch, orchestrator: true do
   end
 
   describe :_run_script do
-    let(:args) { ['with spaces', 'nospaces'] }
+    let(:args) { ['with spaces', 'nospaces', 'echo $HOME; cat /etc/passwd'] }
 
     context "the script succeeds" do
       let(:script_path) do
@@ -236,6 +236,7 @@ describe Bolt::Orch, orchestrator: true do
         ).to eq(<<OUT)
 arg: with spaces
 arg: nospaces
+arg: echo $HOME; cat /etc/passwd
 standard out
 OUT
       end
