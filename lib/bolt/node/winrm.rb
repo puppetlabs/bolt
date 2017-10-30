@@ -79,6 +79,7 @@ function Invoke-Interpreter
 
   $stdoutHandler = { if (-not ([String]::IsNullOrEmpty($EventArgs.Data))) { $Host.UI.WriteLine($EventArgs.Data) } }
   $stderrHandler = { if (-not ([String]::IsNullOrEmpty($EventArgs.Data))) { $Host.UI.WriteErrorLine($EventArgs.Data) } }
+  $invocationId = [Guid]::NewGuid().ToString()
 
   try
   {
@@ -89,6 +90,7 @@ function Invoke-Interpreter
     # https://msdn.microsoft.com/en-us/library/system.diagnostics.process.standarderror(v=vs.110).aspx#Anchor_2
     $stdoutEvent = Register-ObjectEvent -InputObject $process -EventName 'OutputDataReceived' -Action $stdoutHandler
     $stderrEvent = Register-ObjectEvent -InputObject $process -EventName 'ErrorDataReceived' -Action $stderrHandler
+    $exitedEvent = Register-ObjectEvent -InputObject $process -EventName 'Exited' -SourceIdentifier $invocationId
 
     $process.Start() | Out-Null
 
@@ -98,7 +100,7 @@ function Invoke-Interpreter
   catch
   {
     $Host.UI.WriteErrorLine($_)
-    @($stdoutEvent, $stderrEvent) |
+    @($stdoutEvent, $stderrEvent, $exitedEvent) |
       ? { $_ -ne $Null } |
       % { Unregister-Event -SourceIdentifier $_.Name }
     if ($process -ne $Null) { $process.Dispose() }
@@ -111,9 +113,11 @@ function Invoke-Interpreter
     $process.StandardInput.Close()
   }
 
-  $process.WaitForExit($Timeout) | Out-Null
+  # park current thread until the PS event is signaled upon process exit
+  # OR the timeout has elapsed
+  $waitResult = Wait-Event -SourceIdentifier $invocationId -Timeout ($Timeout / 1000)
 
-  @($stdoutEvent, $stderrEvent) | % { Unregister-Event -SourceIdentifier $_.Name }
+  @($stdoutEvent, $stderrEvent, $exitedEvent) | % { Unregister-Event -SourceIdentifier $_.Name }
 
   if (! ($process.HasExited))
   {

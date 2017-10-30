@@ -191,11 +191,14 @@ SHELLWORDS
   it "does not deadlock scripts that write > 4k to stderr", winrm: true do
     contents = <<-PS
     $bytes_in_k = (1024 * 4) + 1
-    [Text.Encoding]::UTF8.GetString((New-Object Byte[] ($bytes_in_k))) | Write-Error
+    $Host.UI.WriteErrorLine([Text.Encoding]::UTF8.GetString((New-Object Byte[] ($bytes_in_k))))
     PS
 
     with_tempfile_containing('script-test-winrm', contents) do |file|
-      expect(winrm._run_script(file.path, [])).to be_success
+      result = winrm._run_script(file.path, [])
+      expect(result).to be_success
+      expected_nulls = ("\0" * (1024 * 4 + 1)) + "\r\n"
+      expect(result.output.stderr.string).to eq(expected_nulls)
     end
   end
 
