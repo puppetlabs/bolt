@@ -72,6 +72,7 @@ function Invoke-Interpreter
   $startInfo = New-Object System.Diagnostics.ProcessStartInfo($Path, $Arguments)
   $startInfo.UseShellExecute = $false
   $startInfo.WorkingDirectory = Split-Path -Parent (Get-Command $Path).Path
+  $startInfo.CreateNoWindow = $true
   if ($StdinInput) { $startInfo.RedirectStandardInput = $true }
   $startInfo.RedirectStandardOutput = $true
   $startInfo.RedirectStandardError = $true
