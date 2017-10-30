@@ -28,26 +28,74 @@ rototiller_task :host_config do |task|
 end
 
 namespace :ci do
+  beaker_options = [
+    { name: '--log-level',
+      add_argument: {
+        name: 'debug',
+        add_env: {
+          name: 'BEAKER_LOG_LEVEL',
+          message: 'Beaker log level'
+        }
+      } },
+    { name: '--hosts',
+      add_argument: {
+        name: 'hosts.yaml',
+        add_env: {
+          name: 'BEAKER_HOSTS_FILE',
+          message: 'Beaker hosts file'
+        }
+      } },
+    { name: '--tests',
+      add_argument: {
+        name: 'tests',
+        add_env: {
+          name: 'BEAKER_TESTS',
+          message: 'Beaker test path(s)'
+        }
+      } },
+    { name: '--preserve-hosts',
+      add_argument: {
+        name: 'never',
+        add_env: {
+          name: 'BEAKER_PRESERVE_HOSTS',
+          message: 'When should beaker keep hosts alive'
+        }
+      } },
+    { name: '--keyfile',
+      add_argument: {
+        add_env: {
+          name: 'BEAKER_KEYFILE',
+          message: 'The private SSH key beaker will use to connect to SUTs'
+        }
+      } }
+  ]
   namespace :test do
     desc "Run bolt acceptance tests against a published gem"
     task gem: :host_config
     rototiller_task :gem do |task|
+      beaker_options << {
+        name: '--options',
+        add_argument: { name: 'config/gem/options.rb' }
+      }
       task.add_env(name: 'GEM_VERSION', default: '> 0.1.0')
       task.add_env(name: 'GEM_SOURCE',  default: 'https://rubygems.org')
       task.add_env(name: 'SSH_USER',    default: 'root')
       task.add_env(name: 'SSH_PASSWORD')
       task.add_env(name: 'WINRM_USER', default: 'Administrator')
       task.add_env(name: 'WINRM_PASSWORD')
-      cmd  = "bundle exec beaker"
-      cmd += " -o config/gem/options.rb"
-      cmd += " -h hosts.yaml"
-      cmd += " -t tests"
-      task.add_command(name: cmd)
+      task.add_command do |cmd|
+        cmd.name = 'bundle exec beaker'
+        cmd.add_option(*beaker_options)
+      end
     end
 
     desc "Run bolt acceptance tests against a git repo"
     task git: :host_config
     rototiller_task :git do |task|
+      beaker_options << {
+        name: '--options',
+        add_argument: { name: 'config/git/options.rb' }
+      }
       task.add_env(name: 'GIT_SERVER', default: 'https://github.com')
       task.add_env(name: 'GIT_FORK',   default: 'puppetlabs/bolt.git')
       task.add_env(name: 'GIT_BRANCH', default: 'master')
@@ -56,11 +104,10 @@ namespace :ci do
       task.add_env(name: 'SSH_PASSWORD')
       task.add_env(name: 'WINRM_USER', default: 'Administrator')
       task.add_env(name: 'WINRM_PASSWORD')
-      cmd  = "bundle exec beaker"
-      cmd += " -o config/git/options.rb"
-      cmd += " -h hosts.yaml"
-      cmd += " -t tests"
-      task.add_command(name: cmd)
+      task.add_command do |cmd|
+        cmd.name = 'bundle exec beaker'
+        cmd.add_option(*beaker_options)
+      end
     end
   end
 end
