@@ -7,6 +7,7 @@ matrix:
   fast_finish: true
 
 environment:
+  BOLT_WINRM_USER: roddypiper
   matrix:
     - RUBY_VERSION: 200
     - RUBY_VERSION: 24
@@ -25,6 +26,16 @@ before_test:
       gem -v
       bundle -v
       type Gemfile.lock
+      $computer = [ADSI]"WinNT://."
+      $user = $computer.Create('user', $ENV:BOLT_WINRM_USER)
+      Add-Type -AssemblyName System.Web
+      $ENV:BOLT_WINRM_PASSWORD = [System.Web.Security.Membership]::GeneratePassword(10, 3)
+      $user.SetPassword($ENV:BOLT_WINRM_PASSWORD)
+      $user.SetInfo()
+      $group = [ADSI]"WinNT://./Remote Management Users,group"
+      # cannot use '.' for host in the user path per
+      # https://stackoverflow.com/questions/20286306/error-while-adding-a-local-group-to-local-user-using-powershell
+      $group.Add("WinNT://$ENV:COMPUTERNAME/$ENV:BOLT_WINRM_USER,user")
 
 test_script:
   - bundle exec rake windows
