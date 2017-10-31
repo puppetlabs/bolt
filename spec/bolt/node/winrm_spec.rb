@@ -9,10 +9,10 @@ describe Bolt::WinRM do
   include BoltSpec::Errors
   include BoltSpec::Files
 
-  let(:host) { 'localhost' }
-  let(:port) { 55985 }
-  let(:user) { "vagrant" }
-  let(:password) { "vagrant" }
+  let(:host) { ENV['BOLT_WINRM_HOST'] || 'localhost' }
+  let(:port) { ENV['BOLT_WINRM_PORT'] || 55985 }
+  let(:user) { ENV['BOLT_WINRM_USER'] || "vagrant" }
+  let(:password) { ENV['BOLT_WINRM_PASSWORD'] || "vagrant" }
   let(:command) { "echo $env:UserName" }
   let(:winrm) { Bolt::WinRM.new(host, port, user, password) }
   let(:echo_script) { <<PS }
@@ -105,12 +105,12 @@ PS
   end
 
   it "executes a command on a host", vagrant: true do
-    expect(winrm.execute(command).value).to eq("vagrant\r\n")
+    expect(winrm.execute(command).value).to eq("#{user}\r\n")
   end
 
   it "can upload a file to a host", vagrant: true do
     contents = "934jklnvf"
-    remote_path = 'C:\Users\vagrant\upload-test-winrm'
+    remote_path = 'C:\Windows\Temp\upload-test-winrm'
     with_tempfile_containing('upload-test-winrm', contents) do |file|
       winrm.upload(file.path, remote_path)
 
