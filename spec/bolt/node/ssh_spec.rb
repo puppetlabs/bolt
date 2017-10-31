@@ -9,10 +9,10 @@ describe Bolt::SSH do
   include BoltSpec::Errors
   include BoltSpec::Files
 
-  let(:hostname) { "localhost" }
-  let(:user) { "vagrant" }
-  let(:password) { "vagrant" }
-  let(:port) { 2224 }
+  let(:hostname) { ENV['BOLT_SSH_HOST'] || "localhost" }
+  let(:user) { ENV['BOLT_SSH_USER'] || "vagrant" }
+  let(:password) { ENV['BOLT_SSH_PASSWORD'] || "vagrant" }
+  let(:port) { ENV['BOLT_SSH_PORT'] || 2224 }
   let(:command) { "pwd" }
   let(:ssh) { Bolt::SSH.new(hostname, port, user, password) }
   let(:insecure) { { config: Bolt::Config.new(insecure: true) } }
@@ -107,7 +107,7 @@ BASH
     after(:each) { ssh.disconnect }
 
     it "executes a command on a host", ssh: true do
-      expect(ssh.execute(command).value).to eq("/home/vagrant\n")
+      expect(ssh.execute(command).value).to eq("/home/#{user}\n")
     end
 
     it "captures stderr from a host", ssh: true do
@@ -117,13 +117,13 @@ BASH
     it "can upload a file to a host", ssh: true do
       contents = "kljhdfg"
       with_tempfile_containing('upload-test', contents) do |file|
-        ssh.upload(file.path, "/home/vagrant/upload-test")
+        ssh.upload(file.path, "/home/#{user}/upload-test")
 
         expect(
-          ssh.execute("cat /home/vagrant/upload-test").value
+          ssh.execute("cat /home/#{user}/upload-test").value
         ).to eq(contents)
 
-        ssh.execute("rm /home/vagrant/upload-test")
+        ssh.execute("rm /home/#{user}/upload-test")
       end
     end
 
