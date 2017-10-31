@@ -7,12 +7,17 @@ RSpec::Core::RakeTask.new(:spec)
 
 desc "Run RSpec tests that don't require VM fixtures"
 RSpec::Core::RakeTask.new(:unit) do |t|
-  t.rspec_opts = '--tag ~vagrant'
+  t.rspec_opts = '--tag ~ssh --tag ~winrm'
 end
 
 desc "Run RSpec tests that don't require VM fixtures or orchestrator"
 RSpec::Core::RakeTask.new(:windows) do |t|
-  t.rspec_opts = '--tag ~vagrant --tag ~orchestrator'
+  t.rspec_opts = '--tag ~ssh --tag ~winrm --tag ~orchestrator'
+end
+
+desc "Run RSpec tests for AppVeyor that don't require SSH or orchestrator"
+RSpec::Core::RakeTask.new(:appveyor) do |t|
+  t.rspec_opts = '--tag ~ssh --tag ~orchestrator'
 end
 
 RuboCop::RakeTask.new(:rubocop) do |t|

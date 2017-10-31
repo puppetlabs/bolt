@@ -32,7 +32,7 @@ PS
     allow(shell).to receive(:run).and_raise(klass, message)
   end
 
-  context "when connecting fails", vagrant: true do
+  context "when connecting fails", winrm: true do
     it "raises Node::ConnectError if the node name can't be resolved" do
       winrm = Bolt::WinRM.new('totally-not-there', port, user, password)
       expect_node_error(Bolt::Node::ConnectError,
@@ -104,11 +104,11 @@ PS
     end
   end
 
-  it "executes a command on a host", vagrant: true do
+  it "executes a command on a host", winrm: true do
     expect(winrm.execute(command).value).to eq("#{user}\r\n")
   end
 
-  it "can upload a file to a host", vagrant: true do
+  it "can upload a file to a host", winrm: true do
     contents = "934jklnvf"
     remote_path = 'C:\Windows\Temp\upload-test-winrm'
     with_tempfile_containing('upload-test-winrm', contents) do |file|
@@ -122,7 +122,7 @@ PS
     end
   end
 
-  it "can run a script remotely", vagrant: true do
+  it "can run a script remotely", winrm: true do
     contents = "Write-Output \"hellote\""
     with_tempfile_containing('script-test-winrm', contents) do |file|
       expect(
@@ -131,7 +131,7 @@ PS
     end
   end
 
-  it "can run a script remotely with quoted arguments", vagrant: true do
+  it "can run a script remotely with quoted arguments", winrm: true do
     with_tempfile_containing('script-test-winrm-quotes', echo_script) do |file|
       expect(
         winrm._run_script(
@@ -155,7 +155,7 @@ QUOTED
     end
   end
 
-  it "loses track of embedded double quotes", vagrant: true do
+  it "loses track of embedded double quotes", winrm: true do
     with_tempfile_containing('script-test-winrm-buggy', echo_script) do |file|
       expect(
         winrm._run_script(
@@ -177,7 +177,7 @@ QUOTED
     end
   end
 
-  it "escapes unsafe shellwords", vagrant: true do
+  it "escapes unsafe shellwords", winrm: true do
     with_tempfile_containing('script-test-winrm-escape', echo_script) do |file|
       expect(
         winrm._run_script(
@@ -191,7 +191,7 @@ SHELLWORDS
     end
   end
 
-  it "can run a task remotely", vagrant: true do
+  it "can run a task remotely", winrm: true do
     contents = 'Write-Output "$env:PT_message_one" ${env:PT_message two}'
     arguments = { :message_one => 'task is running',
                   :"message two" => 'task has run' }
@@ -201,7 +201,7 @@ SHELLWORDS
     end
   end
 
-  it "can run a task passing input on stdin", vagrant: true do
+  it "can run a task passing input on stdin", winrm: true do
     contents = <<PS
 $line = [Console]::In.ReadLine()
 Write-Output $line
@@ -213,7 +213,7 @@ PS
     end
   end
 
-  it "can run a task passing input on stdin and environment", vagrant: true do
+  it "can run a task passing input on stdin and environment", winrm: true do
     contents = <<PS
 Write-Output "$env:PT_message_one" "$env:PT_message_two"
 $line = [Console]::In.ReadLine()
@@ -230,7 +230,7 @@ PS
     end
   end
 
-  it "can apply a puppet manifest for a '.pp' task", vagrant: true do
+  it "can apply a puppet manifest for a '.pp' task", winrm: true do
     output = <<OUTPUT
 Notice: Scope(Class[main]): hi
 Notice: Compiled catalog for x.y.z in environment production in 0.04 seconds

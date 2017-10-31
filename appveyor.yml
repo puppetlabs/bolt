@@ -8,6 +8,8 @@ matrix:
 
 environment:
   BOLT_WINRM_USER: roddypiper
+  BOLT_WINRM_HOST: localhost
+  BOLT_WINRM_PORT: 5985
   matrix:
     - RUBY_VERSION: 200
     - RUBY_VERSION: 24
@@ -38,4 +40,4 @@ before_test:
       $group.Add("WinNT://$ENV:COMPUTERNAME/$ENV:BOLT_WINRM_USER,user")
 
 test_script:
-  - bundle exec rake windows
+  - bundle exec rake appveyor
