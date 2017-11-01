@@ -15,6 +15,7 @@ before_script:
 - export BOLT_SSH_PASSWORD=`apg -n 1`
 - sudo adduser --disabled-password --home /home/$BOLT_SSH_USER --gecos "" $BOLT_SSH_USER
 - echo $BOLT_SSH_USER:$BOLT_SSH_PASSWORD | sudo chpasswd
+- 'echo "$BOLT_SSH_USER ALL=(ALL) PASSWD: ALL" | sudo tee /etc/sudoers.d/bolt'
 script:
 - bundle exec rake travisci rubocop
 notifications:

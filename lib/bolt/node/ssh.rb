@@ -54,9 +54,19 @@ module Bolt
       end
     end
 
-    def execute(command, options = {})
+    def execute(command, sudoable: false, **options)
       result_output = Bolt::Node::ResultOutput.new
       status = {}
+      use_sudo = sudoable && (@sudo || @run_as)
+      sudo_prompt = '[sudo] Bolt needs to run as another user, password: '
+      if use_sudo
+        user_clause = if @run_as
+                        "-u #{@run_as}"
+                      else
+                        ''
+                      end
+        command = "sudo -S #{user_clause} -p '#{sudo_prompt}' #{command}"
+      end
 
       @logger.debug { "Executing: #{command}" }
 
@@ -68,12 +78,22 @@ module Bolt
           raise "could not execute command: #{command.inspect}" unless success
 
           channel.on_data do |_, data|
-            result_output.stdout << data
+            if use_sudo && data == sudo_prompt
+              channel.send_data "#{@sudo_password}\n"
+              channel.wait
+            else
+              result_output.stdout << data
+            end
             @logger.debug { "stdout: #{data}" }
           end
 
           channel.on_extended_data do |_, _, data|
-            result_output.stderr << data
+            if use_sudo && data == sudo_prompt
+              channel.send_data "#{@sudo_password}\n"
+              channel.wait
+            else
+              result_output.stderr << data
+            end
             @logger.debug { "stderr: #{data}" }
           end
 
@@ -136,8 +156,48 @@ module Bolt
       end
     end
 
+    def make_wrapper_stringio(task_path, stdin)
+      StringIO.new(<<-SCRIPT)
+#!/bin/sh
+'#{task_path}' <<EOF
+#{stdin}
+EOF
+SCRIPT
+    end
+
+    def with_remote_task_wrapper(task_file, stdin)
+      remote_task = ''
+      dir = ''
+      wrapper = ''
+      result = nil
+
+      make_tempdir.then do |value|
+        dir = value
+        remote_task = "#{dir}/#{File.basename(task_file)}"
+        wrapper = "#{dir}/wrapper.sh"
+        Bolt::Node::Success.new
+      end.then do
+        _upload(task_file, remote_task)
+      end.then do
+        _upload(make_wrapper_stringio(remote_task, stdin), wrapper)
+      end.then do
+        execute("chmod u+x '#{remote_task}'")
+      end.then do
+        execute("chmod u+x '#{wrapper}'")
+      end.then do
+        result = yield wrapper
+      end.then do
+        execute("rm -f '#{remote_task}'")
+      end.then do
+        execute("rm -f '#{wrapper}'")
+      end.then do
+        execute("rmdir '#{dir}'")
+        result
+      end
+    end
+
     def _run_command(command)
-      execute(command)
+      execute(command, sudoable: true)
     end
 
     def _run_script(script, arguments)
@@ -145,7 +205,8 @@ module Bolt
       @logger.debug { "arguments: #{arguments}" }
 
       with_remote_file(script) do |remote_path|
-        execute("'#{remote_path}' #{Shellwords.join(arguments)}")
+        execute("'#{remote_path}' #{Shellwords.join(arguments)}",
+                sudoable: true)
       end
     end
 
@@ -166,13 +227,24 @@ module Bolt
         end.join(' ')
       end
 
-      with_remote_file(task) do |remote_path|
-        command = if export_args.empty?
-                    "'#{remote_path}'"
-                  else
-                    "#{export_args} '#{remote_path}'"
-                  end
-        execute(command, stdin: stdin)
+      if stdin
+        with_remote_task_wrapper(task, stdin) do |remote_path|
+          command = if export_args.empty?
+                      "'#{remote_path}'"
+                    else
+                      "#{export_args} '#{remote_path}'"
+                    end
+          execute(command, sudoable: true)
+        end
+      else
+        with_remote_file(task) do |remote_path|
+          command = if export_args.empty?
+                      "'#{remote_path}'"
+                    else
+                      "#{export_args} '#{remote_path}'"
+                    end
+          execute(command, stdin: stdin, sudoable: true)
+        end
       end
     end
   end
