@@ -20,6 +20,11 @@ RSpec::Core::RakeTask.new(:appveyor) do |t|
   t.rspec_opts = '--tag ~ssh --tag ~orchestrator'
 end
 
+desc "Run RSpec tests for TravisCI that don't require WinRM or orchestrator"
+RSpec::Core::RakeTask.new(:travisci) do |t|
+  t.rspec_opts = '--tag ~winrm'
+end
+
 RuboCop::RakeTask.new(:rubocop) do |t|
   t.options = ['--display-cop-names', '--display-style-guide']
 end

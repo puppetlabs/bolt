@@ -4,10 +4,19 @@ cache: bundler
 rvm:
 - 2.4
 - 2.0
+env:
+  global:
+    - BOLT_SSH_USER: cocobware
+    - BOLT_SSH_HOST: localhost
+    - BOLT_SSH_PORT: 22
 before_script:
 - cat Gemfile.lock
+- sudo apt-get install -y apg
+- export BOLT_SSH_PASSWORD=`apg -n 1`
+- sudo adduser --disabled-password --home /home/$BOLT_SSH_USER --gecos "" $BOLT_SSH_USER
+- echo $BOLT_SSH_USER:$BOLT_SSH_PASSWORD | sudo chpasswd
 script:
-- bundle exec rake unit rubocop
+- bundle exec rake travisci rubocop
 notifications:
   email: false
   hipchat:
