@@ -230,22 +230,56 @@ PS
     end
   end
 
-  it "can apply a puppet manifest for a '.pp' task", winrm: true do
-    output = <<OUTPUT
+  describe "when resolving file extensions" do
+    it "can apply a powershell-based task", winrm: true do
+      contents = <<PS
+Write-Output "42"
+PS
+      allow(winrm)
+        .to receive(:execute_process)
+        .with('powershell.exe',
+              ['-NoProfile', '-NonInteractive', '-NoLogo',
+               '-ExecutionPolicy', 'Bypass', '-File', /^".*"$/],
+              anything)
+        .and_return(Bolt::Node::Success.new("42"))
+      with_tempfile_containing('task-rb-winrm', contents, '.ps1') do |file|
+        expect(
+          winrm._run_task(file.path, 'stdin', {}).value
+        ).to eq("42")
+      end
+    end
+
+    it "can apply a ruby-based task", winrm: true do
+      allow(winrm)
+        .to receive(:execute_process)
+        .with('ruby.exe',
+              ['-S', /^".*"$/],
+              anything)
+        .and_return(Bolt::Node::Success.new("42"))
+      with_tempfile_containing('task-rb-winrm', "puts 42", '.rb') do |file|
+        expect(
+          winrm._run_task(file.path, 'stdin', {}).value
+        ).to eq("42")
+      end
+    end
+
+    it "can apply a puppet manifest for a '.pp' task", winrm: true do
+      output = <<OUTPUT
 Notice: Scope(Class[main]): hi
 Notice: Compiled catalog for x.y.z in environment production in 0.04 seconds
 Notice: Applied catalog in 0.04 seconds
 OUTPUT
-    allow(winrm)
-      .to receive(:execute_process)
-      .with("C:\\Program Files\\Puppet Labs\\Puppet\\bin\\puppet.bat",
-            /apply/,
-            anything)
-      .and_return(Bolt::Node::Success.new(output))
-    with_tempfile_containing('task-pp-winrm', "notice('hi)", '.pp') do |file|
-      expect(
-        winrm._run_task(file.path, 'stdin', {}).value
-      ).to eq(output)
+      allow(winrm)
+        .to receive(:execute_process)
+        .with('puppet.bat',
+              ['apply', /^".*"$/],
+              anything)
+        .and_return(Bolt::Node::Success.new(output))
+      with_tempfile_containing('task-pp-winrm', "notice('hi)", '.pp') do |file|
+        expect(
+          winrm._run_task(file.path, 'stdin', {}).value
+        ).to eq(output)
+      end
     end
   end
 end

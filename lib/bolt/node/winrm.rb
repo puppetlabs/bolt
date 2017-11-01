@@ -41,7 +41,8 @@ module Bolt
       return Bolt::Node::Success.new if @shell_initialized
       result = execute(<<-PS)
 
-$ENV:PATH += ";${ENV:ProgramFiles}\\Puppet Labs\\Puppet\\sys\\ruby\\bin\\"
+$ENV:PATH += ";${ENV:ProgramFiles}\\Puppet Labs\\Puppet\\bin\\;" +
+  "${ENV:ProgramFiles}\\Puppet Labs\\Puppet\\sys\\ruby\\bin\\"
 $ENV:RUBYLIB = "${ENV:ProgramFiles}\\Puppet Labs\\Puppet\\puppet\\lib;" +
   "${ENV:ProgramFiles}\\Puppet Labs\\Puppet\\facter\\lib;" +
   "${ENV:ProgramFiles}\\Puppet Labs\\Puppet\\hiera\\lib;" +
@@ -70,6 +71,7 @@ function Invoke-Interpreter
 
   $startInfo = New-Object System.Diagnostics.ProcessStartInfo($Path, $Arguments)
   $startInfo.UseShellExecute = $false
+  $startInfo.WorkingDirectory = Split-Path -Parent (Get-Command $Path).Path
   if ($StdinInput) { $startInfo.RedirectStandardInput = $true }
   $startInfo.RedirectStandardOutput = $true
   $startInfo.RedirectStandardError = $true
@@ -163,17 +165,17 @@ PS
       when '.rb'
         [
           'ruby.exe',
-          ['-S', path]
+          ['-S', "\"#{path}\""]
         ]
       when '.ps1'
         [
           'powershell.exe',
-          [*PS_ARGS, '-File', path]
+          [*PS_ARGS, '-File', "\"#{path}\""]
         ]
       when '.pp'
         [
-          'C:\Program Files\Puppet Labs\Puppet\bin\puppet.bat',
-          "apply \"#{path}\""
+          'puppet.bat',
+          ['apply', "\"#{path}\""]
         ]
       end
     end
@@ -231,7 +233,7 @@ PS
     def _run_script(script, arguments)
       @logger.info { "Running script '#{script}'" }
       with_remote_file(script) do |remote_path|
-        args = [*PS_ARGS, '-File', remote_path]
+        args = [*PS_ARGS, '-File', "\"#{remote_path}\""]
         args += escape_arguments(arguments)
         execute_process('powershell.exe', args)
       end
@@ -256,7 +258,8 @@ PS
         Bolt::Node::Success.new
       end.then do
         with_remote_file(task) do |remote_path|
-          execute_process(*process_from_extension(remote_path), stdin)
+          path, args = *process_from_extension(remote_path)
+          execute_process(path, args, stdin)
         end
       end
     end
