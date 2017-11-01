@@ -23,7 +23,7 @@ do
 done
 BASH
 
-  context "when connecting", vagrant: true do
+  context "when connecting", ssh: true do
     it "performs secure host key verification by default" do
       allow(Net::SSH)
         .to receive(:start)
@@ -106,15 +106,15 @@ BASH
     before(:each) { ssh.connect }
     after(:each) { ssh.disconnect }
 
-    it "executes a command on a host", vagrant: true do
+    it "executes a command on a host", ssh: true do
       expect(ssh.execute(command).value).to eq("/home/vagrant\n")
     end
 
-    it "captures stderr from a host", vagrant: true do
+    it "captures stderr from a host", ssh: true do
       expect(ssh.execute("ssh -V").output.stderr.string).to match(/OpenSSH/)
     end
 
-    it "can upload a file to a host", vagrant: true do
+    it "can upload a file to a host", ssh: true do
       contents = "kljhdfg"
       with_tempfile_containing('upload-test', contents) do |file|
         ssh.upload(file.path, "/home/vagrant/upload-test")
@@ -127,7 +127,7 @@ BASH
       end
     end
 
-    it "can run a script remotely", vagrant: true do
+    it "can run a script remotely", ssh: true do
       contents = "#!/bin/sh\necho hellote"
       with_tempfile_containing('script test', contents) do |file|
         expect(
@@ -136,7 +136,7 @@ BASH
       end
     end
 
-    it "can run a script remotely with quoted arguments", vagrant: true do
+    it "can run a script remotely with quoted arguments", ssh: true do
       with_tempfile_containing('script-test-ssh-quotes', echo_script) do |file|
         expect(
           ssh._run_script(
@@ -167,7 +167,7 @@ QUOTED
       end
     end
 
-    it "escapes unsafe shellwords in arguments", vagrant: true do
+    it "escapes unsafe shellwords in arguments", ssh: true do
       with_tempfile_containing('script-test-ssh-escape', echo_script) do |file|
         expect(
           ssh._run_script(
@@ -180,7 +180,7 @@ SHELLWORDS
       end
     end
 
-    it "can run a task", vagrant: true do
+    it "can run a task", ssh: true do
       contents = "#!/bin/sh\necho -n ${PT_message_one} ${PT_message_two}"
       arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
       with_tempfile_containing('tasks test', contents) do |file|
@@ -189,7 +189,7 @@ SHELLWORDS
       end
     end
 
-    it "can run a task passing input on stdin", vagrant: true do
+    it "can run a task passing input on stdin", ssh: true do
       contents = "#!/bin/sh\ngrep 'message_one'"
       arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
       with_tempfile_containing('tasks test stdin', contents) do |file|
@@ -198,7 +198,7 @@ SHELLWORDS
       end
     end
 
-    it "can run a task passing input on stdin and environment", vagrant: true do
+    it "can run a task passing input on stdin and environment", ssh: true do
       contents = <<SHELL
 #!/bin/sh
 echo -n ${PT_message_one} ${PT_message_two}

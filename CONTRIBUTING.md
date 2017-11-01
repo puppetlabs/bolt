@@ -50,7 +50,7 @@ To use `rubocop`, perform the bundle install with no exclusions
 
 ## Testing
 
-Some tests require a Windows or Linux VM. Execute `vagrant up` to bring these up with the Vagrantfile included with the `bolt` gem. Any tests that require this are tagged with `:vagrant` in rspec.
+Some tests require a Windows or Linux VM. Execute `vagrant up` to bring these up with the Vagrantfile included with the `bolt` gem. Any tests that require this are tagged with `:winrm` or `:ssh` in rspec.
 
 To run all tests, run:
 
