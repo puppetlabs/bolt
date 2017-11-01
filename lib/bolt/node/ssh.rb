@@ -170,7 +170,7 @@ module Bolt
         command = if export_args.empty?
                     "'#{remote_path}'"
                   else
-                    "export #{export_args} && '#{remote_path}'"
+                    "#{export_args} '#{remote_path}'"
                   end
         execute(command, stdin: stdin)
       end
