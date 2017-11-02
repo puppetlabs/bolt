@@ -3,6 +3,7 @@ require 'concurrent'
 require 'bolt/result'
 require 'bolt/config'
 require 'bolt/formatter'
+require 'bolt/notifier'
 
 module Bolt
   class Executor
@@ -12,6 +13,7 @@ module Bolt
       @logger.progname = 'executor'
       @logger.level = config[:log_level]
       @logger.formatter = Bolt::Formatter.new
+      @notifier = Bolt::Notifier.new
     end
 
     def from_uris(nodes)
@@ -20,7 +22,7 @@ module Bolt
       end
     end
 
-    def on(nodes)
+    def on(nodes, callback = nil)
       results = Concurrent::Map.new
 
       poolsize = [nodes.length, @config[:concurrency]].min
@@ -33,7 +35,7 @@ module Bolt
 
       nodes.each { |node|
         pool.post do
-          results[node] =
+          result =
             begin
               node.connect
               yield node
@@ -45,34 +47,47 @@ module Bolt
             ensure
               node.disconnect
             end
+          results[node] = result
+          @notifier.notify(callback, node, result) if callback
+          result
         end
       }
       pool.shutdown
       pool.wait_for_termination
 
+      @notifier.shutdown
+
       results_to_hash(results)
     end
 
     def run_command(nodes, command)
-      on(nodes) do |node|
+      callback = block_given? ? Proc.new : nil
+
+      on(nodes, callback) do |node|
         node.run_command(command)
       end
     end
 
     def run_script(nodes, script, arguments)
-      on(nodes) do |node|
+      callback = block_given? ? Proc.new : nil
+
+      on(nodes, callback) do |node|
         node.run_script(script, arguments)
       end
     end
 
     def run_task(nodes, task, input_method, arguments)
-      on(nodes) do |node|
+      callback = block_given? ? Proc.new : nil
+
+      on(nodes, callback) do |node|
         node.run_task(task, input_method, arguments)
       end
     end
 
     def file_upload(nodes, source, destination)
-      on(nodes) do |node|
+      callback = block_given? ? Proc.new : nil
+
+      on(nodes, callback) do |node|
         node.upload(source, destination)
       end
     end

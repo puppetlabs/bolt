@@ -419,7 +419,8 @@ NODES
     before :each do
       allow(Bolt::Executor).to receive(:new).and_return(executor)
       allow(executor).to receive(:from_uris).and_return(nodes)
-      allow(cli).to receive(:print_results)
+      allow(cli).to receive(:print_summary)
+      allow(cli).to receive(:print_result)
     end
 
     it "executes the 'whoami' command" do
