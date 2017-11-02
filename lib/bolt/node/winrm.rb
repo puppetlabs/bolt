@@ -83,7 +83,7 @@ function Invoke-Interpreter
   }
   catch
   {
-    Write-Error $_
+    $Host.UI.WriteErrorLine($_)
     return 1
   }
 
@@ -98,7 +98,7 @@ function Invoke-Interpreter
   # https://msdn.microsoft.com/en-us/library/system.diagnostics.process.standarderror(v=vs.110).aspx#Anchor_2
   $process.StandardOutput.ReadToEnd() | Out-Host
   $stderr = $process.StandardError.ReadToEnd()
-  if ($stderr) { Write-Error $stderr }
+  if ($stderr) { $Host.UI.WriteErrorLine($stderr) }
   $process.WaitForExit($Timeout) | Out-Null
 
   return $process.ExitCode
