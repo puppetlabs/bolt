@@ -242,7 +242,7 @@ PS
                '-ExecutionPolicy', 'Bypass', '-File', /^".*"$/],
               anything)
         .and_return(Bolt::Node::Success.new("42"))
-      with_tempfile_containing('task-rb-winrm', contents, '.ps1') do |file|
+      with_tempfile_containing('task-ps1-winrm', contents, '.ps1') do |file|
         expect(
           winrm._run_task(file.path, 'stdin', {}).value
         ).to eq("42")
@@ -275,7 +275,7 @@ OUTPUT
               ['apply', /^".*"$/],
               anything)
         .and_return(Bolt::Node::Success.new(output))
-      with_tempfile_containing('task-pp-winrm', "notice('hi)", '.pp') do |file|
+      with_tempfile_containing('task-pp-winrm', "notice('hi')", '.pp') do |file|
         expect(
           winrm._run_task(file.path, 'stdin', {}).value
         ).to eq(output)
