@@ -71,6 +71,11 @@ function Invoke-Interpreter
 
   try
   {
+    if (-not (Get-Command $Path -ErrorAction SilentlyContinue))
+    {
+      throw "Could not find executable '$Path' in ${ENV:PATH} on target node"
+    }
+
     $startInfo = New-Object System.Diagnostics.ProcessStartInfo($Path, $Arguments)
     $startInfo.UseShellExecute = $false
     $startInfo.WorkingDirectory = Split-Path -Parent (Get-Command $Path).Path

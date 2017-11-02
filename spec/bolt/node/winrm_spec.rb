@@ -428,5 +428,14 @@ OUTPUT
         ).to eq(output)
       end
     end
+
+    it "returns a friendly stderr msg with puppet.bat missing", winrm: true do
+      with_tempfile_containing('task-pp-winrm', "notice('hi')", '.pp') do |file|
+        result = winrm._run_task(file.path, 'stdin', {})
+        stderr = result.output.stderr.string
+        expect(stderr).to match(/^Could not find executable 'puppet\.bat'/)
+        expect(stderr).to_not match(/CommandNotFoundException/)
+      end
+    end
   end
 end
