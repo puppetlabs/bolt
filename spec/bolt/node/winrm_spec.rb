@@ -230,6 +230,111 @@ PS
     end
   end
 
+  describe "when determining result" do
+    it "fails to run a .pp task without Puppet agent installed", winrm: true do
+      with_tempfile_containing('task-pp-winrm', "notice('hi')", '.pp') do |file|
+        result = winrm._run_task(file.path, 'stdin', {})
+        expect(result).to_not be_success
+      end
+    end
+
+    it "fails when a PowerShell script exits with a code", winrm: true do
+      contents = <<-PS
+      exit 42
+      PS
+
+      with_tempfile_containing('script-test-winrm', contents) do |file|
+        result = winrm._run_script(file.path, [])
+        expect(result).to_not be_success
+        expect(result.exit_code).to eq(42)
+      end
+    end
+
+    context "fails for PowerShell terminating errors: " do
+      it "exception thrown", winrm: true do
+        contents = <<-PS
+        throw "My Error"
+        PS
+
+        with_tempfile_containing('script-test-winrm', contents) do |file|
+          result = winrm._run_script(file.path, [])
+          expect(result).to_not be_success
+          expect(result.exit_code).to eq(1)
+        end
+      end
+
+      it "Write-Error and $ErrorActionPreference Stop", winrm: true do
+        contents = <<-PS
+        $ErrorActionPreference = 'Stop'
+        Write-Error "error stream addition"
+        PS
+
+        with_tempfile_containing('script-test-winrm', contents) do |file|
+          result = winrm._run_script(file.path, [])
+          expect(result).to_not be_success
+        end
+      end
+
+      it "ParserError Code (IncompleteParseException)", winrm: true do
+        contents = '{'
+
+        with_tempfile_containing('script-test-winrm', contents) do |file|
+          result = winrm._run_script(file.path, [])
+          expect(result).to_not be_success
+        end
+      end
+
+      it "ParserError Code", winrm: true do
+        contents = <<-PS
+        if (1 -badop 2) { Write-Out 'hi' }
+        PS
+
+        with_tempfile_containing('script-test-winrm', contents) do |file|
+          result = winrm._run_script(file.path, [])
+          expect(result).to_not be_success
+        end
+      end
+    end
+
+    context "does not fail for PowerShell non-terminating errors:" do
+      it "Write-Error with default $ErrorActionPreference", winrm: true do
+        contents = <<-PS
+        Write-Error "error stream addition"
+        PS
+
+        with_tempfile_containing('script-test-winrm', contents) do |file|
+          result = winrm._run_script(file.path, [])
+          expect(result).to be_success
+        end
+      end
+
+      it "Correct syntax bad command (CommandNotFoundException)", winrm: true do
+        contents = <<-PS
+        Foo-Bar
+        PS
+
+        with_tempfile_containing('script-test-winrm', contents) do |file|
+          result = winrm._run_script(file.path, [])
+          expect(result).to be_success
+        end
+      end
+
+      it "Calling a failing external binary", winrm: true do
+        # deriving meaning from $LASTEXITCODE requires a custom PS host
+        contents = <<-PS
+        cmd.exe /c "exit 42"
+        # for desired behavior, a user must explicitly call
+        # exit $LASTEXITCODE
+        PS
+
+        with_tempfile_containing('script-test-winrm', contents) do |file|
+          result = winrm._run_script(file.path, [])
+          expect(result).to be_success
+        end
+      end
+    end
+  end
+
   describe "when resolving file extensions" do
     it "can apply a powershell-based task", winrm: true do
       contents = <<PS

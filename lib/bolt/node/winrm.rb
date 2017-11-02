@@ -149,8 +149,9 @@ $invokeArgs = @{
   #{stdin.nil? ? '' : "StdinInput = @'\n" + stdin + "\n'@"}
 }
 
-# winrm gem relies on $LASTEXITCODE
-$LASTEXITCODE = Invoke-Interpreter @invokeArgs
+# winrm gem checks $? prior to using $LASTEXITCODE
+# making it necessary to exit with the desired code to propagate status properly
+exit $(Invoke-Interpreter @invokeArgs)
 PS
     end
 
