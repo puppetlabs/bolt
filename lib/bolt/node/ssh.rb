@@ -133,26 +133,28 @@ module Bolt
       Bolt::Node::ExceptionFailure.new(e)
     end
 
-    def with_remote_file(file)
-      remote_path = ''
-      dir = ''
-      result = nil
+    def with_remote_tempdir
+      make_tempdir.then do |dir|
+        (yield dir).ensure do
+          execute("rm -rf '#{dir}'")
+        end
+      end
+    end
 
-      make_tempdir.then do |value|
-        dir = value
-        remote_path = "#{dir}/#{File.basename(file)}"
-        Bolt::Node::Success.new
-      end.then do
-        _upload(file, remote_path)
-      end.then do
+    def with_remote_script(dir, file)
+      remote_path = "#{dir}/#{File.basename(file)}"
+      _upload(file, remote_path).then do
         execute("chmod u+x '#{remote_path}'")
       end.then do
-        result = yield remote_path
-      end.then do
-        execute("rm -f '#{remote_path}'")
-      end.then do
-        execute("rmdir '#{dir}'")
-        result
+        yield remote_path
+      end
+    end
+
+    def with_remote_file(file)
+      with_remote_tempdir do |dir|
+        with_remote_script(dir, file) do |remote_path|
+          yield remote_path
+        end
       end
     end
 
@@ -165,34 +167,27 @@ EOF
 SCRIPT
     end
 
-    def with_remote_task_wrapper(task_file, stdin)
-      remote_task = ''
-      dir = ''
-      wrapper = ''
-      result = nil
+    def with_task_wrapper(remote_task, dir, stdin)
+      wrapper = make_wrapper_stringio(remote_task, stdin)
+      command = "#{dir}/wrapper.sh"
+      _upload(wrapper, command).then do
+        execute("chmod u+x '#{command}'")
+      end.then do
+        yield command
+      end
+    end
 
-      make_tempdir.then do |value|
-        dir = value
-        remote_task = "#{dir}/#{File.basename(task_file)}"
-        wrapper = "#{dir}/wrapper.sh"
-        Bolt::Node::Success.new
-      end.then do
-        _upload(task_file, remote_task)
-      end.then do
-        _upload(make_wrapper_stringio(remote_task, stdin), wrapper)
-      end.then do
-        execute("chmod u+x '#{remote_task}'")
-      end.then do
-        execute("chmod u+x '#{wrapper}'")
-      end.then do
-        result = yield wrapper
-      end.then do
-        execute("rm -f '#{remote_task}'")
-      end.then do
-        execute("rm -f '#{wrapper}'")
-      end.then do
-        execute("rmdir '#{dir}'")
-        result
+    def with_remote_task(task_file, stdin)
+      with_remote_tempdir do |dir|
+        with_remote_script(dir, task_file) do |remote_task|
+          if stdin
+            with_task_wrapper(remote_task, dir, stdin) do |command|
+              yield command
+            end
+          else
+            yield remote_task
+          end
+        end
       end
     end
 
@@ -227,24 +222,13 @@ SCRIPT
         end.join(' ')
       end
 
-      if stdin
-        with_remote_task_wrapper(task, stdin) do |remote_path|
-          command = if export_args.empty?
-                      "'#{remote_path}'"
-                    else
-                      "#{export_args} '#{remote_path}'"
-                    end
-          execute(command, sudoable: true)
-        end
-      else
-        with_remote_file(task) do |remote_path|
-          command = if export_args.empty?
-                      "'#{remote_path}'"
-                    else
-                      "#{export_args} '#{remote_path}'"
-                    end
-          execute(command, stdin: stdin, sudoable: true)
-        end
+      with_remote_task(task, stdin) do |remote_path|
+        command = if export_args.empty?
+                    "'#{remote_path}'"
+                  else
+                    "#{export_args} '#{remote_path}'"
+                  end
+        execute(command, sudoable: true)
       end
     end
   end
