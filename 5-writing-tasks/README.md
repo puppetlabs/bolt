@@ -74,7 +74,7 @@ Write-Output "$env:computername received the message: $env:PT_message"
 We can then run it via `bolt` on our remote nodes with the following:
 
 ```
-bolt task run exercise5::print message="hello powershell" --nodes winrm://<node> --user <user> --password <password> --modules ./modules
+bolt task run exercise5::print message="hello powershell" --nodes winrm://<node> --user <user> --password <password> --modulepath ./modules
 ```
 
 Note:
