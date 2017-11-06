@@ -1,3 +1,6 @@
+require 'bolt_command_helper'
+extend Acceptance::BoltCommandHelper
+
 test_name "C100551: \
            bolt task run executes puppet task on remote hosts via winrm" do
 
@@ -17,22 +20,20 @@ test_name "C100551: \
     user = ENV['WINRM_USER']
     password = ENV['WINRM_PASSWORD']
     nodes_csv = winrm_nodes.map { |host| "winrm://#{host.hostname}" }.join(',')
-    bolt_command = "bolt task run test::hostname_win \
-                      --nodes #{nodes_csv}           \
-                      --modulepath #{dir}/modules    \
-                      --user #{user}                 \
-                      --password #{password}"
+    bolt_command = "bolt task run test::hostname_win"
 
-    result = nil
-    case bolt['platform']
-    when /windows/
-      result = on(bolt, powershell(bolt_command))
-    else
-      result = on(bolt, bolt_command)
-    end
+    flags = {
+      '--nodes'       => nodes_csv,
+      '--modulepath'  => "#{dir}/modules",
+      '-u'            => user,
+      '-p'            => password
+    }
+
+    result = bolt_command_on(bolt, bolt_command, flags)
     winrm_nodes.each do |node|
-      assert_match(/#{node.hostname.split('.')[0]}/, result.stdout)
-      assert_match(/{#{node.ip}}/, result.stdout)
+      message = "Unexpected output from the command:\n#{result.cmd}"
+      assert_match(/#{node.hostname.split('.')[0]}/, result.stdout, message)
+      assert_match(/{#{node.ip}}/, result.stdout, message)
     end
   end
 end

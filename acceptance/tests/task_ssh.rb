@@ -1,3 +1,6 @@
+require 'bolt_command_helper'
+extend Acceptance::BoltCommandHelper
+
 test_name "C100550: \
            bolt task run should execute puppet task on remote hosts via ssh" do
 
@@ -17,22 +20,20 @@ test_name "C100550: \
     user = ENV['SSH_USER']
     password = ENV['SSH_PASSWORD']
     nodes_csv = ssh_nodes.map(&:hostname).join(',')
-    bolt_command = "bolt task run test::hostname_nix \
-                      --nodes #{nodes_csv}           \
-                      --modulepath #{dir}/modules    \
-                      --user #{user}                 \
-                      --password #{password}         \
-                      --insecure"
+    bolt_command = "bolt task run test::hostname_nix"
+    flags = {
+      '--nodes'       => nodes_csv,
+      '--modulepath'  => "#{dir}/modules",
+      '-u'            => user,
+      '-p'            => password,
+      '--insecure'    => nil
+    }
 
-    result = nil
-    case bolt['platform']
-    when /windows/
-      result = on(bolt, powershell(bolt_command))
-    else
-      result = on(bolt, bolt_command)
-    end
+    result = bolt_command_on(bolt, bolt_command, flags)
     ssh_nodes.each do |node|
-      assert_match(/hello from #{node.hostname.split('.')[0]}/, result.stdout)
+      message = "Unexpected output from the command:\n#{result.cmd}"
+      regex = /hello from #{node.hostname.split('.')[0]}/
+      assert_match(regex, result.stdout, message)
     end
   end
 end

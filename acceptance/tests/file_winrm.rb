@@ -1,3 +1,6 @@
+require 'bolt_command_helper'
+extend Acceptance::BoltCommandHelper
+
 test_name "C1005xx: \
            bolt file upload should copy local file to remote hosts via winrm" do
 
@@ -24,23 +27,27 @@ test_name "C1005xx: \
     user = ENV['WINRM_USER']
     password = ENV['WINRM_PASSWORD']
     nodes_csv = winrm_nodes.map { |host| "winrm://#{host.hostname}" }.join(',')
-    bolt_command = "bolt file upload                 \
-                      '#{dir}/#{source}' '#{testdir}/#{dest}'   \
-                      --nodes #{nodes_csv}           \
-                      --user #{user}                 \
-                      --password #{password}"
+    bolt_command = "bolt file upload '#{dir}/#{source}' '#{testdir}/#{dest}'"
 
-    result = nil
-    case bolt['platform']
-    when /windows/
-      result = on(bolt, powershell(bolt_command))
-    else
-      result = on(bolt, bolt_command)
-    end
-    assert_match(/Uploaded.*#{source}.*to.*#{dest}/, result.stdout)
+    flags = {
+      '--nodes' => nodes_csv,
+      '-u'      => user,
+      '-p'      => password
+    }
+
+    result = bolt_command_on(bolt, bolt_command, flags)
+    message = "Unexpected output from the command:\n#{result.cmd}"
+    assert_match(/Uploaded.*#{source}.*to.*#{dest}/, result.stdout, message)
+
     winrm_nodes.each do |node|
-      on(node, powershell("type #{testdir}/C1005xx_file.txt")) do |res|
-        assert_match(/When in the course of human events/, res.stdout)
+      command = "type #{testdir}/C1005xx_file.txt"
+      on(node, powershell(command), accept_all_exit_codes: true) do |res|
+        type_message = "The powershell command 'type' was not successful"
+        assert_equal(res.exit_code, 0, type_message)
+
+        content_message = "The content of the file upload was unexpected"
+        regex = /When in the course of human events/
+        assert_match(regex, res.stdout, content_message)
       end
     end
   end

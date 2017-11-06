@@ -1,3 +1,6 @@
+require 'bolt_command_helper'
+extend Acceptance::BoltCommandHelper
+
 test_name "C100546: \
            bolt command run should execute command on remote hosts via ssh" do
 
@@ -8,21 +11,22 @@ test_name "C100546: \
     user = ENV['SSH_USER']
     password = ENV['SSH_PASSWORD']
     nodes_csv = ssh_nodes.map(&:hostname).join(',')
-    command = 'echo """hello from $(hostname)"""'
-    bolt_command = "bolt command run '#{command}' \
-                    --nodes #{nodes_csv}          \
-                    -u #{user} -p #{password}     \
-                    --insecure"
 
-    result = nil
-    case bolt['platform']
-    when /windows/
-      result = execute_powershell_script_on(bolt, bolt_command)
-    else
-      result = on(bolt, bolt_command)
-    end
+    command = 'echo """hello from $(hostname)"""'
+    bolt_command = "bolt command run '#{command}'"
+    flags = {
+      '--nodes'     => nodes_csv,
+      '-u'          => user,
+      '-p'          => password,
+      '--insecure'  => nil
+    }
+
+    result = bolt_command_on(bolt, bolt_command, flags)
+
     ssh_nodes.each do |node|
-      assert_match(/hello from #{node.hostname.split('.')[0]}/, result.stdout)
+      message = "Unexpected output from the command:\n#{result.cmd}"
+      regex = /hello from #{node.hostname.split('.')[0]}/
+      assert_match(regex, result.stdout, message)
     end
   end
 end

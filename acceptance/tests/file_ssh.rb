@@ -1,3 +1,6 @@
+require 'bolt_command_helper'
+extend Acceptance::BoltCommandHelper
+
 test_name "C1005xx: \
            bolt file upload should copy local file to remote hosts via ssh" do
 
@@ -17,23 +20,27 @@ test_name "C1005xx: \
     user = ENV['SSH_USER']
     password = ENV['SSH_PASSWORD']
     nodes_csv = ssh_nodes.map(&:hostname).join(',')
-    bolt_command = "bolt file upload #{dir}/#{source} /tmp/#{dest}  \
-                      --nodes #{nodes_csv}           \
-                      --user #{user}                 \
-                      --password #{password}         \
-                      --insecure"
+    bolt_command = "bolt file upload #{dir}/#{source} /tmp/#{dest}"
+    flags = {
+      '--nodes'     => nodes_csv,
+      '--user'      => user,
+      '--password'  => password,
+      '--insecure'  => nil
+    }
 
-    result = nil
-    case bolt['platform']
-    when /windows/
-      result = on(bolt, powershell(bolt_command))
-    else
-      result = on(bolt, bolt_command)
-    end
-    assert_match(/Uploaded.*#{source}.*to.*#{dest}/, result.stdout)
+    result = bolt_command_on(bolt, bolt_command, flags)
+
+    message = "Unexpected output from the command:\n#{result.cmd}"
+    assert_match(/Uploaded.*#{source}.*to.*#{dest}/, result.stdout, message)
+
     ssh_nodes.each do |node|
-      on(node, "cat /tmp/C1005xx_file.txt") do |res|
-        assert_match(/When in the course of human events/, res.stdout)
+      command = "cat /tmp/C1005xx_file.txt"
+      on(node, command, accept_all_exit_codes: true) do |res|
+        assert_equal(res.exit_code, 0, 'cat was not successful')
+
+        file_contents_message = 'The expected file contents where not observed'
+        regex = /When in the course of human events/
+        assert_match(regex, res.stdout, file_contents_message)
       end
     end
   end

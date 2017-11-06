@@ -1,3 +1,6 @@
+require 'bolt_command_helper'
+extend Acceptance::BoltCommandHelper
+
 test_name "C100554: \
            bolt plan run executes puppet plan on remote hosts via winrm" do
 
@@ -35,24 +38,27 @@ test_name "C100554: \
     user = ENV['WINRM_USER']
     password = ENV['WINRM_PASSWORD']
     nodes_csv = winrm_nodes.map { |host| "winrm://#{host.hostname}" }.join(',')
-    bolt_command = "bolt plan run test::my_win_plan  \
-                      nodes=#{nodes_csv}             \
-                      --modulepath #{dir}/modules    \
-                      --user #{user}                 \
-                      --password #{password}"
+    bolt_command = "bolt plan run test::my_win_plan nodes=#{nodes_csv}"
 
-    result = nil
-    case bolt['platform']
-    when /windows/
-      result = on(bolt, powershell(bolt_command))
-    else
-      result = on(bolt, bolt_command)
-    end
-    assert_match(/ExecutionResult/, result.stdout)
+    flags = {
+      '--modulepath'  => "#{dir}/modules",
+      '-u'            => user,
+      '-p'            => password
+    }
+
+    result = bolt_command_on(bolt, bolt_command, flags)
+    message = "Unexpected output from the command:\n#{result.cmd}"
+    assert_match(/ExecutionResult/, result.stdout, message)
+
     winrm_nodes.each do |node|
-      on(node, powershell("type #{testdir}/C100554_plan_artifact.txt")) do |res|
-        assert_match(/Line one from task a/, res.stdout)
-        assert_match(/Line two from task b/, res.stdout)
+      command = "type #{testdir}/C100554_plan_artifact.txt"
+      on(node, powershell(command), accept_all_exit_codes: true) do |res|
+        type_msg = "The powershell command 'type' was not successful"
+        assert_equal(res.exit_code, 0, type_msg)
+
+        msg = 'The expected contents of the plan artifact were not observed'
+        assert_match(/Line one from task a/, res.stdout, msg)
+        assert_match(/Line two from task b/, res.stdout, msg)
       end
     end
   end

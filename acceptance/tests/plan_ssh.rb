@@ -1,3 +1,6 @@
+require 'bolt_command_helper'
+extend Acceptance::BoltCommandHelper
+
 test_name "C100553: \
            bolt plan run should execute puppet plan on remote hosts via ssh" do
 
@@ -28,26 +31,29 @@ test_name "C100553: \
     user = ENV['SSH_USER']
     password = ENV['SSH_PASSWORD']
     nodes_csv = ssh_nodes.map(&:hostname).join(',')
-    bolt_command = "bolt plan run test::my_unix_plan \
-                      nodes=#{nodes_csv}             \
-                      --modulepath #{dir}/modules    \
-                      --user #{user}                 \
-                      --password #{password}         \
-                      --insecure"
+    bolt_command = "bolt plan run test::my_unix_plan nodes=#{nodes_csv}"
 
-    result = nil
-    case bolt['platform']
-    when /windows/
-      result = on(bolt, powershell(bolt_command))
-    else
-      result = on(bolt, bolt_command)
-    end
-    assert_match(/ExecutionResult/, result.stdout)
+    flags = {
+      '-u'            => user,
+      '--modulepath'  => "#{dir}/modules",
+      '-p'            => password,
+      '--insecure'    => nil
+    }
+
+    result = bolt_command_on(bolt, bolt_command, flags)
+    message = "Unexpected output from the command:\n#{result.cmd}"
+    assert_match(/ExecutionResult/, result.stdout, message)
+
     ssh_nodes.each do |node|
       # bolt plan return value unspecified
-      on(node, "cat /tmp/C100553_plan_artifact.txt") do |res|
-        assert_match(/Line one from task a/, res.stdout)
-        assert_match(/Line two from task b/, res.stdout)
+      command = "cat /tmp/C100553_plan_artifact.txt"
+      on(node, command, accept_all_exit_codes: true) do |res|
+        cat_fail_msg = "The 'cat' command was not successful"
+        assert_equal(res.exit_code, 0, cat_fail_msg)
+
+        fail_msg = 'The observed contents of the plan artifact was unexpected'
+        assert_match(/Line one from task a/, res.stdout, fail_msg)
+        assert_match(/Line two from task b/, res.stdout, fail_msg)
       end
     end
   end
