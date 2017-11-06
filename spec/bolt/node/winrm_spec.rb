@@ -18,7 +18,7 @@ describe Bolt::WinRM do
   let(:echo_script) { <<PS }
 foreach ($i in $args)
 {
-    Write-Output $i
+    Write-Host $i
 }
 PS
 
@@ -203,19 +203,50 @@ SHELLWORDS
   end
 
   it "can run a task remotely", winrm: true do
-    contents = 'Write-Output "$env:PT_message_one" ${env:PT_message two}'
+    contents = 'Write-Host "$env:PT_message_one ${env:PT_message two}"'
     arguments = { :message_one => 'task is running',
                   :"message two" => 'task has run' }
     with_tempfile_containing('task-test-winrm', contents) do |file|
       expect(winrm._run_task(file.path, 'environment', arguments).value)
-        .to eq("task is running\r\ntask has run\r\n")
+        .to eq("task is running task has run\r\n")
+    end
+  end
+
+  it "will collect on stdout using valid output mechanisms", winrm: true do
+    contents = <<-PS
+    # explicit Format-Table for PS5+ overrides implicit Format-Table which
+    # includes a 300ms delay waiting for more pipeline output
+    # https://github.com/PowerShell/PowerShell/issues/4594
+    Write-Output "message 1" | Format-Table
+
+    Write-Host "message 2"
+    "message 3" | Out-Host
+    $Host.UI.WriteLine("message 4")
+    [Console]::WriteLine("message 5")
+
+    # preference variable must be set to show Information messages
+    $InformationPreference = 'Continue'
+    Write-Information "message 6"
+    PS
+
+    with_tempfile_containing('stdout-test-winrm', contents) do |file|
+      expect(
+        winrm._run_script(file.path, []).value
+      ).to eq([
+        "message 1\r\n",
+        "message 2\r\n",
+        "message 3\r\n",
+        "message 4\r\n",
+        "message 5\r\n",
+        "message 6\r\n"
+      ].join(''))
     end
   end
 
   it "can run a task passing input on stdin", winrm: true do
     contents = <<PS
 $line = [Console]::In.ReadLine()
-Write-Output $line
+Write-Host $line
 PS
     arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
     with_tempfile_containing('tasks-test-stdin-winrm', contents) do |file|
@@ -226,17 +257,16 @@ PS
 
   it "can run a task passing input on stdin and environment", winrm: true do
     contents = <<PS
-Write-Output "$env:PT_message_one" "$env:PT_message_two"
+Write-Host "$env:PT_message_one $env:PT_message_two"
 $line = [Console]::In.ReadLine()
-Write-Output $line
+Write-Host $line
 PS
     arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
     with_tempfile_containing('tasks-test-both-winrm', contents) do |file|
       expect(
         winrm._run_task(file.path, 'both', arguments).value
       ).to eq([
-        "Hello from task\r\n",
-        "Goodbye\r\n",
+        "Hello from task Goodbye\r\n",
         "{\"message_one\":\"Hello from task\",\"message_two\":\"Goodbye\"}\r\n"
       ].join(''))
     end
