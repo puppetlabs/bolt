@@ -6,6 +6,7 @@ require 'json'
 require 'bolt/node'
 require 'bolt/version'
 require 'bolt/executor'
+require 'bolt/outputter'
 require 'bolt/config'
 require 'io/console'
 
@@ -16,6 +17,12 @@ module Bolt
     def initialize(msg, error_code: 1)
       super(msg)
       @error_code = error_code
+    end
+
+    def to_json
+      { kind: "bolt/cli-error",
+        msg: message,
+        details: { error_code: @error_code } }.to_json
     end
   end
 
@@ -149,6 +156,17 @@ HELP
                 "Parameters to a task or plan") do |params|
           results[:task_options] = parse_params(params)
         end
+
+        results[:format] = 'human'
+        opts.on('--format FORMAT',
+                "Output format to use") do |format|
+          if %w[human json].include? format
+            results[:format] = format
+          else
+            raise ArgumentError "Unsupported format: #{format}"
+          end
+        end
+        results[:insecure] = false
         opts.on('-k', '--insecure',
                 "Whether to connect insecurely ") do |insecure|
           results[:insecure] = insecure
@@ -201,6 +219,8 @@ HELP
       elsif options[:verbose]
         @config[:log_level] = Logger::INFO
       end
+
+      @config[:format] = options[:format]
 
       if options[:help]
         print_help(options[:mode])
@@ -354,12 +374,14 @@ HELP
         nodes = executor.from_uris(options[:nodes])
 
         results = nil
+        outputter.print_head
+
         elapsed_time = Benchmark.realtime do
           results =
             case options[:mode]
             when 'command'
               executor.run_command(nodes, options[:object]) do |node, result|
-                print_result(node, result)
+                outputter.print_result(node, result)
               end
             when 'script'
               script = options[:object]
@@ -367,7 +389,7 @@ HELP
               executor.run_script(
                 nodes, script, options[:leftovers]
               ) do |node, result|
-                print_result(node, result)
+                outputter.print_result(node, result)
               end
             when 'task'
               task_name = options[:object]
@@ -379,7 +401,7 @@ HELP
               executor.run_task(
                 nodes, path, input_method, options[:task_options]
               ) do |node, result|
-                print_result(node, result)
+                outputter.print_result(node, result)
               end
             when 'file'
               src = options[:object]
@@ -390,45 +412,28 @@ HELP
               end
               validate_file('source file', src)
               executor.file_upload(nodes, src, dest) do |node, result|
-                print_result(node, result)
+                outputter.print_result(node, result)
               end
             end
         end
 
-        print_summary(results, elapsed_time)
+        outputter.print_summary(results, elapsed_time)
       end
+    rescue Bolt::CLIError => e
+      outputter.fatal_error(e)
+      raise e
     end
 
     def execute_plan(executor, options)
+      # Plans return null here?
       result = Puppet.override(bolt_executor: executor) do
         run_plan(options[:object],
                  options[:task_options],
                  options[:modulepath])
       end
-      puts result
+      outputter.print_plan(result)
     rescue Puppet::Error
       raise Bolt::CLIError, "Exiting because of an error in Puppet code"
-    end
-
-    def colorize(result, stream)
-      color = result.success? ? "\033[32m" : "\033[31m"
-      stream.print color if stream.isatty
-      yield
-      stream.print "\033[0m" if stream.isatty
-    end
-
-    def print_result(node, result)
-      colorize(result, $stdout) { $stdout.puts "#{node.host}:" }
-      $stdout.puts
-      $stdout.puts result.message
-      $stdout.puts
-    end
-
-    def print_summary(results, elapsed_time)
-      $stdout.puts format("Ran on %d node%s in %.2f seconds",
-                          results.size,
-                          results.size > 1 ? 's' : '',
-                          elapsed_time)
     end
 
     def validate_file(type, path)
@@ -449,6 +454,10 @@ HELP
 
     def file_stat(path)
       File.stat(path)
+    end
+
+    def outputter
+      @outputter ||= Bolt::Outputter.for_format(@config[:format])
     end
 
     def load_task_data(name, modulepath)

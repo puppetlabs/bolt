@@ -20,6 +20,10 @@ module Bolt
       { 'value' => value }
     end
 
+    def to_result
+      value
+    end
+
     def success?
       true
     end
@@ -35,6 +39,16 @@ module Bolt
     def to_h
       {
         'error' => {
+          'issue_code' => @issue_code,
+          'kind' => @kind,
+          'msg' => @message
+        }
+      }
+    end
+
+    def to_result
+      {
+        '_error' => {
           'issue_code' => @issue_code,
           'kind' => @kind,
           'msg' => @message
@@ -64,6 +78,10 @@ module Bolt
       }
     end
 
+    def to_result
+      value
+    end
+
     def success?
       @exit_code.zero?
     end
@@ -86,6 +104,12 @@ module Bolt
       @object || @stdout
     end
 
+    def to_result
+      result = @object
+      result['_error'] = @error if @error
+      result
+    end
+
     def to_h
       hash = super
       hash['error'] = error if error
@@ -95,12 +119,15 @@ module Bolt
     private
 
     def output_to_json_hash(output)
-      obj = JSON.parse(output)
-      if obj.is_a? Hash
-        obj
+      begin
+        obj = JSON.parse(output)
+        unless obj.is_a? Hash
+          obj = nil
+        end
+      rescue JSON::ParserError
+        nil
       end
-    rescue JSON::ParserError
-      nil
+      obj || { '_output' => output }
     end
   end
 

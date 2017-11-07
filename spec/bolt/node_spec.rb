@@ -69,7 +69,7 @@ describe Bolt::Node do
       expect(node).to receive(:_run_task).and_return(result)
 
       expect(node.run_task('generic', 'stdin', {}).to_h)
-        .to eq('value' => 'some output')
+        .to eq('value' => { '_output' => 'some output' })
     end
 
     it "on failure converts json on stdout if it conforms to expectations" do
@@ -96,7 +96,7 @@ describe Bolt::Node do
       expect(node).to receive(:_run_task).and_return(result)
 
       expect(node.run_task('generic', 'stdin', {}).to_h)
-        .to eq('value' => 'an error occurred',
+        .to eq('value' => { '_output' => 'an error occurred' },
                'error' => { 'kind' => 'puppetlabs.tasks/task-error',
                             'issue_code' => 'TASK_ERROR',
                             'msg' => 'The task failed with exit code 1',

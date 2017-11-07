@@ -8,7 +8,8 @@ module Bolt
                       :insecure,
                       :transport,
                       :log_level,
-                      :log_destination) do
+                      :log_destination,
+                      :format) do
     DEFAULTS = {
       concurrency: 100,
       tty: false,
