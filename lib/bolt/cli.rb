@@ -358,11 +358,17 @@ HELP
           results =
             case options[:mode]
             when 'command'
-              executor.run_command(nodes, options[:object])
+              executor.run_command(nodes, options[:object]) do |node, result|
+                print_result(node, result)
+              end
             when 'script'
               script = options[:object]
               validate_file('script', script)
-              executor.run_script(nodes, script, options[:leftovers])
+              executor.run_script(
+                nodes, script, options[:leftovers]
+              ) do |node, result|
+                print_result(node, result)
+              end
             when 'task'
               task_name = options[:object]
 
@@ -372,7 +378,9 @@ HELP
               input_method ||= 'both'
               executor.run_task(
                 nodes, path, input_method, options[:task_options]
-              )
+              ) do |node, result|
+                print_result(node, result)
+              end
             when 'file'
               src = options[:object]
               dest = options[:leftovers].first
@@ -381,11 +389,13 @@ HELP
                 raise Bolt::CLIError, "A destination path must be specified"
               end
               validate_file('source file', src)
-              executor.file_upload(nodes, src, dest)
+              executor.file_upload(nodes, src, dest) do |node, result|
+                print_result(node, result)
+              end
             end
         end
 
-        print_results(results, elapsed_time)
+        print_summary(results, elapsed_time)
       end
     end
 
@@ -407,14 +417,14 @@ HELP
       stream.print "\033[0m" if stream.isatty
     end
 
-    def print_results(results, elapsed_time)
-      results.each_pair do |node, result|
-        colorize(result, $stdout) { $stdout.puts "#{node.host}:" }
-        $stdout.puts
-        $stdout.puts result.message
-        $stdout.puts
-      end
+    def print_result(node, result)
+      colorize(result, $stdout) { $stdout.puts "#{node.host}:" }
+      $stdout.puts
+      $stdout.puts result.message
+      $stdout.puts
+    end
 
+    def print_summary(results, elapsed_time)
       $stdout.puts format("Ran on %d node%s in %.2f seconds",
                           results.size,
                           results.size > 1 ? 's' : '',

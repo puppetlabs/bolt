@@ -9,12 +9,13 @@ describe "Bolt::Executor" do
   let(:success) { Bolt::Node::Success.new }
   let(:task) { 'service::restart' }
   let(:task_arguments) { { 'name' => 'apache' } }
+  let(:nodes) { [mock_node('node1'), mock_node('node2')] }
 
   def mock_node(name)
     transport = double('holodeck')
     allow(transport).to receive(:initialize_transport)
 
-    node = double(name)
+    node = double(name, name: name)
     allow(node).to receive(:class).and_return(transport)
     allow(node).to receive(:connect)
     allow(node).to receive(:disconnect)
@@ -22,42 +23,77 @@ describe "Bolt::Executor" do
   end
 
   it "executes a command on all nodes" do
-    node1 = mock_node 'node1'
-    expect(node1).to receive(:run_command).with(command).and_return(success)
-    node2 = mock_node 'node2'
-    expect(node2).to receive(:run_command).with(command).and_return(success)
+    nodes.each do |node|
+      expect(node).to receive(:run_command).with(command).and_return(success)
+    end
 
-    executor.run_command([node1, node2], command)
+    executor.run_command(nodes, command)
+  end
+
+  it "yields each command result" do
+    nodes.each do |node|
+      expect(node).to receive(:run_command).with(command).and_return(success)
+    end
+
+    results = []
+    executor.run_command(nodes, command) do |node, result|
+      results << [node, result]
+    end
+
+    expect(results).to match_array(nodes.zip(Array.new(nodes.length, success)))
   end
 
   it "runs a script on all nodes" do
-    node1 = mock_node 'node1'
-    expect(node1).to receive(:run_script).with(script, []).and_return(success)
-    node2 = mock_node 'node2'
-    expect(node2).to receive(:run_script).with(script, []).and_return(success)
+    nodes.each do |node|
+      expect(node).to receive(:run_script).with(script, []).and_return(success)
+    end
 
-    results = executor.run_script([node1, node2], script, [])
+    results = executor.run_script(nodes, script, [])
     results.each_pair do |_, result|
       expect(result).to be_instance_of(Bolt::Node::Success)
     end
   end
 
-  it "runs a task on all nodes" do
-    node1 = mock_node 'node1'
-    expect(node1)
-      .to receive(:run_task)
-      .with(task, 'both', task_arguments)
-      .and_return(success)
-    node2 = mock_node 'node2'
-    expect(node2)
-      .to receive(:run_task)
-      .with(task, 'both', task_arguments)
-      .and_return(success)
+  it "yields each script result" do
+    nodes.each do |node|
+      expect(node).to receive(:run_script).with(script, []).and_return(success)
+    end
 
-    results = executor.run_task([node1, node2], task, 'both', task_arguments)
+    results = []
+    executor.run_script(nodes, script, []) do |node, result|
+      results << [node, result]
+    end
+
+    expect(results).to match_array(nodes.zip(Array.new(nodes.length, success)))
+  end
+
+  it "runs a task on all nodes" do
+    nodes.each do |node|
+      expect(node)
+        .to receive(:run_task)
+        .with(task, 'both', task_arguments)
+        .and_return(success)
+    end
+
+    results = executor.run_task(nodes, task, 'both', task_arguments)
     results.each_pair do |_, result|
       expect(result).to be_instance_of(Bolt::Node::Success)
     end
+  end
+
+  it "yields each task result" do
+    nodes.each do |node|
+      expect(node)
+        .to receive(:run_task)
+        .with(task, 'both', task_arguments)
+        .and_return(success)
+    end
+
+    results = []
+    executor.run_task(nodes, task, 'both', task_arguments) do |node, result|
+      results << [node, result]
+    end
+    expect(results).to match_array(nodes.zip(Array.new(nodes.length, success)))
   end
 
   it "returns an error result if the connect raises a base error" do
