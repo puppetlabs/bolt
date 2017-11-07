@@ -47,7 +47,7 @@ echo $(hostname) received the message: $PT_message
 We can then run that task using `bolt`. Note the `message` argument. This will be expanded to the `PT_message` environment variable expected by our task. By naming parameters explictly it's easier for others to use your tasks.
 
 ```
-bolt task run exercise5 message=hello --nodes <nodes> --modules ./modules
+bolt task run exercise5 message=hello --nodes <nodes> --modulepath ./modules
 ```
 
 This should result in output similar to:
@@ -74,7 +74,7 @@ Write-Output "$env:computername received the message: $env:PT_message"
 We can then run it via `bolt` on our remote nodes with the following:
 
 ```
-bolt task run exercise5::print message="hello powershell" --nodes winrm://<node> --user <user> --password <password> --modules ./modules
+bolt task run exercise5::print message="hello powershell" --nodes winrm://<node> --user <user> --password <password> --modulepath ./modules
 ```
 
 Note:
