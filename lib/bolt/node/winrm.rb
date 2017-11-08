@@ -199,6 +199,10 @@ PS
       -NoProfile -NonInteractive -NoLogo -ExecutionPolicy Bypass
     ].freeze
 
+    def powershell_file?(path)
+      Pathname(path).extname.casecmp('.ps1').zero?
+    end
+
     def process_from_extension(path)
       case Pathname(path).extname.downcase
       when '.rb'
@@ -272,9 +276,31 @@ PS
     def _run_script(script, arguments)
       @logger.info { "Running script '#{script}'" }
       with_remote_file(script) do |remote_path|
-        path, args = *process_from_extension(remote_path)
-        args += escape_arguments(arguments)
-        execute_process(path, args)
+        if powershell_file?(remote_path)
+          mapped_args = arguments.map do |a|
+            "$invokeArgs.ArgumentList += @'\n#{a}\n'@"
+          end.join("\n")
+          execute(<<-PS)
+$invokeArgs = @{
+  ScriptBlock = (Get-Command "#{remote_path}").ScriptBlock
+  ArgumentList = @()
+}
+#{mapped_args}
+
+try
+{
+  Invoke-Command @invokeArgs
+}
+catch
+{
+  exit 1
+}
+          PS
+        else
+          path, args = *process_from_extension(remote_path)
+          args += escape_arguments(arguments)
+          execute_process(path, args)
+        end
       end
     end
 
@@ -297,8 +323,15 @@ PS
         Bolt::Node::Success.new
       end.then do
         with_remote_file(task) do |remote_path|
-          path, args = *process_from_extension(remote_path)
-          execute_process(path, args, stdin)
+          if powershell_file?(remote_path) && stdin.nil?
+            # NOTE: cannot redirect STDIN to a .ps1 script inside of PowerShell
+            # must create new powershell.exe process like other interpreters
+            # fortunately, using PS with stdin input_method should never happen
+            execute("try { &""#{remote_path}"" } catch { exit 1 }")
+          else
+            path, args = *process_from_extension(remote_path)
+            execute_process(path, args, stdin)
+          end
         end
       end
     end

@@ -162,7 +162,7 @@ PS
     end
   end
 
-  it "does not reuse host for multiple PowerShell scripts", winrm: true do
+  it "reuses the host for multiple PowerShell scripts", winrm: true do
     contents = <<-PS
       $Host.InstanceId.ToString(), $Host.Runspace.InstanceId.ToString()
 
@@ -186,15 +186,17 @@ PS
 
       # scripts execute in a completely new process
       # Host unique Guid is different
-      expect(instance).to_not eq(instance2)
+      expect(instance).to eq(instance2)
       # Runspace unique Guid is different
-      expect(runspace).to_not eq(runspace2)
+      expect(runspace).to eq(runspace2)
 
       # state not yet set, only get one copy
       expect(outputs).to eq(%w[env unscoped script local global])
 
-      # state doesn't carry over from first invocation given new process
-      expect(outputs2).to eq(%w[env unscoped script local global])
+      # environment variable remains set
+      # as do script and global given use of Invoke-Command
+      outs = %w[env script global env unscoped script local global]
+      expect(outputs2).to eq(outs)
     end
   end
 
@@ -221,8 +223,8 @@ QUOTED
     end
   end
 
-  it "loses track of embedded double quotes", winrm: true do
-    with_tempfile_containing('script-test-winrm-buggy', echo_script) do |file|
+  it "correctly passes embedded double quotes to PowerShell", winrm: true do
+    with_tempfile_containing('script-test-winrm-psquote', echo_script) do |file|
       expect(
         winrm._run_script(
           file.path,
@@ -232,12 +234,10 @@ QUOTED
            'a "b" c']
         ).value
       ).to eq(<<QUOTED)
-a\r
-b\r
-a\r
-b\r
-a b c\r
-a b c\r
+"a b"\r
+"a b"\r
+a "b" c\r
+a "b" c\r
 QUOTED
     end
   end
@@ -274,7 +274,8 @@ SHELLWORDS
     arguments = { :message_one => 'task is running',
                   :"message two" => 'task has run' }
     with_tempfile_containing('task-test-winrm', contents) do |file|
-      expect(winrm._run_task(file.path, 'environment', arguments).value)
+      task_return = winrm._run_task(file.path, 'environment', arguments)
+      expect(task_return.value)
         .to eq("task is running task has run\r\n")
     end
   end
@@ -289,6 +290,8 @@ SHELLWORDS
     Write-Host "message 2"
     "message 3" | Out-Host
     $Host.UI.WriteLine("message 4")
+
+    # Console::WriteLine doesn't work in WinRMs ServerRemoteHost
     [Console]::WriteLine("message 5")
 
     # preference variable must be set to show Information messages
@@ -304,7 +307,6 @@ SHELLWORDS
         "message 2\r\n",
         "message 3\r\n",
         "message 4\r\n",
-        "message 5\r\n",
         "message 6\r\n"
       ].join(''))
     end
@@ -403,23 +405,23 @@ PS
           expect(result).to_not be_success
         end
       end
+
+      it "Correct syntax bad command (CommandNotFoundException)", winrm: true do
+        contents = <<-PS
+        Foo-Bar
+        PS
+
+        with_tempfile_containing('script-test-winrm', contents) do |file|
+          result = winrm._run_script(file.path, [])
+          expect(result).to_not be_success
+        end
+      end
     end
 
     context "does not fail for PowerShell non-terminating errors:" do
       it "Write-Error with default $ErrorActionPreference", winrm: true do
         contents = <<-PS
         Write-Error "error stream addition"
-        PS
-
-        with_tempfile_containing('script-test-winrm', contents) do |file|
-          result = winrm._run_script(file.path, [])
-          expect(result).to be_success
-        end
-      end
-
-      it "Correct syntax bad command (CommandNotFoundException)", winrm: true do
-        contents = <<-PS
-        Foo-Bar
         PS
 
         with_tempfile_containing('script-test-winrm', contents) do |file|
