@@ -108,6 +108,37 @@ PS
     expect(winrm.execute(command).value).to eq("#{user}\r\n")
   end
 
+  it "reuses a PowerShell host / runspace for multiple commands", winrm: true do
+    contents = [
+      "$Host.InstanceId.ToString(), $Host.Runspace.InstanceId.ToString()",
+      "$ENV:A, $B, $script:C, $local:D, $global:E",
+      "$ENV:A = 'env'",
+      "$B = 'unscoped'",
+      "$script:C = 'script'",
+      "$local:D = 'local'",
+      "$global:E = 'global'",
+      "$ENV:A, $B, $script:C, $local:D, $global:E"
+    ].join('; ')
+
+    result = winrm.execute(contents)
+    instance, runspace, *outputs = result.value.split("\r\n")
+
+    result2 = winrm.execute(contents)
+    instance2, runspace2, *outputs2 = result2.value.split("\r\n")
+
+    # Host should be identical (uniquely identified by Guid)
+    expect(instance).to eq(instance2)
+    # Runspace should be identical (uniquely identified by Guid)
+    expect(runspace).to eq(runspace2)
+
+    # state not yet set, only get one copy
+    expect(outputs).to eq(%w[env unscoped script local global])
+
+    # state carries across invocations, get 2 copies
+    outs = %w[env unscoped script local global env unscoped script local global]
+    expect(outputs2).to eq(outs)
+  end
+
   it "can upload a file to a host", winrm: true do
     contents = "934jklnvf"
     remote_path = 'C:\Windows\Temp\upload-test-winrm'
@@ -128,6 +159,42 @@ PS
       expect(
         winrm._run_script(file.path, []).value
       ).to eq("hellote\r\n")
+    end
+  end
+
+  it "does not reuse host for multiple PowerShell scripts", winrm: true do
+    contents = <<-PS
+      $Host.InstanceId.ToString(), $Host.Runspace.InstanceId.ToString()
+
+      $ENV:A, $B, $script:C, $local:D, $global:E
+
+      $ENV:A = 'env'
+      $B = 'unscoped'
+      $script:C = 'script'
+      $local:D = 'local'
+      $global:E = 'global'
+
+      $ENV:A, $B, $script:C, $local:D, $global:E
+    PS
+
+    with_tempfile_containing('script-test-winrm', contents) do |file|
+      result = winrm._run_script(file.path, [])
+      instance, runspace, *outputs = result.value.split("\r\n")
+
+      result2 = winrm._run_script(file.path, [])
+      instance2, runspace2, *outputs2 = result2.value.split("\r\n")
+
+      # scripts execute in a completely new process
+      # Host unique Guid is different
+      expect(instance).to_not eq(instance2)
+      # Runspace unique Guid is different
+      expect(runspace).to_not eq(runspace2)
+
+      # state not yet set, only get one copy
+      expect(outputs).to eq(%w[env unscoped script local global])
+
+      # state doesn't carry over from first invocation given new process
+      expect(outputs2).to eq(%w[env unscoped script local global])
     end
   end
 
