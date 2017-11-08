@@ -109,7 +109,7 @@ else:
 We can then run the task against our nodes like so:
 
 ```
-$ bolt task run exercise5::gethost host=google.com --nodes <nodes> --modules ./modules
+$ bolt task run exercise5::gethost host=google.com --nodes <nodes> --modulepath ./modules
 node1:
 
 google.com is available at 216.58.204.14 on node1
