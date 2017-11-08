@@ -122,7 +122,7 @@ PS
     end
   end
 
-  it "can run a script remotely", winrm: true do
+  it "can run a PowerShell script remotely", winrm: true do
     contents = "Write-Output \"hellote\""
     with_tempfile_containing('script-test-winrm', contents) do |file|
       expect(
@@ -131,7 +131,7 @@ PS
     end
   end
 
-  it "can run a script remotely with quoted arguments", winrm: true do
+  it "can run a PowerShell script remotely with quoted args", winrm: true do
     with_tempfile_containing('script-test-winrm-quotes', echo_script) do |file|
       expect(
         winrm._run_script(
@@ -212,7 +212,7 @@ SHELLWORDS
     end
   end
 
-  it "will collect on stdout using valid output mechanisms", winrm: true do
+  it "will collect stdout using valid PowerShell output methods", winrm: true do
     contents = <<-PS
     # explicit Format-Table for PS5+ overrides implicit Format-Table which
     # includes a 300ms delay waiting for more pipeline output
@@ -396,6 +396,19 @@ PS
       end
     end
 
+    it "can apply a ruby-based script", winrm: true do
+      allow(winrm)
+        .to receive(:execute_process)
+        .with('ruby.exe',
+              ['-S', /^".*"$/])
+        .and_return(Bolt::Node::Success.new("42"))
+      with_tempfile_containing('script-rb-winrm', "puts 42", '.rb') do |file|
+        expect(
+          winrm._run_script(file.path, []).value
+        ).to eq("42")
+      end
+    end
+
     it "can apply a ruby-based task", winrm: true do
       allow(winrm)
         .to receive(:execute_process)
@@ -407,6 +420,25 @@ PS
         expect(
           winrm._run_task(file.path, 'stdin', {}).value
         ).to eq("42")
+      end
+    end
+
+    it "can apply a puppet manifest for a '.pp' script", winrm: true do
+      output = <<OUTPUT
+Notice: Scope(Class[main]): hi
+Notice: Compiled catalog for x.y.z in environment production in 0.04 seconds
+Notice: Applied catalog in 0.04 seconds
+OUTPUT
+      allow(winrm)
+        .to receive(:execute_process)
+        .with('puppet.bat',
+              ['apply', /^".*"$/])
+        .and_return(Bolt::Node::Success.new(output))
+      contents = "notice('hi')"
+      with_tempfile_containing('script-pp-winrm', contents, '.pp') do |file|
+        expect(
+          winrm._run_script(file.path, []).value
+        ).to eq(output)
       end
     end
 

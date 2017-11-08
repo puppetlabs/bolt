@@ -272,9 +272,9 @@ PS
     def _run_script(script, arguments)
       @logger.info { "Running script '#{script}'" }
       with_remote_file(script) do |remote_path|
-        args = [*PS_ARGS, '-File', "\"#{remote_path}\""]
+        path, args = *process_from_extension(remote_path)
         args += escape_arguments(arguments)
-        execute_process('powershell.exe', args)
+        execute_process(path, args)
       end
     end
 
