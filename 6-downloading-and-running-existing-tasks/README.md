@@ -67,7 +67,7 @@ wget https://raw.githubusercontent.com/puppetlabs/tasks-hands-on-lab/master/6-do
 Let's quickly check on the status of a specific package using `bolt`:
 
 ```
-bolt task run package action=status package=bash --nodes <nodes> --modules ./modules
+bolt task run package action=status package=bash --nodes <nodes> --modulepath ./modules
 node1:
 
 {"status":"up to date","version":"4.3-7ubuntu1.7"}
@@ -80,7 +80,7 @@ Ran on 1 node in 3.81 seconds
 The package task also supports other actions, including ensuring a package is installed. Let's install a package across all of our nodes using that action:
 
 ```
-bolt task run package action=install package=vim --nodes <nodes> --modules ./modules
+bolt task run package action=install package=vim --nodes <nodes> --modulepath ./modules
 node1:
 
 {"status":"installed","version":"2:7.4.052-1ubuntu3.1"}
