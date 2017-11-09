@@ -37,6 +37,17 @@ node1:
 Ran on 1 node in 0.06 seconds
 ```
 
+If you receive an error reading `Host key verification failed` you are using a newer version of bolt. In this case you must provide the `-k` oder `--insecure` option:
+
+```
+$ bolt command run uptime --nodes node1 --insecure
+node1:
+
+ 07:20:08 up  6:33,  0 users,  load average: 0.20, 0.05, 0.01
+
+Ran on 1 node in 0.06 seconds
+```
+
 `bolt` can also run commands against multiple nodes by passing a command separated list. Replace `node1,node2` in the following with two or more of your own nodes.
 
 ```
