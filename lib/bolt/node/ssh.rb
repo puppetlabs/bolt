@@ -22,6 +22,7 @@ module Bolt
 
       options[:port] = @port if @port
       options[:password] = @password if @password
+      options[:keys] = @key if @key
       options[:verify_host_key] = if @insecure
                                     Net::SSH::Verifiers::Lenient.new
                                   else

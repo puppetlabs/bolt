@@ -4,6 +4,7 @@ module Bolt
   Config = Struct.new(:concurrency,
                       :user,
                       :password,
+                      :key,
                       :tty,
                       :insecure,
                       :transport,
