@@ -1,8 +1,0 @@
-{
-    "name": "puppetlabs/bolt",
-    "version": "0.7.0",
-    "source": "git@github.com/puppetlabs/bolt.git",
-    "dependencies": [],
-    "author": "Puppet Inc",
-    "license": "Apache-2.0",
-}
