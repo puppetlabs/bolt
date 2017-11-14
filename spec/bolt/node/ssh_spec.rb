@@ -78,21 +78,29 @@ BASH
     end
 
     it "returns Node::ConnectError if the node name can't be resolved" do
+      # even with default timeout, name resolution fails in < 1
       ssh = Bolt::SSH.new('totally-not-there', port)
+      exec_time = Time.now
       expect_node_error(Bolt::Node::ConnectError,
                         'CONNECT_ERROR',
                         /Failed to connect to/) do
         ssh.connect
       end
+      exec_time = Time.now - exec_time
+      expect(exec_time).to be < 1
     end
 
     it "returns Node::ConnectError if the connection is refused" do
+      # even with default timeout, connection refused fails in < 1
       ssh = Bolt::SSH.new(hostname, 65535, user, password)
+      exec_time = Time.now
       expect_node_error(Bolt::Node::ConnectError,
                         'CONNECT_ERROR',
                         /Failed to connect to/) do
         ssh.connect
       end
+      exec_time = Time.now - exec_time
+      expect(exec_time).to be < 1
     end
 
     it "returns Node::ConnectError if the connection times out" do
@@ -104,6 +112,21 @@ BASH
                         /Failed to connect to/) do
         ssh.connect
       end
+    end
+
+    it "takes > 2 seconds if connection fails to non-SSH port", ssh: true do
+      bogus_port = 5555
+      Process.spawn("nc -l #{bogus_port}")
+      # CLI failures present on a dead port like:
+      # Failed to connect to ssh://localhost:2222:
+      #   connection closed by remote host
+      #
+      # Ran on 1 node in 438.96 seconds
+      ssh = Bolt::SSH.new(hostname, bogus_port, 'bad', 'password')
+
+      expect {
+        Timeout.timeout(2) { ssh.connect }
+      }.to raise_error(Timeout::Error)
     end
   end
 

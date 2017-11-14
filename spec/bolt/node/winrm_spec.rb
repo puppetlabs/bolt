@@ -35,11 +35,14 @@ PS
   context "when connecting fails", winrm: true do
     it "raises Node::ConnectError if the node name can't be resolved" do
       winrm = Bolt::WinRM.new('totally-not-there', port, user, password)
+      exec_time = Time.now
       expect_node_error(Bolt::Node::ConnectError,
                         'CONNECT_ERROR',
                         /Failed to connect to/) do
         winrm.connect
       end
+      exec_time = Time.now - exec_time
+      expect(exec_time).to be < 1
     end
 
     it "raises Node::ConnectError if the connection is refused" do
@@ -55,6 +58,13 @@ PS
                         /Failed to connect to/) do
         winrm.connect
       end
+    end
+
+    it "takes > 2 seconds to raise Node::ConnectError for connection refused" do
+      winrm = Bolt::WinRM.new(host, 65535, user, password)
+      expect {
+        Timeout.timeout(2) { winrm.connect }
+      }.to raise_error(Timeout::Error)
     end
 
     it "raises Node::ConnectError if the connection times out" do
