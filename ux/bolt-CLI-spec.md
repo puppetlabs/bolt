@@ -86,47 +86,72 @@ PARAMETERS:
 
 
 
-**View output per node while task/command/script is running on single or multiple nodes.**
+**View output per node while task/command/script/file is running on single or multiple nodes.**
 
-**--human format (default)**
+**--human format (default) for commands, scripts, and files**
 
 ~~~
-$ bolt [task/command/script] run [options...]
-Starting [task/command/script]...
+$ bolt [command/script/file] run [options...]
+Starting [command/script/file]...
 Nodes: 3
 
 Started on node-1...
 Started on node-2...
 Started on node-3...
-Finished on node-1
-  status: [succeeded/failed/<task-specific staus>]
-    STDOUT:
-      [stdout output...]
-    STDERR:
-      [stderr output...]
-Finished on node-2
-  status: [succeeded/failed/<task-specific staus>]
-   STDOUT:
-      [stdout output...]
-    STDERR:
-      [stderr output...] 
-Finished on node-3
-  status: [succeeded/failed/<task-specific staus>]
-    STDOUT:
-      [stdout output...]
-    STDERR:
-      [stderr output...] 
+[Succeeded/Failed] on node-1
+  STDOUT:
+    [stdout output...]
+  STDERR:
+    [stderr output...]
+[Succeeded/Failed] on node-2
+  STDOUT:
+    [stdout output...]
+  STDERR:
+    [stderr output...]
+[Succeeded/Failed] on node-3
+  STDOUT:
+    [stdout output...]
+  STDERR:
+    [stderr output...]
       
 
-[Task/Command/Script] completed. 3/3 nodes succeeded.
+[Command/Script/File] completed. 3/3 nodes succeeded.
 Duration: 27 sec
 ~~~
 
+**--human format (default) for tasks**
+
+~~~
+$ bolt task run [options...]
+Starting task...
+Nodes: 3
+
+Started on node-1...
+Started on node-2...
+Started on node-3...
+[Succeeded/Failed] on node-1
+  [_error messages printed in red]
+  [_output messages printed in default color]
+  [additional JSON pretty printed]
+[Succeeded/Failed] on node-2
+  [_error messages printed in red]
+  [_output messages printed in default color]
+  [additional JSON pretty printed]
+[Succeeded/Failed] on node-3
+  [_error messages printed in red]
+  [_output messages printed in default color]
+  [additional JSON pretty printed]
+      
+
+[Task] completed. 3/3 nodes succeeded.
+Duration: 27 sec
+~~~
+
+
 - colors should match puppet job run output for started, finished, and errors.
 - For tasks, capitalization of the finished node results comes from module (eg. status vs. Status).
-- status will be succeeded or failed for command and scripts; task status may be something else specified by task.
 - STDOUT or STDERR labels will be printed only if the outout from that stream is non-empty.
-
+- file will only output STDERR; there will be no STDOUT
 
 
 **View output per node while task/command/script is running on single or multiple nodes.**
