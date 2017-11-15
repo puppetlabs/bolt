@@ -54,9 +54,19 @@ module Bolt
       end
     end
 
-    def execute(command, options = {})
+    def execute(command, sudoable: false, **options)
       result_output = Bolt::Node::ResultOutput.new
       status = {}
+      use_sudo = sudoable && (@sudo || @run_as)
+      sudo_prompt = '[sudo] Bolt needs to run as another user, password: '
+      if use_sudo
+        user_clause = if @run_as
+                        "-u #{@run_as}"
+                      else
+                        ''
+                      end
+        command = "sudo -S #{user_clause} -p '#{sudo_prompt}' #{command}"
+      end
 
       @logger.debug { "Executing: #{command}" }
 
@@ -68,12 +78,22 @@ module Bolt
           raise "could not execute command: #{command.inspect}" unless success
 
           channel.on_data do |_, data|
-            result_output.stdout << data
+            if use_sudo && data == sudo_prompt
+              channel.send_data "#{@sudo_password}\n"
+              channel.wait
+            else
+              result_output.stdout << data
+            end
             @logger.debug { "stdout: #{data}" }
           end
 
           channel.on_extended_data do |_, _, data|
-            result_output.stderr << data
+            if use_sudo && data == sudo_prompt
+              channel.send_data "#{@sudo_password}\n"
+              channel.wait
+            else
+              result_output.stderr << data
+            end
             @logger.debug { "stderr: #{data}" }
           end
 
@@ -113,31 +133,66 @@ module Bolt
       Bolt::Node::ExceptionFailure.new(e)
     end
 
-    def with_remote_file(file)
-      remote_path = ''
-      dir = ''
-      result = nil
+    def with_remote_tempdir
+      make_tempdir.then do |dir|
+        (yield dir).ensure do
+          execute("rm -rf '#{dir}'")
+        end
+      end
+    end
 
-      make_tempdir.then do |value|
-        dir = value
-        remote_path = "#{dir}/#{File.basename(file)}"
-        Bolt::Node::Success.new
-      end.then do
-        _upload(file, remote_path)
-      end.then do
+    def with_remote_script(dir, file)
+      remote_path = "#{dir}/#{File.basename(file)}"
+      _upload(file, remote_path).then do
         execute("chmod u+x '#{remote_path}'")
       end.then do
-        result = yield remote_path
+        yield remote_path
+      end
+    end
+
+    def with_remote_file(file)
+      with_remote_tempdir do |dir|
+        with_remote_script(dir, file) do |remote_path|
+          yield remote_path
+        end
+      end
+    end
+
+    def make_wrapper_stringio(task_path, stdin)
+      StringIO.new(<<-SCRIPT)
+#!/bin/sh
+'#{task_path}' <<EOF
+#{stdin}
+EOF
+SCRIPT
+    end
+
+    def with_task_wrapper(remote_task, dir, stdin)
+      wrapper = make_wrapper_stringio(remote_task, stdin)
+      command = "#{dir}/wrapper.sh"
+      _upload(wrapper, command).then do
+        execute("chmod u+x '#{command}'")
       end.then do
-        execute("rm -f '#{remote_path}'")
-      end.then do
-        execute("rmdir '#{dir}'")
-        result
+        yield command
+      end
+    end
+
+    def with_remote_task(task_file, stdin)
+      with_remote_tempdir do |dir|
+        with_remote_script(dir, task_file) do |remote_task|
+          if stdin
+            with_task_wrapper(remote_task, dir, stdin) do |command|
+              yield command
+            end
+          else
+            yield remote_task
+          end
+        end
       end
     end
 
     def _run_command(command)
-      execute(command)
+      execute(command, sudoable: true)
     end
 
     def _run_script(script, arguments)
@@ -145,7 +200,8 @@ module Bolt
       @logger.debug { "arguments: #{arguments}" }
 
       with_remote_file(script) do |remote_path|
-        execute("'#{remote_path}' #{Shellwords.join(arguments)}")
+        execute("'#{remote_path}' #{Shellwords.join(arguments)}",
+                sudoable: true)
       end
     end
 
@@ -166,13 +222,13 @@ module Bolt
         end.join(' ')
       end
 
-      with_remote_file(task) do |remote_path|
+      with_remote_task(task, stdin) do |remote_path|
         command = if export_args.empty?
                     "'#{remote_path}'"
                   else
-                    "export #{export_args} && '#{remote_path}'"
+                    "#{export_args} '#{remote_path}'"
                   end
-        execute(command, stdin: stdin)
+        execute(command, sudoable: true)
       end
     end
   end

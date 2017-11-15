@@ -213,4 +213,39 @@ SHELL
       end
     end
   end
+
+  context "with sudo" do
+    let(:config) {
+      Bolt::Config.new(insecure: true, sudo: true,
+                       sudo_password: password, run_as: 'root')
+    }
+    let(:ssh) { Bolt::SSH.new(hostname, port, user, password, config: config) }
+
+    before(:each) { ssh.connect }
+    after(:each) { ssh.disconnect }
+
+    it "can execute a command", ssh: true do
+      expect(ssh._run_command('whoami').value).to eq("root\n")
+    end
+
+    it "can run a task passing input on stdin", ssh: true do
+      contents = "#!/bin/sh\ngrep 'message_one'"
+      arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
+      with_tempfile_containing('tasks test stdin', contents) do |file|
+        expect(ssh._run_task(file.path, 'stdin', arguments).value)
+          .to match(/{"message_one":"Hello from task","message_two":"Goodbye"}/)
+      end
+    end
+
+    context "requesting a pty" do
+      let(:config) {
+        Bolt::Config.new(insecure: true, sudo: true, sudo_password: password,
+                         run_as: 'root', tty: true)
+      }
+
+      it "can execute a command when a tty is requested", ssh: true do
+        expect(ssh._run_command('whoami').value).to eq("\r\nroot\r\n")
+      end
+    end
+  end
 end

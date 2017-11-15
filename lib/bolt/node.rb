@@ -40,6 +40,9 @@ module Bolt
       @tty = config[:tty]
       @insecure = config[:insecure]
       @uri = uri
+      @sudo = config[:sudo]
+      @sudo_password = config[:sudo_password]
+      @run_as = config[:run_as]
 
       @logger = init_logger(config[:log_destination], config[:log_level])
       @transport_logger = init_logger(config[:log_destination], Logger::WARN)

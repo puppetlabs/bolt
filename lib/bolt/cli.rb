@@ -175,6 +175,23 @@ HELP
                 "Specify a default transport: #{TRANSPORTS.join(', ')}") do |t|
           options[:transport] = t
         end
+        opts.on('--run-as USER',
+                "User to run as using privilege escalation") do |user|
+          options[:run_as] = user
+        end
+        opts.on('--sudo [PROGRAM]',
+                "Program to execute for privilege escalation. " \
+                "Currently only sudo is supported.") do |program|
+          options[:sudo] = program || 'sudo'
+          if options[:sudo] != 'sudo'
+            raise Bolt::CLIError,
+                  "Only 'sudo' is supported for privilege escalation."
+          end
+        end
+        opts.on('--sudo-password [PASSWORD]',
+                'Password for privilege escalation') do |password|
+          options[:sudo_password] = password
+        end
         opts.on_tail('--[no-]tty',
                      "Request a pseudo TTY on nodes that support it") do |tty|
           results[:tty] = tty
@@ -347,7 +364,8 @@ HELP
     end
 
     def execute(options)
-      %i[concurrency user password tty insecure transport].each do |key|
+      %i[concurrency user password tty insecure transport
+         sudo sudo_password run_as].each do |key|
         config[key] = options[key]
       end
 

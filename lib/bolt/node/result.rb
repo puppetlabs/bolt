@@ -38,6 +38,11 @@ module Bolt
       def exit_code
         0
       end
+
+      def ensure
+        yield
+        self
+      end
     end
 
     class Success < Result

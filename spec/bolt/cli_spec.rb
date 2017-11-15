@@ -250,6 +250,23 @@ NODES
     end
   end
 
+  describe "sudo" do
+    it "defaults method to sudo" do
+      cli = Bolt::CLI.new(%w[command run --nodes foo whoami --sudo])
+      expect(cli.parse[:sudo]).to eq('sudo')
+    end
+
+    it "rejects unsupported methods" do
+      cli = Bolt::CLI.new(%w[command run --nodes foo whoami --sudo rm])
+      expect { cli.parse[:sudo] }.to raise_error(Bolt::CLIError)
+    end
+
+    it "supports running as a user" do
+      cli = Bolt::CLI.new(%w[command run --nodes foo whoami --run-as root])
+      expect(cli.parse[:run_as]).to eq('root')
+    end
+  end
+
   describe "transport" do
     it "defaults to 'ssh'" do
       cli = Bolt::CLI.new(%w[command run --nodes foo whoami])
