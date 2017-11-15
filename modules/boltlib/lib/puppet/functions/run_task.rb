@@ -5,8 +5,6 @@
 # * A target is a String with a targets's hostname or a Target.
 # * The returned value contains information about the result per target.
 #
-# Since > 5.4.0 TODO: Update when version is known
-#
 Puppet::Functions.create_function(:run_task) do
   local_types do
     type 'TargetOrTargets = Variant[String[1], Target, Array[TargetOrTargets]]'

@@ -18,6 +18,8 @@ before_script:
 - 'echo "$BOLT_SSH_USER ALL=(ALL) PASSWD: ALL" | sudo tee /etc/sudoers.d/bolt'
 script:
 - bundle exec rake travisci rubocop
+- cd modules/boltlib
+- bundle exec rake spec
 notifications:
   email: false
   hipchat:

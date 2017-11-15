@@ -8,8 +8,6 @@
 #   }
 #   run_plan('myplan', {x => 'testing' }
 #
-# @since > 5.2 TODO: change this when known
-#
 Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction) do
   dispatch :run_plan do
     scope_param
