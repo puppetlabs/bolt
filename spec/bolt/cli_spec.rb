@@ -419,8 +419,11 @@ NODES
     before :each do
       allow(Bolt::Executor).to receive(:new).and_return(executor)
       allow(executor).to receive(:from_uris).and_return(nodes)
-      allow(cli).to receive(:print_summary)
-      allow(cli).to receive(:print_result)
+
+      @output = StringIO.new
+      outputter = Bolt::Outputter::JSON.new(@output)
+
+      allow(cli).to receive(:outputter).and_return(outputter)
     end
 
     it "executes the 'whoami' command" do
@@ -430,9 +433,13 @@ NODES
         .and_return({})
 
       options = {
-        nodes: node_names, mode: 'command', action: 'run', object: 'whoami'
+        nodes: node_names,
+        mode: 'command',
+        action: 'run',
+        object: 'whoami'
       }
       cli.execute(options)
+      expect(JSON.parse(@output.string)).to be
     end
 
     describe "when running a script" do
@@ -451,6 +458,7 @@ NODES
           .and_return({})
 
         cli.execute(options)
+        expect(JSON.parse(@output.string)).to be
       end
 
       it "errors for non-existent scripts" do
@@ -459,6 +467,7 @@ NODES
         expect { cli.execute(options) }.to raise_error(
           Bolt::CLIError, /The script '#{script}' does not exist/
         )
+        expect(JSON.parse(@output.string)).to be
       end
 
       it "errors for unreadable scripts" do
@@ -467,6 +476,7 @@ NODES
         expect { cli.execute(options) }.to raise_error(
           Bolt::CLIError, /The script '#{script}' is unreadable/
         )
+        expect(JSON.parse(@output.string)).to be
       end
 
       it "errors for scripts that aren't files" do
@@ -475,6 +485,7 @@ NODES
         expect { cli.execute(options) }.to raise_error(
           Bolt::CLIError, /The script '#{script}' is not a file/
         )
+        expect(JSON.parse(@output.string)).to be
       end
     end
 
@@ -499,6 +510,7 @@ NODES
         modulepath: [File.join(__FILE__, '../../fixtures/modules')]
       }
       cli.execute(options)
+      expect(JSON.parse(@output.string)).to be
     end
 
     it "errors for non-existent modules" do
@@ -516,6 +528,7 @@ NODES
       expect { cli.execute(options) }.to raise_error(
         Bolt::CLIError, /Could not find module/
       )
+      expect(JSON.parse(@output.string)).to be
     end
 
     it "errors for non-existent tasks" do
@@ -534,6 +547,7 @@ NODES
         Bolt::CLIError,
         /Could not find task '#{task_name}' in module 'sample'/
       )
+      expect(JSON.parse(@output.string)).to be
     end
 
     it "runs an init task given a module name" do
@@ -557,6 +571,7 @@ NODES
         modulepath: [File.join(__FILE__, '../../fixtures/modules')]
       }
       cli.execute(options)
+      expect(JSON.parse(@output.string)).to be
     end
 
     it "runs a task passing input on stdin" do
@@ -579,6 +594,7 @@ NODES
         modulepath: [File.join(__FILE__, '../../fixtures/modules')]
       }
       cli.execute(options)
+      expect(JSON.parse(@output.string)).to be
     end
 
     it "runs a powershell task passing input on stdin" do
@@ -601,6 +617,7 @@ NODES
         modulepath: [File.join(__FILE__, '../../fixtures/modules')]
       }
       cli.execute(options)
+      expect(JSON.parse(@output.string)).to be
     end
 
     describe "file uploading" do
@@ -625,6 +642,7 @@ NODES
           .and_return({})
 
         cli.execute(options)
+        expect(JSON.parse(@output.string)).to be
       end
 
       it "raises if the local file doesn't exist" do
@@ -633,6 +651,7 @@ NODES
         expect { cli.execute(options) }.to raise_error(
           Bolt::CLIError, /The source file '#{source}' does not exist/
         )
+        expect(JSON.parse(@output.string)).to be
       end
 
       it "errors if the local file is unreadable" do
@@ -641,6 +660,7 @@ NODES
         expect { cli.execute(options) }.to raise_error(
           Bolt::CLIError, /The source file '#{source}' is unreadable/
         )
+        expect(JSON.parse(@output.string)).to be
       end
 
       it "errors if the local file is a directory" do
@@ -649,6 +669,7 @@ NODES
         expect { cli.execute(options) }.to raise_error(
           Bolt::CLIError, /The source file '#{source}' is not a file/
         )
+        expect(JSON.parse(@output.string)).to be
       end
     end
   end
