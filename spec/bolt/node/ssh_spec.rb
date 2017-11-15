@@ -23,6 +23,12 @@ do
 done
 BASH
 
+  def result_value(stdout = nil, stderr = nil, exit_code = 0)
+    { 'stdout' => stdout || '',
+      'stderr' => stderr || '',
+      'exit_code' => exit_code }
+  end
+
   context "when connecting", ssh: true do
     it "performs secure host key verification by default" do
       allow(Net::SSH)
@@ -100,18 +106,18 @@ BASH
     end
   end
 
-  context "when executing" do
+  context "when running_commands" do
     let(:ssh) { Bolt::SSH.new(hostname, port, user, password, **insecure) }
 
     before(:each) { ssh.connect }
     after(:each) { ssh.disconnect }
 
     it "executes a command on a host", ssh: true do
-      expect(ssh.execute(command).value).to eq("/home/#{user}\n")
+      expect(ssh._run_command(command).value).to eq(result_value("/home/#{user}\n"))
     end
 
     it "captures stderr from a host", ssh: true do
-      expect(ssh.execute("ssh -V").output.stderr.string).to match(/OpenSSH/)
+      expect(ssh._run_command("ssh -V").value['stderr']).to match(/OpenSSH/)
     end
 
     it "can upload a file to a host", ssh: true do
@@ -120,7 +126,7 @@ BASH
         ssh.upload(file.path, "/home/#{user}/upload-test")
 
         expect(
-          ssh.execute("cat /home/#{user}/upload-test").value
+          ssh._run_command("cat /home/#{user}/upload-test").stdout
         ).to eq(contents)
 
         ssh.execute("rm /home/#{user}/upload-test")
@@ -131,7 +137,7 @@ BASH
       contents = "#!/bin/sh\necho hellote"
       with_tempfile_containing('script test', contents) do |file|
         expect(
-          ssh._run_script(file.path, []).value
+          ssh._run_script(file.path, []).stdout
         ).to eq("hellote\n")
       end
     end
@@ -151,7 +157,7 @@ BASH
              "double 'single' double",
              'single "double" single',
              'single \'single\' single']
-          ).value
+          ).stdout
         ).to eq(<<QUOTED)
 nospaces
 with spaces
@@ -173,7 +179,7 @@ QUOTED
           ssh._run_script(
             file.path,
             ['echo $HOME; cat /etc/passwd']
-          ).value
+          ).stdout
         ).to eq(<<SHELLWORDS)
 echo $HOME; cat /etc/passwd
 SHELLWORDS
@@ -184,7 +190,7 @@ SHELLWORDS
       contents = "#!/bin/sh\necho -n ${PT_message_one} ${PT_message_two}"
       arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
       with_tempfile_containing('tasks test', contents) do |file|
-        expect(ssh._run_task(file.path, 'environment', arguments).value)
+        expect(ssh._run_task(file.path, 'environment', arguments).message)
           .to eq('Hello from task Goodbye')
       end
     end
@@ -194,7 +200,7 @@ SHELLWORDS
       arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
       with_tempfile_containing('tasks test stdin', contents) do |file|
         expect(ssh._run_task(file.path, 'stdin', arguments).value)
-          .to match(/{"message_one":"Hello from task","message_two":"Goodbye"}/)
+          .to eq("message_one" => "Hello from task", "message_two" => "Goodbye")
       end
     end
 
@@ -206,10 +212,67 @@ grep 'message_one'
 SHELL
       arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
       with_tempfile_containing('tasks-test-both', contents) do |file|
-        expect(ssh._run_task(file.path, 'both', arguments).value).to eq(<<SHELL)
+        expect(ssh._run_task(file.path, 'both', arguments).message).to eq(<<SHELL)
 Hello from task Goodbye{\"message_one\":\
 \"Hello from task\",\"message_two\":\"Goodbye\"}
 SHELL
+      end
+    end
+
+    context "when it can't upload a file" do
+      before(:each) do
+        expect(ssh).to receive(:write_remote_file).and_raise(
+          Bolt::Node::FileError.new("no write", "WRITE_ERROR")
+        )
+      end
+
+      it 'returns an error result for _upload', ssh: true do
+        contents = "kljhdfg"
+        with_tempfile_containing('upload-test', contents) do |file|
+          expect(ssh.upload(file.path, "/home/#{user}/upload-test").error['msg']).to eq('no write')
+        end
+      end
+
+      it 'returns an error result for _run_command', ssh: true do
+        contents = "#!/bin/sh\necho hellote"
+        with_tempfile_containing('script test', contents) do |file|
+          expect(
+            ssh._run_script(file.path, []).error['msg']
+          ).to eq("no write")
+        end
+      end
+
+      it 'returns an error result for _run_task', ssh: true do
+        contents = "#!/bin/sh\necho -n ${PT_message_one} ${PT_message_two}"
+        arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
+        with_tempfile_containing('tasks test', contents) do |file|
+          expect(ssh._run_task(file.path, 'environment', arguments).error['msg']).to eq("no write")
+        end
+      end
+    end
+
+    context "when it can't create a tempfile" do
+      before(:each) do
+        expect(ssh).to receive(:make_tempdir).and_raise(
+          Bolt::Node::FileError.new("no tmpdir", "TEMDIR_ERROR")
+        )
+      end
+
+      it 'errors when it tries to run a script', ssh: true do
+        contents = "#!/bin/sh\necho hellote"
+        with_tempfile_containing('script test', contents) do |file|
+          expect(
+            ssh._run_script(file.path, []).error['msg']
+          ).to eq("no tmpdir")
+        end
+      end
+
+      it "can run a task", ssh: true do
+        contents = "#!/bin/sh\necho -n ${PT_message_one} ${PT_message_two}"
+        arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
+        with_tempfile_containing('tasks test', contents) do |file|
+          expect(ssh._run_task(file.path, 'environment', arguments).error['msg']).to eq("no tmpdir")
+        end
       end
     end
   end
@@ -225,7 +288,7 @@ SHELL
     after(:each) { ssh.disconnect }
 
     it "can execute a command", ssh: true do
-      expect(ssh._run_command('whoami').value).to eq("root\n")
+      expect(ssh._run_command('whoami').stdout).to eq("root\n")
     end
 
     it "can run a task passing input on stdin", ssh: true do
@@ -233,7 +296,7 @@ SHELL
       arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
       with_tempfile_containing('tasks test stdin', contents) do |file|
         expect(ssh._run_task(file.path, 'stdin', arguments).value)
-          .to match(/{"message_one":"Hello from task","message_two":"Goodbye"}/)
+          .to eq("message_one" => "Hello from task", "message_two" => "Goodbye")
       end
     end
 
@@ -244,7 +307,7 @@ SHELL
       }
 
       it "can execute a command when a tty is requested", ssh: true do
-        expect(ssh._run_command('whoami').value).to eq("\r\nroot\r\n")
+        expect(ssh._run_command('whoami').stdout).to eq("\r\nroot\r\n")
       end
     end
   end

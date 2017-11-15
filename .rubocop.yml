@@ -21,6 +21,9 @@ Style/BlockDelimiters:
 Style/NumericLiterals:
   Enabled: false
 
+Style/NumericPredicate:
+  Enabled: false
+
 Layout/IndentHeredoc:
   Enabled: false
 

@@ -23,12 +23,14 @@ describe "Bolt::Outputter::JSON" do
   it "prints multiple items" do
     outputter.print_head
     outputter.print_result(Bolt::Node.from_uri('node1', config: config),
-                           Bolt::Result.new("ok"))
+                           Bolt::Result.new)
     outputter.print_result(Bolt::Node.from_uri('node2', config: config),
                            Bolt::Result.new("ok"))
     outputter.print_summary(results, 10.0)
     parsed = JSON.parse(output.string)
     expect(parsed['items'].size).to eq(2)
+    expect(parsed['items'][0]['status']).to eq('success')
+    expect(parsed['items'][1]['status']).to eq('failure')
   end
 
   it "handles fatal errors" do

@@ -6,7 +6,9 @@ describe "Bolt::Executor" do
   let(:executor) { Bolt::Executor.new(config) }
   let(:command) { "hostname" }
   let(:script) { '/path/to/script.sh' }
-  let(:success) { Bolt::Node::Success.new }
+  let(:success) { Bolt::Result.new }
+  let(:start_event) { { type: :node_start } }
+  let(:success_event) { { type: :node_result, result: success } }
   let(:task) { 'service::restart' }
   let(:task_arguments) { { 'name' => 'apache' } }
   let(:nodes) { [mock_node('node1'), mock_node('node2')] }
@@ -14,6 +16,7 @@ describe "Bolt::Executor" do
   def mock_node(name)
     transport = double('holodeck')
     allow(transport).to receive(:initialize_transport)
+    allow(transport).to receive(:name)
 
     node = double(name, name: name)
     allow(node).to receive(:class).and_return(transport)
@@ -40,7 +43,10 @@ describe "Bolt::Executor" do
       results << [node, result]
     end
 
-    expect(results).to match_array(nodes.zip(Array.new(nodes.length, success)))
+    nodes.each do |node|
+      expect(results).to include([node, success_event])
+      expect(results).to include([node, start_event])
+    end
   end
 
   it "runs a script on all nodes" do
@@ -50,7 +56,7 @@ describe "Bolt::Executor" do
 
     results = executor.run_script(nodes, script, [])
     results.each_pair do |_, result|
-      expect(result).to be_instance_of(Bolt::Node::Success)
+      expect(result).to be_instance_of(Bolt::Result)
     end
   end
 
@@ -64,7 +70,10 @@ describe "Bolt::Executor" do
       results << [node, result]
     end
 
-    expect(results).to match_array(nodes.zip(Array.new(nodes.length, success)))
+    nodes.each do |node|
+      expect(results).to include([node, success_event])
+      expect(results).to include([node, start_event])
+    end
   end
 
   it "runs a task on all nodes" do
@@ -77,7 +86,7 @@ describe "Bolt::Executor" do
 
     results = executor.run_task(nodes, task, 'both', task_arguments)
     results.each_pair do |_, result|
-      expect(result).to be_instance_of(Bolt::Node::Success)
+      expect(result).to be_instance_of(Bolt::Result)
     end
   end
 
@@ -93,7 +102,10 @@ describe "Bolt::Executor" do
     executor.run_task(nodes, task, 'both', task_arguments) do |node, result|
       results << [node, result]
     end
-    expect(results).to match_array(nodes.zip(Array.new(nodes.length, success)))
+    nodes.each do |node|
+      expect(results).to include([node, success_event])
+      expect(results).to include([node, start_event])
+    end
   end
 
   it "returns an error result if the connect raises a base error" do
@@ -106,7 +118,7 @@ describe "Bolt::Executor" do
 
     results = executor.run_command([node], command)
     results.each_pair do |_, result|
-      expect(result).to be_instance_of(Bolt::ErrorResult)
+      expect(result.error['kind']).to eq('puppetlabs.tasks/connect-error')
     end
   end
 
@@ -118,7 +130,7 @@ describe "Bolt::Executor" do
 
     results = executor.run_command([node], command)
     results.each_pair do |_, result|
-      expect(result).to be_instance_of(Bolt::ExceptionResult)
+      expect(result.error['kind']).to eq('puppetlabs.tasks/exception-error')
     end
   end
 
