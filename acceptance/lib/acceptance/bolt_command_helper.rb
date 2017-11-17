@@ -18,7 +18,7 @@ module Acceptance
         execute_powershell_script_on(host, bolt_command, opts)
       elsif platform =~ /osx/
         env = 'source /etc/profile  ~/.bash_profile ~/.bash_login ~/.profile &&'
-        on(host, env + ' ' + command)
+        on(host, env + ' ' + bolt_command)
       else
         on(host, bolt_command, opts)
       end
