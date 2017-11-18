@@ -30,21 +30,27 @@ Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFuncti
   def run_script_with_args(scope, script, targets, args_hash)
     unless Puppet[:tasks]
       raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
-        Puppet::Pops::Issues::TASK_OPERATION_NOT_SUPPORTED_WHEN_COMPILING,
-        {:operation => 'run_script'})
+        Puppet::Pops::Issues::TASK_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, operation: 'run_script'
+      )
     end
 
     executor = Puppet.lookup(:bolt_executor) { nil }
     unless executor && Puppet.features.bolt?
-      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(Puppet::Pops::Issues::TASK_MISSING_BOLT, :action => _('run a script'))
+      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
+        Puppet::Pops::Issues::TASK_MISSING_BOLT, action: _('run a script')
+      )
     end
 
     found = Puppet::Parser::Files.find_file(script, scope.compiler.environment)
     unless found && Puppet::FileSystem.exist?(found)
-      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(Puppet::Pops::Issues::NO_SUCH_FILE_OR_DIRECTORY, {:file => script})
+      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
+        Puppet::Pops::Issues::NO_SUCH_FILE_OR_DIRECTORY, file: script
+      )
     end
     unless Puppet::FileSystem.file?(found)
-      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(Puppet::Pops::Issues::NOT_A_FILE, {:file => script})
+      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
+        Puppet::Pops::Issues::NOT_A_FILE, file: script
+      )
     end
 
     # Ensure that that given targets are all Target instances)
@@ -54,7 +60,7 @@ Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFuncti
       Puppet::Pops::Types::ExecutionResult::EMPTY_RESULT
     else
       # Awaits change in the executor, enabling it receive Target instances
-      hosts = targets.map { |h| h.host }
+      hosts = targets.map(&:host)
 
       Puppet::Pops::Types::ExecutionResult.from_bolt(
         executor.run_script(executor.from_uris(hosts), found, args_hash['arguments'])

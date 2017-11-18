@@ -20,18 +20,22 @@ Puppet::Functions.create_function(:file_upload, Puppet::Functions::InternalFunct
   def file_upload(scope, source, destination, *targets)
     unless Puppet[:tasks]
       raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
-        Puppet::Pops::Issues::TASK_OPERATION_NOT_SUPPORTED_WHEN_COMPILING,
-        {:operation => 'file_upload'})
+        Puppet::Pops::Issues::TASK_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, operation: 'file_upload'
+      )
     end
 
     executor = Puppet.lookup(:bolt_executor) { nil }
     unless executor && Puppet.features.bolt?
-      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(Puppet::Pops::Issues::TASK_MISSING_BOLT, :action => _('do file uploads'))
+      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
+        Puppet::Pops::Issues::TASK_MISSING_BOLT, action: _('do file uploads')
+      )
     end
 
     found = Puppet::Parser::Files.find_file(source, scope.compiler.environment)
     unless found && Puppet::FileSystem.exist?(found)
-      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(Puppet::Pops::Issues::NO_SUCH_FILE_OR_DIRECTORY, {:file => source})
+      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
+        Puppet::Pops::Issues::NO_SUCH_FILE_OR_DIRECTORY, file: source
+      )
     end
 
     # Ensure that that given targets are all Target instances
@@ -41,7 +45,7 @@ Puppet::Functions.create_function(:file_upload, Puppet::Functions::InternalFunct
       Puppet::Pops::Types::ExecutionResult::EMPTY_RESULT
     else
       # Awaits change in the executor, enabling it receive Target instances
-      hosts = targets.map { |h| h.host }
+      hosts = targets.map(&:host)
 
       Puppet::Pops::Types::ExecutionResult.from_bolt(
         executor.file_upload(executor.from_uris(hosts), found, destination)

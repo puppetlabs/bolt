@@ -8,7 +8,7 @@ describe 'file_upload' do
 
   around(:each) do |example|
     Puppet[:tasks] = tasks_enabled
-    Puppet.override(:bolt_executor => executor) do
+    Puppet.override(bolt_executor: executor) do
       example.run
     end
   end
@@ -30,24 +30,24 @@ describe 'file_upload' do
 
     it 'with fully resolved path of file and destination' do
       executor.expects(:from_uris).with(hosts).returns([host])
-      executor.expects(:file_upload).with([host], full_path, destination).returns({ host => result })
-      Puppet::Pops::Types::ExecutionResult.expects(:from_bolt).with({ host => result }).returns(exec_result)
+      executor.expects(:file_upload).with([host], full_path, destination).returns(host: result)
+      Puppet::Pops::Types::ExecutionResult.expects(:from_bolt).with(host: result).returns(exec_result)
 
       is_expected.to run.with_params('test/uploads/index.html', destination, hostname).and_return(exec_result)
     end
 
     it 'with fully resolved path of directory and destination' do
       executor.expects(:from_uris).with(hosts).returns([host])
-      executor.expects(:file_upload).with([host], full_dir_path, destination).returns({ host => result })
-      Puppet::Pops::Types::ExecutionResult.expects(:from_bolt).with({ host => result }).returns(exec_result)
+      executor.expects(:file_upload).with([host], full_dir_path, destination).returns(host: result)
+      Puppet::Pops::Types::ExecutionResult.expects(:from_bolt).with(host: result).returns(exec_result)
 
       is_expected.to run.with_params('test/uploads', destination, hostname).and_return(exec_result)
     end
 
     it 'with target specified as a Target' do
       executor.expects(:from_uris).with(hosts).returns([host])
-      executor.expects(:file_upload).with([host], full_dir_path, destination).returns({ host => result })
-      Puppet::Pops::Types::ExecutionResult.expects(:from_bolt).with({ host => result }).returns(exec_result)
+      executor.expects(:file_upload).with([host], full_dir_path, destination).returns(host: result)
+      Puppet::Pops::Types::ExecutionResult.expects(:from_bolt).with(host: result).returns(exec_result)
 
       target = Puppet::Pops::Types::TypeFactory.target.create(hostname)
       is_expected.to run.with_params('test/uploads', destination, target).and_return(exec_result)
@@ -62,10 +62,11 @@ describe 'file_upload' do
 
       it 'propagates multiple hosts and returns multiple results' do
         executor.expects(:from_uris).with(hosts).returns([host, host2])
-        executor.expects(:file_upload).with([host, host2], full_path, destination).returns({ host => result, host2 => result2 })
-        Puppet::Pops::Types::ExecutionResult.expects(:from_bolt).with({ host => result, host2 => result2 }).returns(exec_result)
+        executor.expects(:file_upload).with([host, host2], full_path, destination).returns(host: result, host2: result2)
+        Puppet::Pops::Types::ExecutionResult.expects(:from_bolt).with(host: result, host2: result2).returns(exec_result)
 
-        is_expected.to run.with_params('test/uploads/index.html', destination, hostname, hostname2).and_return(exec_result)
+        is_expected.to run.with_params('test/uploads/index.html', destination, hostname, hostname2)
+                          .and_return(exec_result)
       end
     end
 
@@ -74,7 +75,7 @@ describe 'file_upload' do
       executor.expects(:file_upload).never
 
       is_expected.to run.with_params('test/uploads/index.html', destination)
-        .and_return(Puppet::Pops::Types::ExecutionResult::EMPTY_RESULT)
+                        .and_return(Puppet::Pops::Types::ExecutionResult::EMPTY_RESULT)
     end
 
     it 'errors when file is not found' do
@@ -82,7 +83,7 @@ describe 'file_upload' do
       executor.expects(:file_upload).never
 
       is_expected.to run.with_params('test/uploads/nonesuch.html', destination)
-        .and_raise_error(/No such file or directory: .*nonesuch\.html/)
+                        .and_raise_error(/No such file or directory: .*nonesuch\.html/)
     end
   end
 
@@ -90,7 +91,7 @@ describe 'file_upload' do
     it 'fails and reports that bolt library is required' do
       Puppet.features.stubs(:bolt?).returns(false)
       is_expected.to run.with_params('test/uploads/nonesuch.html', '/some/place')
-        .and_raise_error(/The 'bolt' library is required to do file uploads/)
+                        .and_raise_error(/The 'bolt' library is required to do file uploads/)
     end
   end
 
@@ -99,7 +100,7 @@ describe 'file_upload' do
 
     it 'fails and reports that file_upload is not available' do
       is_expected.to run.with_params('test/uploads/nonesuch.html', '/some/place')
-        .and_raise_error(/The task operation 'file_upload' is not available/)
+                        .and_raise_error(/The task operation 'file_upload' is not available/)
     end
   end
 end

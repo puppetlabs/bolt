@@ -18,27 +18,28 @@ Puppet::Functions.create_function(:run_command) do
   def run_command(command, *targets)
     unless Puppet[:tasks]
       raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
-        Puppet::Pops::Issues::TASK_OPERATION_NOT_SUPPORTED_WHEN_COMPILING,
-        {:operation => 'run_command'})
+        Puppet::Pops::Issues::TASK_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, operation: 'run_command'
+      )
     end
 
     executor = Puppet.lookup(:bolt_executor) { nil }
     unless executor && Puppet.features.bolt?
-      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(Puppet::Pops::Issues::TASK_MISSING_BOLT, :action => _('run a command'))
+      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
+        Puppet::Pops::Issues::TASK_MISSING_BOLT, action: _('run a command')
+      )
     end
 
     # Ensure that that given targets are all Target instances
     targets = targets.flatten.map { |t| t.is_a?(String) ? Puppet::Pops::Types::TypeFactory.target.create(t) : t }
+
     if targets.empty?
       call_function('debug', "Simulating run_command('#{command}') - no targets given - no action taken")
       Puppet::Pops::Types::ExecutionResult::EMPTY_RESULT
     else
       # Awaits change in the executor, enabling it receive Target instances
-      hosts = targets.map { |h| h.host }
+      hosts = targets.map(&:host)
 
-      Puppet::Pops::Types::ExecutionResult.from_bolt(
-        executor.run_command(executor.from_uris(hosts), command)
-      )
+      Puppet::Pops::Types::ExecutionResult.from_bolt(executor.run_command(executor.from_uris(hosts), command))
     end
   end
 end

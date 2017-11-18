@@ -8,7 +8,7 @@ describe 'run_script' do
 
   around(:each) do |example|
     Puppet[:tasks] = tasks_enabled
-    Puppet.override(:bolt_executor => executor) do
+    Puppet.override(bolt_executor: executor) do
       example.run
     end
   end
@@ -27,16 +27,16 @@ describe 'run_script' do
 
     it 'with fully resolved path of file' do
       executor.expects(:from_uris).with(hosts).returns([host])
-      executor.expects(:run_script).with([host], full_path, []).returns({ host => result })
-      Puppet::Pops::Types::ExecutionResult.expects(:from_bolt).with({ host => result }).returns(exec_result)
+      executor.expects(:run_script).with([host], full_path, []).returns(host: result)
+      Puppet::Pops::Types::ExecutionResult.expects(:from_bolt).with(host: result).returns(exec_result)
 
       is_expected.to run.with_params('test/uploads/hostname.sh', hostname).and_return(exec_result)
     end
 
     it 'with host given as Target' do
       executor.expects(:from_uris).with(hosts).returns([host])
-      executor.expects(:run_script).with([host], full_path, []).returns({ host => result })
-      Puppet::Pops::Types::ExecutionResult.expects(:from_bolt).with({ host => result }).returns(exec_result)
+      executor.expects(:run_script).with([host], full_path, []).returns(host: result)
+      Puppet::Pops::Types::ExecutionResult.expects(:from_bolt).with(host: result).returns(exec_result)
 
       target = Puppet::Pops::Types::TypeFactory.target.create(hostname)
       is_expected.to run.with_params('test/uploads/hostname.sh', target).and_return(exec_result)
@@ -44,19 +44,21 @@ describe 'run_script' do
 
     it 'with given arguments as a hash of {arguments => [value]}' do
       executor.expects(:from_uris).with(hosts).returns([host])
-      executor.expects(:run_script).with([host], full_path, ['hello', 'world']).returns({ host => result })
-      Puppet::Pops::Types::ExecutionResult.expects(:from_bolt).with({ host => result }).returns(exec_result)
+      executor.expects(:run_script).with([host], full_path, %w[hello world]).returns(host: result)
+      Puppet::Pops::Types::ExecutionResult.expects(:from_bolt).with(host: result).returns(exec_result)
 
-      is_expected.to run.with_params('test/uploads/hostname.sh', hostname, {'arguments' => ['hello', 'world']}).and_return(exec_result)
+      is_expected.to run.with_params('test/uploads/hostname.sh',
+                                     hostname,
+                                     'arguments' => %w[hello world]).and_return(exec_result)
     end
 
     it 'with given arguments as a hash of {arguments => []}' do
       executor.expects(:from_uris).with(hosts).returns([host])
-      executor.expects(:run_script).with([host], full_path, []).returns({ host => result })
-      Puppet::Pops::Types::ExecutionResult.expects(:from_bolt).with({ host => result }).returns(exec_result)
+      executor.expects(:run_script).with([host], full_path, []).returns(host: result)
+      Puppet::Pops::Types::ExecutionResult.expects(:from_bolt).with(host: result).returns(exec_result)
 
       target = Puppet::Pops::Types::TypeFactory.target.create(hostname)
-      is_expected.to run.with_params('test/uploads/hostname.sh', target, {'arguments' => []}).and_return(exec_result)
+      is_expected.to run.with_params('test/uploads/hostname.sh', target, 'arguments' => []).and_return(exec_result)
     end
 
     context 'with multiple destinations' do
@@ -68,8 +70,8 @@ describe 'run_script' do
 
       it 'with propagated multiple hosts and returns multiple results' do
         executor.expects(:from_uris).with(hosts).returns(nodes)
-        executor.expects(:run_script).with(nodes, full_path, []).returns({ host => result, host2 => result2 })
-        Puppet::Pops::Types::ExecutionResult.expects(:from_bolt).with({ host => result, host2 => result2 }).returns(exec_result)
+        executor.expects(:run_script).with(nodes, full_path, []).returns(host: result, host2: result2)
+        Puppet::Pops::Types::ExecutionResult.expects(:from_bolt).with(host: result, host2: result2).returns(exec_result)
 
         is_expected.to run.with_params('test/uploads/hostname.sh', hostname, hostname2).and_return(exec_result)
       end
@@ -79,28 +81,31 @@ describe 'run_script' do
       executor.expects(:from_uris).never
       executor.expects(:run_script).never
 
-      is_expected.to run.with_params('test/uploads/hostname.sh').and_return(Puppet::Pops::Types::ExecutionResult::EMPTY_RESULT)
+      is_expected.to run
+        .with_params('test/uploads/hostname.sh').and_return(Puppet::Pops::Types::ExecutionResult::EMPTY_RESULT)
     end
 
     it 'errors when script is not found' do
       executor.expects(:from_uris).never
       executor.expects(:run_script).never
 
-      is_expected.to run.with_params('test/uploads/nonesuch.sh').and_raise_error(/No such file or directory: .*nonesuch\.sh/)
+      is_expected.to run
+        .with_params('test/uploads/nonesuch.sh').and_raise_error(/No such file or directory: .*nonesuch\.sh/)
     end
 
     it 'errors when script appoints a directory' do
       executor.expects(:from_uris).never
       executor.expects(:run_script).never
 
-      is_expected.to run.with_params('test/uploads').and_raise_error(/.*\/uploads is not a file/)
+      is_expected.to run.with_params('test/uploads').and_raise_error(%r{.*\/uploads is not a file})
     end
   end
 
   context 'without bolt feature present' do
     it 'fails and reports that bolt library is required' do
       Puppet.features.stubs(:bolt?).returns(false)
-      is_expected.to run.with_params('test/uploads/nonesuch.sh').and_raise_error(/The 'bolt' library is required to run a script/)
+      is_expected.to run
+        .with_params('test/uploads/nonesuch.sh').and_raise_error(/The 'bolt' library is required to run a script/)
     end
   end
 
@@ -108,7 +113,8 @@ describe 'run_script' do
     let(:tasks_enabled) { false }
 
     it 'fails and reports that run_script is not available' do
-      is_expected.to run.with_params('test/uploads/nonesuch.sh').and_raise_error(/The task operation 'run_script' is not available/)
+      is_expected.to run
+        .with_params('test/uploads/nonesuch.sh').and_raise_error(/The task operation 'run_script' is not available/)
     end
   end
 end

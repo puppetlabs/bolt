@@ -28,7 +28,7 @@ describe 'run_plan' do
       end
 
       it 'run_plan(name, hash) where hash is mapping argname to value' do
-        is_expected.to run.with_params('test::run_me_int', {'x' => 3}).and_return(3)
+        is_expected.to run.with_params('test::run_me_int', 'x' => 3).and_return(3)
       end
     end
 
@@ -44,7 +44,8 @@ describe 'run_plan' do
       end
 
       it 'failing with type mismatch error if given args does not match parameters' do
-        is_expected.to run.with_params('test::run_me_int', {'x' => 'should not work'}).and_raise_error(/expects an Integer value/)
+        is_expected.to run.with_params('test::run_me_int', 'x' => 'should not work')
+                          .and_raise_error(/expects an Integer value/)
       end
     end
   end

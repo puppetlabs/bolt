@@ -36,7 +36,9 @@ Puppet::Functions.create_function(:run_task) do
   def run_named_task(task_name, targets, task_args = nil)
     task_type = Puppet.lookup(:loaders).private_environment_loader.load(:type, task_name)
     if task_type.nil?
-      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(Puppet::Pops::Issues::UNKNOWN_TASK, :type_name => task_name)
+      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
+        Puppet::Pops::Issues::UNKNOWN_TASK, type_name: task_name
+      )
     end
     use_args = task_args.nil? ? {} : task_args
     task_instance = call_function('new', task_type, use_args)
@@ -46,13 +48,15 @@ Puppet::Functions.create_function(:run_task) do
   def run_task_instance(task, *targets)
     unless Puppet[:tasks]
       raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
-        Puppet::Pops::Issues::TASK_OPERATION_NOT_SUPPORTED_WHEN_COMPILING,
-        {:operation => 'run_task'})
+        Puppet::Pops::Issues::TASK_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, operation: 'run_task'
+      )
     end
 
     executor = Puppet.lookup(:bolt_executor) { nil }
     unless executor && Puppet.features.bolt?
-      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(Puppet::Pops::Issues::TASK_MISSING_BOLT, :action => _('run a task'))
+      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
+        Puppet::Pops::Issues::TASK_MISSING_BOLT, action: _('run a task')
+      )
     end
 
     # Ensure that that given targets are all Target instances
@@ -62,16 +66,14 @@ Puppet::Functions.create_function(:run_task) do
       Puppet::Pops::Types::ExecutionResult::EMPTY_RESULT
     else
       # Awaits change in the executor, enabling it receive Target instances
-      hosts = targets.map { |h| h.host }
+      hosts = targets.map(&:host)
 
       # TODO: separate handling of default since it's platform specific
       input_method = task._pcore_type['input_method'].value
 
       arguments = task.task_args
       Puppet::Pops::Types::ExecutionResult.from_bolt(
-        executor.run_task(
-          executor.from_uris(hosts), task.executable_path, input_method, arguments
-        )
+        executor.run_task(executor.from_uris(hosts), task.executable_path, input_method, arguments)
       )
     end
   end
