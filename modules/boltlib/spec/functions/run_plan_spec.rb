@@ -10,17 +10,15 @@ describe 'run_plan' do
   context "when invoked" do
     context 'can be called as' do
       it 'run_plan(name) referencing a plan defined in the manifest' do
-        pending('wip')
         result = Puppet::Pal.in_tmp_environment('pal_env') do |pal|
           pal.with_script_compiler do |compiler|
             compiler.evaluate_string(<<-CODE)
             plan run_me() { "worked1" }
-            $a = run_plan('run_me')
-            notice $a
+            run_plan('run_me')
             CODE
           end
         end
-        expect(result).to eql(['worked1'])
+        expect(result).to eql('worked1')
       end
 
       it 'run_plan(name) referencing an autoloaded plan in a module' do
