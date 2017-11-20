@@ -34,15 +34,14 @@ describe 'run_task' do
     let(:host) { stub(uri: hostname) }
     let(:host2) { stub(uri: hostname2) }
     let(:result) { { value: message } }
-    let(:exec_result) { stub('exec_result') }
+    let(:exec_result) { Puppet::Pops::Types::ExecutionResult.from_bolt(host => result) }
     let(:tasks_root) { File.expand_path(fixtures('modules', 'test', 'tasks')) }
 
     it 'when running a task without metadata the input method is "both"' do
       executable = File.join(tasks_root, 'echo.sh')
 
       executor.expects(:from_uris).with(hosts).returns([host])
-      executor.expects(:run_task).with([host], executable, 'both', 'message' => message).returns(host: result)
-      Puppet::Pops::Types::ExecutionResult.expects(:from_bolt).with(host: result).returns(exec_result)
+      executor.expects(:run_task).with([host], executable, 'both', 'message' => message).returns(host => result)
 
       with_task('Test::Echo') do |task_type|
         is_expected.to run.with_params(task_type.create('message' => message), hostname).and_return(exec_result)
@@ -53,39 +52,40 @@ describe 'run_task' do
       executable = File.join(tasks_root, 'meta.sh')
 
       executor.expects(:from_uris).with(hosts).returns([host])
-      executor.expects(:run_task).with([host], executable, 'environment', 'message' => message).returns(host: result)
-      Puppet::Pops::Types::ExecutionResult.expects(:from_bolt).with(host: result).returns(exec_result)
+      executor.expects(:run_task).with([host], executable, 'environment', 'message' => message).returns(host => result)
 
       with_task('Test::Meta') do |task_type|
         is_expected.to run.with_params(task_type.create(message), hostname).and_return(exec_result)
       end
     end
 
-    it 'nodes can be specified as repeated nested arrays and strings and combine into one list of nodes' do
-      executable = File.join(tasks_root, 'meta.sh')
+    context 'with multiple destinations' do
+      let(:exec_result) { Puppet::Pops::Types::ExecutionResult.from_bolt(host => result, host2 => result) }
 
-      executor.expects(:from_uris).with([hostname, hostname2]).returns([host, host2])
-      executor.expects(:run_task).with([host, host2], executable, 'environment', 'message' => message)
-              .returns(host: result, host2: result)
-      Puppet::Pops::Types::ExecutionResult.expects(:from_bolt).with(host: result, host2: result).returns(exec_result)
+      it 'nodes can be specified as repeated nested arrays and strings and combine into one list of nodes' do
+        executable = File.join(tasks_root, 'meta.sh')
 
-      with_task('Test::Meta') do |task_type|
-        is_expected.to run.with_params(task_type.create(message), hostname, [[hostname2]], []).and_return(exec_result)
+        executor.expects(:from_uris).with([hostname, hostname2]).returns([host, host2])
+        executor.expects(:run_task).with([host, host2], executable, 'environment', 'message' => message)
+                .returns(host => result, host2 => result)
+
+        with_task('Test::Meta') do |task_type|
+          is_expected.to run.with_params(task_type.create(message), hostname, [[hostname2]], []).and_return(exec_result)
+        end
       end
-    end
 
-    it 'nodes can be specified as repeated nested arrays and Targets and combine into one list of nodes' do
-      executable = File.join(tasks_root, 'meta.sh')
+      it 'nodes can be specified as repeated nested arrays and Targets and combine into one list of nodes' do
+        executable = File.join(tasks_root, 'meta.sh')
 
-      executor.expects(:from_uris).with([hostname, hostname2]).returns([host, host2])
-      executor.expects(:run_task).with([host, host2], executable, 'environment', 'message' => message)
-              .returns(host: result, host2: result)
-      Puppet::Pops::Types::ExecutionResult.expects(:from_bolt).with(host: result, host2: result).returns(exec_result)
+        executor.expects(:from_uris).with([hostname, hostname2]).returns([host, host2])
+        executor.expects(:run_task).with([host, host2], executable, 'environment', 'message' => message)
+                .returns(host => result, host2 => result)
 
-      target = Puppet::Pops::Types::TypeFactory.target.create(hostname)
-      target2 = Puppet::Pops::Types::TypeFactory.target.create(hostname2)
-      with_task('Test::Meta') do |task_type|
-        is_expected.to run.with_params(task_type.create(message), target, [[target2]], []).and_return(exec_result)
+        target = Puppet::Pops::Types::TypeFactory.target.create(hostname)
+        target2 = Puppet::Pops::Types::TypeFactory.target.create(hostname2)
+        with_task('Test::Meta') do |task_type|
+          is_expected.to run.with_params(task_type.create(message), target, [[target2]], []).and_return(exec_result)
+        end
       end
     end
 
@@ -96,8 +96,7 @@ describe 'run_task' do
 
           executor.expects(:from_uris).with(hosts).returns([host])
           executor.expects(:run_task).with([host], executable, 'environment', 'message' => message)
-                  .returns(host: result)
-          Puppet::Pops::Types::ExecutionResult.expects(:from_bolt).with(host: result).returns(exec_result)
+                  .returns(host => result)
 
           with_task('Test::Meta') do |task_type|
             is_expected.to run.with_params(task_type, hostname, 'message' => message).and_return(exec_result)
@@ -106,8 +105,7 @@ describe 'run_task' do
 
         it 'without args hash (for a task where this is allowed)' do
           executor.expects(:from_uris).with(hosts).returns([host])
-          executor.expects(:run_task).with([host], anything, 'both', {}).returns(host: result)
-          Puppet::Pops::Types::ExecutionResult.expects(:from_bolt).with(host: result).returns(exec_result)
+          executor.expects(:run_task).with([host], anything, 'both', {}).returns(host => result)
 
           with_task('Test::Yes') do |task_type|
             is_expected.to run.with_params(task_type, hostname).and_return(exec_result)
@@ -130,8 +128,7 @@ describe 'run_task' do
 
           executor.expects(:from_uris).with(hosts).returns([host])
           executor.expects(:run_task).with([host], executable, 'environment', 'message' => message)
-                  .returns(host: result)
-          Puppet::Pops::Types::ExecutionResult.expects(:from_bolt).with(host: result).returns(exec_result)
+                  .returns(host => result)
 
           is_expected.to run.with_params('test::meta', hostname, 'message' => message).and_return(exec_result)
         end
@@ -140,8 +137,7 @@ describe 'run_task' do
           executable = File.join(tasks_root, 'yes.sh')
 
           executor.expects(:from_uris).with(hosts).returns([host])
-          executor.expects(:run_task).with([host], executable, 'both', {}).returns(host: result)
-          Puppet::Pops::Types::ExecutionResult.expects(:from_bolt).with(host: result).returns(exec_result)
+          executor.expects(:run_task).with([host], executable, 'both', {}).returns(host => result)
 
           is_expected.to run.with_params('test::yes', hostname).and_return(exec_result)
         end
@@ -171,8 +167,7 @@ describe 'run_task' do
             executable = File.join(tasks_root, 'init.sh')
 
             executor.expects(:from_uris).with(hosts).returns([host])
-            executor.expects(:run_task).with([host], executable, 'both', {}).returns(host: result)
-            Puppet::Pops::Types::ExecutionResult.expects(:from_bolt).with(host: result).returns(exec_result)
+            executor.expects(:run_task).with([host], executable, 'both', {}).returns(host => result)
 
             is_expected.to run.with_params('test', hostname).and_return(exec_result)
           end

@@ -18,23 +18,21 @@ describe 'run_command' do
     let(:host) { stub(uri: hostname) }
     let(:command) { 'hostname' }
     let(:result) { { value: hostname } }
-    let(:exec_result) { stub('exec_result') }
+    let(:exec_result) { Puppet::Pops::Types::ExecutionResult.from_bolt(host => result) }
     before(:each) do
       Puppet.features.stubs(:bolt?).returns(true)
     end
 
     it 'with given command and host' do
       executor.expects(:from_uris).with(hosts).returns([host])
-      executor.expects(:run_command).with([host], command).returns(host: result)
-      Puppet::Pops::Types::ExecutionResult.expects(:from_bolt).with(host: result).returns(exec_result)
+      executor.expects(:run_command).with([host], command).returns(host => result)
 
       is_expected.to run.with_params(command, hostname).and_return(exec_result)
     end
 
     it 'with given command and Target' do
       executor.expects(:from_uris).with(hosts).returns([host])
-      executor.expects(:run_command).with([host], command).returns(host: result)
-      Puppet::Pops::Types::ExecutionResult.expects(:from_bolt).with(host: result).returns(exec_result)
+      executor.expects(:run_command).with([host], command).returns(host => result)
 
       target = Puppet::Pops::Types::TypeFactory.target.create(hostname)
       is_expected.to run.with_params(command, target).and_return(exec_result)
@@ -45,19 +43,18 @@ describe 'run_command' do
       let(:hosts) { [hostname, hostname2] }
       let(:host2) { stub(uri: hostname2) }
       let(:result2) { { value: hostname2 } }
+      let(:exec_result) { Puppet::Pops::Types::ExecutionResult.from_bolt(host => result, host2 => result2) }
 
       it 'with propagates multiple hosts and returns multiple results' do
         executor.expects(:from_uris).with(hosts).returns([host, host2])
-        executor.expects(:run_command).with([host, host2], command).returns(host: result, host2: result2)
-        Puppet::Pops::Types::ExecutionResult.expects(:from_bolt).with(host: result, host2: result2).returns(exec_result)
+        executor.expects(:run_command).with([host, host2], command).returns(host => result, host2 => result2)
 
         is_expected.to run.with_params(command, hostname, hostname2).and_return(exec_result)
       end
 
       it 'with propagates multiple Targets and returns multiple results' do
         executor.expects(:from_uris).with(hosts).returns([host, host2])
-        executor.expects(:run_command).with([host, host2], command).returns(host: result, host2: result2)
-        Puppet::Pops::Types::ExecutionResult.expects(:from_bolt).with(host: result, host2: result2).returns(exec_result)
+        executor.expects(:run_command).with([host, host2], command).returns(host => result, host2 => result2)
 
         target = Puppet::Pops::Types::TypeFactory.target.create(hostname)
         target2 = Puppet::Pops::Types::TypeFactory.target.create(hostname2)

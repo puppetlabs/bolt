@@ -18,7 +18,7 @@ describe 'run_script' do
     let(:hosts) { [hostname] }
     let(:host) { stub(uri: hostname) }
     let(:result) { { value: hostname } }
-    let(:exec_result) { stub('exec_result') }
+    let(:exec_result) { Puppet::Pops::Types::ExecutionResult.from_bolt(host => result) }
     let(:module_root) { File.expand_path(fixtures('modules', 'test')) }
     let(:full_path) { File.join(module_root, 'files/uploads/hostname.sh') }
     before(:each) do
@@ -27,16 +27,14 @@ describe 'run_script' do
 
     it 'with fully resolved path of file' do
       executor.expects(:from_uris).with(hosts).returns([host])
-      executor.expects(:run_script).with([host], full_path, []).returns(host: result)
-      Puppet::Pops::Types::ExecutionResult.expects(:from_bolt).with(host: result).returns(exec_result)
+      executor.expects(:run_script).with([host], full_path, []).returns(host => result)
 
       is_expected.to run.with_params('test/uploads/hostname.sh', hostname).and_return(exec_result)
     end
 
     it 'with host given as Target' do
       executor.expects(:from_uris).with(hosts).returns([host])
-      executor.expects(:run_script).with([host], full_path, []).returns(host: result)
-      Puppet::Pops::Types::ExecutionResult.expects(:from_bolt).with(host: result).returns(exec_result)
+      executor.expects(:run_script).with([host], full_path, []).returns(host => result)
 
       target = Puppet::Pops::Types::TypeFactory.target.create(hostname)
       is_expected.to run.with_params('test/uploads/hostname.sh', target).and_return(exec_result)
@@ -44,8 +42,7 @@ describe 'run_script' do
 
     it 'with given arguments as a hash of {arguments => [value]}' do
       executor.expects(:from_uris).with(hosts).returns([host])
-      executor.expects(:run_script).with([host], full_path, %w[hello world]).returns(host: result)
-      Puppet::Pops::Types::ExecutionResult.expects(:from_bolt).with(host: result).returns(exec_result)
+      executor.expects(:run_script).with([host], full_path, %w[hello world]).returns(host => result)
 
       is_expected.to run.with_params('test/uploads/hostname.sh',
                                      hostname,
@@ -54,8 +51,7 @@ describe 'run_script' do
 
     it 'with given arguments as a hash of {arguments => []}' do
       executor.expects(:from_uris).with(hosts).returns([host])
-      executor.expects(:run_script).with([host], full_path, []).returns(host: result)
-      Puppet::Pops::Types::ExecutionResult.expects(:from_bolt).with(host: result).returns(exec_result)
+      executor.expects(:run_script).with([host], full_path, []).returns(host => result)
 
       target = Puppet::Pops::Types::TypeFactory.target.create(hostname)
       is_expected.to run.with_params('test/uploads/hostname.sh', target, 'arguments' => []).and_return(exec_result)
@@ -66,12 +62,12 @@ describe 'run_script' do
       let(:hosts) { [hostname, hostname2] }
       let(:host2) { stub(uri: hostname2) }
       let(:result2) { { value: hostname2 } }
+      let(:exec_result) { Puppet::Pops::Types::ExecutionResult.from_bolt(host => result, host2 => result2) }
       let(:nodes) { [mock(hostname), mock(hostname2)] }
 
       it 'with propagated multiple hosts and returns multiple results' do
         executor.expects(:from_uris).with(hosts).returns(nodes)
-        executor.expects(:run_script).with(nodes, full_path, []).returns(host: result, host2: result2)
-        Puppet::Pops::Types::ExecutionResult.expects(:from_bolt).with(host: result, host2: result2).returns(exec_result)
+        executor.expects(:run_script).with(nodes, full_path, []).returns(host => result, host2 => result2)
 
         is_expected.to run.with_params('test/uploads/hostname.sh', hostname, hostname2).and_return(exec_result)
       end
