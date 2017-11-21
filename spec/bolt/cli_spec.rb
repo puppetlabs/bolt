@@ -546,6 +546,30 @@ NODES
       expect(JSON.parse(@output.string)).to be
     end
 
+    it "runs a plan given a name" do
+      plan_name = 'sample::single_task'
+      plan_params = { 'nodes' => nodes.join(',') }
+      input_method = 'both'
+
+      expect(executor)
+        .to receive(:run_task)
+        .with(
+          nodes,
+          %r{modules/sample/tasks/echo.sh$}, input_method, 'message' => 'hi there'
+        ).and_return({})
+
+      options = {
+        nodes: node_names,
+        mode: 'plan',
+        action: 'run',
+        object: plan_name,
+        task_options: plan_params,
+        modulepath: [File.join(__FILE__, '../../fixtures/modules')]
+      }
+      cli.execute(options)
+      expect(@output.string).to eq("\"ExecutionResult({})\"\n")
+    end
+
     it "errors for non-existent modules" do
       task_name = 'dne::task1'
       task_params = { 'message' => 'hi' }
