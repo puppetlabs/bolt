@@ -88,11 +88,11 @@ PARAMETERS:
 
 **View output per node while task/command/script/file is running on single or multiple nodes.**
 
-**--human format (default) for commands, scripts, and files**
+**--human format (default) for commands and scripts**
 
 ~~~
-$ bolt [command/script/file] run [options...]
-Starting [command/script/file]...
+$ bolt [command/script] run [options...]
+Starting [command/script]...
 Nodes: 3
 
 Started on node-1...
@@ -115,7 +115,7 @@ Started on node-3...
     [stderr output...]
       
 
-[Command/Script/File] completed. 3/3 nodes succeeded.
+[Command/Script] completed. 3/3 nodes succeeded.
 Duration: 27 sec
 ~~~
 
@@ -148,10 +148,32 @@ Duration: 27 sec
 ~~~
 
 
+**--human format (default) for files**
+
+~~~
+$ bolt file upload [options...]
+Starting upload...
+Nodes: 3
+
+Started on node-1...
+Started on node-2...
+Started on node-3...
+[Succeeded/Failed] on node-1
+  [_error messages printed in red]
+[Succeeded/Failed] on node-2
+  [_error messages printed in red]
+[Succeeded/Failed] on node-3
+  [_error messages printed in red]
+      
+
+File upload completed. 3/3 nodes succeeded.
+Duration: 27 sec
+~~~
+
+
 - colors should match puppet job run output for started, finished, and errors.
 - For tasks, capitalization of the finished node results comes from module (eg. status vs. Status).
 - STDOUT or STDERR labels will be printed only if the outout from that stream is non-empty.
-- file will only output STDERR; there will be no STDOUT
 
 
 **View output per node while task/command/script is running on single or multiple nodes.**
