@@ -1,0 +1,10 @@
+{
+  "description": "echo a message",
+  "input_method": "environment",
+  "parameters": {
+    "message": {
+      "description": "the message",
+      "type": "String"
+    }
+  }
+}
