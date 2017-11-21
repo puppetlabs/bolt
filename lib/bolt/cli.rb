@@ -94,6 +94,7 @@ HELP
     MODES = %w[command script task plan file].freeze
     ACTIONS = %w[run upload download].freeze
     TRANSPORTS = %w[ssh winrm pcp].freeze
+    BOLTLIB_PATH = File.join(__FILE__, '../../../modules')
 
     attr_reader :parser, :config
     attr_accessor :options
@@ -525,8 +526,10 @@ HELP
           cli << "--#{setting}" << dir
         end
         Puppet.initialize_settings(cli)
-        Puppet::Pal.in_tmp_environment('bolt', modulepath: modulepath) do |pal|
-          puts pal.run_plan(plan, plan_args: args)
+        Puppet::Pal.in_tmp_environment('bolt', modulepath: [BOLTLIB_PATH] + modulepath) do |pal|
+          pal.with_script_compiler do |compiler|
+            compiler.call_function('run_plan', plan, args)
+          end
         end
       end
     end
