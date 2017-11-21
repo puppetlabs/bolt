@@ -267,6 +267,22 @@ NODES
     end
   end
 
+  describe "sudo-password" do
+    it "accepts a password" do
+      cli = Bolt::CLI.new(%w[command run --sudo-password opensez --nodes foo])
+      expect(cli.parse).to include(sudo_password: 'opensez')
+    end
+
+    it "prompts the user for sudo-password if not specified" do
+      allow(STDIN).to receive(:noecho).and_return('opensez')
+      pw_prompt = 'Please enter your privilege escalation password: '
+      allow(STDOUT).to receive(:print).with(pw_prompt)
+      allow(STDOUT).to receive(:puts)
+      cli = Bolt::CLI.new(%w[command run --nodes foo --sudo-password])
+      expect(cli.parse).to include(sudo_password: 'opensez')
+    end
+  end
+
   describe "transport" do
     it "defaults to 'ssh'" do
       cli = Bolt::CLI.new(%w[command run --nodes foo whoami])
