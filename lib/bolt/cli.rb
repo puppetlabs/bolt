@@ -190,7 +190,13 @@ HELP
         end
         opts.on('--sudo-password [PASSWORD]',
                 'Password for privilege escalation') do |password|
-          options[:sudo_password] = password
+          if password.nil?
+            STDOUT.print "Please enter your privilege escalation password: "
+            results[:sudo_password] = STDIN.noecho(&:gets).chomp
+            STDOUT.puts
+          else
+            results[:sudo_password] = password
+          end
         end
         opts.on_tail('--[no-]tty',
                      "Request a pseudo TTY on nodes that support it") do |tty|
