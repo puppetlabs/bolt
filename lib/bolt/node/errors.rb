@@ -18,6 +18,12 @@ module Bolt
       end
     end
 
+    class EscalateError < BaseError
+      def kind
+        'puppetlabs.tasks/escalate-error'
+      end
+    end
+
     class FileError < BaseError
       def kind
         'puppetlabs.tasks/task_file_error'

@@ -74,12 +74,23 @@ module Bolt
         channel.request_pty if @tty
 
         channel.exec(command) do |_, success|
-          raise "could not execute command: #{command.inspect}" unless success
+          unless success
+            raise Bolt::Node::ConnectError.new(
+              "Could not execute command: #{command.inspect}",
+              'EXEC_ERROR'
+            )
+          end
 
           channel.on_data do |_, data|
             if use_sudo && data == sudo_prompt
               channel.send_data "#{@sudo_password}\n"
               channel.wait
+            elsif use_sudo && data =~ /^Sorry, try again\./
+              @logger.info { data }
+              raise Bolt::Node::EscalateError.new(
+                "Sudo-password not recognized for #{@uri}",
+                'BAD_PASSWORD'
+              )
             else
               result_output.stdout << data
             end
@@ -90,6 +101,12 @@ module Bolt
             if use_sudo && data == sudo_prompt
               channel.send_data "#{@sudo_password}\n"
               channel.wait
+            elsif use_sudo && data =~ /^Sorry, try again\./
+              @logger.info { data }
+              raise Bolt::Node::EscalateError.new(
+                "Sudo-password not recognized for #{@uri}",
+                'BAD_PASSWORD'
+              )
             else
               result_output.stderr << data
             end
