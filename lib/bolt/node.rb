@@ -60,23 +60,24 @@ module Bolt
       @logger.debug { "Uploading #{source} to #{destination}" }
       result = _upload(source, destination)
       if result.success?
-        Bolt::Result.new("Uploaded '#{source}' to '#{host}:#{destination}'")
+        Bolt::Result.new(nil, "Uploaded '#{source}' to '#{host}:#{destination}'")
       else
-        result.to_result
+        result
       end
     end
 
     def run_command(command)
       @logger.info { "Running command: #{command}" }
-      _run_command(command).to_command_result
+      _run_command(command)
     end
 
     def run_script(script, arguments)
-      _run_script(script, arguments).to_command_result
+      @logger.info { "Running script: #{command}" }
+      _run_script(script, arguments)
     end
 
     def run_task(task, input_method, arguments)
-      _run_task(task, input_method, arguments).to_task_result
+      _run_task(task, input_method, arguments)
     end
   end
 end

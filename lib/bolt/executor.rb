@@ -37,18 +37,18 @@ module Bolt
         pool.post do
           result =
             begin
+              @notifier.notify(callback, node, type: :node_start) if callback
               node.connect
               yield node
-            rescue Bolt::Node::BaseError => ex
-              Bolt::ErrorResult.new(ex.message, ex.issue_code, ex.kind)
             rescue StandardError => ex
-              node.logger.error(ex)
-              Bolt::ExceptionResult.new(ex)
+              Bolt::Result.from_exception(ex)
             ensure
               node.disconnect
             end
           results[node] = result
-          @notifier.notify(callback, node, result) if callback
+          if callback
+            @notifier.notify(callback, node, type: :node_result, result: result)
+          end
           result
         end
       }

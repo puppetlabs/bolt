@@ -107,8 +107,8 @@ describe Bolt::Orch, orchestrator: true do
   describe :_run_task do
     it "executes a task on a host" do
       mock_client
-      expect(orch._run_task(@taskpath, 'stdin', @params).value)
-        .to eq(@result.to_json)
+      expect(orch._run_task(@taskpath, 'stdin', @params).to_result)
+        .to eq(@result)
     end
 
     it "returns a success" do
@@ -124,16 +124,15 @@ describe Bolt::Orch, orchestrator: true do
         expect(orch._run_task(@taskpath, 'stdin', @params)).not_to be_success
       end
 
-      it "adds an unkown exitcode when absent" do
+      it "does not report success when there is an error and no exitcode" do
         mock_client
-        expect(orch._run_task(@taskpath, 'stdin', @params).exit_code)
-          .to eq('unknown')
+        expect(orch._run_task(@taskpath, 'stdin', @params)).not_to be_success
       end
 
-      it "uses the exitcode when present" do
+      it "does not report success when there is an exit_code" do
         @result = { '_error' => { 'details' => { 'exit_code' => '3' } } }
         mock_client
-        expect(orch._run_task(@taskpath, 'stdin', params).exit_code).to eq('3')
+        expect(orch._run_task(@taskpath, 'stdin', params)).not_to be_success
       end
     end
   end
@@ -147,7 +146,7 @@ describe Bolt::Orch, orchestrator: true do
       end
 
       it 'it returns the output' do
-        expect(orch._run_command(@command).value).to eq("hi!\n")
+        expect(orch._run_command(@command).stdout).to eq("hi!\n")
       end
 
       it 'it is a success' do
@@ -156,8 +155,7 @@ describe Bolt::Orch, orchestrator: true do
 
       it 'captures stderr' do
         result = orch._run_command(@command)
-        result.output.stderr.rewind
-        expect(result.output.stderr.read).to eq("bye\n")
+        expect(result.stderr).to eq("bye\n")
       end
     end
 
@@ -177,14 +175,12 @@ describe Bolt::Orch, orchestrator: true do
 
       it 'captures stdout' do
         result = orch._run_command(@command)
-        result.output.stdout.rewind
-        expect(result.output.stdout.read).to eq("hi!\n")
+        expect(result.stdout).to eq("hi!\n")
       end
 
       it 'captures stderr' do
         result = orch._run_command(@command)
-        result.output.stderr.rewind
-        expect(result.output.stderr.read).to eq("bye\n")
+        expect(result.stderr).to eq("bye\n")
       end
     end
   end
@@ -232,7 +228,7 @@ describe Bolt::Orch, orchestrator: true do
 
       it 'captures stdout' do
         expect(
-          orch._run_script(script_path, args).value
+          orch._run_script(script_path, args).stdout
         ).to eq(<<OUT)
 arg: with spaces
 arg: nospaces
@@ -243,8 +239,7 @@ OUT
 
       it 'captures stderr' do
         result = orch._run_script(script_path, args)
-        result.output.stderr.rewind
-        expect(result.output.stderr.read).to eq("standard error\n")
+        expect(result.stderr).to eq("standard error\n")
       end
     end
 
@@ -268,14 +263,12 @@ OUT
 
       it 'captures stdout' do
         result = orch._run_script(script_path, args)
-        result.output.stdout.rewind
-        expect(result.output.stdout.read).to eq("standard out\n")
+        expect(result.stdout).to eq("standard out\n")
       end
 
       it 'captures stderr' do
         result = orch._run_script(script_path, args)
-        result.output.stderr.rewind
-        expect(result.output.stderr.read).to eq("standard error\n")
+        expect(result.stderr).to eq("standard error\n")
       end
     end
   end

@@ -12,7 +12,7 @@ end
 
 describe "Bolt::Notifier" do
   let(:executor) { Concurrent::ImmediateExecutor.new }
-  let(:success) { Bolt::Node::Success.new }
+  let(:success) { Bolt::Result.new }
   let(:callback) { Bolt::MockCallback.new }
 
   def mock_node(name)

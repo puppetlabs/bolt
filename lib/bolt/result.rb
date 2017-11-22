@@ -1,10 +1,28 @@
 require 'json'
+require 'bolt/error'
 
 module Bolt
   class Result
-    attr_reader :message
+    attr_reader :message, :error
 
-    def initialize(message)
+    def self.from_exception(exception)
+      @exception = exception
+      if @exception.is_a?(Bolt::Error)
+        error = @exception.to_h
+      else
+        error = {
+          'kind' => 'puppetlabs.tasks/exception-error',
+          'issue_code' => 'EXCEPTION',
+          'msg' => exception.message,
+          'details' => { 'class' => exception.class.to_s }
+        }
+        error['details']['stack_trace'] = exception.backtrace.join('\n') if exception.backtrace
+      end
+      Result.new(error)
+    end
+
+    def initialize(error = nil, message = nil)
+      @error = error
       @message = message
     end
 
@@ -12,57 +30,41 @@ module Bolt
       nil
     end
 
-    def error
-      nil
-    end
-
     def to_h
-      { 'value' => value }
+      h = {}
+      if value
+        h['value'] = value
+        h['value']['_output'] = message if message
+      elsif message
+        h['value'] = { '_output' => message }
+      end
+      h['error'] = error if error
+      h
     end
 
     def to_result
-      value
+      # TODO: This should be to_h but we need to update the plan functions to
+      # use this hash instead
+      special_keys = {}
+      special_keys['_error'] = error if error
+      special_keys['_output'] = message if message
+      val = value || {}
+      val.merge(special_keys)
     end
 
     def success?
-      true
-    end
-  end
-
-  class ErrorResult < Result
-    def initialize(message, issue_code, kind)
-      super(message)
-      @issue_code = issue_code
-      @kind = kind
-    end
-
-    def to_h
-      {
-        'error' => {
-          'issue_code' => @issue_code,
-          'kind' => @kind,
-          'msg' => @message
-        }
-      }
-    end
-
-    def to_result
-      {
-        '_error' => {
-          'issue_code' => @issue_code,
-          'kind' => @kind,
-          'msg' => @message
-        }
-      }
-    end
-
-    def success?
-      false
+      error.nil?
     end
   end
 
   class CommandResult < Result
     attr_reader :stdout, :stderr, :exit_code
+
+    def self.from_output(output)
+      new(output.stdout.string,
+          output.stderr.string,
+          output.exit_code)
+    end
 
     def initialize(stdout, stderr, exit_code)
       @stdout = stdout
@@ -78,111 +80,59 @@ module Bolt
       }
     end
 
-    def to_result
-      value
-    end
-
     def success?
-      @exit_code.zero?
+      @exit_code == 0
     end
 
-    def message
-      [stdout, stderr].join("\n")
+    def error
+      unless success?
+        {
+          'kind' => 'puppetlabs.tasks/command-error',
+          'issue_code' => 'COMMAND_ERROR',
+          'msg' => "The command failed with exit code #{@exit_code}",
+          'details' => { 'exit_code' => @exit_code }
+        }
+      end
     end
   end
 
   class TaskResult < CommandResult
-    attr_reader :error
+    attr_reader :value
 
     def initialize(stdout, stderr, exit_code)
       super(stdout, stderr, exit_code)
-      @object = output_to_json_hash(stdout)
-      @error = @object.delete('_error') if @object
+      @value = parse_output(stdout)
+      @message = @value.delete('_output')
+      @error = @value.delete('_error')
     end
 
-    def value
-      @object || @stdout
-    end
-
-    def to_result
-      result = @object
-      result['_error'] = @error if @error
-      result
-    end
-
-    def to_h
-      hash = super
-      hash['error'] = error if error
-      hash
+    def error
+      unless success?
+        return @error if @error
+        msg = if !@stdout.empty?
+                "The task failed with exit code #{@exit_code}"
+              else
+                "The task failed with exit code #{@exit_code}:\n#{@stderr}"
+              end
+        { 'kind' => 'puppetlabs.tasks/task-error',
+          'issue_code' => 'TASK_ERROR',
+          'msg' => msg,
+          'details' => { 'exit_code' => @exit_code } }
+      end
     end
 
     private
 
-    def output_to_json_hash(output)
+    def parse_output(output)
       begin
         obj = JSON.parse(output)
         unless obj.is_a? Hash
           obj = nil
         end
       rescue JSON::ParserError
-        nil
+        obj = nil
       end
       obj || { '_output' => output }
-    end
-  end
-
-  class TaskSuccess < TaskResult
-    def success?
-      true
-    end
-  end
-
-  class TaskFailure < TaskResult
-    def initialize(stdout, stderr, exit_code)
-      super(stdout, stderr, exit_code)
-      @error ||= generate_error
-    end
-
-    def success?
-      false
-    end
-
-    private
-
-    def generate_error
-      {
-        'kind' => 'puppetlabs.tasks/task-error',
-        'issue_code' => 'TASK_ERROR',
-        'msg' => "The task failed with exit code #{@exit_code}",
-        'details' => { 'exit_code' => @exit_code }
-      }
-    end
-  end
-
-  class ExceptionResult < Result
-    def initialize(exception)
-      @exception = exception
-    end
-
-    def error
-      {
-        'kind' => 'puppetlabs.tasks/exception-error',
-        'issue_code' => 'EXCEPTION',
-        'msg' => @exception.message,
-        'details' => { 'stack_trace' => @exception.backtrace.join('\n') }
-      }
-    end
-
-    def to_h
-      { 'error' => error }
-    end
-
-    def message
-      @exception.message
-    end
-
-    def success?
-      false
     end
   end
 end

@@ -5,24 +5,19 @@ require 'logger'
 require 'json'
 require 'bolt/node'
 require 'bolt/version'
+require 'bolt/error'
 require 'bolt/executor'
 require 'bolt/outputter'
 require 'bolt/config'
 require 'io/console'
 
 module Bolt
-  class CLIError < RuntimeError
+  class CLIError < Bolt::Error
     attr_reader :error_code
 
     def initialize(msg, error_code: 1)
-      super(msg)
+      super(msg, "bolt/cli-error")
       @error_code = error_code
-    end
-
-    def to_json
-      { kind: "bolt/cli-error",
-        msg: message,
-        details: { error_code: @error_code } }.to_json
     end
   end
 
@@ -405,16 +400,16 @@ HELP
           results =
             case options[:mode]
             when 'command'
-              executor.run_command(nodes, options[:object]) do |node, result|
-                outputter.print_result(node, result)
+              executor.run_command(nodes, options[:object]) do |node, event|
+                outputter.print_event(node, event)
               end
             when 'script'
               script = options[:object]
               validate_file('script', script)
               executor.run_script(
                 nodes, script, options[:leftovers]
-              ) do |node, result|
-                outputter.print_result(node, result)
+              ) do |node, event|
+                outputter.print_event(node, event)
               end
             when 'task'
               task_name = options[:object]
@@ -425,8 +420,8 @@ HELP
               input_method ||= 'both'
               executor.run_task(
                 nodes, path, input_method, options[:task_options]
-              ) do |node, result|
-                outputter.print_result(node, result)
+              ) do |node, event|
+                outputter.print_event(node, event)
               end
             when 'file'
               src = options[:object]
@@ -436,8 +431,8 @@ HELP
                 raise Bolt::CLIError, "A destination path must be specified"
               end
               validate_file('source file', src)
-              executor.file_upload(nodes, src, dest) do |node, result|
-                outputter.print_result(node, result)
+              executor.file_upload(nodes, src, dest) do |node, event|
+                outputter.print_event(node, event)
               end
             end
         end

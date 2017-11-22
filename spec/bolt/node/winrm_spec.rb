@@ -105,7 +105,7 @@ PS
   end
 
   it "executes a command on a host", winrm: true do
-    expect(winrm.execute(command).value).to eq("#{user}\r\n")
+    expect(winrm.execute(command).stdout.string).to eq("#{user}\r\n")
   end
 
   it "reuses a PowerShell host / runspace for multiple commands", winrm: true do
@@ -121,10 +121,10 @@ PS
     ].join('; ')
 
     result = winrm.execute(contents)
-    instance, runspace, *outputs = result.value.split("\r\n")
+    instance, runspace, *outputs = result.stdout.string.split("\r\n")
 
     result2 = winrm.execute(contents)
-    instance2, runspace2, *outputs2 = result2.value.split("\r\n")
+    instance2, runspace2, *outputs2 = result2.stdout.string.split("\r\n")
 
     # Host should be identical (uniquely identified by Guid)
     expect(instance).to eq(instance2)
@@ -146,7 +146,7 @@ PS
       winrm.upload(file.path, remote_path)
 
       expect(
-        winrm.execute("type #{remote_path}").value
+        winrm.execute("type #{remote_path}").stdout.string
       ).to eq("#{contents}\r\n")
 
       winrm.execute("del #{remote_path}")
@@ -157,7 +157,7 @@ PS
     contents = "Write-Output \"hellote\""
     with_tempfile_containing('script-test-winrm', contents) do |file|
       expect(
-        winrm._run_script(file.path, []).value
+        winrm._run_script(file.path, []).stdout
       ).to eq("hellote\r\n")
     end
   end
@@ -179,10 +179,10 @@ PS
 
     with_tempfile_containing('script-test-winrm', contents) do |file|
       result = winrm._run_script(file.path, [])
-      instance, runspace, *outputs = result.value.split("\r\n")
+      instance, runspace, *outputs = result.stdout.split("\r\n")
 
       result2 = winrm._run_script(file.path, [])
-      instance2, runspace2, *outputs2 = result2.value.split("\r\n")
+      instance2, runspace2, *outputs2 = result2.stdout.split("\r\n")
 
       # scripts execute in a completely new process
       # Host unique Guid is different
@@ -211,7 +211,7 @@ PS
            '\'a b\'',
            "a 'b' c",
            'a \'b\' c']
-        ).value
+        ).stdout
       ).to eq(<<QUOTED)
 nospaces\r
 with spaces\r
@@ -232,7 +232,7 @@ QUOTED
            '"a b"',
            "a \"b\" c",
            'a "b" c']
-        ).value
+        ).stdout
       ).to eq(<<QUOTED)
 "a b"\r
 "a b"\r
@@ -248,7 +248,7 @@ QUOTED
         winrm._run_script(
           file.path,
           ['echo $env:path']
-        ).value
+        ).stdout
       ).to eq(<<SHELLWORDS)
 echo $env:path\r
 SHELLWORDS
@@ -265,7 +265,7 @@ SHELLWORDS
       result = winrm._run_script(file.path, [])
       expect(result).to be_success
       expected_nulls = ("\0" * (1024 * 4 + 1)) + "\r\n"
-      expect(result.output.stderr.string).to eq(expected_nulls)
+      expect(result.stderr).to eq(expected_nulls)
     end
   end
 
@@ -274,8 +274,7 @@ SHELLWORDS
     arguments = { :message_one => 'task is running',
                   :"message two" => 'task has run' }
     with_tempfile_containing('task-test-winrm', contents) do |file|
-      task_return = winrm._run_task(file.path, 'environment', arguments)
-      expect(task_return.value)
+      expect(winrm._run_task(file.path, 'environment', arguments).message)
         .to eq("task is running task has run\r\n")
     end
   end
@@ -301,7 +300,7 @@ SHELLWORDS
 
     with_tempfile_containing('stdout-test-winrm', contents) do |file|
       expect(
-        winrm._run_script(file.path, []).value
+        winrm._run_script(file.path, []).stdout
       ).to eq([
         "message 1\r\n",
         "message 2\r\n",
@@ -320,7 +319,7 @@ PS
     arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
     with_tempfile_containing('tasks-test-stdin-winrm', contents) do |file|
       expect(winrm._run_task(file.path, 'stdin', arguments).value)
-        .to match(/{"message_one":"Hello from task","message_two":"Goodbye"}/)
+        .to eq("message_one" => "Hello from task", "message_two" => "Goodbye")
     end
   end
 
@@ -333,7 +332,7 @@ PS
     arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
     with_tempfile_containing('tasks-test-both-winrm', contents) do |file|
       expect(
-        winrm._run_task(file.path, 'both', arguments).value
+        winrm._run_task(file.path, 'both', arguments).message
       ).to eq([
         "Hello from task Goodbye\r\n",
         "{\"message_one\":\"Hello from task\",\"message_two\":\"Goodbye\"}\r\n"
@@ -447,6 +446,13 @@ PS
   end
 
   describe "when resolving file extensions" do
+    let(:output) do
+      output = Bolt::Node::Output.new
+      output.stdout << "42"
+      output.exit_code = 0
+      output
+    end
+
     it "can apply a powershell-based task", winrm: true do
       contents = <<PS
 Write-Output "42"
@@ -457,10 +463,10 @@ PS
               ['-NoProfile', '-NonInteractive', '-NoLogo',
                '-ExecutionPolicy', 'Bypass', '-File', /^".*"$/],
               anything)
-        .and_return(Bolt::Node::Success.new("42"))
+        .and_return(output)
       with_tempfile_containing('task-ps1-winrm', contents, '.ps1') do |file|
         expect(
-          winrm._run_task(file.path, 'stdin', {}).value
+          winrm._run_task(file.path, 'stdin', {}).message
         ).to eq("42")
       end
     end
@@ -470,10 +476,10 @@ PS
         .to receive(:execute_process)
         .with('ruby.exe',
               ['-S', /^".*"$/])
-        .and_return(Bolt::Node::Success.new("42"))
+        .and_return(output)
       with_tempfile_containing('script-rb-winrm', "puts 42", '.rb') do |file|
         expect(
-          winrm._run_script(file.path, []).value
+          winrm._run_script(file.path, []).stdout
         ).to eq("42")
       end
     end
@@ -484,56 +490,55 @@ PS
         .with('ruby.exe',
               ['-S', /^".*"$/],
               anything)
-        .and_return(Bolt::Node::Success.new("42"))
+        .and_return(output)
       with_tempfile_containing('task-rb-winrm', "puts 42", '.rb') do |file|
         expect(
-          winrm._run_task(file.path, 'stdin', {}).value
+          winrm._run_task(file.path, 'stdin', {}).message
         ).to eq("42")
       end
     end
 
     it "can apply a puppet manifest for a '.pp' script", winrm: true do
-      output = <<OUTPUT
+      stdout = <<OUTPUT
 Notice: Scope(Class[main]): hi
 Notice: Compiled catalog for x.y.z in environment production in 0.04 seconds
 Notice: Applied catalog in 0.04 seconds
 OUTPUT
+      output = Bolt::Node::Output.new
+      output.stdout << stdout
+      output.exit_code = 0
+
       allow(winrm)
         .to receive(:execute_process)
         .with('puppet.bat',
               ['apply', /^".*"$/])
-        .and_return(Bolt::Node::Success.new(output))
+        .and_return(output)
       contents = "notice('hi')"
       with_tempfile_containing('script-pp-winrm', contents, '.pp') do |file|
         expect(
-          winrm._run_script(file.path, []).value
-        ).to eq(output)
+          winrm._run_script(file.path, []).stdout
+        ).to eq(stdout)
       end
     end
 
     it "can apply a puppet manifest for a '.pp' task", winrm: true do
-      output = <<OUTPUT
-Notice: Scope(Class[main]): hi
-Notice: Compiled catalog for x.y.z in environment production in 0.04 seconds
-Notice: Applied catalog in 0.04 seconds
-OUTPUT
       allow(winrm)
         .to receive(:execute_process)
         .with('puppet.bat',
               ['apply', /^".*"$/],
               anything)
-        .and_return(Bolt::Node::Success.new(output))
+        .and_return(output)
       with_tempfile_containing('task-pp-winrm', "notice('hi')", '.pp') do |file|
         expect(
-          winrm._run_task(file.path, 'stdin', {}).value
-        ).to eq(output)
+          winrm._run_task(file.path, 'stdin', {}).message
+        ).to eq("42")
       end
     end
 
     it "returns a friendly stderr msg with puppet.bat missing", winrm: true do
       with_tempfile_containing('task-pp-winrm', "notice('hi')", '.pp') do |file|
         result = winrm._run_task(file.path, 'stdin', {})
-        stderr = result.output.stderr.string
+        stderr = result.error['msg']
         expect(stderr).to match(/^Could not find executable 'puppet\.bat'/)
         expect(stderr).to_not match(/CommandNotFoundException/)
       end

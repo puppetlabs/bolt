@@ -2,7 +2,7 @@ require 'json'
 require 'shellwords'
 require 'net/ssh'
 require 'net/sftp'
-require 'bolt/node/result'
+require 'bolt/node/output'
 
 module Bolt
   class SSH < Node
@@ -55,8 +55,7 @@ module Bolt
     end
 
     def execute(command, sudoable: false, **options)
-      result_output = Bolt::Node::ResultOutput.new
-      status = {}
+      result_output = Bolt::Node::Output.new
       use_sudo = sudoable && (@sudo || @run_as)
       sudo_prompt = '[sudo] Bolt needs to run as another user, password: '
       if use_sudo
@@ -98,7 +97,7 @@ module Bolt
           end
 
           channel.on_request("exit-status") do |_, data|
-            status[:exit_code] = data.read_long
+            result_output.exit_code = data.read_long
           end
 
           if options[:stdin]
@@ -109,45 +108,55 @@ module Bolt
       end
       session_channel.wait
 
-      if status[:exit_code].zero?
+      if result_output.exit_code == 0
         @logger.debug { "Command returned successfully" }
-        Bolt::Node::Success.new(result_output.stdout.string, result_output)
       else
-        @logger.info { "Command failed with exit code #{status[:exit_code]}" }
-        Bolt::Node::Failure.new(status[:exit_code], result_output)
+        @logger.info { "Command failed with exit code #{result_output.exit_code}" }
       end
+      result_output
     end
 
     def _upload(source, destination)
-      Net::SFTP::Session.new(@session).connect! do |sftp|
-        sftp.upload!(source, destination)
-      end
-      Bolt::Node::Success.new
+      write_remote_file(source, destination)
+      Bolt::Result.new
     rescue StandardError => e
-      Bolt::Node::ExceptionFailure.new(e)
+      Bolt::Result.from_exception(e)
+    end
+
+    def write_remote_file(source, destination)
+      conn = Net::SFTP::Session.new(@session).connect!
+      # This provides a slighter better error for sftp misconfiguration
+      raise "SFTP connection closed before #{destination} could be written" unless conn.open?
+      conn.upload!(source, destination)
+    rescue StandardError => e
+      raise FileError.new(e.message, 'WRITE_ERROR')
     end
 
     def make_tempdir
-      Bolt::Node::Success.new(@session.exec!('mktemp -d').chomp)
-    rescue StandardError => e
-      Bolt::Node::ExceptionFailure.new(e)
+      result = execute('mktemp -d')
+      if result.exit_code != 0
+        raise FileError.new("Could not make tempdir: #{result.stderr.string}", 'TEMPDIR_ERROR')
+      end
+      result.stdout.string.chomp
     end
 
     def with_remote_tempdir
-      make_tempdir.then do |dir|
-        (yield dir).ensure do
-          execute("rm -rf '#{dir}'")
+      dir = make_tempdir
+      begin
+        yield dir
+      ensure
+        output =  execute("rm -rf '#{dir}'")
+        if output.exit_code != 0
+          logger.warn("Failed to clean up tempdir '#{dir}': #{output.stderr.string}")
         end
       end
     end
 
     def with_remote_script(dir, file)
       remote_path = "#{dir}/#{File.basename(file)}"
-      _upload(file, remote_path).then do
-        execute("chmod u+x '#{remote_path}'")
-      end.then do
-        yield remote_path
-      end
+      write_remote_file(file, remote_path)
+      make_executable(remote_path)
+      yield remote_path
     end
 
     def with_remote_file(file)
@@ -167,14 +176,19 @@ EOF
 SCRIPT
     end
 
+    def make_executable(path)
+      result = execute("chmod u+x '#{path}'")
+      if result.exit_code != 0
+        raise FileError.new("Could not make file '#{path}' executable: #{result.stderr.string}", 'CHMOD_ERROR')
+      end
+    end
+
     def with_task_wrapper(remote_task, dir, stdin)
       wrapper = make_wrapper_stringio(remote_task, stdin)
       command = "#{dir}/wrapper.sh"
-      _upload(wrapper, command).then do
-        execute("chmod u+x '#{command}'")
-      end.then do
-        yield command
-      end
+      write_remote_file(wrapper, command)
+      make_executable(command)
+      yield command
     end
 
     def with_remote_task(task_file, stdin)
@@ -192,7 +206,12 @@ SCRIPT
     end
 
     def _run_command(command)
-      execute(command, sudoable: true)
+      output = execute(command, sudoable: true)
+      Bolt::CommandResult.from_output(output)
+    # TODO: We should be able to rely on the excutor for this but it will mean
+    # a test refactor
+    rescue StandardError => e
+      Bolt::Result.from_exception(e)
     end
 
     def _run_script(script, arguments)
@@ -200,9 +219,14 @@ SCRIPT
       @logger.debug { "arguments: #{arguments}" }
 
       with_remote_file(script) do |remote_path|
-        execute("'#{remote_path}' #{Shellwords.join(arguments)}",
-                sudoable: true)
+        output = execute("'#{remote_path}' #{Shellwords.join(arguments)}",
+                         sudoable: true)
+        Bolt::CommandResult.from_output(output)
       end
+    # TODO: We should be able to rely on the excutor for this but it will mean
+    # a test refactor
+    rescue StandardError => e
+      Bolt::Result.from_exception(e)
     end
 
     def _run_task(task, input_method, arguments)
@@ -228,8 +252,13 @@ SCRIPT
                   else
                     "#{export_args} '#{remote_path}'"
                   end
-        execute(command, sudoable: true)
+        output = execute(command, sudoable: true)
+        Bolt::TaskResult.from_output(output)
       end
+    # TODO: We should be able to rely on the excutor for this but it will mean
+    # a test refactor
+    rescue StandardError => e
+      Bolt::Result.from_exception(e)
     end
   end
 end

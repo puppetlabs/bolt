@@ -15,10 +15,17 @@ module Bolt
         @object_open = true
       end
 
+      def print_event(node, event)
+        case event[:type]
+        when :node_result
+          print_result(node, event[:result])
+        end
+      end
+
       def print_result(node, result)
         item = {
           name: node.uri,
-          status: result.is_a?(Bolt::ErrorResult) ? 'failure' : 'success',
+          status: result.success? ? 'success' : 'failure',
           result: result.to_result
         }
 
