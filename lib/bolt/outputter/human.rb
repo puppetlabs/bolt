@@ -74,7 +74,7 @@ module Bolt
       end
 
       def print_plan(result)
-        @stream.puts ::JSON.pretty_generate(result)
+        @stream.puts result
       end
 
       def fatal_error(e); end
