@@ -10,6 +10,7 @@ env:
     - BOLT_SSH_HOST: localhost
     - BOLT_SSH_PORT: 22
 before_script:
+- eval `ssh-agent`
 - cat Gemfile.lock
 - sudo apt-get install -y apg
 - export BOLT_SSH_PASSWORD=`apg -n 1`
