@@ -13,12 +13,9 @@ describe Bolt::SSH do
   let(:user) { ENV['BOLT_SSH_USER'] || "vagrant" }
   let(:password) { ENV['BOLT_SSH_PASSWORD'] || "vagrant" }
   let(:port) { ENV['BOLT_SSH_PORT'] || 2224 }
+  let(:key) { ENV['BOLT_SSH_KEY'] || Dir[".vagrant/**/private_key"] }
   let(:command) { "pwd" }
   let(:ssh) { Bolt::SSH.new(hostname, port, user, password) }
-  let(:key) {
-    { config: Bolt::Config.new(key: Dir[".vagrant/**/private_key"],
-                               insecure: true) }
-  }
   let(:insecure) { { config: Bolt::Config.new(insecure: true) } }
   let(:echo_script) { <<BASH }
 for var in "$@"
@@ -111,33 +108,34 @@ BASH
   end
 
   context "when executing with private key" do
-    let(:ssh) { Bolt::SSH.new(hostname, port, user, **key) }
+    let(:config) { Bolt::Config.new(insecure: true, key: key) }
+    let(:ssh) { Bolt::SSH.new(hostname, port, user, nil, uri: 'foo', config: config) }
 
     before(:each) { ssh.connect }
     after(:each) { ssh.disconnect }
 
-    it "executes a command on a host", vagrant: true do
-      expect(ssh.execute(command).stdout.string).to eq("/home/vagrant\n")
+    it "executes a command on a host", ssh: true do
+      expect(ssh.execute(command).stdout.string).to eq("/home/#{user}\n")
     end
 
-    it "captures stderr from a host", vagrant: true do
+    it "captures stderr from a host", ssh: true do
       expect(ssh.execute("ssh -V").stderr.string).to match(/OpenSSH/)
     end
 
-    it "can upload a file to a host", vagrant: true do
+    it "can upload a file to a host", ssh: true do
       contents = "kljhdfg"
       with_tempfile_containing('upload-test', contents) do |file|
-        ssh.upload(file.path, "/home/vagrant/upload-test")
+        ssh.upload(file.path, "/tmp/upload-test")
 
         expect(
-          ssh.execute("cat /home/vagrant/upload-test").stdout.string
+          ssh.execute("cat /tmp/upload-test").stdout.string
         ).to eq(contents)
 
-        ssh.execute("rm /home/vagrant/upload-test")
+        ssh.execute("rm /tmp/upload-test")
       end
     end
 
-    it "can run a script remotely", vagrant: true do
+    it "can run a script remotely", ssh: true do
       contents = "#!/bin/sh\necho hellote"
       with_tempfile_containing('script test', contents) do |file|
         expect(
@@ -146,7 +144,7 @@ BASH
       end
     end
 
-    it "can run a script remotely with quoted arguments", vagrant: true do
+    it "can run a script remotely with quoted arguments", ssh: true do
       with_tempfile_containing('script-test-ssh-quotes', echo_script) do |file|
         expect(
           ssh._run_script(
@@ -177,7 +175,7 @@ QUOTED
       end
     end
 
-    it "escapes unsafe shellwords in arguments", vagrant: true do
+    it "escapes unsafe shellwords in arguments", ssh: true do
       with_tempfile_containing('script-test-ssh-escape', echo_script) do |file|
         expect(
           ssh._run_script(
@@ -190,7 +188,7 @@ SHELLWORDS
       end
     end
 
-    it "can run a task", vagrant: true do
+    it "can run a task", ssh: true do
       contents = "#!/bin/sh\necho -n ${PT_message_one} ${PT_message_two}"
       arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
       with_tempfile_containing('tasks test', contents) do |file|
@@ -199,7 +197,7 @@ SHELLWORDS
       end
     end
 
-    it "can run a task passing input on stdin", vagrant: true do
+    it "can run a task passing input on stdin", ssh: true do
       contents = "#!/bin/sh\ngrep 'message_one'"
       arguments = { 'message_one' => 'Hello from task', 'message_two' => 'Goodbye' }
       with_tempfile_containing('tasks test stdin', contents) do |file|
@@ -208,7 +206,7 @@ SHELLWORDS
       end
     end
 
-    it "can run a task passing input on stdin and environment", vagrant: true do
+    it "can run a task passing input on stdin and environment", ssh: true do
       contents = <<SHELL
 #!/bin/sh
 echo -n ${PT_message_one} ${PT_message_two}
