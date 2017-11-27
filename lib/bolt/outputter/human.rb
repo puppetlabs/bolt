@@ -59,10 +59,14 @@ module Bolt
         if result.instance_of? Bolt::TaskResult
           @stream.puts(indent(2, ::JSON.pretty_generate(result.value)))
         elsif result.instance_of? Bolt::CommandResult
-          @stream.puts(indent(2, "STDOUT:"))
-          @stream.puts(indent(4, result.stdout))
-          @stream.puts(indent(2, "STDERR:"))
-          @stream.puts(indent(4, result.stderr))
+          unless result.stdout.strip.empty?
+            @stream.puts(indent(2, "STDOUT:"))
+            @stream.puts(indent(4, result.stdout))
+          end
+          unless result.stderr.strip.empty?
+            @stream.puts(indent(2, "STDERR:"))
+            @stream.puts(indent(4, result.stderr))
+          end
         end
       end
 

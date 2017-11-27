@@ -67,8 +67,8 @@ module Bolt
     end
 
     def initialize(stdout, stderr, exit_code)
-      @stdout = stdout
-      @stderr = stderr
+      @stdout = stdout || ""
+      @stderr = stderr || ""
       @exit_code = exit_code
     end
 
