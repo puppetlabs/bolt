@@ -155,11 +155,11 @@ HELP
 
         results[:format] = 'human'
         opts.on('--format FORMAT',
-                "Output format to use") do |format|
+                "Output format to use: human or json") do |format|
           if %w[human json].include? format
             results[:format] = format
           else
-            raise ArgumentError "Unsupported format: #{format}"
+            raise Bolt::CLIError, "Unsupported format: #{format}"
           end
         end
         results[:insecure] = false
