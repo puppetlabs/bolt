@@ -1,7 +1,7 @@
 require 'json'
 require 'shellwords'
 require 'net/ssh'
-require 'net/sftp'
+require 'net/scp'
 require 'bolt/node/output'
 
 module Bolt
@@ -124,10 +124,7 @@ module Bolt
     end
 
     def write_remote_file(source, destination)
-      conn = Net::SFTP::Session.new(@session).connect!
-      # This provides a slighter better error for sftp misconfiguration
-      raise "SFTP connection closed before #{destination} could be written" unless conn.open?
-      conn.upload!(source, destination)
+      @session.scp.upload!(source, destination)
     rescue StandardError => e
       raise FileError.new(e.message, 'WRITE_ERROR')
     end
