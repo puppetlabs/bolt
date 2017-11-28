@@ -310,5 +310,50 @@ SHELL
         expect(ssh._run_command('whoami').stdout).to eq("\r\nroot\r\n")
       end
     end
+
+    context "as root, no sudo password required" do
+      pending('fails in Travis CI')
+      let(:config) {
+        Bolt::Config.new(insecure: true, sudo: true, run_as: user)
+      }
+      let(:ssh) { Bolt::SSH.new(hostname, port, 'root', password, uri: 'foo', config: config) }
+
+      it "can execute a command", ssh: true do
+        expect(ssh._run_command('whoami').stdout).to eq("#{user}\n")
+      end
+    end
+
+    context "with an incorrect password" do
+      let(:config) {
+        Bolt::Config.new(insecure: true, sudo: true,
+                         sudo_password: 'nonsense', run_as: 'root')
+      }
+      let(:ssh) { Bolt::SSH.new(hostname, port, user, password, uri: 'foo', config: config) }
+
+      it "returns a failed result", ssh: true do
+        expect(ssh._run_command('whoami').error).to eq(
+          'kind' => 'puppetlabs.tasks/escalate-error',
+          'msg' => "Sudo password for user #{user} not recognized on foo",
+          'details' => {},
+          'issue_code' => 'BAD_PASSWORD'
+        )
+      end
+    end
+
+    context "with no password" do
+      let(:config) {
+        Bolt::Config.new(insecure: true, sudo: true, run_as: 'root')
+      }
+      let(:ssh) { Bolt::SSH.new(hostname, port, user, password, uri: 'foo', config: config) }
+
+      it "returns a failed result", ssh: true do
+        expect(ssh._run_command('whoami').error).to eq(
+          'kind' => 'puppetlabs.tasks/escalate-error',
+          'msg' => "Sudo password for user #{user} was not provided for foo",
+          'details' => {},
+          'issue_code' => 'NO_PASSWORD'
+        )
+      end
+    end
   end
 end
