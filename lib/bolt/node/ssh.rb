@@ -54,10 +54,41 @@ module Bolt
       end
     end
 
+    def sudo_prompt
+      '[sudo] Bolt needs to run as another user, password: '
+    end
+
+    def handled_sudo(channel, data)
+      if data == sudo_prompt
+        if @sudo_password
+          channel.send_data "#{@sudo_password}\n"
+          channel.wait
+          return true
+        else
+          raise Bolt::Node::EscalateError.new(
+            "Sudo password for user #{@user} was not provided for #{@uri}",
+            'NO_PASSWORD'
+          )
+        end
+      elsif data =~ /^#{@user} is not in the sudoers file\./
+        @logger.info { data }
+        raise Bolt::Node::EscalateError.new(
+          "User #{@user} does not have sudo permission on #{@uri}",
+          'SUDO_DENIED'
+        )
+      elsif data =~ /^Sorry, try again\./
+        @logger.info { data }
+        raise Bolt::Node::EscalateError.new(
+          "Sudo password for user #{@user} not recognized on #{@uri}",
+          'BAD_PASSWORD'
+        )
+      end
+      false
+    end
+
     def execute(command, sudoable: false, **options)
       result_output = Bolt::Node::Output.new
       use_sudo = sudoable && (@sudo || @run_as)
-      sudo_prompt = '[sudo] Bolt needs to run as another user, password: '
       if use_sudo
         user_clause = if @run_as
                         "-u #{@run_as}"
@@ -74,23 +105,22 @@ module Bolt
         channel.request_pty if @tty
 
         channel.exec(command) do |_, success|
-          raise "could not execute command: #{command.inspect}" unless success
+          unless success
+            raise Bolt::Node::ConnectError.new(
+              "Could not execute command: #{command.inspect}",
+              'EXEC_ERROR'
+            )
+          end
 
           channel.on_data do |_, data|
-            if use_sudo && data == sudo_prompt
-              channel.send_data "#{@sudo_password}\n"
-              channel.wait
-            else
+            unless use_sudo && handled_sudo(channel, data)
               result_output.stdout << data
             end
             @logger.debug { "stdout: #{data}" }
           end
 
           channel.on_extended_data do |_, _, data|
-            if use_sudo && data == sudo_prompt
-              channel.send_data "#{@sudo_password}\n"
-              channel.wait
-            else
+            unless use_sudo && handled_sudo(channel, data)
               result_output.stderr << data
             end
             @logger.debug { "stderr: #{data}" }
