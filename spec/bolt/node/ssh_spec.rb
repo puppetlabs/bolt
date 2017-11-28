@@ -311,18 +311,6 @@ SHELL
       end
     end
 
-    context "as root, no sudo password required" do
-      pending('fails in Travis CI')
-      let(:config) {
-        Bolt::Config.new(insecure: true, sudo: true, run_as: user)
-      }
-      let(:ssh) { Bolt::SSH.new(hostname, port, 'root', password, uri: 'foo', config: config) }
-
-      it "can execute a command", ssh: true do
-        expect(ssh._run_command('whoami').stdout).to eq("#{user}\n")
-      end
-    end
-
     context "with an incorrect password" do
       let(:config) {
         Bolt::Config.new(insecure: true, sudo: true,
