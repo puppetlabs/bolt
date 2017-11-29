@@ -12,6 +12,7 @@ module Bolt
     :sudo,
     :sudo_password,
     :transport,
+    :key,
     :tty,
     :user
   ) do

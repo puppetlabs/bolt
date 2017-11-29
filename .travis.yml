@@ -9,14 +9,14 @@ env:
     - BOLT_SSH_USER: cocobware
     - BOLT_SSH_HOST: localhost
     - BOLT_SSH_PORT: 22
+    - BOLT_SSH_KEY: spec/fixtures/keys/id_rsa
 before_script:
 - eval `ssh-agent`
 - cat Gemfile.lock
 - sudo apt-get install -y apg
 - export BOLT_SSH_PASSWORD=`apg -n 1`
-- sudo adduser --disabled-password --home /home/$BOLT_SSH_USER --gecos "" $BOLT_SSH_USER
-- echo $BOLT_SSH_USER:$BOLT_SSH_PASSWORD | sudo chpasswd
-- 'echo "$BOLT_SSH_USER ALL=(ALL) PASSWD: ALL" | sudo tee /etc/sudoers.d/bolt'
+- scripts/setup_local_ssh.sh
+
 script:
 - bundle exec rake travisci rubocop
 - cd modules/boltlib

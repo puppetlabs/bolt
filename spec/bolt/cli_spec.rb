@@ -183,6 +183,24 @@ NODES
     end
   end
 
+  describe "private-key" do
+    it "accepts a private key" do
+      cli = Bolt::CLI.new(%w[  command run
+                               --private-key ~/.ssh/google_compute_engine
+                               --nodes foo])
+      expect(cli.parse).to include(key: '~/.ssh/google_compute_engine')
+      expect(cli.config[:key]).to eq('~/.ssh/google_compute_engine')
+    end
+
+    it "generates an error message if no key value is given" do
+      cli = Bolt::CLI.new(%w[command run --nodes foo --private-key])
+      expect {
+        cli.parse
+      }.to raise_error(Bolt::CLIError,
+                       /Option '--private-key' needs a parameter/)
+    end
+  end
+
   describe "concurrency" do
     it "accepts a concurrency limit" do
       cli = Bolt::CLI.new(%w[command run --concurrency 10 --nodes foo])

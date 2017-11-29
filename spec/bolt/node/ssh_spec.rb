@@ -13,6 +13,7 @@ describe Bolt::SSH do
   let(:user) { ENV['BOLT_SSH_USER'] || "vagrant" }
   let(:password) { ENV['BOLT_SSH_PASSWORD'] || "vagrant" }
   let(:port) { ENV['BOLT_SSH_PORT'] || 2224 }
+  let(:key) { ENV['BOLT_SSH_KEY'] || Dir[".vagrant/**/private_key"] }
   let(:command) { "pwd" }
   let(:ssh) { Bolt::SSH.new(hostname, port, user, password) }
   let(:insecure) { { config: Bolt::Config.new(insecure: true) } }
@@ -106,7 +107,32 @@ BASH
     end
   end
 
-  context "when running_commands" do
+  context "when executing with private key" do
+    let(:config) { Bolt::Config.new(insecure: true, key: key) }
+    let(:ssh) { Bolt::SSH.new(hostname, port, user, nil, uri: 'foo', config: config) }
+
+    before(:each) { ssh.connect }
+    after(:each) { ssh.disconnect }
+
+    it "executes a command on a host", ssh: true do
+      expect(ssh.execute(command).stdout.string).to eq("/home/#{user}\n")
+    end
+
+    it "can upload a file to a host", ssh: true do
+      contents = "kljhdfg"
+      with_tempfile_containing('upload-test', contents) do |file|
+        ssh.upload(file.path, "/tmp/upload-test")
+
+        expect(
+          ssh.execute("cat /tmp/upload-test").stdout.string
+        ).to eq(contents)
+
+        ssh.execute("rm /tmp/upload-test")
+      end
+    end
+  end
+
+  context "when executing" do
     let(:ssh) { Bolt::SSH.new(hostname, port, user, password, **insecure) }
 
     before(:each) { ssh.connect }
