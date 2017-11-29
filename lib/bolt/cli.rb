@@ -527,7 +527,7 @@ HELP
           cli << "--#{setting}" << dir
         end
         Puppet.initialize_settings(cli)
-        Puppet::Pal.in_tmp_environment('bolt', modulepath: [BOLTLIB_PATH] + modulepath) do |pal|
+        Puppet::Pal.in_tmp_environment('bolt', modulepath: [BOLTLIB_PATH] + modulepath, facts: {}) do |pal|
           pal.with_script_compiler do |compiler|
             compiler.call_function('run_plan', plan, args)
           end
