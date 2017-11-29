@@ -118,10 +118,6 @@ BASH
       expect(ssh.execute(command).stdout.string).to eq("/home/#{user}\n")
     end
 
-    it "captures stderr from a host", ssh: true do
-      expect(ssh.execute("ssh -V").stderr.string).to match(/OpenSSH/)
-    end
-
     it "can upload a file to a host", ssh: true do
       contents = "kljhdfg"
       with_tempfile_containing('upload-test', contents) do |file|
@@ -132,92 +128,6 @@ BASH
         ).to eq(contents)
 
         ssh.execute("rm /tmp/upload-test")
-      end
-    end
-
-    it "can run a script remotely", ssh: true do
-      contents = "#!/bin/sh\necho hellote"
-      with_tempfile_containing('script test', contents) do |file|
-        expect(
-          ssh._run_script(file.path, []).stdout
-        ).to eq("hellote\n")
-      end
-    end
-
-    it "can run a script remotely with quoted arguments", ssh: true do
-      with_tempfile_containing('script-test-ssh-quotes', echo_script) do |file|
-        expect(
-          ssh._run_script(
-            file.path,
-            ['nospaces',
-             'with spaces',
-             "\"double double\"",
-             "'double single'",
-             '\'single single\'',
-             '"single double"',
-             "double \"double\" double",
-             "double 'single' double",
-             'single "double" single',
-             'single \'single\' single']
-          ).stdout
-        ).to eq(<<QUOTED)
-nospaces
-with spaces
-"double double"
-'double single'
-'single single'
-"single double"
-double "double" double
-double 'single' double
-single "double" single
-single 'single' single
-QUOTED
-      end
-    end
-
-    it "escapes unsafe shellwords in arguments", ssh: true do
-      with_tempfile_containing('script-test-ssh-escape', echo_script) do |file|
-        expect(
-          ssh._run_script(
-            file.path,
-            ['echo $HOME; cat /etc/passwd']
-          ).stdout
-        ).to eq(<<SHELLWORDS)
-echo $HOME; cat /etc/passwd
-SHELLWORDS
-      end
-    end
-
-    it "can run a task", ssh: true do
-      contents = "#!/bin/sh\necho -n ${PT_message_one} ${PT_message_two}"
-      arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-      with_tempfile_containing('tasks test', contents) do |file|
-        expect(ssh._run_task(file.path, 'environment', arguments).message)
-          .to eq('Hello from task Goodbye')
-      end
-    end
-
-    it "can run a task passing input on stdin", ssh: true do
-      contents = "#!/bin/sh\ngrep 'message_one'"
-      arguments = { 'message_one' => 'Hello from task', 'message_two' => 'Goodbye' }
-      with_tempfile_containing('tasks test stdin', contents) do |file|
-        expect(ssh._run_task(file.path, 'stdin', arguments).value)
-          .to eq(arguments)
-      end
-    end
-
-    it "can run a task passing input on stdin and environment", ssh: true do
-      contents = <<SHELL
-#!/bin/sh
-echo -n ${PT_message_one} ${PT_message_two}
-grep 'message_one'
-SHELL
-      arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-      with_tempfile_containing('tasks-test-both', contents) do |file|
-        expect(ssh._run_task(file.path, 'both', arguments).message).to eq(<<SHELL)
-Hello from task Goodbye{\"message_one\":\
-\"Hello from task\",\"message_two\":\"Goodbye\"}
-SHELL
       end
     end
   end

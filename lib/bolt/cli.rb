@@ -243,6 +243,8 @@ HELP
         @config[:log_level] = Logger::INFO
       end
 
+      @config[:key] = options[:key]
+
       @config[:format] = options[:format]
 
       if options[:help]

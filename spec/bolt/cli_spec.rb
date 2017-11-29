@@ -189,6 +189,7 @@ NODES
                                --private-key ~/.ssh/google_compute_engine
                                --nodes foo])
       expect(cli.parse).to include(key: '~/.ssh/google_compute_engine')
+      expect(cli.config[:key]).to eq('~/.ssh/google_compute_engine')
     end
 
     it "generates an error message if no key value is given" do
