@@ -43,7 +43,11 @@ module Bolt
             rescue StandardError => ex
               Bolt::Result.from_exception(ex)
             ensure
-              node.disconnect
+              begin
+                node.disconnect
+              rescue StandardError => ex
+                @logger.info("Failed to close connection to #{node.uri} : #{ex.message}")
+              end
             end
           results[node] = result
           if callback
