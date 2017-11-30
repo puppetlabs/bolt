@@ -420,12 +420,13 @@ HELP
             when 'task'
               task_name = options[:object]
 
-              path, metadata = load_task_data(task_name, options[:modulepath])
-              input_method = metadata['input_method']
+              task_type = load_task_data(task_name, options[:task_options], options[:modulepath])
+              metadata = task_type._pcore_type
+              input_method = metadata['input_method'].value
 
               input_method ||= 'both'
               executor.run_task(
-                nodes, path, input_method, options[:task_options]
+                nodes, task_type.executable_path, input_method, options[:task_options]
               ) do |node, event|
                 outputter.print_event(node, event)
               end
@@ -486,38 +487,22 @@ HELP
       @outputter ||= Bolt::Outputter.for_format(@config[:format])
     end
 
-    def load_task_data(name, modulepath)
-      module_name, file_name = name.split('::', 2)
-      file_name ||= 'init'
-
-      begin
-        env = Puppet::Node::Environment.create('bolt', modulepath)
-        Puppet.override(environments: Puppet::Environments::Static.new(env)) do
-          data = Puppet::InfoService::TaskInformationService.task_data(
-            env.name, module_name, name
-          )
-
-          file = data[:files].find { |f| File.basename(f, '.*') == file_name }
-          if file.nil?
-            raise Bolt::CLIError, "Failed to load task file for '#{name}'"
-          end
-
-          metadata =
-            if data[:metadata_file]
-              JSON.parse(File.read(data[:metadata_file]))
-            else
-              {}
-            end
-
-          [file, metadata]
+    def load_task_data(name, args, modulepath)
+      task_type = nil
+      task = nil
+      Puppet.initialize_settings
+      Puppet::Pal.in_tmp_environment('bolt', modulepath: [BOLTLIB_PATH] + modulepath, facts: {}) do |pal|
+        pal.with_script_compiler do |compiler|
+          # Update once Pal includes task_signature (PUP-8202)
+          #task_type = compiler.task_signature(name)
+          task_type = Puppet.lookup(:loaders).private_environment_loader.load(:type, name)
+          task = compiler.create(task_type, args) if task_type
         end
-      rescue Puppet::Module::Task::TaskNotFound
-        raise  Bolt::CLIError,
-               "Could not find task '#{name}' in module '#{module_name}'"
-      rescue Puppet::Module::MissingModule
-        # Generate message so we don't expose "bolt environment"
-        raise  Bolt::CLIError, "Could not find module '#{module_name}'"
       end
+      raise Bolt::CLIError, "Could not find task '#{name}'" unless task_type
+      task
+    rescue Puppet::Error
+      raise Bolt::CLIError, "Task parameters did not match"
     end
 
     def run_plan(plan, args, modulepath)
