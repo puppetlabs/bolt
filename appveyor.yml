@@ -1,4 +1,9 @@
 # See https://www.appveyor.com/docs/lang/ruby/
+image:
+# Windows Server 2012R2
+- Visual Studio 2013
+# Windows Server 2016
+- Visual Studio 2017
 version: 0.1.0.{build}-{branch}
 cache:
   - .bundle
@@ -14,7 +19,27 @@ environment:
     - RUBY_VERSION: 200
     - RUBY_VERSION: 24
 
+init:
+- ps: |
+    if (($ENV:APPVEYOR_BUILD_WORKER_IMAGE -eq 'Visual Studio 2013') -and ($PSVersionTable.PSVersion -gt [Version]'5.0.0'))
+    {
+      Get-Hotfix
+      Write-Output "Uninstalling WMF5.1...";
+      # uninstall the WMF5.1 package on 2012R2
+      # wusa /uninstall /kb:3191564
+      Write-Output "Uninstalling WMF5...";
+      Start-Process 'wusa.exe' -ArgumentList @('/uninstall', '/kb:3134758', '/norestart') -Wait
+      # uninstall the WMF5 package on 2012R2
+
+      Write-Output "Restarting worker in 5 seconds...";
+      # install the orginal Windows Feature
+      # Install-WindowsFeature
+      Start-Sleep -Seconds 5
+      Restart-Computer -Force -Confirm:$false;
+    }
+
 install:
+  - timeout 6
   - set PATH=C:\Ruby%RUBY_VERSION%\bin;%PATH%
   - git submodule update --init --recursive
   - bundle config --local path .bundle
@@ -24,6 +49,13 @@ build: off
 
 before_test:
   - ps: |
+      $PSVersionTable
+      # if (($ENV:APPVEYOR_BUILD_WORKER_IMAGE -eq 'Visual Studio 2013') -and ($PSVersionTable.PSVersion -gt [Version]'5.0.0'))
+      # {
+      #   # pray
+      #   $PSVersionTable
+      #   # throw "Expecting Visual Studio 2013 image to have PowerShell version < 5"
+      # }
       ruby -v
       gem -v
       bundle -v
