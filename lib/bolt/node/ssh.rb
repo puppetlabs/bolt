@@ -14,6 +14,10 @@ module Bolt
       }
     end
 
+    def protocol
+      'ssh'
+    end
+
     def connect
       options = {
         logger: @transport_logger,

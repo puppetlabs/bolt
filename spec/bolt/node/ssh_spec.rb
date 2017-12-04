@@ -16,7 +16,7 @@ describe Bolt::SSH do
   let(:key) { ENV['BOLT_SSH_KEY'] || Dir[".vagrant/**/private_key"] }
   let(:command) { "pwd" }
   let(:ssh) { Bolt::SSH.new(hostname, port, user, password) }
-  let(:insecure) { { config: Bolt::Config.new(insecure: true) } }
+  let(:insecure) { { config: Bolt::Config.new(transports: { ssh: { insecure: true } }) } }
   let(:echo_script) { <<BASH }
 for var in "$@"
 do
@@ -108,7 +108,7 @@ BASH
   end
 
   context "when executing with private key" do
-    let(:config) { Bolt::Config.new(insecure: true, key: key) }
+    let(:config) { Bolt::Config.new(transports: { ssh: { insecure: true, key: key } }) }
     let(:ssh) { Bolt::SSH.new(hostname, port, user, nil, uri: 'foo', config: config) }
 
     before(:each) { ssh.connect }
@@ -304,10 +304,15 @@ SHELL
   end
 
   context "with sudo" do
-    let(:config) {
-      Bolt::Config.new(insecure: true, sudo: true,
-                       sudo_password: password, run_as: 'root')
-    }
+    let(:config) do
+      Bolt::Config.new(transports: { ssh: {
+                         insecure: true,
+                         sudo: true,
+                         sudo_password: password,
+                         run_as: 'root'
+                       } })
+    end
+
     let(:ssh) { Bolt::SSH.new(hostname, port, user, password, config: config) }
 
     before(:each) { ssh.connect }
@@ -327,10 +332,15 @@ SHELL
     end
 
     context "requesting a pty" do
-      let(:config) {
-        Bolt::Config.new(insecure: true, sudo: true, sudo_password: password,
-                         run_as: 'root', tty: true)
-      }
+      let(:config) do
+        Bolt::Config.new(transports: { ssh: {
+                           insecure: true,
+                           sudo: true,
+                           sudo_password: password,
+                           run_as: 'root',
+                           tty: true
+                         } })
+      end
 
       it "can execute a command when a tty is requested", ssh: true do
         expect(ssh._run_command('whoami').stdout).to eq("\r\nroot\r\n")
@@ -339,8 +349,12 @@ SHELL
 
     context "with an incorrect password" do
       let(:config) {
-        Bolt::Config.new(insecure: true, sudo: true,
-                         sudo_password: 'nonsense', run_as: 'root')
+        Bolt::Config.new(transports: { ssh: {
+                           insecure: true,
+                           sudo: true,
+                           sudo_password: 'nonsense',
+                           run_as: 'root'
+                         } })
       }
       let(:ssh) { Bolt::SSH.new(hostname, port, user, password, uri: 'foo', config: config) }
 
@@ -355,9 +369,13 @@ SHELL
     end
 
     context "with no password" do
-      let(:config) {
-        Bolt::Config.new(insecure: true, sudo: true, run_as: 'root')
-      }
+      let(:config) do
+        Bolt::Config.new(transports: { ssh: {
+                           insecure: true,
+                           sudo: true,
+                           run_as: 'root'
+                         } })
+      end
       let(:ssh) { Bolt::SSH.new(hostname, port, user, password, uri: 'foo', config: config) }
 
       it "returns a failed result", ssh: true do

@@ -97,9 +97,7 @@ HELP
     def initialize(argv)
       @argv    = argv
       @options = {
-        nodes: [],
-        insecure: false,
-        transport: 'ssh'
+        nodes: []
       }
       @config = Bolt::Config.new
       @parser = create_option_parser(@options)
@@ -137,7 +135,6 @@ HELP
             results[:password] = password
           end
         end
-        results[:concurrency] = 100
         opts.on('--private-key KEY',
                 "Private ssh key to authenticate with (Optional)") do |key|
           results[:key] = key
@@ -157,16 +154,10 @@ HELP
           results[:task_options] = parse_params(params)
         end
 
-        results[:format] = 'human'
         opts.on('--format FORMAT',
                 "Output format to use: human or json") do |format|
-          if %w[human json].include? format
-            results[:format] = format
-          else
-            raise Bolt::CLIError, "Unsupported format: #{format}"
-          end
+          results[:format] = format
         end
-        results[:insecure] = false
         opts.on('-k', '--insecure',
                 "Whether to connect insecurely ") do |insecure|
           results[:insecure] = insecure
@@ -183,10 +174,6 @@ HELP
                 "Program to execute for privilege escalation. " \
                 "Currently only sudo is supported.") do |program|
           options[:sudo] = program || 'sudo'
-          if options[:sudo] != 'sudo'
-            raise Bolt::CLIError,
-                  "Only 'sudo' is supported for privilege escalation."
-          end
         end
         opts.on('--sudo-password [PASSWORD]',
                 'Password for privilege escalation') do |password|
@@ -197,6 +184,10 @@ HELP
           else
             results[:sudo_password] = password
           end
+        end
+        opts.on('--configfile CONFIG_PATH',
+                'Specify where to load the config file from') do |path|
+          results[:configfile] = path
         end
         opts.on_tail('--[no-]tty',
                      "Request a pseudo TTY on nodes that support it") do |tty|
@@ -227,6 +218,7 @@ HELP
         parser.permute(@argv)
       end
 
+      # Shortcut to handle help before other errors may be generated
       options[:mode] = remaining.shift
 
       if options[:mode] == 'help'
@@ -234,23 +226,19 @@ HELP
         options[:mode] = remaining.shift
       end
 
-      options[:action] = remaining.shift
-      options[:object] = remaining.shift
-
-      if options[:debug]
-        @config[:log_level] = Logger::DEBUG
-      elsif options[:verbose]
-        @config[:log_level] = Logger::INFO
-      end
-
-      @config[:key] = options[:key]
-
-      @config[:format] = options[:format]
-
       if options[:help]
         print_help(options[:mode])
         raise Bolt::CLIExit
       end
+
+      @config.load_file(options[:configfile])
+      @config.update_from_cli(options)
+      @config.validate
+
+      # This section handles parsing non-flag options which are
+      # mode specific rather then part of the config
+      options[:action] = remaining.shift
+      options[:object] = remaining.shift
 
       task_options, remaining = remaining.partition { |s| s =~ /.+=/ }
       if options[:task_options]
@@ -356,7 +344,7 @@ HELP
         raise Bolt::CLIError, "Option '--nodes' must be specified"
       end
 
-      if %w[task plan].include?(options[:mode]) && options[:modulepath].nil?
+      if %w[task plan].include?(options[:mode]) && @config[:modulepath].nil?
         raise Bolt::CLIError,
               "Option '--modulepath' must be specified when running" \
               " a task or plan"
@@ -372,11 +360,6 @@ HELP
     end
 
     def execute(options)
-      %i[concurrency user password tty insecure transport
-         sudo sudo_password run_as].each do |key|
-        config[key] = options[key]
-      end
-
       if options[:mode] == 'plan' || options[:mode] == 'task'
         begin
           require_relative '../../vendored/require_vendored'
@@ -420,7 +403,7 @@ HELP
             when 'task'
               task_name = options[:object]
 
-              path, metadata = load_task_data(task_name, options[:modulepath])
+              path, metadata = load_task_data(task_name, @config[:modulepath])
               input_method = metadata['input_method']
 
               input_method ||= 'both'
@@ -455,7 +438,7 @@ HELP
       result = Puppet.override(bolt_executor: executor) do
         run_plan(options[:object],
                  options[:task_options],
-                 options[:modulepath])
+                 @config[:modulepath])
       end
       outputter.print_plan(result)
     rescue Puppet::Error
