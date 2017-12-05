@@ -144,9 +144,9 @@ HELP
                 "(Optional, defaults to 100)") do |concurrency|
           results[:concurrency] = concurrency
         end
-        opts.on('--timeout TIMEOUT', Integer,
+        opts.on('--connect-timeout TIMEOUT', Integer,
                 "Connection timeout (Optional)") do |timeout|
-          results[:timeout] = timeout
+          results[:connect_timeout] = timeout
         end
         opts.on('--modulepath MODULES',
                 "List of directories containing modules, " \

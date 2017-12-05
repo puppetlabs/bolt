@@ -256,18 +256,18 @@ NODES
       end
     end
 
-    describe "timeout" do
+    describe "connect_timeout" do
       it "accepts a specific timeout" do
-        cli = Bolt::CLI.new(%w[command run --timeout 123 --nodes foo])
-        expect(cli.parse).to include(timeout: 123)
+        cli = Bolt::CLI.new(%w[command run --connect-timeout 123 --nodes foo])
+        expect(cli.parse).to include(connect_timeout: 123)
       end
 
       it "generates an error message if no timeout value is given" do
-        cli = Bolt::CLI.new(%w[command run --nodes foo --timeout])
+        cli = Bolt::CLI.new(%w[command run --nodes foo --connect-timeout])
         expect {
           cli.parse
         }.to raise_error(Bolt::CLIError,
-                         /Option '--timeout' needs a parameter/)
+                         /Option '--connect-timeout' needs a parameter/)
       end
     end
 

@@ -135,7 +135,7 @@ BASH
       TCPServer.open(0) do |server|
         port = server.addr[1]
 
-        timeout = { config: Bolt::Config.new(transports: { ssh: { timeout: 2 } }) }
+        timeout = { config: Bolt::Config.new(transports: { ssh: { connect_timeout: 2 } }) }
         ssh = Bolt::SSH.new(hostname, port, 'bad', 'password', **timeout)
 
         exec_time = Time.now

@@ -32,7 +32,7 @@ module Bolt
                                   else
                                     Net::SSH::Verifiers::Secure.new
                                   end
-      options[:timeout] = @timeout if @timeout
+      options[:timeout] = @connect_timeout if @connect_timeout
 
       @session = Net::SSH.start(@host, @user, options)
       @logger.debug { "Opened session" }

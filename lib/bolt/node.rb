@@ -29,7 +29,7 @@ module Bolt
 
     def self.initialize_transport(_logger); end
 
-    attr_reader :logger, :host, :uri, :user, :password, :timeout
+    attr_reader :logger, :host, :uri, :user, :password, :connect_timeout
 
     def initialize(host, port = nil, user = nil, password = nil, uri: nil,
                    config: Bolt::Config.new)
@@ -43,7 +43,7 @@ module Bolt
       @key = transport_conf[:key]
       @tty = transport_conf[:tty]
       @insecure = transport_conf[:insecure]
-      @timeout = transport_conf[:timeout]
+      @connect_timeout = transport_conf[:connect_timeout]
       @sudo = transport_conf[:sudo]
       @sudo_password = transport_conf[:sudo_password]
       @run_as = transport_conf[:run_as]

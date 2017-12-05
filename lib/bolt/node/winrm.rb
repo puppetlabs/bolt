@@ -22,10 +22,10 @@ module Bolt
                   password: @password,
                   retry_limit: 1 }
 
-      if @timeout
-        options[:receive_timeout] = @timeout + 1
+      if @connect_timeout
+        options[:receive_timeout] = @connect_timeout + 1
         # NOTE: must be set to at least 1, else winrm gem throws an error (boo)
-        options[:operation_timeout] = @timeout
+        options[:operation_timeout] = @connect_timeout
       end
       @connection = ::WinRM::Connection.new(options)
       @connection.logger = @transport_logger
