@@ -279,6 +279,64 @@ SHELLWORDS
     end
   end
 
+  it "supports the powershell input method", winrm: true do
+    contents = <<-PS
+      param ($Name, $Age, $Height)
+
+      Write-Host `
+        "Name: $Name ($(if ($Name -ne $null) { $Name.GetType().Name } else { 'null' }))," `
+        "Age: $Age ($(if ($Age -ne $null) { $Age.GetType().Name } else { 'null' }))," `
+        "Height: $Height ($(if ($Height -ne $null) { $Height.GetType().Name } else { 'null' }))"
+    PS
+    # note that the order of the entries in this hash is not the same as
+    # the order of the task parameters
+    arguments = { Age: 30,
+                  Height: 5.75,
+                  Name: 'John Doe' }
+    with_tempfile_containing('task-params-test-winrm.ps1', contents) do |file|
+      expect(winrm._run_task(file.path, 'powershell', arguments).message)
+        .to match(/^Name: John Doe \(String\), Age: 30 \(Int\d+\), Height: 5.75 \((Double|Decimal)\)\r\n$/s)
+    end
+  end
+
+  it "fails when the powershell input method is used to pass unexpected parameters to a task", winrm: true do
+    contents = <<-PS
+      param (
+        [Parameter()]
+        [String]$foo
+      )
+
+      $bar = $env:PT_bar
+      Write-Host `
+        "foo: $foo ($(if ($foo -ne $null) { $foo.GetType().Name } else { 'null' }))," `
+        "bar: $bar ($(if ($bar -ne $null) { $bar.GetType().Name } else { 'null' }))"
+    PS
+    arguments = { bar: 30 } # note that the script doesn't recognize the 'bar' parameter
+    with_tempfile_containing('task-params-test-winrm.ps1', contents) do |file|
+      expect(winrm._run_task(file.path, 'powershell', arguments).error)
+        .to_not be_nil
+    end
+  end
+
+  it "succeeds when the environment input method is used to pass unexpected parameters to a task", winrm: true do
+    contents = <<-PS
+      param (
+        [Parameter()]
+        [String]$foo
+      )
+
+      $bar = $env:PT_bar
+      Write-Host `
+        "foo: $foo ($(if ($foo -ne $null) { $foo.GetType().Name } else { 'null' }))," `
+        "bar: $bar ($(if ($bar -ne $null) { $bar.GetType().Name } else { 'null' }))"
+    PS
+    arguments = { bar: 30 } # note that the script doesn't recognize the 'bar' parameter
+    with_tempfile_containing('task-params-test-winrm.ps1', contents) do |file|
+      expect(winrm._run_task(file.path, 'environment', arguments).message)
+        .to eq("foo:  (String), bar: 30 (String)\r\n") # note that $foo is an empty string and not null
+    end
+  end
+
   it "will collect stdout using valid PowerShell output methods", winrm: true do
     contents = <<-PS
     # explicit Format-Table for PS5+ overrides implicit Format-Table which
