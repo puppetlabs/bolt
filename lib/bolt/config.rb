@@ -94,6 +94,15 @@ module Bolt
         if data['ssh']['insecure']
           self[:transports][:ssh][:insecure] = data['ssh']['insecure']
         end
+        if data['ssh']['connect-timeout']
+          self[:transports][:ssh][:connect_timeout] = data['ssh']['connect-timeout']
+        end
+      end
+
+      if data['winrm']
+        if data['winrm']['connect-timeout']
+          self[:transports][:winrm][:connect_timeout] = data['winrm']['connect-timeout']
+        end
       end
       # if data['pcp']
       # end

@@ -777,8 +777,12 @@ NODES
         'concurrency' => 14,
         'format' => 'json',
         'ssh' => {
-          "private-key" => '/bar/foo',
-          "insecure" => true
+          'private-key' => '/bar/foo',
+          'insecure' => true,
+          'connect-timeout' => 4
+        },
+        'winrm' => {
+          'connect-timeout' => 7
         } }
     end
 
@@ -819,6 +823,15 @@ NODES
         cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --insecure])
         cli.parse
         expect(cli.config[:transports][:ssh][:insecure]).to eq(true)
+      end
+    end
+
+    it 'reads separate connect-timeout for ssh and winrm' do
+      with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
+        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --insecure])
+        cli.parse
+        expect(cli.config[:transports][:ssh][:connect_timeout]).to eq(4)
+        expect(cli.config[:transports][:winrm][:connect_timeout]).to eq(7)
       end
     end
 

@@ -61,25 +61,27 @@ ssh:
 
 ### Global configuration options
 
-`concurrency`: The number of threads to use when executing on remote nodes(default 100)
+`concurrency`: The number of threads to use when executing on remote nodes (default: 100)
 
-`format`: The format to use when printing results. Options are `human` and `json`(default `human`)
+`format`: The format to use when printing results. Options are `human` and `json` (default: `human`)
 
-`modulepath`: The module path to load tasks and plan code from. This is a list of directories seperated byt the OS specific file path seperator.
+`modulepath`: The module path to load tasks and plan code from. This is a list of directories separated by the OS-specific path separator (`:` on Linux/macOS, `;` on Windows).
 
 ### `ssh` transport configuration options
 
-`insecure`: Whether to perform host key validation when connecting over ssh.(default false)
+`insecure`: If true, host key validation will be skipped when connecting over SSH. (default: false)
 
-`private-key`: The path to the private key file to use for ssh authentication.
+`private-key`: The path to the private key file to use for SSH authentication.
+
+`connect-timeout`: Maximum amount of time to allow for an SSH connection to be established, in seconds
 
 ### `winrm` transport configuration options
 
-There are currenlty no options for the winrm transport
+`connect-timeout`: Maximum amount of time to allow for a WinRM connection to be established, in seconds
 
 ### `pcp` transport configuration options
 
-There are currenlty no options for the pcp orchestrator transport
+There are currently no options for the PCP orchestrator transport
 
 
 ## Usage examples
