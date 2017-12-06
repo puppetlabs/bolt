@@ -75,7 +75,7 @@ module Bolt
     end
 
     def run_script(script, arguments)
-      @logger.info { "Running script: #{command}" }
+      @logger.info { "Running script: #{script}" }
       _run_script(script, arguments)
     end
 
