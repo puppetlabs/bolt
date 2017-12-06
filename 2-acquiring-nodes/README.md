@@ -69,7 +69,7 @@ $env:NODES = 3
 vagrant up
 ```
 
-Finally you can generate the SSH configuration so `bolt` knows how to authenticate with the SSH daemon. The following command will output the required details. 
+Finally you can generate the SSH configuration so `bolt` knows how to authenticate with the SSH daemon. The following command will output the required details.
 
 ```
 vagrant ssh-config
@@ -78,17 +78,25 @@ vagrant ssh-config
 Note that if you've created more than one SSH server as above, this should be:
 
 ```
-NODES=3 vagrant ssh-config
+NODES=3 vagrant ssh-config | sed /StrictHostKeyChecking/d | sed /UserKnownHostsFile/d
 ```
 
 You can save that so it will be automatically picked up by most SSH clients, including `bolt`. This uses the ability to specify hosts along with there connection details in a [configuration file](https://linux.die.net/man/5/ssh_config).
 
 ```
 mkdir ~/.ssh
-NODES=3 vagrant ssh-config >> ~/.ssh/config
-``` 
+NODES=3 vagrant ssh-config | sed /StrictHostKeyChecking/d | sed /UserKnownHostsFile/d >> ~/.ssh/config
+```
 
 When passing nodes to `bolt` in the following exercises you will use something like `--nodes node1,node2`, up to the number of nodes you decided to launch. The reason you can use the node name, rather than the IP address, is the above SSH configuration file.
+
+Make sure you can ssh into all of your nodes. If you've used the vagrant nodes before you may have to remove entries from `~/.ssh/known_hosts`.
+
+``
+ssh node1
+ssh node2
+ssh node3
+```
 
 
 # Using Docker
@@ -126,7 +134,7 @@ docker-compose ps
 2acquiringnodes_ssh_2   /usr/sbin/sshd -D   Up      0.0.0.0:32769->22/tcp
 ```
 
-Note the `Ports` column. We are forwarding a local port to the SSH server running in the container. So you should be able to SSH to `127.0.0.1:32768` (in the example above). 
+Note the `Ports` column. We are forwarding a local port to the SSH server running in the container. So you should be able to SSH to `127.0.0.1:32768` (in the example above).
 
 The image sets the username to `root` and the password to `root`. Test the connection out if you have a local SSH client like so, changing the port to one you get from running the `docker-compose ps` command above.
 
@@ -134,7 +142,9 @@ The image sets the username to `root` and the password to `root`. Test the conne
 ssh root@127.0.0.1 -p 32768
 ```
 
-When passing nodes to `bolt` in the next section you will use `--nodes 127.0.0.1:32768,127.0.0.1:32769`, replacing the ports with those you see when you run the `docker-compose ps` command shown above. 
+Make sure you can log into all the nodes before moving on. You may have to remove some entries from `~/.ssh/known_hosts`
+
+When passing nodes to `bolt` in the next section you will use `--nodes 127.0.0.1:32768,127.0.0.1:32769`, replacing the ports with those you see when you run the `docker-compose ps` command shown above.
 
 # Next steps
 

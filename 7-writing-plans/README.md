@@ -22,7 +22,7 @@ It is also useful to have some familiarity with running commands with `bolt` so 
 
 # Write a plan using run_command
 
-Plans allow for linking a set of commands, scripts and tasks together; and to parameterize them so they are easy to reuse. Plans are written using the Puppet language but you don't need to install Puppet separately to use them. 
+Plans allow for linking a set of commands, scripts and tasks together; and to parameterize them so they are easy to reuse. Plans are written using the Puppet language but you don't need to install Puppet separately to use them.
 
 Let's create a simple plan which takes a list of nodes and runs a command on them. Save the following as `modules/exercise7/plans/command.pp`:
 
@@ -39,7 +39,7 @@ We can run the plan like so:
 
 ```
 $ bolt plan run exercise7::command nodes=<nodes> --modulepath ./modules
- 11:17:39 up 19:57,  0 users,  load average: 0.14, 0.04, 0.01
+ExecutionResult({'node1' => {'stdout' => " 23:08:34 up  2:02,  0 users,  load average: 0.00, 0.01, 0.05\n", 'stderr' => '', 'exit_code' => 0}})
 ```
 
 Note that:

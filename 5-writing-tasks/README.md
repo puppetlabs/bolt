@@ -25,14 +25,14 @@ It is also useful to have some familiarity with running commands with `bolt` so 
 
 # How do tasks work?
 
-Tasks allow you to share commonly used commands as Puppet modules. This means they can be uploaded and downloaded from the Forge, as well as managed using all the existing Puppet tools. You can also just use them from GitHub or as a way of organizing regularly used commands locally. 
+Tasks allow you to share commonly used commands as Puppet modules. This means they can be uploaded and downloaded from the Forge, as well as managed using all the existing Puppet tools. You can also just use them from GitHub or as a way of organizing regularly used commands locally.
 
 By default tasks take arguments as environment variables, prefixed with `PT` (short for Puppet Tasks). Tasks are stored in the `tasks` directory of a module, a module being a directory with a unique name. You can have several tasks per module, but the `init` task is special and will be run by default if a task name is not specified. All of that will make more sense if we see it in action.
 
-Note that tasks can be implemented in any language which will run on the target nodes. 
+Note that tasks can be implemented in any language which will run on the target nodes.
 
 
-# Write your first task in Bash 
+# Write your first task in Bash
 
 For our first example we'll use `sh` here purely as a simple demonstration, but you could use Perl, Python, Lua, JavaScript, etc. as long as it can read environment variables or take content on stdin.
 
@@ -53,11 +53,10 @@ bolt task run exercise5 message=hello --nodes <nodes> --modulepath ./modules
 This should result in output similar to:
 
 ```
-node1:
-
-node1 got passed the message: hello
-
-Ran on 1 node in 0.39 seconds
+Started on node1...
+Finished on node1:
+  localhost.localdomain received the message: hello
+Ran on 1 node in 0.43 seconds
 ```
 
 Try running the `bolt` command with a different value for `message` and you should see the expected results.
@@ -85,24 +84,33 @@ Note:
 
 # Write your first task in Python
 
-The above examples are obviously very simple. Lets implement something slightly more interesting and useful. We'll use Python for this example but remember Puppet Tasks can be implemented in any language which can be run on the target node.
+The above examples are obviously very simple. Lets implement something slightly more interesting and useful. We'll use Python for this example but remember Puppet Tasks can be implemented in any language which can be run on the target node. When using a more fully featured language like python tasks can return structured data by printing a single JSON object to stdout. This helps
 
 Note that `bolt` assumes that the required runtime is already available on the target nodes. So for the following examples to work the target nodes should have Python 2 or 3 already installed. This task will also work on Windows system with Python 2 or 3 installed on them.
 
-Save the following as `modules/exercise5/tasks/gethost.py`: 
+Save the following as `modules/exercise5/tasks/gethost.py`:
 
 ```python
 #!/usr/bin/env python
+
 import socket
 import sys
 import os
+import json
 
 host = os.environ.get('PT_host')
+result = { 'host': host }
 
 if host:
-    print("%s is available at %s on %s" % (host, socket.gethostbyname(host), socket.gethostname()))
+    result['ipaddr'] = socket.gethostbyname(host)
+    result['hostname'] = socket.gethostname()
+    # The _output key is special and used by bolt to display a human readable summary
+    result['_output'] = "%s is available at %s on %s" % (host, result['ipaddr'], result['hostname'])
+    print(json.dumps(result))
 else:
-    print('No host argument passed')
+    # The _error key is special. Bolt will print the 'msg' in the error for the user.
+    result['_error'] = { 'msg': 'No host argument passed', 'kind': 'exercise5/missing_parameter' }
+    print(json.dumps(result))
     sys.exit(1)
 ```
 
@@ -110,11 +118,15 @@ We can then run the task against our nodes like so:
 
 ```
 $ bolt task run exercise5::gethost host=google.com --nodes <nodes> --modulepath ./modules
-node1:
-
-google.com is available at 216.58.204.14 on node1
-
-Ran on 1 node in 0.36 seconds
+Started on node1...
+Finished on node1:
+  google.com is available at 216.58.204.14 on localhost.localdomain
+  {
+    "host": "google.com",
+    "hostname": "localhost.localdomain",
+    "ipaddr": "216.58.204.14"
+  }
+Ran on 1 node in 0.41 seconds
 ```
 
 The important thing to note above is that our task is just a standard Python script, in this case using parts of the Python standard library. Apart from accepting arguments as `PT_`-prefixed environment variables, which will work outside Puppet Tasks too, the script is exactly what you would write to achieve the same task outside Puppet Tasks. `bolt` just gives you the ability to run that script across a large number of nodes quickly and easily. No configuration files or rewriting

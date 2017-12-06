@@ -7,7 +7,7 @@
 In this exercise you will run existing scripts against remote nodes using `bolt`.
 
 - [Test Linux nodes for ShellShock](#test-linux-nodes-for-shellshock)
-- [Test Windows external connectivity](#test-windows-external-connectivity) 
+- [Test Windows external connectivity](#test-windows-external-connectivity)
 
 # Prerequisites
 
@@ -33,27 +33,27 @@ curl -O https://raw.githubusercontent.com/hannob/bashcheck/master/bashcheck
 Next we run the script using `bolt script run <script-name>`. This will upload the script specified to all specified nodes, ensure it's executable and finally run it, returning the output to the console. An example of running that with `bashcheck` looks like:
 
 ```
-$ bolt script run bashcheck -n <nodes>
-node_1:
+$ bolt script run bashcheck --n node1
+Started on node1...
+Finished on node1:
+  STDOUT:
+    Testing /usr/bin/bash ...
+    Bash version 4.2.46(2)-release
 
-Testing /bin/bash ...
-Bash version 4.3.11(1)-release
-
-Variable function parser pre/suffixed [%%, upstream], bugs not exploitable
-Not vulnerable to CVE-2014-6271 (original shellshock)
-Not vulnerable to CVE-2014-7169 (taviso bug)
-Not vulnerable to CVE-2014-7186 (redir_stack bug)
-Test for CVE-2014-7187 not reliable without address sanitizer
-Not vulnerable to CVE-2014-6277 (lcamtuf bug #1)
-Not vulnerable to CVE-2014-6278 (lcamtuf bug #2)
-
-Ran on 1 node in 0.64 seconds
+    Variable function parser pre/suffixed [(), redhat], bugs not exploitable
+    Not vulnerable to CVE-2014-6271 (original shellshock)
+    Not vulnerable to CVE-2014-7169 (taviso bug)
+    Not vulnerable to CVE-2014-7186 (redir_stack bug)
+    Test for CVE-2014-7187 not reliable without address sanitizer
+    Not vulnerable to CVE-2014-6277 (lcamtuf bug #1)
+    Not vulnerable to CVE-2014-6278 (lcamtuf bug #2)
+Ran on 1 node in 0.41 seconds
 ```
 
 `bashcheck` is a bash script, but `bolt` will happily upload and run any script which is runnable on the specified nodes. Just set the shebang line correctly and you can run Python scripts, Ruby scripts, Perl scripts or anything else.
 
 
-# Test Windows external connectivity 
+# Test Windows external connectivity
 
 You likely already have a set of scripts which you run to accomplish common systems administration tasks. `bolt` makes it easy to reuse those scripts without modification, and to run them quickly across a large number of nodes. Feel free to use an existing script of you have one in mind, if not we'll create a simple PowerShell script to test our connectivity to a known website.
 
@@ -66,14 +66,19 @@ Test-Connection -ComputerName "example.com" -Count 3 -Delay 2 -TTL 255 -BufferSi
 Next we run the script using `bolt script run`. This will upload the script to all specified nodes, ensure it's executable and finally run it, returning the output to the console.
 
 ```
-$ bolt script run testconnection.ps1 --nodes winrm://<node> --user <user> --password <password>
-node_1:
+$ bolt script run testconnection.ps1 --n winrm://vagrant:vagrant@localhost:55985
+Started on localhost...
+Finished on localhost:
+  STDOUT:
 
-Source        Destination     IPV4Address      IPV6Address                              Bytes    Time(ms)
-------        -----------     -----------      -----------                              -----    --------
-DESKTOP-G9... example.com     93.184.216.34                                             256      83
-DESKTOP-G9... example.com     93.184.216.34                                             256      85
-DESKTOP-G9... example.com     93.184.216.34                                             256      86
+    Source        Destination     IPV4Address      IPV6Address                              Bytes    Time(ms)
+    ------        -----------     -----------      -----------                              -----    --------
+    Nano          example.com                                                               256      5
+    Nano          example.com                                                               256      5
+    Nano          example.com                                                               256      6
+
+
+Ran on 1 node in 12.37 seconds
 ```
 
 # Next steps
