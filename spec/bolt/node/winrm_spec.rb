@@ -295,7 +295,7 @@ SHELLWORDS
                   Name: 'John Doe' }
     with_tempfile_containing('task-params-test-winrm.ps1', contents) do |file|
       expect(winrm._run_task(file.path, 'powershell', arguments).message)
-        .to match(/^Name: John Doe \(String\), Age: 30 \(Int\d+\), Height: 5.75 \((Double|Decimal)\)\r\n$/s)
+        .to match(/^Name: John Doe \(String\), ?Age: 30 \(Int\d+\), ?Height: 5.75 \((Double|Decimal)\)\r?\n?$/s)
     end
   end
 
@@ -333,7 +333,7 @@ SHELLWORDS
     arguments = { bar: 30 } # note that the script doesn't recognize the 'bar' parameter
     with_tempfile_containing('task-params-test-winrm.ps1', contents) do |file|
       expect(winrm._run_task(file.path, 'environment', arguments).message)
-        .to eq("foo:  (String), bar: 30 (String)\r\n") # note that $foo is an empty string and not null
+        .to match(/foo:  \(String\), ?bar: 30 \(String\)\r\n/) # note that $foo is an empty string and not null
     end
   end
 
