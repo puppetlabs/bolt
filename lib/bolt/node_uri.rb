@@ -1,4 +1,4 @@
-require 'addressable'
+require 'addressable/uri'
 
 module Bolt
   class NodeURI
