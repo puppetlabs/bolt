@@ -4,6 +4,10 @@ require 'bolt/result'
 
 module Bolt
   class WinRM < Node
+    def protocol
+      'winrm'
+    end
+
     def initialize(host, port, user, password, shell: :powershell, **kwargs)
       super(host, port, user, password, **kwargs)
 

@@ -35,15 +35,17 @@ module Bolt
                    config: Bolt::Config.new)
       @host = host
       @port = port
-      @user = user || config[:user]
-      @password = password || config[:password]
-      @key = config[:key]
-      @tty = config[:tty]
-      @insecure = config[:insecure]
       @uri = uri
-      @sudo = config[:sudo]
-      @sudo_password = config[:sudo_password]
-      @run_as = config[:run_as]
+
+      transport_conf = config[:transports][protocol.to_sym]
+      @user = user || transport_conf[:user]
+      @password = password || transport_conf[:password]
+      @key = transport_conf[:key]
+      @tty = transport_conf[:tty]
+      @insecure = transport_conf[:insecure]
+      @sudo = transport_conf[:sudo]
+      @sudo_password = transport_conf[:sudo_password]
+      @run_as = transport_conf[:run_as]
 
       @logger = init_logger(config[:log_destination], config[:log_level])
       @transport_logger = init_logger(config[:log_destination], Logger::WARN)

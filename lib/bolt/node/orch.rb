@@ -11,6 +11,10 @@ module Bolt
 
     def disconnect; end
 
+    def protocol
+      'pcp'
+    end
+
     def make_client
       OrchestratorClient.new({}, true)
     end
