@@ -43,6 +43,44 @@ To install and use Bolt on Windows systems, you must also install Ruby. You can 
 2. Refresh your environment by running `refreshenv`
 3. Install Bolt by running gem install bolt
 
+## Configuring Bolt
+
+To configure Bolt create a `~/.puppetlabs/bolt.yml` file. Global options live at the top level of the file while transport specific options are configured for each transport. If a config options is set in the config file and passed with the corresponding command line flag the flag will take precedence.
+
+
+example file:
+```yaml
+---
+modulepath: "~/.puppetlabs/bolt-code/site:~/.puppetlabs/bolt-code/modules"
+concurrency: 10
+format: human
+ssh:
+  insecure: true
+  private-key: ~/.ssh/bolt_id
+```
+
+### Global configuration options
+
+`concurrency`: The number of threads to use when executing on remote nodes(default 100)
+
+`format`: The format to use when printing results. Options are `human` and `json`(default `human`)
+
+`modulepath`: The module path to load tasks and plan code from. This is a list of directories seperated byt the OS specific file path seperator.
+
+### `ssh` transport configuration options
+
+`insecure`: Whether to perform host key validation when connecting over ssh.(default false)
+
+`private-key`: The path to the private key file to use for ssh authentication.
+
+### `winrm` transport configuration options
+
+There are currenlty no options for the winrm transport
+
+### `pcp` transport configuration options
+
+There are currenlty no options for the pcp orchestrator transport
+
 
 ## Usage examples
 
