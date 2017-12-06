@@ -46,6 +46,11 @@ module Bolt
         "Host key verification failed for #{@uri}: #{e.message}",
         'HOST_KEY_ERROR'
       )
+    rescue Net::SSH::ConnectionTimeout
+      raise Bolt::Node::ConnectError.new(
+        "Timeout after #{@connect_timeout} seconds connecting to #{@uri}",
+        'CONNECT_ERROR'
+      )
     rescue StandardError => e
       raise Bolt::Node::ConnectError.new(
         "Failed to connect to #{@uri}: #{e.message}",

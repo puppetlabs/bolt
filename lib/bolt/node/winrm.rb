@@ -32,7 +32,7 @@ module Bolt
       end
     rescue Timeout::Error
       raise Bolt::Node::ConnectError.new(
-        "Timeout connecting to #{@endpoint}",
+        "Timeout after #{@connect_timeout} seconds connecting to #{@endpoint}",
         'CONNECT_ERROR'
       )
     rescue ::WinRM::WinRMAuthorizationError

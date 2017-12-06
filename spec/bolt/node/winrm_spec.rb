@@ -70,7 +70,7 @@ PS
         Timeout.timeout(3) do
           expect_node_error(Bolt::Node::ConnectError,
                             'CONNECT_ERROR',
-                            /Timeout connecting to/) do
+                            /Timeout after \d+ seconds connecting to/) do
             winrm.connect
           end
         end

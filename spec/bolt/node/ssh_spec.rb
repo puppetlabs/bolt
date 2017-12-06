@@ -109,7 +109,7 @@ BASH
         .and_raise(Net::SSH::ConnectionTimeout)
       expect_node_error(Bolt::Node::ConnectError,
                         'CONNECT_ERROR',
-                        /Failed to connect to/) do
+                        /Timeout after \d+ seconds connecting to/) do
         ssh.connect
       end
     end
