@@ -23,7 +23,7 @@ module Bolt
     TRANSPORT_OPTIONS = %i[insecure password run_as sudo sudo_password key tty user connect_timeout].freeze
 
     TRANSPORT_DEFAULTS = {
-      connect_timeout: 1,
+      connect_timeout: 10,
       insecure: false,
       tty: false
     }.freeze

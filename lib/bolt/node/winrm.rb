@@ -22,17 +22,19 @@ module Bolt
                   password: @password,
                   retry_limit: 1 }
 
-      if @connect_timeout
-        options[:receive_timeout] = @connect_timeout + 1
-        # NOTE: must be set to at least 1, else winrm gem throws an error (boo)
-        options[:operation_timeout] = @connect_timeout
-      end
-      @connection = ::WinRM::Connection.new(options)
-      @connection.logger = @transport_logger
+      Timeout.timeout(@connect_timeout) do
+        @connection = ::WinRM::Connection.new(options)
+        @connection.logger = @transport_logger
 
-      @session = @connection.shell(@shell)
-      @session.run('$PSVersionTable.PSVersion')
-      @logger.debug { "Opened session" }
+        @session = @connection.shell(@shell)
+        @session.run('$PSVersionTable.PSVersion')
+        @logger.debug { "Opened session" }
+      end
+    rescue Timeout::Error
+      raise Bolt::Node::ConnectError.new(
+        "Timeout connecting to #{@endpoint}",
+        'CONNECT_ERROR'
+      )
     rescue ::WinRM::WinRMAuthorizationError
       raise Bolt::Node::ConnectError.new(
         "Authentication failed for #{@endpoint}",
