@@ -4,7 +4,7 @@
 
 > **Time**: Approximately 5 minutes
 
-At the most basic level `bolt` can be used to run arbitrary commands on a set of remote hosts. Let's see that in practice before we move on to more useful higher-level features. In particular we'll look at: 
+At the most basic level `bolt` can be used to run arbitrary commands on a set of remote hosts. Let's see that in practice before we move on to more useful higher-level features. In particular we'll look at:
 
 - [Running shell commands on Linux nodes](#running-shell-commands-on-linux-nodes)
 - [Running PowerShell commands on Windows nodes](#running-powershell-commands-on-windows-nodes)
@@ -20,47 +20,40 @@ For the following exercises you should already have `bolt` installed and have a 
 
 # Running shell commands on Linux nodes
 
-`bolt` by default uses SSH for transport, and will reuse your existing SSH configuration for authentication. If you can SSH to a node using an SSH another client then `bolt` should just work. That normally means just providing configuration in `~/.ssh/config`. Running a command against a remote node is done with the following:  
+`bolt` by default uses SSH for transport, and will reuse your existing SSH configuration for authentication. If you can SSH to a node using an SSH another client then `bolt` should just work. That normally means just providing configuration in `~/.ssh/config`. Running a command against a remote node is done with the following:
 
 ```
 bolt command run <command> --nodes <nodes>
 ```
 
-Let's run the `uptime` command. Replace `node1` in the following with the address of one of your own nodes. 
+Let's run the `uptime` command. Replace `node1` in the following with the address of one of your own nodes.
 
 ```
 $ bolt command run uptime --nodes node1
-node1:
-
- 07:20:08 up  6:33,  0 users,  load average: 0.20, 0.05, 0.01
-
-Ran on 1 node in 0.06 seconds
+Started on node1...
+Finished on node1:
+  STDOUT:
+    21:19:23 up 13 min,  0 users,  load average: 0.08, 0.03, 0.04
 ```
 
-If you receive an error reading `Host key verification failed` you are using a newer version of bolt. In this case you must provide the `-k` oder `--insecure` option:
+If you receive an error reading `Host key verification failed` you should make sure the correct host keys are in your `known_hosts` file or pass `--insecure` to future bolt commands. Bolt will not honor `StrictHostKeyChecking` in you ssh config.
+
+`bolt` can also run commands against multiple nodes by passing a command separated list. Replace `node1,node2` in the following with two or more of your own nodes. If you get an error about `Host key verification` run the rest of the examples with the `--insecure` flag to disable host key verification.
 
 ```
-$ bolt command run uptime --nodes node1 --insecure
-node1:
-
- 07:20:08 up  6:33,  0 users,  load average: 0.20, 0.05, 0.01
-
-Ran on 1 node in 0.06 seconds
-```
-
-`bolt` can also run commands against multiple nodes by passing a command separated list. Replace `node1,node2` in the following with two or more of your own nodes.
-
-```
-$ bolt command run uptime --nodes node1,node2
-node1:
-
- 07:43:58 up  6:57,  0 users,  load average: 0.00, 0.00, 0.00
-
-node2:
-
- 07:43:58 up  6:57,  0 users,  load average: 0.00, 0.00, 0.00
-
-Ran on 2 nodes in 0.13 seconds
+$ bolt command run uptime --nodes node1,node2,node3
+Started on node1...
+Started on node2...
+Started on node3...
+Finished on node1:
+  STDOUT:
+     21:20:13 up 13 min,  0 users,  load average: 0.20, 0.06, 0.05
+Finished on node3:
+  STDOUT:
+     21:20:14 up 12 min,  0 users,  load average: 0.00, 0.01, 0.02
+Finished on node2:
+  STDOUT:
+     21:20:14 up 13 min,  0 users,  load average: 0.00, 0.01, 0.05$
 ```
 
 If you're accessing nodes using a username and password rather than keys you can pass those on the command line like so:

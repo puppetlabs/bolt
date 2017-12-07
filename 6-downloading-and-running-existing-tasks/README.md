@@ -24,54 +24,66 @@ It is also useful to have some familiarity with running commands with `bolt` so 
 
 1. [Running Commands](../3-running-commands)
 
+# Clone the control repo and configure Bolt's modulepath
+
+These exercises will use the [task-modules](https://github.com/puppetlabs/task-modules) control repo. Like many control repos this repository contains some modules committed directly in the `site` directory and manages other with a `Puppetfile`.
+
+```
+mkdir ~/.puppetlabs
+cd ~/.puppetlabs
+git clone git@github.com:puppetlabs/task-modules.git
+```
+
+Now open `~/.puppetlabs/bolt.yml` and set up the bolt module path. The module path will include both modules commited directly in `site` and those managed by the puppetfile in `modules`.
+
+```
+---
+modulepath: "~/.puppetlabs/task-modules/site:~/.puppetlabs/task-modules/modules"
+# If you have to pass --insecure to skip host key verifaction you can
+# uncomment these lines.
+#ssh:
+#  insecure: true
+```
+
 # Install Puppet using Bolt
 
-[puppet-install-shell](https://github.com/petems/puppet-install-shell) is a project to maintain a set of scripts which install Puppet on a range of different Linux flavors.
-
-The script can be downloaded and piped to `sh` as indicated in the documentation, alternatively you can download the script locally and then use `bolt script` to upload and run it.
+The [`install_puppet` task](https://github.com/puppetlabs/task-modules/blob/master/site/install_puppet/tasks/init.sh) in task-modules contains a task to install the puppet agent package on a node. This task need to run as root so if you're not logging in as root with vagrant you'll need to tell bolt to sudo to root with `--run-as root`
 
 ```
-wget https://raw.githubusercontent.com/petems/puppet-install-shell/master/install_puppet_5_agent.sh
-bolt script run install_puppet_5_agent.sh --nodes <nodes>
+bolt task run install_puppet -n node1 --run_as root
 ```
 
-That should output various installation steps and result in Puppet being installed from the official Puppet packages on the target nodes. You can verify that with bolt itself.
+This task may take a while and will produce a lot of output when it's done.
+
+# Install r10k and Puppetfile modules
+
+Committing modules directly to the control repo is useful while developing new modules or for private modules that won't be shared. For public modules hosted either in their own repositories on the Puppet Forge it's easier to use a Puppetfile and install them with r10k. To do that first you need to install `r10k`
 
 ```
-$ bolt command run "/opt/puppetlabs/bin/puppet --version" --nodes <nodes>
-node1:
+gem install r10k
+```
 
-5.2.0
+Now you can use r10k to install the modules in the Puppetfile `~/.puppetlabs/task-modules/Puppetfile`
 
-Ran on 1 node in 0.68 seconds
+```
+cd ~/.puppetlabs/task-modules
+r10k puppetfile install ./Puppetfile
 ```
 
 # Use package task to check status of package
 
-With Puppet installed on the node we can use some of the tasks that expose Puppet resources, like the package task.
-
-The `package` task is one of a number of tasks written to accompany the launch of `bolt`. These tasks will shortly be available from the Forge, but for the moment you can find it in the repository for this lab. Let's download it from there:
-
-```bash
-mkdir -p modules/package/tasks
-wget https://raw.githubusercontent.com/puppetlabs/tasks-hands-on-lab/master/6-downloading-and-running-existing-tasks/modules/package/tasks/init.rb
-```
-
-Or the same on Windows with PowerShell:
-
-```powershell
-mkdir modules/package/tasks
-wget https://raw.githubusercontent.com/puppetlabs/tasks-hands-on-lab/master/6-downloading-and-running-existing-tasks/modules/package/tasks/init.rb --outfile modules/package/tasks/init.rb
-```
+With Puppet installed on the node we can use some of the tasks that expose Puppet resources, like the package task which you just installed from the Puppet Forge with r10k.
 
 Let's quickly check on the status of a specific package using `bolt`:
 
 ```
-bolt task run package action=status package=bash --nodes <nodes> --modulepath ./modules
-node1:
-
-{"status":"up to date","version":"4.3-7ubuntu1.7"}
-
+$ bolt task run package action=status name=bash --nodes node1
+Started on node1...
+Finished on node1:
+  {
+    "status": "up to date",
+    "version": "4.2.46-29.el7_4"
+  }
 Ran on 1 node in 3.81 seconds
 ```
 
@@ -80,11 +92,13 @@ Ran on 1 node in 3.81 seconds
 The package task also supports other actions, including ensuring a package is installed. Let's install a package across all of our nodes using that action:
 
 ```
-bolt task run package action=install package=vim --nodes <nodes> --modulepath ./modules
-node1:
-
-{"status":"installed","version":"2:7.4.052-1ubuntu3.1"}
-
+$ bolt task run package action=install name=vim --nodes node --run-as root
+Started on node1...
+Finished on node1:
+  {
+    "status": "present",
+    "version": "2:7.4.160-2.el7"
+  }
 Ran on 1 node in 15.26 seconds
 ```
 
