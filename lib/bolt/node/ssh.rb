@@ -171,11 +171,18 @@ module Bolt
     end
 
     def make_tempdir
-      result = execute('mktemp -d')
+      tmppath = nil
+      if @tmpdir
+        tmppath = "#{@tmpdir}/#{SecureRandom.uuid}"
+        command = "mkdir -m 700 #{tmppath}"
+      else
+        command = 'mktemp -d'
+      end
+      result = execute(command)
       if result.exit_code != 0
         raise FileError.new("Could not make tempdir: #{result.stderr.string}", 'TEMPDIR_ERROR')
       end
-      result.stdout.string.chomp
+      tmppath || result.stdout.string.chomp
     end
 
     def with_remote_tempdir

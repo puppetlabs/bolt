@@ -435,8 +435,9 @@ PS
     end
 
     def make_tempdir
+      find_parent = @tmpdir ? "\"#{@tmpdir}\"" : '[System.IO.Path]::GetTempPath()'
       result = execute(<<-PS)
-$parent = [System.IO.Path]::GetTempPath()
+$parent = #{find_parent}
 $name = [System.IO.Path]::GetRandomFileName()
 $path = Join-Path $parent $name
 New-Item -ItemType Directory -Path $path | Out-Null

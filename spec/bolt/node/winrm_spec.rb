@@ -512,6 +512,19 @@ PS
     end
   end
 
+  describe "when tmpdir is specified", winrm: true do
+    let(:tmpdir) { 'C:\mytmp' }
+    let(:config) { Bolt::Config.new(transports: { winrm: { tmpdir: 'C:\mytmp' } }) }
+    let(:winrm) { Bolt::WinRM.new(host, port, user, password, config: config) }
+
+    it 'uploads scripts to the specified tmpdir' do
+      contents = "Write-Host $PSScriptRoot"
+      with_tempfile_containing('script-test-winrm', contents) do |file|
+        expect(winrm._run_script(file.path, []).stdout).to match(/#{Regexp.escape(tmpdir)}/)
+      end
+    end
+  end
+
   describe "when resolving file extensions" do
     let(:output) do
       output = Bolt::Node::Output.new
