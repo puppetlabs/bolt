@@ -256,17 +256,25 @@ NODES
       end
     end
 
+    describe "connect_timeout" do
+      it "accepts a specific timeout" do
+        cli = Bolt::CLI.new(%w[command run --connect-timeout 123 --nodes foo])
+        expect(cli.parse).to include(connect_timeout: 123)
+      end
+
+      it "generates an error message if no timeout value is given" do
+        cli = Bolt::CLI.new(%w[command run --nodes foo --connect-timeout])
+        expect {
+          cli.parse
+        }.to raise_error(Bolt::CLIError,
+                         /Option '--connect-timeout' needs a parameter/)
+      end
+    end
+
     describe "modulepath" do
       it "accepts a modulepath directory" do
         cli = Bolt::CLI.new(%w[command run --modulepath ./modules --nodes foo])
         expect(cli.parse).to include(modulepath: ['./modules'])
-      end
-
-      it "accepts a list of module directories" do
-        modulepath = %w[modules more].join(File::PATH_SEPARATOR)
-        cli = Bolt::CLI.new(%W[command run --modulepath #{modulepath}
-                               --nodes foo])
-        expect(cli.parse).to include(modulepath: %w[modules more])
       end
 
       it "generates an error message if no value is given" do
@@ -769,8 +777,12 @@ NODES
         'concurrency' => 14,
         'format' => 'json',
         'ssh' => {
-          "private-key" => '/bar/foo',
-          "insecure" => true
+          'private-key' => '/bar/foo',
+          'insecure' => true,
+          'connect-timeout' => 4
+        },
+        'winrm' => {
+          'connect-timeout' => 7
         } }
     end
 
@@ -811,6 +823,15 @@ NODES
         cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --insecure])
         cli.parse
         expect(cli.config[:transports][:ssh][:insecure]).to eq(true)
+      end
+    end
+
+    it 'reads separate connect-timeout for ssh and winrm' do
+      with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
+        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --insecure])
+        cli.parse
+        expect(cli.config[:transports][:ssh][:connect_timeout]).to eq(4)
+        expect(cli.config[:transports][:winrm][:connect_timeout]).to eq(7)
       end
     end
 

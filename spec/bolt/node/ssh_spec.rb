@@ -78,21 +78,29 @@ BASH
     end
 
     it "returns Node::ConnectError if the node name can't be resolved" do
+      # even with default timeout, name resolution fails in < 1
       ssh = Bolt::SSH.new('totally-not-there', port)
+      exec_time = Time.now
       expect_node_error(Bolt::Node::ConnectError,
                         'CONNECT_ERROR',
                         /Failed to connect to/) do
         ssh.connect
       end
+      exec_time = Time.now - exec_time
+      expect(exec_time).to be < 1
     end
 
     it "returns Node::ConnectError if the connection is refused" do
+      # even with default timeout, connection refused fails in < 1
       ssh = Bolt::SSH.new(hostname, 65535, user, password)
+      exec_time = Time.now
       expect_node_error(Bolt::Node::ConnectError,
                         'CONNECT_ERROR',
                         /Failed to connect to/) do
         ssh.connect
       end
+      exec_time = Time.now - exec_time
+      expect(exec_time).to be < 1
     end
 
     it "returns Node::ConnectError if the connection times out" do
@@ -101,8 +109,23 @@ BASH
         .and_raise(Net::SSH::ConnectionTimeout)
       expect_node_error(Bolt::Node::ConnectError,
                         'CONNECT_ERROR',
-                        /Failed to connect to/) do
+                        /Timeout after \d+ seconds connecting to/) do
         ssh.connect
+      end
+    end
+
+    it "adheres to specified connection timeout when connecting to a non-SSH port", ssh: true do
+      TCPServer.open(0) do |server|
+        port = server.addr[1]
+
+        timeout = { config: Bolt::Config.new(transports: { ssh: { connect_timeout: 2 } }) }
+        ssh = Bolt::SSH.new(hostname, port, 'bad', 'password', **timeout)
+
+        exec_time = Time.now
+        expect {
+          ssh.connect
+        }.to raise_error(Bolt::Node::ConnectError)
+        expect(Time.now - exec_time).to be > 2
       end
     end
   end

@@ -35,36 +35,45 @@ PS
   context "when connecting fails", winrm: true do
     it "raises Node::ConnectError if the node name can't be resolved" do
       winrm = Bolt::WinRM.new('totally-not-there', port, user, password)
+      exec_time = Time.now
       expect_node_error(Bolt::Node::ConnectError,
                         'CONNECT_ERROR',
                         /Failed to connect to/) do
         winrm.connect
       end
+      exec_time = Time.now - exec_time
+      expect(exec_time).to be < 1
     end
 
     it "raises Node::ConnectError if the connection is refused" do
-      winrm = Bolt::WinRM.new(host, 65535, user, password)
+      port = TCPServer.open(0) { |socket| socket.addr[1] }
+      winrm = Bolt::WinRM.new(host, port, user, password)
 
-      stub_winrm_to_raise(
-        Errno::ECONNREFUSED,
-        "Connection refused - connect(2) for \"#{host}\" port #{port}"
-      )
-
-      expect_node_error(Bolt::Node::ConnectError,
-                        'CONNECT_ERROR',
-                        /Failed to connect to/) do
-        winrm.connect
+      # The connection should fail immediately; this timeout helps ensure that
+      # and avoids a hang
+      Timeout.timeout(3) do
+        expect_node_error(Bolt::Node::ConnectError,
+                          'CONNECT_ERROR',
+                          /Failed to connect to/) do
+          winrm.connect
+        end
       end
     end
 
-    it "raises Node::ConnectError if the connection times out" do
-      winrm = Bolt::WinRM.new(host, port, user, password)
-      stub_winrm_to_raise(HTTPClient::ConnectTimeoutError, 'execution expired')
+    it "adheres to the specified timeout" do
+      TCPServer.open(0) do |server|
+        port = server.addr[1]
 
-      expect_node_error(Bolt::Node::ConnectError,
-                        'CONNECT_ERROR',
-                        /Failed to connect to/) do
-        winrm.connect
+        timeout = { config: Bolt::Config.new(transports: { winrm: { connect_timeout: 2 } }) }
+        winrm = Bolt::WinRM.new(host, port, user, password, **timeout)
+
+        Timeout.timeout(3) do
+          expect_node_error(Bolt::Node::ConnectError,
+                            'CONNECT_ERROR',
+                            /Timeout after \d+ seconds connecting to/) do
+            winrm.connect
+          end
+        end
       end
     end
 

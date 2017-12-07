@@ -17,14 +17,24 @@ module Bolt
     end
 
     def connect
-      @connection = ::WinRM::Connection.new(endpoint: @endpoint,
-                                            user: @user,
-                                            password: @password)
-      @connection.logger = @transport_logger
+      options = { endpoint: @endpoint,
+                  user: @user,
+                  password: @password,
+                  retry_limit: 1 }
 
-      @session = @connection.shell(@shell)
-      @session.run('$PSVersionTable.PSVersion')
-      @logger.debug { "Opened session" }
+      Timeout.timeout(@connect_timeout) do
+        @connection = ::WinRM::Connection.new(options)
+        @connection.logger = @transport_logger
+
+        @session = @connection.shell(@shell)
+        @session.run('$PSVersionTable.PSVersion')
+        @logger.debug { "Opened session" }
+      end
+    rescue Timeout::Error
+      raise Bolt::Node::ConnectError.new(
+        "Timeout after #{@connect_timeout} seconds connecting to #{@endpoint}",
+        'CONNECT_ERROR'
+      )
     rescue ::WinRM::WinRMAuthorizationError
       raise Bolt::Node::ConnectError.new(
         "Authentication failed for #{@endpoint}",

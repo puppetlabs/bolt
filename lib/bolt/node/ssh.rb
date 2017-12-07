@@ -32,6 +32,7 @@ module Bolt
                                   else
                                     Net::SSH::Verifiers::Secure.new
                                   end
+      options[:timeout] = @connect_timeout if @connect_timeout
 
       @session = Net::SSH.start(@host, @user, options)
       @logger.debug { "Opened session" }
@@ -44,6 +45,11 @@ module Bolt
       raise Bolt::Node::ConnectError.new(
         "Host key verification failed for #{@uri}: #{e.message}",
         'HOST_KEY_ERROR'
+      )
+    rescue Net::SSH::ConnectionTimeout
+      raise Bolt::Node::ConnectError.new(
+        "Timeout after #{@connect_timeout} seconds connecting to #{@uri}",
+        'CONNECT_ERROR'
       )
     rescue StandardError => e
       raise Bolt::Node::ConnectError.new(
