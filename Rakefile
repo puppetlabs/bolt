@@ -35,3 +35,22 @@ task test: %w[spec rubocop]
 task :default do
   system "rake --tasks"
 end
+
+namespace :integration do
+  desc 'Run tests that require a host System Under Test configured with WinRM'
+  RSpec::Core::RakeTask.new(:winrm) do |t|
+    t.rspec_opts = '--tag winrm'
+  end
+
+  desc 'Run tests that require a host System Under Test configured with SSH'
+  RSpec::Core::RakeTask.new(:ssh) do |t|
+    t.rspec_opts = '--tag ssh'
+  end
+
+  task ssh: :update_submodules
+  task winrm: :update_submodules
+
+  task :update_submodules do
+    sh 'git submodule update --init'
+  end
+end
