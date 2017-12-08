@@ -355,7 +355,8 @@ bar: $bar ($(if ($bar -ne $null) { $bar.GetType().Name } else { 'null' }))
 
     # preference variable must be set to show Information messages
     $InformationPreference = 'Continue'
-    Write-Information "message 6"
+    if ($PSVersionTable.PSVersion -ge [Version]'5.0.0') { Write-Information "message 6" }
+    else { Write-Host "message 6" }
     PS
 
     with_tempfile_containing('stdout-test-winrm', contents) do |file|
