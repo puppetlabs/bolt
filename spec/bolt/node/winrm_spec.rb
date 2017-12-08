@@ -110,7 +110,8 @@ PS
 
   it "reuses a PowerShell host / runspace for multiple commands", winrm: true do
     contents = [
-      "$Host.InstanceId.ToString(), $Host.Runspace.InstanceId.ToString()",
+      "$Host.InstanceId.ToString()",
+      "if ($Host.Runspace.InstanceId) { $Host.Runspace.InstanceId.ToString()} else { 'noid' }",
       "$ENV:A, $B, $script:C, $local:D, $global:E",
       "$ENV:A = 'env'",
       "$B = 'unscoped'",
@@ -164,7 +165,8 @@ PS
 
   it "reuses the host for multiple PowerShell scripts", winrm: true do
     contents = <<-PS
-      $Host.InstanceId.ToString(), $Host.Runspace.InstanceId.ToString()
+      $Host.InstanceId.ToString()
+      if ($Host.Runspace.InstanceId) { $Host.Runspace.InstanceId.ToString()} else { 'noid' }
 
       $ENV:A, $B, $script:C, $local:D, $global:E
 
