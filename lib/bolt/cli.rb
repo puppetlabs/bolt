@@ -139,6 +139,10 @@ HELP
                 "Private ssh key to authenticate with (Optional)") do |key|
           results[:key] = key
         end
+        opts.on('--tmpdir DIR',
+                "The directory to upload and execute temporary files on the target(Optional)") do |tmpdir|
+          results[:tmpdir] = tmpdir
+        end
         opts.on('-c', '--concurrency CONCURRENCY', Integer,
                 "Maximum number of simultaneous connections " \
                 "(Optional, defaults to 100)") do |concurrency|

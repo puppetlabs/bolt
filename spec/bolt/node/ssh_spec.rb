@@ -326,6 +326,43 @@ SHELL
     end
   end
 
+  context 'When tmpdir is specified' do
+    let(:tmpdir) { '/tmp/mytempdir' }
+    let(:config) do
+      Bolt::Config.new(transports: { ssh: {
+                         insecure: true,
+                         tmpdir: tmpdir
+                       } })
+    end
+    let(:ssh) { Bolt::SSH.new(hostname, port, user, password, config: config) }
+
+    before(:each) { ssh.connect }
+    after(:each) do
+      begin
+        ssh._run_command("rm -rf #{tmpdir}")
+      ensure
+        ssh.disconnect
+      end
+    end
+
+    it "errors when tmpdir doesn't exist", ssh: true do
+      contents = "#!/bin/sh\n echo $0"
+      with_tempfile_containing('script dir', contents) do |file|
+        result = ssh._run_script(file.path, [])
+        expect(result.success?).to eq(false)
+        expect(result.error['msg']).to match(/Could not make tempdir.*#{Regexp.escape(tmpdir)}/)
+      end
+    end
+
+    it 'uploads a script to the specified tmpdir', ssh: true do
+      ssh._run_command("mkdir #{tmpdir}")
+      contents = "#!/bin/sh\n echo $0"
+      with_tempfile_containing('script dir', contents) do |file|
+        expect(ssh._run_script(file.path, []).stdout).to match(/#{Regexp.escape(tmpdir)}/)
+      end
+    end
+  end
+
   context "with sudo" do
     let(:config) do
       Bolt::Config.new(transports: { ssh: {

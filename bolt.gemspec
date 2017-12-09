@@ -42,7 +42,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency "win32-security", "= 0.2.5"
   spec.add_dependency "win32-service", "= 0.8.8"
 
-  spec.add_development_dependency "puppetlabs_spec_helper", "~> 2.5"
+  # there is a bug in puppetlabs_spec_helper for modules without fixtures
+  spec.add_development_dependency "puppetlabs_spec_helper", "2.5.1"
   spec.add_development_dependency "bundler", "~> 1.14"
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "rspec", "~> 3.0"

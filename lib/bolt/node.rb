@@ -47,6 +47,7 @@ module Bolt
       @sudo = transport_conf[:sudo]
       @sudo_password = transport_conf[:sudo_password]
       @run_as = transport_conf[:run_as]
+      @tmpdir = transport_conf[:tmpdir]
 
       @logger = init_logger(config[:log_destination], config[:log_level])
       @transport_logger = init_logger(config[:log_destination], Logger::WARN)

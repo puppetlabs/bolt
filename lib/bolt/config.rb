@@ -20,7 +20,7 @@ module Bolt
       log_destination: STDERR
     }.freeze
 
-    TRANSPORT_OPTIONS = %i[insecure password run_as sudo sudo_password key tty user connect_timeout].freeze
+    TRANSPORT_OPTIONS = %i[insecure password run_as sudo sudo_password key tty tmpdir user connect_timeout].freeze
 
     TRANSPORT_DEFAULTS = {
       connect_timeout: 10,
@@ -97,17 +97,19 @@ module Bolt
         if data['ssh']['connect-timeout']
           self[:transports][:ssh][:connect_timeout] = data['ssh']['connect-timeout']
         end
+        if data['ssh']['tmpdir']
+          self[:transports][:ssh][:tmpdir] = data['ssh']['tmpdir']
+        end
       end
 
       if data['winrm']
         if data['winrm']['connect-timeout']
           self[:transports][:winrm][:connect_timeout] = data['winrm']['connect-timeout']
         end
+        if data['winrm']['tmpdir']
+          self[:transports][:winrm][:tmpdir] = data['winrm']['tmpdir']
+        end
       end
-      # if data['pcp']
-      # end
-      # if data['winrm']
-      # end
     end
 
     def load_file(path)
