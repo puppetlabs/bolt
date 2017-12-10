@@ -409,16 +409,7 @@ HELP
                 outputter.print_event(node, event)
               end
             when 'task'
-              task_name = options[:object]
-
-              task_type = load_task_data(task_name, options[:task_options], @config[:modulepath])
-              metadata = task_type._pcore_type
-              input_method = metadata['input_method'].value
-
-              input_method ||= 'both'
-              executor.run_task(
-                nodes, task_type.executable_path, input_method, options[:task_options]
-              ) do |node, event|
+              execute_task(executor, options) do |node, event|
                 outputter.print_event(node, event)
               end
             when 'file'
@@ -442,12 +433,26 @@ HELP
       raise e
     end
 
+    def with_bolt_executor(executor, &block)
+      Puppet.override(bolt_executor: executor, &block)
+    end
+
+    def execute_task(executor, options, &block)
+      with_bolt_executor(executor) do
+        run_task(options[:object],
+                 options[:nodes],
+                 options[:task_options],
+                 &block)
+      end
+    rescue Puppet::Error
+      raise Bolt::CLIError, "Exiting because of an error in Puppet code"
+    end
+
     def execute_plan(executor, options)
       # Plans return null here?
-      result = Puppet.override(bolt_executor: executor) do
+      result = with_bolt_executor(executor) do
         run_plan(options[:object],
-                 options[:task_options],
-                 @config[:modulepath])
+                 options[:task_options])
       end
       outputter.print_plan(result)
     rescue Puppet::Error
@@ -478,32 +483,34 @@ HELP
       @outputter ||= Bolt::Outputter.for_format(@config[:format])
     end
 
-    def load_task_data(name, args, modulepath)
-      task_type = nil
-      task = nil
+    def run_task(name, nodes, args, &block)
+      parse_error = nil
       Puppet.initialize_settings
-      Puppet::Pal.in_tmp_environment('bolt', modulepath: [BOLTLIB_PATH] + modulepath, facts: {}) do |pal|
+      Puppet::Pal.in_tmp_environment('bolt', modulepath: [BOLTLIB_PATH] + @config[:modulepath], facts: {}) do |pal|
         pal.with_script_compiler do |compiler|
-          # Update once Pal includes task_signature (PUP-8202)
-          #task_type = compiler.task_signature(name)
-          task_type = Puppet.lookup(:loaders).private_environment_loader.load(:type, name)
-          task = compiler.create(task_type, args) if task_type
+          begin
+            return compiler.call_function('run_task', name, nodes, args, &block)
+          rescue Puppet::ParseError => e
+            # we assume that the Puppet::ParseError is due to a problem with
+            # the task and/or its parameters, but since the with_script_compiler
+            # method rescues these errors and raises different ones instead,
+            # we save it in a local variable and raise it as Bolt::CLIError
+            # outside of the block
+            parse_error = e
+          end
         end
       end
-      raise Bolt::CLIError, "Could not find task '#{name}'" unless task_type
-      task
-    rescue Puppet::Error
-      raise Bolt::CLIError, "Task parameters did not match"
+      raise Bolt::CLIError, parse_error.message
     end
 
-    def run_plan(plan, args, modulepath)
+    def run_plan(plan, args)
       Dir.mktmpdir('bolt') do |dir|
         cli = []
         Puppet::Settings::REQUIRED_APP_SETTINGS.each do |setting|
           cli << "--#{setting}" << dir
         end
         Puppet.initialize_settings(cli)
-        Puppet::Pal.in_tmp_environment('bolt', modulepath: [BOLTLIB_PATH] + modulepath, facts: {}) do |pal|
+        Puppet::Pal.in_tmp_environment('bolt', modulepath: [BOLTLIB_PATH] + @config[:modulepath], facts: {}) do |pal|
           pal.with_script_compiler do |compiler|
             compiler.call_function('run_plan', plan, args)
           end

@@ -6,7 +6,7 @@
 #     # do things with tasks
 #     notice "plan done with param x = ${x}"
 #   }
-#   run_plan('myplan', {x => 'testing' }
+#   run_plan('myplan', { x => 'testing' })
 #
 Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction) do
   dispatch :run_plan do
