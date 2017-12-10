@@ -621,7 +621,7 @@ NODES
         }
         cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
         expect { cli.execute(options) }.to raise_error(
-          Bolt::CLIError, /Could not find module/
+          Bolt::CLIError, /Task not found: dne::task1/
         )
         expect(JSON.parse(@output.string)).to be
       end
@@ -639,8 +639,7 @@ NODES
         }
         cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
         expect { cli.execute(options) }.to raise_error(
-          Bolt::CLIError,
-          /Could not find task '#{task_name}' in module 'sample'/
+          Bolt::CLIError, /Task not found: sample::dne/
         )
         expect(JSON.parse(@output.string)).to be
       end

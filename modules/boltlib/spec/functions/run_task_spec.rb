@@ -1,18 +1,6 @@
 require 'spec_helper'
 require 'puppet/pops/types/execution_result'
 
-def with_task(task)
-  env = Puppet.lookup(:current_environment)
-  loaders = Puppet::Pops::Loaders.new(env)
-  Puppet.push_context({ loaders: loaders }, "test-examples")
-
-  task_type = Puppet.lookup(:loaders).private_environment_loader.load(:type, task)
-  yield task_type
-
-  Puppet::Pops::Loaders.clear
-  Puppet.pop_context
-end
-
 describe 'run_task' do
   include PuppetlabsSpec::Fixtures
   let(:executor) { mock('bolt_executor') }
@@ -43,9 +31,7 @@ describe 'run_task' do
       executor.expects(:from_uris).with(hosts).returns([host])
       executor.expects(:run_task).with([host], executable, 'both', 'message' => message).returns(host => result)
 
-      with_task('Test::Echo') do |task_type|
-        is_expected.to run.with_params(task_type.create('message' => message), hostname).and_return(exec_result)
-      end
+      is_expected.to run.with_params('Test::Echo', hostname, 'message' => message).and_return(exec_result)
     end
 
     it 'when running a task with metadata - the input method is specified by the metadata' do
@@ -54,9 +40,23 @@ describe 'run_task' do
       executor.expects(:from_uris).with(hosts).returns([host])
       executor.expects(:run_task).with([host], executable, 'environment', 'message' => message).returns(host => result)
 
-      with_task('Test::Meta') do |task_type|
-        is_expected.to run.with_params(task_type.create(message), hostname).and_return(exec_result)
-      end
+      is_expected.to run.with_params('Test::Meta', hostname, 'message' => message).and_return(exec_result)
+    end
+
+    it 'when called without without args hash (for a task where this is allowed)' do
+      executable = File.join(tasks_root, 'yes.sh')
+
+      executor.expects(:from_uris).with(hosts).returns([host])
+      executor.expects(:run_task).with([host], executable, 'both', {}).returns(host => result)
+
+      is_expected.to run.with_params('test::yes', hostname).and_return(exec_result)
+    end
+
+    it 'when called with no destinations - does not invoke bolt' do
+      executor.expects(:from_uris).never
+      executor.expects(:run_task).never
+
+      is_expected.to run.with_params('Test::Yes', []).and_return(Puppet::Pops::Types::ExecutionResult::EMPTY_RESULT)
     end
 
     context 'with multiple destinations' do
@@ -69,9 +69,8 @@ describe 'run_task' do
         executor.expects(:run_task).with([host, host2], executable, 'environment', 'message' => message)
                 .returns(host => result, host2 => result)
 
-        with_task('Test::Meta') do |task_type|
-          is_expected.to run.with_params(task_type.create(message), hostname, [[hostname2]], []).and_return(exec_result)
-        end
+        is_expected.to run.with_params('Test::Meta', [hostname, [[hostname2]], []], 'message' => message)
+                          .and_return(exec_result)
       end
 
       it 'nodes can be specified as repeated nested arrays and Targets and combine into one list of nodes' do
@@ -83,96 +82,33 @@ describe 'run_task' do
 
         target = Puppet::Pops::Types::TypeFactory.target.create(hostname)
         target2 = Puppet::Pops::Types::TypeFactory.target.create(hostname2)
-        with_task('Test::Meta') do |task_type|
-          is_expected.to run.with_params(task_type.create(message), target, [[target2]], []).and_return(exec_result)
-        end
+        is_expected.to run.with_params('Test::Meta', [target, [[target2]], []], 'message' => message)
+                          .and_return(exec_result)
       end
     end
 
-    context 'the same way as if a task instance was used; when called with' do
-      context 'a task type' do
-        it 'and args hash' do
-          executable = File.join(tasks_root, 'meta.sh')
+    context 'when called on a module that contains manifests/init.pp' do
+      it 'the call does not load init.pp' do
+        executor.expects(:from_uris).never
+        executor.expects(:run_task).never
 
-          executor.expects(:from_uris).with(hosts).returns([host])
-          executor.expects(:run_task).with([host], executable, 'environment', 'message' => message)
-                  .returns(host => result)
-
-          with_task('Test::Meta') do |task_type|
-            is_expected.to run.with_params(task_type, hostname, 'message' => message).and_return(exec_result)
-          end
-        end
-
-        it 'without args hash (for a task where this is allowed)' do
-          executor.expects(:from_uris).with(hosts).returns([host])
-          executor.expects(:run_task).with([host], anything, 'both', {}).returns(host => result)
-
-          with_task('Test::Yes') do |task_type|
-            is_expected.to run.with_params(task_type, hostname).and_return(exec_result)
-          end
-        end
-
-        it 'without nodes - does not invoke bolt' do
-          executor.expects(:from_uris).never
-          executor.expects(:run_task).never
-
-          with_task('Test::Yes') do |task_type|
-            is_expected.to run.with_params(task_type, []).and_return(Puppet::Pops::Types::ExecutionResult::EMPTY_RESULT)
-          end
-        end
+        is_expected.to run.with_params('test::echo', [])
       end
+    end
 
-      context 'a task name' do
-        it 'and args hash' do
-          executable = File.join(tasks_root, 'meta.sh')
+    context 'when called on a module that contains tasks/init.sh' do
+      it 'finds task named after the module' do
+        executable = File.join(tasks_root, 'init.sh')
 
-          executor.expects(:from_uris).with(hosts).returns([host])
-          executor.expects(:run_task).with([host], executable, 'environment', 'message' => message)
-                  .returns(host => result)
+        executor.expects(:from_uris).with(hosts).returns([host])
+        executor.expects(:run_task).with([host], executable, 'both', {}).returns(host => result)
 
-          is_expected.to run.with_params('test::meta', hostname, 'message' => message).and_return(exec_result)
-        end
-
-        it 'without args hash (for a task where this is allowed)' do
-          executable = File.join(tasks_root, 'yes.sh')
-
-          executor.expects(:from_uris).with(hosts).returns([host])
-          executor.expects(:run_task).with([host], executable, 'both', {}).returns(host => result)
-
-          is_expected.to run.with_params('test::yes', hostname).and_return(exec_result)
-        end
-
-        it 'without nodes - does not invoke bolt' do
-          executor.expects(:from_uris).never
-          executor.expects(:run_task).never
-
-          is_expected.to run.with_params('test::yes', []).and_return(Puppet::Pops::Types::ExecutionResult::EMPTY_RESULT)
-        end
-
-        it 'with non existing task - reports an unknown task error' do
-          is_expected.to run.with_params('test::nonesuch', []).and_raise_error(/Task not found: test::nonesuch/)
-        end
-
-        context 'on a module that contains manifests/init.pp' do
-          it 'the call does not load init.pp' do
-            executor.expects(:from_uris).never
-            executor.expects(:run_task).never
-
-            is_expected.to run.with_params('test::echo', [])
-          end
-        end
-
-        context 'on a module that contains tasks/init.sh' do
-          it 'finds task named after the module' do
-            executable = File.join(tasks_root, 'init.sh')
-
-            executor.expects(:from_uris).with(hosts).returns([host])
-            executor.expects(:run_task).with([host], executable, 'both', {}).returns(host => result)
-
-            is_expected.to run.with_params('test', hostname).and_return(exec_result)
-          end
-        end
+        is_expected.to run.with_params('test', hostname).and_return(exec_result)
       end
+    end
+
+    it 'when called with non existing task - reports an unknown task error' do
+      is_expected.to run.with_params('test::nonesuch', []).and_raise_error(/Task not found: test::nonesuch/)
     end
   end
 end
