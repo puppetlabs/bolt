@@ -1,0 +1,26 @@
+{
+  "description": "Task with parameters",
+  "input_method": "stdin",
+  "parameters": {
+    "mandatory_string": {
+      "description": "Mandatory string parameter",
+      "type": "String[1, 10]"
+    },
+    "mandatory_integer": {
+      "description": "Mandatory integer parameter",
+      "type": "Integer"
+    },
+    "mandatory_boolean": {
+      "description": "Mandatory boolean parameter",
+      "type": "Boolean"
+    },
+    "optional_string": {
+      "description": "Optional string parameter",
+      "type": "Optional[String]"
+    },
+    "optional_integer": {
+      "description": "Optional integer parameter",
+      "type": "Optional[Integer[-5,5]]"
+    }
+  }
+}

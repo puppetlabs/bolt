@@ -688,6 +688,100 @@ NODES
           cli.execute(options)
           expect(JSON.parse(@output.string)).to be
         end
+
+        describe 'task parameters validation' do
+          let(:task_name) { 'sample::params' }
+          let(:task_params) { {} }
+          let(:input_method) { 'stdin' }
+          let(:options) {
+            {
+              nodes: node_names,
+              mode: 'task',
+              action: 'run',
+              object: task_name,
+              task_options: task_params
+            }
+          }
+
+          it "errors when unknown parameters are specified" do
+            task_params.merge!(
+              'foo' => nil,
+              'bar' => nil
+            )
+
+            expect { cli.execute(options) }.to raise_error(
+              Bolt::CLIError,
+              /Task\ sample::params:\n
+               \s*has\ no\ parameter\ named\ 'foo'\n
+               \s*has\ no\ parameter\ named\ 'bar'/x
+            )
+            expect(JSON.parse(@output.string)).to be
+          end
+
+          it "errors when required parameters are not specified" do
+            task_params['mandatory_string'] = 'str'
+
+            expect { cli.execute(options) }.to raise_error(
+              Bolt::CLIError,
+              /Task\ sample::params:\n
+               \s*expects\ a\ value\ for\ parameter\ 'mandatory_integer'\n
+               \s*expects\ a\ value\ for\ parameter\ 'mandatory_boolean'/x
+            )
+            expect(JSON.parse(@output.string)).to be
+          end
+
+          it "errors when the specified parameter values don't match the expected data types" do
+            task_params.merge!(
+              'mandatory_string'  => 'str',
+              'mandatory_integer' => 10,
+              'mandatory_boolean' => 'str',
+              'optional_string'   => 10
+            )
+
+            expect { cli.execute(options) }.to raise_error(
+              Bolt::CLIError,
+              /Task\ sample::params:\n
+               \s*parameter\ 'mandatory_boolean'\ expects\ a\ Boolean\ value,\ got\ String\n
+               \s*parameter\ 'optional_string'\ expects\ a\ value\ of\ type\ Undef\ or\ String,
+                                              \ got\ Integer/x
+            )
+            expect(JSON.parse(@output.string)).to be
+          end
+
+          it "errors when the specified parameter values are outside of the expected ranges" do
+            task_params.merge!(
+              'mandatory_string'  => '0123456789a',
+              'mandatory_integer' => 10,
+              'mandatory_boolean' => true,
+              'optional_integer'  => 10
+            )
+
+            expect { cli.execute(options) }.to raise_error(
+              Bolt::CLIError,
+              /Task\ sample::params:\n
+               \s*parameter\ 'mandatory_string'\ expects\ a\ String\[1,\ 10\]\ value,\ got\ String\n
+               \s*parameter\ 'optional_integer'\ expects\ a\ value\ of\ type\ Undef\ or\ Integer\[-5,\ 5\],
+                                               \ got\ Integer\[10,\ 10\]/x
+            )
+            expect(JSON.parse(@output.string)).to be
+          end
+
+          it "runs the task when the specified parameters are successfully validated" do
+            expect(executor)
+              .to receive(:run_task)
+              .with(nodes,
+                    %r{modules/sample/tasks/params.sh$}, input_method, task_params)
+              .and_return({})
+            task_params.merge!(
+              'mandatory_string'  => ' ',
+              'mandatory_integer' => 0,
+              'mandatory_boolean' => false
+            )
+
+            cli.execute(options)
+            expect(JSON.parse(@output.string)).to be
+          end
+        end
       end
 
       context "when running a plan", reset_puppet_settings: true do

@@ -14,7 +14,7 @@ describe 'run_task' do
     end
   end
 
-  context 'it calls bolt with executor, input method, and arguments' do
+  context 'it calls bolt executor run_task' do
     let(:hostname) { 'a.b.com' }
     let(:hostname2) { 'x.y.com' }
     let(:message) { 'the message' }
@@ -109,6 +109,71 @@ describe 'run_task' do
 
     it 'when called with non existing task - reports an unknown task error' do
       is_expected.to run.with_params('test::nonesuch', []).and_raise_error(/Task not found: test::nonesuch/)
+    end
+  end
+
+  context 'it validates the task parameters' do
+    let(:task_name) { 'Test::Params' }
+    let(:hostname) { 'a.b.com' }
+    let(:task_params) { {} }
+
+    it 'errors when unknown parameters are specified' do
+      task_params.merge!(
+        'foo' => nil,
+        'bar' => nil
+      )
+
+      is_expected.to run.with_params(task_name, hostname, task_params).and_raise_error(
+        Puppet::ParseError,
+        /Task\ test::params:\n
+         \s*has\ no\ parameter\ named\ 'foo'\n
+         \s*has\ no\ parameter\ named\ 'bar'/x
+      )
+    end
+
+    it 'errors when required parameters are not specified' do
+      task_params['mandatory_string'] = 'str'
+
+      is_expected.to run.with_params(task_name, hostname, task_params).and_raise_error(
+        Puppet::ParseError,
+        /Task\ test::params:\n
+         \s*expects\ a\ value\ for\ parameter\ 'mandatory_integer'\n
+         \s*expects\ a\ value\ for\ parameter\ 'mandatory_boolean'/x
+      )
+    end
+
+    it "errors when the specified parameter values don't match the expected data types" do
+      task_params.merge!(
+        'mandatory_string'  => 'str',
+        'mandatory_integer' => 10,
+        'mandatory_boolean' => 'str',
+        'optional_string'   => 10
+      )
+
+      is_expected.to run.with_params(task_name, hostname, task_params).and_raise_error(
+        Puppet::ParseError,
+        /Task\ test::params:\n
+         \s*parameter\ 'mandatory_boolean'\ expects\ a\ Boolean\ value,\ got\ String\n
+         \s*parameter\ 'optional_string'\ expects\ a\ value\ of\ type\ Undef\ or\ String,
+                                        \ got\ Integer/x
+      )
+    end
+
+    it 'errors when the specified parameter values are outside of the expected ranges' do
+      task_params.merge!(
+        'mandatory_string'  => '0123456789a',
+        'mandatory_integer' => 10,
+        'mandatory_boolean' => true,
+        'optional_integer'  => 10
+      )
+
+      is_expected.to run.with_params(task_name, hostname, task_params).and_raise_error(
+        Puppet::ParseError,
+        /Task\ test::params:\n
+         \s*parameter\ 'mandatory_string'\ expects\ a\ String\[1,\ 10\]\ value,\ got\ String\n
+         \s*parameter\ 'optional_integer'\ expects\ a\ value\ of\ type\ Undef\ or\ Integer\[-5,\ 5\],
+                                         \ got\ Integer\[10,\ 10\]/x
+      )
     end
   end
 end
