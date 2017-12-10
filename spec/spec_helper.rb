@@ -4,6 +4,15 @@ require 'bolt'
 
 $LOAD_PATH.unshift File.join(__dir__, 'lib')
 
+RSpec.shared_context 'reset puppet settings' do
+  after :each do
+    # reset puppet settings so that they can be initialized again
+    Puppet.settings.instance_exec do
+      clear_everything_for_tests
+    end
+  end
+end
+
 RSpec.configure do |config|
   # rspec-expectations config
   config.expect_with :rspec do |expectations|
@@ -29,4 +38,9 @@ RSpec.configure do |config|
   config.example_status_persistence_file_path = "spec/examples.txt"
 
   # config.warnings = true
+
+  # Make it possible to include the 'reset puppet settings' shared context
+  # in a group (or even an individual test) by specifying
+  # `reset_puppet_settings: true' metadata on the group/test
+  config.include_context 'reset puppet settings', reset_puppet_settings: true
 end
