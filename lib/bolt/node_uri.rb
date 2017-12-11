@@ -7,13 +7,11 @@ module Bolt
     end
 
     def parse(string, transport)
-      uri = if string =~ %r{^[^:]+://}
-              Addressable::URI.parse(string)
-            else
-              Addressable::URI.parse("#{transport}://#{string}")
-            end
-      uri.port ||= 5985 if uri.scheme == 'winrm'
-      uri
+      if string =~ %r{^[^:]+://}
+        Addressable::URI.parse(string)
+      else
+        Addressable::URI.parse("#{transport}://#{string}")
+      end
     end
     private :parse
 

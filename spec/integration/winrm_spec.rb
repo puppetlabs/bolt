@@ -30,7 +30,7 @@ describe "when runnning over the winrm transport", winrm: true do
   end
 
   context 'when using a configfile' do
-    let(:config) { { 'format' => 'json', 'modulepath' => modulepath } }
+    let(:config) { { 'format' => 'json', 'modulepath' => modulepath, 'winrm' => { 'insecure' => true } } }
     let(:config_flags) { %W[--nodes #{uri} --password #{password}] }
 
     it 'runs a command' do

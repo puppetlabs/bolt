@@ -86,18 +86,11 @@ describe Bolt::NodeURI do
       expect(uri.port).to eq(55985)
     end
 
-    it "defaults the winrm port to 5985" do
-      uri = Bolt::NodeURI.new('winrm://neptune')
-      expect(uri.scheme).to eq('winrm')
-      expect(uri.hostname).to eq('neptune')
-      expect(uri.port).to eq(5985)
-    end
-
     it "uses 'winrm' when it's the default transport" do
       uri = Bolt::NodeURI.new('neptune', 'winrm')
       expect(uri.scheme).to eq('winrm')
       expect(uri.hostname).to eq('neptune')
-      expect(uri.port).to eq(5985)
+      expect(uri.port).to be_nil
     end
   end
 

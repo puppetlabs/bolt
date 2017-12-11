@@ -9,40 +9,52 @@ module Bolt
       'winrm'
     end
 
-    def initialize(host, port, user, password, shell: :powershell, **kwargs)
-      super(host, port, user, password, **kwargs)
+    def port
+      default_port = @insecure ? 5985 : 5986
+      @port || default_port
+    end
 
-      @shell = shell
-      @endpoint = "http://#{host}:#{port}/wsman"
+    def initialize(host, port, user, password, **kwargs)
+      super(host, port, user, password, **kwargs)
     end
 
     def connect
-      options = { endpoint: @endpoint,
+      if @insecure
+        scheme = 'http'
+        transport = :negotiate
+      else
+        scheme = 'https'
+        transport = :ssl
+      end
+      endpoint = "#{scheme}://#{host}:#{port}/wsman"
+      options = { endpoint: endpoint,
                   user: @user,
                   password: @password,
-                  retry_limit: 1 }
+                  retry_limit: 1,
+                  transport: transport,
+                  ca_trust_path: @ca_cert }
 
       Timeout.timeout(@connect_timeout) do
         @connection = ::WinRM::Connection.new(options)
         @connection.logger = @transport_logger
 
-        @session = @connection.shell(@shell)
+        @session = @connection.shell(:powershell)
         @session.run('$PSVersionTable.PSVersion')
         @logger.debug { "Opened session" }
       end
     rescue Timeout::Error
       raise Bolt::Node::ConnectError.new(
-        "Timeout after #{@connect_timeout} seconds connecting to #{@endpoint}",
+        "Timeout after #{@connect_timeout} seconds connecting to #{endpoint}",
         'CONNECT_ERROR'
       )
     rescue ::WinRM::WinRMAuthorizationError
       raise Bolt::Node::ConnectError.new(
-        "Authentication failed for #{@endpoint}",
+        "Authentication failed for #{endpoint}",
         'AUTH_ERROR'
       )
     rescue StandardError => e
       raise Bolt::Node::ConnectError.new(
-        "Failed to connect to #{@endpoint}: #{e.message}",
+        "Failed to connect to #{endpoint}: #{e.message}",
         'CONNECT_ERROR'
       )
     end
