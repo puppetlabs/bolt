@@ -11,11 +11,14 @@ describe Bolt::WinRM do
 
   let(:host) { ENV['BOLT_WINRM_HOST'] || 'localhost' }
   let(:port) { ENV['BOLT_WINRM_PORT'] || 55985 }
+  let(:ssl_port) { ENV['BOLT_WINRM_SSL_PORT'] || 55986 }
   let(:user) { ENV['BOLT_WINRM_USER'] || "vagrant" }
   let(:password) { ENV['BOLT_WINRM_PASSWORD'] || "vagrant" }
   let(:command) { "echo $env:UserName" }
   let(:config) { Bolt::Config.new(transports: { winrm: { insecure: true } }) }
+  let(:ssl_config) { Bolt::Config.new(transports: { winrm: { ca_cert: 'resources/cert.pem' } }) }
   let(:winrm) { Bolt::WinRM.new(host, port, user, password, config: config) }
+  let(:winrm_ssl) { Bolt::WinRM.new(host, ssl_port, user, password, config: ssl_config) }
   let(:echo_script) { <<PS }
 foreach ($i in $args)
 {
@@ -108,6 +111,13 @@ PS
       ) do
         winrm.connect
       end
+    end
+  end
+
+  context "connecting over SSL" do
+    it "executes a command on a host", winrm: true do
+      winrm_ssl.connect
+      expect(winrm_ssl.execute(command).stdout.string).to eq("#{user}\r\n")
     end
   end
 
