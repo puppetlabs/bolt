@@ -147,6 +147,14 @@ module Bolt
       unless %w[human json].include? self[:format]
         raise Bolt::CLIError, "Unsupported format: '#{self[:format]}'"
       end
+
+      self[:transports].each_value do |v|
+        timeout_value = v[:connect_timeout]
+        unless timeout_value.is_a?(Integer) || timeout_value.nil?
+          error_msg = "connect-timeout value must be an Integer, received #{timeout_value}:#{timeout_value.class}"
+          raise Bolt::CLIError, error_msg
+        end
+      end
     end
   end
 end

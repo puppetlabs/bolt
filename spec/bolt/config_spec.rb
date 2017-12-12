@@ -25,5 +25,29 @@ describe Bolt::Config do
         Bolt::Config.new(what: 'why')
       }.to raise_error(NameError)
     end
+
+    it "accepts integers for connection-timeout" do
+      config = {
+        transports: {
+          ssh: { connect_timeout: 42 },
+          winrm: { connect_timeout: 999 },
+          pcp: {}
+        }
+      }
+      expect {
+        Bolt::Config.new(config).validate
+      }.not_to raise_error
+    end
+
+    it "does not accept values that are not integers" do
+      config = {
+        transports: {
+          ssh: { connect_timeout: '42s' }
+        }
+      }
+      expect {
+        Bolt::Config.new(config).validate
+      }.to raise_error(Bolt::CLIError)
+    end
   end
 end
