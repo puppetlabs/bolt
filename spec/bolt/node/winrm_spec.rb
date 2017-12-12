@@ -119,7 +119,8 @@ PS
 
   it "reuses a PowerShell host / runspace for multiple commands", winrm: true do
     contents = [
-      "$Host.InstanceId.ToString(), $Host.Runspace.InstanceId.ToString()",
+      "$Host.InstanceId.ToString()",
+      "if ($Host.Runspace.InstanceId) { $Host.Runspace.InstanceId.ToString()} else { 'noid' }",
       "$ENV:A, $B, $script:C, $local:D, $global:E",
       "$ENV:A = 'env'",
       "$B = 'unscoped'",
@@ -173,7 +174,8 @@ PS
 
   it "reuses the host for multiple PowerShell scripts", winrm: true do
     contents = <<-PS
-      $Host.InstanceId.ToString(), $Host.Runspace.InstanceId.ToString()
+      $Host.InstanceId.ToString()
+      if ($Host.Runspace.InstanceId) { $Host.Runspace.InstanceId.ToString()} else { 'noid' }
 
       $ENV:A, $B, $script:C, $local:D, $global:E
 
@@ -292,10 +294,11 @@ SHELLWORDS
     contents = <<-PS
       param ($Name, $Age, $Height)
 
-      Write-Host `
-        "Name: $Name ($(if ($Name -ne $null) { $Name.GetType().Name } else { 'null' }))," `
-        "Age: $Age ($(if ($Age -ne $null) { $Age.GetType().Name } else { 'null' }))," `
-        "Height: $Height ($(if ($Height -ne $null) { $Height.GetType().Name } else { 'null' }))"
+      Write-Host @"
+Name: $Name ($(if ($Name -ne $null) { $Name.GetType().Name } else { 'null' }))
+Age: $Age ($(if ($Age -ne $null) { $Age.GetType().Name } else { 'null' }))
+Height: $Height ($(if ($Height -ne $null) { $Height.GetType().Name } else { 'null' }))
+"@
     PS
     # note that the order of the entries in this hash is not the same as
     # the order of the task parameters
@@ -304,7 +307,7 @@ SHELLWORDS
                   Name: 'John Doe' }
     with_tempfile_containing('task-params-test-winrm.ps1', contents) do |file|
       expect(winrm._run_task(file.path, 'powershell', arguments).message)
-        .to match(/^Name: John Doe \(String\), Age: 30 \(Int\d+\), Height: 5.75 \((Double|Decimal)\)\r\n$/s)
+        .to match(/\AName: John Doe \(String\).*^Age: 30 \(Int\d+\).*^Height: 5.75 \((Double|Decimal)\).*\Z/m)
     end
   end
 
@@ -335,14 +338,15 @@ SHELLWORDS
       )
 
       $bar = $env:PT_bar
-      Write-Host `
-        "foo: $foo ($(if ($foo -ne $null) { $foo.GetType().Name } else { 'null' }))," `
-        "bar: $bar ($(if ($bar -ne $null) { $bar.GetType().Name } else { 'null' }))"
+      Write-Host @"
+foo: $foo ($(if ($foo -ne $null) { $foo.GetType().Name } else { 'null' }))
+bar: $bar ($(if ($bar -ne $null) { $bar.GetType().Name } else { 'null' }))
+"@
     PS
     arguments = { bar: 30 } # note that the script doesn't recognize the 'bar' parameter
     with_tempfile_containing('task-params-test-winrm.ps1', contents) do |file|
       expect(winrm._run_task(file.path, 'environment', arguments).message)
-        .to eq("foo:  (String), bar: 30 (String)\r\n") # note that $foo is an empty string and not null
+        .to match(/\Afoo:  \(String\).*^bar: 30 \(String\).*\Z/m) # note that $foo is an empty string and not null
     end
   end
 
@@ -362,7 +366,8 @@ SHELLWORDS
 
     # preference variable must be set to show Information messages
     $InformationPreference = 'Continue'
-    Write-Information "message 6"
+    if ($PSVersionTable.PSVersion -ge [Version]'5.0.0') { Write-Information "message 6" }
+    else { Write-Host "message 6" }
     PS
 
     with_tempfile_containing('stdout-test-winrm', contents) do |file|
