@@ -31,18 +31,6 @@ PS
   end
 
   context "when connecting fails", winrm: true do
-    it "raises Node::ConnectError if the node name can't be resolved" do
-      winrm = Bolt::WinRM.new('totally-not-there', port, user, password, config: config)
-      exec_time = Time.now
-      expect_node_error(Bolt::Node::ConnectError,
-                        'CONNECT_ERROR',
-                        /Failed to connect to/) do
-        winrm.connect
-      end
-      exec_time = Time.now - exec_time
-      expect(exec_time).to be < 1
-    end
-
     it "raises Node::ConnectError if the connection is refused" do
       port = TCPServer.open(0) { |socket| socket.addr[1] }
       winrm = Bolt::WinRM.new(host, port, user, password)
@@ -56,6 +44,18 @@ PS
           winrm.connect
         end
       end
+    end
+
+    it "raises Node::ConnectError if the node name can't be resolved" do
+      winrm = Bolt::WinRM.new('totally-not-there', port, user, password, config: config)
+      exec_time = Time.now
+      expect_node_error(Bolt::Node::ConnectError,
+                        'CONNECT_ERROR',
+                        /Failed to connect to/) do
+        winrm.connect
+      end
+      exec_time = Time.now - exec_time
+      expect(exec_time).to be < 1
     end
 
     it "adheres to the specified timeout" do
