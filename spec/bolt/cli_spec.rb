@@ -513,7 +513,7 @@ NODES
         expect(JSON.parse(@output.string)).to be
       end
 
-      describe "when running a script" do
+      context "when running a script" do
         let(:script) { 'bar.sh' }
         let(:options) {
           { nodes: node_names, mode: 'script', action: 'run', object: script,
@@ -560,159 +560,257 @@ NODES
         end
       end
 
-      it "runs a task given a name" do
-        task_name = 'sample::echo'
-        task_params = { 'message' => 'hi' }
-        input_method = 'both'
+      context "when running a task", reset_puppet_settings: true do
+        before :each do
+          cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
+        end
 
-        expect(executor)
-          .to receive(:run_task)
-          .with(
-            nodes,
-            %r{modules/sample/tasks/echo.sh$}, input_method, task_params
-          ).and_return({})
+        it "runs a task given a name" do
+          task_name = 'sample::echo'
+          task_params = { 'message' => 'hi' }
+          input_method = 'both'
 
-        options = {
-          nodes: node_names,
-          mode: 'task',
-          action: 'run',
-          object: task_name,
-          task_options: task_params
-        }
-        cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
-        cli.execute(options)
-        expect(JSON.parse(@output.string)).to be
+          expect(executor)
+            .to receive(:run_task)
+            .with(
+              nodes,
+              %r{modules/sample/tasks/echo.sh$}, input_method, task_params
+            ).and_return({})
+
+          options = {
+            nodes: node_names,
+            mode: 'task',
+            action: 'run',
+            object: task_name,
+            task_options: task_params
+          }
+          cli.execute(options)
+          expect(JSON.parse(@output.string)).to be
+        end
+
+        it "errors for non-existent modules" do
+          task_name = 'dne::task1'
+          task_params = { 'message' => 'hi' }
+
+          options = {
+            nodes: node_names,
+            mode: 'task',
+            action: 'run',
+            object: task_name,
+            task_options: task_params
+          }
+          expect { cli.execute(options) }.to raise_error(
+            Bolt::CLIError, /Task not found: dne::task1/
+          )
+          expect(JSON.parse(@output.string)).to be
+        end
+
+        it "errors for non-existent tasks" do
+          task_name = 'sample::dne'
+          task_params = { 'message' => 'hi' }
+
+          options = {
+            nodes: node_names,
+            mode: 'task',
+            action: 'run',
+            object: task_name,
+            task_options: task_params
+          }
+          expect { cli.execute(options) }.to raise_error(
+            Bolt::CLIError, /Task not found: sample::dne/
+          )
+          expect(JSON.parse(@output.string)).to be
+        end
+
+        it "runs an init task given a module name" do
+          task_name = 'sample'
+          task_params = { 'message' => 'hi' }
+          input_method = 'both'
+
+          expect(executor)
+            .to receive(:run_task)
+            .with(
+              nodes,
+              %r{modules/sample/tasks/init.sh$}, input_method, task_params
+            ).and_return({})
+
+          options = {
+            nodes: node_names,
+            mode: 'task',
+            action: 'run',
+            object: task_name,
+            task_options: task_params
+          }
+          cli.execute(options)
+          expect(JSON.parse(@output.string)).to be
+        end
+
+        it "runs a task passing input on stdin" do
+          task_name = 'sample::stdin'
+          task_params = { 'message' => 'hi' }
+          input_method = 'stdin'
+
+          expect(executor)
+            .to receive(:run_task)
+            .with(nodes,
+                  %r{modules/sample/tasks/stdin.sh$}, input_method, task_params)
+            .and_return({})
+
+          options = {
+            nodes: node_names,
+            mode: 'task',
+            action: 'run',
+            object: task_name,
+            task_options: task_params
+          }
+          cli.execute(options)
+          expect(JSON.parse(@output.string)).to be
+        end
+
+        it "runs a powershell task passing input on stdin" do
+          task_name = 'sample::winstdin'
+          task_params = { 'message' => 'hi' }
+          input_method = 'stdin'
+
+          expect(executor)
+            .to receive(:run_task)
+            .with(nodes,
+                  %r{modules/sample/tasks/winstdin.ps1$}, input_method, task_params)
+            .and_return({})
+
+          options = {
+            nodes: node_names,
+            mode: 'task',
+            action: 'run',
+            object: task_name,
+            task_options: task_params
+          }
+          cli.execute(options)
+          expect(JSON.parse(@output.string)).to be
+        end
+
+        describe 'task parameters validation' do
+          let(:task_name) { 'sample::params' }
+          let(:task_params) { {} }
+          let(:input_method) { 'stdin' }
+          let(:options) {
+            {
+              nodes: node_names,
+              mode: 'task',
+              action: 'run',
+              object: task_name,
+              task_options: task_params
+            }
+          }
+
+          it "errors when unknown parameters are specified" do
+            task_params.merge!(
+              'foo' => nil,
+              'bar' => nil
+            )
+
+            expect { cli.execute(options) }.to raise_error(
+              Bolt::CLIError,
+              /Task\ sample::params:\n
+               \s*has\ no\ parameter\ named\ 'foo'\n
+               \s*has\ no\ parameter\ named\ 'bar'/x
+            )
+            expect(JSON.parse(@output.string)).to be
+          end
+
+          it "errors when required parameters are not specified" do
+            task_params['mandatory_string'] = 'str'
+
+            expect { cli.execute(options) }.to raise_error(
+              Bolt::CLIError,
+              /Task\ sample::params:\n
+               \s*expects\ a\ value\ for\ parameter\ 'mandatory_integer'\n
+               \s*expects\ a\ value\ for\ parameter\ 'mandatory_boolean'/x
+            )
+            expect(JSON.parse(@output.string)).to be
+          end
+
+          it "errors when the specified parameter values don't match the expected data types" do
+            task_params.merge!(
+              'mandatory_string'  => 'str',
+              'mandatory_integer' => 10,
+              'mandatory_boolean' => 'str',
+              'optional_string'   => 10
+            )
+
+            expect { cli.execute(options) }.to raise_error(
+              Bolt::CLIError,
+              /Task\ sample::params:\n
+               \s*parameter\ 'mandatory_boolean'\ expects\ a\ Boolean\ value,\ got\ String\n
+               \s*parameter\ 'optional_string'\ expects\ a\ value\ of\ type\ Undef\ or\ String,
+                                              \ got\ Integer/x
+            )
+            expect(JSON.parse(@output.string)).to be
+          end
+
+          it "errors when the specified parameter values are outside of the expected ranges" do
+            task_params.merge!(
+              'mandatory_string'  => '0123456789a',
+              'mandatory_integer' => 10,
+              'mandatory_boolean' => true,
+              'optional_integer'  => 10
+            )
+
+            expect { cli.execute(options) }.to raise_error(
+              Bolt::CLIError,
+              /Task\ sample::params:\n
+               \s*parameter\ 'mandatory_string'\ expects\ a\ String\[1,\ 10\]\ value,\ got\ String\n
+               \s*parameter\ 'optional_integer'\ expects\ a\ value\ of\ type\ Undef\ or\ Integer\[-5,\ 5\],
+                                               \ got\ Integer\[10,\ 10\]/x
+            )
+            expect(JSON.parse(@output.string)).to be
+          end
+
+          it "runs the task when the specified parameters are successfully validated" do
+            expect(executor)
+              .to receive(:run_task)
+              .with(nodes,
+                    %r{modules/sample/tasks/params.sh$}, input_method, task_params)
+              .and_return({})
+            task_params.merge!(
+              'mandatory_string'  => ' ',
+              'mandatory_integer' => 0,
+              'mandatory_boolean' => false
+            )
+
+            cli.execute(options)
+            expect(JSON.parse(@output.string)).to be
+          end
+        end
       end
 
-      it "runs a plan given a name" do
-        plan_name = 'sample::single_task'
-        plan_params = { 'nodes' => nodes.join(',') }
-        input_method = 'both'
+      context "when running a plan", reset_puppet_settings: true do
+        before :each do
+          cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
+        end
 
-        expect(executor)
-          .to receive(:run_task)
-          .with(
-            nodes,
-            %r{modules/sample/tasks/echo.sh$}, input_method, 'message' => 'hi there'
-          ).and_return({})
+        it "runs a plan given a name" do
+          plan_name = 'sample::single_task'
+          plan_params = { 'nodes' => nodes.join(',') }
+          input_method = 'both'
 
-        options = {
-          nodes: node_names,
-          mode: 'plan',
-          action: 'run',
-          object: plan_name,
-          task_options: plan_params
-        }
-        cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
-        cli.execute(options)
-        expect(@output.string).to eq("\"ExecutionResult({})\"\n")
-      end
+          expect(executor)
+            .to receive(:run_task)
+            .with(
+              nodes,
+              %r{modules/sample/tasks/echo.sh$}, input_method, 'message' => 'hi there'
+            ).and_return({})
 
-      it "errors for non-existent modules" do
-        task_name = 'dne::task1'
-        task_params = { 'message' => 'hi' }
-
-        options = {
-          nodes: node_names,
-          mode: 'task',
-          action: 'run',
-          object: task_name,
-          task_options: task_params
-        }
-        cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
-        expect { cli.execute(options) }.to raise_error(
-          Bolt::CLIError, /Could not find module/
-        )
-        expect(JSON.parse(@output.string)).to be
-      end
-
-      it "errors for non-existent tasks" do
-        task_name = 'sample::dne'
-        task_params = { 'message' => 'hi' }
-
-        options = {
-          nodes: node_names,
-          mode: 'task',
-          action: 'run',
-          object: task_name,
-          task_options: task_params
-        }
-        cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
-        expect { cli.execute(options) }.to raise_error(
-          Bolt::CLIError,
-          /Could not find task '#{task_name}' in module 'sample'/
-        )
-        expect(JSON.parse(@output.string)).to be
-      end
-
-      it "runs an init task given a module name" do
-        task_name = 'sample'
-        task_params = { 'message' => 'hi' }
-        input_method = 'both'
-
-        expect(executor)
-          .to receive(:run_task)
-          .with(
-            nodes,
-            %r{modules/sample/tasks/init.sh$}, input_method, task_params
-          ).and_return({})
-
-        options = {
-          nodes: node_names,
-          mode: 'task',
-          action: 'run',
-          object: task_name,
-          task_options: task_params
-        }
-        cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
-        cli.execute(options)
-        expect(JSON.parse(@output.string)).to be
-      end
-
-      it "runs a task passing input on stdin" do
-        task_name = 'sample::stdin'
-        task_params = { 'message' => 'hi' }
-        input_method = 'stdin'
-
-        expect(executor)
-          .to receive(:run_task)
-          .with(nodes,
-                %r{modules/sample/tasks/stdin.sh$}, input_method, task_params)
-          .and_return({})
-
-        options = {
-          nodes: node_names,
-          mode: 'task',
-          action: 'run',
-          object: task_name,
-          task_options: task_params
-        }
-        cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
-        cli.execute(options)
-        expect(JSON.parse(@output.string)).to be
-      end
-
-      it "runs a powershell task passing input on stdin" do
-        task_name = 'sample::winstdin'
-        task_params = { 'message' => 'hi' }
-        input_method = 'stdin'
-
-        expect(executor)
-          .to receive(:run_task)
-          .with(nodes,
-                %r{modules/sample/tasks/winstdin.ps1$}, input_method, task_params)
-          .and_return({})
-
-        options = {
-          nodes: node_names,
-          mode: 'task',
-          action: 'run',
-          object: task_name,
-          task_options: task_params
-        }
-        cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
-        cli.execute(options)
-        expect(JSON.parse(@output.string)).to be
+          options = {
+            nodes: node_names,
+            mode: 'plan',
+            action: 'run',
+            object: plan_name,
+            task_options: plan_params
+          }
+          cli.execute(options)
+          expect(@output.string).to eq("\"ExecutionResult({})\"\n")
+        end
       end
 
       describe "file uploading" do

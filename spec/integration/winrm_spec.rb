@@ -23,7 +23,7 @@ describe "when runnning over the winrm transport", winrm: true do
       expect(result['stdout'].strip).to eq(user)
     end
 
-    it 'runs a task' do
+    it 'runs a task', reset_puppet_settings: true do
       result = run_one_node(%W[task run #{stdin_task} message=somemessage] + config_flags)
       expect(result['_output'].strip).to match(/STDIN: {"messa/)
     end
@@ -40,7 +40,7 @@ describe "when runnning over the winrm transport", winrm: true do
       end
     end
 
-    it 'runs a task' do
+    it 'runs a task', reset_puppet_settings: true do
       with_tempfile_containing('conf', YAML.dump(config)) do |conf|
         result = run_one_node(%W[task run #{stdin_task} message=somemessage --configfile #{conf.path}] + config_flags)
         expect(result['_output'].strip).to match(/STDIN: {"messa/)

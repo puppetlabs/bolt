@@ -10,7 +10,8 @@ describe 'run_plan' do
   context "when invoked" do
     context 'can be called as' do
       it 'run_plan(name) referencing a plan defined in the manifest' do
-        result = Puppet::Pal.in_tmp_environment('pal_env') do |pal|
+        env = Puppet.lookup(:current_environment)
+        result = Puppet::Pal.in_tmp_environment('pal_env', modulepath: env.modulepath) do |pal|
           pal.with_script_compiler do |compiler|
             compiler.evaluate_string(<<-CODE)
             plan run_me() { "worked1" }
