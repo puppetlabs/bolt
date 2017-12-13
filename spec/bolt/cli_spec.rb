@@ -789,7 +789,7 @@ NODES
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
         end
 
-        it "runs a plan given a name" do
+        it "formats results of a passing task" do
           plan_name = 'sample::single_task'
           plan_params = { 'nodes' => nodes.join(',') }
           input_method = 'both'
@@ -799,7 +799,7 @@ NODES
             .with(
               nodes,
               %r{modules/sample/tasks/echo.sh$}, input_method, 'message' => 'hi there'
-            ).and_return({})
+            ).and_return(double(uri: 'foo') => Bolt::TaskResult.new('yes', '', 0))
 
           options = {
             nodes: node_names,
@@ -809,7 +809,48 @@ NODES
             task_options: plan_params
           }
           cli.execute(options)
-          expect(@output.string).to eq("\"ExecutionResult({})\"\n")
+          expect(JSON.parse(@output.string)).to eq(
+            [{ 'node' => 'foo', 'status' => 'finished', 'result' => { '_output' => 'yes' } }]
+          )
+        end
+
+        it "formats results of a failing task" do
+          plan_name = 'sample::single_task'
+          plan_params = { 'nodes' => nodes.join(',') }
+          input_method = 'both'
+
+          expect(executor)
+            .to receive(:run_task)
+            .with(
+              nodes,
+              %r{modules/sample/tasks/echo.sh$}, input_method, 'message' => 'hi there'
+            ).and_return(double(uri: 'foo') => Bolt::TaskResult.new('no', '', 1))
+
+          options = {
+            nodes: node_names,
+            mode: 'plan',
+            action: 'run',
+            object: plan_name,
+            task_options: plan_params
+          }
+          cli.execute(options)
+          expect(JSON.parse(@output.string)).to eq(
+            [
+              {
+                'node' => 'foo',
+                'status' => 'failed',
+                'result' => {
+                  "_error" => {
+                    "message" => "The task failed with exit code 1",
+                    "kind" => "puppetlabs.tasks/task-error",
+                    "issue_code" => "TASK_ERROR",
+                    "partial_result" => { "_output" => "no" },
+                    "details" => { "exit_code" => 1 }
+                  }
+                }
+              }
+            ]
+          )
         end
       end
 

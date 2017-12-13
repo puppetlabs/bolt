@@ -503,6 +503,23 @@ HELP
       raise Bolt::CLIError, parse_error.message
     end
 
+    # Expects to be called with a configured Puppet compiler or error.instance? will fail
+    def unwrap_execution_result(result)
+      if result.instance_of? Puppet::Pops::Types::ExecutionResult
+        error = Puppet::Pops::Types::TypeFactory.error
+        result.iterator.map do |node, output|
+          if error.instance?(output)
+            # Get the original error hash used to initialize the Error type object.
+            { node: node, status: 'failed', result: { '_error' => output._pcore_init_hash } }
+          else
+            { node: node, status: 'finished', result: output }
+          end
+        end
+      else
+        result
+      end
+    end
+
     def run_plan(plan, args)
       Dir.mktmpdir('bolt') do |dir|
         cli = []
@@ -512,7 +529,10 @@ HELP
         Puppet.initialize_settings(cli)
         Puppet::Pal.in_tmp_environment('bolt', modulepath: [BOLTLIB_PATH] + @config[:modulepath], facts: {}) do |pal|
           pal.with_script_compiler do |compiler|
-            compiler.call_function('run_plan', plan, args)
+            result = compiler.call_function('run_plan', plan, args)
+            # Querying ExecutionResult for failures currently requires a script compiler.
+            # Convert from an ExecutionResult to structured output that we can print.
+            unwrap_execution_result(result)
           end
         end
       end

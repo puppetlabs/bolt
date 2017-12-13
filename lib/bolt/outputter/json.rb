@@ -44,6 +44,7 @@ module Bolt
       end
 
       def print_plan(result)
+        # Ruby JSON patches most objects to have a to_json method.
         @stream.puts result.to_json
       end
 

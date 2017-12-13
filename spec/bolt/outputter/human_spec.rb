@@ -51,6 +51,39 @@ describe "Bolt::Outputter::Human" do
     expect(lines).to match(/^    "key": "val"$/)
   end
 
+  it "prints empty results from a plan" do
+    outputter.print_plan([])
+    expect(output.string).to eq("[]\n")
+  end
+
+  it "formats unwrapped ExecutionResult from a plan" do
+    result = [
+      { 'node' => 'node1', 'status' => 'finished', 'result' => { '_output' => 'yes' } },
+      { 'node' => 'node2', 'status' => 'failed', 'result' =>
+        { '_error' => { 'message' => 'The command failed with exit code 2',
+                        'kind' => 'puppetlabs.tasks/command-error',
+                        'issue_code' => 'COMMAND_ERROR',
+                        'partial_result' => { 'stdout' => 'no', 'stderr' => '', 'exit_code' => 2 },
+                        'details' => { 'exit_code' => 2 } } } }
+    ]
+    outputter.print_plan(result)
+
+    result_hash = JSON.parse(output.string)
+    expect(result_hash).to eq(result)
+  end
+
+  it "formats hash results from a plan" do
+    result = { 'some' => 'data' }
+    outputter.print_plan(result)
+    expect(JSON.parse(output.string)).to eq(result)
+  end
+
+  it "prints simple output from a plan" do
+    result = "some data"
+    outputter.print_plan(result)
+    expect(output.string.strip).to eq(result)
+  end
+
   it "handles fatal errors" do
     outputter.fatal_error(Bolt::CLIError.new("oops"))
     expect(output.string).to eq('')
