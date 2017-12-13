@@ -21,8 +21,8 @@ test_name "C100553: \
                        "#{dir}/modules/test/plans/my_unix_plan.pp", <<-FILE)
     plan test::my_unix_plan($nodes) {
       $nodes_array = $nodes.split(',')
-      run_task(Test::A_unix(), $nodes_array)
-      run_task(Test::B_unix(), $nodes_array)
+      run_task(test::a_unix, $nodes_array)
+      run_task(test::b_unix, $nodes_array)
     }
     FILE
   end

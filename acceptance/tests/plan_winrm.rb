@@ -28,8 +28,8 @@ test_name "C100554: \
                        "#{dir}/modules/test/plans/my_win_plan.pp", <<-FILE)
     plan test::my_win_plan($nodes) {
       $nodes_array = $nodes.split(',')
-      run_task(Test::A_win, $nodes_array)
-      run_task(Test::B_win, $nodes_array)
+      run_task(test::a_win, $nodes_array)
+      run_task(test::b_win, $nodes_array)
     }
     FILE
   end
