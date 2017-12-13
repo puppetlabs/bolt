@@ -114,10 +114,26 @@ PS
     end
   end
 
-  context "connecting over SSL" do
-    it "executes a command on a host", winrm: true do
-      winrm_ssl.connect
+  context "connecting over SSL", winrm: true do
+    before(:each) { winrm_ssl.connect }
+    after(:each) { winrm_ssl.disconnect }
+
+    it "executes a command on a host" do
       expect(winrm_ssl.execute(command).stdout.string).to eq("#{user}\r\n")
+    end
+
+    it "can upload a file to a host" do
+      contents = "kadejtw89894"
+      remote_path = 'C:\Windows\Temp\upload-test-winrm-ssl'
+      with_tempfile_containing('upload-test-winrm-ssl', contents) do |file|
+        winrm_ssl.upload(file.path, remote_path)
+
+        expect(
+          winrm_ssl.execute("type #{remote_path}").stdout.string
+        ).to eq("#{contents}\r\n")
+
+        winrm_ssl.execute("del #{remote_path}")
+      end
     end
   end
 
