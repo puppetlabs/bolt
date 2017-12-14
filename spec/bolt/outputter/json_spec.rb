@@ -33,6 +33,28 @@ describe "Bolt::Outputter::JSON" do
     expect(parsed['items'][1]['status']).to eq('failure')
   end
 
+  it "formats ExecutionResult from a plan" do
+    result = [
+      { 'node' => 'node1', 'status' => 'finished', 'result' => { '_output' => 'yes' } },
+      { 'node' => 'node2', 'status' => 'failed', 'result' =>
+        { '_error' => { 'message' => 'The command failed with exit code 2',
+                        'kind' => 'puppetlabs.tasks/command-error',
+                        'issue_code' => 'COMMAND_ERROR',
+                        'partial_result' => { 'stdout' => 'no', 'stderr' => '', 'exit_code' => 2 },
+                        'details' => { 'exit_code' => 2 } } } }
+    ]
+    outputter.print_plan(result)
+
+    result_hash = JSON.parse(output.string)
+    expect(result_hash).to eq(result)
+  end
+
+  it "prints non-ExecutionResult from a plan" do
+    result = "some data"
+    outputter.print_plan(result)
+    expect(output.string.strip).to eq('"' + result + '"')
+  end
+
   it "handles fatal errors" do
     outputter.print_head
     outputter.print_result(Bolt::Node.from_uri('node1', config: config),

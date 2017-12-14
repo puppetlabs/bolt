@@ -78,7 +78,17 @@ module Bolt
       end
 
       def print_plan(result)
-        @stream.puts result
+        # If a hash or array, pretty-print as JSON
+        if result.is_a?(Hash) || result.is_a?(Array)
+          if result.empty?
+            # Avoids extra lines for an empty result
+            @stream.puts(result.to_json)
+          else
+            @stream.puts(::JSON.pretty_generate(result))
+          end
+        else
+          @stream.puts result.to_s
+        end
       end
 
       def fatal_error(e); end
