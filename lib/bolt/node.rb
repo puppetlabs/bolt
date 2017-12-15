@@ -49,6 +49,9 @@ module Bolt
       @sudo_password = transport_conf[:sudo_password]
       @run_as = transport_conf[:run_as]
       @tmpdir = transport_conf[:tmpdir]
+      @service_url = transport_conf[:service_url]
+      @token_file = transport_conf[:token_file]
+      @orch_task_environment = transport_conf[:orch_task_environment]
 
       @logger = init_logger(config[:log_destination], config[:log_level])
       @transport_logger = init_logger(config[:log_destination], Logger::WARN)

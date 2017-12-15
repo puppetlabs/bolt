@@ -16,7 +16,11 @@ module Bolt
     end
 
     def make_client
-      OrchestratorClient.new({}, true)
+      opts = {}
+      opts["service-url"] = @service_url if @service_url
+      opts["token-file"] = @token_file if @token_file
+      opts["cacert"] = @ca_cert if @ca_cert
+      OrchestratorClient.new(opts, true)
     end
 
     def client
@@ -41,6 +45,7 @@ module Bolt
 
     def _run_task(task, _input_method, arguments)
       body = { task: task_name_from_path(task),
+               environment: @orch_task_environment,
                params: arguments,
                scope: {
                  nodes: [@host]
