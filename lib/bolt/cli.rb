@@ -86,8 +86,11 @@ Available actions are:
 Available options are:
 HELP
 
-    MODES = %w[command script task plan file].freeze
-    ACTIONS = %w[run upload download].freeze
+    COMMANDS = { 'command' => %w[run],
+                 'script'  => %w[run],
+                 'task'    => %w[run],
+                 'plan'    => %w[run],
+                 'file'    => %w[upload] }.freeze
     TRANSPORTS = %w[ssh winrm pcp].freeze
     BOLTLIB_PATH = File.join(__FILE__, '../../../modules')
 
@@ -314,10 +317,10 @@ HELP
     end
 
     def validate(options)
-      unless MODES.include?(options[:mode])
+      unless COMMANDS.include?(options[:mode])
         raise Bolt::CLIError,
               "Expected subcommand '#{options[:mode]}' to be one of " \
-              "#{MODES.join(', ')}"
+              "#{COMMANDS.keys.join(', ')}"
       end
 
       if options[:action].nil?
@@ -325,10 +328,11 @@ HELP
               "Expected an action of the form 'bolt #{options[:mode]} <action>'"
       end
 
-      unless ACTIONS.include?(options[:action])
+      actions = COMMANDS[options[:mode]]
+      unless actions.include?(options[:action])
         raise Bolt::CLIError,
               "Expected action '#{options[:action]}' to be one of " \
-              "#{ACTIONS.join(', ')}"
+              "#{actions.join(', ')}"
       end
 
       if options[:mode] != 'file' && options[:mode] != 'script' &&
