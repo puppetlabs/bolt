@@ -41,10 +41,20 @@ module Bolt
 
     def _run_task(task, _input_method, arguments)
       body = { task: task_name_from_path(task),
+               environment: @environment,
                params: arguments,
                scope: {
                  nodes: [@host]
                } }
+      if @service_url
+        body.merge(service_url: @service_url)
+      end
+      if @token_file
+        body.merge(token_file: @token_file)
+      end
+      if @ca_cert
+        body.merge(ca_trust_path: @ca_cert)
+      end
       # Should we handle errors here or let them propagate?
       results = client.run_task(body)
       node_result = results[0]

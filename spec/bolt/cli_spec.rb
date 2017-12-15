@@ -911,6 +911,7 @@ NODES
 
   describe 'configfile' do
     let(:configdir) { File.join(__dir__, '..', 'fixtures', 'configs') }
+    # TODO: why isn't this just a fixture?
     let(:complete_config) do
       { 'modulepath' => "/foo/bar#{File::PATH_SEPARATOR}/baz/qux",
         'concurrency' => 14,
@@ -922,6 +923,12 @@ NODES
         },
         'winrm' => {
           'connect-timeout' => 7
+        },
+        'pcp' => {
+          'environment' => 'testenv',
+          'service-url' => 'http://foo.org',
+          'token-file' => '/path/to/token',
+          'ca-cert' => '/path/to/cacert'
         } }
     end
 
@@ -971,6 +978,38 @@ NODES
         cli.parse
         expect(cli.config[:transports][:ssh][:connect_timeout]).to eq(4)
         expect(cli.config[:transports][:winrm][:connect_timeout]).to eq(7)
+      end
+    end
+
+    it 'reads environment for pcp' do
+      with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
+        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --insecure])
+        cli.parse
+        expect(cli.config[:transports][:pcp][:environment]).to eq('testenv')
+      end
+    end
+
+    it 'reads service url for pcp' do
+      with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
+        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --insecure])
+        cli.parse
+        expect(cli.config[:transports][:pcp][:service_url]).to eql('http://foo.org')
+      end
+    end
+
+    it 'reads token file for pcp' do
+      with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
+        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --insecure])
+        cli.parse
+        expect(cli.config[:transports][:pcp][:token_file]).to eql('/path/to/token')
+      end
+    end
+
+    it 'reads ca cert file for pcp' do
+      with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
+        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --insecure])
+        cli.parse
+        expect(cli.config[:transports][:pcp][:ca_cert]).to eql('/path/to/cacert')
       end
     end
 
