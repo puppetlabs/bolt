@@ -77,6 +77,12 @@ module Bolt
                             elapsed_time)
       end
 
+      def print_table(results)
+        results.each do |result|
+          @stream.puts result.to_s
+        end
+      end
+
       def print_plan(result)
         # If a hash or array, pretty-print as JSON
         if result.is_a?(Hash) || result.is_a?(Array)

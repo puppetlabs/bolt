@@ -30,6 +30,7 @@ Usage: bolt <subcommand> <action> [options]
 Available subcommands:
     bolt command run <command>       Run a command remotely
     bolt script run <script>         Upload a local script and run it remotely
+    bolt task show                   Show list of available tasks
     bolt task run <task> [params]    Run a Puppet task
     bolt plan run <plan> [params]    Run a Puppet task plan
     bolt file upload <src> <dest>    Upload a local file
@@ -41,6 +42,7 @@ HELP
 Usage: bolt task <action> <task> [options] [parameters]
 
 Available actions are:
+    show                             Show list of available tasks
     run                              Run a Puppet task
 
 Parameters are of the form <parameter>=<value>.
@@ -88,7 +90,7 @@ HELP
 
     COMMANDS = { 'command' => %w[run],
                  'script'  => %w[run],
-                 'task'    => %w[run],
+                 'task'    => %w[show run],
                  'plan'    => %w[run],
                  'file'    => %w[upload] }.freeze
     TRANSPORTS = %w[ssh winrm pcp].freeze
@@ -341,7 +343,7 @@ HELP
               "Unknown argument(s) #{options[:leftovers].join(', ')}"
       end
 
-      if %w[task plan].include?(options[:mode])
+      if %w[task plan].include?(options[:mode]) && options[:action] == 'run'
         if options[:object].nil?
           raise Bolt::CLIError, "Must specify a #{options[:mode]} to run"
         end
@@ -352,13 +354,13 @@ HELP
         end
       end
 
-      unless !options[:nodes].empty? || options[:mode] == 'plan'
+      if options[:nodes].empty? && options[:mode] != 'plan' && options[:action] != 'show'
         raise Bolt::CLIError, "Option '--nodes' must be specified"
       end
 
       if %w[task plan].include?(options[:mode]) && @config[:modulepath].nil?
         raise Bolt::CLIError,
-              "Option '--modulepath' must be specified when running" \
+              "Option '--modulepath' must be specified when using" \
               " a task or plan"
       end
     end
@@ -385,6 +387,11 @@ HELP
                              else
                                'notice'
                              end
+      end
+
+      if options[:mode] == 'task' && options[:action] == 'show'
+        outputter.print_table(list_tasks)
+        return
       end
 
       executor = Bolt::Executor.new(@config)
@@ -485,6 +492,18 @@ HELP
 
     def outputter
       @outputter ||= Bolt::Outputter.for_format(@config[:format])
+    end
+
+    def list_tasks
+      Puppet.initialize_settings
+      Puppet::Pal.in_tmp_environment('bolt', modulepath: [BOLTLIB_PATH] + @config[:modulepath], facts: {}) do |pal|
+        pal.with_script_compiler do |compiler|
+          tasks = compiler.list_tasks
+          tasks.map(&:name)
+        end
+      end
+    rescue Puppet::Error
+      raise Bolt::CLIError, "Failure while reading task metadata"
     end
 
     def run_task(name, nodes, args, &block)

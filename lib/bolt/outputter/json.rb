@@ -43,6 +43,10 @@ module Bolt
                             elapsed_time)
       end
 
+      def print_table(results)
+        @stream.puts results.to_json
+      end
+
       def print_plan(result)
         # Ruby JSON patches most objects to have a to_json method.
         @stream.puts result.to_json
