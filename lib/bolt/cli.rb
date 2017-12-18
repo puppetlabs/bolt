@@ -494,15 +494,21 @@ HELP
       @outputter ||= Bolt::Outputter.for_format(@config[:format])
     end
 
-    def list_tasks
-      Puppet.initialize_settings
+    def in_bolt_compiler(opts = [])
+      Puppet.initialize_settings(opts)
       Puppet::Pal.in_tmp_environment('bolt', modulepath: [BOLTLIB_PATH] + @config[:modulepath], facts: {}) do |pal|
         pal.with_script_compiler do |compiler|
-          tasks = compiler.list_tasks
-          tasks.map(&:name).sort.map do |task_name|
-            task_sig = compiler.task_signature(task_name)
-            [task_name, task_sig.task.description]
-          end
+          yield compiler
+        end
+      end
+    end
+
+    def list_tasks
+      in_bolt_compiler do |compiler|
+        tasks = compiler.list_tasks
+        tasks.map(&:name).sort.map do |task_name|
+          task_sig = compiler.task_signature(task_name)
+          [task_name, task_sig.task.description]
         end
       end
     rescue Puppet::Error
@@ -511,19 +517,16 @@ HELP
 
     def run_task(name, nodes, args, &block)
       parse_error = nil
-      Puppet.initialize_settings
-      Puppet::Pal.in_tmp_environment('bolt', modulepath: [BOLTLIB_PATH] + @config[:modulepath], facts: {}) do |pal|
-        pal.with_script_compiler do |compiler|
-          begin
-            return compiler.call_function('run_task', name, nodes, args, &block)
-          rescue Puppet::ParseError => e
-            # we assume that the Puppet::ParseError is due to a problem with
-            # the task and/or its parameters, but since the with_script_compiler
-            # method rescues these errors and raises different ones instead,
-            # we save it in a local variable and raise it as Bolt::CLIError
-            # outside of the block
-            parse_error = e
-          end
+      in_bolt_compiler do |compiler|
+        begin
+          return compiler.call_function('run_task', name, nodes, args, &block)
+        rescue Puppet::ParseError => e
+          # we assume that the Puppet::ParseError is due to a problem with
+          # the task and/or its parameters, but since the with_script_compiler
+          # method rescues these errors and raises different ones instead,
+          # we save it in a local variable and raise it as Bolt::CLIError
+          # outside of the block
+          parse_error = e
         end
       end
       raise Bolt::CLIError, parse_error.message
@@ -552,14 +555,11 @@ HELP
         Puppet::Settings::REQUIRED_APP_SETTINGS.each do |setting|
           cli << "--#{setting}" << dir
         end
-        Puppet.initialize_settings(cli)
-        Puppet::Pal.in_tmp_environment('bolt', modulepath: [BOLTLIB_PATH] + @config[:modulepath], facts: {}) do |pal|
-          pal.with_script_compiler do |compiler|
-            result = compiler.call_function('run_plan', plan, args)
-            # Querying ExecutionResult for failures currently requires a script compiler.
-            # Convert from an ExecutionResult to structured output that we can print.
-            unwrap_execution_result(result)
-          end
+        in_bolt_compiler(cli) do |compiler|
+          result = compiler.call_function('run_plan', plan, args)
+          # Querying ExecutionResult for failures currently requires a script compiler.
+          # Convert from an ExecutionResult to structured output that we can print.
+          unwrap_execution_result(result)
         end
       end
     end
