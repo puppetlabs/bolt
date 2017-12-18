@@ -33,6 +33,12 @@ describe "Bolt::Outputter::JSON" do
     expect(parsed['items'][1]['status']).to eq('failure')
   end
 
+  it "formats a table" do
+    table = [%w[a b], %w[c1 d]]
+    outputter.print_table(table)
+    expect(JSON.parse(output.string)).to eq(table)
+  end
+
   it "formats ExecutionResult from a plan" do
     result = [
       { 'node' => 'node1', 'status' => 'finished', 'result' => { '_output' => 'yes' } },

@@ -1,3 +1,4 @@
+require 'terminal-table'
 module Bolt
   class Outputter
     class Human < Bolt::Outputter
@@ -78,9 +79,18 @@ module Bolt
       end
 
       def print_table(results)
-        results.each do |result|
-          @stream.puts result.to_s
-        end
+        @stream.puts Terminal::Table.new(
+          rows: results,
+          style: {
+            border_x: '',
+            border_y: '',
+            border_i: '',
+            padding_left: 0,
+            padding_right: 3,
+            border_top: false,
+            border_bottom: false
+          }
+        )
       end
 
       def print_plan(result)

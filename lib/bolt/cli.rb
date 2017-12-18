@@ -499,7 +499,10 @@ HELP
       Puppet::Pal.in_tmp_environment('bolt', modulepath: [BOLTLIB_PATH] + @config[:modulepath], facts: {}) do |pal|
         pal.with_script_compiler do |compiler|
           tasks = compiler.list_tasks
-          tasks.map(&:name)
+          tasks.map(&:name).sort.map do |task_name|
+            task_sig = compiler.task_signature(task_name)
+            [task_name, task_sig.task.description]
+          end
         end
       end
     rescue Puppet::Error

@@ -560,6 +560,30 @@ NODES
         end
       end
 
+      context "when showing available tasks", reset_puppet_settings: true do
+        before :each do
+          cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
+        end
+
+        it "lists tasks with description" do
+          options = {
+            mode: 'task',
+            action: 'show'
+          }
+          cli.execute(options)
+          expect(JSON.parse(@output.string)).to eq(
+            [
+              ['sample::echo', nil],
+              ['sample::init', nil],
+              ['sample::notice', nil],
+              ['sample::params', 'Task with parameters'],
+              ['sample::stdin', nil],
+              ['sample::winstdin', nil]
+            ]
+          )
+        end
+      end
+
       context "when running a task", reset_puppet_settings: true do
         before :each do
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]

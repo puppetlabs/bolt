@@ -32,6 +32,14 @@ describe "Bolt::Outputter::Human" do
     expect(lines).to match(/oops/)
   end
 
+  it "formats a table" do
+    outputter.print_table([%w[a b], %w[c1 d]])
+    expect(output.string).to eq(<<-TABLE)
+a    b
+c1   d
+    TABLE
+  end
+
   it "prints CommandResults" do
     outputter.print_result(Bolt::Node.from_uri('node1', config: config),
                            Bolt::CommandResult.new("stout", "sterr", 2))
