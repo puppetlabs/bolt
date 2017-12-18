@@ -206,6 +206,10 @@ HELP
                      "Request a pseudo TTY on nodes that support it") do |tty|
           results[:tty] = tty
         end
+        opts.on_tail('--noop',
+                     "Execute a task that supports it in noop mode") do |_|
+          results[:noop] = true
+        end
         opts.on_tail('-h', '--help', 'Display help') do |_|
           results[:help] = true
         end
@@ -363,6 +367,11 @@ HELP
               "Option '--modulepath' must be specified when using" \
               " a task or plan"
       end
+
+      if options[:noop] && (options[:mode] != 'task' || options[:action] != 'run')
+        raise Bolt::CLIError,
+              "Option '--noop' may only be specified when running a task"
+      end
     end
 
     def handle_parser_errors
@@ -394,7 +403,7 @@ HELP
         return
       end
 
-      executor = Bolt::Executor.new(@config)
+      executor = Bolt::Executor.new(@config, options[:noop])
 
       if options[:mode] == 'plan'
         execute_plan(executor, options)

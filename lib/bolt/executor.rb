@@ -7,12 +7,15 @@ require 'bolt/notifier'
 
 module Bolt
   class Executor
-    def initialize(config = Bolt::Config.new)
+    attr_reader :noop
+
+    def initialize(config = Bolt::Config.new, noop = nil)
       @config = config
       @logger = Logger.new(config[:log_destination])
       @logger.progname = 'executor'
       @logger.level = config[:log_level]
       @logger.formatter = Bolt::Formatter.new
+      @noop = noop
       @notifier = Bolt::Notifier.new
     end
 

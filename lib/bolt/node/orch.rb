@@ -46,7 +46,8 @@ module Bolt
     def _run_task(task, _input_method, arguments)
       body = { task: task_name_from_path(task),
                environment: @orch_task_environment,
-               params: arguments,
+               noop: arguments['_noop'],
+               params: arguments.reject { |k, _| k == '_noop' },
                scope: {
                  nodes: [@host]
                } }

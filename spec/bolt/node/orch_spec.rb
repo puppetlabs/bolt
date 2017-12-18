@@ -17,13 +17,14 @@ describe Bolt::Orch, orchestrator: true do
   let(:params) { { param: 'val' } }
   let(:scope) { { nodes: [hostname] } }
 
+  let(:noop) { nil }
   let(:result_state) { 'finished' }
   let(:result) { { '_output' => 'ok' } }
 
   let(:base_path) { File.expand_path(File.join(File.dirname(__FILE__), '..', '..', '..')) }
 
   def mock_client
-    body = { task: task, environment: task_environment, params: params, scope: scope }
+    body = { task: task, environment: task_environment, noop: noop, params: params, scope: scope }
     results = [{ 'state' => result_state, 'result' => result }]
 
     orch_client = instance_double("OrchestratorClient")
@@ -34,7 +35,7 @@ describe Bolt::Orch, orchestrator: true do
 
   def bolt_task_client
     bolt_task = File.expand_path(File.join(base_path, 'tasks', 'init.rb'))
-    body = { task: 'bolt', environment: task_environment, params: params, scope: scope }
+    body = { task: 'bolt', environment: task_environment, noop: noop, params: params, scope: scope }
 
     orch_client = instance_double("OrchestratorClient")
     orch.instance_variable_set(:@client, orch_client)
@@ -83,6 +84,14 @@ describe Bolt::Orch, orchestrator: true do
 
     it "returns a success" do
       expect(orch._run_task(taskpath, 'stdin', params)).to be_success
+    end
+
+    context "when running noop" do
+      let(:noop) { true }
+
+      it "handles the _noop param" do
+        expect(orch._run_task(taskpath, 'stdin', params.merge('_noop' => true))).to be_success
+      end
     end
 
     context "when the task target node was skipped" do
