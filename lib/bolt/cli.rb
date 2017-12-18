@@ -177,16 +177,16 @@ HELP
         end
         opts.on('--transport TRANSPORT', TRANSPORTS,
                 "Specify a default transport: #{TRANSPORTS.join(', ')}") do |t|
-          options[:transport] = t
+          results[:transport] = t
         end
         opts.on('--run-as USER',
                 "User to run as using privilege escalation") do |user|
-          options[:run_as] = user
+          results[:run_as] = user
         end
         opts.on('--sudo [PROGRAM]',
                 "Program to execute for privilege escalation. " \
                 "Currently only sudo is supported.") do |program|
-          options[:sudo] = program || 'sudo'
+          results[:sudo] = program || 'sudo'
         end
         opts.on('--sudo-password [PASSWORD]',
                 'Password for privilege escalation') do |password|
