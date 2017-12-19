@@ -584,6 +584,46 @@ NODES
             ]
           )
         end
+
+        it "shows an individual task data in json" do
+          task_name = 'sample::params'
+          options = {
+            mode: 'task',
+            action: 'show',
+            object: task_name
+          }
+          cli.execute(options)
+          json = JSON.parse(@output.string)
+          json.delete('executable')
+          expect(json).to eq(
+            "name" => "sample::params",
+            "description" => "Task with parameters",
+            "input_method" => 'stdin',
+            "parameters" => {
+              "mandatory_string" => {
+                "description" => "Mandatory string parameter",
+                "type" => "String[1, 10]"
+              },
+              "mandatory_integer" => {
+                "description" => "Mandatory integer parameter",
+                "type" => "Integer"
+              },
+              "mandatory_boolean" => {
+                "description" => "Mandatory boolean parameter",
+                "type" => "Boolean"
+              },
+              "optional_string" => {
+                "description" => "Optional string parameter",
+                "type" => "Optional[String]"
+              },
+              "optional_integer" => {
+                "description" => "Optional integer parameter",
+                "type" => "Optional[Integer[-5, 5]]"
+              }
+            },
+            "supports_noop" => true
+          )
+        end
       end
 
       context "when available tasks include an error", reset_puppet_settings: true do

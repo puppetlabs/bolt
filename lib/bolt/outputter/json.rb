@@ -47,6 +47,10 @@ module Bolt
         @stream.puts results.to_json
       end
 
+      def print_task_info(task)
+        @stream.puts task.to_json
+      end
+
       def print_plan(result)
         # Ruby JSON patches most objects to have a to_json method.
         @stream.puts result.to_json
@@ -58,6 +62,8 @@ module Bolt
         @stream.puts e.to_json
         @stream.puts '}' if @object_open
       end
+
+      def print_message(message); end
     end
   end
 end

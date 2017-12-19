@@ -31,6 +31,7 @@ Available subcommands:
     bolt command run <command>       Run a command remotely
     bolt script run <script>         Upload a local script and run it remotely
     bolt task show                   Show list of available tasks
+    bolt task show <task>            Show documentation for task
     bolt task run <task> [params]    Run a Puppet task
     bolt plan show                   Show list of available plans
     bolt plan run <plan> [params]    Run a Puppet task plan
@@ -402,7 +403,14 @@ HELP
 
       if options[:action] == 'show'
         if options[:mode] == 'task'
-          outputter.print_table(list_tasks)
+          if options[:object]
+            outputter.print_task_info(get_task_info(options[:object]))
+          else
+            outputter.print_table(list_tasks)
+            outputter.print_message("Use `bolt task show <task-name>` to view
+                                  details and parameters for a specific
+                                  task.")
+          end
         elsif options[:mode] == 'plan'
           outputter.print_table(list_plans)
         end
@@ -536,6 +544,14 @@ HELP
       end
     rescue Puppet::Error
       raise Bolt::CLIError, "Failure while reading plans"
+    end
+
+    def get_task_info(task_name)
+      in_bolt_compiler do |compiler|
+        compiler.task_signature(task_name).task_hash
+      end
+    rescue Puppet::Error
+      raise Bolt::CLIError, "Failure while reading task metadata"
     end
 
     def run_task(name, nodes, args, &block)

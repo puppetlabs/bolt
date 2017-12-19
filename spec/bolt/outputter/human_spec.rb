@@ -40,6 +40,31 @@ c1   d
     TABLE
   end
 
+  it "formats a task" do
+    task = {
+      'name' => 'cinnamon_roll',
+      'description' => 'A delicious sweet bun',
+      'parameters' => {
+        'icing' => {
+          'type' => 'Cream cheese',
+          'description' => 'Rich, tangy, sweet'
+        }
+      }
+    }
+    outputter.print_task_info(task)
+    expect(output.string).to eq(<<-TASK_OUTPUT)
+cinnamon_roll - A delicious sweet bun
+
+USAGE:
+bolt task run --nodes, -n <node-name> cinnamon_roll icing=<value>
+
+PARAMETERS:
+- icing: Cream cheese
+    Rich, tangy, sweet
+
+TASK_OUTPUT
+  end
+
   it "prints CommandResults" do
     outputter.print_result(Bolt::Node.from_uri('node1', config: config),
                            Bolt::CommandResult.new("stout", "sterr", 2))
