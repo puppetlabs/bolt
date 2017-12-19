@@ -401,6 +401,10 @@ HELP
                              end
       end
 
+      # ExecutionResult loaded here so that it can get puppet features if
+      # puppet is present
+      require 'bolt/execution_result'
+
       if options[:action] == 'show'
         if options[:mode] == 'task'
           if options[:object]
@@ -574,10 +578,9 @@ HELP
 
     # Expects to be called with a configured Puppet compiler or error.instance? will fail
     def unwrap_execution_result(result)
-      if result.instance_of? Puppet::Pops::Types::ExecutionResult
-        error = Puppet::Pops::Types::TypeFactory.error
+      if result.instance_of? Bolt::ExecutionResult
         result.iterator.map do |node, output|
-          if error.instance?(output)
+          if output.is_a?(Puppet::DataTypes::Error)
             # Get the original error hash used to initialize the Error type object.
             { node: node, status: 'failed', result: { '_error' => output._pcore_init_hash } }
           else
