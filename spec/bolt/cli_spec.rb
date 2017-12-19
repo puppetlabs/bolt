@@ -584,6 +584,21 @@ NODES
         end
       end
 
+      context "when available tasks include an error", reset_puppet_settings: true do
+        before :each do
+          cli.config.modulepath = [File.join(__FILE__, '../../fixtures/invalid_mods')]
+        end
+
+        it "task show displays an error" do
+          options = {
+            mode: 'task',
+            action: 'show'
+          }
+          expect(Puppet).to receive(:err).with(/unexpected token at/)
+          expect { cli.execute(options) }.to raise_error "Failure while reading task metadata"
+        end
+      end
+
       context "when running a task", reset_puppet_settings: true do
         before :each do
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
