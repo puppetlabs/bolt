@@ -517,9 +517,9 @@ HELP
 
     def run_task(name, nodes, args, &block)
       parse_error = nil
-      in_bolt_compiler do |compiler|
+      result = in_bolt_compiler do |compiler|
         begin
-          return compiler.call_function('run_task', name, nodes, args, &block)
+          compiler.call_function('run_task', name, nodes, args, &block)
         rescue Puppet::ParseError => e
           # we assume that the Puppet::ParseError is due to a problem with
           # the task and/or its parameters, but since the with_script_compiler
@@ -529,7 +529,8 @@ HELP
           parse_error = e
         end
       end
-      raise Bolt::CLIError, parse_error.message
+      raise Bolt::CLIError, parse_error.message if parse_error
+      result
     end
 
     # Expects to be called with a configured Puppet compiler or error.instance? will fail
