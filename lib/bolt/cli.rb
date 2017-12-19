@@ -32,6 +32,7 @@ Available subcommands:
     bolt script run <script>         Upload a local script and run it remotely
     bolt task show                   Show list of available tasks
     bolt task run <task> [params]    Run a Puppet task
+    bolt plan show                   Show list of available plans
     bolt plan run <plan> [params]    Run a Puppet task plan
     bolt file upload <src> <dest>    Upload a local file
 
@@ -72,6 +73,7 @@ HELP
 Usage: bolt plan <action> <plan> [options] [parameters]
 
 Available actions are:
+    show                             Show list of available plans
     run                              Run a Puppet task plan
 
 Parameters are of the form <parameter>=<value>.
@@ -91,7 +93,7 @@ HELP
     COMMANDS = { 'command' => %w[run],
                  'script'  => %w[run],
                  'task'    => %w[show run],
-                 'plan'    => %w[run],
+                 'plan'    => %w[show run],
                  'file'    => %w[upload] }.freeze
     TRANSPORTS = %w[ssh winrm pcp].freeze
     BOLTLIB_PATH = File.join(__FILE__, '../../../modules')
@@ -398,8 +400,12 @@ HELP
                              end
       end
 
-      if options[:mode] == 'task' && options[:action] == 'show'
-        outputter.print_table(list_tasks)
+      if options[:action] == 'show'
+        if options[:mode] == 'task'
+          outputter.print_table(list_tasks)
+        elsif options[:mode] == 'plan'
+          outputter.print_table(list_plans)
+        end
         return
       end
 
@@ -522,6 +528,14 @@ HELP
       end
     rescue Puppet::Error
       raise Bolt::CLIError, "Failure while reading task metadata"
+    end
+
+    def list_plans
+      in_bolt_compiler do |compiler|
+        compiler.list_plans.map { |plan| [plan.name] }.sort
+      end
+    rescue Puppet::Error
+      raise Bolt::CLIError, "Failure while reading plans"
     end
 
     def run_task(name, nodes, args, &block)

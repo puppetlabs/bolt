@@ -601,6 +601,42 @@ NODES
         end
       end
 
+      context "when showing available plans", reset_puppet_settings: true do
+        before :each do
+          cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
+        end
+
+        it "lists plans" do
+          options = {
+            mode: 'plan',
+            action: 'show'
+          }
+          cli.execute(options)
+          expect(JSON.parse(@output.string)).to eq(
+            [
+              ['sample::single_task'],
+              ['sample::three_tasks'],
+              ['sample::two_tasks']
+            ]
+          )
+        end
+      end
+
+      context "when available plans include an error", reset_puppet_settings: true do
+        before :each do
+          cli.config.modulepath = [File.join(__FILE__, '../../fixtures/invalid_mods')]
+        end
+
+        it "plan show displays an error" do
+          options = {
+            mode: 'plan',
+            action: 'show'
+          }
+          expect(Puppet).to receive(:log_exception)
+          expect { cli.execute(options) }.to raise_error "Failure while reading plans"
+        end
+      end
+
       context "when running a task", reset_puppet_settings: true do
         before :each do
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
