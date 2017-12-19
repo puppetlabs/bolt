@@ -29,16 +29,15 @@ describe "Bolt::CLI" do
     allow(cli).to receive(:file_stat).with(path).and_return(stat)
   end
 
-  def stub_config(file_content = nil, base = nil)
+  def stub_config(config, file_content = nil)
     file_content ||= {}
-    base ||= {}
-    config = Bolt::Config.new(**base)
     allow(config).to receive(:read_config_file).and_return(file_content)
     allow(Bolt::Config).to receive(:new).and_return(config)
   end
 
   context "without a config file" do
-    before(:each) { stub_config }
+    let(:config) { Bolt::Config.new }
+    before(:each) { stub_config(config) }
 
     it "generates an error message if an unknown argument is given" do
       cli = Bolt::CLI.new(%w[command run --unknown])
@@ -482,7 +481,7 @@ NODES
     end
 
     describe "execute" do
-      let(:executor) { double('executor') }
+      let(:executor) { double('executor', noop: false) }
       let(:cli) { Bolt::CLI.new({}) }
       let(:node_names) { ['foo'] }
       let(:nodes) { [double('node', host: 'foo')] }
@@ -575,8 +574,11 @@ NODES
             [
               ['sample::echo', nil],
               ['sample::init', nil],
+              ['sample::no_noop', 'Task with no noop'],
+              ['sample::noop', 'Task with noop'],
               ['sample::notice', nil],
               ['sample::params', 'Task with parameters'],
+              ['sample::ps_noop', 'Powershell task with noop'],
               ['sample::stdin', nil],
               ['sample::winstdin', nil]
             ]
@@ -943,6 +945,86 @@ NODES
             Bolt::CLIError, /The source file '#{source}' is not a file/
           )
           expect(JSON.parse(@output.string)).to be
+        end
+      end
+    end
+
+    describe "execute with noop" do
+      let(:executor) { double('executor', noop: true) }
+      let(:cli) { Bolt::CLI.new({}) }
+      let(:node_names) { ['foo'] }
+      let(:nodes) { [double('node', host: 'foo')] }
+
+      before :each do
+        allow(Bolt::Executor).to receive(:new).with(config, true).and_return(executor)
+        allow(executor).to receive(:from_uris).and_return(nodes)
+
+        @output = StringIO.new
+        outputter = Bolt::Outputter::JSON.new(@output)
+
+        allow(cli).to receive(:outputter).and_return(outputter)
+      end
+
+      context "when running a task", reset_puppet_settings: true do
+        before :each do
+          cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
+        end
+
+        it "runs a task that supports noop" do
+          task_name = 'sample::noop'
+          task_params = { 'message' => 'hi' }
+          input_method = 'both'
+
+          expect(executor)
+            .to receive(:run_task)
+            .with(nodes,
+                  %r{modules/sample/tasks/noop.sh$}, input_method, task_params.merge('_noop' => true))
+            .and_return({})
+
+          options = {
+            nodes: node_names,
+            mode: 'task',
+            action: 'run',
+            object: task_name,
+            task_options: task_params,
+            noop: true
+          }
+          cli.execute(options)
+          expect(JSON.parse(@output.string)).to be
+        end
+
+        it "errors on a task that doesn't support noop" do
+          task_name = 'sample::no_noop'
+          task_params = { 'message' => 'hi' }
+
+          expect(executor).not_to receive(:run_task)
+
+          options = {
+            nodes: node_names,
+            mode: 'task',
+            action: 'run',
+            object: task_name,
+            task_options: task_params,
+            noop: true
+          }
+          expect { cli.execute(options) }.to raise_error('Task does not support noop')
+        end
+
+        it "errors on a task without metadata" do
+          task_name = 'sample::echo'
+          task_params = { 'message' => 'hi' }
+
+          expect(executor).not_to receive(:run_task)
+
+          options = {
+            nodes: node_names,
+            mode: 'task',
+            action: 'run',
+            object: task_name,
+            task_options: task_params,
+            noop: true
+          }
+          expect { cli.execute(options) }.to raise_error('Task does not support noop')
         end
       end
     end

@@ -177,16 +177,16 @@ HELP
         end
         opts.on('--transport TRANSPORT', TRANSPORTS,
                 "Specify a default transport: #{TRANSPORTS.join(', ')}") do |t|
-          options[:transport] = t
+          results[:transport] = t
         end
         opts.on('--run-as USER',
                 "User to run as using privilege escalation") do |user|
-          options[:run_as] = user
+          results[:run_as] = user
         end
         opts.on('--sudo [PROGRAM]',
                 "Program to execute for privilege escalation. " \
                 "Currently only sudo is supported.") do |program|
-          options[:sudo] = program || 'sudo'
+          results[:sudo] = program || 'sudo'
         end
         opts.on('--sudo-password [PASSWORD]',
                 'Password for privilege escalation') do |password|
@@ -205,6 +205,10 @@ HELP
         opts.on_tail('--[no-]tty',
                      "Request a pseudo TTY on nodes that support it") do |tty|
           results[:tty] = tty
+        end
+        opts.on_tail('--noop',
+                     "Execute a task that supports it in noop mode") do |_|
+          results[:noop] = true
         end
         opts.on_tail('-h', '--help', 'Display help') do |_|
           results[:help] = true
@@ -363,6 +367,11 @@ HELP
               "Option '--modulepath' must be specified when using" \
               " a task or plan"
       end
+
+      if options[:noop] && (options[:mode] != 'task' || options[:action] != 'run')
+        raise Bolt::CLIError,
+              "Option '--noop' may only be specified when running a task"
+      end
     end
 
     def handle_parser_errors
@@ -394,7 +403,7 @@ HELP
         return
       end
 
-      executor = Bolt::Executor.new(@config)
+      executor = Bolt::Executor.new(@config, options[:noop])
 
       if options[:mode] == 'plan'
         execute_plan(executor, options)

@@ -1,0 +1,4 @@
+{
+  "description": "Powershell task with noop",
+  "supports_noop": true
+}

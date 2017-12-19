@@ -58,6 +58,14 @@ Puppet::Functions.create_function(:run_task) do
     end || (raise Puppet::ParseError, 'Task parameters did not match')
     task = task_signature.task
 
+    if executor.noop
+      if task.supports_noop
+        use_args['_noop'] = true
+      else
+        raise Puppet::ParseError, 'Task does not support noop'
+      end
+    end
+
     # Ensure that that given targets are all Target instances
     targets = [targets] unless targets.is_a?(Array)
     targets = targets.flatten.map { |t| t.is_a?(String) ? Puppet::Pops::Types::TypeFactory.target.create(t) : t }

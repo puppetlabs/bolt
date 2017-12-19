@@ -28,6 +28,16 @@ describe "when runnning over the ssh transport", ssh: true do
       result = run_one_node(%W[task run #{stdin_task} message=somemessage] + config_flags)
       expect(result['message'].strip).to eq("somemessage")
     end
+
+    it 'passes noop to a task that supports noop', reset_puppet_settings: true do
+      result = run_one_node(%w[task run sample::noop message=somemessage --noop] + config_flags)
+      expect(result['_output'].strip).to eq("somemessage with noop true")
+    end
+
+    it 'does not pass noop to a task by default', reset_puppet_settings: true do
+      result = run_one_node(%w[task run sample::noop message=somemessage] + config_flags)
+      expect(result['_output'].strip).to eq("somemessage with noop")
+    end
   end
 
   context 'when using a configfile' do
