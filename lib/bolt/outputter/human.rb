@@ -1,3 +1,4 @@
+require 'terminal-table'
 module Bolt
   class Outputter
     class Human < Bolt::Outputter
@@ -75,6 +76,21 @@ module Bolt
                             results.size,
                             results.size == 1 ? '' : 's',
                             elapsed_time)
+      end
+
+      def print_table(results)
+        @stream.puts Terminal::Table.new(
+          rows: results,
+          style: {
+            border_x: '',
+            border_y: '',
+            border_i: '',
+            padding_left: 0,
+            padding_right: 3,
+            border_top: false,
+            border_bottom: false
+          }
+        )
       end
 
       def print_plan(result)

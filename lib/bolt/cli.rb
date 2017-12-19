@@ -30,6 +30,7 @@ Usage: bolt <subcommand> <action> [options]
 Available subcommands:
     bolt command run <command>       Run a command remotely
     bolt script run <script>         Upload a local script and run it remotely
+    bolt task show                   Show list of available tasks
     bolt task run <task> [params]    Run a Puppet task
     bolt plan run <plan> [params]    Run a Puppet task plan
     bolt file upload <src> <dest>    Upload a local file
@@ -41,6 +42,7 @@ HELP
 Usage: bolt task <action> <task> [options] [parameters]
 
 Available actions are:
+    show                             Show list of available tasks
     run                              Run a Puppet task
 
 Parameters are of the form <parameter>=<value>.
@@ -86,8 +88,11 @@ Available actions are:
 Available options are:
 HELP
 
-    MODES = %w[command script task plan file].freeze
-    ACTIONS = %w[run upload download].freeze
+    COMMANDS = { 'command' => %w[run],
+                 'script'  => %w[run],
+                 'task'    => %w[show run],
+                 'plan'    => %w[run],
+                 'file'    => %w[upload] }.freeze
     TRANSPORTS = %w[ssh winrm pcp].freeze
     BOLTLIB_PATH = File.join(__FILE__, '../../../modules')
 
@@ -314,10 +319,10 @@ HELP
     end
 
     def validate(options)
-      unless MODES.include?(options[:mode])
+      unless COMMANDS.include?(options[:mode])
         raise Bolt::CLIError,
               "Expected subcommand '#{options[:mode]}' to be one of " \
-              "#{MODES.join(', ')}"
+              "#{COMMANDS.keys.join(', ')}"
       end
 
       if options[:action].nil?
@@ -325,10 +330,11 @@ HELP
               "Expected an action of the form 'bolt #{options[:mode]} <action>'"
       end
 
-      unless ACTIONS.include?(options[:action])
+      actions = COMMANDS[options[:mode]]
+      unless actions.include?(options[:action])
         raise Bolt::CLIError,
               "Expected action '#{options[:action]}' to be one of " \
-              "#{ACTIONS.join(', ')}"
+              "#{actions.join(', ')}"
       end
 
       if options[:mode] != 'file' && options[:mode] != 'script' &&
@@ -337,7 +343,7 @@ HELP
               "Unknown argument(s) #{options[:leftovers].join(', ')}"
       end
 
-      if %w[task plan].include?(options[:mode])
+      if %w[task plan].include?(options[:mode]) && options[:action] == 'run'
         if options[:object].nil?
           raise Bolt::CLIError, "Must specify a #{options[:mode]} to run"
         end
@@ -348,13 +354,13 @@ HELP
         end
       end
 
-      unless !options[:nodes].empty? || options[:mode] == 'plan'
+      if options[:nodes].empty? && options[:mode] != 'plan' && options[:action] != 'show'
         raise Bolt::CLIError, "Option '--nodes' must be specified"
       end
 
       if %w[task plan].include?(options[:mode]) && @config[:modulepath].nil?
         raise Bolt::CLIError,
-              "Option '--modulepath' must be specified when running" \
+              "Option '--modulepath' must be specified when using" \
               " a task or plan"
       end
     end
@@ -381,6 +387,11 @@ HELP
                              else
                                'notice'
                              end
+      end
+
+      if options[:mode] == 'task' && options[:action] == 'show'
+        outputter.print_table(list_tasks)
+        return
       end
 
       executor = Bolt::Executor.new(@config)
@@ -483,24 +494,43 @@ HELP
       @outputter ||= Bolt::Outputter.for_format(@config[:format])
     end
 
-    def run_task(name, nodes, args, &block)
-      parse_error = nil
-      Puppet.initialize_settings
+    def in_bolt_compiler(opts = [])
+      Puppet.initialize_settings(opts)
       Puppet::Pal.in_tmp_environment('bolt', modulepath: [BOLTLIB_PATH] + @config[:modulepath], facts: {}) do |pal|
         pal.with_script_compiler do |compiler|
-          begin
-            return compiler.call_function('run_task', name, nodes, args, &block)
-          rescue Puppet::ParseError => e
-            # we assume that the Puppet::ParseError is due to a problem with
-            # the task and/or its parameters, but since the with_script_compiler
-            # method rescues these errors and raises different ones instead,
-            # we save it in a local variable and raise it as Bolt::CLIError
-            # outside of the block
-            parse_error = e
-          end
+          yield compiler
         end
       end
-      raise Bolt::CLIError, parse_error.message
+    end
+
+    def list_tasks
+      in_bolt_compiler do |compiler|
+        tasks = compiler.list_tasks
+        tasks.map(&:name).sort.map do |task_name|
+          task_sig = compiler.task_signature(task_name)
+          [task_name, task_sig.task.description]
+        end
+      end
+    rescue Puppet::Error
+      raise Bolt::CLIError, "Failure while reading task metadata"
+    end
+
+    def run_task(name, nodes, args, &block)
+      parse_error = nil
+      result = in_bolt_compiler do |compiler|
+        begin
+          compiler.call_function('run_task', name, nodes, args, &block)
+        rescue Puppet::ParseError => e
+          # we assume that the Puppet::ParseError is due to a problem with
+          # the task and/or its parameters, but since the with_script_compiler
+          # method rescues these errors and raises different ones instead,
+          # we save it in a local variable and raise it as Bolt::CLIError
+          # outside of the block
+          parse_error = e
+        end
+      end
+      raise Bolt::CLIError, parse_error.message if parse_error
+      result
     end
 
     # Expects to be called with a configured Puppet compiler or error.instance? will fail
@@ -526,14 +556,11 @@ HELP
         Puppet::Settings::REQUIRED_APP_SETTINGS.each do |setting|
           cli << "--#{setting}" << dir
         end
-        Puppet.initialize_settings(cli)
-        Puppet::Pal.in_tmp_environment('bolt', modulepath: [BOLTLIB_PATH] + @config[:modulepath], facts: {}) do |pal|
-          pal.with_script_compiler do |compiler|
-            result = compiler.call_function('run_plan', plan, args)
-            # Querying ExecutionResult for failures currently requires a script compiler.
-            # Convert from an ExecutionResult to structured output that we can print.
-            unwrap_execution_result(result)
-          end
+        in_bolt_compiler(cli) do |compiler|
+          result = compiler.call_function('run_plan', plan, args)
+          # Querying ExecutionResult for failures currently requires a script compiler.
+          # Convert from an ExecutionResult to structured output that we can print.
+          unwrap_execution_result(result)
         end
       end
     end
