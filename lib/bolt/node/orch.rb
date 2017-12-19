@@ -58,6 +58,18 @@ module Bolt
 
       if state == 'finished'
         exit_code = 0
+      elsif state == 'skipped'
+        return Bolt::TaskResult.new(
+          JSON.dump(
+            '_error' => {
+              'kind' => 'puppetlabs.tasks/skipped-node',
+              'msg' => "Node #{@host} was skipped",
+              'details' => {}
+            }
+          ),
+          nil,
+          nil
+        )
       else
         # Try to extract the exit_code from _error
         begin
