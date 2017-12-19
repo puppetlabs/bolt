@@ -32,7 +32,7 @@ module Bolt
                   password: @password,
                   retry_limit: 1,
                   transport: transport,
-                  ca_trust_path: @ca_cert }
+                  ca_trust_path: @cacert }
 
       Timeout.timeout(@connect_timeout) do
         @connection = ::WinRM::Connection.new(options)

@@ -41,7 +41,7 @@ module Bolt
       @user = user || transport_conf[:user]
       @password = password || transport_conf[:password]
       @key = transport_conf[:key]
-      @ca_cert = transport_conf[:ca_cert]
+      @cacert = transport_conf[:cacert]
       @tty = transport_conf[:tty]
       @insecure = transport_conf[:insecure]
       @connect_timeout = transport_conf[:connect_timeout]

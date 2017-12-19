@@ -19,7 +19,7 @@ module Bolt
       opts = {}
       opts["service-url"] = @service_url if @service_url
       opts["token-file"] = @token_file if @token_file
-      opts["cacert"] = @ca_cert if @ca_cert
+      opts["cacert"] = @cacert if @cacert
       OrchestratorClient.new(opts, true)
     end
 
