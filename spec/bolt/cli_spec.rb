@@ -1078,13 +1078,14 @@ NODES
           'connect-timeout' => 4
         },
         'winrm' => {
-          'connect-timeout' => 7
+          'connect-timeout' => 7,
+          'cacert' => '/path/to/winrm-cacert'
         },
         'pcp' => {
           'task-environment' => 'testenv',
           'service-url' => 'http://foo.org',
           'token-file' => '/path/to/token',
-          'ca-cert' => '/path/to/cacert'
+          'cacert' => '/path/to/cacert'
         } }
     end
 
@@ -1161,11 +1162,12 @@ NODES
       end
     end
 
-    it 'reads ca cert file for pcp' do
+    it 'reads separate cacert file for pcp and winrm' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --insecure])
         cli.parse
-        expect(cli.config[:transports][:pcp][:ca_cert]).to eql('/path/to/cacert')
+        expect(cli.config[:transports][:pcp][:cacert]).to eql('/path/to/cacert')
+        expect(cli.config[:transports][:winrm][:cacert]).to eql('/path/to/winrm-cacert')
       end
     end
 

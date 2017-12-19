@@ -16,7 +16,7 @@ describe Bolt::WinRM do
   let(:password) { ENV['BOLT_WINRM_PASSWORD'] || "vagrant" }
   let(:command) { "echo $env:UserName" }
   let(:config) { Bolt::Config.new(transports: { winrm: { insecure: true } }) }
-  let(:ssl_config) { Bolt::Config.new(transports: { winrm: { ca_cert: 'resources/cert.pem' } }) }
+  let(:ssl_config) { Bolt::Config.new(transports: { winrm: { cacert: 'resources/cert.pem' } }) }
   let(:winrm) { Bolt::WinRM.new(host, port, user, password, config: config) }
   let(:winrm_ssl) { Bolt::WinRM.new(host, ssl_port, user, password, config: ssl_config) }
   let(:echo_script) { <<PS }

@@ -21,7 +21,7 @@ module Bolt
     }.freeze
 
     TRANSPORT_OPTIONS = %i[insecure password run_as sudo sudo_password
-                           key tty tmpdir user connect_timeout ca_cert
+                           key tty tmpdir user connect_timeout cacert
                            token_file orch_task_environment service_url].freeze
 
     TRANSPORT_DEFAULTS = {
@@ -115,8 +115,8 @@ module Bolt
         if data['winrm']['tmpdir']
           self[:transports][:winrm][:tmpdir] = data['winrm']['tmpdir']
         end
-        if data['winrm']['ca-cert']
-          self[:transports][:winrm][:ca_cert] = data['winrm']['ca-cert']
+        if data['winrm']['cacert']
+          self[:transports][:winrm][:cacert] = data['winrm']['cacert']
         end
       end
 
@@ -124,8 +124,8 @@ module Bolt
         if data['pcp']['service-url']
           self[:transports][:pcp][:service_url] = data['pcp']['service-url']
         end
-        if data['pcp']['ca-cert']
-          self[:transports][:pcp][:ca_cert] = data['pcp']['ca-cert']
+        if data['pcp']['cacert']
+          self[:transports][:pcp][:cacert] = data['pcp']['cacert']
         end
         if data['pcp']['token-file']
           self[:transports][:pcp][:token_file] = data['pcp']['token-file']
