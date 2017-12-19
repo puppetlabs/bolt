@@ -85,6 +85,22 @@ describe Bolt::Orch, orchestrator: true do
       expect(orch._run_task(taskpath, 'stdin', params)).to be_success
     end
 
+    context "when the task target node was skipped" do
+      let(:result_state) { 'skipped' }
+
+      it 'returns a failure' do
+        expect(orch._run_task(taskpath, 'stdin', params)).not_to be_success
+      end
+
+      it 'includes an appropriate error in the returned result' do
+        expect(orch._run_task(taskpath, 'stdin', params).error).to eq(
+          'kind' => 'puppetlabs.tasks/skipped-node',
+          'msg' => "Node #{hostname} was skipped",
+          'details' => {}
+        )
+      end
+    end
+
     context "when the task failed" do
       let(:result_state) { 'failed' }
 
