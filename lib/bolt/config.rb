@@ -21,10 +21,12 @@ module Bolt
     }.freeze
 
     TRANSPORT_OPTIONS = %i[insecure password run_as sudo sudo_password
-                           key tty tmpdir user connect_timeout ca_cert].freeze
+                           key tty tmpdir user connect_timeout ca_cert
+                           token_file orch_task_environment service_url].freeze
 
     TRANSPORT_DEFAULTS = {
       connect_timeout: 10,
+      orch_task_environment: 'production',
       insecure: false,
       tty: false
     }.freeze
@@ -115,6 +117,21 @@ module Bolt
         end
         if data['winrm']['ca-cert']
           self[:transports][:winrm][:ca_cert] = data['winrm']['ca-cert']
+        end
+      end
+
+      if data['pcp']
+        if data['pcp']['service-url']
+          self[:transports][:pcp][:service_url] = data['pcp']['service-url']
+        end
+        if data['pcp']['ca-cert']
+          self[:transports][:pcp][:ca_cert] = data['pcp']['ca-cert']
+        end
+        if data['pcp']['token-file']
+          self[:transports][:pcp][:token_file] = data['pcp']['token-file']
+        end
+        if data['pcp']['task-environment']
+          self[:transports][:pcp][:orch_task_environment] = data['pcp']['task-environment']
         end
       end
     end

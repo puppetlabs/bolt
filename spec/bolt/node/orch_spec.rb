@@ -26,6 +26,7 @@ describe Bolt::Orch, orchestrator: true do
   before(:each) do
     @task = "foo"
     @taskpath = "foo/tasks/init"
+    @task_environment = 'production'
     @params =  { param: 'val' }
     @scope = { nodes: [@hostname] }
     @result_state = 'finished'
@@ -33,7 +34,7 @@ describe Bolt::Orch, orchestrator: true do
   end
 
   def mock_client
-    body = { task: @task, params: @params, scope: @scope }
+    body = { task: @task, environment: @task_environment, params: @params, scope: @scope }
     results = [{ 'state' => @result_state, 'result' => @result }]
 
     orch_client = instance_double("OrchestratorClient")
@@ -44,7 +45,7 @@ describe Bolt::Orch, orchestrator: true do
 
   def bolt_task_client
     bolt_task = File.expand_path(File.join(base_path, 'tasks', 'init.rb'))
-    body = { task: 'bolt', params: @params, scope: @scope }
+    body = { task: 'bolt', environment: @task_environment, params: @params, scope: @scope }
 
     orch_client = instance_double("OrchestratorClient")
     orch.instance_variable_set(:@client, orch_client)
