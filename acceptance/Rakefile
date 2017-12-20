@@ -20,7 +20,7 @@ rototiller_task :host_config do |task|
     n_new << node
   end
   nodes_final = n_new.join('-')
-  generate = "bundle exec beaker-hostgenerator"
+  generate = "beaker-hostgenerator"
   generate += " #{nodes_final}"
   generate += " > hosts.yaml"
   sh generate
@@ -84,7 +84,7 @@ namespace :ci do
       task.add_env(name: 'WINRM_USER', default: 'Administrator')
       task.add_env(name: 'WINRM_PASSWORD')
       task.add_command do |cmd|
-        cmd.name = 'bundle exec beaker'
+        cmd.name = 'beaker'
         cmd.add_option(*beaker_options)
       end
     end
@@ -105,7 +105,7 @@ namespace :ci do
       task.add_env(name: 'WINRM_USER', default: 'Administrator')
       task.add_env(name: 'WINRM_PASSWORD')
       task.add_command do |cmd|
-        cmd.name = 'bundle exec beaker'
+        cmd.name = 'beaker'
         cmd.add_option(*beaker_options)
       end
     end
