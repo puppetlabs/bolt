@@ -526,10 +526,19 @@ HELP
       end
     end
 
+    # TODO: remove this when the PAL functions return the correct names
+    def fix_typed_name(typed_name)
+      name_parts = typed_name.name_parts
+      if name_parts[-1] == 'init'
+        name_parts = name_parts[0..-2]
+      end
+      name_parts.join('::')
+    end
+
     def list_tasks
       in_bolt_compiler do |compiler|
         tasks = compiler.list_tasks
-        tasks.map(&:name).sort.map do |task_name|
+        tasks.map {|tn| fix_typed_name(tn) }.sort.map do |task_name|
           task_sig = compiler.task_signature(task_name)
           [task_name, task_sig.task.description]
         end
@@ -540,7 +549,7 @@ HELP
 
     def list_plans
       in_bolt_compiler do |compiler|
-        compiler.list_plans.map { |plan| [plan.name] }.sort
+        compiler.list_plans.map { |plan| [fix_typed_name(plan)] }.sort
       end
     rescue Puppet::Error
       raise Bolt::CLIError, "Failure while reading plans"
