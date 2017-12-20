@@ -286,17 +286,6 @@ NODES
     end
 
     describe "sudo" do
-      it "defaults method to sudo" do
-        cli = Bolt::CLI.new(%w[command run --nodes foo whoami --sudo])
-        cli.parse
-        expect(cli.config[:transports][:ssh][:sudo]).to eq('sudo')
-      end
-
-      it "rejects unsupported methods" do
-        cli = Bolt::CLI.new(%w[command run --nodes foo whoami --sudo rm])
-        expect { cli.parse }.to raise_error(Bolt::CLIError)
-      end
-
       it "supports running as a user" do
         cli = Bolt::CLI.new(%w[command run --nodes foo whoami --run-as root])
         expect(cli.parse[:run_as]).to eq('root')
@@ -1131,7 +1120,8 @@ NODES
         'ssh' => {
           'private-key' => '/bar/foo',
           'insecure' => true,
-          'connect-timeout' => 4
+          'connect-timeout' => 4,
+          'run-as' => 'Fakey McFakerson'
         },
         'winrm' => {
           'connect-timeout' => 7,
@@ -1182,6 +1172,14 @@ NODES
         cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --insecure])
         cli.parse
         expect(cli.config[:transports][:ssh][:insecure]).to eq(true)
+      end
+    end
+
+    it 'reads run-as for ssh' do
+      with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
+        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --password bar --insecure])
+        cli.parse
+        expect(cli.config[:transports][:ssh][:run_as]).to eq('Fakey McFakerson')
       end
     end
 

@@ -109,6 +109,7 @@ HELP
       }
       @config = Bolt::Config.new
       @parser = create_option_parser(@options)
+      @logger = Logger.new(STDERR)
     end
 
     def create_option_parser(results)
@@ -186,13 +187,13 @@ HELP
                 "User to run as using privilege escalation") do |user|
           results[:run_as] = user
         end
-        opts.on('--sudo [PROGRAM]',
-                "Program to execute for privilege escalation. " \
-                "Currently only sudo is supported.") do |program|
-          results[:sudo] = program || 'sudo'
-        end
         opts.on('--sudo-password [PASSWORD]',
                 'Password for privilege escalation') do |password|
+          if results[:run_as].nil?
+            @logger.warn("--sudo-password only provides privilege escalation
+                        for a user specified by --run-as. Please include the
+                        --run-as flag")
+          end
           if password.nil?
             STDOUT.print "Please enter your privilege escalation password: "
             results[:sudo_password] = STDIN.noecho(&:gets).chomp
