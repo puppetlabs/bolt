@@ -24,5 +24,7 @@ Puppet::DataTypes.create_type('ExecutionResult') do
     }
   PUPPET
 
+  load_file('bolt/executionresult')
+
   implementation_class Bolt::ExecutionResult
 end

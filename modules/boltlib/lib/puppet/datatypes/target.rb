@@ -6,5 +6,7 @@ Puppet::DataTypes.create_type('Target') do
     }
     PUPPET
 
+  load_file('bolt/target')
+
   implementation_class Bolt::Target
 end

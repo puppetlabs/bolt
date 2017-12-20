@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'puppet/pops/types/execution_result'
+require 'bolt/execution_result'
 
 describe 'file_upload' do
   include PuppetlabsSpec::Fixtures

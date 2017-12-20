@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'puppet/pops/types/execution_result'
+require 'bolt/execution_result'
 
 describe 'run_command' do
   let(:executor) { mock('bolt_executor') }
