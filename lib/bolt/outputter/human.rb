@@ -100,19 +100,21 @@ module Bolt
         task_info = ""
         usage = "bolt task run --nodes, -n <node-name> #{task['name']}"
 
-        task['parameters'].each do |k, v|
-          pretty_params << "- #{k}: #{v['type']}\n"
-          pretty_params << "    #{v['description']}\n" if v['description']
-          usage << if !v['type'].to_s.include? "Optional"
-                     " #{k}=<value>"
-                   else
-                     " [#{k}=<value>]"
-                   end
+        if task['parameters']
+          task['parameters'].each do |k, v|
+            pretty_params << "- #{k}: #{v['type']}\n"
+            pretty_params << "    #{v['description']}\n" if v['description']
+            usage << if !v['type'].to_s.include? "Optional"
+                       " #{k}=<value>"
+                     else
+                       " [#{k}=<value>]"
+                     end
+          end
         end
 
         usage << " [--noop]" if task['supports_noop']
 
-        task_info << task['name']
+        task_info << "\n#{task['name']}"
         task_info << " - #{task['description']}" if task['description']
         task_info << "\n\n"
         task_info << "USAGE:\n#{usage}\n\n"
