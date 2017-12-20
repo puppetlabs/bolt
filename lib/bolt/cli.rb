@@ -547,10 +547,11 @@ HELP
     end
 
     def get_task_info(task_name)
-      in_bolt_compiler do |compiler|
-        task = compiler.task_signature(task_name)
-        task.task_hash
+      task = in_bolt_compiler do |compiler|
+        compiler.task_signature(task_name)
       end
+      raise Bolt::CLIError, "Could not find task #{task_name} in your modulepath" if task.nil?
+      task.task_hash
     rescue Puppet::Error
       raise Bolt::CLIError, "Failure while reading task metadata"
     end
