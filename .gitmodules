@@ -1,7 +1,7 @@
 [submodule "vendored/puppet"]
 	path = vendored/puppet
-	url = https://github.com/puppetlabs/puppet
-	branch = feature_puppet-tasks
+	url = https://github.com/adreyer/puppet
+	branch = PUP-8271
 [submodule "vendored/hiera"]
 	path = vendored/hiera
 	url = https://github.com/puppetlabs/hiera
