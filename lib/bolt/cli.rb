@@ -407,9 +407,9 @@ HELP
             outputter.print_task_info(get_task_info(options[:object]))
           else
             outputter.print_table(list_tasks)
-            outputter.print_message("Use `bolt task show <task-name>` to view
-                                  details and parameters for a specific
-                                  task.")
+            outputter.print_message("Use `bolt task show <task-name>` to view "\
+                                  "details and parameters for a specific "\
+                                  "task.")
           end
         elsif options[:mode] == 'plan'
           outputter.print_table(list_plans)
