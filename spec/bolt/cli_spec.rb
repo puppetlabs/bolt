@@ -641,6 +641,22 @@ NODES
         end
       end
 
+      context "when the task is not in the modulepath", reset_puppet_settings: true do
+        before :each do
+          cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
+        end
+
+        it "task show displays an error if the task is not in modulepath" do
+          options = {
+            mode: 'task',
+            action: 'show',
+            object: 'abcdefg'
+          }
+          expect { cli.execute(options) }.to raise_error(Bolt::CLIError,
+                                                         "Could not find task abcdefg in your modulepath")
+        end
+      end
+
       context "when showing available plans", reset_puppet_settings: true do
         before :each do
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
