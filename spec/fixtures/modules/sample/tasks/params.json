@@ -1,6 +1,7 @@
 {
   "description": "Task with parameters",
   "input_method": "stdin",
+  "supports_noop": true,
   "parameters": {
     "mandatory_string": {
       "description": "Mandatory string parameter",

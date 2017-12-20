@@ -39,6 +39,21 @@ describe "Bolt::Outputter::JSON" do
     expect(JSON.parse(output.string)).to eq(table)
   end
 
+  it "formats a task" do
+    task = {
+      'name' => 'cinnamon roll',
+      'description' => 'A delicious sweet bun',
+      'parameters' => {
+        'icing' => {
+          'type' => 'Cream cheese',
+          'description' => 'Rich, tangy, sweet'
+        }
+      }
+    }
+    outputter.print_task_info(task)
+    expect(JSON.parse(output.string)).to eq(task)
+  end
+
   it "formats ExecutionResult from a plan" do
     result = [
       { 'node' => 'node1', 'status' => 'finished', 'result' => { '_output' => 'yes' } },

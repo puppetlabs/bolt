@@ -93,6 +93,33 @@ module Bolt
         )
       end
 
+      # @param [Hash] A hash representing the task
+      def print_task_info(task)
+        # Building lots of strings...
+        pretty_params = ""
+        task_info = ""
+        usage = "bolt task run --nodes, -n <node-name> #{task['name']}"
+
+        task['parameters'].each do |k, v|
+          pretty_params << "- #{k}: #{v['type']}"
+          pretty_params << "\n    #{v['description']}\n" if v['description']
+          usage << if !v['type'].to_s.include? "Optional"
+                     " #{k}=<value>"
+                   else
+                     " [#{k}=<value>]"
+                   end
+        end
+
+        usage << " [--noop]" if task['supports_noop']
+
+        task_info << task['name']
+        task_info << " - #{task['description']}" if task['description']
+        task_info << "\n\n"
+        task_info << "USAGE:\n#{usage}\n\n"
+        task_info << "PARAMETERS:\n#{pretty_params}\n" if task['parameters']
+        @stream.puts(task_info)
+      end
+
       def print_plan(result)
         # If a hash or array, pretty-print as JSON
         if result.is_a?(Hash) || result.is_a?(Array)
@@ -108,6 +135,10 @@ module Bolt
       end
 
       def fatal_error(e); end
+    end
+
+    def print_message(message)
+      @stream.puts(message)
     end
   end
 end
