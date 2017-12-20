@@ -407,7 +407,7 @@ HELP
             outputter.print_task_info(get_task_info(options[:object]))
           else
             outputter.print_table(list_tasks)
-            outputter.print_message("Use `bolt task show <task-name>` to view "\
+            outputter.print_message("\nUse `bolt task show <task-name>` to view "\
                                   "details and parameters for a specific "\
                                   "task.")
           end
@@ -548,7 +548,8 @@ HELP
 
     def get_task_info(task_name)
       in_bolt_compiler do |compiler|
-        compiler.task_signature(task_name).task_hash
+        task = compiler.task_signature(task_name)
+        task.task_hash
       end
     rescue Puppet::Error
       raise Bolt::CLIError, "Failure while reading task metadata"

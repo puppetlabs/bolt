@@ -53,6 +53,7 @@ c1   d
     }
     outputter.print_task_info(task)
     expect(output.string).to eq(<<-TASK_OUTPUT)
+
 cinnamon_roll - A delicious sweet bun
 
 USAGE:
