@@ -101,8 +101,8 @@ module Bolt
         usage = "bolt task run --nodes, -n <node-name> #{task['name']}"
 
         task['parameters'].each do |k, v|
-          pretty_params << "- #{k}: #{v['type']}"
-          pretty_params << "\n    #{v['description']}\n" if v['description']
+          pretty_params << "- #{k}: #{v['type']}\n"
+          pretty_params << "    #{v['description']}\n" if v['description']
           usage << if !v['type'].to_s.include? "Optional"
                      " #{k}=<value>"
                    else
