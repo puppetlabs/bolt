@@ -4,7 +4,7 @@ module BoltSpec
       cli = Bolt::CLI.new(arguments)
 
       # prevent tests from reading users config
-      allow(cli.config).to receive(:default_path).and_return(File.join('.', 'path', 'does not exist'))
+      allow(cli.config).to receive(:default_paths).and_return([File.join('.', 'path', 'does not exist')])
       output =  StringIO.new
       outputter = Bolt::Outputter::JSON.new(output)
       allow(cli).to receive(:outputter).and_return(outputter)
