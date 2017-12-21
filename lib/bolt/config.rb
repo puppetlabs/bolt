@@ -1,5 +1,6 @@
 require 'logger'
 require 'yaml'
+require 'bolt/cli'
 
 module Bolt
   Config = Struct.new(
@@ -50,15 +51,23 @@ module Bolt
       end
     end
 
-    def default_path
-      path = ['.puppetlabs', 'bolt.yml']
-      root_path = '~'
-      File.join(root_path, *path)
+    def default_paths
+      root_path = File.expand_path(File.join('~', '.puppetlabs'))
+      [File.join(root_path, 'bolt.yaml'), File.join(root_path, 'bolt.yml')]
     end
 
     def read_config_file(path)
       path_passed = path
-      path ||= default_path
+      if path.nil?
+        found_default = default_paths.select { |p| File.exist?(p) }
+        if found_default.size > 1
+          logger = Logger.new(self[:log_destination])
+          logger.warn "Config files found at #{found_default.join(', ')}, using the first"
+        end
+        # Use first found, fall back to first default and try to load even if it didn't exist
+        path = found_default.first || default_paths.first
+      end
+
       path = File.expand_path(path)
       # safe_load doesn't work with psych in ruby 2.0
       # The user controls the configfile so this isn't a problem

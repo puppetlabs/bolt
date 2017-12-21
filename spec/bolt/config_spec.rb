@@ -25,7 +25,50 @@ describe Bolt::Config do
         Bolt::Config.new(what: 'why')
       }.to raise_error(NameError)
     end
+  end
 
+  describe "load_file" do
+    let(:default_path) { File.expand_path(File.join('~', '.puppetlabs', 'bolt.yaml')) }
+    let(:alt_path) { File.expand_path(File.join('~', '.puppetlabs', 'bolt.yml')) }
+
+    it "loads from a default file" do
+      expect(File).to receive(:exist?).with(default_path).and_return(true)
+      expect(File).to receive(:exist?).with(alt_path).and_return(false)
+      expect(File).to receive(:open).with(default_path, 'r:UTF-8').and_raise(Errno::ENOENT)
+      config.load_file(nil)
+    end
+
+    it "falls back to the old default file" do
+      expect(File).to receive(:exist?).with(default_path).and_return(false)
+      expect(File).to receive(:exist?).with(alt_path).and_return(true)
+      expect(File).to receive(:open).with(alt_path, 'r:UTF-8').and_raise(Errno::ENOENT)
+      config.load_file(nil)
+    end
+
+    it "warns if both defaults exist, and uses the new default" do
+      logger = double('logger')
+      expect(logger).to receive(:warn).with("Config files found at #{default_path}, #{alt_path}, using the first")
+      expect(Logger).to receive(:new).and_return(logger)
+
+      expect(File).to receive(:exist?).with(default_path).and_return(true)
+      expect(File).to receive(:exist?).with(alt_path).and_return(true)
+      expect(File).to receive(:open).with(default_path, 'r:UTF-8').and_raise(Errno::ENOENT)
+
+      config.load_file(nil)
+    end
+
+    it "loads from the specified file" do
+      path = 'does not exist'
+      expanded_path = File.expand_path(path)
+
+      expect(File).not_to receive(:exist?).with(default_path)
+      expect(File).not_to receive(:exist?).with(alt_path)
+      expect(File).to receive(:open).with(expanded_path, 'r:UTF-8').and_raise(Errno::ENOENT)
+      expect { config.load_file(path) }.to raise_error(Bolt::CLIError)
+    end
+  end
+
+  describe "validate" do
     it "accepts integers for connection-timeout" do
       config = {
         transports: {
