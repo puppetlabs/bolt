@@ -21,7 +21,7 @@ module Bolt
       log_destination: STDERR
     }.freeze
 
-    TRANSPORT_OPTIONS = %i[insecure password run_as sudo sudo_password
+    TRANSPORT_OPTIONS = %i[insecure password run_as sudo_password
                            key tty tmpdir user connect_timeout cacert
                            token_file orch_task_environment service_url].freeze
 
@@ -112,6 +112,9 @@ module Bolt
         if data['ssh']['tmpdir']
           self[:transports][:ssh][:tmpdir] = data['ssh']['tmpdir']
         end
+        if data['ssh']['run-as']
+          self[:transports][:ssh][:run_as] = data['ssh']['run-as']
+        end
       end
 
       if data['winrm']
@@ -151,7 +154,7 @@ module Bolt
     end
 
     def update_from_cli(options)
-      %i[concurrency transport format modulepath].each do |key|
+      %i[concurrency transport format modulepath ssh['run_as']].each do |key|
         self[key] = options[key] if options[key]
       end
 
@@ -171,10 +174,7 @@ module Bolt
 
     def validate
       TRANSPORTS.each do |transport|
-        tconf = self[:transports][transport]
-        if tconf[:sudo] && tconf[:sudo] != 'sudo'
-          raise Bolt::CLIError, "Only 'sudo' is supported for privilege escalation."
-        end
+        self[:transports][transport]
       end
 
       unless %w[human json].include? self[:format]

@@ -12,6 +12,7 @@ describe "when runnning over the ssh transport", ssh: true do
   let(:modulepath) { File.join(__dir__, '../fixtures/modules') }
   let(:stdin_task) { "sample::stdin" }
   let(:uri) { conn_uri('ssh') }
+  let(:user) { conn_info('ssh')[:user] }
   let(:password) { conn_info('ssh')[:password] }
 
   context 'when using CLI options' do
@@ -38,6 +39,13 @@ describe "when runnning over the ssh transport", ssh: true do
       result = run_one_node(%w[task run sample::noop message=somemessage] + config_flags)
       expect(result['_output'].strip).to eq("somemessage with noop")
     end
+
+    it 'escalates privileges when passed --run-as' do
+      result = run_one_node(%W[command run #{whoami} --run-as root --sudo-password #{password}] + config_flags)
+      expect(result['stdout'].strip).to eq("root")
+      result = run_one_node(%W[command run #{whoami} --run-as #{user} --sudo-password #{password}] + config_flags)
+      expect(result['stdout'].strip).to eq(user)
+    end
   end
 
   context 'when using a configfile' do
@@ -62,6 +70,16 @@ describe "when runnning over the ssh transport", ssh: true do
       with_tempfile_containing('conf', YAML.dump(config)) do |conf|
         result = run_one_node(%W[task run #{stdin_task} message=somemessage --configfile #{conf.path}] + config_flags)
         expect(result['message'].strip).to eq("somemessage")
+      end
+    end
+
+    it 'runs a task as a specified user', reset_puppet_settings: true do
+      config['ssh']['run-as'] = user
+
+      with_tempfile_containing('conf', YAML.dump(config)) do |conf|
+        result = run_one_node(%W[command run #{whoami} --configfile #{conf.path}
+                                 --sudo-password #{password}] + config_flags)
+        expect(result['stdout'].strip).to eq(user)
       end
     end
   end

@@ -46,7 +46,6 @@ module Bolt
       @tty = transport_conf[:tty]
       @insecure = transport_conf[:insecure]
       @connect_timeout = transport_conf[:connect_timeout]
-      @sudo = transport_conf[:sudo]
       @sudo_password = transport_conf[:sudo_password]
       @run_as = transport_conf[:run_as]
       @tmpdir = transport_conf[:tmpdir]
