@@ -973,12 +973,12 @@ NODES
                 'node' => 'foo',
                 'status' => 'failed',
                 'result' => {
+                  "_output" => "no",
                   "_error" => {
-                    "message" => "The task failed with exit code 1",
+                    "msg" => "The task failed with exit code 1",
                     "kind" => "puppetlabs.tasks/task-error",
+                    "details" => { "exit_code" => 1 },
                     "issue_code" => "TASK_ERROR",
-                    "partial_result" => { "_output" => "no" },
-                    "details" => { "exit_code" => 1 }
                   }
                 }
               }
