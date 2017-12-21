@@ -572,8 +572,8 @@ NODES
           cli.execute(options)
           expect(JSON.parse(@output.string)).to eq(
             [
+              ['sample', nil],
               ['sample::echo', nil],
-              ['sample::init', nil],
               ['sample::no_noop', 'Task with no noop'],
               ['sample::noop', 'Task with noop'],
               ['sample::notice', nil],
