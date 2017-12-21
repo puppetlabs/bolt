@@ -25,7 +25,7 @@ Puppet::Functions.create_function(:run_task) do
   end
 
   def run_task(task_name, targets, task_args = nil)
-    Puppet::Pops::Types::ExecutionResult.from_bolt(
+    Bolt::ExecutionResult.from_bolt(
       run_task_raw(task_name, targets, task_args)
     )
   end
@@ -68,7 +68,7 @@ Puppet::Functions.create_function(:run_task) do
 
     # Ensure that that given targets are all Target instances
     targets = [targets] unless targets.is_a?(Array)
-    targets = targets.flatten.map { |t| t.is_a?(String) ? Puppet::Pops::Types::TypeFactory.target.create(t) : t }
+    targets = targets.flatten.map { |t| t.is_a?(String) ? Bolt::Target.new(t) : t }
     if targets.empty?
       call_function('debug', "Simulating run of task #{task.name} - no targets given - no action taken")
       Puppet::Pops::EMPTY_HASH

@@ -3,6 +3,7 @@ require 'bolt/node_uri'
 require 'bolt/formatter'
 require 'bolt/result'
 require 'bolt/config'
+require 'bolt/target'
 
 module Bolt
   class Node

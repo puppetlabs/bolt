@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'puppet/pops/types/execution_result'
+require 'bolt/execution_result'
 
 describe 'run_task' do
   include PuppetlabsSpec::Fixtures
@@ -23,7 +23,7 @@ describe 'run_task' do
     let(:host) { stub(uri: hostname) }
     let(:host2) { stub(uri: hostname2) }
     let(:result) { { value: message } }
-    let(:exec_result) { Puppet::Pops::Types::ExecutionResult.from_bolt(host => result) }
+    let(:exec_result) { Bolt::ExecutionResult.from_bolt(host => result) }
     let(:tasks_root) { File.expand_path(fixtures('modules', 'test', 'tasks')) }
 
     it 'when running a task without metadata the input method is "both"' do
@@ -57,11 +57,11 @@ describe 'run_task' do
       executor.expects(:from_uris).never
       executor.expects(:run_task).never
 
-      is_expected.to run.with_params('Test::Yes', []).and_return(Puppet::Pops::Types::ExecutionResult::EMPTY_RESULT)
+      is_expected.to run.with_params('Test::Yes', []).and_return(Bolt::ExecutionResult::EMPTY_RESULT)
     end
 
     context 'with multiple destinations' do
-      let(:exec_result) { Puppet::Pops::Types::ExecutionResult.from_bolt(host => result, host2 => result) }
+      let(:exec_result) { Bolt::ExecutionResult.from_bolt(host => result, host2 => result) }
 
       it 'nodes can be specified as repeated nested arrays and strings and combine into one list of nodes' do
         executable = File.join(tasks_root, 'meta.sh')
@@ -81,8 +81,8 @@ describe 'run_task' do
         executor.expects(:run_task).with([host, host2], executable, 'environment', 'message' => message)
                 .returns(host => result, host2 => result)
 
-        target = Puppet::Pops::Types::TypeFactory.target.create(hostname)
-        target2 = Puppet::Pops::Types::TypeFactory.target.create(hostname2)
+        target = Bolt::Target.new(hostname)
+        target2 = Bolt::Target.new(hostname2)
         is_expected.to run.with_params('Test::Meta', [target, [[target2]], []], 'message' => message)
                           .and_return(exec_result)
       end

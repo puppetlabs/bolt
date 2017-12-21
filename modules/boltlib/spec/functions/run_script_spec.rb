@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'puppet/pops/types/execution_result'
+require 'bolt/execution_result'
 
 describe 'run_script' do
   include PuppetlabsSpec::Fixtures
@@ -18,7 +18,7 @@ describe 'run_script' do
     let(:hosts) { [hostname] }
     let(:host) { stub(uri: hostname) }
     let(:result) { { value: hostname } }
-    let(:exec_result) { Puppet::Pops::Types::ExecutionResult.from_bolt(host => result) }
+    let(:exec_result) { Bolt::ExecutionResult.from_bolt(host => result) }
     let(:module_root) { File.expand_path(fixtures('modules', 'test')) }
     let(:full_path) { File.join(module_root, 'files/uploads/hostname.sh') }
     before(:each) do
@@ -36,7 +36,7 @@ describe 'run_script' do
       executor.expects(:from_uris).with(hosts).returns([host])
       executor.expects(:run_script).with([host], full_path, []).returns(host => result)
 
-      target = Puppet::Pops::Types::TypeFactory.target.create(hostname)
+      target = Bolt::Target.new(hostname)
       is_expected.to run.with_params('test/uploads/hostname.sh', target).and_return(exec_result)
     end
 
@@ -53,7 +53,7 @@ describe 'run_script' do
       executor.expects(:from_uris).with(hosts).returns([host])
       executor.expects(:run_script).with([host], full_path, []).returns(host => result)
 
-      target = Puppet::Pops::Types::TypeFactory.target.create(hostname)
+      target = Bolt::Target.new(hostname)
       is_expected.to run.with_params('test/uploads/hostname.sh', target, 'arguments' => []).and_return(exec_result)
     end
 
@@ -62,7 +62,7 @@ describe 'run_script' do
       let(:hosts) { [hostname, hostname2] }
       let(:host2) { stub(uri: hostname2) }
       let(:result2) { { value: hostname2 } }
-      let(:exec_result) { Puppet::Pops::Types::ExecutionResult.from_bolt(host => result, host2 => result2) }
+      let(:exec_result) { Bolt::ExecutionResult.from_bolt(host => result, host2 => result2) }
       let(:nodes) { [mock(hostname), mock(hostname2)] }
 
       it 'with propagated multiple hosts and returns multiple results' do
@@ -78,7 +78,7 @@ describe 'run_script' do
       executor.expects(:run_script).never
 
       is_expected.to run
-        .with_params('test/uploads/hostname.sh').and_return(Puppet::Pops::Types::ExecutionResult::EMPTY_RESULT)
+        .with_params('test/uploads/hostname.sh').and_return(Bolt::ExecutionResult::EMPTY_RESULT)
     end
 
     it 'errors when script is not found' do
