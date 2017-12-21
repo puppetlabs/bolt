@@ -575,12 +575,14 @@ HELP
 
     # Expects to be called with a configured Puppet compiler or error.instance? will fail
     def unwrap_execution_result(result)
-      if result.instance_of? Puppet::Pops::Types::ExecutionResult
+      if result.instance_of? Puppet::DataTypes::ExecutionResult
         error = Puppet::Pops::Types::TypeFactory.error
         result.iterator.map do |node, output|
           if error.instance?(output)
             # Get the original error hash used to initialize the Error type object.
-            { node: node, status: 'failed', result: { '_error' => output._pcore_init_hash } }
+            result = output.partial_result || {}
+            result[:_error] = { msg: output.message, kind: output.kind, details: output.details, issue_code: output.issue_code }
+            { node: node, status: 'failed', result: result }
           else
             { node: node, status: 'finished', result: output }
           end

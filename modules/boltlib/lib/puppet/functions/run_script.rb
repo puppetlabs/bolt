@@ -54,15 +54,15 @@ Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFuncti
     end
 
     # Ensure that that given targets are all Target instances)
-    targets = [targets].flatten.map { |t| t.is_a?(String) ? Puppet::Pops::Types::TypeFactory.target.create(t) : t }
+    targets = [targets].flatten.map { |t| t.is_a?(String) ? Puppet::DataTypes::Target.new(t) : t }
     if targets.empty?
       call_function('debug', "Simulating run_script of '#{found}' - no targets given - no action taken")
-      Puppet::Pops::Types::ExecutionResult::EMPTY_RESULT
+      Puppet::DataTypes::ExecutionResult::EMPTY_RESULT
     else
       # Awaits change in the executor, enabling it receive Target instances
       hosts = targets.map(&:host)
 
-      Puppet::Pops::Types::ExecutionResult.from_bolt(
+      Puppet::DataTypes::ExecutionResult.from_bolt(
         executor.run_script(executor.from_uris(hosts), found, args_hash['arguments'])
       )
     end
