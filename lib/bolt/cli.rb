@@ -584,7 +584,12 @@ HELP
         result.iterator.map do |node, output|
           if output.is_a?(Puppet::DataTypes::Error)
             # Get the original error hash used to initialize the Error type object.
-            { node: node, status: 'failed', result: { '_error' => output._pcore_init_hash } }
+            result = output.partial_result || {}
+            result[:_error] = { msg: output.message,
+                                kind: output.kind,
+                                details: output.details,
+                                issue_code: output.issue_code }
+            { node: node, status: 'failed', result: result }
           else
             { node: node, status: 'finished', result: output }
           end
