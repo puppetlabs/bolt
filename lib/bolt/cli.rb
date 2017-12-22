@@ -326,6 +326,13 @@ HELP
       raise Bolt::CLIError, "Error attempting to read #{file}: #{err}"
     end
 
+    # This regex should be in one place so we don't have to keep track of it
+    def validate_task_name(name)
+      unless name =~ /\A([a-z][a-z0-9_]*)?(::[a-z][a-z0-9_]*)*\Z/
+        raise Bolt::CLIError, "Invalid #{options[:mode]} '#{options[:object]}'"
+      end
+    end
+
     def validate(options)
       unless COMMANDS.include?(options[:mode])
         raise Bolt::CLIError,
@@ -356,10 +363,7 @@ HELP
           raise Bolt::CLIError, "Must specify a #{options[:mode]} to run"
         end
         # This may mean that we parsed a parameter as the object
-        unless options[:object] =~ /\A([a-z][a-z0-9_]*)?(::[a-z][a-z0-9_]*)*\Z/
-          raise Bolt::CLIError,
-                "Invalid #{options[:mode]} '#{options[:object]}'"
-        end
+        validate_task_name(options[:object])
       end
 
       if options[:nodes].empty? && options[:mode] != 'plan' && options[:action] != 'show'

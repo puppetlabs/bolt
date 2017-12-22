@@ -37,6 +37,12 @@ Puppet::Functions.create_function(:run_task) do
       )
     end
 
+    unless task_name =~ /\A([a-z][a-z0-9_]*)?(::[a-z][a-z0-9_]*)*\Z/
+      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
+        Puppet::Pops::Issues::INVALID_TASK_NAME, name: task_name
+      )
+    end
+
     # TODO: use the compiler injection once PUP-8237 lands
     task_signature = Puppet::Pal::ScriptCompiler.new(closure_scope.compiler).task_signature(task_name)
     if task_signature.nil?
