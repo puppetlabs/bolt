@@ -189,11 +189,6 @@ HELP
         end
         opts.on('--sudo-password [PASSWORD]',
                 'Password for privilege escalation') do |password|
-          if results[:run_as].nil?
-            @logger.warn("--sudo-password only provides privilege escalation
-                        for a user specified by --run-as. Please include the
-                        --run-as flag")
-          end
           if password.nil?
             STDOUT.print "Please enter your privilege escalation password: "
             results[:sudo_password] = STDIN.noecho(&:gets).chomp
