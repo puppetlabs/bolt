@@ -144,4 +144,4 @@ Plans should be used whenever you want to run several commands together, often b
 
 Now you know how to download and run third party tasks with `bolt` you can move on to:
 
-1. [Writing advanced Plans](../8-writing-advanced-plans)
+1. [Writing advanced Tasks](../8-writing-advanced-tasks)

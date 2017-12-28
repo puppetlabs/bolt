@@ -23,7 +23,7 @@ It is also useful to have some familiarity with writing and running Plans with `
 
 In the previous exercise we ran tasks and commands within the context of a plan, but we didn't capture the return values or use those values in subsequent steps. The ability to use the output of a task as the input to another task allows for creating much more complex and powerful plans.
 
-First lets create a task. This will print a JSON structure with an `answer` key with a value of true or false. The important thing to note is the use of JSON to structure our return value. Save the following as `modules/exercise8/tasks/yesorno.py`:
+First lets create a task. This will print a JSON structure with an `answer` key with a value of true or false. The important thing to note is the use of JSON to structure our return value. Save the following as `modules/exercise9/tasks/yesorno.py`:
 
 ```python
 #! /usr/bin/env python
@@ -40,12 +40,12 @@ import random
 print(json.dumps({'answer': bool(random.getrandbits(1))}))
 ```
 
-Then we can write out the plan. Save the following as `modules/exercise8/plans/yesorno.pp`:
+Then we can write out the plan. Save the following as `modules/exercise9/plans/yesorno.pp`:
 
 ```puppet
-plan exercise8::yesorno(String $nodes) {
+plan exercise9::yesorno(String $nodes) {
   $all = $nodes.split(",")
-  $results = run_task('exercise8::yesorno', $all)
+  $results = run_task('exercise9::yesorno', $all)
   $subset = $all.filter |$node| { $results[$node][answer] == true }
   run_command("uptime", $subset)
 }
@@ -54,7 +54,7 @@ plan exercise8::yesorno(String $nodes) {
 In the above plan we:
 
 * Accept a comma-separated list of nodes
-* Run the `exercise8::yesorno` task from above on all of our nodes
+* Run the `exercise9::yesorno` task from above on all of our nodes
 * Store the results of running the task in the variable `$results`. This will contain a `Struct` containing the node names and the data parsed from the JSON response from the task
 * We filter the list of nodes into the `$subset` variable for only those that answered `true`
 * We finally run the `uptime` command on our filtered list of nodes
@@ -62,7 +62,7 @@ In the above plan we:
 You can see this plan in action by running:
 
 ```bash
-bolt plan run exercise8::yesorno nodes=<nodes> --modulepath ./modules
+bolt plan run exercise9::yesorno nodes=<nodes> --modulepath ./modules
 ```
 
 When run you should see output like the following. Running it multiple times should result in different output, as the return value of the task is random the command should run on a different subset of nodes each time.
