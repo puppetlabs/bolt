@@ -244,6 +244,15 @@ SHELLWORDS
       end
     end
 
+    it "doesn't call with_task_wrapper", ssh: true do
+      contents = "#!/bin/sh\necho -n ${PT_message_one} ${PT_message_two}"
+      arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
+      with_tempfile_containing('tasks test', contents) do |file|
+        expect(ssh).not_to receive(:with_task_wrapper)
+        ssh._run_task(file.path, 'environment', arguments)
+      end
+    end
+
     it "can run a task passing input on stdin", ssh: true do
       contents = "#!/bin/sh\ngrep 'message_one'"
       arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }

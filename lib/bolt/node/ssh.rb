@@ -99,7 +99,7 @@ module Bolt
 
     def execute(command, sudoable: false, **options)
       result_output = Bolt::Node::Output.new
-      use_sudo = sudoable && (@sudo || @run_as)
+      use_sudo = sudoable && @run_as
       if use_sudo
         user_clause = if @run_as
                         "-u #{@run_as}"
@@ -276,7 +276,7 @@ SCRIPT
 
     def _run_task(task, input_method, arguments)
       export_args = {}
-      stdin = nil
+      stdin, output = nil
 
       @logger.info { "Running task '#{task}'" }
       @logger.debug { "arguments: #{arguments}\ninput_method: #{input_method}" }
@@ -291,15 +291,21 @@ SCRIPT
         end.join(' ')
       end
 
-      with_remote_task(task, stdin) do |remote_path|
-        command = if export_args.empty?
-                    "'#{remote_path}'"
-                  else
-                    "#{export_args} '#{remote_path}'"
-                  end
-        output = execute(command, sudoable: true)
-        Bolt::TaskResult.from_output(output)
+      command = export_args.empty? ? '' : "#{export_args} "
+
+      if @run_as
+        with_remote_task(task, stdin) do |remote_path|
+          command += "'#{remote_path}'"
+          output = execute(command, sudoable: true)
+        end
+      else
+        with_remote_file(task) do |remote_path|
+          command += "'#{remote_path}'"
+          output = execute(command, stdin: stdin)
+        end
       end
+      Bolt::TaskResult.from_output(output)
+
     # TODO: We should be able to rely on the excutor for this but it will mean
     # a test refactor
     rescue StandardError => e
