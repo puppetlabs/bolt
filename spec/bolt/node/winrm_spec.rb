@@ -58,7 +58,7 @@ PS
         winrm.connect
       end
       exec_time = Time.now - exec_time
-      expect(exec_time).to be < 1
+      expect(exec_time).to be < 5
     end
 
     it "adheres to the specified timeout" do
