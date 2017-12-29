@@ -294,7 +294,7 @@ NODES
 
     describe "sudo-password" do
       it "accepts a password" do
-        cli = Bolt::CLI.new(%w[command run --sudo-password opensez --nodes foo])
+        cli = Bolt::CLI.new(%w[command run --sudo-password opensez --run-as alibaba --nodes foo])
         expect(cli.parse).to include(sudo_password: 'opensez')
       end
 
@@ -303,7 +303,7 @@ NODES
         pw_prompt = 'Please enter your privilege escalation password: '
         allow(STDOUT).to receive(:print).with(pw_prompt)
         allow(STDOUT).to receive(:puts)
-        cli = Bolt::CLI.new(%w[command run --nodes foo --sudo-password])
+        cli = Bolt::CLI.new(%w[command run --nodes foo --run-as alibaba --sudo-password])
         expect(cli.parse).to include(sudo_password: 'opensez')
       end
     end

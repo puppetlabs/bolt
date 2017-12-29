@@ -154,7 +154,7 @@ module Bolt
     end
 
     def update_from_cli(options)
-      %i[concurrency transport format modulepath ssh['run_as']].each do |key|
+      %i[concurrency transport format modulepath].each do |key|
         self[key] = options[key] if options[key]
       end
 
@@ -169,6 +169,12 @@ module Bolt
         TRANSPORTS.each do |transport|
           self[:transports][transport][key] = options[key] if options[key]
         end
+      end
+
+      if options[:sudo_password] && self[:transports][:ssh][:run_as].nil?
+        logger = Logger.new(self[:log_destination])
+        logger.warn("'--sudo-password will not be used without specifying a" \
+                    "user to escalate to with --run-as")
       end
     end
 
