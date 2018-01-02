@@ -84,7 +84,7 @@ Now lets write the accompanying metadata.  Well specify the parameters as types 
 Use the following command to show to test that your task is listed with its description. 
 
 ```
-$ bolt task show 
+$ bolt task show --modulepath ./modules
 ...
 exercise8::great_metadata     An exercise in writing great metadata
 facter_task                   Inspect the value of system facts
@@ -118,14 +118,14 @@ PARAMETERS:
 Bolt can use the types that you have specified in your metadata to validate parameters passed to your task.  Lets attempt to run your task with an incorrect value passed to the `action` parameter.  We will pass the params as a JSON string.  
 
 ```
-$ bolt task run exercise8::great_metadata --nodes <nodes> --params '{"name":"poppey","action":"spinach","recursive":true}'
+$ bolt task run exercise8::great_metadata --nodes <nodes> --modulepath ./modules --params '{"name":"poppey","action":"spinach","recursive":true}'
 Task exercise8::great_metadata:
  parameter 'action' expects a match for Enum['restart', 'start', 'stop'], got 'spinach'
 ```
 
 If we correct our mistake we can see the task working correctly 
 ```
-$ bolt task run exercise8::great_metadata --nodes <nodes> --params '{"name":"poppey","action":"start","recursive":true}'
+$ bolt task run exercise8::great_metadata --nodes <nodes> --modulepath ./modules --params '{"name":"poppey","action":"start","recursive":true}'
 
   {
     "message": "Congratulations on writing your metadata!  Here are the keys and the values that you passed to this task.",
@@ -231,7 +231,7 @@ exit(exitcode)
 
 Lets test out our new task with the `--noop` flag.
 ```
-$ bolt task run exercise8::file --nodes <nodes> content=Hello_World filename=/tmp/hello_world --noop
+$ bolt task run exercise8::file --nodes <nodes> --modulepath ./modules content=Hello_World filename=/tmp/hello_world --noop
   {
     "_noop": true,
     "success": true
@@ -241,7 +241,7 @@ Ran on 1 node in 0.64 seconds
 
 Now if we run again with `--noop` we can see the task creating the file successfully.
 ```
-$ bolt task run exercise8::file --nodes <nodes> content=Hello_World filename=/tmp/hello_world
+$ bolt task run exercise8::file --nodes <nodes> --modulepath ./modules content=Hello_World filename=/tmp/hello_world
   {
     "success": true
   }
