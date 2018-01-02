@@ -659,6 +659,7 @@ NODES
           cli.execute(options)
           expect(JSON.parse(@output.string)).to eq(
             [
+              ['sample'],
               ['sample::single_task'],
               ['sample::three_tasks'],
               ['sample::two_tasks']
