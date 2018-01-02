@@ -176,5 +176,18 @@ describe 'run_task' do
                                          \ got\ Integer\[10,\ 10\]/x
       )
     end
+
+    it "errors when a specified parameter value is not Data" do
+      task_params.merge!(
+        'mandatory_string'  => 'str',
+        'mandatory_integer' => 10,
+        'mandatory_boolean' => true,
+        'optional_hash'     => { now: Time.now }
+      )
+
+      is_expected.to run.with_params(task_name, hostname, task_params).and_raise_error(
+        Puppet::ParseError, /Task parameters is not of type Data/
+      )
+    end
   end
 end
