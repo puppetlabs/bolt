@@ -15,6 +15,9 @@
       "description": "Mandatory boolean parameter",
       "type": "Boolean"
     },
+    "non_empty_string": {
+      "type": "String[1]"
+    },
     "optional_string": {
       "description": "Optional string parameter",
       "type": "Optional[String]"
