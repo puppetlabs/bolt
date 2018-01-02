@@ -70,9 +70,57 @@ cd ~/.puppetlabs/task-modules
 r10k puppetfile install ./Puppetfile
 ```
 
+# Inspect installed tasks
+
+Lets see what tasks we installed in the previous step.  
+
+```
+$ bolt task show
+apache                        Allows you to perform apache service functions
+apt                           Allows you to perform apt functions
+bootstrap                     Bootstrap a node with puppet-agent
+exec                          Executes an arbitrary shell command on the target system
+facter_task                   Inspect the value of system facts
+install_puppet                Install the puppet 5 agent package
+minifact
+mysql::sql                    Allows you to execute arbitary SQL
+package                       Manage and inspect the state of packages
+puppet_conf                   Inspect puppet agent configuration settings
+puppet_device                 Run puppet device on a (proxy) Puppet agent
+puppeteer::apply              Run a puppet apply on agents
+puppeteer::certificate_info   Grab certificate information on agent
+puppeteer::external_fact      Add or update external facts on agents
+puppeteer::features           Query the node for what features are available
+puppeteer::providers          Query the node for what providers are available
+resource                      Inspect the value of resources
+service                       Manage and inspect the state of services
+
+Use `bolt task show <task-name>` to view details and parameters for a specific task.
+```
+
 # Use package task to check status of package
 
-With Puppet installed on the node we can use some of the tasks that expose Puppet resources, like the package task which you just installed from the Puppet Forge with r10k.
+With Puppet installed on the node we can use some of the tasks that expose Puppet resources, like the package task which you just installed from the Puppet Forge with r10k.  We can use the bolt to show us the parameters used by the package task.  
+
+```
+$ bolt task show package
+package - Manage and inspect the state of packages
+
+USAGE:
+bolt task run --nodes, -n <node-name> package action=<value> name=<value> [version=<value>] [provider=<value>]
+
+PARAMETERS:
+- action: Enum['install', 'status', 'uninstall', 'upgrade']
+    The operation (install, status, uninstall and upgrade) to perform on the package
+- name: String[1, default]
+    The name of the package to be manipulated
+- version: Optional[String[1, default]]
+    Version numbers must match the full version to install, including release if the provider uses a release moniker. 
+    Ranges or semver patterns are not accepted except for the gem package provider. 
+    For example, to install the bash package from the rpm bash-4.1.2-29.el6.x86_64.rpm, use the string '4.1.2-29.el6'.
+- provider: Optional[String[1, default]]
+    The provider to use to manage or inspect the package, defaults to the system package manager
+```
 
 Let's quickly check on the status of a specific package using `bolt`:
 
