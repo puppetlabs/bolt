@@ -601,6 +601,9 @@ NODES
                 "description" => "Mandatory boolean parameter",
                 "type" => "Boolean"
               },
+              "non_empty_string" => {
+                "type" => "String[1]"
+              },
               "optional_string" => {
                 "description" => "Optional string parameter",
                 "type" => "Optional[String]"
@@ -857,6 +860,7 @@ NODES
               'mandatory_string'  => 'str',
               'mandatory_integer' => 10,
               'mandatory_boolean' => 'str',
+              'non_empty_string'  => 'foo',
               'optional_string'   => 10
             )
 
@@ -875,6 +879,7 @@ NODES
               'mandatory_string'  => '0123456789a',
               'mandatory_integer' => 10,
               'mandatory_boolean' => true,
+              'non_empty_string'  => 'foo',
               'optional_integer'  => 10
             )
 
@@ -897,7 +902,8 @@ NODES
             task_params.merge!(
               'mandatory_string'  => ' ',
               'mandatory_integer' => 0,
-              'mandatory_boolean' => false
+              'mandatory_boolean' => false,
+              'non_empty_string'  => 'foo'
             )
 
             cli.execute(options)
