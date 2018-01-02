@@ -1,4 +1,4 @@
-require 'logger'
+require 'bolt/logger'
 require 'bolt/node_uri'
 require 'bolt/formatter'
 require 'bolt/result'
@@ -76,12 +76,10 @@ module Bolt
     end
 
     def run_command(command)
-      @logger.info { "Running command: #{command}" }
       _run_command(command)
     end
 
     def run_script(script, arguments)
-      @logger.info { "Running script: #{script}" }
       _run_script(script, arguments)
     end
 

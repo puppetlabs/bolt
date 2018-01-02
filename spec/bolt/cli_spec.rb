@@ -930,6 +930,11 @@ NODES
               %r{modules/sample/tasks/echo.sh$}, input_method, 'message' => 'hi there'
             ).and_return(double(uri: 'foo') => Bolt::TaskResult.new('yes', '', 0))
 
+          logger = double('logger')
+          expect(logger).to receive(:notice).with("Running task sample::echo")
+          expect(logger).to receive(:notice).with("Ran task sample::echo on 1 node with 0 failures")
+          expect(Logger).to receive(:instance).and_return(logger)
+
           options = {
             nodes: node_names,
             mode: 'plan',
@@ -954,6 +959,11 @@ NODES
               nodes,
               %r{modules/sample/tasks/echo.sh$}, input_method, 'message' => 'hi there'
             ).and_return(double(uri: 'foo') => Bolt::TaskResult.new('no', '', 1))
+
+          logger = double('logger')
+          expect(logger).to receive(:notice).with("Running task sample::echo")
+          expect(logger).to receive(:notice).with("Ran task sample::echo on 1 node with 1 failure")
+          expect(Logger).to receive(:instance).and_return(logger)
 
           options = {
             nodes: node_names,

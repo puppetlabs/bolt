@@ -47,7 +47,7 @@ module Bolt
 
     def error_nodes
       result = {}
-      @result_hash.each_pair { |k, v| result[k] = v if v.is_a?(Error) }
+      @result_hash.each_pair { |k, v| result[k] = v if v.is_a?(Puppet::DataTypes::Error) }
       self.class.new(result, true)
     end
 
@@ -56,7 +56,7 @@ module Bolt
     end
 
     def ok
-      @result_hash.values.none? { |v| v.is_a?(Error) }
+      @result_hash.values.none? { |v| v.is_a?(Puppet::DataTypes::Error) }
     end
     alias ok? ok
 
