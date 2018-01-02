@@ -665,7 +665,8 @@ NODES
               ['sample'],
               ['sample::single_task'],
               ['sample::three_tasks'],
-              ['sample::two_tasks']
+              ['sample::two_tasks'],
+              ['sample::upper_case']
             ]
           )
         end
@@ -979,6 +980,20 @@ NODES
                 }
               }
             ]
+          )
+        end
+
+        it "plan with upper case task name errors" do
+          options = {
+            object: 'sample::upper_case',
+            task_options: { 'nodes' => nodes.join(',') }
+          }
+
+          expect {
+            cli.run_plan(options[:object],
+                         options[:task_options])
+          }.to raise_error(
+            Puppet::ParseErrorWithIssue, /Sample::Echo is not a valid task name/
           )
         end
       end
