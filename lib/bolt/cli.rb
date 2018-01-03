@@ -108,25 +108,29 @@ HELP
         nodes: []
       }
       @config = Bolt::Config.new
+
+      # parse mode and object, use COMMANDS as a whitelist
+      @options[:mode] = argv[0] if COMMANDS.keys.any? { |mode| argv[0] == mode }
+      @options[:object] = argv[1] if COMMANDS.values.flatten.uniq.any? { |object| argv[1] == object }
       @parser = create_option_parser(@options)
     end
 
     def create_option_parser(results)
-      OptionParser.new('') do |opts|
-        opts.on(
-          '-n', '--nodes NODES',
-          'Node(s) to connect to in URI format [protocol://]host[:port]',
-          'Eg. --nodes bolt.puppet.com',
-          'Eg. --nodes localhost,ssh://nix.com:2222,winrm://windows.puppet.com',
-          "\n",
-          '* NODES can either be comma-separated, \'@<file>\' to read',
-          '* nodes from a file, or \'-\' to read from stdin',
-          '* Windows nodes must specify protocol with winrm://',
-          '* protocol is `ssh` by default, may be `ssh` or `winrm`',
-          '* port is `22` by default for SSH, `5985` for winrm (Optional)'
-        ) do |nodes|
-          results[:nodes] += parse_nodes(nodes)
-          results[:nodes].uniq!
+      parser = OptionParser.new('') do |opts|
+        unless results[:mode] == 'plan'
+          opts.on('-n', '--nodes NODES',
+                  'Node(s) to connect to in URI format [protocol://]host[:port]',
+                  'Eg. --nodes bolt.puppet.com',
+                  'Eg. --nodes localhost,ssh://nix.com:2222,winrm://windows.puppet.com',
+                  "\n",
+                  '* NODES can either be comma-separated, \'@<file>\' to read',
+                  '* nodes from a file, or \'-\' to read from stdin',
+                  '* Windows nodes must specify protocol with winrm://',
+                  '* protocol is `ssh` by default, may be `ssh` or `winrm`',
+                  '* port is `22` by default for SSH, `5985` for winrm (Optional)') do |nodes|
+            results[:nodes] += parse_nodes(nodes)
+            results[:nodes].uniq!
+          end
         end
         opts.on('-u', '--user USER',
                 "User to authenticate as (Optional)") do |user|
@@ -222,6 +226,22 @@ HELP
           raise Bolt::CLIExit
         end
       end
+
+      parser.banner = case results[:mode]
+                      when "plan"
+                        PLAN_HELP
+                      when "command"
+                        COMMAND_HELP
+                      when "script"
+                        SCRIPT_HELP
+                      when "task"
+                        TASK_HELP
+                      when "file"
+                        FILE_HELP
+                      else
+                        BANNER
+                      end
+      parser
     end
 
     def parse
@@ -238,11 +258,14 @@ HELP
 
       if options[:mode] == 'help'
         options[:help] = true
+
+        # regenerate options parser with new mode
         options[:mode] = remaining.shift
+        @parser = create_option_parser(options)
       end
 
       if options[:help]
-        print_help(options[:mode])
+        puts parser.help
         raise Bolt::CLIExit
       end
 
@@ -275,24 +298,6 @@ HELP
     rescue Bolt::CLIError => e
       warn e.message
       raise e
-    end
-
-    def print_help(mode)
-      parser.banner = case mode
-                      when 'task'
-                        TASK_HELP
-                      when 'command'
-                        COMMAND_HELP
-                      when 'script'
-                        SCRIPT_HELP
-                      when 'file'
-                        FILE_HELP
-                      when 'plan'
-                        PLAN_HELP
-                      else
-                        BANNER
-                      end
-      puts parser.help
     end
 
     def parse_nodes(nodes)
@@ -380,7 +385,7 @@ HELP
       yield
     rescue OptionParser::MissingArgument => e
       raise Bolt::CLIError, "Option '#{e.args.first}' needs a parameter"
-    rescue OptionParser::InvalidOption => e
+    rescue OptionParser::InvalidOption, OptionParser::AmbiguousOption => e
       raise Bolt::CLIError, "Unknown argument '#{e.args.first}'"
     end
 
