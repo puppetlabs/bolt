@@ -21,6 +21,10 @@
     "optional_integer": {
       "description": "Optional integer parameter",
       "type": "Optional[Integer[-5,5]]"
+    },
+    "optional_hash": {
+      "description": "Optional hash parameter",
+      "type": "Optional[Hash]"
     }
   }
 }

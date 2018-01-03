@@ -56,6 +56,11 @@ Puppet::Functions.create_function(:run_task) do
     task_signature.runnable_with?(use_args) do |mismatch|
       raise Puppet::ParseError, mismatch
     end || (raise Puppet::ParseError, 'Task parameters did not match')
+
+    unless Puppet::Pops::Types::TypeFactory.data.instance?(use_args)
+      raise Puppet::ParseError, 'Task parameters is not of type Data'
+    end
+
     task = task_signature.task
 
     if executor.noop
