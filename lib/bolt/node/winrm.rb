@@ -75,7 +75,7 @@ $ENV:RUBYLIB = "${ENV:ProgramFiles}\\Puppet Labs\\Puppet\\puppet\\lib;" +
   "${ENV:ProgramFiles}\\Puppet Labs\\Puppet\\hiera\\lib;" +
   $ENV:RUBYLIB
 
-Add-Type -AssemblyName System.ServiceModel.Web, System.Runtime.Serialization
+Add-Type -AssemblyName System.Runtime.Serialization
 $utf8 = [System.Text.Encoding]::UTF8
 
 function Invoke-Interpreter
