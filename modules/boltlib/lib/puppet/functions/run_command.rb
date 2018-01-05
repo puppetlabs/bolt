@@ -13,6 +13,7 @@ Puppet::Functions.create_function(:run_command) do
   dispatch :run_command do
     param 'String[1]', :command
     repeated_param 'TargetOrTargets', :targets
+    return_type 'ExecutionResult'
   end
 
   def run_command(command, *targets)

@@ -15,6 +15,7 @@ Puppet::Functions.create_function(:file_upload, Puppet::Functions::InternalFunct
     param 'String[1]', :source
     param 'String[1]', :destination
     repeated_param 'TargetOrTargets', :targets
+    return_type 'ExecutionResult'
   end
 
   def file_upload(scope, source, destination, *targets)

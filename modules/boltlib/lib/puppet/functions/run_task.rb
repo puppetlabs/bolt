@@ -14,6 +14,7 @@ Puppet::Functions.create_function(:run_task) do
     param 'String[1]', :task_name
     param 'TargetOrTargets', :targets
     optional_param 'Hash[String[1], Any]', :task_args
+    return_type 'ExecutionResult'
   end
 
   # this is used from 'bolt task run'
