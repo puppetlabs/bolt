@@ -6,7 +6,6 @@ module Bolt
   Config = Struct.new(
     :concurrency,
     :format,
-    :log_destination,
     :log_level,
     :modulepath,
     :transport,
@@ -16,9 +15,7 @@ module Bolt
     DEFAULTS = {
       concurrency: 100,
       transport: 'ssh',
-      format: 'human',
-      log_level: Logger::NOTICE,
-      log_destination: STDERR
+      format: 'human'
     }.freeze
 
     TRANSPORT_OPTIONS = %i[insecure password run_as sudo_password
@@ -61,7 +58,7 @@ module Bolt
       if path.nil?
         found_default = default_paths.select { |p| File.exist?(p) }
         if found_default.size > 1
-          logger = Logger.new(self[:log_destination])
+          logger = Logger.get_logger
           logger.warn "Config files found at #{found_default.join(', ')}, using the first"
         end
         # Use first found, fall back to first default and try to load even if it didn't exist
@@ -170,12 +167,6 @@ module Bolt
           self[:transports][transport][key] = options[key] if options[key]
         end
       end
-
-      if options[:sudo_password] && self[:transports][:ssh][:run_as].nil?
-        logger = Logger.new(self[:log_destination])
-        logger.warn("'--sudo-password will not be used without specifying a" \
-                    "user to escalate to with --run-as")
-      end
     end
 
     def validate
@@ -185,6 +176,12 @@ module Bolt
 
       unless %w[human json].include? self[:format]
         raise Bolt::CLIError, "Unsupported format: '#{self[:format]}'"
+      end
+
+      if self[:transports][:ssh][:sudo_password] && self[:transports][:ssh][:run_as].nil?
+        logger = Logger.get_logger
+        logger.warn("--sudo-password will not be used without specifying a " \
+                    "user to escalate to with --run-as")
       end
 
       self[:transports].each_value do |v|

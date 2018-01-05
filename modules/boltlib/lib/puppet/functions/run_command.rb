@@ -1,5 +1,3 @@
-require 'bolt/logger'
-
 # Runs a command on the given set of targets and returns the result from each command execution.
 #
 # * This function does nothing if the list of targets is empty.
@@ -18,19 +16,7 @@ Puppet::Functions.create_function(:run_command) do
     return_type 'ExecutionResult'
   end
 
-  def log_summary(object, node_count, fail_count)
-    format("Ran command %s on %d node%s with %d failure%s",
-           object,
-           node_count,
-           node_count == 1 ? '' : 's',
-           fail_count,
-           fail_count == 1 ? '' : 's')
-  end
-
   def run_command(command, *targets)
-    r = nil
-    logger = Logger.instance
-    logger.notice("Running command #{command}")
     unless Puppet[:tasks]
       raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
         Puppet::Pops::Issues::TASK_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, operation: 'run_command'
@@ -49,14 +35,12 @@ Puppet::Functions.create_function(:run_command) do
 
     if targets.empty?
       call_function('debug', "Simulating run_command('#{command}') - no targets given - no action taken")
-      r = Bolt::ExecutionResult::EMPTY_RESULT
+      Bolt::ExecutionResult::EMPTY_RESULT
     else
       # Awaits change in the executor, enabling it receive Target instances
       hosts = targets.map(&:host)
 
-      r = Bolt::ExecutionResult.from_bolt(executor.run_command(executor.from_uris(hosts), command))
+      Bolt::ExecutionResult.from_bolt(executor.run_command(executor.from_uris(hosts), command))
     end
-    logger.notice(log_summary(command, targets.size, r.error_nodes.count))
-    r
   end
 end

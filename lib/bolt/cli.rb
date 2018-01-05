@@ -109,8 +109,6 @@ HELP
       }
       @config = Bolt::Config.new
       @parser = create_option_parser(@options)
-      @logger = Logger.instance(STDERR)
-      @logger.level = Logger::NOTICE
     end
 
     def create_option_parser(results)
@@ -250,6 +248,7 @@ HELP
 
       @config.load_file(options[:configfile])
       @config.update_from_cli(options)
+      Logger.configure(@config)
       @config.validate
 
       # This section handles parsing non-flag options which are
@@ -418,19 +417,15 @@ HELP
         return
       end
 
-      executor = Bolt::Executor.new(@config, options[:noop])
-
       if options[:mode] == 'plan'
+        executor = Bolt::Executor.new(@config, options[:noop], true)
         execute_plan(executor, options)
       else
+        executor = Bolt::Executor.new(@config, options[:noop])
         nodes = executor.from_uris(options[:nodes])
 
         results = nil
-        mode = options[:mode]
-        action = options[:action]
-        object = options[:object]
         outputter.print_head
-        @logger.info("Starting bolt #{mode} #{action} #{object}")
 
         elapsed_time = Benchmark.realtime do
           results =

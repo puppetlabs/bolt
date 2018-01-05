@@ -82,13 +82,13 @@ module Bolt
           )
         end
       elsif data =~ /^#{@user} is not in the sudoers file\./
-        @logger.info { data }
+        @logger.debug { data }
         raise Bolt::Node::EscalateError.new(
           "User #{@user} does not have sudo permission on #{@uri}",
           'SUDO_DENIED'
         )
       elsif data =~ /^Sorry, try again\./
-        @logger.info { data }
+        @logger.debug { data }
         raise Bolt::Node::EscalateError.new(
           "Sudo password for user #{@user} not recognized on #{@uri}",
           'BAD_PASSWORD'

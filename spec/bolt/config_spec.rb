@@ -48,7 +48,7 @@ describe Bolt::Config do
     it "warns if both defaults exist, and uses the new default" do
       logger = double('logger')
       expect(logger).to receive(:warn).with("Config files found at #{default_path}, #{alt_path}, using the first")
-      expect(Logger).to receive(:new).and_return(logger)
+      expect(Logger).to receive(:get_logger).and_return(logger)
 
       expect(File).to receive(:exist?).with(default_path).and_return(true)
       expect(File).to receive(:exist?).with(alt_path).and_return(true)

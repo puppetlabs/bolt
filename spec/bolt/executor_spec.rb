@@ -6,6 +6,7 @@ describe "Bolt::Executor" do
   let(:executor) { Bolt::Executor.new(config) }
   let(:command) { "hostname" }
   let(:script) { '/path/to/script.sh' }
+  let(:dest) { '/tmp/upload' }
   let(:success) { Bolt::Result.new }
   let(:start_event) { { type: :node_start } }
   let(:success_event) { { type: :node_result, result: success } }
@@ -22,6 +23,7 @@ describe "Bolt::Executor" do
     allow(node).to receive(:class).and_return(transport)
     allow(node).to receive(:connect)
     allow(node).to receive(:disconnect)
+    allow(node).to receive(:uri).and_return(name)
     node
   end
 
@@ -148,5 +150,79 @@ describe "Bolt::Executor" do
     expect(Bolt::WinRM).to receive(:new).with('b.com', any_args)
 
     executor.from_uris(['ssh://a.net', 'winrm://b.com'])
+  end
+
+  context "When running a plan" do
+    let(:executor) { Bolt::Executor.new(config, nil, true) }
+    let(:nodes_string) { nodes.map(&:uri) }
+
+    it "logs commands" do
+      nodes.each do |node|
+        expect(node)
+          .to receive(:run_command)
+          .with(command)
+          .and_return(success)
+      end
+
+      logger = double('logger')
+      allow(logger).to receive(:debug)
+      expect(logger).to receive(:log).with(Logger::NOTICE, "Starting command run '#{command}' on #{nodes_string}")
+      expect(logger).to receive(:log).with(Logger::NOTICE, "Ran command '#{command}' on 2 nodes with 0 failures")
+      allow(Logger).to receive(:get_logger).and_return(logger)
+
+      executor.run_command(nodes, command)
+    end
+
+    it "logs scripts" do
+      nodes.each do |node|
+        expect(node)
+          .to receive(:run_script)
+          .with(script, [])
+          .and_return(success)
+      end
+
+      logger = double('logger')
+      allow(logger).to receive(:debug)
+      expect(logger).to receive(:log).with(Logger::NOTICE, "Starting script run #{script} on #{nodes_string}")
+      expect(logger).to receive(:log).with(Logger::NOTICE, "Ran script '#{script}' on 2 nodes with 0 failures")
+      allow(Logger).to receive(:get_logger).and_return(logger)
+
+      executor.run_script(nodes, script, [])
+    end
+
+    it "logs tasks" do
+      nodes.each do |node|
+        expect(node)
+          .to receive(:run_task)
+          .with(task, 'both', task_arguments)
+          .and_return(success)
+      end
+
+      logger = double('logger')
+      allow(logger).to receive(:debug)
+      expect(logger).to receive(:log).with(Logger::NOTICE, 'Starting task service::restart on ["node1", "node2"]')
+      expect(logger).to receive(:log).with(Logger::NOTICE, "Ran task 'service::restart' on 2 nodes with 0 failures")
+      allow(Logger).to receive(:get_logger).and_return(logger)
+
+      executor.run_task(nodes, task, 'both', task_arguments)
+    end
+
+    it "logs uploads" do
+      nodes.each do |node|
+        expect(node)
+          .to receive(:upload)
+          .with(script, dest)
+          .and_return(success)
+      end
+
+      logger = double('logger')
+      allow(logger).to receive(:debug)
+      expect(logger).to receive(:log).with(Logger::NOTICE,
+                                           "Starting file upload from #{script} to #{dest} on #{nodes_string}")
+      expect(logger).to receive(:log).with(Logger::NOTICE, "Ran upload '#{script}' on 2 nodes with 0 failures")
+      allow(Logger).to receive(:get_logger).and_return(logger)
+
+      executor.file_upload(nodes, script, dest)
+    end
   end
 end

@@ -1,5 +1,3 @@
-require 'bolt/logger'
-
 # Runs a given instance of a `Task` on the given set of targets and returns the result from each.
 #
 # * This function does nothing if the list of targets is empty.
@@ -27,25 +25,10 @@ Puppet::Functions.create_function(:run_task) do
     block_param
   end
 
-  def log_summary(object, node_count, fail_count)
-    format("Ran task %s on %d node%s with %d failure%s",
-           object,
-           node_count,
-           node_count == 1 ? '' : 's',
-           fail_count,
-           fail_count == 1 ? '' : 's')
-  end
-
   def run_task(task_name, targets, task_args = nil)
-    logger = Logger.instance
-    logger.notice("Running task #{task_name}")
-
-    r = Bolt::ExecutionResult.from_bolt(
+    Bolt::ExecutionResult.from_bolt(
       run_task_raw(task_name, targets, task_args)
     )
-
-    logger.notice(log_summary(task_name, targets.size, r.error_nodes.count))
-    r
   end
 
   def run_task_raw(task_name, targets, task_args = nil, &block)

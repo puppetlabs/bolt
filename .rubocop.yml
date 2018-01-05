@@ -33,9 +33,6 @@ Style/GuardClause:
 Style/MultilineBlockChain:
   Enabled: false
 
-Style/ClassVars:
-  Enabled: false
-
 # Disable nearly all Metrics checks. These seem better off left to judgement.
 
 Metrics/AbcSize:

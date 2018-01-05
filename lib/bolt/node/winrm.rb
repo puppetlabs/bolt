@@ -440,7 +440,6 @@ PS
     end
 
     def write_remote_file(source, destination)
-      @logger.debug { "Uploading #{source} to #{destination}" }
       fs = ::WinRM::FS::FileManager.new(@connection)
       # TODO: raise FileError here if this fails
       fs.upload(source, destination)
@@ -488,7 +487,6 @@ PS
     end
 
     def _run_script(script, arguments)
-      @logger.info { "Running script '#{script}'" }
       with_remote_file(script) do |remote_path|
         if powershell_file?(remote_path)
           mapped_args = arguments.map do |a|
@@ -523,9 +521,6 @@ catch
     end
 
     def _run_task(task, input_method, arguments)
-      @logger.info { "Running task '#{task}'" }
-      @logger.debug { "arguments: #{arguments}\ninput_method: #{input_method}" }
-
       if STDIN_METHODS.include?(input_method)
         stdin = JSON.dump(arguments)
       end
