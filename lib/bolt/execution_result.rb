@@ -13,7 +13,7 @@ module Bolt
       end
 
       def to_s
-        Puppet::Pops::Types::StringConverter.singleton.convert(self)
+        @result_hash.to_s
       end
     else
       def iterator
