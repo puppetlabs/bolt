@@ -559,19 +559,20 @@ NODES
             action: 'show'
           }
           cli.execute(options)
-          expect(JSON.parse(@output.string)).to eq(
-            [
-              ['sample', nil],
-              ['sample::echo', nil],
-              ['sample::no_noop', 'Task with no noop'],
-              ['sample::noop', 'Task with noop'],
-              ['sample::notice', nil],
-              ['sample::params', 'Task with parameters'],
-              ['sample::ps_noop', 'Powershell task with noop'],
-              ['sample::stdin', nil],
-              ['sample::winstdin', nil]
-            ]
-          )
+          tasks = JSON.parse(@output.string)
+          [
+            ['sample', nil],
+            ['sample::echo', nil],
+            ['sample::no_noop', 'Task with no noop'],
+            ['sample::noop', 'Task with noop'],
+            ['sample::notice', nil],
+            ['sample::params', 'Task with parameters'],
+            ['sample::ps_noop', 'Powershell task with noop'],
+            ['sample::stdin', nil],
+            ['sample::winstdin', nil]
+          ].each do |taskdoc|
+            expect(tasks).to include(taskdoc)
+          end
         end
 
         it "shows an individual task data in json" do
@@ -660,14 +661,15 @@ NODES
             action: 'show'
           }
           cli.execute(options)
-          expect(JSON.parse(@output.string)).to eq(
-            [
-              ['sample'],
-              ['sample::single_task'],
-              ['sample::three_tasks'],
-              ['sample::two_tasks']
-            ]
-          )
+          plan_list = JSON.parse(@output.string)
+          [
+            ['sample'],
+            ['sample::single_task'],
+            ['sample::three_tasks'],
+            ['sample::two_tasks']
+          ].each do |plan|
+            expect(plan_list).to include(plan)
+          end
         end
       end
 
