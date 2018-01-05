@@ -1,4 +1,5 @@
-require 'logger'
+require 'bolt/logger'
+require 'json'
 require 'concurrent'
 require 'bolt/result'
 require 'bolt/config'
@@ -11,8 +12,8 @@ module Bolt
 
     def initialize(config = Bolt::Config.new, noop = nil)
       @config = config
-      @logger = Logger.new(config[:log_destination])
-      @logger.progname = 'executor'
+      @logger = Logger.instance(config[:log_destination])
+      # @logger.progname = 'executor'
       @logger.level = config[:log_level]
       @logger.formatter = Bolt::Formatter.new
       @noop = noop
@@ -67,35 +68,56 @@ module Bolt
       results_to_hash(results)
     end
 
+    def get_node_list(nodes)
+      # TODO: This prints an array as ["node", "node"] Investigate pretty printing
+      nodes.map(&:uri)
+    end
+
     def run_command(nodes, command)
+      @logger.info("Starting bolt command run #{command} on #{get_node_list(nodes)}")
+      @logger.debug { "Arguments: #{arguments}" }
       callback = block_given? ? Proc.new : nil
 
       on(nodes, callback) do |node|
-        node.run_command(command)
+        r = node.run_command(command)
+        @logger.info("Result on #{node.uri}: #{JSON.dump(r.to_result)}")
+        r
       end
     end
 
     def run_script(nodes, script, arguments)
+      @logger.info("Starting bolt script run #{script} on #{get_node_list(nodes)}")
+      @logger.debug { "Arguments: #{arguments}" }
       callback = block_given? ? Proc.new : nil
 
       on(nodes, callback) do |node|
-        node.run_script(script, arguments)
+        r = node.run_script(script, arguments)
+        @logger.info("Result on #{node.uri}: #{JSON.dump(r.to_result)}")
+        r
       end
     end
 
     def run_task(nodes, task, input_method, arguments)
+      @logger.info("Starting bolt task run #{task} on #{get_node_list(nodes)}")
+      @logger.debug { "Arguments: #{arguments}\nInput method: #{input_method}" }
       callback = block_given? ? Proc.new : nil
 
       on(nodes, callback) do |node|
-        node.run_task(task, input_method, arguments)
+        @logger.info { "Running task '#{task}'" }
+        r = node.run_task(task, input_method, arguments)
+        @logger.info("Result on #{node.uri}: #{JSON.dump(r.to_result)}")
+        r
       end
     end
 
     def file_upload(nodes, source, destination)
+      @logger.info("Starting bolt file upload from #{source} to #{destination} on #{nodes}")
       callback = block_given? ? Proc.new : nil
 
       on(nodes, callback) do |node|
-        node.upload(source, destination)
+        r = node.upload(source, destination)
+        @logger.info("Result on #{node.uri}: #{JSON.dump(r.to_result)}")
+        r
       end
     end
 

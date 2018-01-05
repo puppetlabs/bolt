@@ -1,7 +1,7 @@
 require 'uri'
 require 'optparse'
 require 'benchmark'
-require 'logger'
+require 'bolt/logger'
 require 'json'
 require 'bolt/node'
 require 'bolt/version'
@@ -109,7 +109,8 @@ HELP
       }
       @config = Bolt::Config.new
       @parser = create_option_parser(@options)
-      @logger = Logger.new(STDERR)
+      @logger = Logger.instance(STDERR)
+      @logger.level = Logger::NOTICE
     end
 
     def create_option_parser(results)
@@ -425,7 +426,11 @@ HELP
         nodes = executor.from_uris(options[:nodes])
 
         results = nil
+        mode = options[:mode]
+        action = options[:action]
+        object = options[:object]
         outputter.print_head
+        @logger.info("Starting bolt #{mode} #{action} #{object}")
 
         elapsed_time = Benchmark.realtime do
           results =

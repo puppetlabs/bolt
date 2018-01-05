@@ -260,9 +260,6 @@ SCRIPT
     end
 
     def _run_script(script, arguments)
-      @logger.info { "Running script '#{script}'" }
-      @logger.debug { "arguments: #{arguments}" }
-
       with_remote_file(script) do |remote_path|
         output = execute("'#{remote_path}' #{Shellwords.join(arguments)}",
                          sudoable: true)
@@ -277,9 +274,6 @@ SCRIPT
     def _run_task(task, input_method, arguments)
       export_args = {}
       stdin, output = nil
-
-      @logger.info { "Running task '#{task}'" }
-      @logger.debug { "arguments: #{arguments}\ninput_method: #{input_method}" }
 
       if STDIN_METHODS.include?(input_method)
         stdin = JSON.dump(arguments)
