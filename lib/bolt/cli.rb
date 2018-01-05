@@ -179,6 +179,10 @@ HELP
                 "Whether to connect insecurely ") do |insecure|
           results[:insecure] = insecure
         end
+        opts.on('--kerberos REALM',
+                "Use kerberos authentication for WinRM") do |realm|
+          results[:kerberos] = realm
+        end
         opts.on('--transport TRANSPORT', TRANSPORTS,
                 "Specify a default transport: #{TRANSPORTS.join(', ')}") do |t|
           results[:transport] = t

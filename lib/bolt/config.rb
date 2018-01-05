@@ -21,7 +21,7 @@ module Bolt
       log_destination: STDERR
     }.freeze
 
-    TRANSPORT_OPTIONS = %i[insecure password run_as sudo_password
+    TRANSPORT_OPTIONS = %i[insecure kerberos password run_as sudo_password
                            key tty tmpdir user connect_timeout cacert
                            token_file orch_task_environment service_url].freeze
 
@@ -29,7 +29,8 @@ module Bolt
       connect_timeout: 10,
       orch_task_environment: 'production',
       insecure: false,
-      tty: false
+      tty: false,
+      kerberos: false
     }.freeze
 
     TRANSPORTS = %i[ssh winrm pcp].freeze
@@ -123,6 +124,9 @@ module Bolt
         end
         if data['winrm']['insecure']
           self[:transports][:winrm][:insecure] = data['winrm']['insecure']
+        end
+        if data['winrm']['kerberos']
+          self[:transports][:winrm][:kerberos] = data['winrm']['kerberos']
         end
         if data['winrm']['tmpdir']
           self[:transports][:winrm][:tmpdir] = data['winrm']['tmpdir']

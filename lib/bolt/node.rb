@@ -45,6 +45,7 @@ module Bolt
       @cacert = transport_conf[:cacert]
       @tty = transport_conf[:tty]
       @insecure = transport_conf[:insecure]
+      @kerberos = transport_conf[:kerberos]
       @connect_timeout = transport_conf[:connect_timeout]
       @sudo_password = transport_conf[:sudo_password]
       @run_as = transport_conf[:run_as]

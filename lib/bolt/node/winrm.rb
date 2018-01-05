@@ -27,12 +27,20 @@ module Bolt
         transport = :ssl
       end
       endpoint = "#{scheme}://#{host}:#{port}/wsman"
+
+      if @kerberos
+        transport = :kerberos
+        realm = @kerberos
+      end
+
+      # Allow unspecified user/password for kerberos auth.
       options = { endpoint: endpoint,
-                  user: @user,
-                  password: @password,
+                  user: @user || '',
+                  password: @password || '',
                   retry_limit: 1,
                   transport: transport,
-                  ca_trust_path: @cacert }
+                  ca_trust_path: @cacert,
+                  realm: realm }
 
       Timeout.timeout(@connect_timeout) do
         @connection = ::WinRM::Connection.new(options)
