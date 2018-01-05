@@ -602,10 +602,6 @@ HELP
           cli << "--#{setting}" << dir
         end
         in_bolt_compiler(cli) do |compiler|
-          # Make sure the Datatypes we expose to plans are loaded
-          compiler.type('ExecutionResult')
-          compiler.type('Target')
-
           result = compiler.call_function('run_plan', plan, args)
           # Querying ExecutionResult for failures currently requires a script compiler.
           # Convert from an ExecutionResult to structured output that we can print.

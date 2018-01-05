@@ -15,12 +15,14 @@ Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFuncti
     param 'String[1]', :script
     param 'TargetOrTargets', :targets
     param 'Struct[arguments => Array[String]]', :arguments
+    return_type 'ExecutionResult'
   end
 
   dispatch :run_script do
     scope_param
     param 'String[1]', :script
     repeated_param 'TargetOrTargets', :targets
+    return_type 'ExecutionResult'
   end
 
   def run_script(scope, script, *targets)
