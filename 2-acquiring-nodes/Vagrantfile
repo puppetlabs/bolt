@@ -15,4 +15,10 @@ Vagrant.configure('2') do |config|
   (1..$nodes_count).each do |i|
     config.vm.define "node#{i}"
   end
+
+  config.vm.define :windows do |windows|
+    windows.vm.box = "mwrock/WindowsNano"
+    windows.vm.guest = :windows
+    windows.vm.communicator = "winrm"
+  end
 end

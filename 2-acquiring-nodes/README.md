@@ -37,10 +37,16 @@ Vagrant.configure('2') do |config|
   (1..$nodes_count).each do |i|
     config.vm.define "node#{i}"
   end
+
+  config.vm.define :windows do |windows|
+    windows.vm.box = "mwrock/WindowsNano"
+    windows.vm.guest = :windows
+    windows.vm.communicator = "winrm"
+  end
 end
 ```
 
-This will by default launch three CentOS 7 nodes. Run the following command. We are assuming you have some familiarity with Vagrant and have a suitable hypervisor configured.
+This will by default launch three CentOS 7 nodes and a Windows (Nano Server) node. Run the following command. We are assuming you have some familiarity with Vagrant and have a suitable hypervisor configured.
 
 ```
 vagrant up
@@ -63,7 +69,7 @@ mkdir ~/.ssh
 vagrant ssh-config | sed /StrictHostKeyChecking/d | sed /UserKnownHostsFile/d >> ~/.ssh/config
 ```
 
-When passing nodes to `bolt` in the following exercises you will use `--nodes node1,node2`. The reason you can use the node name, rather than the IP address, is the above SSH configuration file.
+When passing nodes to `bolt` in the following exercises with Linux you will use `--nodes node1,node2`. The reason you can use the node name, rather than the IP address, is the above SSH configuration file.
 
 Make sure you can ssh into all of your nodes. If you've used the vagrant nodes before you may have to remove entries from `~/.ssh/known_hosts`.
 

@@ -66,7 +66,7 @@ Test-Connection -ComputerName "example.com" -Count 3 -Delay 2 -TTL 255 -BufferSi
 Next we run the script using `bolt script run`. This will upload the script to all specified nodes, ensure it's executable and finally run it, returning the output to the console.
 
 ```
-$ bolt script run testconnection.ps1 -n winrm://vagrant:vagrant@localhost:55985
+$ bolt script run testconnection.ps1 -n $WINNODE
 Started on localhost...
 Finished on localhost:
   STDOUT:
