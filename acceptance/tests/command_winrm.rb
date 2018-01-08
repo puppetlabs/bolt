@@ -14,9 +14,10 @@ test_name "C100547: \
     command = '[System.Net.Dns]::GetHostByName(($env:computerName))'
     bolt_command = "bolt command run '#{command}'"
     flags = {
-      '--nodes' => nodes_csv,
-      '-u'      => user,
-      '-p'      => password
+      '--nodes'     => nodes_csv,
+      '-u'          => user,
+      '-p'          => password,
+      '--insecure'  => nil
     }
 
     result = bolt_command_on(bolt, bolt_command, flags)

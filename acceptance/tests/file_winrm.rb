@@ -30,9 +30,10 @@ test_name "C1005xx: \
     bolt_command = "bolt file upload '#{dir}/#{source}' '#{testdir}/#{dest}'"
 
     flags = {
-      '--nodes' => nodes_csv,
-      '-u'      => user,
-      '-p'      => password
+      '--nodes'     => nodes_csv,
+      '-u'          => user,
+      '-p'          => password,
+      '--insecure'  => nil
     }
 
     result = bolt_command_on(bolt, bolt_command, flags)

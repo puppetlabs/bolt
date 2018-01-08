@@ -28,8 +28,8 @@ test_name "C100554: \
                        "#{dir}/modules/test/plans/my_win_plan.pp", <<-FILE)
     plan test::my_win_plan($nodes) {
       $nodes_array = $nodes.split(',')
-      run_task(test::a_win, $nodes_array)
-      run_task(test::b_win, $nodes_array)
+      notice("${run_task(test::a_win, $nodes_array)}")
+      notice("${run_task(test::b_win, $nodes_array)}")
     }
     FILE
   end
@@ -43,12 +43,17 @@ test_name "C100554: \
     flags = {
       '--modulepath'  => "#{dir}/modules",
       '-u'            => user,
-      '-p'            => password
+      '-p'            => password,
+      '--insecure'    => nil
     }
 
     result = bolt_command_on(bolt, bolt_command, flags)
-    message = "Unexpected output from the command:\n#{result.cmd}"
-    assert_match(/ExecutionResult/, result.stdout, message)
+    message = "The plan was expected to notify but did not"
+    assert_match(/Notice:/, result.stdout, message)
+    winrm_nodes.each do |node|
+      message = "The plan was expceted to mention the host #{node.hostname} with _output"
+      assert_match(/#{node.hostname}"=>{"_output"=>/, result.stdout, message)
+    end
 
     winrm_nodes.each do |node|
       command = "type #{testdir}/C100554_plan_artifact.txt"

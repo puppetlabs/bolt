@@ -21,9 +21,10 @@ test_name "C100549: \
     nodes_csv = winrm_nodes.map { |host| "winrm://#{host.hostname}" }.join(',')
     bolt_command = "bolt script run #{script}"
     flags = {
-      '--nodes' => nodes_csv,
-      '-u'      => user,
-      '-p'      => password
+      '--nodes'     => nodes_csv,
+      '-u'          => user,
+      '-p'          => password,
+      '--insecure'  => nil
     }
 
     result = bolt_command_on(bolt, bolt_command, flags)

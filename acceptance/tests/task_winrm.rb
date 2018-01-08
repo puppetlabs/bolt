@@ -26,7 +26,8 @@ test_name "C100551: \
       '--nodes'       => nodes_csv,
       '--modulepath'  => "#{dir}/modules",
       '-u'            => user,
-      '-p'            => password
+      '-p'            => password,
+      '--insecure'    => nil
     }
 
     result = bolt_command_on(bolt, bolt_command, flags)
