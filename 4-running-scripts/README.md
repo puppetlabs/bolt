@@ -33,7 +33,7 @@ curl -O https://raw.githubusercontent.com/hannob/bashcheck/master/bashcheck
 Next we run the script using `bolt script run <script-name>`. This will upload the script specified to all specified nodes, ensure it's executable and finally run it, returning the output to the console. An example of running that with `bashcheck` looks like:
 
 ```
-$ bolt script run bashcheck --n node1
+$ bolt script run bashcheck -n node1
 Started on node1...
 Finished on node1:
   STDOUT:
@@ -66,7 +66,7 @@ Test-Connection -ComputerName "example.com" -Count 3 -Delay 2 -TTL 255 -BufferSi
 Next we run the script using `bolt script run`. This will upload the script to all specified nodes, ensure it's executable and finally run it, returning the output to the console.
 
 ```
-$ bolt script run testconnection.ps1 --n winrm://vagrant:vagrant@localhost:55985
+$ bolt script run testconnection.ps1 -n winrm://vagrant:vagrant@localhost:55985
 Started on localhost...
 Finished on localhost:
   STDOUT:
