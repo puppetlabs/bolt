@@ -23,7 +23,7 @@ If you already have, or can easily launch, a few Linux or Windows nodes then you
 Save the following as `Vagrantfile`, or use the file accompanying this exercise.
 
 ```ruby
-$nodes_count = 1
+$nodes_count = 3
 
 if ENV['NODES'].to_i > 0 && ENV['NODES']
   $nodes_count = ENV['NODES'].to_i
@@ -40,26 +40,15 @@ Vagrant.configure('2') do |config|
 end
 ```
 
-This will by default launch one node. Run the following command. We are assuming you have some familiarity with Vagrant and have a suitable hypervisor configured.
+This will by default launch three CentOS 7 nodes. Run the following command. We are assuming you have some familiarity with Vagrant and have a suitable hypervisor configured.
 
 ```
 vagrant up
 ```
 
-If you would like to run more than one SSH server then you can set the `NODES` environment variable and run `vagrant up` again. With a Linux shell this is:
+It can be configured to a different number of nodes by setting the `NODES` environment variable.
 
-```
-NODES=3 vagrant up
-```
-
-On Windows you can do the same thing with PowerShell:
-
-```powershell
-$env:NODES = 3
-vagrant up
-```
-
-Finally you can generate the SSH configuration so `bolt` knows how to authenticate with the SSH daemon. The following command will output the required details.
+You can generate the SSH configuration so `bolt` knows how to authenticate with the SSH daemon. The following command will output the required details.
 
 ```
 vagrant ssh-config
@@ -67,18 +56,14 @@ vagrant ssh-config
 
 Note that if you've created more than one SSH server as above, this should be:
 
-```
-NODES=3 vagrant ssh-config | sed /StrictHostKeyChecking/d | sed /UserKnownHostsFile/d
-```
-
 You can save that so it will be automatically picked up by most SSH clients, including `bolt`. This uses the ability to specify hosts along with there connection details in a [configuration file](https://linux.die.net/man/5/ssh_config).
 
 ```
 mkdir ~/.ssh
-NODES=3 vagrant ssh-config | sed /StrictHostKeyChecking/d | sed /UserKnownHostsFile/d >> ~/.ssh/config
+vagrant ssh-config | sed /StrictHostKeyChecking/d | sed /UserKnownHostsFile/d >> ~/.ssh/config
 ```
 
-When passing nodes to `bolt` in the following exercises you will use something like `--nodes node1,node2`, up to the number of nodes you decided to launch. The reason you can use the node name, rather than the IP address, is the above SSH configuration file.
+When passing nodes to `bolt` in the following exercises you will use `--nodes node1,node2`. The reason you can use the node name, rather than the IP address, is the above SSH configuration file.
 
 Make sure you can ssh into all of your nodes. If you've used the vagrant nodes before you may have to remove entries from `~/.ssh/known_hosts`.
 

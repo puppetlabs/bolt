@@ -38,7 +38,7 @@ Finished on node1:
 
 If you receive an error reading `Host key verification failed` you should make sure the correct host keys are in your `known_hosts` file or pass `--insecure` to future bolt commands. Bolt will not honor `StrictHostKeyChecking` in you ssh config.
 
-`bolt` can also run commands against multiple nodes by passing a command separated list. Replace `node1,node2` in the following with two or more of your own nodes. If you get an error about `Host key verification` run the rest of the examples with the `--insecure` flag to disable host key verification.
+`bolt` can also run commands against multiple nodes by passing a command separated list. Replace `node1,node2,node3` in the following with two or more of your own nodes. If you get an error about `Host key verification` run the rest of the examples with the `--insecure` flag to disable host key verification.
 
 ```
 $ bolt command run uptime --nodes node1,node2,node3

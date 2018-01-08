@@ -1,7 +1,7 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-$nodes_count = 1
+$nodes_count = 3
 
 if ENV['NODES'].to_i > 0 && ENV['NODES']
   $nodes_count = ENV['NODES'].to_i
