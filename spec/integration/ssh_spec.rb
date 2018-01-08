@@ -15,6 +15,8 @@ describe "when runnning over the ssh transport", ssh: true do
   let(:user) { conn_info('ssh')[:user] }
   let(:password) { conn_info('ssh')[:password] }
 
+  after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
+
   context 'when using CLI options' do
     let(:config_flags) { %W[--nodes #{uri} --insecure --format json --modulepath #{modulepath} --password #{password}] }
 
