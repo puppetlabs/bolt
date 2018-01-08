@@ -333,7 +333,7 @@ Height: $Height ($(if ($Height -ne $null) { $Height.GetType().Name } else { 'nul
       arguments = { Age: 30,
                     Height: 5.75,
                     Name: 'John Doe' }
-      with_tempfile_containing('task-params-test-winrm.ps1', contents) do |file|
+      with_tempfile_containing('task-params-test-winrm', contents) do |file|
         expect(winrm._run_task(file.path, 'powershell', arguments).message)
           .to match(/\AName: John Doe \(String\).*^Age: 30 \(Int\d+\).*^Height: 5.75 \((Double|Decimal)\).*\Z/m)
       end
@@ -352,7 +352,7 @@ Height: $Height ($(if ($Height -ne $null) { $Height.GetType().Name } else { 'nul
           "bar: $bar ($(if ($bar -ne $null) { $bar.GetType().Name } else { 'null' }))"
       PS
       arguments = { bar: 30 } # note that the script doesn't recognize the 'bar' parameter
-      with_tempfile_containing('task-params-test-winrm.ps1', contents) do |file|
+      with_tempfile_containing('task-params-test-winrm', contents) do |file|
         expect(winrm._run_task(file.path, 'powershell', arguments).error)
           .to_not be_nil
       end
@@ -372,7 +372,7 @@ bar: $bar ($(if ($bar -ne $null) { $bar.GetType().Name } else { 'null' }))
 "@
       PS
       arguments = { bar: 30 } # note that the script doesn't recognize the 'bar' parameter
-      with_tempfile_containing('task-params-test-winrm.ps1', contents) do |file|
+      with_tempfile_containing('task-params-test-winrm', contents) do |file|
         expect(winrm._run_task(file.path, 'environment', arguments).message)
           .to match(/\Afoo:  \(String\).*^bar: 30 \(String\).*\Z/m) # note that $foo is an empty string and not null
       end
@@ -645,6 +645,33 @@ OUTPUT
           expect(
             winrm._run_task(file.path, 'stdin', {}).message
           ).to eq("42")
+        end
+      end
+
+      it "can apply an arbitrary script", winrm: true do
+        allow(winrm)
+          .to receive(:execute_process)
+          .with('cmd.exe',
+                ['/c', /^".*"$/])
+          .and_return(output)
+        with_tempfile_containing('script-py-winrm', 'print(42)', '.py') do |file|
+          expect(
+            winrm._run_script(file.path, []).stdout
+          ).to eq('42')
+        end
+      end
+
+      it "can apply an arbitrary script as a task", winrm: true do
+        allow(winrm)
+          .to receive(:execute_process)
+          .with('cmd.exe',
+                ['/c', /^".*"$/],
+                anything)
+          .and_return(output)
+        with_tempfile_containing('task-py-winrm', 'print(42)', '.py') do |file|
+          expect(
+            winrm._run_task(file.path, 'stdin', {}).message
+          ).to eq('42')
         end
       end
 

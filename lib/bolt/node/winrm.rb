@@ -401,8 +401,6 @@ exit $(Invoke-Interpreter @invokeArgs)
 PS
     end
 
-    VALID_EXTENSIONS = ['.ps1', '.rb', '.pp'].freeze
-
     PS_ARGS = %w[
       -NoProfile -NonInteractive -NoLogo -ExecutionPolicy Bypass
     ].freeze
@@ -427,6 +425,12 @@ PS
         [
           'puppet.bat',
           ['apply', "\"#{path}\""]
+        ]
+      else
+        # Run the script via cmd, letting Windows extension handling determine how
+        [
+          'cmd.exe',
+          ['/c', "\"#{path}\""]
         ]
       end
     end
@@ -461,11 +465,11 @@ PS
     end
 
     def with_remote_file(file)
-      ext = File.extname(file)
-      ext = VALID_EXTENSIONS.include?(ext) ? ext : '.ps1'
-      file_base = File.basename(file, '.*')
+      file_base = File.basename(file)
+      # Default to powershell if no extension present
+      file_base += '.ps1' if File.extname(file).empty?
       dir = make_tempdir
-      dest = "#{dir}\\#{file_base}#{ext}"
+      dest = "#{dir}\\#{file_base}"
       begin
         write_remote_file(file, dest)
         shell_init
