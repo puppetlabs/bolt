@@ -32,18 +32,10 @@ end
 Vagrant.configure('2') do |config|
   config.vm.box = 'centos/7'
   config.ssh.forward_agent = true
+  config.vm.network "private_network", type: "dhcp"
 
   (1..$nodes_count).each do |i|
-    config.vm.define "node#{i}" do |node|
-      ip = "192.168.50.#{i+100}"
-      node.vm.network "private_network", ip: ip
-      ['vmware_fusion', 'vmware_workstation', 'virtualbox'].each do |provider|
-        config.vm.provider provider do |_, override|
-          override.ssh.host = ip
-          override.ssh.port = 22
-        end unless ENV['BOOT']
-      end
-    end
+    config.vm.define "node#{i}"
   end
 end
 ```
@@ -51,16 +43,14 @@ end
 This will by default launch one node. Run the following command. We are assuming you have some familiarity with Vagrant and have a suitable hypervisor configured.
 
 ```
-BOOT=true vagrant up
+vagrant up
 ```
 
 If you would like to run more than one SSH server then you can set the `NODES` environment variable and run `vagrant up` again. With a Linux shell this is:
 
 ```
-NODES=3 BOOT=true vagrant up
+NODES=3 vagrant up
 ```
-
-Note that the `BOOT` environment variable is only required when launching new nodes with `vagrant up` and should be left out when running other commands like `vagrant ssh` or `vagrant ssh-config`.
 
 On Windows you can do the same thing with PowerShell:
 
