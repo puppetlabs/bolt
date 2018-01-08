@@ -82,7 +82,7 @@ When passing nodes to `bolt` in the following exercises you will use something l
 
 Make sure you can ssh into all of your nodes. If you've used the vagrant nodes before you may have to remove entries from `~/.ssh/known_hosts`.
 
-``
+```
 ssh node1
 ssh node2
 ssh node3
