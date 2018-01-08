@@ -56,10 +56,22 @@ Finished on node2:
      21:20:14 up 13 min,  0 users,  load average: 0.00, 0.01, 0.05$
 ```
 
+For the duration of these exercises, it may help to set a variable with the list of nodes for future use. Later examples will refer to this variable. For example if using the provided Vagrant configuration, set the following:
+
+```
+NODE=node1,node2,node3
+```
+
+On Windows, you can do the same thing with Powershell:
+
+```powershell
+$NODE="node1,node2,node3"
+```
+
 If you're accessing nodes using a username and password rather than keys you can pass those on the command line like so:
 
 ```
-bolt command run <command> --nodes <node> --user <user> --password <password>
+bolt command run <command> --nodes $NODE --user <user> --password <password>
 ```
 
 `bolt` has a number of other flags. Run the following command to list all of them:

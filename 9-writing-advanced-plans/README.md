@@ -62,7 +62,7 @@ In the above plan we:
 You can see this plan in action by running:
 
 ```bash
-bolt plan run exercise9::yesorno nodes=<nodes> --modulepath ./modules
+bolt plan run exercise9::yesorno nodes=$NODE --modulepath ./modules
 ```
 
 When run you should see output like the following. Running it multiple times should result in different output, as the return value of the task is random the command should run on a different subset of nodes each time.
