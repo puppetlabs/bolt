@@ -21,8 +21,8 @@ test_name "C100553: \
                        "#{dir}/modules/test/plans/my_unix_plan.pp", <<-FILE)
     plan test::my_unix_plan($nodes) {
       $nodes_array = $nodes.split(',')
-      run_task(test::a_unix, $nodes_array)
-      run_task(test::b_unix, $nodes_array)
+      notice("${run_task(test::a_unix, $nodes_array)}")
+      notice("${run_task(test::b_unix, $nodes_array)}")
     }
     FILE
   end
@@ -41,8 +41,12 @@ test_name "C100553: \
     }
 
     result = bolt_command_on(bolt, bolt_command, flags)
-    message = "Unexpected output from the command:\n#{result.cmd}"
-    assert_match(/ExecutionResult/, result.stdout, message)
+    message = "The plan was expected to notify but did not"
+    assert_match(/Notice:/, result.stdout, message)
+    ssh_nodes.each do |node|
+      message = "The plan was expceted to mention the host #{node.hostname} with _output"
+      assert_match(/#{node.hostname}"=>{"_output"=>/, result.stdout, message)
+    end
 
     ssh_nodes.each do |node|
       # bolt plan return value unspecified
