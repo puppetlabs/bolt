@@ -27,6 +27,7 @@ describe "Bolt::Executor" do
 
   it "executes a command on all nodes" do
     nodes.each do |node|
+      allow(node).to receive(:uri)
       expect(node).to receive(:run_command).with(command).and_return(success)
     end
 
@@ -35,11 +36,13 @@ describe "Bolt::Executor" do
 
   it "yields each command result" do
     nodes.each do |node|
+      allow(node).to receive(:uri)
       expect(node).to receive(:run_command).with(command).and_return(success)
     end
 
     results = []
     executor.run_command(nodes, command) do |node, result|
+      allow(node).to receive(:uri)
       results << [node, result]
     end
 
@@ -51,6 +54,7 @@ describe "Bolt::Executor" do
 
   it "runs a script on all nodes" do
     nodes.each do |node|
+      allow(node).to receive(:uri)
       expect(node).to receive(:run_script).with(script, []).and_return(success)
     end
 
@@ -62,6 +66,7 @@ describe "Bolt::Executor" do
 
   it "yields each script result" do
     nodes.each do |node|
+      allow(node).to receive(:uri)
       expect(node).to receive(:run_script).with(script, []).and_return(success)
     end
 
@@ -78,6 +83,7 @@ describe "Bolt::Executor" do
 
   it "runs a task on all nodes" do
     nodes.each do |node|
+      allow(node).to receive(:uri)
       expect(node)
         .to receive(:run_task)
         .with(task, 'both', task_arguments)
@@ -92,6 +98,7 @@ describe "Bolt::Executor" do
 
   it "yields each task result" do
     nodes.each do |node|
+      allow(node).to receive(:uri)
       expect(node)
         .to receive(:run_task)
         .with(task, 'both', task_arguments)
@@ -110,6 +117,7 @@ describe "Bolt::Executor" do
 
   it "returns an error result if the connect raises a base error" do
     node = mock_node 'node'
+    allow(node).to receive(:uri)
     expect(node)
       .to receive(:connect)
       .and_raise(
@@ -126,6 +134,7 @@ describe "Bolt::Executor" do
     logger = double('logger', error: nil)
     node = mock_node 'node'
     allow(node).to receive(:logger).and_return(logger)
+    allow(node).to receive(:uri)
     expect(node).to receive(:connect).and_raise("reset")
 
     results = executor.run_command([node], command)

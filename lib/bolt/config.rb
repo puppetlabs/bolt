@@ -1,4 +1,4 @@
-require 'logger'
+require 'bolt/logger'
 require 'yaml'
 require 'bolt/cli'
 
@@ -17,7 +17,7 @@ module Bolt
       concurrency: 100,
       transport: 'ssh',
       format: 'human',
-      log_level: Logger::WARN,
+      log_level: Logger::NOTICE,
       log_destination: STDERR
     }.freeze
 

@@ -1,3 +1,5 @@
+require 'bolt/logger'
+
 # Uploads the given script to the given set of targets and returns the result of having each target execute the script.
 #
 # * This function does nothing if the list of targets is empty.
@@ -25,8 +27,21 @@ Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFuncti
     return_type 'ExecutionResult'
   end
 
+  def log_summary(object, node_count, fail_count)
+    format("Ran script %s on %d node%s with %d failure%s",
+           object,
+           node_count,
+           node_count == 1 ? '' : 's',
+           fail_count,
+           fail_count == 1 ? '' : 's')
+  end
+
   def run_script(scope, script, *targets)
-    run_script_with_args(scope, script, targets, 'arguments' => [])
+    logger = Logger.instance
+    logger.notice("Running script #{script}")
+    r = run_script_with_args(scope, script, targets, 'arguments' => [])
+    logger.notice(log_summary(script, targets.size, r.error_nodes.count))
+    r
   end
 
   def run_script_with_args(scope, script, targets, args_hash)
