@@ -38,7 +38,7 @@ plan exercise7::command(String $nodes) {
 We can run the plan like so:
 
 ```
-$ bolt plan run exercise7::command nodes=<nodes> --modulepath ./modules
+$ bolt plan run exercise7::command nodes=$NODE --modulepath ./modules
 ExecutionResult({'node1' => {'stdout' => " 23:08:34 up  2:02,  0 users,  load average: 0.00, 0.01, 0.05\n", 'stderr' => '', 'exit_code' => 0}})
 ```
 
