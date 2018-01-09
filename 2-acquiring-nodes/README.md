@@ -23,7 +23,7 @@ If you already have, or can easily launch, a few Linux or Windows nodes then you
 Save the following as `Vagrantfile`, or use the file accompanying this exercise.
 
 ```ruby
-$nodes_count = 1
+$nodes_count = 3
 
 if ENV['NODES'].to_i > 0 && ENV['NODES']
   $nodes_count = ENV['NODES'].to_i
@@ -32,44 +32,29 @@ end
 Vagrant.configure('2') do |config|
   config.vm.box = 'centos/7'
   config.ssh.forward_agent = true
+  config.vm.network "private_network", type: "dhcp"
 
   (1..$nodes_count).each do |i|
-    config.vm.define "node#{i}" do |node|
-      ip = "192.168.50.#{i+100}"
-      node.vm.network "private_network", ip: ip
-      ['vmware_fusion', 'vmware_workstation', 'virtualbox'].each do |provider|
-        config.vm.provider provider do |_, override|
-          override.ssh.host = ip
-          override.ssh.port = 22
-        end unless ENV['BOOT']
-      end
-    end
+    config.vm.define "node#{i}"
+  end
+
+  config.vm.define :windows do |windows|
+    windows.vm.box = "mwrock/WindowsNano"
+    windows.vm.guest = :windows
+    windows.vm.communicator = "winrm"
   end
 end
 ```
 
-This will by default launch one node. Run the following command. We are assuming you have some familiarity with Vagrant and have a suitable hypervisor configured.
+This will by default launch three CentOS 7 nodes and a Windows (Nano Server) node. Run the following command. We are assuming you have some familiarity with Vagrant and have a suitable hypervisor configured.
 
 ```
-BOOT=true vagrant up
-```
-
-If you would like to run more than one SSH server then you can set the `NODES` environment variable and run `vagrant up` again. With a Linux shell this is:
-
-```
-NODES=3 BOOT=true vagrant up
-```
-
-Note that the `BOOT` environment variable is only required when launching new nodes with `vagrant up` and should be left out when running other commands like `vagrant ssh` or `vagrant ssh-config`.
-
-On Windows you can do the same thing with PowerShell:
-
-```powershell
-$env:NODES = 3
 vagrant up
 ```
 
-Finally you can generate the SSH configuration so `bolt` knows how to authenticate with the SSH daemon. The following command will output the required details.
+It can be configured to a different number of nodes by setting the `NODES` environment variable.
+
+You can generate the SSH configuration so `bolt` knows how to authenticate with the SSH daemon. The following command will output the required details.
 
 ```
 vagrant ssh-config
@@ -77,22 +62,18 @@ vagrant ssh-config
 
 Note that if you've created more than one SSH server as above, this should be:
 
-```
-NODES=3 vagrant ssh-config | sed /StrictHostKeyChecking/d | sed /UserKnownHostsFile/d
-```
-
 You can save that so it will be automatically picked up by most SSH clients, including `bolt`. This uses the ability to specify hosts along with there connection details in a [configuration file](https://linux.die.net/man/5/ssh_config).
 
 ```
 mkdir ~/.ssh
-NODES=3 vagrant ssh-config | sed /StrictHostKeyChecking/d | sed /UserKnownHostsFile/d >> ~/.ssh/config
+vagrant ssh-config | sed /StrictHostKeyChecking/d | sed /UserKnownHostsFile/d >> ~/.ssh/config
 ```
 
-When passing nodes to `bolt` in the following exercises you will use something like `--nodes node1,node2`, up to the number of nodes you decided to launch. The reason you can use the node name, rather than the IP address, is the above SSH configuration file.
+When passing nodes to `bolt` in the following exercises with Linux you will use `--nodes node1,node2`. The reason you can use the node name, rather than the IP address, is the above SSH configuration file.
 
 Make sure you can ssh into all of your nodes. If you've used the vagrant nodes before you may have to remove entries from `~/.ssh/known_hosts`.
 
-``
+```
 ssh node1
 ssh node2
 ssh node3

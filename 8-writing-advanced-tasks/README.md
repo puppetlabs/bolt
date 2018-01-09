@@ -18,7 +18,7 @@ For the following exercises you should already have `bolt` installed and have a 
 
 Writing metadata helps those that consume your tasks know how to provide input to the tasks that you write.  Metadata for a task is written in JSON and is expected to have the same name as your task with a `.json` extension. So if you write a task called `foo_bar.py` you should write a corresponding `foo_bar.json`.  Lets start by writing a simple task that formats the parameters a user gives it.      
 
-Save the following file to `modules/exercise8/tasks/foo_bar.py`:
+Save the following file to `modules/exercise8/tasks/great_metadata.py`:
 ```
 #! /usr/bin/env python
 
@@ -96,7 +96,7 @@ install_puppet                Install the puppet 5 agent package
 Now use the bolt task show command to inspect the parameters used by your task.  This will show you the parameters with descriptions and expected type.
 
 ```
-$ bolt task show exercise8::great_metadata
+$ bolt task show exercise8::great_metadata --modulepath ./modules
 exercie8::great_metadata - An exercise in writing great metadata
 
 USAGE:
@@ -118,14 +118,14 @@ PARAMETERS:
 Bolt can use the types that you have specified in your metadata to validate parameters passed to your task.  Lets attempt to run your task with an incorrect value passed to the `action` parameter.  We will pass the params as a JSON string.  
 
 ```
-$ bolt task run exercise8::great_metadata --nodes <nodes> --modulepath ./modules --params '{"name":"poppey","action":"spinach","recursive":true}'
+$ bolt task run exercise8::great_metadata --nodes $NODE --modulepath ./modules --params '{"name":"poppey","action":"spinach","recursive":true}'
 Task exercise8::great_metadata:
  parameter 'action' expects a match for Enum['restart', 'start', 'stop'], got 'spinach'
 ```
 
 If we correct our mistake we can see the task working correctly 
 ```
-$ bolt task run exercise8::great_metadata --nodes <nodes> --modulepath ./modules --params '{"name":"poppey","action":"start","recursive":true}'
+$ bolt task run exercise8::great_metadata --nodes $NODE --modulepath ./modules --params '{"name":"poppey","action":"start","recursive":true}'
 
   {
     "message": "Congratulations on writing your metadata!  Here are the keys and the values that you passed to this task.",
@@ -231,7 +231,7 @@ exit(exitcode)
 
 Lets test out our new task with the `--noop` flag.
 ```
-$ bolt task run exercise8::file --nodes <nodes> --modulepath ./modules content=Hello_World filename=/tmp/hello_world --noop
+$ bolt task run exercise8::file --nodes $NODE --modulepath ./modules content=Hello_World filename=/tmp/hello_world --noop
   {
     "_noop": true,
     "success": true
@@ -239,9 +239,9 @@ $ bolt task run exercise8::file --nodes <nodes> --modulepath ./modules content=H
 Ran on 1 node in 0.64 seconds
 ```
 
-Now if we run again with `--noop` we can see the task creating the file successfully.
+Now if we run again without `--noop` we can see the task creating the file successfully.
 ```
-$ bolt task run exercise8::file --nodes <nodes> --modulepath ./modules content=Hello_World filename=/tmp/hello_world
+$ bolt task run exercise8::file --nodes $NODE --modulepath ./modules content=Hello_World filename=/tmp/hello_world
   {
     "success": true
   }

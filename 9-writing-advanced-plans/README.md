@@ -62,13 +62,13 @@ In the above plan we:
 You can see this plan in action by running:
 
 ```bash
-bolt plan run exercise9::yesorno nodes=<nodes> --modulepath ./modules
+bolt plan run exercise9::yesorno nodes=$NODE --modulepath ./modules
 ```
 
 When run you should see output like the following. Running it multiple times should result in different output, as the return value of the task is random the command should run on a different subset of nodes each time.
 
 ```bash
-ExecutionResult({'node1' => {'stdout' => " 20:53:10 up  1:42,  0 users,  load average: 0.60, 0.42, 0.21\n", 'stderr' => '', 'exit_code' => 0}, 'node2' => {'stdout' => " 20:53:10 up  1:42,  0 users,  load average: 0.60, 0.42, 0.21\n", 'stderr' => '', 'exit_code' => 0}})
+{'node1' => {'stdout' => " 20:53:10 up  1:42,  0 users,  load average: 0.60, 0.42, 0.21\n", 'stderr' => '', 'exit_code' => 0}, 'node2' => {'stdout' => " 20:53:10 up  1:42,  0 users,  load average: 0.60, 0.42, 0.21\n", 'stderr' => '', 'exit_code' => 0}}
 ```
 
 Here we've shown how to capture the output from a task and then reuse it as part of the plan. More real-world uses for this might include:

@@ -38,7 +38,7 @@ plan exercise7::command(String $nodes) {
 We can run the plan like so:
 
 ```
-$ bolt plan run exercise7::command nodes=<nodes> --modulepath ./modules
+$ bolt plan run exercise7::command nodes=$NODE --modulepath ./modules
 ExecutionResult({'node1' => {'stdout' => " 23:08:34 up  2:02,  0 users,  load average: 0.00, 0.01, 0.05\n", 'stderr' => '', 'exit_code' => 0}})
 ```
 
@@ -74,7 +74,7 @@ This task simply accepts a filename and some content and saves a file to `/tmp`.
 You can run the task directly with the following command:
 
 ```
-bolt task run exercise7::write filename=hello message=world --nodes=<nodes> --modulepath ./modules --debug
+bolt task run exercise7::write filename=hello message=world --nodes=$NODE --modulepath ./modules --debug
 ```
 
 Note that in this case the task doesn't output anything to stdout. It can be useful to still trace the running of the task, and for that the `--debug` flag is useful. Here is the output when run with debug:

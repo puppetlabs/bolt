@@ -38,7 +38,7 @@ Finished on node1:
 
 If you receive an error reading `Host key verification failed` you should make sure the correct host keys are in your `known_hosts` file or pass `--insecure` to future bolt commands. Bolt will not honor `StrictHostKeyChecking` in you ssh config.
 
-`bolt` can also run commands against multiple nodes by passing a command separated list. Replace `node1,node2` in the following with two or more of your own nodes. If you get an error about `Host key verification` run the rest of the examples with the `--insecure` flag to disable host key verification.
+`bolt` can also run commands against multiple nodes by passing a command separated list. Replace `node1,node2,node3` in the following with two or more of your own nodes. If you get an error about `Host key verification` run the rest of the examples with the `--insecure` flag to disable host key verification.
 
 ```
 $ bolt command run uptime --nodes node1,node2,node3
@@ -56,10 +56,22 @@ Finished on node2:
      21:20:14 up 13 min,  0 users,  load average: 0.00, 0.01, 0.05$
 ```
 
+For the duration of these exercises, it may help to set a variable with the list of nodes for future use. Later examples will refer to this variable. For example if using the provided Vagrant configuration, set the following:
+
+```
+NODE=node1,node2,node3
+```
+
+On Windows, you can do the same thing with Powershell:
+
+```powershell
+$NODE="node1,node2,node3"
+```
+
 If you're accessing nodes using a username and password rather than keys you can pass those on the command line like so:
 
 ```
-bolt command run <command> --nodes <node> --user <user> --password <password>
+bolt command run <command> --nodes $NODE --user <user> --password <password>
 ```
 
 `bolt` has a number of other flags. Run the following command to list all of them:
@@ -77,16 +89,32 @@ bolt --help
 bolt command run <command> --nodes winrm://<node> --user <user> --password <password>
 ```
 
-Note the `winrm://` prefix for the node address. Also note the `--username` and `--password` flags for passing authentication information. You can see all of the available flags by running:
+Note the `winrm://` prefix for the node address. Also note the `--username` and `--password` flags for passing authentication information. Unless you have SSL setup for WinRM communication, you will also need to supply the `--insecure` flag.
+
+If you get an error about `unknown protocol`, you may not have SSL setup for WinRM communication and should run the rest of the examples with the `--insecure` flag.
+
+You can see all of the available flags by running:
 
 ```
 bolt --help
 ```
 
-If you're trying `bolt` out using Windows run the following command, replacing `node1` with the address of your Windows node. This should list all of the processes running on the remote machine.
+For the duration of these exercises, it may help to set a variable with the list of nodes for future use. Later examples will refer to this variable. Username and password can be incorporated into the node address as well. For example if using the provided Vagrant configuration, set the following:
 
 ```
-bolt command run "gps | select ProcessName" --nodes winrm://node1 --user <user> --password <password>
+WINNODE=winrm://vagrant:vagrant@localhost:55985
+```
+
+On Windows, you can do the same thing with Powershell:
+
+```powershell
+$WINNODE="winrm://vagrant:vagrant@localhost:55985"
+```
+
+If you're trying `bolt` out using Windows run the following command. This should list all of the processes running on the remote machine.
+
+```
+bolt command run "gps | select ProcessName" --nodes $WINNODE
 ```
 
 The above example accesses a single node. You can also provide a command separated list of nodes like so:
