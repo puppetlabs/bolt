@@ -4,5 +4,6 @@
     'setup/git/pre-suite/010_install_git.rb',
     'setup/git/pre-suite/020_install.rb'
   ],
-  load_path: './lib/acceptance'
+  load_path: './lib/acceptance',
+  ssh: { forward_agent: false }
 }
