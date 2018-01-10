@@ -478,8 +478,6 @@ HELP
                  options[:task_options],
                  &block)
       end
-    rescue Puppet::Error
-      raise Bolt::CLIError, "Exiting because of an error in Puppet code"
     end
 
     def execute_plan(executor, options)
@@ -489,8 +487,6 @@ HELP
                  options[:task_options])
       end
       outputter.print_plan(result)
-    rescue Puppet::Error
-      raise Bolt::CLIError, "Exiting because of an error in Puppet code"
     end
 
     def validate_file(type, path)
@@ -517,13 +513,24 @@ HELP
       @outputter ||= Bolt::Outputter.for_format(@config[:format])
     end
 
+    # Runs a block in a PAL script compiler configured for Bolt.
+    # Catches exceptions thrown by the block and re-raises them as Bolt::CLIError.
     def in_bolt_compiler(opts = [])
       Puppet.initialize_settings(opts)
-      Puppet::Pal.in_tmp_environment('bolt', modulepath: [BOLTLIB_PATH] + @config[:modulepath], facts: {}) do |pal|
+      r = Puppet::Pal.in_tmp_environment('bolt', modulepath: [BOLTLIB_PATH] + @config[:modulepath], facts: {}) do |pal|
         pal.with_script_compiler do |compiler|
-          yield compiler
+          begin
+            yield compiler
+          rescue Puppet::PreformattedError => err
+            err.cause
+          rescue StandardError => err
+            err
+          end
         end
       end
+
+      raise Bolt::CLIError, r.message if r.is_a? StandardError
+      r
     end
 
     def list_tasks
@@ -534,16 +541,12 @@ HELP
           [task_name, task_sig.task.description]
         end
       end
-    rescue Puppet::Error
-      raise Bolt::CLIError, "Failure while reading task metadata"
     end
 
     def list_plans
       in_bolt_compiler do |compiler|
         compiler.list_plans.map { |plan| [plan.name] }.sort
       end
-    rescue Puppet::Error
-      raise Bolt::CLIError, "Failure while reading plans"
     end
 
     def get_task_info(task_name)
@@ -552,26 +555,12 @@ HELP
       end
       raise Bolt::CLIError, "Could not find task #{task_name} in your modulepath" if task.nil?
       task.task_hash
-    rescue Puppet::Error
-      raise Bolt::CLIError, "Failure while reading task metadata"
     end
 
     def run_task(name, nodes, args, &block)
-      parse_error = nil
-      result = in_bolt_compiler do |compiler|
-        begin
-          compiler.call_function('run_task', name, nodes, args, &block)
-        rescue Puppet::ParseError => e
-          # we assume that the Puppet::ParseError is due to a problem with
-          # the task and/or its parameters, but since the with_script_compiler
-          # method rescues these errors and raises different ones instead,
-          # we save it in a local variable and raise it as Bolt::CLIError
-          # outside of the block
-          parse_error = e
-        end
+      in_bolt_compiler do |compiler|
+        compiler.call_function('run_task', name, nodes, args, &block)
       end
-      raise Bolt::CLIError, parse_error.message if parse_error
-      result
     end
 
     # Expects to be called with a configured Puppet compiler or error.instance? will fail
