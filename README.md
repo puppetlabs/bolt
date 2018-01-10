@@ -73,15 +73,31 @@ ssh:
 
 `private-key`: The path to the private key file to use for SSH authentication.
 
-`connect-timeout`: Maximum amount of time to allow for an SSH connection to be established, in seconds
+`connect-timeout`: Maximum amount of time to allow for an SSH connection to be established, in seconds.
+
+`tmpdir`: The directory to store temporary files on the target node. (default: location used by `mktemp -d`, usually `/tmp`)
+
+`run-as`: Triggers privilege escalation for commands on the target node as the specified user. Currently only works via `sudo`.
 
 ### `winrm` transport configuration options
 
-`connect-timeout`: Maximum amount of time to allow for a WinRM connection to be established, in seconds
+`connect-timeout`: Maximum amount of time to allow for a WinRM connection to be established, in seconds.
+
+`insecure`: Whether to skip requiring SSL for connections. (default: false)
+
+`cacert`: The CA certificate used to authenticate SSL connections. (default: uses system CA certificates)
+
+`tmpdir`: The directory to store temporary files on the target node. (default: `[System.IO.Path]::GetTempPath()`)
 
 ### `pcp` transport configuration options
 
-There are currently no options for the PCP orchestrator transport
+`service-url`: The URL of the Orchestrator service, usually of the form `https://puppet:8143`. If not specified, will attempt to read local PE Client Tools configuration for the same setting from `orchestrator.conf`.
+
+`cacert`: The CA certificate used to authenticate the `service-url`. If not specified, will attempt to read local PE Client Tools configuration for the same setting from `orchestrator.conf`.
+
+`token-file`: The token certificate used to authorize requests to the `service-url`. If not specified, will attempt to read local PE Client Tools configuration for the same setting from `orchestrator.conf`. (default: `~/.puppetlabs/token`)
+
+`task-environment`: The environment from which Orchestrator will serve task implementations. (default: `production`)
 
 
 ## Usage examples
