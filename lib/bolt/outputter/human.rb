@@ -136,7 +136,9 @@ module Bolt
         end
       end
 
-      def fatal_error(e); end
+      def fatal_error(e)
+        @stream.puts(colorize(:red, e.message))
+      end
     end
 
     def print_message(message)

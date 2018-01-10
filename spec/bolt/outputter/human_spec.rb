@@ -120,6 +120,6 @@ TASK_OUTPUT
 
   it "handles fatal errors" do
     outputter.fatal_error(Bolt::CLIError.new("oops"))
-    expect(output.string).to eq('')
+    expect(output.string).to eq("oops\n")
   end
 end

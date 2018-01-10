@@ -5,6 +5,14 @@ require 'bolt/cli'
 describe "Bolt::CLI" do
   include BoltSpec::Files
 
+  before(:each) do
+    @output = StringIO.new
+    outputter = Bolt::Outputter::Human.new(@output)
+
+    allow_any_instance_of(Bolt::CLI).to receive(:outputter).and_return(outputter)
+    allow_any_instance_of(Bolt::CLI).to receive(:warn)
+  end
+
   def stub_file(path)
     stat = double('stat', readable?: true, file?: true)
 
@@ -630,8 +638,7 @@ NODES
             mode: 'task',
             action: 'show'
           }
-          expect(Puppet).to receive(:err).with(/unexpected token at/)
-          expect { cli.execute(options) }.to raise_error "Failure while reading task metadata"
+          expect { cli.execute(options) }.to raise_error(/unexpected token at/)
         end
       end
 
@@ -684,8 +691,21 @@ NODES
             mode: 'plan',
             action: 'show'
           }
-          expect(Puppet).to receive(:log_exception)
-          expect { cli.execute(options) }.to raise_error "Failure while reading plans"
+          expect { cli.execute(options) }.to raise_error(/^Syntax error at/)
+        end
+
+        it "plan run displays an error" do
+          plan_name = 'sample::single_task'
+          plan_params = { 'nodes' => nodes.join(',') }
+
+          options = {
+            nodes: node_names,
+            mode: 'plan',
+            action: 'run',
+            object: plan_name,
+            task_options: plan_params
+          }
+          expect { cli.execute(options) }.to raise_error(/^Syntax error at/)
         end
       end
 
