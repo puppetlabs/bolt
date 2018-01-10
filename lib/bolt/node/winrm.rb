@@ -466,8 +466,6 @@ PS
 
     def with_remote_file(file)
       file_base = File.basename(file)
-      # Default to powershell if no extension present
-      file_base += '.ps1' if File.extname(file).empty?
       dir = make_tempdir
       dest = "#{dir}\\#{file_base}"
       begin
