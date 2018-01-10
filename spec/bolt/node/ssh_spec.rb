@@ -15,7 +15,7 @@ describe Bolt::SSH do
   let(:port) { ENV['BOLT_SSH_PORT'] || 2224 }
   let(:key) { ENV['BOLT_SSH_KEY'] || Dir[".vagrant/**/private_key"] }
   let(:command) { "pwd" }
-  let(:ssh) { Bolt::SSH.new(hostname, port, user, password) }
+  let(:ssh) { Bolt::SSH.new(target) }
   let(:insecure) { { config: Bolt::Config.new(transports: { ssh: { insecure: true } }) } }
   let(:echo_script) { <<BASH }
 for var in "$@"
@@ -23,6 +23,14 @@ do
     echo $var
 done
 BASH
+
+  def target(h = hostname, p = port, u = user, pw = password)
+    t = Bolt::Target.from_uri(h)
+    t.uri.port = p
+    t.uri.user = u
+    t.uri.password = pw
+    t
+  end
 
   def result_value(stdout = nil, stderr = nil, exit_code = 0)
     { 'stdout' => stdout || '',
@@ -43,7 +51,7 @@ BASH
     end
 
     it "downgrades to lenient if insecure is true" do
-      ssh = Bolt::SSH.new(hostname, port, user, password, **insecure)
+      ssh = Bolt::SSH.new(target, **insecure)
 
       allow(Net::SSH)
         .to receive(:start)
@@ -64,7 +72,7 @@ BASH
     end
 
     it "raises ConnectError if authentication fails" do
-      ssh = Bolt::SSH.new(hostname, port, user, password, **insecure)
+      ssh = Bolt::SSH.new(target, **insecure)
 
       allow(Net::SSH)
         .to receive(:start)
@@ -79,7 +87,7 @@ BASH
 
     it "returns Node::ConnectError if the node name can't be resolved" do
       # even with default timeout, name resolution fails in < 1
-      ssh = Bolt::SSH.new('totally-not-there', port)
+      ssh = Bolt::SSH.new(target('totally-not-there'))
       exec_time = Time.now
       expect_node_error(Bolt::Node::ConnectError,
                         'CONNECT_ERROR',
@@ -92,7 +100,7 @@ BASH
 
     it "returns Node::ConnectError if the connection is refused" do
       # even with default timeout, connection refused fails in < 1
-      ssh = Bolt::SSH.new(hostname, 65535, user, password)
+      ssh = Bolt::SSH.new(target(hostname, 65535))
       exec_time = Time.now
       expect_node_error(Bolt::Node::ConnectError,
                         'CONNECT_ERROR',
@@ -119,7 +127,7 @@ BASH
         port = server.addr[1]
 
         timeout = { config: Bolt::Config.new(transports: { ssh: { connect_timeout: 2 } }) }
-        ssh = Bolt::SSH.new(hostname, port, 'bad', 'password', **timeout)
+        ssh = Bolt::SSH.new(target(hostname, port, 'bad', 'password'), **timeout)
 
         exec_time = Time.now
         expect {
@@ -132,7 +140,7 @@ BASH
 
   context "when executing with private key" do
     let(:config) { Bolt::Config.new(transports: { ssh: { insecure: true, key: key } }) }
-    let(:ssh) { Bolt::SSH.new(hostname, port, user, nil, uri: 'foo', config: config) }
+    let(:ssh) { Bolt::SSH.new(target(hostname, port, user, nil), config: config) }
 
     before(:each) { ssh.connect }
     after(:each) { ssh.disconnect }
@@ -156,7 +164,7 @@ BASH
   end
 
   context "when executing" do
-    let(:ssh) { Bolt::SSH.new(hostname, port, user, password, **insecure) }
+    let(:ssh) { Bolt::SSH.new(target, **insecure) }
 
     before(:each) { ssh.connect }
     after(:each) { ssh.disconnect }
@@ -343,7 +351,7 @@ SHELL
                          tmpdir: tmpdir
                        } })
     end
-    let(:ssh) { Bolt::SSH.new(hostname, port, user, password, config: config) }
+    let(:ssh) { Bolt::SSH.new(target, config: config) }
 
     before(:each) { ssh.connect }
     after(:each) do
@@ -382,7 +390,7 @@ SHELL
                        } })
     end
 
-    let(:ssh) { Bolt::SSH.new(hostname, port, user, password, config: config) }
+    let(:ssh) { Bolt::SSH.new(target, config: config) }
 
     before(:each) { ssh.connect }
     after(:each) { ssh.disconnect }
@@ -425,12 +433,12 @@ SHELL
                            run_as: 'root'
                          } })
       }
-      let(:ssh) { Bolt::SSH.new(hostname, port, user, password, uri: 'foo', config: config) }
+      let(:ssh) { Bolt::SSH.new(target, config: config) }
 
       it "returns a failed result", ssh: true do
         expect(ssh._run_command('whoami').error).to eq(
           'kind' => 'puppetlabs.tasks/escalate-error',
-          'msg' => "Sudo password for user #{user} not recognized on foo",
+          'msg' => "Sudo password for user #{user} not recognized on #{user}:#{password}@#{hostname}:#{port}",
           'details' => {},
           'issue_code' => 'BAD_PASSWORD'
         )
@@ -445,12 +453,12 @@ SHELL
                            run_as: 'root'
                          } })
       end
-      let(:ssh) { Bolt::SSH.new(hostname, port, user, password, uri: 'foo', config: config) }
+      let(:ssh) { Bolt::SSH.new(target, config: config) }
 
       it "returns a failed result", ssh: true do
         expect(ssh._run_command('whoami').error).to eq(
           'kind' => 'puppetlabs.tasks/escalate-error',
-          'msg' => "Sudo password for user #{user} was not provided for foo",
+          'msg' => "Sudo password for user #{user} was not provided for #{user}:#{password}@#{hostname}:#{port}",
           'details' => {},
           'issue_code' => 'NO_PASSWORD'
         )

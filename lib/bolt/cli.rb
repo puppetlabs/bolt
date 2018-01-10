@@ -8,6 +8,7 @@ require 'bolt/node'
 require 'bolt/version'
 require 'bolt/error'
 require 'bolt/executor'
+require 'bolt/target'
 require 'bolt/outputter'
 require 'bolt/config'
 require 'io/console'
@@ -298,7 +299,7 @@ HELP
 
     def parse_nodes(nodes)
       list = get_arg_input(nodes)
-      list.split(/[[:space:],]+/).reject(&:empty?).uniq
+      Target.parse_urls(list)
     end
 
     def parse_params(params)
@@ -426,7 +427,7 @@ HELP
         execute_plan(executor, options)
       else
         executor = Bolt::Executor.new(@config, options[:noop])
-        nodes = executor.from_uris(options[:nodes])
+        targets = options[:nodes]
 
         results = nil
         outputter.print_head
@@ -435,20 +436,20 @@ HELP
           results =
             case options[:mode]
             when 'command'
-              executor.run_command(nodes, options[:object]) do |node, event|
-                outputter.print_event(node, event)
+              executor.run_command(targets, options[:object]) do |target, event|
+                outputter.print_event(target, event)
               end
             when 'script'
               script = options[:object]
               validate_file('script', script)
               executor.run_script(
-                nodes, script, options[:leftovers]
-              ) do |node, event|
-                outputter.print_event(node, event)
+                targets, script, options[:leftovers]
+              ) do |target, event|
+                outputter.print_event(target, event)
               end
             when 'task'
-              execute_task(executor, options) do |node, event|
-                outputter.print_event(node, event)
+              execute_task(executor, options) do |target, event|
+                outputter.print_event(target, event)
               end
             when 'file'
               src = options[:object]
@@ -458,8 +459,8 @@ HELP
                 raise Bolt::CLIError, "A destination path must be specified"
               end
               validate_file('source file', src)
-              executor.file_upload(nodes, src, dest) do |node, event|
-                outputter.print_event(node, event)
+              executor.file_upload(targets, src, dest) do |target, event|
+                outputter.print_event(target, event)
               end
             end
         end
@@ -574,10 +575,10 @@ HELP
       task.task_hash
     end
 
-    def run_task(name, nodes, args, &block)
+    def run_task(name, targets, args, &block)
       args = args.merge('_abort' => false)
       in_bolt_compiler do |compiler|
-        compiler.call_function('run_task', name, nodes, args, &block)
+        compiler.call_function('run_task', name, targets, args, &block)
       end
     end
 

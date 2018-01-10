@@ -4,6 +4,7 @@ require 'bolt/cli'
 
 describe "Bolt::CLI" do
   include BoltSpec::Files
+  let(:target) { Bolt::Target.from_uri('foo') }
 
   before(:each) do
     @output = StringIO.new
@@ -100,19 +101,21 @@ describe "Bolt::CLI" do
     end
 
     describe "nodes" do
+      let(:targets) { [target, Bolt::Target.from_uri('bar')] }
+
       it "accepts a single node" do
         cli = Bolt::CLI.new(%w[command run --nodes foo])
-        expect(cli.parse).to include(nodes: ['foo'])
+        expect(cli.parse).to include(nodes: [target])
       end
 
       it "accepts multiple nodes" do
         cli = Bolt::CLI.new(%w[command run --nodes foo,bar])
-        expect(cli.parse).to include(nodes: %w[foo bar])
+        expect(cli.parse).to include(nodes: targets)
       end
 
       it "accepts multiple nodes across multiple declarations" do
         cli = Bolt::CLI.new(%w[command run --nodes foo,bar --nodes bar,more,bars])
-        expect(cli.parse).to include(nodes: %w[foo bar more bars])
+        expect(cli.parse).to include(nodes: targets + [Bolt::Target.from_uri('more'), Bolt::Target.from_uri('bars')])
       end
 
       it "reads from stdin when --nodes is '-'" do
@@ -123,7 +126,7 @@ NODES
         cli = Bolt::CLI.new(%w[command run --nodes -])
         allow(STDIN).to receive(:read).and_return(nodes)
         result = cli.parse
-        expect(result[:nodes]).to eq(%w[foo bar])
+        expect(result[:nodes]).to eq(targets)
       end
 
       it "reads from a file when --nodes starts with @" do
@@ -134,7 +137,7 @@ NODES
         with_tempfile_containing('nodes-args', nodes) do |file|
           cli = Bolt::CLI.new(%W[command run --nodes @#{file.path}])
           result = cli.parse
-          expect(result[:nodes]).to eq(%w[foo bar])
+          expect(result[:nodes]).to eq(targets)
         end
       end
 
@@ -143,13 +146,13 @@ NODES
         with_tempfile_containing('nodes-args', nodes) do |file|
           cli = Bolt::CLI.new(%W[command run --nodes @#{file.path}])
           result = cli.parse
-          expect(result[:nodes]).to eq(%w[foo bar baz qux])
+          expect(result[:nodes]).to eq(targets + [Bolt::Target.from_uri('baz'), Bolt::Target.from_uri('qux')])
         end
       end
 
       it "accepts multiple nodes but is uniq" do
         cli = Bolt::CLI.new(%w[command run --nodes foo,bar,foo])
-        expect(cli.parse).to include(nodes: %w[foo bar])
+        expect(cli.parse).to include(nodes: targets)
       end
 
       it "generates an error message if no nodes given" do
@@ -482,12 +485,10 @@ NODES
     describe "execute" do
       let(:executor) { double('executor', noop: false) }
       let(:cli) { Bolt::CLI.new({}) }
-      let(:node_names) { ['foo'] }
-      let(:nodes) { [double('node', host: 'foo')] }
+      let(:targets) { [target] }
 
       before :each do
         allow(Bolt::Executor).to receive(:new).and_return(executor)
-        allow(executor).to receive(:from_uris).and_return(nodes)
 
         @output = StringIO.new
         outputter = Bolt::Outputter::JSON.new(@output)
@@ -498,11 +499,11 @@ NODES
       it "executes the 'whoami' command" do
         expect(executor)
           .to receive(:run_command)
-          .with(nodes, 'whoami')
+          .with(targets, 'whoami')
           .and_return({})
 
         options = {
-          nodes: node_names,
+          nodes: targets,
           mode: 'command',
           action: 'run',
           object: 'whoami'
@@ -514,7 +515,7 @@ NODES
       context "when running a script" do
         let(:script) { 'bar.sh' }
         let(:options) {
-          { nodes: node_names, mode: 'script', action: 'run', object: script,
+          { nodes: targets, mode: 'script', action: 'run', object: script,
             leftovers: [] }
         }
 
@@ -523,7 +524,7 @@ NODES
 
           expect(executor)
             .to receive(:run_script)
-            .with(nodes, script, [])
+            .with(targets, script, [])
             .and_return({})
 
           cli.execute(options)
@@ -697,10 +698,9 @@ NODES
 
         it "plan run displays an error" do
           plan_name = 'sample::single_task'
-          plan_params = { 'nodes' => nodes.join(',') }
+          plan_params = { 'nodes' => targets.map(&:host).join(',') }
 
           options = {
-            nodes: node_names,
             mode: 'plan',
             action: 'run',
             object: plan_name,
@@ -723,12 +723,12 @@ NODES
           expect(executor)
             .to receive(:run_task)
             .with(
-              nodes,
+              targets,
               %r{modules/sample/tasks/echo.sh$}, input_method, task_params
             ).and_return({})
 
           options = {
-            nodes: node_names,
+            nodes: targets,
             mode: 'task',
             action: 'run',
             object: task_name,
@@ -743,7 +743,7 @@ NODES
           task_params = { 'message' => 'hi' }
 
           options = {
-            nodes: node_names,
+            nodes: targets,
             mode: 'task',
             action: 'run',
             object: task_name,
@@ -760,7 +760,7 @@ NODES
           task_params = { 'message' => 'hi' }
 
           options = {
-            nodes: node_names,
+            nodes: targets,
             mode: 'task',
             action: 'run',
             object: task_name,
@@ -780,12 +780,12 @@ NODES
           expect(executor)
             .to receive(:run_task)
             .with(
-              nodes,
+              targets,
               %r{modules/sample/tasks/init.sh$}, input_method, task_params
             ).and_return({})
 
           options = {
-            nodes: node_names,
+            nodes: targets,
             mode: 'task',
             action: 'run',
             object: task_name,
@@ -802,12 +802,12 @@ NODES
 
           expect(executor)
             .to receive(:run_task)
-            .with(nodes,
+            .with(targets,
                   %r{modules/sample/tasks/stdin.sh$}, input_method, task_params)
             .and_return({})
 
           options = {
-            nodes: node_names,
+            nodes: targets,
             mode: 'task',
             action: 'run',
             object: task_name,
@@ -824,12 +824,12 @@ NODES
 
           expect(executor)
             .to receive(:run_task)
-            .with(nodes,
+            .with(targets,
                   %r{modules/sample/tasks/winstdin.ps1$}, input_method, task_params)
             .and_return({})
 
           options = {
-            nodes: node_names,
+            nodes: targets,
             mode: 'task',
             action: 'run',
             object: task_name,
@@ -845,7 +845,7 @@ NODES
           let(:input_method) { 'stdin' }
           let(:options) {
             {
-              nodes: node_names,
+              nodes: targets,
               mode: 'task',
               action: 'run',
               object: task_name,
@@ -921,7 +921,7 @@ NODES
           it "runs the task when the specified parameters are successfully validated" do
             expect(executor)
               .to receive(:run_task)
-              .with(nodes,
+              .with(targets,
                     %r{modules/sample/tasks/params.sh$}, input_method, task_params)
               .and_return({})
             task_params.merge!(
@@ -944,18 +944,18 @@ NODES
 
         it "formats results of a passing task" do
           plan_name = 'sample::single_task'
-          plan_params = { 'nodes' => nodes.join(',') }
+          plan_params = { 'nodes' => targets.map(&:host).join(',') }
           input_method = 'both'
 
           expect(executor)
             .to receive(:run_task)
             .with(
-              nodes,
+              targets,
               %r{modules/sample/tasks/echo.sh$}, input_method, 'message' => 'hi there'
-            ).and_return(double(uri: 'foo') => Bolt::TaskResult.new('yes', '', 0))
+            ).and_return(target => Bolt::TaskResult.new(target, 'yes', '', 0))
 
           options = {
-            nodes: node_names,
+            nodes: targets,
             mode: 'plan',
             action: 'run',
             object: plan_name,
@@ -963,24 +963,24 @@ NODES
           }
           cli.execute(options)
           expect(JSON.parse(@output.string)).to eq(
-            [{ 'node' => 'foo', 'status' => 'finished', 'result' => { '_output' => 'yes' } }]
+            [{ 'node' => '//foo', 'status' => 'finished', 'result' => { '_output' => 'yes' } }]
           )
         end
 
         it "formats results of a failing task" do
           plan_name = 'sample::single_task'
-          plan_params = { 'nodes' => nodes.join(',') }
+          plan_params = { 'nodes' => targets.map(&:host).join(',') }
           input_method = 'both'
 
           expect(executor)
             .to receive(:run_task)
             .with(
-              nodes,
+              targets,
               %r{modules/sample/tasks/echo.sh$}, input_method, 'message' => 'hi there'
-            ).and_return(double(uri: 'foo') => Bolt::TaskResult.new('no', '', 1))
+            ).and_return(target => Bolt::TaskResult.new(target, 'no', '', 1))
 
           options = {
-            nodes: node_names,
+            nodes: targets,
             mode: 'plan',
             action: 'run',
             object: plan_name,
@@ -990,7 +990,7 @@ NODES
           expect(JSON.parse(@output.string)).to eq(
             [
               {
-                'node' => 'foo',
+                'node' => '//foo',
                 'status' => 'failed',
                 'result' => {
                   "_output" => "no",
@@ -1012,7 +1012,7 @@ NODES
         let(:dest) { '/path/to/remote' }
         let(:options) {
           {
-            nodes: node_names,
+            nodes: targets,
             mode: 'file',
             action: 'upload',
             object: source,
@@ -1025,7 +1025,7 @@ NODES
 
           expect(executor)
             .to receive(:file_upload)
-            .with(nodes, source, dest)
+            .with(targets, source, dest)
             .and_return({})
 
           cli.execute(options)
@@ -1064,12 +1064,10 @@ NODES
     describe "execute with noop" do
       let(:executor) { double('executor', noop: true) }
       let(:cli) { Bolt::CLI.new({}) }
-      let(:node_names) { ['foo'] }
-      let(:nodes) { [double('node', host: 'foo')] }
+      let(:targets) { [target] }
 
       before :each do
         allow(Bolt::Executor).to receive(:new).with(config, true).and_return(executor)
-        allow(executor).to receive(:from_uris).and_return(nodes)
 
         @output = StringIO.new
         outputter = Bolt::Outputter::JSON.new(@output)
@@ -1089,12 +1087,12 @@ NODES
 
           expect(executor)
             .to receive(:run_task)
-            .with(nodes,
+            .with(targets,
                   %r{modules/sample/tasks/noop.sh$}, input_method, task_params.merge('_noop' => true))
             .and_return({})
 
           options = {
-            nodes: node_names,
+            nodes: targets,
             mode: 'task',
             action: 'run',
             object: task_name,
@@ -1112,7 +1110,7 @@ NODES
           expect(executor).not_to receive(:run_task)
 
           options = {
-            nodes: node_names,
+            nodes: targets,
             mode: 'task',
             action: 'run',
             object: task_name,
@@ -1129,7 +1127,7 @@ NODES
           expect(executor).not_to receive(:run_task)
 
           options = {
-            nodes: node_names,
+            nodes: targets,
             mode: 'task',
             action: 'run',
             object: task_name,

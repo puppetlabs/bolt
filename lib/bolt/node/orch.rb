@@ -49,7 +49,7 @@ module Bolt
                noop: arguments['_noop'],
                params: arguments.reject { |k, _| k == '_noop' },
                scope: {
-                 nodes: [@host]
+                 nodes: [host]
                } }
       # Should we handle errors here or let them propagate?
       results = client.run_task(body)
@@ -61,10 +61,11 @@ module Bolt
         exit_code = 0
       elsif state == 'skipped'
         return Bolt::TaskResult.new(
+          @target,
           JSON.dump(
             '_error' => {
               'kind' => 'puppetlabs.tasks/skipped-node',
-              'msg' => "Node #{@host} was skipped",
+              'msg' => "Node #{host} was skipped",
               'details' => {}
             }
           ),
@@ -79,7 +80,7 @@ module Bolt
           exit_code = 'unknown'
         end
       end
-      Bolt::TaskResult.new(result.to_json, "", exit_code)
+      Bolt::TaskResult.new(@target, result.to_json, "", exit_code)
     end
 
     # run_task generates a result that makes sense for a generic task which
@@ -91,7 +92,7 @@ module Bolt
         return result
       end
 
-      Bolt::CommandResult.new(result.value['stdout'], result.value['stderr'], result.value['exit_code'])
+      Bolt::CommandResult.new(@target, result.value['stdout'], result.value['stderr'], result.value['exit_code'])
     end
 
     def _run_command(command, options = {})
@@ -114,7 +115,7 @@ module Bolt
         mode: mode
       }
       result = _run_task(BOLT_MOCK_FILE, 'stdin', params)
-      result = Bolt::Result.new unless result.error
+      result = Bolt::Result.new(@target) unless result.error
       result
     end
 

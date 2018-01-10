@@ -1,4 +1,3 @@
-require 'bolt/node_uri'
 require 'bolt/result'
 require 'bolt/config'
 require 'bolt/target'
@@ -9,9 +8,8 @@ module Bolt
     STDIN_METHODS       = %w[both stdin].freeze
     ENVIRONMENT_METHODS = %w[both environment].freeze
 
-    def self.from_uri(uri_string, **kwargs)
-      uri = NodeURI.new(uri_string, kwargs[:config][:transport])
-      klass = case uri.scheme
+    def self.from_target(target, **kwargs)
+      klass = case target.protocol || kwargs[:config][:transport]
               when 'winrm'
                 Bolt::WinRM
               when 'pcp'
@@ -19,27 +17,19 @@ module Bolt
               else
                 Bolt::SSH
               end
-      klass.new(uri.hostname,
-                uri.port,
-                uri.user,
-                uri.password,
-                uri: uri_string,
-                **kwargs)
+      klass.new(target, **kwargs)
     end
 
     def self.initialize_transport(_logger); end
 
-    attr_reader :logger, :host, :port, :uri, :user, :password, :connect_timeout
+    attr_reader :logger, :user, :password, :connect_timeout, :target
 
-    def initialize(host, port = nil, user = nil, password = nil, uri: nil,
-                   config: Bolt::Config.new)
-      @host = host
-      @port = port
-      @uri = uri
+    def initialize(target, config: Bolt::Config.new)
+      @target = target
 
       transport_conf = config[:transports][protocol.to_sym]
-      @user = user || transport_conf[:user]
-      @password = password || transport_conf[:password]
+      @user = @target.user || transport_conf[:user]
+      @password = @target.password || transport_conf[:password]
       @key = transport_conf[:key]
       @cacert = transport_conf[:cacert]
       @tty = transport_conf[:tty]
@@ -53,14 +43,26 @@ module Bolt
       @orch_task_environment = transport_conf[:orch_task_environment]
       @extensions = transport_conf[:extensions]
 
-      @logger = Logging.logger[@host]
+      @logger = Logging.logger[host]
+    end
+
+    def host
+      @target.host
+    end
+
+    def port
+      @target.port
+    end
+
+    def uri
+      @target.uri.to_s.sub(%r{^/+}, '')
     end
 
     def upload(source, destination)
       @logger.debug { "Uploading #{source} to #{destination}" }
       result = _upload(source, destination)
       if result.success?
-        Bolt::Result.new(nil, "Uploaded '#{source}' to '#{host}:#{destination}'")
+        Bolt::Result.new(@target, nil, "Uploaded '#{source}' to '#{host}:#{destination}'")
       else
         result
       end

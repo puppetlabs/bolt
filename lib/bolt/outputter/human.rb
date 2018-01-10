@@ -25,24 +25,24 @@ module Bolt
         string.sub(/\s\z/, '')
       end
 
-      def print_event(node, event)
+      def print_event(target, event)
         case event[:type]
         when :node_start
-          print_start(node)
+          print_start(target)
         when :node_result
-          print_result(node, event[:result])
+          print_result(event[:result])
         end
       end
 
-      def print_start(node)
-        @stream.puts(colorize(:green, "Started on #{node.host}..."))
+      def print_start(target)
+        @stream.puts(colorize(:green, "Started on #{target.host}..."))
       end
 
-      def print_result(node, result)
+      def print_result(result)
         if result.success?
-          @stream.puts(colorize(:green, "Finished on #{node.host}:"))
+          @stream.puts(colorize(:green, "Finished on #{result.target.host}:"))
         else
-          @stream.puts(colorize(:red, "Failed on #{node.host}:"))
+          @stream.puts(colorize(:red, "Failed on #{result.target.host}:"))
         end
 
         if result.error

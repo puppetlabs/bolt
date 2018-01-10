@@ -13,11 +13,11 @@ module Bolt
 
     def port
       default_port = @insecure ? 5985 : 5986
-      @port || default_port
+      @target.port || default_port
     end
 
-    def initialize(host, port, user, password, **kwargs)
-      super(host, port, user, password, **kwargs)
+    def initialize(target, **kwargs)
+      super(target, **kwargs)
       @extensions = DEFAULT_EXTENSIONS.to_set.merge(@extensions || [])
       @logger.debug { "WinRM initialized for #{@extensions.to_a} extensions" }
     end
@@ -445,10 +445,10 @@ PS
 
     def _upload(source, destination)
       write_remote_file(source, destination)
-      Bolt::Result.new
+      Bolt::Result.new(@target)
     # TODO: we should rely on the executor for this
     rescue StandardError => ex
-      Bolt::Result.from_exception(ex)
+      Bolt::Result.from_exception(@target, ex)
     end
 
     def write_remote_file(source, destination)
@@ -495,10 +495,10 @@ PS
 
     def _run_command(command)
       output = execute(command)
-      Bolt::CommandResult.from_output(output)
+      Bolt::CommandResult.from_output(@target, output)
     # TODO: we should rely on the executor for this
     rescue StandardError => e
-      Bolt::Result.from_exception(e)
+      Bolt::Result.from_exception(@target, e)
     end
 
     def _run_script(script, arguments)
@@ -528,11 +528,11 @@ catch
           args += escape_arguments(arguments)
           output = execute_process(path, args)
         end
-        Bolt::CommandResult.from_output(output)
+        Bolt::CommandResult.from_output(@target, output)
       end
     # TODO: we should rely on the executor for this
     rescue StandardError => e
-      Bolt::Result.from_exception(e)
+      Bolt::Result.from_exception(@target, e)
     end
 
     def _run_task(task, input_method, arguments)
@@ -570,11 +570,11 @@ try { & "#{remote_path}" @taskArgs } catch { exit 1 }
             path, args = *process_from_extension(remote_path)
             execute_process(path, args, stdin)
           end
-        Bolt::TaskResult.from_output(output)
+        Bolt::TaskResult.from_output(@target, output)
       end
     # TODO: we should rely on the executor for this
     rescue StandardError => e
-      Bolt::Result.from_exception(e)
+      Bolt::Result.from_exception(@target, e)
     end
 
     def escape_arguments(arguments)
