@@ -1,6 +1,5 @@
-require 'logger'
+require 'bolt/logger'
 require 'bolt/node_uri'
-require 'bolt/formatter'
 require 'bolt/result'
 require 'bolt/config'
 require 'bolt/target'
@@ -53,16 +52,8 @@ module Bolt
       @token_file = transport_conf[:token_file]
       @orch_task_environment = transport_conf[:orch_task_environment]
 
-      @logger = init_logger(config[:log_destination], config[:log_level])
-      @transport_logger = init_logger(config[:log_destination], Logger::WARN)
-    end
-
-    def init_logger(destination, level)
-      logger = Logger.new(destination)
-      logger.progname = @host
-      logger.level = level
-      logger.formatter = Bolt::Formatter.new
-      logger
+      @logger = Logger.get_logger(progname: @host)
+      @transport_logger = Logger.get_logger(progname: @host, log_level: Logger::WARN)
     end
 
     def upload(source, destination)
@@ -76,12 +67,10 @@ module Bolt
     end
 
     def run_command(command)
-      @logger.info { "Running command: #{command}" }
       _run_command(command)
     end
 
     def run_script(script, arguments)
-      @logger.info { "Running script: #{script}" }
       _run_script(script, arguments)
     end
 

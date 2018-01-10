@@ -1,7 +1,7 @@
 require 'uri'
 require 'optparse'
 require 'benchmark'
-require 'logger'
+require 'bolt/logger'
 require 'json'
 require 'bolt/node'
 require 'bolt/version'
@@ -109,7 +109,6 @@ HELP
       }
       @config = Bolt::Config.new
       @parser = create_option_parser(@options)
-      @logger = Logger.new(STDERR)
     end
 
     def create_option_parser(results)
@@ -249,6 +248,7 @@ HELP
 
       @config.load_file(options[:configfile])
       @config.update_from_cli(options)
+      Logger.configure(@config)
       @config.validate
 
       # This section handles parsing non-flag options which are
@@ -417,11 +417,11 @@ HELP
         return
       end
 
-      executor = Bolt::Executor.new(@config, options[:noop])
-
       if options[:mode] == 'plan'
+        executor = Bolt::Executor.new(@config, options[:noop], true)
         execute_plan(executor, options)
       else
+        executor = Bolt::Executor.new(@config, options[:noop])
         nodes = executor.from_uris(options[:nodes])
 
         results = nil

@@ -1,6 +1,6 @@
 plan results::test_methods(
   String $target,
-  Optional[String] $fail = 'false'
+  Boolean $fail = false
 ) {
   if($fail) {
     $result = run_task('results', [$target], 'fail' => 'true')

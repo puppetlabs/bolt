@@ -13,12 +13,15 @@ describe "when runnning over the ssh transport", ssh: true do
   let(:user) { conn_info('ssh')[:user] }
   let(:password) { conn_info('ssh')[:password] }
 
+  after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
+
   context 'when using CLI options' do
     let(:config_flags) { %W[--insecure --format json --modulepath #{modulepath}] }
 
-    it 'returns true on success' do
-      output = run_cli(['plan', 'run', 'results::test_methods', "target=#{uri}"] + config_flags)
-      expect(output.strip).to eq('true')
+    it 'returns false on failure' do
+      params = { target: uri, fail: true }.to_json
+      output = run_cli(['plan', 'run', 'results::test_methods', "--params", params] + config_flags)
+      expect(output.strip).to eq('false')
     end
   end
 end

@@ -1,22 +1,20 @@
-require 'logger'
+require 'bolt/logger'
+require 'json'
 require 'concurrent'
 require 'bolt/result'
 require 'bolt/config'
-require 'bolt/formatter'
 require 'bolt/notifier'
 
 module Bolt
   class Executor
     attr_reader :noop
 
-    def initialize(config = Bolt::Config.new, noop = nil)
+    def initialize(config = Bolt::Config.new, noop = nil, plan_logging = false)
       @config = config
-      @logger = Logger.new(config[:log_destination])
-      @logger.progname = 'executor'
-      @logger.level = config[:log_level]
-      @logger.formatter = Bolt::Formatter.new
+      @logger = Logger.get_logger(progname: 'executor')
       @noop = noop
       @notifier = Bolt::Notifier.new
+      @plan_logging = plan_logging
     end
 
     def from_uris(nodes)
@@ -67,36 +65,73 @@ module Bolt
       results_to_hash(results)
     end
 
+    def summary(action, object, result)
+      fc = result.select { |_, r| r.error }.length
+      npl = result.length == 1 ? '' : 's'
+      fpl = fc == 1 ? '' : 's'
+      "Ran #{action} '#{object}' on #{result.length} node#{npl} with #{fc} failure#{fpl}"
+    end
+
     def run_command(nodes, command)
+      level = @plan_logging ? Logger::NOTICE : Logger::INFO
+      @logger.log(level, "Starting command run '#{command}' on #{nodes.map(&:uri)}")
       callback = block_given? ? Proc.new : nil
 
-      on(nodes, callback) do |node|
-        node.run_command(command)
+      r = on(nodes, callback) do |node|
+        @logger.debug("Running command '#{command}' on #{node.uri}")
+        node_result = node.run_command(command)
+        @logger.debug("Result on #{node.uri}: #{JSON.dump(node_result.to_result)}")
+        node_result
       end
+      @logger.log(level, summary('command', command, r))
+      r
     end
 
     def run_script(nodes, script, arguments)
+      level = @plan_logging ? Logger::NOTICE : Logger::INFO
+      @logger.log(level, "Starting script run #{script} on #{nodes.map(&:uri)}")
+      @logger.debug("Arguments: #{arguments}")
       callback = block_given? ? Proc.new : nil
 
-      on(nodes, callback) do |node|
-        node.run_script(script, arguments)
+      r = on(nodes, callback) do |node|
+        @logger.debug { "Running script '#{script}' on #{node.uri}" }
+        node_result = node.run_script(script, arguments)
+        @logger.debug("Result on #{node.uri}: #{JSON.dump(node_result.to_result)}")
+        node_result
       end
+      @logger.log(level, summary('script', script, r))
+      r
     end
 
     def run_task(nodes, task, input_method, arguments)
+      level = @plan_logging ? Logger::NOTICE : Logger::INFO
+      @logger.log(level, "Starting task #{task} on #{nodes.map(&:uri)}")
+      @logger.debug("Arguments: #{arguments} Input method: #{input_method}")
       callback = block_given? ? Proc.new : nil
 
-      on(nodes, callback) do |node|
-        node.run_task(task, input_method, arguments)
+      r = on(nodes, callback) do |node|
+        @logger.debug { "Running task run '#{task}' on #{node.uri}" }
+        node_result = node.run_task(task, input_method, arguments)
+        @logger.debug("Result on #{node.uri}: #{JSON.dump(node_result.to_result)}")
+        node_result
       end
+      @logger.log(level, summary('task', task, r))
+      r
     end
 
     def file_upload(nodes, source, destination)
+      level = @plan_logging ? Logger::NOTICE : Logger::INFO
+      @logger.log(level, "Starting file upload from #{source} to #{destination} on #{nodes.map(&:uri)}")
       callback = block_given? ? Proc.new : nil
 
-      on(nodes, callback) do |node|
-        node.upload(source, destination)
+      r = on(nodes, callback) do |node|
+        @logger.debug { "Uploading: '#{source}' to #{node.uri}" }
+        node_result = node.upload(source, destination)
+        @logger.debug("Result on #{node.uri}: #{JSON.dump(node_result.to_result)}")
+        node_result
       end
+      @logger.log(level, summary('upload', source, r))
+      r
     end
 
     private

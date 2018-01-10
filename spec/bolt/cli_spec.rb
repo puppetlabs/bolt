@@ -228,6 +228,7 @@ NODES
     end
 
     describe "log level" do
+      after(:each) { Logger.configure(log_level: Logger::NOTICE) }
       it "is not sensitive to ordering of debug and verbose" do
         cli = Bolt::CLI.new(%w[command run --nodes foo --debug --verbose])
         cli.parse

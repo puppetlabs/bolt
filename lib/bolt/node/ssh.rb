@@ -82,13 +82,13 @@ module Bolt
           )
         end
       elsif data =~ /^#{@user} is not in the sudoers file\./
-        @logger.info { data }
+        @logger.debug { data }
         raise Bolt::Node::EscalateError.new(
           "User #{@user} does not have sudo permission on #{@uri}",
           'SUDO_DENIED'
         )
       elsif data =~ /^Sorry, try again\./
-        @logger.info { data }
+        @logger.debug { data }
         raise Bolt::Node::EscalateError.new(
           "Sudo password for user #{@user} not recognized on #{@uri}",
           'BAD_PASSWORD'
@@ -260,9 +260,6 @@ SCRIPT
     end
 
     def _run_script(script, arguments)
-      @logger.info { "Running script '#{script}'" }
-      @logger.debug { "arguments: #{arguments}" }
-
       with_remote_file(script) do |remote_path|
         output = execute("'#{remote_path}' #{Shellwords.join(arguments)}",
                          sudoable: true)
@@ -277,9 +274,6 @@ SCRIPT
     def _run_task(task, input_method, arguments)
       export_args = {}
       stdin, output = nil
-
-      @logger.info { "Running task '#{task}'" }
-      @logger.debug { "arguments: #{arguments}\ninput_method: #{input_method}" }
 
       if STDIN_METHODS.include?(input_method)
         stdin = JSON.dump(arguments)
