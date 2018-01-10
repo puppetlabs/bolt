@@ -5,6 +5,14 @@ require 'bolt/cli'
 describe "Bolt::CLI" do
   include BoltSpec::Files
 
+  before(:each) do
+    @output = StringIO.new
+    outputter = Bolt::Outputter::Human.new(@output)
+
+    allow_any_instance_of(Bolt::CLI).to receive(:outputter).and_return(outputter)
+    allow_any_instance_of(Bolt::CLI).to receive(:warn)
+  end
+
   def stub_file(path)
     stat = double('stat', readable?: true, file?: true)
 

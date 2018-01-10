@@ -272,6 +272,9 @@ HELP
       validate(options)
 
       options
+    rescue Bolt::CLIError => e
+      warn e.message
+      raise e
     end
 
     def print_help(mode)
