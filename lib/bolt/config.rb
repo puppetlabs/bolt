@@ -18,7 +18,7 @@ module Bolt
       format: 'human'
     }.freeze
 
-    TRANSPORT_OPTIONS = %i[insecure password run_as sudo_password
+    TRANSPORT_OPTIONS = %i[insecure password run_as sudo_password extensions
                            key tty tmpdir user connect_timeout cacert
                            token_file orch_task_environment service_url].freeze
 
@@ -126,6 +126,11 @@ module Bolt
         end
         if data['winrm']['cacert']
           self[:transports][:winrm][:cacert] = data['winrm']['cacert']
+        end
+        if data['winrm']['extensions']
+          # Accept a single entry or a list, ensure each is prefixed with '.'
+          self[:transports][:winrm][:extensions] =
+            [data['winrm']['extensions']].flatten.map { |ext| ext[0] != '.' ? '.' + ext : ext }
         end
       end
 

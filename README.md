@@ -89,6 +89,8 @@ ssh:
 
 `tmpdir`: The directory to store temporary files on the target node. (default: `[System.IO.Path]::GetTempPath()`)
 
+`extensions`: List of file extensions that will be accepted for scripts or tasks. Scripts with these file extensions will rely on the target node's file type association to run. For example, if Python is installed on the system, a `.py` script should run with `python.exe`. `.ps1`, `.rb`, and `.pp` are always allowed and run via hard-coded executables.
+
 ### `pcp` transport configuration options
 
 `service-url`: The URL of the Orchestrator service, usually of the form `https://puppet:8143`. If not specified, will attempt to read local PE Client Tools configuration for the same setting from `orchestrator.conf`.

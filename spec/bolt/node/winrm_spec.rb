@@ -648,7 +648,7 @@ OUTPUT
         end
       end
 
-      it "can apply an arbitrary script", winrm: true do
+      it "does not apply an arbitrary script", winrm: true do
         allow(winrm)
           .to receive(:execute_process)
           .with('cmd.exe',
@@ -656,12 +656,19 @@ OUTPUT
           .and_return(output)
         with_tempfile_containing('script-py-winrm', 'print(42)', '.py') do |file|
           expect(
-            winrm._run_script(file.path, []).stdout
-          ).to eq('42')
+            winrm._run_script(file.path, []).to_h
+          ).to eq(
+            'error' => {
+              'kind' => 'puppetlabs.tasks/task_file_error',
+              'msg' => "File extension .py is not enabled, to run it please add to 'winrm: extensions'",
+              'details' => {},
+              'issue_code' => 'FILETYPE_ERROR'
+            }
+          )
         end
       end
 
-      it "can apply an arbitrary script as a task", winrm: true do
+      it "does not apply an arbitrary script as a task", winrm: true do
         allow(winrm)
           .to receive(:execute_process)
           .with('cmd.exe',
@@ -670,8 +677,46 @@ OUTPUT
           .and_return(output)
         with_tempfile_containing('task-py-winrm', 'print(42)', '.py') do |file|
           expect(
-            winrm._run_task(file.path, 'stdin', {}).message
-          ).to eq('42')
+            winrm._run_task(file.path, 'stdin', {}).to_h
+          ).to eq(
+            'error' => {
+              'kind' => 'puppetlabs.tasks/task_file_error',
+              'msg' => "File extension .py is not enabled, to run it please add to 'winrm: extensions'",
+              'details' => {},
+              'issue_code' => 'FILETYPE_ERROR'
+            }
+          )
+        end
+      end
+
+      context "with extensions specified" do
+        let(:config) { Bolt::Config.new(transports: { winrm: { insecure: true, extensions: ['.py'] } }) }
+
+        it "can apply an arbitrary script", winrm: true do
+          allow(winrm)
+            .to receive(:execute_process)
+            .with('cmd.exe',
+                  ['/c', /^".*"$/])
+            .and_return(output)
+          with_tempfile_containing('script-py-winrm', 'print(42)', '.py') do |file|
+            expect(
+              winrm._run_script(file.path, []).stdout
+            ).to eq('42')
+          end
+        end
+
+        it "can apply an arbitrary script as a task", winrm: true do
+          allow(winrm)
+            .to receive(:execute_process)
+            .with('cmd.exe',
+                  ['/c', /^".*"$/],
+                  anything)
+            .and_return(output)
+          with_tempfile_containing('task-py-winrm', 'print(42)', '.py') do |file|
+            expect(
+              winrm._run_task(file.path, 'stdin', {}).message
+            ).to eq('42')
+          end
         end
       end
 
