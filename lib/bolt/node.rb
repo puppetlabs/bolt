@@ -31,6 +31,7 @@ module Bolt
       @user = @target.user || transport_conf[:user]
       @password = @target.password || transport_conf[:password]
       @key = transport_conf[:key]
+      @disable_ssh_agent = transport_conf[:disable_ssh_agent]
       @cacert = transport_conf[:cacert]
       @tty = transport_conf[:tty]
       @insecure = transport_conf[:insecure]

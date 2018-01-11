@@ -71,6 +71,8 @@ ssh:
 
 `insecure`: If true, host key validation will be skipped when connecting over SSH. (default: false)
 
+`disable-ssh-agent`: If true, ssh-agent will be skipped when connecting over SSH. (default: false)
+
 `private-key`: The path to the private key file to use for SSH authentication.
 
 `connect-timeout`: Maximum amount of time to allow for an SSH connection to be established, in seconds.

@@ -184,6 +184,10 @@ HELP
                 "Whether to connect insecurely ") do |insecure|
           results[:insecure] = insecure
         end
+        opts.on('--disable-ssh-agent',
+                "Whether to disable ssh-agent ") do |disable_ssh_agent|
+          results[:disable_ssh_agent] = disable_ssh_agent
+        end
         opts.on('--transport TRANSPORT', TRANSPORTS,
                 "Specify a default transport: #{TRANSPORTS.join(', ')}") do |t|
           results[:transport] = t
