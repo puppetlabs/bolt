@@ -51,6 +51,7 @@ module Bolt
       @service_url = transport_conf[:service_url]
       @token_file = transport_conf[:token_file]
       @orch_task_environment = transport_conf[:orch_task_environment]
+      @extensions = transport_conf[:extensions]
 
       @logger = Logger.get_logger(progname: @host)
       @transport_logger = Logger.get_logger(progname: @host, log_level: Logger::WARN)

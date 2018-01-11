@@ -125,7 +125,7 @@ PS
     it "can upload a file to a host" do
       contents = "kadejtw89894"
       remote_path = 'C:\Windows\Temp\upload-test-winrm-ssl'
-      with_tempfile_containing('upload-test-winrm-ssl', contents) do |file|
+      with_tempfile_containing('upload-test-winrm-ssl', contents, '.ps1') do |file|
         winrm_ssl.upload(file.path, remote_path)
 
         expect(
@@ -180,7 +180,7 @@ PS
     it "can upload a file to a host", winrm: true do
       contents = "934jklnvf"
       remote_path = 'C:\Windows\Temp\upload-test-winrm'
-      with_tempfile_containing('upload-test-winrm', contents) do |file|
+      with_tempfile_containing('upload-test-winrm', contents, '.ps1') do |file|
         winrm.upload(file.path, remote_path)
 
         expect(
@@ -193,7 +193,7 @@ PS
 
     it "can run a PowerShell script remotely", winrm: true do
       contents = "Write-Output \"hellote\""
-      with_tempfile_containing('script-test-winrm', contents) do |file|
+      with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
         expect(
           winrm._run_script(file.path, []).stdout
         ).to eq("hellote\r\n")
@@ -216,7 +216,7 @@ PS
         $ENV:A, $B, $script:C, $local:D, $global:E
       PS
 
-      with_tempfile_containing('script-test-winrm', contents) do |file|
+      with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
         result = winrm._run_script(file.path, [])
         instance, runspace, *outputs = result.stdout.split("\r\n")
 
@@ -240,7 +240,7 @@ PS
     end
 
     it "can run a PowerShell script remotely with quoted args", winrm: true do
-      with_tempfile_containing('script-test-winrm-quotes', echo_script) do |file|
+      with_tempfile_containing('script-test-winrm-quotes', echo_script, '.ps1') do |file|
         expect(
           winrm._run_script(
             file.path,
@@ -263,7 +263,7 @@ QUOTED
     end
 
     it "correctly passes embedded double quotes to PowerShell", winrm: true do
-      with_tempfile_containing('script-test-winrm-psquote', echo_script) do |file|
+      with_tempfile_containing('script-test-winrm-psquote', echo_script, '.ps1') do |file|
         expect(
           winrm._run_script(
             file.path,
@@ -282,7 +282,7 @@ QUOTED
     end
 
     it "escapes unsafe shellwords", winrm: true do
-      with_tempfile_containing('script-test-winrm-escape', echo_script) do |file|
+      with_tempfile_containing('script-test-winrm-escape', echo_script, '.ps1') do |file|
         expect(
           winrm._run_script(
             file.path,
@@ -300,7 +300,7 @@ SHELLWORDS
       $Host.UI.WriteErrorLine([Text.Encoding]::UTF8.GetString((New-Object Byte[] ($bytes_in_k))))
       PS
 
-      with_tempfile_containing('script-test-winrm', contents) do |file|
+      with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
         result = winrm._run_script(file.path, [])
         expect(result).to be_success
         expected_nulls = ("\0" * (1024 * 4 + 1)) + "\r\n"
@@ -312,7 +312,7 @@ SHELLWORDS
       contents = 'Write-Host "$env:PT_message_one ${env:PT_message two}"'
       arguments = { :message_one => 'task is running',
                     :"message two" => 'task has run' }
-      with_tempfile_containing('task-test-winrm', contents) do |file|
+      with_tempfile_containing('task-test-winrm', contents, '.ps1') do |file|
         expect(winrm._run_task(file.path, 'environment', arguments).message)
           .to eq("task is running task has run\r\n")
       end
@@ -333,7 +333,7 @@ Height: $Height ($(if ($Height -ne $null) { $Height.GetType().Name } else { 'nul
       arguments = { Age: 30,
                     Height: 5.75,
                     Name: 'John Doe' }
-      with_tempfile_containing('task-params-test-winrm.ps1', contents) do |file|
+      with_tempfile_containing('task-params-test-winrm', contents, '.ps1') do |file|
         expect(winrm._run_task(file.path, 'powershell', arguments).message)
           .to match(/\AName: John Doe \(String\).*^Age: 30 \(Int\d+\).*^Height: 5.75 \((Double|Decimal)\).*\Z/m)
       end
@@ -352,7 +352,7 @@ Height: $Height ($(if ($Height -ne $null) { $Height.GetType().Name } else { 'nul
           "bar: $bar ($(if ($bar -ne $null) { $bar.GetType().Name } else { 'null' }))"
       PS
       arguments = { bar: 30 } # note that the script doesn't recognize the 'bar' parameter
-      with_tempfile_containing('task-params-test-winrm.ps1', contents) do |file|
+      with_tempfile_containing('task-params-test-winrm', contents, '.ps1') do |file|
         expect(winrm._run_task(file.path, 'powershell', arguments).error)
           .to_not be_nil
       end
@@ -372,7 +372,7 @@ bar: $bar ($(if ($bar -ne $null) { $bar.GetType().Name } else { 'null' }))
 "@
       PS
       arguments = { bar: 30 } # note that the script doesn't recognize the 'bar' parameter
-      with_tempfile_containing('task-params-test-winrm.ps1', contents) do |file|
+      with_tempfile_containing('task-params-test-winrm', contents, '.ps1') do |file|
         expect(winrm._run_task(file.path, 'environment', arguments).message)
           .to match(/\Afoo:  \(String\).*^bar: 30 \(String\).*\Z/m) # note that $foo is an empty string and not null
       end
@@ -398,7 +398,7 @@ bar: $bar ($(if ($bar -ne $null) { $bar.GetType().Name } else { 'null' }))
       else { Write-Host "message 6" }
       PS
 
-      with_tempfile_containing('stdout-test-winrm', contents) do |file|
+      with_tempfile_containing('stdout-test-winrm', contents, '.ps1') do |file|
         expect(
           winrm._run_script(file.path, []).stdout
         ).to eq([
@@ -417,7 +417,7 @@ $line = [Console]::In.ReadLine()
 Write-Host $line
 PS
       arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-      with_tempfile_containing('tasks-test-stdin-winrm', contents) do |file|
+      with_tempfile_containing('tasks-test-stdin-winrm', contents, '.ps1') do |file|
         expect(winrm._run_task(file.path, 'stdin', arguments).value)
           .to eq("message_one" => "Hello from task", "message_two" => "Goodbye")
       end
@@ -430,7 +430,7 @@ $line = [Console]::In.ReadLine()
 Write-Host $line
 PS
       arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-      with_tempfile_containing('tasks-test-both-winrm', contents) do |file|
+      with_tempfile_containing('tasks-test-both-winrm', contents, '.ps1') do |file|
         expect(
           winrm._run_task(file.path, 'both', arguments).message
         ).to eq([
@@ -453,7 +453,7 @@ PS
         exit 42
         PS
 
-        with_tempfile_containing('script-test-winrm', contents) do |file|
+        with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
           result = winrm._run_script(file.path, [])
           expect(result).to_not be_success
           expect(result.exit_code).to eq(42)
@@ -466,7 +466,7 @@ PS
           throw "My Error"
           PS
 
-          with_tempfile_containing('script-test-winrm', contents) do |file|
+          with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
             result = winrm._run_script(file.path, [])
             expect(result).to_not be_success
             expect(result.exit_code).to eq(1)
@@ -479,7 +479,7 @@ PS
           Write-Error "error stream addition"
           PS
 
-          with_tempfile_containing('script-test-winrm', contents) do |file|
+          with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
             result = winrm._run_script(file.path, [])
             expect(result).to_not be_success
           end
@@ -488,7 +488,7 @@ PS
         it "ParserError Code (IncompleteParseException)", winrm: true do
           contents = '{'
 
-          with_tempfile_containing('script-test-winrm', contents) do |file|
+          with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
             result = winrm._run_script(file.path, [])
             expect(result).to_not be_success
           end
@@ -499,7 +499,7 @@ PS
           if (1 -badop 2) { Write-Out 'hi' }
           PS
 
-          with_tempfile_containing('script-test-winrm', contents) do |file|
+          with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
             result = winrm._run_script(file.path, [])
             expect(result).to_not be_success
           end
@@ -510,7 +510,7 @@ PS
           Foo-Bar
           PS
 
-          with_tempfile_containing('script-test-winrm', contents) do |file|
+          with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
             result = winrm._run_script(file.path, [])
             expect(result).to_not be_success
           end
@@ -523,7 +523,7 @@ PS
           Write-Error "error stream addition"
           PS
 
-          with_tempfile_containing('script-test-winrm', contents) do |file|
+          with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
             result = winrm._run_script(file.path, [])
             expect(result).to be_success
           end
@@ -537,7 +537,7 @@ PS
           # exit $LASTEXITCODE
           PS
 
-          with_tempfile_containing('script-test-winrm', contents) do |file|
+          with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
             result = winrm._run_script(file.path, [])
             expect(result).to be_success
           end
@@ -552,7 +552,7 @@ PS
 
       it 'uploads scripts to the specified tmpdir' do
         contents = "Write-Host $PSScriptRoot"
-        with_tempfile_containing('script-test-winrm', contents) do |file|
+        with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
           expect(winrm._run_script(file.path, []).stdout).to match(/#{Regexp.escape(tmpdir)}/)
         end
       end
@@ -645,6 +645,78 @@ OUTPUT
           expect(
             winrm._run_task(file.path, 'stdin', {}).message
           ).to eq("42")
+        end
+      end
+
+      it "does not apply an arbitrary script", winrm: true do
+        allow(winrm)
+          .to receive(:execute_process)
+          .with('cmd.exe',
+                ['/c', /^".*"$/])
+          .and_return(output)
+        with_tempfile_containing('script-py-winrm', 'print(42)', '.py') do |file|
+          expect(
+            winrm._run_script(file.path, []).to_h
+          ).to eq(
+            'error' => {
+              'kind' => 'puppetlabs.tasks/task_file_error',
+              'msg' => "File extension .py is not enabled, to run it please add to 'winrm: extensions'",
+              'details' => {},
+              'issue_code' => 'FILETYPE_ERROR'
+            }
+          )
+        end
+      end
+
+      it "does not apply an arbitrary script as a task", winrm: true do
+        allow(winrm)
+          .to receive(:execute_process)
+          .with('cmd.exe',
+                ['/c', /^".*"$/],
+                anything)
+          .and_return(output)
+        with_tempfile_containing('task-py-winrm', 'print(42)', '.py') do |file|
+          expect(
+            winrm._run_task(file.path, 'stdin', {}).to_h
+          ).to eq(
+            'error' => {
+              'kind' => 'puppetlabs.tasks/task_file_error',
+              'msg' => "File extension .py is not enabled, to run it please add to 'winrm: extensions'",
+              'details' => {},
+              'issue_code' => 'FILETYPE_ERROR'
+            }
+          )
+        end
+      end
+
+      context "with extensions specified" do
+        let(:config) { Bolt::Config.new(transports: { winrm: { insecure: true, extensions: ['.py'] } }) }
+
+        it "can apply an arbitrary script", winrm: true do
+          allow(winrm)
+            .to receive(:execute_process)
+            .with('cmd.exe',
+                  ['/c', /^".*"$/])
+            .and_return(output)
+          with_tempfile_containing('script-py-winrm', 'print(42)', '.py') do |file|
+            expect(
+              winrm._run_script(file.path, []).stdout
+            ).to eq('42')
+          end
+        end
+
+        it "can apply an arbitrary script as a task", winrm: true do
+          allow(winrm)
+            .to receive(:execute_process)
+            .with('cmd.exe',
+                  ['/c', /^".*"$/],
+                  anything)
+            .and_return(output)
+          with_tempfile_containing('task-py-winrm', 'print(42)', '.py') do |file|
+            expect(
+              winrm._run_task(file.path, 'stdin', {}).message
+            ).to eq('42')
+          end
         end
       end
 

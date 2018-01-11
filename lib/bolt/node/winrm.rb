@@ -2,6 +2,7 @@ require 'winrm'
 require 'winrm-fs'
 require 'bolt/result'
 require 'base64'
+require 'set'
 
 module Bolt
   class WinRM < Node
@@ -16,6 +17,8 @@ module Bolt
 
     def initialize(host, port, user, password, **kwargs)
       super(host, port, user, password, **kwargs)
+      @extensions = DEFAULT_EXTENSIONS.to_set.merge(@extensions || [])
+      @logger.debug { "WinRM initialized for #{@extensions.to_a} extensions" }
     end
 
     def connect
@@ -401,7 +404,7 @@ exit $(Invoke-Interpreter @invokeArgs)
 PS
     end
 
-    VALID_EXTENSIONS = ['.ps1', '.rb', '.pp'].freeze
+    DEFAULT_EXTENSIONS = ['.ps1', '.rb', '.pp'].freeze
 
     PS_ARGS = %w[
       -NoProfile -NonInteractive -NoLogo -ExecutionPolicy Bypass
@@ -427,6 +430,12 @@ PS
         [
           'puppet.bat',
           ['apply', "\"#{path}\""]
+        ]
+      else
+        # Run the script via cmd, letting Windows extension handling determine how
+        [
+          'cmd.exe',
+          ['/c', "\"#{path}\""]
         ]
       end
     end
@@ -462,10 +471,13 @@ PS
 
     def with_remote_file(file)
       ext = File.extname(file)
-      ext = VALID_EXTENSIONS.include?(ext) ? ext : '.ps1'
-      file_base = File.basename(file, '.*')
+      unless @extensions.include?(ext)
+        raise FileError.new("File extension #{ext} is not enabled, "\
+                            "to run it please add to 'winrm: extensions'", 'FILETYPE_ERROR')
+      end
+      file_base = File.basename(file)
       dir = make_tempdir
-      dest = "#{dir}\\#{file_base}#{ext}"
+      dest = "#{dir}\\#{file_base}"
       begin
         write_remote_file(file, dest)
         shell_init

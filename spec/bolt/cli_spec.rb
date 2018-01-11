@@ -1155,7 +1155,8 @@ NODES
         },
         'winrm' => {
           'connect-timeout' => 7,
-          'cacert' => '/path/to/winrm-cacert'
+          'cacert' => '/path/to/winrm-cacert',
+          'extensions' => ['.py', '.bat']
         },
         'pcp' => {
           'task-environment' => 'testenv',
@@ -1219,6 +1220,24 @@ NODES
         cli.parse
         expect(cli.config[:transports][:ssh][:connect_timeout]).to eq(4)
         expect(cli.config[:transports][:winrm][:connect_timeout]).to eq(7)
+      end
+    end
+
+    it 'reads extensions for winrm' do
+      with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
+        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --insecure])
+        cli.parse
+        expect(cli.config[:transports][:winrm][:extensions]).to eq(['.py', '.bat'])
+      end
+    end
+
+    it 'transforms extensions for winrm' do
+      new_config = complete_config.clone
+      new_config['winrm'] = { 'extensions' => 'py' }
+      with_tempfile_containing('conf', YAML.dump(new_config)) do |conf|
+        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --insecure])
+        cli.parse
+        expect(cli.config[:transports][:winrm][:extensions]).to eq(['.py'])
       end
     end
 
