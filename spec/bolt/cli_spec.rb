@@ -963,7 +963,7 @@ NODES
           }
           cli.execute(options)
           expect(JSON.parse(@output.string)).to eq(
-            [{ 'node' => '//foo', 'status' => 'finished', 'result' => { '_output' => 'yes' } }]
+            [{ 'node' => 'foo', 'status' => 'finished', 'result' => { '_output' => 'yes' } }]
           )
         end
 
@@ -990,7 +990,7 @@ NODES
           expect(JSON.parse(@output.string)).to eq(
             [
               {
-                'node' => '//foo',
+                'node' => 'foo',
                 'status' => 'failed',
                 'result' => {
                   "_output" => "no",

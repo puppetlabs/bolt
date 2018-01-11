@@ -27,11 +27,13 @@ foreach ($i in $args)
 PS
 
   def target(h = host, p = port, u = user, pw = password)
-    t = Bolt::Target.from_uri(h)
-    t.uri.port = p
-    t.uri.user = u
-    t.uri.password = pw
-    t
+    uri = "#{h}:#{p}"
+    if u && pw
+      uri = "#{u}:#{pw}@#{uri}"
+    elsif u
+      uri = "#{u}@#{uri}"
+    end
+    Bolt::Target.from_uri(uri)
   end
 
   def stub_winrm_to_raise(klass, message)

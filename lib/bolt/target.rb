@@ -7,22 +7,12 @@ module Bolt
 
     # Satisfies the Puppet datatypes API
     def self.from_asserted_hash(hash)
-      new(parse(hash['uri']), hash['options'])
+      new(hash['uri'], hash['options'])
     end
 
     def self.from_uri(uri)
-      new(parse(uri))
+      new(uri)
     end
-
-    def self.parse(string)
-      if string =~ %r{^[^:]+://}
-        Addressable::URI.parse(string)
-      else
-        # Initialize with an empty scheme to ensure we parse the hostname correctly
-        Addressable::URI.parse("//#{string}")
-      end
-    end
-    private_class_method :parse
 
     def self.parse_urls(urls)
       urls.split(/[[:space:],]+/).reject(&:empty?).uniq.map { |url| from_uri(url) }
@@ -30,8 +20,19 @@ module Bolt
 
     def initialize(uri, options = {})
       @uri = uri
+      @uri_obj = parse(uri)
       @options = options
     end
+
+    def parse(string)
+      if string =~ %r{^[^:]+://}
+        Addressable::URI.parse(string)
+      else
+        # Initialize with an empty scheme to ensure we parse the hostname correctly
+        Addressable::URI.parse("//#{string}")
+      end
+    end
+    private :parse
 
     def eql?(other)
       self.class.equal?(other.class) && @uri == other.uri && @options == other.options
@@ -52,27 +53,27 @@ module Bolt
     end
 
     def host
-      @uri.hostname.sub(%r{^/+}, '')
+      @uri_obj.hostname
     end
 
     def port
-      @uri.port
+      @uri_obj.port
     end
 
     def user
       Addressable::URI.unencode_component(
-        @uri.user
+        @uri_obj.user
       )
     end
 
     def password
       Addressable::URI.unencode_component(
-        @uri.password
+        @uri_obj.password
       )
     end
 
     def protocol
-      @uri.scheme
+      @uri_obj.scheme
     end
   end
 end

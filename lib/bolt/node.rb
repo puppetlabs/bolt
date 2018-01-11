@@ -55,7 +55,7 @@ module Bolt
     end
 
     def uri
-      @target.uri.to_s.sub(%r{^/+}, '')
+      @target.uri
     end
 
     def upload(source, destination)
