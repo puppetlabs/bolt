@@ -18,10 +18,10 @@ test_name "C100554: \
 
   step "create plan on bolt controller" do
     on(bolt, "mkdir -p #{dir}/modules/test/{tasks,plans}")
-    create_remote_file(bolt, "#{dir}/modules/test/tasks/a_win", <<-FILE)
+    create_remote_file(bolt, "#{dir}/modules/test/tasks/a_win.ps1", <<-FILE)
     (echo "Line one from task a") > #{testdir}/C100554_plan_artifact.txt
     FILE
-    create_remote_file(bolt, "#{dir}/modules/test/tasks/b_win", <<-FILE)
+    create_remote_file(bolt, "#{dir}/modules/test/tasks/b_win.ps1", <<-FILE)
     (echo "Line two from task b") >> #{testdir}/C100554_plan_artifact.txt
     FILE
     create_remote_file(bolt,
