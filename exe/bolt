@@ -10,5 +10,6 @@ begin
 rescue Bolt::CLIExit
   exit
 rescue Bolt::CLIError => e
+
   exit e.error_code
 end
