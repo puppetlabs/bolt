@@ -13,11 +13,9 @@ require 'io/console'
 
 module Bolt
   class CLIError < Bolt::Error
-    attr_reader :error_code
-
-    def initialize(msg, error_code: 1)
+    def initialize(msg)
       super(msg, "bolt/cli-error")
-      @error_code = error_code
+      @error_code = error_code if error_code
     end
   end
 
@@ -465,7 +463,7 @@ HELP
 
         outputter.print_summary(results, elapsed_time)
       end
-    rescue Bolt::CLIError => e
+    rescue Bolt::Error => e
       outputter.fatal_error(e)
       raise e
     end
@@ -516,8 +514,9 @@ HELP
       @outputter ||= Bolt::Outputter.for_format(@config[:format])
     end
 
-    # Runs a block in a PAL script compiler configured for Bolt.
-    # Catches exceptions thrown by the block and re-raises them as Bolt::CLIError.
+    # Runs a block in a PAL script compiler configured for Bolt.  Catches
+    # exceptions thrown by the block and re-raises them ensuring they are
+    # Bolt::Errors since the script compiler block will squash all exceptions.
     def in_bolt_compiler(opts = [])
       Puppet.initialize_settings(opts)
       r = Puppet::Pal.in_tmp_environment('bolt', modulepath: [BOLTLIB_PATH] + @config[:modulepath], facts: {}) do |pal|
@@ -525,14 +524,26 @@ HELP
           begin
             yield compiler
           rescue Puppet::PreformattedError => err
-            err.cause
+            # Puppet sometimes rescues exceptions notes the location and reraises
+            # For now return the original error.
+            if err.cause
+              if err.cause.is_a? Bolt::Error
+                err.cause
+              else
+                Bolt::CLIError.new(err.cause.message)
+              end
+            else
+              Bolt::CLIError.new(err.message)
+            end
           rescue StandardError => err
-            err
+            Bolt::CLIError.new(err.message)
           end
         end
       end
 
-      raise Bolt::CLIError, r.message if r.is_a? StandardError
+      if r.is_a? StandardError
+        raise r
+      end
       r
     end
 
@@ -561,29 +572,9 @@ HELP
     end
 
     def run_task(name, nodes, args, &block)
+      args = args.merge('_abort' => false)
       in_bolt_compiler do |compiler|
         compiler.call_function('run_task', name, nodes, args, &block)
-      end
-    end
-
-    # Expects to be called with a configured Puppet compiler or error.instance? will fail
-    def unwrap_execution_result(result)
-      if result.instance_of? Bolt::ExecutionResult
-        result.iterator.map do |node, output|
-          if output.is_a?(Puppet::DataTypes::Error)
-            # Get the original error hash used to initialize the Error type object.
-            result = output.partial_result || {}
-            result[:_error] = { msg: output.message,
-                                kind: output.kind,
-                                details: output.details,
-                                issue_code: output.issue_code }
-            { node: node, status: 'failed', result: result }
-          else
-            { node: node, status: 'finished', result: output }
-          end
-        end
-      else
-        result
       end
     end
 
@@ -597,7 +588,10 @@ HELP
           result = compiler.call_function('run_plan', plan, args)
           # Querying ExecutionResult for failures currently requires a script compiler.
           # Convert from an ExecutionResult to structured output that we can print.
-          unwrap_execution_result(result)
+          if result.instance_of? Bolt::ExecutionResult
+            result = result.unwrap
+          end
+          result
         end
       end
     end

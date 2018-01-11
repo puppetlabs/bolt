@@ -69,7 +69,27 @@ describe 'run_script' do
         executor.expects(:from_uris).with(hosts).returns(nodes)
         executor.expects(:run_script).with(nodes, full_path, []).returns(host => result, host2 => result2)
 
-        is_expected.to run.with_params('test/uploads/hostname.sh', hostname, hostname2).and_return(exec_result)
+        is_expected.to run.with_params('test/uploads/hostname.sh', [hostname, hostname2]).and_return(exec_result)
+      end
+
+      context 'when a script fails on one node' do
+        let(:failresult) { { 'error' => {} } }
+        let(:exec_fail) { Bolt::ExecutionResult.from_bolt(host => result, host2 => failresult) }
+
+        it 'errors by default' do
+          executor.expects(:from_uris).with(hosts).returns(nodes)
+          executor.expects(:run_script).with(nodes, full_path, []).returns(host => result, host2 => failresult)
+
+          is_expected.to run.with_params('test/uploads/hostname.sh', [hostname, hostname2])
+                            .and_raise_error(Bolt::RunFailure)
+        end
+
+        it 'does not error with _abort false' do
+          executor.expects(:from_uris).with(hosts).returns(nodes)
+          executor.expects(:run_script).with(nodes, full_path, []).returns(host => result, host2 => failresult)
+
+          is_expected.to run.with_params('test/uploads/hostname.sh', [hostname, hostname2], '_abort' => false)
+        end
       end
     end
 
@@ -78,7 +98,7 @@ describe 'run_script' do
       executor.expects(:run_script).never
 
       is_expected.to run
-        .with_params('test/uploads/hostname.sh').and_return(Bolt::ExecutionResult::EMPTY_RESULT)
+        .with_params('test/uploads/hostname.sh', []).and_return(Bolt::ExecutionResult::EMPTY_RESULT)
     end
 
     it 'errors when script is not found' do
@@ -86,14 +106,14 @@ describe 'run_script' do
       executor.expects(:run_script).never
 
       is_expected.to run
-        .with_params('test/uploads/nonesuch.sh').and_raise_error(/No such file or directory: .*nonesuch\.sh/)
+        .with_params('test/uploads/nonesuch.sh', []).and_raise_error(/No such file or directory: .*nonesuch\.sh/)
     end
 
     it 'errors when script appoints a directory' do
       executor.expects(:from_uris).never
       executor.expects(:run_script).never
 
-      is_expected.to run.with_params('test/uploads').and_raise_error(%r{.*\/uploads is not a file})
+      is_expected.to run.with_params('test/uploads', []).and_raise_error(%r{.*\/uploads is not a file})
     end
   end
 
@@ -101,7 +121,7 @@ describe 'run_script' do
     it 'fails and reports that bolt library is required' do
       Puppet.features.stubs(:bolt?).returns(false)
       is_expected.to run
-        .with_params('test/uploads/nonesuch.sh').and_raise_error(/The 'bolt' library is required to run a script/)
+        .with_params('test/uploads/nonesuch.sh', []).and_raise_error(/The 'bolt' library is required to run a script/)
     end
   end
 
@@ -110,7 +130,7 @@ describe 'run_script' do
 
     it 'fails and reports that run_script is not available' do
       is_expected.to run
-        .with_params('test/uploads/nonesuch.sh').and_raise_error(/The task operation 'run_script' is not available/)
+        .with_params('test/uploads/nonesuch.sh', []).and_raise_error(/The task operation 'run_script' is not available/)
     end
   end
 end

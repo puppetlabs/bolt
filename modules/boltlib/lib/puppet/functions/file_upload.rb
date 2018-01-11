@@ -5,6 +5,8 @@
 # * A target is a String with a targets's hostname or a Target.
 # * The returned value contains information about the result per target.
 #
+require 'bolt/error'
+
 Puppet::Functions.create_function(:file_upload, Puppet::Functions::InternalFunction) do
   local_types do
     type 'TargetOrTargets = Variant[String[1], Target, Array[TargetOrTargets]]'
@@ -14,11 +16,13 @@ Puppet::Functions.create_function(:file_upload, Puppet::Functions::InternalFunct
     scope_param
     param 'String[1]', :source
     param 'String[1]', :destination
-    repeated_param 'TargetOrTargets', :targets
+    param 'TargetOrTargets', :targets
+    optional_param 'Hash[String[1], Any]', :options
     return_type 'ExecutionResult'
   end
 
-  def file_upload(scope, source, destination, *targets)
+  def file_upload(scope, source, destination, targets, options = nil)
+    options ||= {}
     unless Puppet[:tasks]
       raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
         Puppet::Pops::Issues::TASK_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, operation: 'file_upload'
@@ -40,17 +44,23 @@ Puppet::Functions.create_function(:file_upload, Puppet::Functions::InternalFunct
     end
 
     # Ensure that that given targets are all Target instances
+    targets = [targets] unless targets.is_a?(Array)
     targets = targets.flatten.map { |t| t.is_a?(String) ? Bolt::Target.new(t) : t }
     if targets.empty?
       call_function('debug', "Simulating file upload of '#{found}' - no targets given - no action taken")
-      Bolt::ExecutionResult::EMPTY_RESULT
+      r = Bolt::ExecutionResult::EMPTY_RESULT
     else
       # Awaits change in the executor, enabling it receive Target instances
       hosts = targets.map(&:host)
 
-      Bolt::ExecutionResult.from_bolt(
+      r = Bolt::ExecutionResult.from_bolt(
         executor.file_upload(executor.from_uris(hosts), found, destination)
       )
     end
+
+    if !r.ok && options['_abort'] != false
+      raise Bolt::RunFailure.new(r, 'upload_file', source)
+    end
+    r
   end
 end

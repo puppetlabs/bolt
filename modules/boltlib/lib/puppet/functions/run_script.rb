@@ -10,26 +10,16 @@ Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFuncti
     type 'TargetOrTargets = Variant[String[1], Target, Array[TargetOrTargets]]'
   end
 
-  dispatch :run_script_with_args do
-    scope_param
-    param 'String[1]', :script
-    param 'TargetOrTargets', :targets
-    param 'Struct[arguments => Array[String]]', :arguments
-    return_type 'ExecutionResult'
-  end
-
   dispatch :run_script do
     scope_param
     param 'String[1]', :script
-    repeated_param 'TargetOrTargets', :targets
+    param 'TargetOrTargets', :targets
+    optional_param 'Hash[String[1], Any]', :options
     return_type 'ExecutionResult'
   end
 
-  def run_script(scope, script, *targets)
-    run_script_with_args(scope, script, targets, 'arguments' => [])
-  end
-
-  def run_script_with_args(scope, script, targets, args_hash)
+  def run_script(scope, script, targets, options = nil)
+    options ||= {}
     unless Puppet[:tasks]
       raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
         Puppet::Pops::Issues::TASK_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, operation: 'run_script'
@@ -59,14 +49,19 @@ Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFuncti
     targets = [targets].flatten.map { |t| t.is_a?(String) ? Bolt::Target.new(t) : t }
     if targets.empty?
       call_function('debug', "Simulating run_script of '#{found}' - no targets given - no action taken")
-      Bolt::ExecutionResult::EMPTY_RESULT
+      r = Bolt::ExecutionResult::EMPTY_RESULT
     else
       # Awaits change in the executor, enabling it receive Target instances
       hosts = targets.map(&:host)
 
-      Bolt::ExecutionResult.from_bolt(
-        executor.run_script(executor.from_uris(hosts), found, args_hash['arguments'])
+      r = Bolt::ExecutionResult.from_bolt(
+        executor.run_script(executor.from_uris(hosts), found, options['arguments'] || [])
       )
     end
+
+    if !r.ok && options['_abort'] != false
+      raise Bolt::RunFailure.new(r, 'run_script', script)
+    end
+    r
   end
 end
