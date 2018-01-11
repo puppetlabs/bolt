@@ -11,7 +11,7 @@ test_name "C100551: \
 
   step "create task on bolt controller" do
     on(bolt, "mkdir -p #{dir}/modules/test/tasks")
-    create_remote_file(bolt, "#{dir}/modules/test/tasks/hostname_win", <<-FILE)
+    create_remote_file(bolt, "#{dir}/modules/test/tasks/hostname_win.ps1", <<-FILE)
     [System.Net.Dns]::GetHostByName(($env:computerName))
     FILE
   end
