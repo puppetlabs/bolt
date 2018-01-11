@@ -20,6 +20,18 @@ module Bolt
       @conf_run_as = @run_as
     end
 
+    # Mirroring:
+    # https://github.com/net-ssh/net-ssh/blob/master/lib/net/ssh/authentication/pageant.rb#L403
+    if !!File::ALT_SEPARATOR
+      require 'ffi'
+      module Win
+        extend FFI::Library
+        ffi_lib 'user32'
+        ffi_convention :stdcall
+        attach_function :FindWindow, :FindWindowA, %i[string string], :int
+      end
+    end
+
     def protocol
       'ssh'
     end
@@ -41,6 +53,14 @@ module Bolt
                                     Net::SSH::Verifiers::Secure.new
                                   end
       options[:timeout] = @connect_timeout if @connect_timeout
+
+      if defined?(UNIXSocket) && UNIXSocket && ENV['SSH_AUTH_SOCK'].to_s.empty?
+        @logger.debug { "Disabling use_agent in net-ssh: ssh-agent is not available" }
+        options[:use_agent] = false
+      elsif !!File::ALT_SEPARATOR && Win.FindWindow('Pageant', 'Pageant').to_i == 0
+        @logger.debug { "Disabling use_agent in net-ssh: pageant process not running" }
+        options[:use_agent] = false
+      end
 
       @session = Net::SSH.start(@target.host, @user, options)
       @logger.debug { "Opened session" }
