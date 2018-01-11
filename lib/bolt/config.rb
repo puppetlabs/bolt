@@ -1,6 +1,6 @@
-require 'bolt/logger'
 require 'yaml'
 require 'bolt/cli'
+require 'logging'
 
 module Bolt
   Config = Struct.new(
@@ -33,6 +33,7 @@ module Bolt
 
     def initialize(**kwargs)
       super()
+      @logger = Logging.logger[self]
       DEFAULTS.merge(kwargs).each { |k, v| self[k] = v }
 
       self[:transports] ||= {}
@@ -58,8 +59,7 @@ module Bolt
       if path.nil?
         found_default = default_paths.select { |p| File.exist?(p) }
         if found_default.size > 1
-          logger = Logger.get_logger
-          logger.warn "Config files found at #{found_default.join(', ')}, using the first"
+          @logger.warn "Config files found at #{found_default.join(', ')}, using the first"
         end
         # Use first found, fall back to first default and try to load even if it didn't exist
         path = found_default.first || default_paths.first
@@ -161,9 +161,9 @@ module Bolt
       end
 
       if options[:debug]
-        self[:log_level] = Logger::DEBUG
+        self[:log_level] = :debug
       elsif options[:verbose]
-        self[:log_level] = Logger::INFO
+        self[:log_level] = :info
       end
 
       TRANSPORT_OPTIONS.each do |key|
@@ -184,9 +184,8 @@ module Bolt
       end
 
       if self[:transports][:ssh][:sudo_password] && self[:transports][:ssh][:run_as].nil?
-        logger = Logger.get_logger
-        logger.warn("--sudo-password will not be used without specifying a " \
-                    "user to escalate to with --run-as")
+        @logger.warn("--sudo-password will not be used without specifying a " \
+                     "user to escalate to with --run-as")
       end
 
       self[:transports].each_value do |v|

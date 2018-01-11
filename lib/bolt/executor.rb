@@ -1,6 +1,6 @@
-require 'bolt/logger'
 require 'json'
 require 'concurrent'
+require 'logging'
 require 'bolt/result'
 require 'bolt/config'
 require 'bolt/notifier'
@@ -11,10 +11,15 @@ module Bolt
 
     def initialize(config = Bolt::Config.new, noop = nil, plan_logging = false)
       @config = config
-      @logger = Logger.get_logger(progname: 'executor')
+      @logger = Logging.logger[self]
+
+      # If a specific elevated log level has been requested, honor that.
+      # Otherwise, escalate the log level to "info" if running in plan mode, so
+      # that certain progress messages will be visible.
+      default_log_level = plan_logging ? :info : :notice
+      @logger.level = @config[:log_level] || default_log_level
       @noop = noop
       @notifier = Bolt::Notifier.new
-      @plan_logging = plan_logging
     end
 
     def from_uris(nodes)
@@ -73,8 +78,7 @@ module Bolt
     end
 
     def run_command(nodes, command)
-      level = @plan_logging ? Logger::NOTICE : Logger::INFO
-      @logger.log(level, "Starting command run '#{command}' on #{nodes.map(&:uri)}")
+      @logger.info("Starting command run '#{command}' on #{nodes.map(&:uri)}")
       callback = block_given? ? Proc.new : nil
 
       r = on(nodes, callback) do |node|
@@ -83,13 +87,12 @@ module Bolt
         @logger.debug("Result on #{node.uri}: #{JSON.dump(node_result.to_result)}")
         node_result
       end
-      @logger.log(level, summary('command', command, r))
+      @logger.info(summary('command', command, r))
       r
     end
 
     def run_script(nodes, script, arguments)
-      level = @plan_logging ? Logger::NOTICE : Logger::INFO
-      @logger.log(level, "Starting script run #{script} on #{nodes.map(&:uri)}")
+      @logger.info("Starting script run #{script} on #{nodes.map(&:uri)}")
       @logger.debug("Arguments: #{arguments}")
       callback = block_given? ? Proc.new : nil
 
@@ -99,13 +102,12 @@ module Bolt
         @logger.debug("Result on #{node.uri}: #{JSON.dump(node_result.to_result)}")
         node_result
       end
-      @logger.log(level, summary('script', script, r))
+      @logger.info(summary('script', script, r))
       r
     end
 
     def run_task(nodes, task, input_method, arguments)
-      level = @plan_logging ? Logger::NOTICE : Logger::INFO
-      @logger.log(level, "Starting task #{task} on #{nodes.map(&:uri)}")
+      @logger.info("Starting task #{task} on #{nodes.map(&:uri)}")
       @logger.debug("Arguments: #{arguments} Input method: #{input_method}")
       callback = block_given? ? Proc.new : nil
 
@@ -115,13 +117,12 @@ module Bolt
         @logger.debug("Result on #{node.uri}: #{JSON.dump(node_result.to_result)}")
         node_result
       end
-      @logger.log(level, summary('task', task, r))
+      @logger.info(summary('task', task, r))
       r
     end
 
     def file_upload(nodes, source, destination)
-      level = @plan_logging ? Logger::NOTICE : Logger::INFO
-      @logger.log(level, "Starting file upload from #{source} to #{destination} on #{nodes.map(&:uri)}")
+      @logger.info("Starting file upload from #{source} to #{destination} on #{nodes.map(&:uri)}")
       callback = block_given? ? Proc.new : nil
 
       r = on(nodes, callback) do |node|
@@ -130,7 +131,7 @@ module Bolt
         @logger.debug("Result on #{node.uri}: #{JSON.dump(node_result.to_result)}")
         node_result
       end
-      @logger.log(level, summary('upload', source, r))
+      @logger.info(summary('upload', source, r))
       r
     end
 

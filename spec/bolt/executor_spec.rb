@@ -164,13 +164,10 @@ describe "Bolt::Executor" do
           .and_return(success)
       end
 
-      logger = double('logger')
-      allow(logger).to receive(:debug)
-      expect(logger).to receive(:log).with(Logger::NOTICE, "Starting command run '#{command}' on #{nodes_string}")
-      expect(logger).to receive(:log).with(Logger::NOTICE, "Ran command '#{command}' on 2 nodes with 0 failures")
-      allow(Logger).to receive(:get_logger).and_return(logger)
-
       executor.run_command(nodes, command)
+
+      expect(@log_output.readline).to match(/INFO.*Starting command run .* on .*/)
+      expect(@log_output.readline).to match(/INFO.*Ran command .* on 2 nodes with 0 failures/)
     end
 
     it "logs scripts" do
@@ -181,13 +178,10 @@ describe "Bolt::Executor" do
           .and_return(success)
       end
 
-      logger = double('logger')
-      allow(logger).to receive(:debug)
-      expect(logger).to receive(:log).with(Logger::NOTICE, "Starting script run #{script} on #{nodes_string}")
-      expect(logger).to receive(:log).with(Logger::NOTICE, "Ran script '#{script}' on 2 nodes with 0 failures")
-      allow(Logger).to receive(:get_logger).and_return(logger)
-
       executor.run_script(nodes, script, [])
+
+      expect(@log_output.readline).to match(/INFO.*Starting script run .* on .*/)
+      expect(@log_output.readline).to match(/INFO.*Ran script .* on 2 nodes with 0 failures/)
     end
 
     it "logs tasks" do
@@ -198,13 +192,10 @@ describe "Bolt::Executor" do
           .and_return(success)
       end
 
-      logger = double('logger')
-      allow(logger).to receive(:debug)
-      expect(logger).to receive(:log).with(Logger::NOTICE, 'Starting task service::restart on ["node1", "node2"]')
-      expect(logger).to receive(:log).with(Logger::NOTICE, "Ran task 'service::restart' on 2 nodes with 0 failures")
-      allow(Logger).to receive(:get_logger).and_return(logger)
-
       executor.run_task(nodes, task, 'both', task_arguments)
+
+      expect(@log_output.readline).to match(/INFO.*Starting task service::restart on .*/)
+      expect(@log_output.readline).to match(/INFO.*Ran task 'service::restart' on 2 nodes with 0 failures/)
     end
 
     it "logs uploads" do
@@ -215,14 +206,10 @@ describe "Bolt::Executor" do
           .and_return(success)
       end
 
-      logger = double('logger')
-      allow(logger).to receive(:debug)
-      expect(logger).to receive(:log).with(Logger::NOTICE,
-                                           "Starting file upload from #{script} to #{dest} on #{nodes_string}")
-      expect(logger).to receive(:log).with(Logger::NOTICE, "Ran upload '#{script}' on 2 nodes with 0 failures")
-      allow(Logger).to receive(:get_logger).and_return(logger)
-
       executor.file_upload(nodes, script, dest)
+
+      expect(@log_output.readline).to match(/INFO.*Starting file upload from .* to .* on .*/)
+      expect(@log_output.readline).to match(/INFO.*Ran upload .* on 2 nodes with 0 failures/)
     end
   end
 end

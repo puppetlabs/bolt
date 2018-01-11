@@ -1,8 +1,9 @@
 require 'uri'
 require 'optparse'
 require 'benchmark'
-require 'bolt/logger'
 require 'json'
+require 'logging'
+require 'bolt/logger'
 require 'bolt/node'
 require 'bolt/version'
 require 'bolt/error'
@@ -103,12 +104,14 @@ HELP
     attr_accessor :options
 
     def initialize(argv)
+      Bolt::Logger.initialize_logging
       @argv    = argv
       @options = {
         nodes: []
       }
       @config = Bolt::Config.new
       @parser = create_option_parser(@options)
+      @logger = Logging.logger[self]
     end
 
     def create_option_parser(results)
@@ -248,8 +251,8 @@ HELP
 
       @config.load_file(options[:configfile])
       @config.update_from_cli(options)
-      Logger.configure(@config)
       @config.validate
+      Logging.logger[:root].level = @config[:log_level] || :notice
 
       # This section handles parsing non-flag options which are
       # mode specific rather then part of the config
@@ -393,7 +396,7 @@ HELP
         end
 
         Puppet::Util::Log.newdestination(:console)
-        Puppet[:log_level] = if @config[:log_level] == Logger::DEBUG
+        Puppet[:log_level] = if @config[:log_level] == :debug
                                'debug'
                              else
                                'notice'
