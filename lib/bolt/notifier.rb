@@ -6,9 +6,9 @@ module Bolt
       @executor = executor
     end
 
-    def notify(callback, target, result)
+    def notify(callback, event)
       @executor.post do
-        callback.call(target, result)
+        callback.call(event)
       end
     end
 

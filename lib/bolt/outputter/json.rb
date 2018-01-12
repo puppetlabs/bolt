@@ -15,7 +15,7 @@ module Bolt
         @object_open = true
       end
 
-      def print_event(_, event)
+      def print_event(event)
         case event[:type]
         when :node_result
           print_result(event[:result])

@@ -7,10 +7,13 @@ describe "Bolt::Executor" do
   let(:command) { "hostname" }
   let(:script) { '/path/to/script.sh' }
   let(:dest) { '/tmp/upload' }
-  let(:start_event) { { type: :node_start } }
   let(:task) { 'service::restart' }
   let(:task_arguments) { { 'name' => 'apache' } }
   let(:transport) { double('holodeck', initialize_transport: nil) }
+
+  def start_event(target)
+    { type: :node_start, target: target }
+  end
 
   def success_event(result)
     { type: :node_result, result: result }
@@ -46,13 +49,13 @@ describe "Bolt::Executor" do
     end
 
     results = []
-    executor.run_command(targets, command) do |node, result|
-      results << [node, result]
+    executor.run_command(targets, command) do |result|
+      results << result
     end
 
     node_results.each do |node, result|
-      expect(results).to include([node.target, success_event(result)])
-      expect(results).to include([node.target, start_event])
+      expect(results).to include(success_event(result))
+      expect(results).to include(start_event(node.target))
     end
   end
 
@@ -73,13 +76,13 @@ describe "Bolt::Executor" do
     end
 
     results = []
-    executor.run_script(targets, script, []) do |node, result|
-      results << [node, result]
+    executor.run_script(targets, script, []) do |result|
+      results << result
     end
 
     node_results.each do |node, result|
-      expect(results).to include([node.target, success_event(result)])
-      expect(results).to include([node.target, start_event])
+      expect(results).to include(success_event(result))
+      expect(results).to include(start_event(node.target))
     end
   end
 
@@ -106,12 +109,44 @@ describe "Bolt::Executor" do
     end
 
     results = []
-    executor.run_task(targets, task, 'both', task_arguments) do |node, result|
-      results << [node, result]
+    executor.run_task(targets, task, 'both', task_arguments) do |result|
+      results << result
     end
     node_results.each do |node, result|
-      expect(results).to include([node.target, success_event(result)])
-      expect(results).to include([node.target, start_event])
+      expect(results).to include(success_event(result))
+      expect(results).to include(start_event(node.target))
+    end
+  end
+
+  it "uploads a file on all nodes" do
+    node_results.each do |node, result|
+      expect(node)
+        .to receive(:upload)
+        .with(script, dest)
+        .and_return(result)
+    end
+
+    results = executor.file_upload(targets, script, dest)
+    results.each_pair do |_, result|
+      expect(result).to be_instance_of(Bolt::Result)
+    end
+  end
+
+  it "yields each upload result" do
+    node_results.each do |node, result|
+      expect(node)
+        .to receive(:upload)
+        .with(script, dest)
+        .and_return(result)
+    end
+
+    results = []
+    executor.file_upload(targets, script, dest) do |result|
+      results << result
+    end
+    node_results.each do |node, result|
+      expect(results).to include(success_event(result))
+      expect(results).to include(start_event(node.target))
     end
   end
 

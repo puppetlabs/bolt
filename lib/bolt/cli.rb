@@ -436,20 +436,20 @@ HELP
           results =
             case options[:mode]
             when 'command'
-              executor.run_command(targets, options[:object]) do |target, event|
-                outputter.print_event(target, event)
+              executor.run_command(targets, options[:object]) do |event|
+                outputter.print_event(event)
               end
             when 'script'
               script = options[:object]
               validate_file('script', script)
               executor.run_script(
                 targets, script, options[:leftovers]
-              ) do |target, event|
-                outputter.print_event(target, event)
+              ) do |event|
+                outputter.print_event(event)
               end
             when 'task'
-              execute_task(executor, options) do |target, event|
-                outputter.print_event(target, event)
+              execute_task(executor, options) do |event|
+                outputter.print_event(event)
               end
             when 'file'
               src = options[:object]
@@ -459,8 +459,8 @@ HELP
                 raise Bolt::CLIError, "A destination path must be specified"
               end
               validate_file('source file', src)
-              executor.file_upload(targets, src, dest) do |target, event|
-                outputter.print_event(target, event)
+              executor.file_upload(targets, src, dest) do |event|
+                outputter.print_event(event)
               end
             end
         end

@@ -45,7 +45,7 @@ module Bolt
         pool.post do
           result =
             begin
-              @notifier.notify(callback, node.target, type: :node_start) if callback
+              @notifier.notify(callback, type: :node_start, target: node.target) if callback
               node.connect
               yield node
             rescue StandardError => ex
@@ -58,9 +58,7 @@ module Bolt
               end
             end
           results[node] = result
-          if callback
-            @notifier.notify(callback, node.target, type: :node_result, result: result)
-          end
+          @notifier.notify(callback, type: :node_result, result: result) if callback
           result
         end
       }

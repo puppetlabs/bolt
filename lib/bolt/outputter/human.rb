@@ -25,10 +25,10 @@ module Bolt
         string.sub(/\s\z/, '')
       end
 
-      def print_event(target, event)
+      def print_event(event)
         case event[:type]
         when :node_start
-          print_start(target)
+          print_start(event[:target])
         when :node_result
           print_result(event[:result])
         end
