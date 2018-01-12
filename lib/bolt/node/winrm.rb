@@ -1,5 +1,6 @@
 require 'winrm'
 require 'winrm-fs'
+require 'logging'
 require 'bolt/result'
 require 'base64'
 require 'set'
@@ -39,7 +40,9 @@ module Bolt
 
       Timeout.timeout(@connect_timeout) do
         @connection = ::WinRM::Connection.new(options)
-        @connection.logger = @transport_logger
+        transport_logger = Logging.logger[::WinRM]
+        transport_logger.level = :warn
+        @connection.logger = transport_logger
 
         @session = @connection.shell(:powershell)
         @session.run('$PSVersionTable.PSVersion')

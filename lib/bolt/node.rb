@@ -1,8 +1,8 @@
-require 'bolt/logger'
 require 'bolt/node_uri'
 require 'bolt/result'
 require 'bolt/config'
 require 'bolt/target'
+require 'logging'
 
 module Bolt
   class Node
@@ -53,8 +53,7 @@ module Bolt
       @orch_task_environment = transport_conf[:orch_task_environment]
       @extensions = transport_conf[:extensions]
 
-      @logger = Logger.get_logger(progname: @host)
-      @transport_logger = Logger.get_logger(progname: @host, log_level: Logger::WARN)
+      @logger = Logging.logger[@host]
     end
 
     def upload(source, destination)

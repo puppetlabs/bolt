@@ -1,5 +1,6 @@
 require 'json'
 require 'shellwords'
+require 'logging'
 require 'net/ssh'
 require 'net/scp'
 require 'bolt/node/output'
@@ -19,8 +20,10 @@ module Bolt
     end
 
     def connect
+      transport_logger = Logging.logger[Net::SSH]
+      transport_logger.level = :warn
       options = {
-        logger: @transport_logger,
+        logger: transport_logger,
         non_interactive: true
       }
 

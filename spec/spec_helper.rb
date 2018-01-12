@@ -1,6 +1,9 @@
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 
 require 'bolt'
+require 'bolt/logger'
+require 'logging'
+require 'rspec/logging_helper'
 
 $LOAD_PATH.unshift File.join(__dir__, 'lib')
 
@@ -14,6 +17,10 @@ RSpec.shared_context 'reset puppet settings' do
 end
 
 RSpec.configure do |config|
+  Bolt::Logger.initialize_logging
+  include RSpec::LoggingHelper
+  config.capture_log_messages
+
   # rspec-expectations config
   config.expect_with :rspec do |expectations|
     #     be_bigger_than(2).and_smaller_than(4).description
