@@ -56,6 +56,7 @@ BASH
     end
 
     it "rejects the connection if host key verification fails" do
+      puts "host key test: #{ssh.uri}, #{ssh.user}, #{ssh.password}"
       expect_node_error(Bolt::Node::ConnectError,
                         'HOST_KEY_ERROR',
                         /Host key verification failed/) do
