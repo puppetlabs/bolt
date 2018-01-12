@@ -512,7 +512,7 @@ PS
 
     def _run_command(command)
       output = execute(command)
-      Bolt::CommandResult.from_output(@target, output)
+      Bolt::Result.for_command(@target, output.stdout.string, output.stderr.string, output.exit_code)
     # TODO: we should rely on the executor for this
     rescue StandardError => e
       Bolt::Result.from_exception(@target, e)
@@ -545,7 +545,7 @@ catch
           args += escape_arguments(arguments)
           output = execute_process(path, args)
         end
-        Bolt::CommandResult.from_output(@target, output)
+        Bolt::Result.for_command(@target, output.stdout.string, output.stderr.string, output.exit_code)
       end
     # TODO: we should rely on the executor for this
     rescue StandardError => e
@@ -587,7 +587,9 @@ try { & "#{remote_path}" @taskArgs } catch { exit 1 }
             path, args = *process_from_extension(remote_path)
             execute_process(path, args, stdin)
           end
-        Bolt::TaskResult.from_output(@target, output)
+        Bolt::Result.for_task(@target, output.stdout.string,
+                              output.stderr.string,
+                              output.exit_code)
       end
     # TODO: we should rely on the executor for this
     rescue StandardError => e

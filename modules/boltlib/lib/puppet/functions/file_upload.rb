@@ -18,7 +18,7 @@ Puppet::Functions.create_function(:file_upload, Puppet::Functions::InternalFunct
     param 'String[1]', :destination
     param 'TargetOrTargets', :targets
     optional_param 'Hash[String[1], Any]', :options
-    return_type 'ExecutionResult'
+    return_type 'ResultSet'
   end
 
   def file_upload(scope, source, destination, targets, options = nil)
@@ -48,11 +48,9 @@ Puppet::Functions.create_function(:file_upload, Puppet::Functions::InternalFunct
     targets = targets.flatten.map { |t| t.is_a?(String) ? Bolt::Target.from_uri(t) : t }
     if targets.empty?
       call_function('debug', "Simulating file upload of '#{found}' - no targets given - no action taken")
-      r = Bolt::ExecutionResult::EMPTY_RESULT
+      r = Bolt::ResultSet.new([])
     else
-      r = Bolt::ExecutionResult.from_bolt(
-        executor.file_upload(targets, found, destination)
-      )
+      r = executor.file_upload(targets, found, destination)
     end
 
     if !r.ok && !options['_catch_errors']

@@ -1,3 +1,4 @@
+require 'spec_helper'
 require 'bolt_spec/conn'
 require 'bolt_spec/files'
 require 'bolt_spec/integration'

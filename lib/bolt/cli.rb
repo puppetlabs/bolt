@@ -400,6 +400,9 @@ HELP
           raise Bolt::CLIError, "Puppet must be installed to execute tasks"
         end
 
+        # Now that puppet is loaded we can include puppet mixins in data types
+        Bolt::ResultSet.include_iterable
+
         Puppet::Util::Log.newdestination(:console)
         Puppet[:log_level] = if @config[:log_level] == :debug
                                'debug'
@@ -407,10 +410,6 @@ HELP
                                'notice'
                              end
       end
-
-      # ExecutionResult loaded here so that it can get puppet features if
-      # puppet is present
-      require 'bolt/execution_result'
 
       if options[:action] == 'show'
         if options[:mode] == 'task'
@@ -473,8 +472,7 @@ HELP
         end
 
         outputter.print_summary(results, elapsed_time)
-        successful = results.values.all?(&:success?)
-        code = successful ? 0 : 2
+        code = results.ok ? 0 : 2
       end
       code
     rescue Bolt::Error => e
@@ -544,13 +542,19 @@ HELP
               if err.cause.is_a? Bolt::Error
                 err.cause
               else
-                Bolt::CLIError.new(err.cause.message)
+                e = Bolt::CLIError.new(err.cause.message)
+                e.set_backtrace(err.cause.backtrace)
+                e
               end
             else
-              Bolt::CLIError.new(err.message)
+              e = Bolt::CLIError.new(err.message)
+              e.set_backtrace(err.backtrace)
+              e
             end
           rescue StandardError => err
-            Bolt::CLIError.new(err.message)
+            e = Bolt::CLIError.new(err.message)
+            e.set_backtrace(err.backtrace)
+            e
           end
         end
       end
@@ -599,13 +603,7 @@ HELP
           cli << "--#{setting}" << dir
         end
         in_bolt_compiler(cli) do |compiler|
-          result = compiler.call_function('run_plan', plan, args)
-          # Querying ExecutionResult for failures currently requires a script compiler.
-          # Convert from an ExecutionResult to structured output that we can print.
-          if result.instance_of? Bolt::ExecutionResult
-            result = result.unwrap
-          end
-          result
+          compiler.call_function('run_plan', plan, args)
         end
       end
     end

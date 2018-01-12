@@ -18,10 +18,10 @@ module Bolt
       urls.split(/[[:space:],]+/).reject(&:empty?).uniq.map { |url| from_uri(url) }
     end
 
-    def initialize(uri, options = {})
+    def initialize(uri, options = nil)
       @uri = uri
       @uri_obj = parse(uri)
-      @options = options
+      @options = options || {}
     end
 
     def parse(string)
@@ -44,12 +44,7 @@ module Bolt
     end
 
     def to_s
-      # Use Puppet::Pops::Types::StringConverter if it is available
-      if Object.const_defined?(:Puppet) && Puppet.const_defined?(:Pops)
-        Puppet::Pops::Types::StringConverter.singleton.convert(self)
-      else
-        "Target('#{@uri}', #{@options})"
-      end
+      "Target('#{@uri}', #{@options})"
     end
 
     def host
@@ -58,6 +53,12 @@ module Bolt
 
     def port
       @uri_obj.port
+    end
+
+    # name is currently just uri but should be be used instead to identify the
+    # Target ouside the transport or uri options.
+    def name
+      uri
     end
 
     def user

@@ -5,6 +5,7 @@ require 'bolt/result'
 require 'bolt/config'
 require 'bolt/notifier'
 require 'bolt/node'
+require 'bolt/result_set'
 
 module Bolt
   class Executor
@@ -31,7 +32,7 @@ module Bolt
     private :from_targets
 
     def on(nodes, callback = nil)
-      results = Concurrent::Map.new
+      results = Concurrent::Array.new
 
       poolsize = [nodes.length, @config[:concurrency]].min
       pool = Concurrent::FixedThreadPool.new(poolsize)
@@ -57,9 +58,8 @@ module Bolt
                 @logger.info("Failed to close connection to #{node.uri} : #{ex.message}")
               end
             end
-          results[node] = result
+          results.concat([result])
           @notifier.notify(callback, type: :node_result, result: result) if callback
-          result
         end
       }
       pool.shutdown
@@ -67,12 +67,12 @@ module Bolt
 
       @notifier.shutdown
 
-      results_to_hash(results)
+      Bolt::ResultSet.new(results.map { |r| r })
     end
     private :on
 
     def summary(action, object, result)
-      fc = result.select { |_, r| r.error }.length
+      fc = result.error_set.length
       npl = result.length == 1 ? '' : 's'
       fpl = fc == 1 ? '' : 's'
       "Ran #{action} '#{object}' on #{result.length} node#{npl} with #{fc} failure#{fpl}"
@@ -87,7 +87,7 @@ module Bolt
       r = on(nodes, callback) do |node|
         @logger.debug("Running command '#{command}' on #{node.uri}")
         node_result = node.run_command(command)
-        @logger.debug("Result on #{node.uri}: #{JSON.dump(node_result.to_result)}")
+        @logger.debug("Result on #{node.uri}: #{JSON.dump(node_result.value)}")
         node_result
       end
       @logger.info(summary('command', command, r))
@@ -103,7 +103,7 @@ module Bolt
       r = on(nodes, callback) do |node|
         @logger.debug { "Running script '#{script}' on #{node.uri}" }
         node_result = node.run_script(script, arguments)
-        @logger.debug("Result on #{node.uri}: #{JSON.dump(node_result.to_result)}")
+        @logger.debug("Result on #{node.uri}: #{JSON.dump(node_result.value)}")
         node_result
       end
       @logger.info(summary('script', script, r))
@@ -119,7 +119,7 @@ module Bolt
       r = on(nodes, callback) do |node|
         @logger.debug { "Running task run '#{task}' on #{node.uri}" }
         node_result = node.run_task(task, input_method, arguments)
-        @logger.debug("Result on #{node.uri}: #{JSON.dump(node_result.to_result)}")
+        @logger.debug("Result on #{node.uri}: #{JSON.dump(node_result.value)}")
         node_result
       end
       @logger.info(summary('task', task, r))
@@ -134,19 +134,11 @@ module Bolt
       r = on(nodes, callback) do |node|
         @logger.debug { "Uploading: '#{source}' to #{node.uri}" }
         node_result = node.upload(source, destination)
-        @logger.debug("Result on #{node.uri}: #{JSON.dump(node_result.to_result)}")
+        @logger.debug("Result on #{node.uri}: #{JSON.dump(node_result.value)}")
         node_result
       end
       @logger.info(summary('upload', source, r))
       r
-    end
-
-    private
-
-    def results_to_hash(results)
-      result_hash = {}
-      results.each_pair { |k, v| result_hash[k] = v }
-      result_hash
     end
   end
 end

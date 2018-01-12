@@ -22,8 +22,8 @@ module Bolt
       h
     end
 
-    def to_json
-      to_h.to_json
+    def to_json(opts = nil)
+      to_h.to_json(opts)
     end
   end
 
@@ -34,11 +34,11 @@ module Bolt
       details = {
         action: action,
         object: object,
-        failed_targets: resultset.error_nodes.names
+        failed_targets: resultset.error_set.names
       }
       message = "Plan aborted: #{action} '#{object}' failed on #{details[:failed_targets].length} nodes"
       super(message, 'bolt/run-failure', details)
-      @resultset = resultset.unwrap
+      @resultset = resultset
       @error_code = 2
     end
   end

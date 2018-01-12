@@ -1,5 +1,6 @@
 require 'spec_helper'
-require 'bolt/execution_result'
+require 'bolt/result'
+require 'bolt/result_set'
 require 'bolt/target'
 
 describe 'file_upload' do
@@ -17,9 +18,10 @@ describe 'file_upload' do
   context 'it calls bolt executor file_upload' do
     let(:hostname) { 'test.example.com' }
     let(:target) { Bolt::Target.from_uri(hostname) }
+
     let(:message) { 'uploaded' }
-    let(:result) { { 'value' => message } }
-    let(:exec_result) { Bolt::ExecutionResult.from_bolt(target => result) }
+    let(:result) { Bolt::Result.new(target, message: message) }
+    let(:result_set) { Bolt::ResultSet.new([result]) }
     let(:module_root) { File.expand_path(fixtures('modules', 'test')) }
     let(:full_path) { File.join(module_root, 'files/uploads/index.html') }
     let(:full_dir_path) { File.dirname(full_path) }
@@ -29,46 +31,45 @@ describe 'file_upload' do
     end
 
     it 'with fully resolved path of file and destination' do
-      executor.expects(:file_upload).with([target], full_path, destination).returns(target => result)
+      executor.expects(:file_upload).with([target], full_path, destination).returns(result_set)
 
-      is_expected.to run.with_params('test/uploads/index.html', destination, hostname).and_return(exec_result)
+      is_expected.to run.with_params('test/uploads/index.html', destination, hostname).and_return(result_set)
     end
 
     it 'with fully resolved path of directory and destination' do
-      executor.expects(:file_upload).with([target], full_dir_path, destination).returns(target => result)
+      executor.expects(:file_upload).with([target], full_dir_path, destination).returns(result_set)
 
-      is_expected.to run.with_params('test/uploads', destination, hostname).and_return(exec_result)
+      is_expected.to run.with_params('test/uploads', destination, hostname).and_return(result_set)
     end
 
     it 'with target specified as a Target' do
-      executor.expects(:file_upload).with([target], full_dir_path, destination).returns(target => result)
+      executor.expects(:file_upload).with([target], full_dir_path, destination).returns(result_set)
 
-      is_expected.to run.with_params('test/uploads', destination, target).and_return(exec_result)
+      is_expected.to run.with_params('test/uploads', destination, target).and_return(result_set)
     end
 
     context 'with multiple destinations' do
       let(:hostname2) { 'test.testing.com' }
       let(:target2) { Bolt::Target.from_uri(hostname2) }
       let(:message2) { 'received' }
-      let(:result2) { { 'value' => message2 } }
-      let(:exec_result) { Bolt::ExecutionResult.from_bolt(target => result, target2 => result2) }
+      let(:result2) { Bolt::Result.new(target2, message: message2) }
+      let(:result_set) { Bolt::ResultSet.new([result, result2]) }
 
       it 'propagates multiple hosts and returns multiple results' do
         executor
           .expects(:file_upload).with([target, target2], full_path, destination)
-          .returns(target => result, target2 => result2)
+          .returns(result_set)
 
         is_expected.to run.with_params('test/uploads/index.html', destination, [hostname, hostname2])
-                          .and_return(exec_result)
+                          .and_return(result_set)
       end
 
       context 'when upload fails on one node' do
-        let(:failresult) { { 'error' => {} } }
-        let(:exec_fail) { Bolt::ExecutionResult.from_bolt(target => result, target2 => failresult) }
+        let(:result2) { Bolt::Result.new(target2, error: { 'msg' => 'oops' }) }
 
         it 'errors by default' do
           executor.expects(:file_upload).with([target, target2], full_path, destination)
-                  .returns(target => result, target => failresult)
+                  .returns(result_set)
 
           is_expected.to run.with_params('test/uploads/index.html', destination, [hostname, hostname2])
                             .and_raise_error(Bolt::RunFailure)
@@ -76,7 +77,7 @@ describe 'file_upload' do
 
         it 'does not error with _catch_errors' do
           executor.expects(:file_upload).with([target, target2], full_path, destination)
-                  .returns(target => result, target2 => failresult)
+                  .returns(result_set)
 
           is_expected.to run.with_params('test/uploads/index.html', destination, [hostname, hostname2],
                                          '_catch_errors' => true)
@@ -88,7 +89,7 @@ describe 'file_upload' do
       executor.expects(:file_upload).never
 
       is_expected.to run.with_params('test/uploads/index.html', destination, [])
-                        .and_return(Bolt::ExecutionResult::EMPTY_RESULT)
+                        .and_return(Bolt::ResultSet.new([]))
     end
 
     it 'errors when file is not found' do

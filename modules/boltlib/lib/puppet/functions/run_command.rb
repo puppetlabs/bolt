@@ -16,7 +16,7 @@ Puppet::Functions.create_function(:run_command) do
     param 'String[1]', :command
     param 'TargetOrTargets', :targets
     optional_param 'Hash[String[1], Any]', :options
-    return_type 'ExecutionResult'
+    return_type 'ResultSet'
   end
 
   def run_command(command, targets, options = nil)
@@ -40,9 +40,9 @@ Puppet::Functions.create_function(:run_command) do
 
     if targets.empty?
       call_function('debug', "Simulating run_command('#{command}') - no targets given - no action taken")
-      r = Bolt::ExecutionResult::EMPTY_RESULT
+      r = Bolt::ResultSet.new([])
     else
-      r = Bolt::ExecutionResult.from_bolt(executor.run_command(targets, command))
+      r = executor.run_command(targets, command)
     end
 
     if !r.ok && !options['_catch_errors']

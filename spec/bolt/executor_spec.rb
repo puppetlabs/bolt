@@ -65,7 +65,7 @@ describe "Bolt::Executor" do
     end
 
     results = executor.run_script(targets, script, [])
-    results.each_pair do |_, result|
+    results.each do |result|
       expect(result).to be_instance_of(Bolt::Result)
     end
   end
@@ -95,7 +95,7 @@ describe "Bolt::Executor" do
     end
 
     results = executor.run_task(targets, task, 'both', task_arguments)
-    results.each_pair do |_, result|
+    results.each do |result|
       expect(result).to be_instance_of(Bolt::Result)
     end
   end
@@ -127,7 +127,7 @@ describe "Bolt::Executor" do
     end
 
     results = executor.file_upload(targets, script, dest)
-    results.each_pair do |_, result|
+    results.each do |result|
       expect(result).to be_instance_of(Bolt::Result)
     end
   end
@@ -160,8 +160,8 @@ describe "Bolt::Executor" do
     end
 
     results = executor.run_command(targets, command)
-    results.each_pair do |_, result|
-      expect(result.error['kind']).to eq('puppetlabs.tasks/connect-error')
+    results.each do |result|
+      expect(result.error_hash['kind']).to eq('puppetlabs.tasks/connect-error')
     end
   end
 
@@ -173,8 +173,8 @@ describe "Bolt::Executor" do
     end
 
     results = executor.run_command(targets, command)
-    results.each_pair do |_, result|
-      expect(result.error['kind']).to eq('puppetlabs.tasks/exception-error')
+    results.each do |result|
+      expect(result.error_hash['kind']).to eq('puppetlabs.tasks/exception-error')
     end
   end
 

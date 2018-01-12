@@ -3,6 +3,9 @@ Puppet::DataTypes.create_type('Target') do
     attributes => {
       uri => String[1],
       options => { type => Hash[String[1], Data], value => {} }
+    },
+    functions => {
+      name => Callable[[], String[1]],
     }
     PUPPET
 

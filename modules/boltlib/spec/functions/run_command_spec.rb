@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'bolt/execution_result'
 require 'bolt/target'
 
 describe 'run_command' do
@@ -17,56 +16,55 @@ describe 'run_command' do
     let(:hostname) { 'test.example.com' }
     let(:target) { Bolt::Target.from_uri(hostname) }
     let(:command) { 'hostname' }
-    let(:result) { { value: hostname } }
-    let(:exec_result) { Bolt::ExecutionResult.from_bolt(target => result) }
+    let(:result) { Bolt::Result.new(target, value: { 'stdout' => hostname }) }
+    let(:result_set) { Bolt::ResultSet.new([result]) }
     before(:each) do
       Puppet.features.stubs(:bolt?).returns(true)
     end
 
     it 'with given command and host' do
-      executor.expects(:run_command).with([target], command).returns(target => result)
+      executor.expects(:run_command).with([target], command).returns(result_set)
 
-      is_expected.to run.with_params(command, hostname).and_return(exec_result)
+      is_expected.to run.with_params(command, hostname).and_return(result_set)
     end
 
     it 'with given command and Target' do
-      executor.expects(:run_command).with([target], command).returns(target => result)
+      executor.expects(:run_command).with([target], command).returns(result_set)
 
-      is_expected.to run.with_params(command, target).and_return(exec_result)
+      is_expected.to run.with_params(command, target).and_return(result_set)
     end
 
     context 'with multiple hosts' do
       let(:hostname2) { 'test.testing.com' }
       let(:target2) { Bolt::Target.from_uri(hostname2) }
-      let(:result2) { { value: hostname2 } }
-      let(:exec_result) { Bolt::ExecutionResult.from_bolt(target => result, target2 => result2) }
+      let(:result2) { Bolt::Result.new(target2, value: { 'stdout' => hostname2 }) }
+      let(:result_set) { Bolt::ResultSet.new([result, result2]) }
 
       it 'with propagates multiple hosts and returns multiple results' do
-        executor.expects(:run_command).with([target, target2], command).returns(target => result, target2 => result2)
+        executor.expects(:run_command).with([target, target2], command).returns(result_set)
 
-        is_expected.to run.with_params(command, [hostname, hostname2]).and_return(exec_result)
+        is_expected.to run.with_params(command, [hostname, hostname2]).and_return(result_set)
       end
 
       it 'with propagates multiple Targets and returns multiple results' do
-        executor.expects(:run_command).with([target, target2], command).returns(target => result, target2 => result2)
+        executor.expects(:run_command).with([target, target2], command).returns(result_set)
 
-        is_expected.to run.with_params(command, [target, target2]).and_return(exec_result)
+        is_expected.to run.with_params(command, [target, target2]).and_return(result_set)
       end
 
       context 'when a command fails on one node' do
-        let(:failresult) { { 'error' => {} } }
-        let(:exec_fail) { Bolt::ExecutionResult.from_bolt(target => result, target2 => failresult) }
+        let(:result2) { Bolt::Result.new(target2, error: { 'message' => hostname2 }) }
 
         it 'errors by default' do
           executor.expects(:run_command).with([target, target2], command)
-                  .returns(target => result, target2 => failresult)
+                  .returns(result_set)
 
           is_expected.to run.with_params(command, [target, target2]).and_raise_error(Bolt::RunFailure)
         end
 
         it 'does not error with _catch_errors' do
           executor.expects(:run_command).with([target, target2], command)
-                  .returns(target => result, target2 => failresult)
+                  .returns(result_set)
 
           is_expected.to run.with_params(command, [hostname, hostname2], '_catch_errors' => true)
         end
@@ -76,7 +74,7 @@ describe 'run_command' do
     it 'without nodes - does not invoke bolt' do
       executor.expects(:run_command).never
 
-      is_expected.to run.with_params(command, []).and_return(Bolt::ExecutionResult::EMPTY_RESULT)
+      is_expected.to run.with_params(command, []).and_return(Bolt::ResultSet.new([]))
     end
   end
 

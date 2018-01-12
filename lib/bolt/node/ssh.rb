@@ -255,7 +255,7 @@ SCRIPT
 
     def _run_command(command)
       output = execute(command, sudoable: true)
-      Bolt::CommandResult.from_output(@target, output)
+      Bolt::Result.for_command(@target, output.stdout.string, output.stderr.string, output.exit_code)
     # TODO: We should be able to rely on the excutor for this but it will mean
     # a test refactor
     rescue StandardError => e
@@ -266,7 +266,7 @@ SCRIPT
       with_remote_file(script) do |remote_path|
         output = execute("'#{remote_path}' #{Shellwords.join(arguments)}",
                          sudoable: true)
-        Bolt::CommandResult.from_output(@target, output)
+        Bolt::Result.for_command(@target, output.stdout.string, output.stderr.string, output.exit_code)
       end
     # TODO: We should be able to rely on the excutor for this but it will mean
     # a test refactor
@@ -301,7 +301,9 @@ SCRIPT
           output = execute(command, stdin: stdin)
         end
       end
-      Bolt::TaskResult.from_output(@target, output)
+      Bolt::Result.for_task(@target, output.stdout.string,
+                            output.stderr.string,
+                            output.exit_code)
 
     # TODO: We should be able to rely on the excutor for this but it will mean
     # a test refactor
