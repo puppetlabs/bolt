@@ -9,14 +9,19 @@ describe Bolt::SSH do
   include BoltSpec::Errors
   include BoltSpec::Files
 
+  def mk_config(conf)
+    Bolt::Config.new(transports: { ssh: conf })
+  end
+
   let(:hostname) { ENV['BOLT_SSH_HOST'] || "localhost" }
   let(:user) { ENV['BOLT_SSH_USER'] || "vagrant" }
   let(:password) { ENV['BOLT_SSH_PASSWORD'] || "vagrant" }
   let(:port) { ENV['BOLT_SSH_PORT'] || 2224 }
   let(:key) { ENV['BOLT_SSH_KEY'] || Dir[".vagrant/**/private_key"] }
   let(:command) { "pwd" }
-  let(:ssh) { Bolt::SSH.new(target) }
-  let(:insecure) { { config: Bolt::Config.new(transports: { ssh: { insecure: true } }) } }
+  let(:config) { mk_config(user: user, password: password) }
+  let(:insecure) { mk_config(insecure: true, user: user, password: password) }
+  let(:ssh) { Bolt::SSH.new(target, config: config) }
   let(:echo_script) { <<BASH }
 for var in "$@"
 do
@@ -24,14 +29,8 @@ do
 done
 BASH
 
-  def target(h = hostname, p = port, u = user, pw = password)
-    uri = "#{h}:#{p}"
-    if u && pw
-      uri = "#{u}:#{pw}@#{uri}"
-    elsif u
-      uri = "#{u}@#{uri}"
-    end
-    Bolt::Target.from_uri(uri)
+  def target(h = hostname, p = port)
+    Bolt::Target.from_uri("#{h}:#{p}")
   end
 
   def result_value(stdout = nil, stderr = nil, exit_code = 0)
@@ -53,7 +52,7 @@ BASH
     end
 
     it "downgrades to lenient if insecure is true" do
-      ssh = Bolt::SSH.new(target, **insecure)
+      ssh = Bolt::SSH.new(target, config: insecure)
 
       allow(Net::SSH)
         .to receive(:start)
@@ -74,7 +73,7 @@ BASH
     end
 
     it "raises ConnectError if authentication fails" do
-      ssh = Bolt::SSH.new(target, **insecure)
+      ssh = Bolt::SSH.new(target, config: insecure)
 
       allow(Net::SSH)
         .to receive(:start)
@@ -128,8 +127,8 @@ BASH
       TCPServer.open(0) do |server|
         port = server.addr[1]
 
-        timeout = { config: Bolt::Config.new(transports: { ssh: { connect_timeout: 2 } }) }
-        ssh = Bolt::SSH.new(target(hostname, port, 'bad', 'password'), **timeout)
+        timeout = mk_config(connect_timeout: 2, user: 'bad', password: 'password')
+        ssh = Bolt::SSH.new(target(hostname, port), config: timeout)
 
         exec_time = Time.now
         expect {
@@ -141,8 +140,7 @@ BASH
   end
 
   context "when executing with private key" do
-    let(:config) { Bolt::Config.new(transports: { ssh: { insecure: true, key: key } }) }
-    let(:ssh) { Bolt::SSH.new(target(hostname, port, user, nil), config: config) }
+    let(:config) { mk_config(insecure: true, key: key, user: user) }
 
     before(:each) { ssh.connect }
     after(:each) { ssh.disconnect }
@@ -166,7 +164,7 @@ BASH
   end
 
   context "when executing" do
-    let(:ssh) { Bolt::SSH.new(target, **insecure) }
+    let(:ssh) { Bolt::SSH.new(target, config: insecure) }
 
     before(:each) { ssh.connect }
     after(:each) { ssh.disconnect }
@@ -347,13 +345,7 @@ SHELL
 
   context 'When tmpdir is specified' do
     let(:tmpdir) { '/tmp/mytempdir' }
-    let(:config) do
-      Bolt::Config.new(transports: { ssh: {
-                         insecure: true,
-                         tmpdir: tmpdir
-                       } })
-    end
-    let(:ssh) { Bolt::SSH.new(target, config: config) }
+    let(:config) { mk_config(insecure: true, tmpdir: tmpdir, user: user, password: password) }
 
     before(:each) { ssh.connect }
     after(:each) do
@@ -383,16 +375,7 @@ SHELL
   end
 
   context "with sudo" do
-    let(:config) do
-      Bolt::Config.new(transports: { ssh: {
-                         insecure: true,
-                         sudo: true,
-                         sudo_password: password,
-                         run_as: 'root'
-                       } })
-    end
-
-    let(:ssh) { Bolt::SSH.new(target, config: config) }
+    let(:config) { mk_config(insecure: true, sudo_password: password, run_as: 'root', user: user, password: password) }
 
     before(:each) { ssh.connect }
     after(:each) { ssh.disconnect }
@@ -411,15 +394,10 @@ SHELL
     end
 
     context "requesting a pty" do
-      let(:config) do
-        Bolt::Config.new(transports: { ssh: {
-                           insecure: true,
-                           sudo: true,
-                           sudo_password: password,
-                           run_as: 'root',
-                           tty: true
-                         } })
-      end
+      let(:config) {
+        mk_config(insecure: true, sudo_password: password, run_as: 'root',
+                  tty: true, user: user, password: password)
+      }
 
       it "can execute a command when a tty is requested", ssh: true do
         expect(ssh._run_command('whoami').stdout).to eq("\r\nroot\r\n")
@@ -428,19 +406,14 @@ SHELL
 
     context "with an incorrect password" do
       let(:config) {
-        Bolt::Config.new(transports: { ssh: {
-                           insecure: true,
-                           sudo: true,
-                           sudo_password: 'nonsense',
-                           run_as: 'root'
-                         } })
+        mk_config(insecure: true, sudo_password: 'nonsense', run_as: 'root',
+                  user: user, password: password)
       }
-      let(:ssh) { Bolt::SSH.new(target, config: config) }
 
       it "returns a failed result", ssh: true do
         expect(ssh._run_command('whoami').error).to eq(
           'kind' => 'puppetlabs.tasks/escalate-error',
-          'msg' => "Sudo password for user #{user} not recognized on #{user}:#{password}@#{hostname}:#{port}",
+          'msg' => "Sudo password for user #{user} not recognized on #{hostname}:#{port}",
           'details' => {},
           'issue_code' => 'BAD_PASSWORD'
         )
@@ -448,19 +421,12 @@ SHELL
     end
 
     context "with no password" do
-      let(:config) do
-        Bolt::Config.new(transports: { ssh: {
-                           insecure: true,
-                           sudo: true,
-                           run_as: 'root'
-                         } })
-      end
-      let(:ssh) { Bolt::SSH.new(target, config: config) }
+      let(:config) { mk_config(insecure: true, run_as: 'root', user: user, password: password) }
 
       it "returns a failed result", ssh: true do
         expect(ssh._run_command('whoami').error).to eq(
           'kind' => 'puppetlabs.tasks/escalate-error',
-          'msg' => "Sudo password for user #{user} was not provided for #{user}:#{password}@#{hostname}:#{port}",
+          'msg' => "Sudo password for user #{user} was not provided for #{hostname}:#{port}",
           'details' => {},
           'issue_code' => 'NO_PASSWORD'
         )
