@@ -30,7 +30,7 @@ module Bolt
         scheme = 'https'
         transport = :ssl
       end
-      endpoint = "#{scheme}://#{host}:#{port}/wsman"
+      endpoint = "#{scheme}://#{@target.host}:#{port}/wsman"
       options = { endpoint: endpoint,
                   user: @user,
                   password: @password,

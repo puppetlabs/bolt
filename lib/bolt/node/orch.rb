@@ -49,7 +49,7 @@ module Bolt
                noop: arguments['_noop'],
                params: arguments.reject { |k, _| k == '_noop' },
                scope: {
-                 nodes: [host]
+                 nodes: [@target.host]
                } }
       # Should we handle errors here or let them propagate?
       results = client.run_task(body)
@@ -65,7 +65,7 @@ module Bolt
           JSON.dump(
             '_error' => {
               'kind' => 'puppetlabs.tasks/skipped-node',
-              'msg' => "Node #{host} was skipped",
+              'msg' => "Node #{@target.host} was skipped",
               'details' => {}
             }
           ),

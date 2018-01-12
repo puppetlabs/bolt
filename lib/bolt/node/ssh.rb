@@ -27,7 +27,7 @@ module Bolt
         non_interactive: true
       }
 
-      options[:port] = port if port
+      options[:port] = @target.port if @target.port
       options[:password] = @password if @password
       options[:keys] = @key if @key
       options[:verify_host_key] = if @insecure
@@ -37,7 +37,7 @@ module Bolt
                                   end
       options[:timeout] = @connect_timeout if @connect_timeout
 
-      @session = Net::SSH.start(host, @user, options)
+      @session = Net::SSH.start(@target.host, @user, options)
       @logger.debug { "Opened session" }
     rescue Net::SSH::AuthenticationFailed => e
       raise Bolt::Node::ConnectError.new(

@@ -43,15 +43,7 @@ module Bolt
       @orch_task_environment = transport_conf[:orch_task_environment]
       @extensions = transport_conf[:extensions]
 
-      @logger = Logging.logger[host]
-    end
-
-    def host
-      @target.host
-    end
-
-    def port
-      @target.port
+      @logger = Logging.logger[@target.host]
     end
 
     def uri
@@ -62,7 +54,7 @@ module Bolt
       @logger.debug { "Uploading #{source} to #{destination}" }
       result = _upload(source, destination)
       if result.success?
-        Bolt::Result.new(@target, nil, "Uploaded '#{source}' to '#{host}:#{destination}'")
+        Bolt::Result.new(@target, nil, "Uploaded '#{source}' to '#{@target.host}:#{destination}'")
       else
         result
       end
