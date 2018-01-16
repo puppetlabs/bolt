@@ -57,7 +57,7 @@ modulepath: "~/.puppetlabs/bolt-code/site:~/.puppetlabs/bolt-code/modules"
 concurrency: 10
 format: human
 ssh:
-  insecure: true
+  host-key-check: false
   private-key: ~/.ssh/bolt_id
 ```
 
@@ -71,7 +71,7 @@ ssh:
 
 ### `ssh` transport configuration options
 
-`insecure`: If true, host key validation will be skipped when connecting over SSH. (default: false)
+`host-key-check`: If false, host key validation will be skipped when connecting over SSH. (default: true)
 
 `private-key`: The path to the private key file to use for SSH authentication.
 
@@ -85,7 +85,7 @@ ssh:
 
 `connect-timeout`: Maximum amount of time to allow for a WinRM connection to be established, in seconds.
 
-`insecure`: Whether to skip requiring SSL for connections. (default: false)
+`ssl`: If false, skip requiring SSL for connections. (default: true)
 
 `cacert`: The CA certificate used to authenticate SSL connections. (default: uses system CA certificates)
 

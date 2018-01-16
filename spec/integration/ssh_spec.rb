@@ -19,7 +19,9 @@ describe "when runnning over the ssh transport", ssh: true do
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
 
   context 'when using CLI options' do
-    let(:config_flags) { %W[--nodes #{uri} --insecure --format json --modulepath #{modulepath} --password #{password}] }
+    let(:config_flags) {
+      %W[--nodes #{uri} --no-host-key-check --format json --modulepath #{modulepath} --password #{password}]
+    }
 
     it 'runs a command' do
       result = run_one_node(%W[command run #{whoami}] + config_flags)
@@ -68,7 +70,7 @@ describe "when runnning over the ssh transport", ssh: true do
       { 'format' => 'json',
         'modulepath' => modulepath,
         'ssh' => {
-          'insecure' => true
+          'host-key-check' => false
         } }
     end
 

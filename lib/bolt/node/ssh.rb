@@ -35,10 +35,10 @@ module Bolt
       options[:port] = @target.port if @target.port
       options[:password] = @password if @password
       options[:keys] = @key if @key
-      options[:verify_host_key] = if @insecure
-                                    Net::SSH::Verifiers::Lenient.new
-                                  else
+      options[:verify_host_key] = if @host_key_check
                                     Net::SSH::Verifiers::Secure.new
+                                  else
+                                    Net::SSH::Verifiers::Lenient.new
                                   end
       options[:timeout] = @connect_timeout if @connect_timeout
 
