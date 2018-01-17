@@ -45,7 +45,7 @@ Puppet::Functions.create_function(:run_command) do
       r = Bolt::ExecutionResult.from_bolt(executor.run_command(targets, command))
     end
 
-    if !r.ok && options['_abort'] != false
+    if !r.ok && !options['_catch_errors']
       raise Bolt::RunFailure.new(r, 'run_command', command)
     end
     r

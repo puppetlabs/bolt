@@ -56,7 +56,7 @@ Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFuncti
       )
     end
 
-    if !r.ok && options['_abort'] != false
+    if !r.ok && !options['_catch_errors']
       raise Bolt::RunFailure.new(r, 'run_script', script)
     end
     r

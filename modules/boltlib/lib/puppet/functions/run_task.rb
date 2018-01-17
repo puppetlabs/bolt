@@ -28,10 +28,11 @@ Puppet::Functions.create_function(:run_task) do
   end
 
   def run_task(task_name, targets, task_args = nil)
+    task_args ||= {}
     r = Bolt::ExecutionResult.from_bolt(
       run_task_raw(task_name, targets, task_args)
     )
-    if !r.ok && task_args && task_args['_abort'] != false
+    if !r.ok && !task_args['_catch_errors']
       raise Bolt::RunFailure.new(r, 'run_task', task_name)
     end
     r

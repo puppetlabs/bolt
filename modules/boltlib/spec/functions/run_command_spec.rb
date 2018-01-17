@@ -64,11 +64,11 @@ describe 'run_command' do
           is_expected.to run.with_params(command, [target, target2]).and_raise_error(Bolt::RunFailure)
         end
 
-        it 'does not error with _abort false' do
+        it 'does not error with _catch_errors' do
           executor.expects(:run_command).with([target, target2], command)
                   .returns(target => result, target2 => failresult)
 
-          is_expected.to run.with_params(command, [target, target2], '_abort' => false)
+          is_expected.to run.with_params(command, [hostname, hostname2], '_catch_errors' => true)
         end
       end
     end

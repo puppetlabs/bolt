@@ -74,12 +74,12 @@ describe 'file_upload' do
                             .and_raise_error(Bolt::RunFailure)
         end
 
-        it 'does not error with _abort false' do
+        it 'does not error with _catch_errors' do
           executor.expects(:file_upload).with([target, target2], full_path, destination)
                   .returns(target => result, target2 => failresult)
 
           is_expected.to run.with_params('test/uploads/index.html', destination, [hostname, hostname2],
-                                         '_abort' => false)
+                                         '_catch_errors' => true)
         end
       end
     end

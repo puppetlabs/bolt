@@ -3,7 +3,7 @@ plan results::test_methods(
   Boolean $fail = false
 ) {
   if($fail) {
-    $result = run_task('results', [$target], 'fail' => 'true', '_abort' => false)
+    $result = run_task('results', [$target], 'fail' => 'true', '_catch_errors' => true)
   } else {
     $result = run_task('results', [$target])
   }

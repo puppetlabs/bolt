@@ -95,14 +95,14 @@ describe 'run_task' do
                             .and_raise_error(Bolt::RunFailure)
         end
 
-        it 'does not error with _abort false' do
+        it 'does not error with _catch_errors' do
           executable = File.join(tasks_root, 'meta.sh')
 
           executor.expects(:run_task).with([target, target2], executable, 'environment', 'message' => message)
                   .returns(target => result, target2 => failresult)
 
           is_expected.to run.with_params('Test::Meta', [hostname, hostname2],
-                                         'message' => message, '_abort' => false)
+                                         'message' => message, '_catch_errors' => true)
         end
       end
     end
