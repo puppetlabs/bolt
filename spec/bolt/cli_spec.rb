@@ -87,6 +87,53 @@ describe "Bolt::CLI" do
           }.to raise_error(Bolt::CLIExit)
         }.to output(/Usage: bolt/).to_stdout
       end
+
+      context 'listing actions with help' do
+        it 'accepts command' do
+          cli = Bolt::CLI.new(%w[help command])
+          expect {
+            expect {
+              cli.parse
+            }.to raise_error(Bolt::CLIExit)
+          }.to output(/Available actions are:.*run/m).to_stdout
+        end
+
+        it 'accepts script' do
+          cli = Bolt::CLI.new(%w[help script])
+          expect {
+            expect {
+              cli.parse
+            }.to raise_error(Bolt::CLIExit)
+          }.to output(/Available actions are:.*run/m).to_stdout
+        end
+
+        it 'accepts task' do
+          cli = Bolt::CLI.new(%w[help task])
+          expect {
+            expect {
+              cli.parse
+            }.to raise_error(Bolt::CLIExit)
+          }.to output(/Available actions are:.*show.*run/m).to_stdout
+        end
+
+        it 'accepts plan' do
+          cli = Bolt::CLI.new(%w[help plan])
+          expect {
+            expect {
+              cli.parse
+            }.to raise_error(Bolt::CLIExit)
+          }.to output(/Available actions are:.*show.*run/m).to_stdout
+        end
+
+        it 'accepts file' do
+          cli = Bolt::CLI.new(%w[help file])
+          expect {
+            expect {
+              cli.parse
+            }.to raise_error(Bolt::CLIExit)
+          }.to output(/Available actions are:.*upload/m).to_stdout
+        end
+      end
     end
 
     describe "version" do
@@ -167,6 +214,31 @@ NODES
         expect {
           cli.parse
         }.to raise_error(Bolt::CLIError, /Option '--nodes' must be specified/)
+      end
+
+      it 'does not list nodes in plan --help' do
+        cli = Bolt::CLI.new(%w[plan --help])
+        expect {
+          expect {
+            cli.parse
+          }.to raise_error(Bolt::CLIExit)
+        }.not_to output(/--nodes/).to_stdout
+      end
+
+      it 'does not list nodes in help plan' do
+        cli = Bolt::CLI.new(%w[help plan])
+        expect {
+          expect {
+            cli.parse
+          }.to raise_error(Bolt::CLIExit)
+        }.not_to output(/--nodes/).to_stdout
+      end
+
+      it 'generates an error if --nodes is passed to plan' do
+        cli = Bolt::CLI.new(%w[plan run foo --nodes foobar.com])
+        expect {
+          cli.parse
+        }.to raise_error(Bolt::CLIError, /Unknown argument '--nodes'/)
       end
     end
 
@@ -468,14 +540,14 @@ NODES
 
     describe 'plan' do
       it "errors without a plan" do
-        cli = Bolt::CLI.new(%w[plan run -n example.com --modulepath .])
+        cli = Bolt::CLI.new(%w[plan run --modulepath . nodes=example.com])
         expect {
           cli.parse
-        }.to raise_error(Bolt::CLIError, /Must specify/)
+        }.to raise_error(Bolt::CLIError, /Invalid plan/)
       end
 
       it "errors if plan is a parameter" do
-        cli = Bolt::CLI.new(%w[plan run -n example.com --modulepath . p1=v1])
+        cli = Bolt::CLI.new(%w[plan run nodes=example.com --modulepath . p1=v1])
         expect {
           cli.parse
         }.to raise_error(Bolt::CLIError, /Invalid plan/)
