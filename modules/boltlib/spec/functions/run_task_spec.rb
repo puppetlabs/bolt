@@ -86,6 +86,34 @@ describe 'run_task' do
         is_expected.to run.with_params('Test::Meta', [target, [[target2]], []], 'message' => message)
                           .and_return(exec_result)
       end
+
+      context 'when a command fails on one node' do
+        let(:failresult) { { 'error' => {} } }
+        let(:exec_fail) { Bolt::ExecutionResult.from_bolt(host => result, host2 => failresult) }
+
+        it 'errors by default' do
+          executable = File.join(tasks_root, 'meta.sh')
+
+          executor.expects(:from_uris).with([hostname, hostname2]).returns([host, host2])
+          executor.expects(:run_task).with([host, host2], executable, 'environment', 'message' => message)
+                  .returns(host => result, host2 => failresult)
+
+          is_expected.to run.with_params('Test::Meta', [hostname, hostname2],
+                                         'message' => message)
+                            .and_raise_error(Bolt::RunFailure)
+        end
+
+        it 'does not error with _abort false' do
+          executable = File.join(tasks_root, 'meta.sh')
+
+          executor.expects(:from_uris).with([hostname, hostname2]).returns([host, host2])
+          executor.expects(:run_task).with([host, host2], executable, 'environment', 'message' => message)
+                  .returns(host => result, host2 => failresult)
+
+          is_expected.to run.with_params('Test::Meta', [hostname, hostname2],
+                                         'message' => message, '_abort' => false)
+        end
+      end
     end
 
     context 'when called on a module that contains manifests/init.pp' do

@@ -9,6 +9,6 @@ begin
   cli.execute(opts)
 rescue Bolt::CLIExit
   exit
-rescue Bolt::CLIError => e
+rescue Bolt::Error => e
   exit e.error_code
 end

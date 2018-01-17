@@ -5,6 +5,8 @@
 # * A target is a String with a targets's hostname or a Target.
 # * The returned value contains information about the result per target.
 #
+require 'bolt/error'
+
 Puppet::Functions.create_function(:run_task) do
   local_types do
     type 'TargetOrTargets = Variant[String[1], Target, Array[TargetOrTargets]]'
@@ -26,12 +28,17 @@ Puppet::Functions.create_function(:run_task) do
   end
 
   def run_task(task_name, targets, task_args = nil)
-    Bolt::ExecutionResult.from_bolt(
+    r = Bolt::ExecutionResult.from_bolt(
       run_task_raw(task_name, targets, task_args)
     )
+    if !r.ok && task_args && task_args['_abort'] != false
+      raise Bolt::RunFailure.new(r, 'run_task', task_name)
+    end
+    r
   end
 
   def run_task_raw(task_name, targets, task_args = nil, &block)
+    task_args ||= {}
     unless Puppet[:tasks]
       raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
         Puppet::Pops::Issues::TASK_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, operation: 'run_task'
@@ -53,7 +60,8 @@ Puppet::Functions.create_function(:run_task) do
       )
     end
 
-    use_args = task_args.nil? ? {} : task_args
+    use_args = task_args.reject { |k, _| k.start_with?('_') }
+
     task_signature.runnable_with?(use_args) do |mismatch|
       raise Puppet::ParseError, mismatch
     end || (raise Puppet::ParseError, 'Task parameters did not match')
@@ -82,7 +90,7 @@ Puppet::Functions.create_function(:run_task) do
       # TODO: Awaits change in the executor, enabling it receive Target instances
       hosts = targets.map(&:host)
 
-      # TODO: separate handling of default since it's platform specific
+      # TODO: pass entire task to executor
       input_method = task.input_method
 
       executor.run_task(executor.from_uris(hosts), task.executable, input_method, use_args, &block)

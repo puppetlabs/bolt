@@ -3,6 +3,7 @@ plan sample::single_task(String $nodes) {
   $node_array = split($nodes, ',')
   run_task (
     "sample::echo", $node_array,
-    message => "hi there"
+    message => "hi there",
+    '_abort' => false,
   )
 }
