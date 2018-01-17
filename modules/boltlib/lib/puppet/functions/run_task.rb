@@ -82,18 +82,15 @@ Puppet::Functions.create_function(:run_task) do
 
     # Ensure that that given targets are all Target instances
     targets = [targets] unless targets.is_a?(Array)
-    targets = targets.flatten.map { |t| t.is_a?(String) ? Bolt::Target.new(t) : t }
+    targets = targets.flatten.map { |t| t.is_a?(String) ? Bolt::Target.from_uri(t) : t }
     if targets.empty?
       call_function('debug', "Simulating run of task #{task.name} - no targets given - no action taken")
       Puppet::Pops::EMPTY_HASH
     else
-      # TODO: Awaits change in the executor, enabling it receive Target instances
-      hosts = targets.map(&:host)
-
       # TODO: pass entire task to executor
       input_method = task.input_method
 
-      executor.run_task(executor.from_uris(hosts), task.executable, input_method, use_args, &block)
+      executor.run_task(targets, task.executable, input_method, use_args, &block)
     end
   end
 end

@@ -27,7 +27,7 @@ module Bolt
         non_interactive: true
       }
 
-      options[:port] = @port if @port
+      options[:port] = @target.port if @target.port
       options[:password] = @password if @password
       options[:keys] = @key if @key
       options[:verify_host_key] = if @insecure
@@ -37,7 +37,7 @@ module Bolt
                                   end
       options[:timeout] = @connect_timeout if @connect_timeout
 
-      @session = Net::SSH.start(@host, @user, options)
+      @session = Net::SSH.start(@target.host, @user, options)
       @logger.debug { "Opened session" }
     rescue Net::SSH::AuthenticationFailed => e
       raise Bolt::Node::ConnectError.new(
@@ -46,17 +46,17 @@ module Bolt
       )
     rescue Net::SSH::HostKeyError => e
       raise Bolt::Node::ConnectError.new(
-        "Host key verification failed for #{@uri}: #{e.message}",
+        "Host key verification failed for #{uri}: #{e.message}",
         'HOST_KEY_ERROR'
       )
     rescue Net::SSH::ConnectionTimeout
       raise Bolt::Node::ConnectError.new(
-        "Timeout after #{@connect_timeout} seconds connecting to #{@uri}",
+        "Timeout after #{@connect_timeout} seconds connecting to #{uri}",
         'CONNECT_ERROR'
       )
     rescue StandardError => e
       raise Bolt::Node::ConnectError.new(
-        "Failed to connect to #{@uri}: #{e.message}",
+        "Failed to connect to #{uri}: #{e.message}",
         'CONNECT_ERROR'
       )
     end
@@ -80,20 +80,20 @@ module Bolt
           return true
         else
           raise Bolt::Node::EscalateError.new(
-            "Sudo password for user #{@user} was not provided for #{@uri}",
+            "Sudo password for user #{@user} was not provided for #{uri}",
             'NO_PASSWORD'
           )
         end
       elsif data =~ /^#{@user} is not in the sudoers file\./
         @logger.debug { data }
         raise Bolt::Node::EscalateError.new(
-          "User #{@user} does not have sudo permission on #{@uri}",
+          "User #{@user} does not have sudo permission on #{uri}",
           'SUDO_DENIED'
         )
       elsif data =~ /^Sorry, try again\./
         @logger.debug { data }
         raise Bolt::Node::EscalateError.new(
-          "Sudo password for user #{@user} not recognized on #{@uri}",
+          "Sudo password for user #{@user} not recognized on #{uri}",
           'BAD_PASSWORD'
         )
       end
@@ -162,9 +162,9 @@ module Bolt
 
     def _upload(source, destination)
       write_remote_file(source, destination)
-      Bolt::Result.new
+      Bolt::Result.new(@target)
     rescue StandardError => e
-      Bolt::Result.from_exception(e)
+      Bolt::Result.from_exception(@target, e)
     end
 
     def write_remote_file(source, destination)
@@ -255,23 +255,23 @@ SCRIPT
 
     def _run_command(command)
       output = execute(command, sudoable: true)
-      Bolt::CommandResult.from_output(output)
+      Bolt::CommandResult.from_output(@target, output)
     # TODO: We should be able to rely on the excutor for this but it will mean
     # a test refactor
     rescue StandardError => e
-      Bolt::Result.from_exception(e)
+      Bolt::Result.from_exception(@target, e)
     end
 
     def _run_script(script, arguments)
       with_remote_file(script) do |remote_path|
         output = execute("'#{remote_path}' #{Shellwords.join(arguments)}",
                          sudoable: true)
-        Bolt::CommandResult.from_output(output)
+        Bolt::CommandResult.from_output(@target, output)
       end
     # TODO: We should be able to rely on the excutor for this but it will mean
     # a test refactor
     rescue StandardError => e
-      Bolt::Result.from_exception(e)
+      Bolt::Result.from_exception(@target, e)
     end
 
     def _run_task(task, input_method, arguments)
@@ -301,12 +301,12 @@ SCRIPT
           output = execute(command, stdin: stdin)
         end
       end
-      Bolt::TaskResult.from_output(output)
+      Bolt::TaskResult.from_output(@target, output)
 
     # TODO: We should be able to rely on the excutor for this but it will mean
     # a test refactor
     rescue StandardError => e
-      Bolt::Result.from_exception(e)
+      Bolt::Result.from_exception(@target, e)
     end
   end
 end

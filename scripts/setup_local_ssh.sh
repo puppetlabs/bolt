@@ -13,4 +13,4 @@ sudo cp $BOLT_SSH_KEY.pub /home/$BOLT_SSH_USER/.ssh/authorized_keys
 sudo chown $BOLT_SSH_USER /home/$BOLT_SSH_USER/.ssh/authorized_keys
 sudo chmod 644 /home/$BOLT_SSH_USER/.ssh/authorized_keys
 chmod 600 $BOLT_SSH_KEY
-ssh -v -oStrictHostKeyChecking=no  -i $BOLT_SSH_KEY $BOLT_SSH_USER@$BOLT_SSH_HOST 'echo hello'
+ssh -v -oStrictHostKeyChecking=no -oUserKnownHostsFile=/dev/null -i $BOLT_SSH_KEY $BOLT_SSH_USER@$BOLT_SSH_HOST 'echo hello'

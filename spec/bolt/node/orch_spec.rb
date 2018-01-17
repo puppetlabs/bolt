@@ -9,7 +9,8 @@ describe Bolt::Orch, orchestrator: true do
   include BoltSpec::Files
 
   let(:hostname) { "localhost" }
-  let(:orch) { Bolt::Orch.new(hostname) }
+  let(:target) { Bolt::Target.from_uri(hostname) }
+  let(:orch) { Bolt::Orch.new(target) }
 
   let(:task) { "foo" }
   let(:task_environment) { 'production' }

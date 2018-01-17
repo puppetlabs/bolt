@@ -7,6 +7,8 @@ describe "Bolt::Outputter::JSON" do
   let(:outputter) { Bolt::Outputter::JSON.new(output) }
   let(:results) { { node1: Bolt::Result.new("ok") } }
   let(:config)  { Bolt::Config.new }
+  let(:target1) { Bolt::Target.new('node1') }
+  let(:target2) { Bolt::Target.new('node2') }
 
   it "starts items in head" do
     outputter.print_head
@@ -22,10 +24,8 @@ describe "Bolt::Outputter::JSON" do
 
   it "prints multiple items" do
     outputter.print_head
-    outputter.print_result(Bolt::Node.from_uri('node1', config: config),
-                           Bolt::Result.new)
-    outputter.print_result(Bolt::Node.from_uri('node2', config: config),
-                           Bolt::Result.new("ok"))
+    outputter.print_result(Bolt::Result.new(target1))
+    outputter.print_result(Bolt::Result.new(target2, "ok"))
     outputter.print_summary(results, 10.0)
     parsed = JSON.parse(output.string)
     expect(parsed['items'].size).to eq(2)
@@ -78,10 +78,8 @@ describe "Bolt::Outputter::JSON" do
 
   it "handles fatal errors" do
     outputter.print_head
-    outputter.print_result(Bolt::Node.from_uri('node1', config: config),
-                           Bolt::Result.new("ok"))
-    outputter.print_result(Bolt::Node.from_uri('node2', config: config),
-                           Bolt::Result.new("ok"))
+    outputter.print_result(Bolt::Result.new(target1, "ok"))
+    outputter.print_result(Bolt::Result.new(target2, "ok"))
     outputter.fatal_error(Bolt::CLIError.new("oops"))
     parsed = JSON.parse(output.string)
     expect(parsed['items'].size).to eq(2)

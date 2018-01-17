@@ -4,6 +4,7 @@ require 'logging'
 require 'bolt/result'
 require 'bolt/config'
 require 'bolt/notifier'
+require 'bolt/node'
 
 module Bolt
   class Executor
@@ -22,11 +23,12 @@ module Bolt
       @notifier = Bolt::Notifier.new
     end
 
-    def from_uris(nodes)
-      nodes.map do |node|
-        Bolt::Node.from_uri(node, config: @config)
+    def from_targets(targets)
+      targets.map do |target|
+        Bolt::Node.from_target(target, config: @config)
       end
     end
+    private :from_targets
 
     def on(nodes, callback = nil)
       results = Concurrent::Map.new
@@ -43,11 +45,11 @@ module Bolt
         pool.post do
           result =
             begin
-              @notifier.notify(callback, node, type: :node_start) if callback
+              @notifier.notify(callback, type: :node_start, target: node.target) if callback
               node.connect
               yield node
             rescue StandardError => ex
-              Bolt::Result.from_exception(ex)
+              Bolt::Result.from_exception(node.target, ex)
             ensure
               begin
                 node.disconnect
@@ -56,9 +58,7 @@ module Bolt
               end
             end
           results[node] = result
-          if callback
-            @notifier.notify(callback, node, type: :node_result, result: result)
-          end
+          @notifier.notify(callback, type: :node_result, result: result) if callback
           result
         end
       }
@@ -69,6 +69,7 @@ module Bolt
 
       results_to_hash(results)
     end
+    private :on
 
     def summary(action, object, result)
       fc = result.select { |_, r| r.error }.length
@@ -76,8 +77,10 @@ module Bolt
       fpl = fc == 1 ? '' : 's'
       "Ran #{action} '#{object}' on #{result.length} node#{npl} with #{fc} failure#{fpl}"
     end
+    private :summary
 
-    def run_command(nodes, command)
+    def run_command(targets, command)
+      nodes = from_targets(targets)
       @logger.info("Starting command run '#{command}' on #{nodes.map(&:uri)}")
       callback = block_given? ? Proc.new : nil
 
@@ -91,7 +94,8 @@ module Bolt
       r
     end
 
-    def run_script(nodes, script, arguments)
+    def run_script(targets, script, arguments)
+      nodes = from_targets(targets)
       @logger.info("Starting script run #{script} on #{nodes.map(&:uri)}")
       @logger.debug("Arguments: #{arguments}")
       callback = block_given? ? Proc.new : nil
@@ -106,7 +110,8 @@ module Bolt
       r
     end
 
-    def run_task(nodes, task, input_method, arguments)
+    def run_task(targets, task, input_method, arguments)
+      nodes = from_targets(targets)
       @logger.info("Starting task #{task} on #{nodes.map(&:uri)}")
       @logger.debug("Arguments: #{arguments} Input method: #{input_method}")
       callback = block_given? ? Proc.new : nil
@@ -121,7 +126,8 @@ module Bolt
       r
     end
 
-    def file_upload(nodes, source, destination)
+    def file_upload(targets, source, destination)
+      nodes = from_targets(targets)
       @logger.info("Starting file upload from #{source} to #{destination} on #{nodes.map(&:uri)}")
       callback = block_given? ? Proc.new : nil
 

@@ -16,16 +16,20 @@ describe "when running a plan that manipulates an execution result", ssh: true d
   context 'when using CLI options' do
     let(:config_flags) { %W[--insecure --format json --modulepath #{modulepath}] }
 
-    it 'returns true on success' do
-      params = { target: uri }.to_json
-      output = run_cli(['plan', 'run', 'results::test_methods', "--params", params] + config_flags)
-      expect(output.strip).to eq('true')
-    end
-
-    it 'returns false on failure' do
-      params = { target: uri, fail: true }.to_json
-      output = run_cli(['plan', 'run', 'results::test_methods', "--params", params] + config_flags)
-      expect(output.strip).to eq('false')
+    it 'returns execution results' do
+      params = { node: uri }.to_json
+      output = run_cli(['plan', 'run', 'results::test_target', "--params", params] + config_flags)
+      expect(JSON.parse(output)).to eq(
+        [
+          {
+            'node' => uri,
+            'status' => 'finished',
+            'result' => {
+              '_output' => "hi\n"
+            }
+          }
+        ]
+      )
     end
   end
 end

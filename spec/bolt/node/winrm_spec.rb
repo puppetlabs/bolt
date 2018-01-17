@@ -9,22 +9,30 @@ describe Bolt::WinRM do
   include BoltSpec::Errors
   include BoltSpec::Files
 
+  def mk_config(conf)
+    Bolt::Config.new(transports: { winrm: conf })
+  end
+
   let(:host) { ENV['BOLT_WINRM_HOST'] || 'localhost' }
   let(:port) { ENV['BOLT_WINRM_PORT'] || 55985 }
   let(:ssl_port) { ENV['BOLT_WINRM_SSL_PORT'] || 55986 }
   let(:user) { ENV['BOLT_WINRM_USER'] || "vagrant" }
   let(:password) { ENV['BOLT_WINRM_PASSWORD'] || "vagrant" }
   let(:command) { "echo $env:UserName" }
-  let(:config) { Bolt::Config.new(transports: { winrm: { insecure: true } }) }
-  let(:ssl_config) { Bolt::Config.new(transports: { winrm: { cacert: 'resources/cert.pem' } }) }
-  let(:winrm) { Bolt::WinRM.new(host, port, user, password, config: config) }
-  let(:winrm_ssl) { Bolt::WinRM.new(host, ssl_port, user, password, config: ssl_config) }
+  let(:config) { mk_config(insecure: true, user: user, password: password) }
+  let(:ssl_config) { mk_config(cacert: 'resources/cert.pem', user: user, password: password) }
+  let(:winrm) { Bolt::WinRM.new(target, config: config) }
+  let(:winrm_ssl) { Bolt::WinRM.new(target(host, ssl_port), config: ssl_config) }
   let(:echo_script) { <<PS }
 foreach ($i in $args)
 {
     Write-Host $i
 }
 PS
+
+  def target(h = host, p = port)
+    Bolt::Target.from_uri("#{h}:#{p}")
+  end
 
   def stub_winrm_to_raise(klass, message)
     shell = double('powershell')
@@ -36,7 +44,7 @@ PS
   context "when connecting fails", winrm: true do
     it "raises Node::ConnectError if the connection is refused" do
       port = TCPServer.open(0) { |socket| socket.addr[1] }
-      winrm = Bolt::WinRM.new(host, port, user, password)
+      winrm = Bolt::WinRM.new(target(host, port))
 
       # The connection should fail immediately; this timeout helps ensure that
       # and avoids a hang
@@ -50,7 +58,7 @@ PS
     end
 
     it "raises Node::ConnectError if the node name can't be resolved" do
-      winrm = Bolt::WinRM.new('totally-not-there', port, user, password, config: config)
+      winrm = Bolt::WinRM.new(target('totally-not-there'), config: config)
       exec_time = Time.now
       expect_node_error(Bolt::Node::ConnectError,
                         'CONNECT_ERROR',
@@ -62,11 +70,10 @@ PS
     end
 
     it "adheres to the specified timeout" do
-      TCPServer.open(0) do |server|
-        port = server.addr[1]
-
+      TCPServer.open(0) do |socket|
+        port = socket.addr[1]
         config[:transports][:winrm][:connect_timeout] = 2
-        winrm = Bolt::WinRM.new(host, port, user, password, config: config)
+        winrm = Bolt::WinRM.new(target(host, port), config: config)
 
         Timeout.timeout(3) do
           expect_node_error(Bolt::Node::ConnectError,
@@ -78,38 +85,44 @@ PS
       end
     end
 
-    it "raises Node::ConnectError if authentication fails" do
-      winrm = Bolt::WinRM.new(host, port, user, 'whoops wrong password', config: config)
+    context "authentication fails" do
+      let(:password) { 'whoops wrong password' }
 
-      stub_winrm_to_raise(::WinRM::WinRMAuthorizationError, "")
+      it "raises Node::ConnectError" do
+        stub_winrm_to_raise(::WinRM::WinRMAuthorizationError, "")
 
-      expect_node_error(
-        Bolt::Node::ConnectError, 'AUTH_ERROR',
-        %r{Authentication failed for http://#{host}:#{port}/wsman}
-      ) do
-        winrm.connect
+        expect_node_error(
+          Bolt::Node::ConnectError, 'AUTH_ERROR',
+          %r{Authentication failed for http://#{host}:#{port}/wsman}
+        ) do
+          winrm.connect
+        end
       end
     end
 
-    it "raises Node::ConnectError if user is absent" do
-      winrm = Bolt::WinRM.new(host, port, nil, password)
+    context "user is absent" do
+      let(:user) { nil }
 
-      expect_node_error(
-        Bolt::Node::ConnectError, 'CONNECT_ERROR',
-        /Failed to connect to .*: user is a required option/
-      ) do
-        winrm.connect
+      it "raises Node::ConnectError" do
+        expect_node_error(
+          Bolt::Node::ConnectError, 'CONNECT_ERROR',
+          /Failed to connect to .*: user is a required option/
+        ) do
+          winrm.connect
+        end
       end
     end
 
-    it "raises Node::ConnectError if password is absent" do
-      winrm = Bolt::WinRM.new(host, port, user, nil)
+    context "password is absent" do
+      let(:password) { nil }
 
-      expect_node_error(
-        Bolt::Node::ConnectError, 'CONNECT_ERROR',
-        /Failed to connect to .*: password is a required option/
-      ) do
-        winrm.connect
+      it "raises Node::ConnectError" do
+        expect_node_error(
+          Bolt::Node::ConnectError, 'CONNECT_ERROR',
+          /Failed to connect to .*: password is a required option/
+        ) do
+          winrm.connect
+        end
       end
     end
   end
@@ -547,8 +560,8 @@ PS
 
     describe "when tmpdir is specified", winrm: true do
       let(:tmpdir) { 'C:\mytmp' }
-      let(:config) { Bolt::Config.new(transports: { winrm: { tmpdir: 'C:\mytmp', insecure: true } }) }
-      let(:winrm) { Bolt::WinRM.new(host, port, user, password, config: config) }
+      let(:config) { mk_config(tmpdir: 'C:\mytmp', insecure: true, user: user, password: password) }
+      let(:winrm) { Bolt::WinRM.new(target, config: config) }
 
       it 'uploads scripts to the specified tmpdir' do
         contents = "Write-Host $PSScriptRoot"
@@ -690,7 +703,7 @@ OUTPUT
       end
 
       context "with extensions specified" do
-        let(:config) { Bolt::Config.new(transports: { winrm: { insecure: true, extensions: ['.py'] } }) }
+        let(:config) { mk_config(insecure: true, extensions: ['.py'], user: user, password: password) }
 
         it "can apply an arbitrary script", winrm: true do
           allow(winrm)

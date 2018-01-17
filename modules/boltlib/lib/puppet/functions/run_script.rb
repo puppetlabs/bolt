@@ -46,16 +46,13 @@ Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFuncti
     end
 
     # Ensure that that given targets are all Target instances)
-    targets = [targets].flatten.map { |t| t.is_a?(String) ? Bolt::Target.new(t) : t }
+    targets = [targets].flatten.map { |t| t.is_a?(String) ? Bolt::Target.from_uri(t) : t }
     if targets.empty?
       call_function('debug', "Simulating run_script of '#{found}' - no targets given - no action taken")
       r = Bolt::ExecutionResult::EMPTY_RESULT
     else
-      # Awaits change in the executor, enabling it receive Target instances
-      hosts = targets.map(&:host)
-
       r = Bolt::ExecutionResult.from_bolt(
-        executor.run_script(executor.from_uris(hosts), found, options['arguments'] || [])
+        executor.run_script(targets, found, options['arguments'] || [])
       )
     end
 

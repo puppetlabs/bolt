@@ -3,9 +3,9 @@ require 'bolt/error'
 
 module Bolt
   class Result
-    attr_reader :message, :error
+    attr_reader :message, :error, :target
 
-    def self.from_exception(exception)
+    def self.from_exception(target, exception)
       @exception = exception
       if @exception.is_a?(Bolt::Error)
         error = @exception.to_h
@@ -18,10 +18,11 @@ module Bolt
         }
         error['details']['stack_trace'] = exception.backtrace.join('\n') if exception.backtrace
       end
-      Result.new(error)
+      Result.new(target, error)
     end
 
-    def initialize(error = nil, message = nil)
+    def initialize(target, error = nil, message = nil)
+      @target = target
       @error = error
       @message = message
     end
@@ -60,13 +61,15 @@ module Bolt
   class CommandResult < Result
     attr_reader :stdout, :stderr, :exit_code
 
-    def self.from_output(output)
-      new(output.stdout.string,
+    def self.from_output(target, output)
+      new(target,
+          output.stdout.string,
           output.stderr.string,
           output.exit_code)
     end
 
-    def initialize(stdout, stderr, exit_code)
+    def initialize(target, stdout, stderr, exit_code)
+      super(target)
       @stdout = stdout || ""
       @stderr = stderr || ""
       @exit_code = exit_code
@@ -99,8 +102,8 @@ module Bolt
   class TaskResult < CommandResult
     attr_reader :value
 
-    def initialize(stdout, stderr, exit_code)
-      super(stdout, stderr, exit_code)
+    def initialize(target, stdout, stderr, exit_code)
+      super(target, stdout, stderr, exit_code)
       @value = parse_output(stdout)
       @message = @value.delete('_output')
       @error = @value.delete('_error')

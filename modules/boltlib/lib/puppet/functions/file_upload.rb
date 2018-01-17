@@ -45,16 +45,13 @@ Puppet::Functions.create_function(:file_upload, Puppet::Functions::InternalFunct
 
     # Ensure that that given targets are all Target instances
     targets = [targets] unless targets.is_a?(Array)
-    targets = targets.flatten.map { |t| t.is_a?(String) ? Bolt::Target.new(t) : t }
+    targets = targets.flatten.map { |t| t.is_a?(String) ? Bolt::Target.from_uri(t) : t }
     if targets.empty?
       call_function('debug', "Simulating file upload of '#{found}' - no targets given - no action taken")
       r = Bolt::ExecutionResult::EMPTY_RESULT
     else
-      # Awaits change in the executor, enabling it receive Target instances
-      hosts = targets.map(&:host)
-
       r = Bolt::ExecutionResult.from_bolt(
-        executor.file_upload(executor.from_uris(hosts), found, destination)
+        executor.file_upload(targets, found, destination)
       )
     end
 
