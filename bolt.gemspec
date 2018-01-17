@@ -31,7 +31,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "orchestrator_client", "~> 0.2.1"
   spec.add_dependency "terminal-table", "~> 1.8.0"
   spec.add_dependency "winrm", "~> 2.0"
-  spec.add_dependency "winrm-fs", "~> 1.0"
+  spec.add_dependency "winrm-fs", "~> 1.1.0"
   spec.add_dependency "logging", "~> 2.2"
 
   # Dependencies of our vendored puppet, etc
