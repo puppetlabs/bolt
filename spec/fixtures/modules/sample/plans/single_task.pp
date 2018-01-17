@@ -4,6 +4,6 @@ plan sample::single_task(String $nodes) {
   run_task (
     "sample::echo", $node_array,
     message => "hi there",
-    '_abort' => false,
+    '_catch_errors' => true,
   )
 }

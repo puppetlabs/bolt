@@ -581,7 +581,7 @@ HELP
     end
 
     def run_task(name, targets, args, &block)
-      args = args.merge('_abort' => false)
+      args = args.merge('_catch_errors' => true)
       in_bolt_compiler do |compiler|
         compiler.call_function('run_task', name, targets, args, &block)
       end

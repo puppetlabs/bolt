@@ -55,7 +55,7 @@ Puppet::Functions.create_function(:file_upload, Puppet::Functions::InternalFunct
       )
     end
 
-    if !r.ok && options['_abort'] != false
+    if !r.ok && !options['_catch_errors']
       raise Bolt::RunFailure.new(r, 'upload_file', source)
     end
     r
