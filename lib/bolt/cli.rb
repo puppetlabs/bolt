@@ -430,6 +430,7 @@ HELP
       if options[:mode] == 'plan'
         executor = Bolt::Executor.new(@config, options[:noop], true)
         execute_plan(executor, options)
+        code = 0
       else
         executor = Bolt::Executor.new(@config, options[:noop])
         targets = options[:nodes]
@@ -471,7 +472,10 @@ HELP
         end
 
         outputter.print_summary(results, elapsed_time)
+        successful = results.values.all?(&:success?)
+        code = successful ? 0 : 2
       end
+      code
     rescue Bolt::Error => e
       outputter.fatal_error(e)
       raise e

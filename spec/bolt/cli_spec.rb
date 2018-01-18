@@ -568,20 +568,37 @@ NODES
         allow(cli).to receive(:outputter).and_return(outputter)
       end
 
-      it "executes the 'whoami' command" do
-        expect(executor)
-          .to receive(:run_command)
-          .with(targets, 'whoami')
-          .and_return({})
+      context "when running a command" do
+        it "executes the 'whoami' command" do
+          expect(executor)
+            .to receive(:run_command)
+            .with(targets, 'whoami')
+            .and_return({})
 
-        options = {
-          nodes: targets,
-          mode: 'command',
-          action: 'run',
-          object: 'whoami'
-        }
-        cli.execute(options)
-        expect(JSON.parse(@output.string)).to be
+          options = {
+            nodes: targets,
+            mode: 'command',
+            action: 'run',
+            object: 'whoami'
+          }
+          expect(cli.execute(options)).to eq(0)
+          expect(JSON.parse(@output.string)).to be
+        end
+
+        it "returns 2 if any node fails" do
+          expect(executor)
+            .to receive(:run_command)
+            .with(targets, 'whoami')
+            .and_return(target => double('result', success?: false))
+
+          options = {
+            nodes: targets,
+            mode: 'command',
+            action: 'run',
+            object: 'whoami'
+          }
+          expect(cli.execute(options)).to eq(2)
+        end
       end
 
       context "when running a script" do
@@ -599,7 +616,7 @@ NODES
             .with(targets, script, [])
             .and_return({})
 
-          cli.execute(options)
+          expect(cli.execute(options)).to eq(0)
           expect(JSON.parse(@output.string)).to be
         end
 
@@ -628,6 +645,15 @@ NODES
             Bolt::CLIError, /The script '#{script}' is not a file/
           )
           expect(JSON.parse(@output.string)).to be
+        end
+
+        it "returns 2 if any node fails" do
+          stub_file(script)
+          expect(executor).to receive(:run_script)
+            .with(targets, script, [])
+            .and_return(target => double('result', success?: false))
+
+          expect(cli.execute(options)).to eq(2)
         end
       end
 
@@ -806,8 +832,30 @@ NODES
             object: task_name,
             task_options: task_params
           }
-          cli.execute(options)
+          expect(cli.execute(options)).to eq(0)
           expect(JSON.parse(@output.string)).to be
+        end
+
+        it "returns 2 if any node fails" do
+          task_name = 'sample::echo'
+          task_params = { 'message' => 'hi' }
+          input_method = 'both'
+
+          expect(executor)
+            .to receive(:run_task)
+            .with(
+              targets,
+              %r{modules/sample/tasks/echo.sh$}, input_method, task_params
+            ).and_return(target => double('result', success?: false))
+
+          options = {
+            nodes: targets,
+            mode: 'task',
+            action: 'run',
+            object: task_name,
+            task_options: task_params
+          }
+          expect(cli.execute(options)).to eq(2)
         end
 
         it "errors for non-existent modules" do
@@ -1102,6 +1150,17 @@ NODES
 
           cli.execute(options)
           expect(JSON.parse(@output.string)).to be
+        end
+
+        it "returns 2 if any node fails" do
+          stub_file(source)
+
+          expect(executor)
+            .to receive(:file_upload)
+            .with(targets, source, dest)
+            .and_return(target => double('result', success?: false))
+
+          expect(cli.execute(options)).to eq(2)
         end
 
         it "raises if the local file doesn't exist" do
