@@ -62,6 +62,10 @@ module Bolt
       new(target, value: value)
     end
 
+    def self.for_upload(target, source, destination)
+      new(target, message: "Uploaded '#{source}' to '#{target.host}:#{destination}'")
+    end
+
     def initialize(target, error: nil, message: nil, value: nil)
       @target = target
       @value = value || {}

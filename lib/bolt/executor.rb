@@ -132,7 +132,7 @@ module Bolt
       callback = block_given? ? Proc.new : nil
 
       r = on(nodes, callback) do |node|
-        @logger.debug { "Uploading: '#{source}' to #{node.uri}" }
+        @logger.debug { "Uploading: '#{source}' to #{destination} on #{node.uri}" }
         node_result = node.upload(source, destination)
         @logger.debug("Result on #{node.uri}: #{JSON.dump(node_result.value)}")
         node_result

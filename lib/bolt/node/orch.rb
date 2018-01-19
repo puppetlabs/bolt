@@ -43,7 +43,7 @@ module Bolt
       end
     end
 
-    def _run_task(task, _input_method, arguments)
+    def run_task(task, _input_method, arguments)
       body = { task: task_name_from_path(task),
                environment: @orch_task_environment,
                noop: arguments['_noop'],
@@ -88,16 +88,16 @@ module Bolt
       Bolt::Result.for_command(@target, result.value['stdout'], result.value['stderr'], result.value['exit_code'])
     end
 
-    def _run_command(command, options = {})
-      result = _run_task(BOLT_MOCK_FILE,
-                         'stdin',
-                         action: 'command',
-                         command: command,
-                         options: options)
+    def run_command(command, options = {})
+      result = run_task(BOLT_MOCK_FILE,
+                        'stdin',
+                        action: 'command',
+                        command: command,
+                        options: options)
       unwrap_bolt_result(result)
     end
 
-    def _upload(source, destination)
+    def upload(source, destination)
       content = File.open(source, &:read)
       content = Base64.encode64(content)
       mode = File.stat(source).mode
@@ -107,12 +107,12 @@ module Bolt
         content: content,
         mode: mode
       }
-      result = _run_task(BOLT_MOCK_FILE, 'stdin', params)
-      result = Bolt::Result.new(@target) unless result.error_hash
+      result = run_task(BOLT_MOCK_FILE, 'stdin', params)
+      result = Bolt::Result.for_upload(@target, source, destination) unless result.error_hash
       result
     end
 
-    def _run_script(script, arguments)
+    def run_script(script, arguments)
       content = File.open(script, &:read)
       content = Base64.encode64(content)
       params = {
@@ -120,7 +120,7 @@ module Bolt
         content: content,
         arguments: arguments
       }
-      unwrap_bolt_result(_run_task(BOLT_MOCK_FILE, 'stdin', params))
+      unwrap_bolt_result(run_task(BOLT_MOCK_FILE, 'stdin', params))
     end
   end
 end

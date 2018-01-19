@@ -49,28 +49,6 @@ module Bolt
     def uri
       @target.uri
     end
-
-    def upload(source, destination)
-      @logger.debug { "Uploading #{source} to #{destination}" }
-      result = _upload(source, destination)
-      if result.success?
-        Bolt::Result.new(@target, message: "Uploaded '#{source}' to '#{@target.host}:#{destination}'")
-      else
-        result
-      end
-    end
-
-    def run_command(command)
-      _run_command(command)
-    end
-
-    def run_script(script, arguments)
-      _run_script(script, arguments)
-    end
-
-    def run_task(task, input_method, arguments)
-      _run_task(task, input_method, arguments)
-    end
   end
 end
 

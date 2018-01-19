@@ -73,25 +73,25 @@ describe Bolt::Orch, orchestrator: true do
     end
   end
 
-  describe :_run_task do
+  describe :run_task do
     before(:each) do
       mock_client
     end
 
     it "executes a task on a host" do
-      expect(orch._run_task(taskpath, 'stdin', params).value)
+      expect(orch.run_task(taskpath, 'stdin', params).value)
         .to eq(result)
     end
 
     it "returns a success" do
-      expect(orch._run_task(taskpath, 'stdin', params)).to be_success
+      expect(orch.run_task(taskpath, 'stdin', params)).to be_success
     end
 
     context "when running noop" do
       let(:noop) { true }
 
       it "handles the _noop param" do
-        expect(orch._run_task(taskpath, 'stdin', params.merge('_noop' => true))).to be_success
+        expect(orch.run_task(taskpath, 'stdin', params.merge('_noop' => true))).to be_success
       end
     end
 
@@ -99,11 +99,11 @@ describe Bolt::Orch, orchestrator: true do
       let(:result_state) { 'skipped' }
 
       it 'returns a failure' do
-        expect(orch._run_task(taskpath, 'stdin', params)).not_to be_success
+        expect(orch.run_task(taskpath, 'stdin', params)).not_to be_success
       end
 
       it 'includes an appropriate error in the returned result' do
-        expect(orch._run_task(taskpath, 'stdin', params).error_hash).to eq(
+        expect(orch.run_task(taskpath, 'stdin', params).error_hash).to eq(
           'kind' => 'puppetlabs.tasks/skipped-node',
           'msg' => "Node #{hostname} was skipped",
           'details' => {}
@@ -115,12 +115,12 @@ describe Bolt::Orch, orchestrator: true do
       let(:result_state) { 'failed' }
 
       it "returns a failure" do
-        expect(orch._run_task(taskpath, 'stdin', params)).not_to be_success
+        expect(orch.run_task(taskpath, 'stdin', params)).not_to be_success
       end
 
       context "when there is an error and no exitcode" do
         it "does not report success" do
-          expect(orch._run_task(taskpath, 'stdin', params)).not_to be_success
+          expect(orch.run_task(taskpath, 'stdin', params)).not_to be_success
         end
       end
 
@@ -128,13 +128,13 @@ describe Bolt::Orch, orchestrator: true do
         let(:result) { { '_error' => { 'details' => { 'exit_code' => '3' } } } }
 
         it "does not report success" do
-          expect(orch._run_task(taskpath, 'stdin', params)).not_to be_success
+          expect(orch.run_task(taskpath, 'stdin', params)).not_to be_success
         end
       end
     end
   end
 
-  describe :_run_command do
+  describe :run_command do
     let(:options) { {} }
     let(:params) {
       {
@@ -152,15 +152,15 @@ describe Bolt::Orch, orchestrator: true do
       let(:command) { 'echo hi!; echo bye >&2' }
 
       it 'returns a success' do
-        expect(orch._run_command(command)).to be_success
+        expect(orch.run_command(command)).to be_success
       end
 
       it 'captures stdout' do
-        expect(orch._run_command(command)['stdout']).to eq("hi!\n")
+        expect(orch.run_command(command)['stdout']).to eq("hi!\n")
       end
 
       it 'captures stderr' do
-        expect(orch._run_command(command)['stderr']).to eq("bye\n")
+        expect(orch.run_command(command)['stderr']).to eq("bye\n")
       end
     end
 
@@ -168,24 +168,24 @@ describe Bolt::Orch, orchestrator: true do
       let(:command) { 'echo hi!; echo bye >&2; exit 23' }
 
       it 'returns a failure' do
-        expect(orch._run_command(command)).not_to be_success
+        expect(orch.run_command(command)).not_to be_success
       end
 
       it 'captures exit_code' do
-        expect(orch._run_command(command)['exit_code']).to eq(23)
+        expect(orch.run_command(command)['exit_code']).to eq(23)
       end
 
       it 'captures stdout' do
-        expect(orch._run_command(command)['stdout']).to eq("hi!\n")
+        expect(orch.run_command(command)['stdout']).to eq("hi!\n")
       end
 
       it 'captures stderr' do
-        expect(orch._run_command(command)['stderr']).to eq("bye\n")
+        expect(orch.run_command(command)['stderr']).to eq("bye\n")
       end
     end
   end
 
-  describe :_upload do
+  describe :upload do
     let(:source_path) { File.join(base_path, 'spec', 'fixtures', 'scripts', 'success.sh') }
     let(:dest_path) { 'success.sh' } # to be prepended with a temp dir in the 'around(:each)' block
     let(:params) {
@@ -213,7 +213,9 @@ describe Bolt::Orch, orchestrator: true do
     end
 
     it 'should write the file' do
-      expect(orch._upload(source_path, dest_path)).to be_success
+      expect(orch.upload(source_path, dest_path).value).to eq(
+        '_output' => "Uploaded '#{source_path}' to '#{hostname}:#{dest_path}'"
+      )
 
       source_mode = File.stat(source_path).mode
       dest_mode = File.stat(dest_path).mode
@@ -225,7 +227,7 @@ describe Bolt::Orch, orchestrator: true do
     end
   end
 
-  describe :_run_script do
+  describe :run_script do
     let(:args) { ['with spaces', 'nospaces', 'echo $HOME; cat /etc/passwd'] }
     let(:params) {
       content = Base64.encode64(File.read(script_path))
@@ -245,12 +247,12 @@ describe Bolt::Orch, orchestrator: true do
       let(:script_path) { File.join(base_path, 'spec', 'fixtures', 'scripts', 'success.sh') }
 
       it 'returns a success' do
-        expect(orch._run_script(script_path, args)).to be_success
+        expect(orch.run_script(script_path, args)).to be_success
       end
 
       it 'captures stdout' do
         expect(
-          orch._run_script(script_path, args)['stdout']
+          orch.run_script(script_path, args)['stdout']
         ).to eq(<<-OUT)
 arg: with spaces
 arg: nospaces
@@ -260,7 +262,7 @@ standard out
       end
 
       it 'captures stderr' do
-        expect(orch._run_script(script_path, args)['stderr']).to eq("standard error\n")
+        expect(orch.run_script(script_path, args)['stderr']).to eq("standard error\n")
       end
     end
 
@@ -268,19 +270,19 @@ standard out
       let(:script_path) { File.join(base_path, 'spec', 'fixtures', 'scripts', 'failure.sh') }
 
       it 'returns a failure' do
-        expect(orch._run_script(script_path, args)).not_to be_success
+        expect(orch.run_script(script_path, args)).not_to be_success
       end
 
       it 'captures exit_code' do
-        expect(orch._run_script(script_path, args)['exit_code']).to eq(34)
+        expect(orch.run_script(script_path, args)['exit_code']).to eq(34)
       end
 
       it 'captures stdout' do
-        expect(orch._run_script(script_path, args)['stdout']).to eq("standard out\n")
+        expect(orch.run_script(script_path, args)['stdout']).to eq("standard out\n")
       end
 
       it 'captures stderr' do
-        expect(orch._run_script(script_path, args)['stderr']).to eq("standard error\n")
+        expect(orch.run_script(script_path, args)['stderr']).to eq("standard error\n")
       end
     end
   end

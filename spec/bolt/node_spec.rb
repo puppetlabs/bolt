@@ -34,17 +34,4 @@ describe Bolt::Node do
       expect(node.password).to eq('better')
     end
   end
-
-  describe "returning results from upload" do
-    let(:node) { Bolt::SSH.new(Bolt::Target.from_uri('localhost')) }
-
-    it "on success returns a result with value nil" do
-      result = Bolt::Result.new(node.target)
-      expect(node).to receive(:_upload).and_return(result)
-
-      expect(node.upload('here', 'there').value).to eq(
-        '_output' => "Uploaded 'here' to 'localhost:there'"
-      )
-    end
-  end
 end
