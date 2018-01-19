@@ -424,7 +424,7 @@ HELP
         elsif options[:mode] == 'plan'
           outputter.print_table(list_plans)
         end
-        return
+        return 0
       end
 
       if options[:mode] == 'plan'
