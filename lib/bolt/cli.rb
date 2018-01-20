@@ -121,7 +121,7 @@ HELP
       parser = OptionParser.new('') do |opts|
         unless results[:mode] == 'plan'
           opts.on('-n', '--nodes NODES',
-                  'Node(s) to connect to in URI format [protocol://]host[:port]',
+                  'Node(s) to connect to in URI format [protocol://]host[:port] (Optional)',
                   'Eg. --nodes bolt.puppet.com',
                   'Eg. --nodes localhost,ssh://nix.com:2222,winrm://windows.puppet.com',
                   "\n",
@@ -129,7 +129,8 @@ HELP
                   '* nodes from a file, or \'-\' to read from stdin',
                   '* Windows nodes must specify protocol with winrm://',
                   '* protocol is `ssh` by default, may be `ssh` or `winrm`',
-                  '* port is `22` by default for SSH, `5985` for winrm (Optional)') do |nodes|
+                  '* port defaults to `22` for SSH',
+                  '* port defaults to `5985` or `5986` for WinRM, based on the --insecure setting') do |nodes|
             results[:nodes] += parse_nodes(nodes)
             results[:nodes].uniq!
           end
@@ -154,7 +155,7 @@ HELP
           results[:key] = key
         end
         opts.on('--tmpdir DIR',
-                "The directory to upload and execute temporary files on the target(Optional)") do |tmpdir|
+                "The directory to upload and execute temporary files on the target (Optional)") do |tmpdir|
           results[:tmpdir] = tmpdir
         end
         opts.on('-c', '--concurrency CONCURRENCY', Integer,
@@ -424,7 +425,7 @@ HELP
         elsif options[:mode] == 'plan'
           outputter.print_table(list_plans)
         end
-        return
+        return 0
       end
 
       if options[:mode] == 'plan'

@@ -11,8 +11,11 @@ module Bolt
       'winrm'
     end
 
+    HTTP_PORT = 5985
+    HTTPS_PORT = 5986
+
     def port
-      default_port = @insecure ? 5985 : 5986
+      default_port = @insecure ? HTTP_PORT : HTTPS_PORT
       @target.port || default_port
     end
 
@@ -49,14 +52,28 @@ module Bolt
         @logger.debug { "Opened session" }
       end
     rescue Timeout::Error
+      # If we're using the default port with SSL, a timeout probably means the
+      # host doesn't support SSL.
+      if !@insecure && port == HTTPS_PORT
+        theres_your_problem = "\nUse --insecure if this host isn't configured to use SSL for WinRM"
+      end
       raise Bolt::Node::ConnectError.new(
-        "Timeout after #{@connect_timeout} seconds connecting to #{endpoint}",
+        "Timeout after #{@connect_timeout} seconds connecting to #{endpoint}#{theres_your_problem}",
         'CONNECT_ERROR'
       )
     rescue ::WinRM::WinRMAuthorizationError
       raise Bolt::Node::ConnectError.new(
         "Authentication failed for #{endpoint}",
         'AUTH_ERROR'
+      )
+    rescue OpenSSL::SSL::SSLError => e
+      # If we're using SSL with the default non-SSL port, mention that as a likely problem
+      if !@insecure && port == HTTP_PORT
+        theres_your_problem = "\nAre you using SSL to connect to a non-SSL port?"
+      end
+      raise Bolt::Node::ConnectError.new(
+        "Failed to connect to #{endpoint}: #{e.message}#{theres_your_problem}",
+        "CONNECT_ERROR"
       )
     rescue StandardError => e
       raise Bolt::Node::ConnectError.new(
