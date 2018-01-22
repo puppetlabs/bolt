@@ -44,8 +44,8 @@ test_name "C100553: \
     message = "The plan was expected to notify but did not"
     assert_match(/Notice:/, result.stdout, message)
     ssh_nodes.each do |node|
-      message = "The plan was expceted to mention the host #{node.hostname} with _output"
-      assert_match(/#{node.hostname}"=>{"_output"=>/, result.stdout, message)
+      message = "The plan was expected to mention the host #{node.hostname} with _output"
+      assert_match(/"node":"#{node.hostname}","status":"success"/, result.stdout, message)
     end
 
     ssh_nodes.each do |node|
