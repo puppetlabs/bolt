@@ -19,17 +19,19 @@ describe "Bolt::Executor" do
     { type: :node_result, result: result }
   end
 
-  def mock_node(name, target)
-    double(name, class: transport, connect: nil, disconnect: nil, uri: name, target: target)
+  def mock_node(name, target, run_as)
+    double(name, class: transport, connect: nil, disconnect: nil, uri: name, target: target, run_as: run_as)
+  end
+
+  def mock_node_results(run_as = nil)
+    {
+      mock_node('node1', targets[0], run_as) => Bolt::Result.new(targets[0]),
+      mock_node('node2', targets[1], run_as) => Bolt::Result.new(targets[0])
+    }
   end
 
   let(:targets) { [double('target1'), double('target2')] }
-  let(:node_results) {
-    {
-      mock_node('node1', targets[0]) => Bolt::Result.new(targets[0]),
-      mock_node('node2', targets[1]) => Bolt::Result.new(targets[0])
-    }
-  }
+  let(:node_results) { mock_node_results }
 
   before(:each) do
     allow(executor).to receive(:from_targets).with(targets).and_return(node_results.map(&:first))
@@ -41,6 +43,28 @@ describe "Bolt::Executor" do
     end
 
     executor.run_command(targets, command, {})
+  end
+
+  it 'passes _run_as to the command' do
+    executor.run_as = 'foo'
+    node_results.each do |node, result|
+      expect(node).to receive(:run_command).with(command, '_run_as' => 'foo').and_return(result)
+    end
+
+    executor.run_command(targets, command)
+  end
+
+  context 'nodes with run_as' do
+    let(:node_results) { mock_node_results('foo') }
+
+    it 'does not pass _run_as to command' do
+      executor.run_as = 'foo'
+      node_results.each do |node, result|
+        expect(node).to receive(:run_command).with(command, {}).and_return(result)
+      end
+
+      executor.run_command(targets, command)
+    end
   end
 
   it "yields each command result" do
@@ -67,6 +91,34 @@ describe "Bolt::Executor" do
     results = executor.run_script(targets, script, [], {})
     results.each do |result|
       expect(result).to be_instance_of(Bolt::Result)
+    end
+  end
+
+  it 'passes _run_as to the script' do
+    executor.run_as = 'foo'
+    node_results.each do |node, result|
+      expect(node).to receive(:run_script).with(script, [], '_run_as' => 'foo').and_return(result)
+    end
+
+    results = executor.run_script(targets, script, [])
+    results.each do |result|
+      expect(result).to be_instance_of(Bolt::Result)
+    end
+  end
+
+  context 'nodes with run_as' do
+    let(:node_results) { mock_node_results('foo') }
+
+    it 'does not pass _run_as to script' do
+      executor.run_as = 'foo'
+      node_results.each do |node, result|
+        expect(node).to receive(:run_script).with(script, [], {}).and_return(result)
+      end
+
+      results = executor.run_script(targets, script, [])
+      results.each do |result|
+        expect(result).to be_instance_of(Bolt::Result)
+      end
     end
   end
 
@@ -97,6 +149,40 @@ describe "Bolt::Executor" do
     results = executor.run_task(targets, task, 'both', task_arguments, {})
     results.each do |result|
       expect(result).to be_instance_of(Bolt::Result)
+    end
+  end
+
+  it 'passes _run_as to the task' do
+    executor.run_as = 'foo'
+    node_results.each do |node, result|
+      expect(node)
+        .to receive(:run_task)
+        .with(task, 'both', task_arguments, '_run_as' => 'foo')
+        .and_return(result)
+    end
+
+    results = executor.run_task(targets, task, 'both', task_arguments, {})
+    results.each do |result|
+      expect(result).to be_instance_of(Bolt::Result)
+    end
+  end
+
+  context 'nodes with run_as' do
+    let(:node_results) { mock_node_results('foo') }
+
+    it 'does not pass _run_as to task' do
+      executor.run_as = 'foo'
+      node_results.each do |node, result|
+        expect(node)
+          .to receive(:run_task)
+          .with(task, 'both', task_arguments, {})
+          .and_return(result)
+      end
+
+      results = executor.run_task(targets, task, 'both', task_arguments, {})
+      results.each do |result|
+        expect(result).to be_instance_of(Bolt::Result)
+      end
     end
   end
 

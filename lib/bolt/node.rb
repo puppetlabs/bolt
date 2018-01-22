@@ -22,7 +22,7 @@ module Bolt
 
     def self.initialize_transport(_logger); end
 
-    attr_reader :logger, :user, :password, :connect_timeout, :target
+    attr_reader :logger, :user, :password, :connect_timeout, :target, :run_as
 
     def initialize(target, config: Bolt::Config.new)
       @target = target

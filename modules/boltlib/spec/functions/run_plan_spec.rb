@@ -3,8 +3,16 @@ require 'puppet_pal'
 
 describe 'run_plan' do
   include PuppetlabsSpec::Fixtures
-  before(:each) do
+  let(:executor) { mock('bolt_executor') }
+
+  around(:each) do |example|
     Puppet[:tasks] = true
+    Puppet.features.stubs(:bolt?).returns(true)
+    executor.stubs(:noop).returns(false)
+
+    Puppet.override(bolt_executor: executor) do
+      example.run
+    end
   end
 
   context "when invoked" do
@@ -28,6 +36,14 @@ describe 'run_plan' do
 
       it 'run_plan(name, hash) where hash is mapping argname to value' do
         is_expected.to run.with_params('test::run_me_int', 'x' => 3).and_return(3)
+      end
+
+      it 'run_plan(name, hash) where hash includes _run_as' do
+        executor.stubs(:run_as).returns('foo')
+        executor.expects(:run_as=).with('bar')
+        executor.expects(:run_as=).with('foo')
+
+        is_expected.to run.with_params('test::run_me', '_run_as' => 'bar').and_return('worked2')
       end
     end
 
