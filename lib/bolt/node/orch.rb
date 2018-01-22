@@ -57,42 +57,35 @@ module Bolt
       state = node_result['state']
       result = node_result['result']
 
-      if state == 'finished'
-        exit_code = 0
+      # If it's finished or already has a proper error simply pass it to the
+      # the result otherwise make sure an error is generated
+      if state == 'finished' || result['_error']
+        Bolt::Result.new(@target, value: result)
       elsif state == 'skipped'
-        return Bolt::TaskResult.new(
+        Bolt::Result.new(
           @target,
-          JSON.dump(
-            '_error' => {
-              'kind' => 'puppetlabs.tasks/skipped-node',
-              'msg' => "Node #{@target.host} was skipped",
-              'details' => {}
-            }
-          ),
-          nil,
-          nil
+          value: { '_error' => {
+            'kind' => 'puppetlabs.tasks/skipped-node',
+            'msg' => "Node #{@target.host} was skipped",
+            'details' => {}
+          } }
         )
       else
-        # Try to extract the exit_code from _error
-        begin
-          exit_code = result['_error']['details']['exit_code'] || 'unknown'
-        rescue NoMethodError
-          exit_code = 'unknown'
-        end
+        # Make a generic error with a unkown exit_code
+        Bolt::Result.for_task(@target, result.to_json, '', 'unknown')
       end
-      Bolt::TaskResult.new(@target, result.to_json, "", exit_code)
     end
 
     # run_task generates a result that makes sense for a generic task which
     # needs to be unwrapped to extract stdout/stderr/exitcode.
     #
     def unwrap_bolt_result(result)
-      if result.error
+      if result.error_hash
         # something went wrong return the failure
         return result
       end
 
-      Bolt::CommandResult.new(@target, result.value['stdout'], result.value['stderr'], result.value['exit_code'])
+      Bolt::Result.for_command(@target, result.value['stdout'], result.value['stderr'], result.value['exit_code'])
     end
 
     def _run_command(command, options = {})
@@ -115,7 +108,7 @@ module Bolt
         mode: mode
       }
       result = _run_task(BOLT_MOCK_FILE, 'stdin', params)
-      result = Bolt::Result.new(@target) unless result.error
+      result = Bolt::Result.new(@target) unless result.error_hash
       result
     end
 

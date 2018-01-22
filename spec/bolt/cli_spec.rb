@@ -558,6 +558,21 @@ NODES
       let(:executor) { double('executor', noop: false) }
       let(:cli) { Bolt::CLI.new({}) }
       let(:targets) { [target] }
+      let(:result_vals) { [{}] }
+      let(:fail_vals) { [{ '_error' => {} }] }
+      let(:result_set) do
+        results = targets.zip(result_vals).map do |t, r|
+          Bolt::Result.new(t, value: r)
+        end
+        Bolt::ResultSet.new(results)
+      end
+
+      let(:fail_set) do
+        results = targets.zip(fail_vals).map do |t, r|
+          Bolt::Result.new(t, value: r)
+        end
+        Bolt::ResultSet.new(results)
+      end
 
       before :each do
         allow(Bolt::Executor).to receive(:new).and_return(executor)
@@ -568,12 +583,12 @@ NODES
         allow(cli).to receive(:outputter).and_return(outputter)
       end
 
-      context "when running a command" do
+      context 'when running a command' do
         it "executes the 'whoami' command" do
           expect(executor)
             .to receive(:run_command)
             .with(targets, 'whoami')
-            .and_return({})
+            .and_return(Bolt::ResultSet.new([]))
 
           options = {
             nodes: targets,
@@ -589,7 +604,7 @@ NODES
           expect(executor)
             .to receive(:run_command)
             .with(targets, 'whoami')
-            .and_return(target => double('result', success?: false))
+            .and_return(fail_set)
 
           options = {
             nodes: targets,
@@ -614,7 +629,7 @@ NODES
           expect(executor)
             .to receive(:run_script)
             .with(targets, script, [])
-            .and_return({})
+            .and_return(Bolt::ResultSet.new([]))
 
           expect(cli.execute(options)).to eq(0)
           expect(JSON.parse(@output.string)).to be
@@ -651,7 +666,7 @@ NODES
           stub_file(script)
           expect(executor).to receive(:run_script)
             .with(targets, script, [])
-            .and_return(target => double('result', success?: false))
+            .and_return(fail_set)
 
           expect(cli.execute(options)).to eq(2)
         end
@@ -823,7 +838,7 @@ NODES
             .with(
               targets,
               %r{modules/sample/tasks/echo.sh$}, input_method, task_params
-            ).and_return({})
+            ).and_return(Bolt::ResultSet.new([]))
 
           options = {
             nodes: targets,
@@ -846,7 +861,7 @@ NODES
             .with(
               targets,
               %r{modules/sample/tasks/echo.sh$}, input_method, task_params
-            ).and_return(target => double('result', success?: false))
+            ).and_return(fail_set)
 
           options = {
             nodes: targets,
@@ -923,7 +938,7 @@ NODES
             .with(
               targets,
               %r{modules/sample/tasks/init.sh$}, input_method, task_params
-            ).and_return({})
+            ).and_return(Bolt::ResultSet.new([]))
 
           options = {
             nodes: targets,
@@ -945,7 +960,7 @@ NODES
             .to receive(:run_task)
             .with(targets,
                   %r{modules/sample/tasks/stdin.sh$}, input_method, task_params)
-            .and_return({})
+            .and_return(Bolt::ResultSet.new([]))
 
           options = {
             nodes: targets,
@@ -967,7 +982,7 @@ NODES
             .to receive(:run_task)
             .with(targets,
                   %r{modules/sample/tasks/winstdin.ps1$}, input_method, task_params)
-            .and_return({})
+            .and_return(Bolt::ResultSet.new([]))
 
           options = {
             nodes: targets,
@@ -1064,7 +1079,7 @@ NODES
               .to receive(:run_task)
               .with(targets,
                     %r{modules/sample/tasks/params.sh$}, input_method, task_params)
-              .and_return({})
+              .and_return(Bolt::ResultSet.new([]))
             task_params.merge!(
               'mandatory_string'  => ' ',
               'mandatory_integer' => 0,
@@ -1093,7 +1108,7 @@ NODES
             .with(
               targets,
               %r{modules/sample/tasks/echo.sh$}, input_method, 'message' => 'hi there'
-            ).and_return(target => Bolt::TaskResult.new(target, 'yes', '', 0))
+            ).and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0)]))
 
           options = {
             nodes: targets,
@@ -1104,7 +1119,7 @@ NODES
           }
           cli.execute(options)
           expect(JSON.parse(@output.string)).to eq(
-            [{ 'node' => 'foo', 'status' => 'finished', 'result' => { '_output' => 'yes' } }]
+            [{ 'node' => 'foo', 'status' => 'success', 'result' => { '_output' => 'yes' } }]
           )
         end
 
@@ -1140,7 +1155,7 @@ NODES
             .with(
               targets,
               %r{modules/sample/tasks/echo.sh$}, input_method, 'message' => 'hi there'
-            ).and_return(target => Bolt::TaskResult.new(target, 'no', '', 1))
+            ).and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'no', '', 1)]))
 
           options = {
             nodes: targets,
@@ -1154,7 +1169,7 @@ NODES
             [
               {
                 'node' => 'foo',
-                'status' => 'failed',
+                'status' => 'failure',
                 'result' => {
                   "_output" => "no",
                   "_error" => {
@@ -1189,7 +1204,7 @@ NODES
           expect(executor)
             .to receive(:file_upload)
             .with(targets, source, dest)
-            .and_return({})
+            .and_return(Bolt::ResultSet.new([]))
 
           cli.execute(options)
           expect(JSON.parse(@output.string)).to be
@@ -1201,7 +1216,7 @@ NODES
           expect(executor)
             .to receive(:file_upload)
             .with(targets, source, dest)
-            .and_return(target => double('result', success?: false))
+            .and_return(fail_set)
 
           expect(cli.execute(options)).to eq(2)
         end
@@ -1263,7 +1278,7 @@ NODES
             .to receive(:run_task)
             .with(targets,
                   %r{modules/sample/tasks/noop.sh$}, input_method, task_params.merge('_noop' => true))
-            .and_return({})
+            .and_return(Bolt::ResultSet.new([]))
 
           options = {
             nodes: targets,

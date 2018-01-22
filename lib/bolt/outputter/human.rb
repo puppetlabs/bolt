@@ -45,28 +45,28 @@ module Bolt
           @stream.puts(colorize(:red, "Failed on #{result.target.host}:"))
         end
 
-        if result.error
-          if result.error['msg']
-            @stream.puts(colorize(:red, remove_trail(indent(2, result.error['msg']))))
-          else
-            @stream.puts(colorize(:red, remove_trail(indent(2, result.error))))
-          end
+        if result.error_hash
+          @stream.puts(colorize(:red, remove_trail(indent(2, result.error_hash['msg']))))
         end
 
         if result.message
           @stream.puts(remove_trail(indent(2, result.message)))
         end
 
-        if result.instance_of? Bolt::TaskResult
-          @stream.puts(indent(2, ::JSON.pretty_generate(result.value)))
-        elsif result.instance_of? Bolt::CommandResult
-          unless result.stdout.strip.empty?
-            @stream.puts(indent(2, "STDOUT:"))
-            @stream.puts(indent(4, result.stdout))
-          end
-          unless result.stderr.strip.empty?
-            @stream.puts(indent(2, "STDERR:"))
-            @stream.puts(indent(4, result.stderr))
+        # There is more information to output
+        if result.generic_value
+          # Use special handling if the result looks like a command or script result
+          if result.generic_value.keys == %w[stdout stderr exit_code]
+            unless result['stdout'].strip.empty?
+              @stream.puts(indent(2, "STDOUT:"))
+              @stream.puts(indent(4, result['stdout']))
+            end
+            unless result['stderr'].strip.empty?
+              @stream.puts(indent(2, "STDERR:"))
+              @stream.puts(indent(4, result['stderr']))
+            end
+          else
+            @stream.puts(indent(2, ::JSON.pretty_generate(result.generic_value)))
           end
         end
       end

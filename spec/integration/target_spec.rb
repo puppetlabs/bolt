@@ -23,7 +23,7 @@ describe "when running a plan that manipulates an execution result", ssh: true d
         [
           {
             'node' => uri,
-            'status' => 'finished',
+            'status' => 'success',
             'result' => {
               '_output' => "hi\n"
             }

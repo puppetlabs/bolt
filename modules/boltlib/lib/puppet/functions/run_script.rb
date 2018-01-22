@@ -15,7 +15,7 @@ Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFuncti
     param 'String[1]', :script
     param 'TargetOrTargets', :targets
     optional_param 'Hash[String[1], Any]', :options
-    return_type 'ExecutionResult'
+    return_type 'ResultSet'
   end
 
   def run_script(scope, script, targets, options = nil)
@@ -47,14 +47,11 @@ Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFuncti
 
     # Ensure that that given targets are all Target instances)
     targets = [targets].flatten.map { |t| t.is_a?(String) ? Bolt::Target.from_uri(t) : t }
-    if targets.empty?
-      call_function('debug', "Simulating run_script of '#{found}' - no targets given - no action taken")
-      r = Bolt::ExecutionResult::EMPTY_RESULT
-    else
-      r = Bolt::ExecutionResult.from_bolt(
-        executor.run_script(targets, found, options['arguments'] || [])
-      )
-    end
+    r = if targets.empty?
+          Bolt::ResultSet.new([])
+        else
+          executor.run_script(targets, found, options['arguments'] || [])
+        end
 
     if !r.ok && !options['_catch_errors']
       raise Bolt::RunFailure.new(r, 'run_script', script)

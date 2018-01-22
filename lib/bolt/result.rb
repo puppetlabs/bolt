@@ -3,7 +3,7 @@ require 'bolt/error'
 
 module Bolt
   class Result
-    attr_reader :message, :error, :target
+    attr_reader :target, :value
 
     def self.from_exception(target, exception)
       @exception = exception
@@ -18,124 +18,120 @@ module Bolt
         }
         error['details']['stack_trace'] = exception.backtrace.join('\n') if exception.backtrace
       end
-      Result.new(target, error)
+      Result.new(target, error: error)
     end
 
-    def initialize(target, error = nil, message = nil)
-      @target = target
-      @error = error
-      @message = message
-    end
-
-    def value
-      nil
-    end
-
-    def to_h
-      h = {}
-      if value
-        h['value'] = value
-        h['value']['_output'] = message if message
-      elsif message
-        h['value'] = { '_output' => message }
-      end
-      h['error'] = error if error
-      h
-    end
-
-    def to_result
-      # TODO: This should be to_h but we need to update the plan functions to
-      # use this hash instead
-      special_keys = {}
-      special_keys['_error'] = error if error
-      special_keys['_output'] = message if message
-      val = value || {}
-      val.merge(special_keys)
-    end
-
-    def success?
-      error.nil?
-    end
-  end
-
-  class CommandResult < Result
-    attr_reader :stdout, :stderr, :exit_code
-
-    def self.from_output(target, output)
-      new(target,
-          output.stdout.string,
-          output.stderr.string,
-          output.exit_code)
-    end
-
-    def initialize(target, stdout, stderr, exit_code)
-      super(target)
-      @stdout = stdout || ""
-      @stderr = stderr || ""
-      @exit_code = exit_code
-    end
-
-    def value
-      {
-        'stdout' => @stdout,
-        'stderr' => @stderr,
-        'exit_code' => @exit_code
+    def self.for_command(target, stdout, stderr, exit_code)
+      value = {
+        'stdout' => stdout,
+        'stderr' => stderr,
+        'exit_code' => exit_code
       }
-    end
-
-    def success?
-      @exit_code == 0
-    end
-
-    def error
-      unless success?
-        {
+      unless exit_code == 0
+        value['_error'] = {
           'kind' => 'puppetlabs.tasks/command-error',
           'issue_code' => 'COMMAND_ERROR',
-          'msg' => "The command failed with exit code #{@exit_code}",
-          'details' => { 'exit_code' => @exit_code }
+          'msg' => "The command failed with exit code #{exit_code}",
+          'details' => { 'exit_code' => exit_code }
         }
       end
-    end
-  end
-
-  class TaskResult < CommandResult
-    attr_reader :value
-
-    def initialize(target, stdout, stderr, exit_code)
-      super(target, stdout, stderr, exit_code)
-      @value = parse_output(stdout)
-      @message = @value.delete('_output')
-      @error = @value.delete('_error')
+      new(target, value: value)
     end
 
-    def error
-      unless success?
-        return @error if @error
-        msg = if !@stdout.empty?
-                "The task failed with exit code #{@exit_code}"
-              else
-                "The task failed with exit code #{@exit_code}:\n#{@stderr}"
-              end
-        { 'kind' => 'puppetlabs.tasks/task-error',
-          'issue_code' => 'TASK_ERROR',
-          'msg' => msg,
-          'details' => { 'exit_code' => @exit_code } }
-      end
-    end
-
-    private
-
-    def parse_output(output)
+    def self.for_task(target, stdout, stderr, exit_code)
       begin
-        obj = JSON.parse(output)
-        unless obj.is_a? Hash
-          obj = nil
+        value = JSON.parse(stdout)
+        unless value.is_a? Hash
+          value = nil
         end
       rescue JSON::ParserError
-        obj = nil
+        value = nil
       end
-      obj || { '_output' => output }
+      value ||= { '_output' => stdout }
+      if exit_code != 0 && value['_error'].nil?
+        msg = if stdout.empty?
+                "The task failed with exit code #{exit_code}:\n#{stderr}"
+              else
+                "The task failed with exit code #{exit_code}"
+              end
+        value['_error'] = { 'kind' => 'puppetlabs.tasks/task-error',
+                            'issue_code' => 'TASK_ERROR',
+                            'msg' => msg,
+                            'details' => { 'exit_code' => exit_code } }
+      end
+      new(target, value: value)
+    end
+
+    def initialize(target, error: nil, message: nil, value: nil)
+      @target = target
+      @value = value || {}
+      @value_set = !value.nil?
+      if error && !error.is_a?(Hash)
+        raise "TODO: how did we get a string error"
+      end
+      @value['_error'] = error if error
+      @value['_output'] = message if message
+    end
+
+    def message
+      @value['_output']
+    end
+
+    def status_hash
+      { node: @target.name,
+        status: ok? ? 'success' : 'failure',
+        result: @value }
+    end
+
+    # TODO: what to call this it's the value minus special keys
+    # This should be {} if a value was set otherwise it's nil
+    def generic_value
+      if @value_set
+        value.reject { |k, _| %w[_error _output].include? k }
+      end
+    end
+
+    def eql?(other)
+      self.class == other.class &&
+        target == other.target &&
+        value == other.value
+    end
+
+    def [](key)
+      value[key]
+    end
+
+    def ==(other)
+      eql?(other)
+    end
+
+    # TODO: remove in favor of ok?
+    def success?
+      ok?
+    end
+
+    def ok?
+      error_hash.nil?
+    end
+    alias ok ok?
+
+    # This allows access to errors outside puppet compilation
+    # it should be prefered over error in bolt code
+    def error_hash
+      value['_error']
+    end
+
+    # Warning: This will fail outside of a compilation.
+    # Use error_hash inside bolt.
+    # Is it crazy for this to behave differently outside a compiler?
+    def error
+      if error_hash
+        Puppet::DataTypes::Error.new(error_hash['msg'],
+                                     error_hash['kind'],
+                                     nil, nil,
+                                     error_hash['details'])
+
+      end
     end
   end
 end

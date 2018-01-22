@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'bolt/execution_result'
 require 'bolt/target'
 
 describe 'run_task' do
@@ -22,73 +21,74 @@ describe 'run_task' do
     let(:message) { 'the message' }
     let(:target) { Bolt::Target.from_uri(hostname) }
     let(:target2) { Bolt::Target.from_uri(hostname2) }
-    let(:result) { { value: message } }
-    let(:exec_result) { Bolt::ExecutionResult.from_bolt(target => result) }
+    let(:result) { Bolt::Result.new(target, value: { '_output' => message }) }
+    let(:result2) { Bolt::Result.new(target2, value: { '_output' => message }) }
+    let(:result_set) { Bolt::ResultSet.new([result]) }
     let(:tasks_root) { File.expand_path(fixtures('modules', 'test', 'tasks')) }
 
     it 'when running a task without metadata the input method is "both"' do
       executable = File.join(tasks_root, 'echo.sh')
 
-      executor.expects(:run_task).with([target], executable, 'both', 'message' => message).returns(target => result)
+      executor.expects(:run_task).with([target], executable, 'both', 'message' => message).returns(result_set)
 
-      is_expected.to run.with_params('Test::Echo', hostname, 'message' => message).and_return(exec_result)
+      is_expected.to run.with_params('Test::Echo', hostname, 'message' => message).and_return(result_set)
     end
 
     it 'when running a task with metadata - the input method is specified by the metadata' do
       executable = File.join(tasks_root, 'meta.sh')
 
       executor.expects(:run_task).with([target], executable, 'environment', 'message' => message)
-              .returns(target => result)
+              .returns(result_set)
 
-      is_expected.to run.with_params('Test::Meta', hostname, 'message' => message).and_return(exec_result)
+      is_expected.to run.with_params('Test::Meta', hostname, 'message' => message).and_return(result_set)
     end
 
     it 'when called without without args hash (for a task where this is allowed)' do
       executable = File.join(tasks_root, 'yes.sh')
 
-      executor.expects(:run_task).with([target], executable, 'both', {}).returns(target => result)
+      executor.expects(:run_task).with([target], executable, 'both', {}).returns(result_set)
 
-      is_expected.to run.with_params('test::yes', hostname).and_return(exec_result)
+      is_expected.to run.with_params('test::yes', hostname).and_return(result_set)
     end
 
     it 'when called with no destinations - does not invoke bolt' do
       executor.expects(:run_task).never
 
-      is_expected.to run.with_params('Test::Yes', []).and_return(Bolt::ExecutionResult::EMPTY_RESULT)
+      is_expected.to run.with_params('Test::Yes', []).and_return(Bolt::ResultSet.new([]))
     end
 
     context 'with multiple destinations' do
-      let(:exec_result) { Bolt::ExecutionResult.from_bolt(target => result, target2 => result) }
+      let(:result_set) { Bolt::ResultSet.new([result, result2]) }
 
       it 'nodes can be specified as repeated nested arrays and strings and combine into one list of nodes' do
         executable = File.join(tasks_root, 'meta.sh')
 
         executor.expects(:run_task).with([target, target2], executable, 'environment', 'message' => message)
-                .returns(target => result, target2 => result)
+                .returns(result_set)
 
         is_expected.to run.with_params('Test::Meta', [hostname, [[hostname2]], []], 'message' => message)
-                          .and_return(exec_result)
+                          .and_return(result_set)
       end
 
       it 'nodes can be specified as repeated nested arrays and Targets and combine into one list of nodes' do
         executable = File.join(tasks_root, 'meta.sh')
 
         executor.expects(:run_task).with([target, target2], executable, 'environment', 'message' => message)
-                .returns(target => result, target2 => result)
+                .returns(result_set)
 
         is_expected.to run.with_params('Test::Meta', [target, [[target2]], []], 'message' => message)
-                          .and_return(exec_result)
+                          .and_return(result_set)
       end
 
       context 'when a command fails on one node' do
-        let(:failresult) { { 'error' => {} } }
-        let(:exec_fail) { Bolt::ExecutionResult.from_bolt(target => result, target2 => failresult) }
+        let(:failresult) { Bolt::Result.new(target2, error: { 'msg' => 'oops' }) }
+        let(:result_set) { Bolt::ResultSet.new([result, failresult]) }
 
         it 'errors by default' do
           executable = File.join(tasks_root, 'meta.sh')
 
           executor.expects(:run_task).with([target, target2], executable, 'environment', 'message' => message)
-                  .returns(target => result, target2 => failresult)
+                  .returns(result_set)
 
           is_expected.to run.with_params('Test::Meta', [hostname, hostname2],
                                          'message' => message)
@@ -99,7 +99,7 @@ describe 'run_task' do
           executable = File.join(tasks_root, 'meta.sh')
 
           executor.expects(:run_task).with([target, target2], executable, 'environment', 'message' => message)
-                  .returns(target => result, target2 => failresult)
+                  .returns(result_set)
 
           is_expected.to run.with_params('Test::Meta', [hostname, hostname2],
                                          'message' => message, '_catch_errors' => true)
@@ -119,9 +119,9 @@ describe 'run_task' do
       it 'finds task named after the module' do
         executable = File.join(tasks_root, 'init.sh')
 
-        executor.expects(:run_task).with([target], executable, 'both', {}).returns(target => result)
+        executor.expects(:run_task).with([target], executable, 'both', {}).returns(result_set)
 
-        is_expected.to run.with_params('test', hostname).and_return(exec_result)
+        is_expected.to run.with_params('test', hostname).and_return(result_set)
       end
     end
 

@@ -16,7 +16,7 @@ Puppet::Functions.create_function(:run_task) do
     param 'String[1]', :task_name
     param 'TargetOrTargets', :targets
     optional_param 'Hash[String[1], Any]', :task_args
-    return_type 'ExecutionResult'
+    return_type 'ResultSet'
   end
 
   # this is used from 'bolt task run'
@@ -24,14 +24,13 @@ Puppet::Functions.create_function(:run_task) do
     param 'String[1]', :task_name
     param 'TargetOrTargets', :targets
     optional_param 'Hash[String[1], Any]', :task_args
+    # return_type 'ResultSet'
     block_param
   end
 
   def run_task(task_name, targets, task_args = nil)
     task_args ||= {}
-    r = Bolt::ExecutionResult.from_bolt(
-      run_task_raw(task_name, targets, task_args)
-    )
+    r = run_task_raw(task_name, targets, task_args)
     if !r.ok && !task_args['_catch_errors']
       raise Bolt::RunFailure.new(r, 'run_task', task_name)
     end
@@ -85,13 +84,10 @@ Puppet::Functions.create_function(:run_task) do
     targets = [targets] unless targets.is_a?(Array)
     targets = targets.flatten.map { |t| t.is_a?(String) ? Bolt::Target.from_uri(t) : t }
     if targets.empty?
-      call_function('debug', "Simulating run of task #{task.name} - no targets given - no action taken")
-      Puppet::Pops::EMPTY_HASH
+      Bolt::ResultSet.new([])
     else
       # TODO: pass entire task to executor
-      input_method = task.input_method
-
-      executor.run_task(targets, task.executable, input_method, use_args, &block)
+      executor.run_task(targets, task.executable, task.input_method, use_args, &block)
     end
   end
 end

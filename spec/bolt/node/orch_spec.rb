@@ -79,7 +79,7 @@ describe Bolt::Orch, orchestrator: true do
     end
 
     it "executes a task on a host" do
-      expect(orch._run_task(taskpath, 'stdin', params).to_result)
+      expect(orch._run_task(taskpath, 'stdin', params).value)
         .to eq(result)
     end
 
@@ -103,7 +103,7 @@ describe Bolt::Orch, orchestrator: true do
       end
 
       it 'includes an appropriate error in the returned result' do
-        expect(orch._run_task(taskpath, 'stdin', params).error).to eq(
+        expect(orch._run_task(taskpath, 'stdin', params).error_hash).to eq(
           'kind' => 'puppetlabs.tasks/skipped-node',
           'msg' => "Node #{hostname} was skipped",
           'details' => {}
@@ -156,11 +156,11 @@ describe Bolt::Orch, orchestrator: true do
       end
 
       it 'captures stdout' do
-        expect(orch._run_command(command).stdout).to eq("hi!\n")
+        expect(orch._run_command(command)['stdout']).to eq("hi!\n")
       end
 
       it 'captures stderr' do
-        expect(orch._run_command(command).stderr).to eq("bye\n")
+        expect(orch._run_command(command)['stderr']).to eq("bye\n")
       end
     end
 
@@ -172,15 +172,15 @@ describe Bolt::Orch, orchestrator: true do
       end
 
       it 'captures exit_code' do
-        expect(orch._run_command(command).exit_code).to eq(23)
+        expect(orch._run_command(command)['exit_code']).to eq(23)
       end
 
       it 'captures stdout' do
-        expect(orch._run_command(command).stdout).to eq("hi!\n")
+        expect(orch._run_command(command)['stdout']).to eq("hi!\n")
       end
 
       it 'captures stderr' do
-        expect(orch._run_command(command).stderr).to eq("bye\n")
+        expect(orch._run_command(command)['stderr']).to eq("bye\n")
       end
     end
   end
@@ -250,7 +250,7 @@ describe Bolt::Orch, orchestrator: true do
 
       it 'captures stdout' do
         expect(
-          orch._run_script(script_path, args).stdout
+          orch._run_script(script_path, args)['stdout']
         ).to eq(<<-OUT)
 arg: with spaces
 arg: nospaces
@@ -260,7 +260,7 @@ standard out
       end
 
       it 'captures stderr' do
-        expect(orch._run_script(script_path, args).stderr).to eq("standard error\n")
+        expect(orch._run_script(script_path, args)['stderr']).to eq("standard error\n")
       end
     end
 
@@ -272,15 +272,15 @@ standard out
       end
 
       it 'captures exit_code' do
-        expect(orch._run_script(script_path, args).exit_code).to eq(34)
+        expect(orch._run_script(script_path, args)['exit_code']).to eq(34)
       end
 
       it 'captures stdout' do
-        expect(orch._run_script(script_path, args).stdout).to eq("standard out\n")
+        expect(orch._run_script(script_path, args)['stdout']).to eq("standard out\n")
       end
 
       it 'captures stderr' do
-        expect(orch._run_script(script_path, args).stderr).to eq("standard error\n")
+        expect(orch._run_script(script_path, args)['stderr']).to eq("standard error\n")
       end
     end
   end

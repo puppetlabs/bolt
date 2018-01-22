@@ -23,14 +23,8 @@ module Bolt
       end
 
       def print_result(result)
-        item = {
-          name: result.target.uri,
-          status: result.success? ? 'success' : 'failure',
-          result: result.to_result
-        }
-
         @stream.puts ',' if @preceding_item
-        @stream.puts item.to_json
+        @stream.puts result.status_hash.to_json
         @preceding_item = true
       end
 

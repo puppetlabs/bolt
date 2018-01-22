@@ -54,7 +54,7 @@ module Bolt
       @logger.debug { "Uploading #{source} to #{destination}" }
       result = _upload(source, destination)
       if result.success?
-        Bolt::Result.new(@target, nil, "Uploaded '#{source}' to '#{@target.host}:#{destination}'")
+        Bolt::Result.new(@target, message: "Uploaded '#{source}' to '#{@target.host}:#{destination}'")
       else
         result
       end

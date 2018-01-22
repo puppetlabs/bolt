@@ -1,6 +1,7 @@
 require 'spec_helper'
-require 'bolt/execution_result'
 require 'bolt/target'
+require 'bolt/result'
+require 'bolt/result_set'
 
 describe 'run_script' do
   include PuppetlabsSpec::Fixtures
@@ -17,8 +18,8 @@ describe 'run_script' do
   context 'it calls bolt executor run_script' do
     let(:hostname) { 'test.example.com' }
     let(:target) { Bolt::Target.from_uri(hostname) }
-    let(:result) { { value: hostname } }
-    let(:exec_result) { Bolt::ExecutionResult.from_bolt(target => result) }
+    let(:result) { Bolt::Result.new(target, value: { 'stdout' => hostname }) }
+    let(:result_set) { Bolt::ResultSet.new([result]) }
     let(:module_root) { File.expand_path(fixtures('modules', 'test')) }
     let(:full_path) { File.join(module_root, 'files/uploads/hostname.sh') }
     before(:each) do
@@ -26,51 +27,50 @@ describe 'run_script' do
     end
 
     it 'with fully resolved path of file' do
-      executor.expects(:run_script).with([target], full_path, []).returns(target => result)
+      executor.expects(:run_script).with([target], full_path, []).returns(result_set)
 
-      is_expected.to run.with_params('test/uploads/hostname.sh', hostname).and_return(exec_result)
+      is_expected.to run.with_params('test/uploads/hostname.sh', hostname).and_return(result_set)
     end
 
     it 'with host given as Target' do
-      executor.expects(:run_script).with([target], full_path, []).returns(target => result)
+      executor.expects(:run_script).with([target], full_path, []).returns(result_set)
 
-      is_expected.to run.with_params('test/uploads/hostname.sh', target).and_return(exec_result)
+      is_expected.to run.with_params('test/uploads/hostname.sh', target).and_return(result_set)
     end
 
     it 'with given arguments as a hash of {arguments => [value]}' do
-      executor.expects(:run_script).with([target], full_path, %w[hello world]).returns(target => result)
+      executor.expects(:run_script).with([target], full_path, %w[hello world]).returns(result_set)
 
       is_expected.to run.with_params('test/uploads/hostname.sh',
                                      hostname,
-                                     'arguments' => %w[hello world]).and_return(exec_result)
+                                     'arguments' => %w[hello world]).and_return(result_set)
     end
 
     it 'with given arguments as a hash of {arguments => []}' do
-      executor.expects(:run_script).with([target], full_path, []).returns(target => result)
+      executor.expects(:run_script).with([target], full_path, []).returns(result_set)
 
-      is_expected.to run.with_params('test/uploads/hostname.sh', target, 'arguments' => []).and_return(exec_result)
+      is_expected.to run.with_params('test/uploads/hostname.sh', target, 'arguments' => []).and_return(result_set)
     end
 
     context 'with multiple destinations' do
       let(:hostname2) { 'test.testing.com' }
       let(:target2) { Bolt::Target.from_uri(hostname2) }
-      let(:result2) { { value: hostname2 } }
-      let(:exec_result) { Bolt::ExecutionResult.from_bolt(target => result, target2 => result2) }
+      let(:result2) { Bolt::Result.new(target2, value: { 'stdout' => hostname2 }) }
+      let(:result_set) { Bolt::ResultSet.new([result, result2]) }
 
       it 'with propagated multiple hosts and returns multiple results' do
         executor.expects(:run_script).with([target, target2], full_path, [])
-                .returns(target => result, target2 => result2)
+                .returns(result_set)
 
-        is_expected.to run.with_params('test/uploads/hostname.sh', [hostname, hostname2]).and_return(exec_result)
+        is_expected.to run.with_params('test/uploads/hostname.sh', [hostname, hostname2]).and_return(result_set)
       end
 
       context 'when a script fails on one node' do
-        let(:failresult) { { 'error' => {} } }
-        let(:exec_fail) { Bolt::ExecutionResult.from_bolt(target => result, target2 => failresult) }
+        let(:result2) { Bolt::Result.new(target2, error: { 'message' => hostname2 }) }
 
         it 'errors by default' do
           executor.expects(:run_script).with([target, target2], full_path, [])
-                  .returns(target => result, target2 => failresult)
+                  .returns(result_set)
 
           is_expected.to run.with_params('test/uploads/hostname.sh', [hostname, hostname2])
                             .and_raise_error(Bolt::RunFailure)
@@ -78,7 +78,7 @@ describe 'run_script' do
 
         it 'does not error with _catch_errors' do
           executor.expects(:run_script).with([target, target2], full_path, [])
-                  .returns(target => result, target2 => failresult)
+                  .returns(result_set)
 
           is_expected.to run.with_params('test/uploads/hostname.sh', [hostname, hostname2], '_catch_errors' => true)
         end
@@ -89,7 +89,7 @@ describe 'run_script' do
       executor.expects(:run_script).never
 
       is_expected.to run
-        .with_params('test/uploads/hostname.sh', []).and_return(Bolt::ExecutionResult::EMPTY_RESULT)
+        .with_params('test/uploads/hostname.sh', []).and_return(Bolt::ResultSet.new([]))
     end
 
     it 'errors when script is not found' do
