@@ -460,9 +460,9 @@ PS
       end
     end
 
-    def _upload(source, destination)
+    def upload(source, destination)
       write_remote_file(source, destination)
-      Bolt::Result.new(@target)
+      Bolt::Result.for_upload(@target, source, destination)
     # TODO: we should rely on the executor for this
     rescue StandardError => ex
       Bolt::Result.from_exception(@target, ex)
@@ -510,7 +510,7 @@ PS
       end
     end
 
-    def _run_command(command)
+    def run_command(command)
       output = execute(command)
       Bolt::Result.for_command(@target, output.stdout.string, output.stderr.string, output.exit_code)
     # TODO: we should rely on the executor for this
@@ -518,7 +518,7 @@ PS
       Bolt::Result.from_exception(@target, e)
     end
 
-    def _run_script(script, arguments)
+    def run_script(script, arguments)
       with_remote_file(script) do |remote_path|
         if powershell_file?(remote_path)
           mapped_args = arguments.map do |a|
@@ -552,7 +552,7 @@ catch
       Bolt::Result.from_exception(@target, e)
     end
 
-    def _run_task(task, input_method, arguments)
+    def run_task(task, input_method, arguments)
       if STDIN_METHODS.include?(input_method)
         stdin = JSON.dump(arguments)
       end

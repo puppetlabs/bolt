@@ -139,7 +139,11 @@ PS
       contents = "kadejtw89894"
       remote_path = 'C:\Windows\Temp\upload-test-winrm-ssl'
       with_tempfile_containing('upload-test-winrm-ssl', contents, '.ps1') do |file|
-        winrm_ssl.upload(file.path, remote_path)
+        expect(
+          winrm_ssl.upload(file.path, remote_path).value
+        ).to eq(
+          '_output' => "Uploaded '#{file.path}' to '#{target.host}:#{remote_path}'"
+        )
 
         expect(
           winrm_ssl.execute("type #{remote_path}").stdout.string
@@ -194,7 +198,11 @@ PS
       contents = "934jklnvf"
       remote_path = 'C:\Windows\Temp\upload-test-winrm'
       with_tempfile_containing('upload-test-winrm', contents, '.ps1') do |file|
-        winrm.upload(file.path, remote_path)
+        expect(
+          winrm.upload(file.path, remote_path).value
+        ).to eq(
+          '_output' => "Uploaded '#{file.path}' to '#{target.host}:#{remote_path}'"
+        )
 
         expect(
           winrm.execute("type #{remote_path}").stdout.string
@@ -208,7 +216,7 @@ PS
       contents = "Write-Output \"hellote\""
       with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
         expect(
-          winrm._run_script(file.path, [])['stdout']
+          winrm.run_script(file.path, [])['stdout']
         ).to eq("hellote\r\n")
       end
     end
@@ -230,10 +238,10 @@ PS
       PS
 
       with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
-        result = winrm._run_script(file.path, [])
+        result = winrm.run_script(file.path, [])
         instance, runspace, *outputs = result['stdout'].split("\r\n")
 
-        result2 = winrm._run_script(file.path, [])
+        result2 = winrm.run_script(file.path, [])
         instance2, runspace2, *outputs2 = result2['stdout'].split("\r\n")
 
         # scripts execute in a completely new process
@@ -255,7 +263,7 @@ PS
     it "can run a PowerShell script remotely with quoted args", winrm: true do
       with_tempfile_containing('script-test-winrm-quotes', echo_script, '.ps1') do |file|
         expect(
-          winrm._run_script(
+          winrm.run_script(
             file.path,
             ['nospaces',
              'with spaces',
@@ -278,7 +286,7 @@ QUOTED
     it "correctly passes embedded double quotes to PowerShell", winrm: true do
       with_tempfile_containing('script-test-winrm-psquote', echo_script, '.ps1') do |file|
         expect(
-          winrm._run_script(
+          winrm.run_script(
             file.path,
             ["\"a b\"",
              '"a b"',
@@ -297,7 +305,7 @@ QUOTED
     it "escapes unsafe shellwords", winrm: true do
       with_tempfile_containing('script-test-winrm-escape', echo_script, '.ps1') do |file|
         expect(
-          winrm._run_script(
+          winrm.run_script(
             file.path,
             ['echo $env:path']
           )['stdout']
@@ -314,7 +322,7 @@ SHELLWORDS
       PS
 
       with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
-        result = winrm._run_script(file.path, [])
+        result = winrm.run_script(file.path, [])
         expect(result).to be_success
         expected_nulls = ("\0" * (1024 * 4 + 1)) + "\r\n"
         expect(result['stderr']).to eq(expected_nulls)
@@ -326,7 +334,7 @@ SHELLWORDS
       arguments = { :message_one => 'task is running',
                     :"message two" => 'task has run' }
       with_tempfile_containing('task-test-winrm', contents, '.ps1') do |file|
-        expect(winrm._run_task(file.path, 'environment', arguments).message)
+        expect(winrm.run_task(file.path, 'environment', arguments).message)
           .to eq("task is running task has run\r\n")
       end
     end
@@ -347,7 +355,7 @@ Height: $Height ($(if ($Height -ne $null) { $Height.GetType().Name } else { 'nul
                     Height: 5.75,
                     Name: 'John Doe' }
       with_tempfile_containing('task-params-test-winrm', contents, '.ps1') do |file|
-        expect(winrm._run_task(file.path, 'powershell', arguments).message)
+        expect(winrm.run_task(file.path, 'powershell', arguments).message)
           .to match(/\AName: John Doe \(String\).*^Age: 30 \(Int\d+\).*^Height: 5.75 \((Double|Decimal)\).*\Z/m)
       end
     end
@@ -366,7 +374,7 @@ Height: $Height ($(if ($Height -ne $null) { $Height.GetType().Name } else { 'nul
       PS
       arguments = { bar: 30 } # note that the script doesn't recognize the 'bar' parameter
       with_tempfile_containing('task-params-test-winrm', contents, '.ps1') do |file|
-        expect(winrm._run_task(file.path, 'powershell', arguments).error_hash)
+        expect(winrm.run_task(file.path, 'powershell', arguments).error_hash)
           .to_not be_nil
       end
     end
@@ -386,7 +394,7 @@ bar: $bar ($(if ($bar -ne $null) { $bar.GetType().Name } else { 'null' }))
       PS
       arguments = { bar: 30 } # note that the script doesn't recognize the 'bar' parameter
       with_tempfile_containing('task-params-test-winrm', contents, '.ps1') do |file|
-        expect(winrm._run_task(file.path, 'environment', arguments).message)
+        expect(winrm.run_task(file.path, 'environment', arguments).message)
           .to match(/\Afoo:  \(String\).*^bar: 30 \(String\).*\Z/m) # note that $foo is an empty string and not null
       end
     end
@@ -413,7 +421,7 @@ bar: $bar ($(if ($bar -ne $null) { $bar.GetType().Name } else { 'null' }))
 
       with_tempfile_containing('stdout-test-winrm', contents, '.ps1') do |file|
         expect(
-          winrm._run_script(file.path, [])['stdout']
+          winrm.run_script(file.path, [])['stdout']
         ).to eq([
           "message 1\r\n",
           "message 2\r\n",
@@ -431,7 +439,7 @@ Write-Host $line
 PS
       arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
       with_tempfile_containing('tasks-test-stdin-winrm', contents, '.ps1') do |file|
-        expect(winrm._run_task(file.path, 'stdin', arguments).value)
+        expect(winrm.run_task(file.path, 'stdin', arguments).value)
           .to eq("message_one" => "Hello from task", "message_two" => "Goodbye")
       end
     end
@@ -445,7 +453,7 @@ PS
       arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
       with_tempfile_containing('tasks-test-both-winrm', contents, '.ps1') do |file|
         expect(
-          winrm._run_task(file.path, 'both', arguments).message
+          winrm.run_task(file.path, 'both', arguments).message
         ).to eq([
           "Hello from task Goodbye\r\n",
           "{\"message_one\":\"Hello from task\",\"message_two\":\"Goodbye\"}\r\n"
@@ -456,7 +464,7 @@ PS
     describe "when determining result" do
       it "fails to run a .pp task without Puppet agent installed", winrm: true do
         with_tempfile_containing('task-pp-winrm', "notice('hi')", '.pp') do |file|
-          result = winrm._run_task(file.path, 'stdin', {})
+          result = winrm.run_task(file.path, 'stdin', {})
           expect(result).to_not be_success
         end
       end
@@ -467,7 +475,7 @@ PS
         PS
 
         with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
-          result = winrm._run_script(file.path, [])
+          result = winrm.run_script(file.path, [])
           expect(result).to_not be_success
           expect(result['exit_code']).to eq(42)
         end
@@ -480,7 +488,7 @@ PS
           PS
 
           with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
-            result = winrm._run_script(file.path, [])
+            result = winrm.run_script(file.path, [])
             expect(result).to_not be_success
             expect(result['exit_code']).to eq(1)
           end
@@ -493,7 +501,7 @@ PS
           PS
 
           with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
-            result = winrm._run_script(file.path, [])
+            result = winrm.run_script(file.path, [])
             expect(result).to_not be_success
           end
         end
@@ -502,7 +510,7 @@ PS
           contents = '{'
 
           with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
-            result = winrm._run_script(file.path, [])
+            result = winrm.run_script(file.path, [])
             expect(result).to_not be_success
           end
         end
@@ -513,7 +521,7 @@ PS
           PS
 
           with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
-            result = winrm._run_script(file.path, [])
+            result = winrm.run_script(file.path, [])
             expect(result).to_not be_success
           end
         end
@@ -524,7 +532,7 @@ PS
           PS
 
           with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
-            result = winrm._run_script(file.path, [])
+            result = winrm.run_script(file.path, [])
             expect(result).to_not be_success
           end
         end
@@ -537,7 +545,7 @@ PS
           PS
 
           with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
-            result = winrm._run_script(file.path, [])
+            result = winrm.run_script(file.path, [])
             expect(result).to be_success
           end
         end
@@ -551,7 +559,7 @@ PS
           PS
 
           with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
-            result = winrm._run_script(file.path, [])
+            result = winrm.run_script(file.path, [])
             expect(result).to be_success
           end
         end
@@ -566,7 +574,7 @@ PS
       it 'uploads scripts to the specified tmpdir' do
         contents = "Write-Host $PSScriptRoot"
         with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
-          expect(winrm._run_script(file.path, [])['stdout']).to match(/#{Regexp.escape(tmpdir)}/)
+          expect(winrm.run_script(file.path, [])['stdout']).to match(/#{Regexp.escape(tmpdir)}/)
         end
       end
     end
@@ -592,7 +600,7 @@ PS
           .and_return(output)
         with_tempfile_containing('task-ps1-winrm', contents, '.ps1') do |file|
           expect(
-            winrm._run_task(file.path, 'stdin', {}).message
+            winrm.run_task(file.path, 'stdin', {}).message
           ).to eq("42")
         end
       end
@@ -605,7 +613,7 @@ PS
           .and_return(output)
         with_tempfile_containing('script-rb-winrm', "puts 42", '.rb') do |file|
           expect(
-            winrm._run_script(file.path, [])['stdout']
+            winrm.run_script(file.path, [])['stdout']
           ).to eq("42")
         end
       end
@@ -619,7 +627,7 @@ PS
           .and_return(output)
         with_tempfile_containing('task-rb-winrm', "puts 42", '.rb') do |file|
           expect(
-            winrm._run_task(file.path, 'stdin', {}).message
+            winrm.run_task(file.path, 'stdin', {}).message
           ).to eq("42")
         end
       end
@@ -642,7 +650,7 @@ OUTPUT
         contents = "notice('hi')"
         with_tempfile_containing('script-pp-winrm', contents, '.pp') do |file|
           expect(
-            winrm._run_script(file.path, [])['stdout']
+            winrm.run_script(file.path, [])['stdout']
           ).to eq(stdout)
         end
       end
@@ -656,7 +664,7 @@ OUTPUT
           .and_return(output)
         with_tempfile_containing('task-pp-winrm', "notice('hi')", '.pp') do |file|
           expect(
-            winrm._run_task(file.path, 'stdin', {}).message
+            winrm.run_task(file.path, 'stdin', {}).message
           ).to eq("42")
         end
       end
@@ -669,7 +677,7 @@ OUTPUT
           .and_return(output)
         with_tempfile_containing('script-py-winrm', 'print(42)', '.py') do |file|
           expect(
-            winrm._run_script(file.path, []).value
+            winrm.run_script(file.path, []).value
           ).to eq(
             '_error' => {
               'kind' => 'puppetlabs.tasks/task_file_error',
@@ -690,7 +698,7 @@ OUTPUT
           .and_return(output)
         with_tempfile_containing('task-py-winrm', 'print(42)', '.py') do |file|
           expect(
-            winrm._run_task(file.path, 'stdin', {}).value
+            winrm.run_task(file.path, 'stdin', {}).value
           ).to eq(
             '_error' => {
               'kind' => 'puppetlabs.tasks/task_file_error',
@@ -713,7 +721,7 @@ OUTPUT
             .and_return(output)
           with_tempfile_containing('script-py-winrm', 'print(42)', '.py') do |file|
             expect(
-              winrm._run_script(file.path, [])['stdout']
+              winrm.run_script(file.path, [])['stdout']
             ).to eq('42')
           end
         end
@@ -727,7 +735,7 @@ OUTPUT
             .and_return(output)
           with_tempfile_containing('task-py-winrm', 'print(42)', '.py') do |file|
             expect(
-              winrm._run_task(file.path, 'stdin', {}).message
+              winrm.run_task(file.path, 'stdin', {}).message
             ).to eq('42')
           end
         end
@@ -735,7 +743,7 @@ OUTPUT
 
       it "returns a friendly stderr msg with puppet.bat missing", winrm: true do
         with_tempfile_containing('task-pp-winrm', "notice('hi')", '.pp') do |file|
-          result = winrm._run_task(file.path, 'stdin', {})
+          result = winrm.run_task(file.path, 'stdin', {})
           stderr = result.error_hash['msg']
           expect(stderr).to match(/^Could not find executable 'puppet\.bat'/)
           expect(stderr).to_not match(/CommandNotFoundException/)
