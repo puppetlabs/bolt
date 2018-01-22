@@ -67,7 +67,7 @@ module Bolt
 
       @notifier.shutdown
 
-      Bolt::ResultSet.new(results.map { |r| r })
+      Bolt::ResultSet.new(results)
     end
     private :on
 
