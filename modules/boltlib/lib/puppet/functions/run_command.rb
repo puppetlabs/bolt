@@ -42,7 +42,7 @@ Puppet::Functions.create_function(:run_command) do
       call_function('debug', "Simulating run_command('#{command}') - no targets given - no action taken")
       r = Bolt::ResultSet.new([])
     else
-      r = executor.run_command(targets, command)
+      r = executor.run_command(targets, command, options.select { |k, _| k == '_run_as' })
     end
 
     if !r.ok && !options['_catch_errors']

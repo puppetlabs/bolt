@@ -49,6 +49,22 @@ module Bolt
     def uri
       @target.uri
     end
+
+    def upload(_source, _destination)
+      raise NotImplementedError, 'transports must implement upload(source, destination)'
+    end
+
+    def run_command(_command, _options = nil)
+      raise NotImplementedError, 'transports must implement run_command(command, options = nil)'
+    end
+
+    def run_script(_script, _arguments, _options = nil)
+      raise NotImplementedError, 'transports must implement run_script(script, arguments, options = nil)'
+    end
+
+    def run_task(_task, _input_method, _arguments, _options = nil)
+      raise NotImplementedError, 'transports must implement run_task(task, input_method, arguments, options = nil)'
+    end
   end
 end
 

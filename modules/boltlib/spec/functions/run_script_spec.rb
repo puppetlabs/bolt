@@ -27,19 +27,19 @@ describe 'run_script' do
     end
 
     it 'with fully resolved path of file' do
-      executor.expects(:run_script).with([target], full_path, []).returns(result_set)
+      executor.expects(:run_script).with([target], full_path, [], {}).returns(result_set)
 
       is_expected.to run.with_params('test/uploads/hostname.sh', hostname).and_return(result_set)
     end
 
     it 'with host given as Target' do
-      executor.expects(:run_script).with([target], full_path, []).returns(result_set)
+      executor.expects(:run_script).with([target], full_path, [], {}).returns(result_set)
 
       is_expected.to run.with_params('test/uploads/hostname.sh', target).and_return(result_set)
     end
 
     it 'with given arguments as a hash of {arguments => [value]}' do
-      executor.expects(:run_script).with([target], full_path, %w[hello world]).returns(result_set)
+      executor.expects(:run_script).with([target], full_path, %w[hello world], {}).returns(result_set)
 
       is_expected.to run.with_params('test/uploads/hostname.sh',
                                      hostname,
@@ -47,9 +47,15 @@ describe 'run_script' do
     end
 
     it 'with given arguments as a hash of {arguments => []}' do
-      executor.expects(:run_script).with([target], full_path, []).returns(result_set)
+      executor.expects(:run_script).with([target], full_path, [], {}).returns(result_set)
 
       is_expected.to run.with_params('test/uploads/hostname.sh', target, 'arguments' => []).and_return(result_set)
+    end
+
+    it 'with _run_as' do
+      executor.expects(:run_script).with([target], full_path, [], '_run_as' => 'root').returns(result_set)
+
+      is_expected.to run.with_params('test/uploads/hostname.sh', target, '_run_as' => 'root').and_return(result_set)
     end
 
     context 'with multiple destinations' do
@@ -59,7 +65,7 @@ describe 'run_script' do
       let(:result_set) { Bolt::ResultSet.new([result, result2]) }
 
       it 'with propagated multiple hosts and returns multiple results' do
-        executor.expects(:run_script).with([target, target2], full_path, [])
+        executor.expects(:run_script).with([target, target2], full_path, [], {})
                 .returns(result_set)
 
         is_expected.to run.with_params('test/uploads/hostname.sh', [hostname, hostname2]).and_return(result_set)
@@ -69,7 +75,7 @@ describe 'run_script' do
         let(:result2) { Bolt::Result.new(target2, error: { 'message' => hostname2 }) }
 
         it 'errors by default' do
-          executor.expects(:run_script).with([target, target2], full_path, [])
+          executor.expects(:run_script).with([target, target2], full_path, [], {})
                   .returns(result_set)
 
           is_expected.to run.with_params('test/uploads/hostname.sh', [hostname, hostname2])
@@ -77,7 +83,7 @@ describe 'run_script' do
         end
 
         it 'does not error with _catch_errors' do
-          executor.expects(:run_script).with([target, target2], full_path, [])
+          executor.expects(:run_script).with([target, target2], full_path, [], {})
                   .returns(result_set)
 
           is_expected.to run.with_params('test/uploads/hostname.sh', [hostname, hostname2], '_catch_errors' => true)

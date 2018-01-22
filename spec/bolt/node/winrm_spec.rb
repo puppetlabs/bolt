@@ -162,6 +162,10 @@ PS
       expect(winrm.run_command(command)['stdout']).to eq("#{user}\r\n")
     end
 
+    it "ignores _run_as", winrm: true do
+      expect(winrm.run_command(command, '_run_as' => 'root')['stdout']).to eq("#{user}\r\n")
+    end
+
     it "reuses a PowerShell host / runspace for multiple commands", winrm: true do
       contents = [
         "$Host.InstanceId.ToString()",
@@ -217,6 +221,15 @@ PS
       with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
         expect(
           winrm.run_script(file.path, [])['stdout']
+        ).to eq("hellote\r\n")
+      end
+    end
+
+    it "ignores _run_as", winrm: true do
+      contents = "Write-Output \"hellote\""
+      with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
+        expect(
+          winrm.run_script(file.path, [], '_run_as' => 'root')['stdout']
         ).to eq("hellote\r\n")
       end
     end
@@ -335,6 +348,16 @@ SHELLWORDS
                     :"message two" => 'task has run' }
       with_tempfile_containing('task-test-winrm', contents, '.ps1') do |file|
         expect(winrm.run_task(file.path, 'environment', arguments).message)
+          .to eq("task is running task has run\r\n")
+      end
+    end
+
+    it "ignores _run_as", winrm: true do
+      contents = 'Write-Host "$env:PT_message_one ${env:PT_message two}"'
+      arguments = { :message_one => 'task is running',
+                    :"message two" => 'task has run' }
+      with_tempfile_containing('task-test-winrm', contents, '.ps1') do |file|
+        expect(winrm.run_task(file.path, 'environment', arguments, '_run_as' => 'root').message)
           .to eq("task is running task has run\r\n")
       end
     end

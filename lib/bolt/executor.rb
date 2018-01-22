@@ -79,14 +79,14 @@ module Bolt
     end
     private :summary
 
-    def run_command(targets, command)
+    def run_command(targets, command, options = {})
       nodes = from_targets(targets)
       @logger.info("Starting command run '#{command}' on #{nodes.map(&:uri)}")
       callback = block_given? ? Proc.new : nil
 
       r = on(nodes, callback) do |node|
         @logger.debug("Running command '#{command}' on #{node.uri}")
-        node_result = node.run_command(command)
+        node_result = node.run_command(command, options)
         @logger.debug("Result on #{node.uri}: #{JSON.dump(node_result.value)}")
         node_result
       end
@@ -94,7 +94,7 @@ module Bolt
       r
     end
 
-    def run_script(targets, script, arguments)
+    def run_script(targets, script, arguments, options = {})
       nodes = from_targets(targets)
       @logger.info("Starting script run #{script} on #{nodes.map(&:uri)}")
       @logger.debug("Arguments: #{arguments}")
@@ -102,7 +102,7 @@ module Bolt
 
       r = on(nodes, callback) do |node|
         @logger.debug { "Running script '#{script}' on #{node.uri}" }
-        node_result = node.run_script(script, arguments)
+        node_result = node.run_script(script, arguments, options)
         @logger.debug("Result on #{node.uri}: #{JSON.dump(node_result.value)}")
         node_result
       end
@@ -110,7 +110,7 @@ module Bolt
       r
     end
 
-    def run_task(targets, task, input_method, arguments)
+    def run_task(targets, task, input_method, arguments, options = {})
       nodes = from_targets(targets)
       @logger.info("Starting task #{task} on #{nodes.map(&:uri)}")
       @logger.debug("Arguments: #{arguments} Input method: #{input_method}")
@@ -118,7 +118,7 @@ module Bolt
 
       r = on(nodes, callback) do |node|
         @logger.debug { "Running task run '#{task}' on #{node.uri}" }
-        node_result = node.run_task(task, input_method, arguments)
+        node_result = node.run_task(task, input_method, arguments, options)
         @logger.debug("Result on #{node.uri}: #{JSON.dump(node_result.value)}")
         node_result
       end

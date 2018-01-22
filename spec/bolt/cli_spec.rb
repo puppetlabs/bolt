@@ -837,7 +837,7 @@ NODES
             .to receive(:run_task)
             .with(
               targets,
-              %r{modules/sample/tasks/echo.sh$}, input_method, task_params
+              %r{modules/sample/tasks/echo.sh$}, input_method, task_params, {}
             ).and_return(Bolt::ResultSet.new([]))
 
           options = {
@@ -860,7 +860,7 @@ NODES
             .to receive(:run_task)
             .with(
               targets,
-              %r{modules/sample/tasks/echo.sh$}, input_method, task_params
+              %r{modules/sample/tasks/echo.sh$}, input_method, task_params, {}
             ).and_return(fail_set)
 
           options = {
@@ -915,7 +915,7 @@ NODES
             .to receive(:run_task)
             .with(
               targets,
-              %r{modules/sample/tasks/echo.sh$}, input_method, {}
+              %r{modules/sample/tasks/echo.sh$}, input_method, {}, {}
             ).and_raise("Could not connect to target")
 
           options = {
@@ -937,7 +937,7 @@ NODES
             .to receive(:run_task)
             .with(
               targets,
-              %r{modules/sample/tasks/init.sh$}, input_method, task_params
+              %r{modules/sample/tasks/init.sh$}, input_method, task_params, {}
             ).and_return(Bolt::ResultSet.new([]))
 
           options = {
@@ -959,7 +959,7 @@ NODES
           expect(executor)
             .to receive(:run_task)
             .with(targets,
-                  %r{modules/sample/tasks/stdin.sh$}, input_method, task_params)
+                  %r{modules/sample/tasks/stdin.sh$}, input_method, task_params, {})
             .and_return(Bolt::ResultSet.new([]))
 
           options = {
@@ -981,7 +981,7 @@ NODES
           expect(executor)
             .to receive(:run_task)
             .with(targets,
-                  %r{modules/sample/tasks/winstdin.ps1$}, input_method, task_params)
+                  %r{modules/sample/tasks/winstdin.ps1$}, input_method, task_params, {})
             .and_return(Bolt::ResultSet.new([]))
 
           options = {
@@ -1078,7 +1078,7 @@ NODES
             expect(executor)
               .to receive(:run_task)
               .with(targets,
-                    %r{modules/sample/tasks/params.sh$}, input_method, task_params)
+                    %r{modules/sample/tasks/params.sh$}, input_method, task_params, {})
               .and_return(Bolt::ResultSet.new([]))
             task_params.merge!(
               'mandatory_string'  => ' ',
@@ -1107,7 +1107,7 @@ NODES
             .to receive(:run_task)
             .with(
               targets,
-              %r{modules/sample/tasks/echo.sh$}, input_method, 'message' => 'hi there'
+              %r{modules/sample/tasks/echo.sh$}, input_method, { 'message' => 'hi there' }, {}
             ).and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0)]))
 
           options = {
@@ -1132,7 +1132,7 @@ NODES
             .to receive(:run_task)
             .with(
               targets,
-              %r{modules/sample/tasks/echo.sh$}, input_method, 'message' => 'hi there'
+              %r{modules/sample/tasks/echo.sh$}, input_method, { 'message' => 'hi there' }, {}
             ).and_raise("Could not connect to target")
 
           options = {
@@ -1154,7 +1154,7 @@ NODES
             .to receive(:run_task)
             .with(
               targets,
-              %r{modules/sample/tasks/echo.sh$}, input_method, 'message' => 'hi there'
+              %r{modules/sample/tasks/echo.sh$}, input_method, { 'message' => 'hi there' }, {}
             ).and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'no', '', 1)]))
 
           options = {
@@ -1277,7 +1277,7 @@ NODES
           expect(executor)
             .to receive(:run_task)
             .with(targets,
-                  %r{modules/sample/tasks/noop.sh$}, input_method, task_params.merge('_noop' => true))
+                  %r{modules/sample/tasks/noop.sh$}, input_method, task_params.merge('_noop' => true), {})
             .and_return(Bolt::ResultSet.new([]))
 
           options = {

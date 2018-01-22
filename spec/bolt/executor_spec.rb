@@ -37,15 +37,15 @@ describe "Bolt::Executor" do
 
   it "executes a command on all nodes" do
     node_results.each do |node, result|
-      expect(node).to receive(:run_command).with(command).and_return(result)
+      expect(node).to receive(:run_command).with(command, {}).and_return(result)
     end
 
-    executor.run_command(targets, command)
+    executor.run_command(targets, command, {})
   end
 
   it "yields each command result" do
     node_results.each do |node, result|
-      expect(node).to receive(:run_command).with(command).and_return(result)
+      expect(node).to receive(:run_command).with(command, {}).and_return(result)
     end
 
     results = []
@@ -61,10 +61,10 @@ describe "Bolt::Executor" do
 
   it "runs a script on all nodes" do
     node_results.each do |node, result|
-      expect(node).to receive(:run_script).with(script, []).and_return(result)
+      expect(node).to receive(:run_script).with(script, [], {}).and_return(result)
     end
 
-    results = executor.run_script(targets, script, [])
+    results = executor.run_script(targets, script, [], {})
     results.each do |result|
       expect(result).to be_instance_of(Bolt::Result)
     end
@@ -72,7 +72,7 @@ describe "Bolt::Executor" do
 
   it "yields each script result" do
     node_results.each do |node, result|
-      expect(node).to receive(:run_script).with(script, []).and_return(result)
+      expect(node).to receive(:run_script).with(script, [], {}).and_return(result)
     end
 
     results = []
@@ -90,11 +90,11 @@ describe "Bolt::Executor" do
     node_results.each do |node, result|
       expect(node)
         .to receive(:run_task)
-        .with(task, 'both', task_arguments)
+        .with(task, 'both', task_arguments, {})
         .and_return(result)
     end
 
-    results = executor.run_task(targets, task, 'both', task_arguments)
+    results = executor.run_task(targets, task, 'both', task_arguments, {})
     results.each do |result|
       expect(result).to be_instance_of(Bolt::Result)
     end
@@ -104,7 +104,7 @@ describe "Bolt::Executor" do
     node_results.each do |node, result|
       expect(node)
         .to receive(:run_task)
-        .with(task, 'both', task_arguments)
+        .with(task, 'both', task_arguments, {})
         .and_return(result)
     end
 
@@ -186,7 +186,7 @@ describe "Bolt::Executor" do
       node_results.each do |node, result|
         expect(node)
           .to receive(:run_command)
-          .with(command)
+          .with(command, {})
           .and_return(result)
       end
 
@@ -200,7 +200,7 @@ describe "Bolt::Executor" do
       node_results.each do |node, result|
         expect(node)
           .to receive(:run_script)
-          .with(script, [])
+          .with(script, [], {})
           .and_return(result)
       end
 
@@ -214,7 +214,7 @@ describe "Bolt::Executor" do
       node_results.each do |node, result|
         expect(node)
           .to receive(:run_task)
-          .with(task, 'both', task_arguments)
+          .with(task, 'both', task_arguments, {})
           .and_return(result)
       end
 

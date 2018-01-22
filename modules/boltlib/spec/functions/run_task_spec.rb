@@ -25,28 +25,39 @@ describe 'run_task' do
     let(:result2) { Bolt::Result.new(target2, value: { '_output' => message }) }
     let(:result_set) { Bolt::ResultSet.new([result]) }
     let(:tasks_root) { File.expand_path(fixtures('modules', 'test', 'tasks')) }
+    let(:default_args) { { 'message' => message } }
 
     it 'when running a task without metadata the input method is "both"' do
       executable = File.join(tasks_root, 'echo.sh')
 
-      executor.expects(:run_task).with([target], executable, 'both', 'message' => message).returns(result_set)
+      executor.expects(:run_task).with([target], executable, 'both', default_args, {}).returns(result_set)
 
-      is_expected.to run.with_params('Test::Echo', hostname, 'message' => message).and_return(result_set)
+      is_expected.to run.with_params('Test::Echo', hostname, default_args).and_return(result_set)
     end
 
     it 'when running a task with metadata - the input method is specified by the metadata' do
       executable = File.join(tasks_root, 'meta.sh')
 
-      executor.expects(:run_task).with([target], executable, 'environment', 'message' => message)
+      executor.expects(:run_task).with([target], executable, 'environment', default_args, {})
               .returns(result_set)
 
-      is_expected.to run.with_params('Test::Meta', hostname, 'message' => message).and_return(result_set)
+      is_expected.to run.with_params('Test::Meta', hostname, default_args).and_return(result_set)
+    end
+
+    it 'when called with _run_as - _run_as is passed to the executor' do
+      executable = File.join(tasks_root, 'meta.sh')
+
+      executor.expects(:run_task).with([target], executable, 'environment', default_args, '_run_as' => 'root')
+              .returns(result_set)
+
+      args = default_args.merge('_run_as' => 'root')
+      is_expected.to run.with_params('Test::Meta', hostname, args).and_return(result_set)
     end
 
     it 'when called without without args hash (for a task where this is allowed)' do
       executable = File.join(tasks_root, 'yes.sh')
 
-      executor.expects(:run_task).with([target], executable, 'both', {}).returns(result_set)
+      executor.expects(:run_task).with([target], executable, 'both', {}, {}).returns(result_set)
 
       is_expected.to run.with_params('test::yes', hostname).and_return(result_set)
     end
@@ -63,20 +74,20 @@ describe 'run_task' do
       it 'nodes can be specified as repeated nested arrays and strings and combine into one list of nodes' do
         executable = File.join(tasks_root, 'meta.sh')
 
-        executor.expects(:run_task).with([target, target2], executable, 'environment', 'message' => message)
+        executor.expects(:run_task).with([target, target2], executable, 'environment', default_args, {})
                 .returns(result_set)
 
-        is_expected.to run.with_params('Test::Meta', [hostname, [[hostname2]], []], 'message' => message)
+        is_expected.to run.with_params('Test::Meta', [hostname, [[hostname2]], []], default_args)
                           .and_return(result_set)
       end
 
       it 'nodes can be specified as repeated nested arrays and Targets and combine into one list of nodes' do
         executable = File.join(tasks_root, 'meta.sh')
 
-        executor.expects(:run_task).with([target, target2], executable, 'environment', 'message' => message)
+        executor.expects(:run_task).with([target, target2], executable, 'environment', default_args, {})
                 .returns(result_set)
 
-        is_expected.to run.with_params('Test::Meta', [target, [[target2]], []], 'message' => message)
+        is_expected.to run.with_params('Test::Meta', [target, [[target2]], []], default_args)
                           .and_return(result_set)
       end
 
@@ -87,22 +98,21 @@ describe 'run_task' do
         it 'errors by default' do
           executable = File.join(tasks_root, 'meta.sh')
 
-          executor.expects(:run_task).with([target, target2], executable, 'environment', 'message' => message)
+          executor.expects(:run_task).with([target, target2], executable, 'environment', default_args, {})
                   .returns(result_set)
 
-          is_expected.to run.with_params('Test::Meta', [hostname, hostname2],
-                                         'message' => message)
+          is_expected.to run.with_params('Test::Meta', [hostname, hostname2], default_args)
                             .and_raise_error(Bolt::RunFailure)
         end
 
         it 'does not error with _catch_errors' do
           executable = File.join(tasks_root, 'meta.sh')
 
-          executor.expects(:run_task).with([target, target2], executable, 'environment', 'message' => message)
+          executor.expects(:run_task).with([target, target2], executable, 'environment', default_args, {})
                   .returns(result_set)
 
-          is_expected.to run.with_params('Test::Meta', [hostname, hostname2],
-                                         'message' => message, '_catch_errors' => true)
+          args = default_args.merge('_catch_errors' => true)
+          is_expected.to run.with_params('Test::Meta', [hostname, hostname2], args)
         end
       end
     end
@@ -119,7 +129,7 @@ describe 'run_task' do
       it 'finds task named after the module' do
         executable = File.join(tasks_root, 'init.sh')
 
-        executor.expects(:run_task).with([target], executable, 'both', {}).returns(result_set)
+        executor.expects(:run_task).with([target], executable, 'both', {}, {}).returns(result_set)
 
         is_expected.to run.with_params('test', hostname).and_return(result_set)
       end

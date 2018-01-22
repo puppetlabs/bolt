@@ -87,7 +87,8 @@ Puppet::Functions.create_function(:run_task) do
       Bolt::ResultSet.new([])
     else
       # TODO: pass entire task to executor
-      executor.run_task(targets, task.executable, task.input_method, use_args, &block)
+      options = task_args.select { |k, _| k == '_run_as' }
+      executor.run_task(targets, task.executable, task.input_method, use_args, options, &block)
     end
   end
 end
