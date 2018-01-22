@@ -892,6 +892,27 @@ NODES
           expect(JSON.parse(@output.string)).to be
         end
 
+        it "raises errors from the executor" do
+          task_name = 'sample::echo'
+          input_method = 'both'
+
+          expect(executor)
+            .to receive(:run_task)
+            .with(
+              targets,
+              %r{modules/sample/tasks/echo.sh$}, input_method, {}
+            ).and_raise("Could not connect to target")
+
+          options = {
+            nodes: targets,
+            mode: 'task',
+            action: 'run',
+            object: task_name,
+            task_options: {}
+          }
+          expect { cli.execute(options) }.to raise_error(/Could not connect to target/)
+        end
+
         it "runs an init task given a module name" do
           task_name = 'sample'
           task_params = { 'message' => 'hi' }
@@ -1085,6 +1106,28 @@ NODES
           expect(JSON.parse(@output.string)).to eq(
             [{ 'node' => 'foo', 'status' => 'finished', 'result' => { '_output' => 'yes' } }]
           )
+        end
+
+        it "raises errors from the executor" do
+          plan_name = 'sample::single_task'
+          plan_params = { 'nodes' => targets.map(&:host).join(',') }
+          input_method = 'both'
+
+          expect(executor)
+            .to receive(:run_task)
+            .with(
+              targets,
+              %r{modules/sample/tasks/echo.sh$}, input_method, 'message' => 'hi there'
+            ).and_raise("Could not connect to target")
+
+          options = {
+            nodes: targets,
+            mode: 'plan',
+            action: 'run',
+            object: plan_name,
+            task_options: plan_params
+          }
+          expect { cli.execute(options) }.to raise_error(/Could not connect to target/)
         end
 
         it "formats results of a failing task" do

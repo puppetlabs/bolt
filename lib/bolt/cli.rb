@@ -539,8 +539,9 @@ HELP
             yield compiler
           rescue Puppet::PreformattedError => err
             # Puppet sometimes rescues exceptions notes the location and reraises
-            # For now return the original error.
-            if err.cause
+            # For now return the original error. Exception cause support was added in Ruby 2.1
+            # so we fall back to reporting the error we got for Ruby 2.0.
+            if err.respond_to?(:cause) && err.cause
               if err.cause.is_a? Bolt::Error
                 err.cause
               else
