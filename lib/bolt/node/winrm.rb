@@ -396,6 +396,7 @@ PS
       end
       result_output
     end
+    private :execute
 
     # 10 minutes in seconds
     DEFAULT_EXECUTION_TIMEOUT = 10 * 60
