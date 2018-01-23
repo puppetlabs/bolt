@@ -46,7 +46,7 @@ Then we can write out the plan. Save the following as `modules/exercise9/plans/y
 plan exercise9::yesorno(String $nodes) {
   $all = $nodes.split(",")
   $results = run_task('exercise9::yesorno', $all)
-  $subset = $all.filter |$node| { $results[$node][answer] == true }
+  $subset = $results.filter |$result| { $result[answer] == true }.map |$result| { $result.target.name }
   run_command("uptime", $subset)
 }
 ```
@@ -55,8 +55,9 @@ In the above plan we:
 
 * Accept a comma-separated list of nodes
 * Run the `exercise9::yesorno` task from above on all of our nodes
-* Store the results of running the task in the variable `$results`. This will contain a `Struct` containing the node names and the data parsed from the JSON response from the task
-* We filter the list of nodes into the `$subset` variable for only those that answered `true`
+* Store the results of running the task in the variable `$results`. This will contain a `ResultSet` containing a list of `Result` objects for each node and the data parsed from the JSON response from the task
+* We filter the list of results into the `$subset` variable for only those that answered `true`
+* We get the node name for the filtered results
 * We finally run the `uptime` command on our filtered list of nodes
 
 You can see this plan in action by running:
@@ -68,7 +69,7 @@ bolt plan run exercise9::yesorno nodes=$NODE --modulepath ./modules
 When run you should see output like the following. Running it multiple times should result in different output, as the return value of the task is random the command should run on a different subset of nodes each time.
 
 ```bash
-{'node1' => {'stdout' => " 20:53:10 up  1:42,  0 users,  load average: 0.60, 0.42, 0.21\n", 'stderr' => '', 'exit_code' => 0}, 'node2' => {'stdout' => " 20:53:10 up  1:42,  0 users,  load average: 0.60, 0.42, 0.21\n", 'stderr' => '', 'exit_code' => 0}}
+[{"node":"node1","status":"success","result":{"stdout":" 22:41:43 up 18 min,  0 users,  load average: 0.00, 0.01, 0.05\n","stderr":"","exit_code":0}},{"node":"node3","status":"success","result":{"stdout":" 22:41:43 up 17 min,  0 users,  load average: 0.14, 0.05, 0.06\n","stderr":"","exit_code":0}}]
 ```
 
 Here we've shown how to capture the output from a task and then reuse it as part of the plan. More real-world uses for this might include:
