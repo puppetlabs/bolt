@@ -5,8 +5,8 @@ Puppet::DataTypes.create_type('Result') do
       'target' => Target
     },
     functions => {
-      error => Callable[[], Error],
-      message => Callable[[], String],
+      error => Callable[[], Optional[Error]],
+      message => Callable[[], Optional[String]],
       ok => Callable[[], Boolean],
       '[]' => Callable[[String[1]], Data]
     }
