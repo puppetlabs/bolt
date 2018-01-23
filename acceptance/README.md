@@ -99,7 +99,7 @@ BOLT_CONTROLLER=centos7-64                  \
 BOLT_NODES=ubuntu1604-64,windows10ent-64    \
 SSH_PASSWORD='S3@ret3'                      \
 WINRM_PASSWORD='S3@ret3'                    \
-bundle exec rake ci:test:gem
+bundle exec rake test:gem
 ```
 
 Example to test specific gem version from https://rubygems.mymirror.example.org
@@ -110,7 +110,7 @@ BOLT_CONTROLLER=centos7-64                  \
 BOLT_NODES=ubuntu1604-64,windows10ent-64    \
 SSH_PASSWORD='S3@ret3'                      \
 WINRM_PASSWORD='S3@ret3'                    \
-bundle exec rake ci:test:gem
+bundle exec rake test:gem
 ```
 
 #### Git
@@ -120,7 +120,7 @@ BOLT_CONTROLLER=centos7-64                  \
 BOLT_NODES=ubuntu1604-64,windows10ent-64    \
 SSH_PASSWORD='S3@ret3'                      \
 WINRM_PASSWORD='S3@ret3'                    \
-bundle exec rake ci:test:git
+bundle exec rake test:git
 ```
 
 Example to test specific SHA on https://github.com/puppetlabs/bolt
@@ -130,7 +130,7 @@ BOLT_CONTROLLER=centos7-64                  \
 BOLT_NODES=ubuntu1604-64,windows10ent-64    \
 SSH_PASSWORD='S3@ret3'                      \
 WINRM_PASSWORD='S3@ret3'                    \
-bundle exec rake ci:test:git
+bundle exec rake test:git
 ```
 
 Example to test topic branch on fork of bolt on GitHub
@@ -141,7 +141,7 @@ BOLT_CONTROLLER=centos7-64                  \
 BOLT_NODES=ubuntu1604-64,windows10ent-64    \
 SSH_PASSWORD='S3@ret3'                      \
 WINRM_PASSWORD='S3@ret3'                    \
-bundle exec rake ci:test:git
+bundle exec rake test:git
 ```
 
 ### Beaker
