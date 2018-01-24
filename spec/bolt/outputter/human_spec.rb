@@ -112,7 +112,7 @@ TASK_OUTPUT
   it "prints simple output from a plan" do
     result = "some data"
     outputter.print_plan(result)
-    expect(output.string.strip).to eq(result)
+    expect(output.string.strip).to eq("\"#{result}\"")
   end
 
   it "handles fatal errors" do

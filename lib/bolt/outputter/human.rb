@@ -123,13 +123,15 @@ module Bolt
       end
 
       def print_plan(result)
-        # If a hash or array, pretty-print as JSON
-        if result.is_a?(Hash) || result.is_a?(Array)
-          if result.empty?
-            # Avoids extra lines for an empty result
+        # If the object has a json representation display it
+        if result.respond_to?(:to_json)
+          # Guard against to_json methods that don't accept options
+          # and don't print empty results on multiple lines
+          if result.method(:to_json).arity == 0 ||
+             (result.respond_to?(:empty?) && result.empty?)
             @stream.puts(result.to_json)
           else
-            @stream.puts(::JSON.pretty_generate(result))
+            @stream.puts(::JSON.pretty_generate(result, quirks_mode: true))
           end
         else
           @stream.puts result.to_s
