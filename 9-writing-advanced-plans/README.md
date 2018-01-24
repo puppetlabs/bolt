@@ -46,7 +46,7 @@ Then we can write out the plan. Save the following as `modules/exercise9/plans/y
 plan exercise9::yesorno(String $nodes) {
   $all = $nodes.split(",")
   $results = run_task('exercise9::yesorno', $all)
-  $subset = $all.filter |$node| { $results[$node][answer] == true }
+  $subset = $results.filter |$result| { $result[answer] == true }.map |$result| { $result.target.name }
   run_command("uptime", $subset)
 }
 ```
@@ -55,8 +55,8 @@ In the above plan we:
 
 * Accept a comma-separated list of nodes
 * Run the `exercise9::yesorno` task from above on all of our nodes
-* Store the results of running the task in the variable `$results`. This will contain a `Struct` containing the node names and the data parsed from the JSON response from the task
-* We filter the list of nodes into the `$subset` variable for only those that answered `true`
+* Store the results of running the task in the variable `$results`. This will contain a `ResultSet` containing a list of `Result` objects for each node and the data parsed from the JSON response from the task
+* We filter the list of results to get the node names for only those that answered `true`, stored in the `$subset` variable
 * We finally run the `uptime` command on our filtered list of nodes
 
 You can see this plan in action by running:
@@ -68,13 +68,77 @@ bolt plan run exercise9::yesorno nodes=$NODE --modulepath ./modules
 When run you should see output like the following. Running it multiple times should result in different output, as the return value of the task is random the command should run on a different subset of nodes each time.
 
 ```bash
-{'node1' => {'stdout' => " 20:53:10 up  1:42,  0 users,  load average: 0.60, 0.42, 0.21\n", 'stderr' => '', 'exit_code' => 0}, 'node2' => {'stdout' => " 20:53:10 up  1:42,  0 users,  load average: 0.60, 0.42, 0.21\n", 'stderr' => '', 'exit_code' => 0}}
+[{"node":"node1","status":"success","result":{"stdout":" 22:41:43 up 18 min,  0 users,  load average: 0.00, 0.01, 0.05\n","stderr":"","exit_code":0}},{"node":"node3","status":"success","result":{"stdout":" 22:41:43 up 17 min,  0 users,  load average: 0.14, 0.05, 0.06\n","stderr":"","exit_code":0}}]
 ```
 
 Here we've shown how to capture the output from a task and then reuse it as part of the plan. More real-world uses for this might include:
 
 * A plan which uses a task to check how long since a machine was last rebooted, and then runs another task to reboot the machine only on nodes that have been up for more than a week
 * A plan which uses a task to identify the operating system of a machine and then run a different task on each different operating system
+
+# Write a plan which handles errors
+
+By default, any task or command that fails will cause the plan to abort immediately. To see this behavior in action, save the following as `modules/exercise9/plans/error.pp`:
+
+```puppet
+plan exercise9::error(String $nodes) {
+  $all = $nodes.split(",")
+  $results = run_command('false', $all)
+  if $results.ok {
+    notice("The command succeeded")
+  } else {
+    notice("The command failed")
+  }
+}
+```
+
+This plan runs a command that we know will fail (`false`) and collects the result. It then uses the `ok` function to check if the command succeeded on every node, and prints a message based on that.
+
+Run this plan to see what happens:
+
+```bash
+bolt plan run exercise9::error nodes=$NODE --modulepath ./modules
+```
+
+You should see output like the following:
+
+```bash
+Plan aborted: run_command 'false' failed on 3 nodes
+[...]
+```
+
+This shows that the plan stopped executing immediately after the `run_command()` failed, so we didn't see either of the notices.
+
+For our error-handling code to execute, we need to prevent the plan from stopping immediately on error. We can do that by passing `_catch_error => true` to `run_command`. `_catch_error` will make `run_command` return a `ResultSet` like normal, even if the command fails.
+
+Save this new plan as `modules/exercise9/plans/catch_error.pp`:
+
+```puppet
+plan exercise9::catch_error(String $nodes) {
+  $all = $nodes.split(",")
+  $results = run_command('false', $all, _catch_errors => true)
+  if $results.ok {
+    notice("The command succeeded")
+  } else {
+    notice("The command failed")
+  }
+}
+
+```
+
+Run this plan to see the difference:
+
+```bash
+bolt plan run exercise9::catch_error nodes=$NODE --modulepath ./modules
+```
+
+Now the `notice` statement gets executed and we see our output:
+
+```bash
+Notice: Scope(<module>/exercise9/plans/catch_error.pp, 7): The command failed
+```
+
+The `_catch_error` argument can be passed to `run_command`, `run_task`, `run_script`, and `file_upload`.
 
 # Next steps
 
