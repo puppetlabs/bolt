@@ -15,7 +15,7 @@ module Bolt
     HTTPS_PORT = 5986
 
     def port
-      default_port = @ssl ? HTTP_PORT : HTTPS_PORT
+      default_port = @ssl ? HTTPS_PORT : HTTP_PORT
       @target.port || default_port
     end
 
