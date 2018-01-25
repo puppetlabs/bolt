@@ -10,6 +10,7 @@ require 'bolt/result_set'
 module Bolt
   class Executor
     attr_reader :noop
+    attr_accessor :run_as
 
     def initialize(config = Bolt::Config.new, noop = nil, plan_logging = false)
       @config = config
@@ -21,6 +22,7 @@ module Bolt
       default_log_level = plan_logging ? :info : :notice
       @logger.level = @config[:log_level] || default_log_level
       @noop = noop
+      @run_as = nil
       @notifier = Bolt::Notifier.new
     end
 
@@ -79,14 +81,23 @@ module Bolt
     end
     private :summary
 
-    def run_command(targets, command)
+    def get_run_as(node, options)
+      if node.run_as.nil? && run_as
+        { '_run_as' => run_as }.merge(options)
+      else
+        options
+      end
+    end
+    private :get_run_as
+
+    def run_command(targets, command, options = {})
       nodes = from_targets(targets)
       @logger.info("Starting command run '#{command}' on #{nodes.map(&:uri)}")
       callback = block_given? ? Proc.new : nil
 
       r = on(nodes, callback) do |node|
         @logger.debug("Running command '#{command}' on #{node.uri}")
-        node_result = node.run_command(command)
+        node_result = node.run_command(command, get_run_as(node, options))
         @logger.debug("Result on #{node.uri}: #{JSON.dump(node_result.value)}")
         node_result
       end
@@ -94,7 +105,7 @@ module Bolt
       r
     end
 
-    def run_script(targets, script, arguments)
+    def run_script(targets, script, arguments, options = {})
       nodes = from_targets(targets)
       @logger.info("Starting script run #{script} on #{nodes.map(&:uri)}")
       @logger.debug("Arguments: #{arguments}")
@@ -102,7 +113,7 @@ module Bolt
 
       r = on(nodes, callback) do |node|
         @logger.debug { "Running script '#{script}' on #{node.uri}" }
-        node_result = node.run_script(script, arguments)
+        node_result = node.run_script(script, arguments, get_run_as(node, options))
         @logger.debug("Result on #{node.uri}: #{JSON.dump(node_result.value)}")
         node_result
       end
@@ -110,7 +121,7 @@ module Bolt
       r
     end
 
-    def run_task(targets, task, input_method, arguments)
+    def run_task(targets, task, input_method, arguments, options = {})
       nodes = from_targets(targets)
       @logger.info("Starting task #{task} on #{nodes.map(&:uri)}")
       @logger.debug("Arguments: #{arguments} Input method: #{input_method}")
@@ -118,7 +129,7 @@ module Bolt
 
       r = on(nodes, callback) do |node|
         @logger.debug { "Running task run '#{task}' on #{node.uri}" }
-        node_result = node.run_task(task, input_method, arguments)
+        node_result = node.run_task(task, input_method, arguments, get_run_as(node, options))
         @logger.debug("Result on #{node.uri}: #{JSON.dump(node_result.value)}")
         node_result
       end

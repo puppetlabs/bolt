@@ -409,6 +409,28 @@ SHELL
       end
     end
 
+    context "as non-root" do
+      let(:config) { mk_config(insecure: true, sudo_password: password, run_as: user, user: user, password: password) }
+
+      it "can override run_as for command via an option", ssh: true do
+        expect(ssh.run_command('whoami', '_run_as' => 'root')['stdout']).to eq("root\n")
+      end
+
+      it "can override run_as for script via an option", ssh: true do
+        contents = "#!/bin/sh\nwhoami"
+        with_tempfile_containing('script test', contents) do |file|
+          expect(ssh.run_script(file.path, [], '_run_as' => 'root')['stdout']).to eq("root\n")
+        end
+      end
+
+      it "can override run_as for task via an option", ssh: true do
+        contents = "#!/bin/sh\nwhoami"
+        with_tempfile_containing('tasks test', contents) do |file|
+          expect(ssh.run_task(file.path, 'environment', {}, '_run_as' => 'root').message).to eq("root\n")
+        end
+      end
+    end
+
     context "with an incorrect password" do
       let(:config) {
         mk_config(insecure: true, sudo_password: 'nonsense', run_as: 'root',

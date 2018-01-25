@@ -43,7 +43,7 @@ module Bolt
       end
     end
 
-    def run_task(task, _input_method, arguments)
+    def run_task(task, _input_method, arguments, _options = nil)
       body = { task: task_name_from_path(task),
                environment: @orch_task_environment,
                noop: arguments['_noop'],
@@ -88,12 +88,12 @@ module Bolt
       Bolt::Result.for_command(@target, result.value['stdout'], result.value['stderr'], result.value['exit_code'])
     end
 
-    def run_command(command, options = {})
+    def run_command(command, _options = nil)
       result = run_task(BOLT_MOCK_FILE,
                         'stdin',
                         action: 'command',
                         command: command,
-                        options: options)
+                        options: {})
       unwrap_bolt_result(result)
     end
 
@@ -112,7 +112,7 @@ module Bolt
       result
     end
 
-    def run_script(script, arguments)
+    def run_script(script, arguments, _options = nil)
       content = File.open(script, &:read)
       content = Base64.encode64(content)
       params = {

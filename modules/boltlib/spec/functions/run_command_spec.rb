@@ -23,15 +23,21 @@ describe 'run_command' do
     end
 
     it 'with given command and host' do
-      executor.expects(:run_command).with([target], command).returns(result_set)
+      executor.expects(:run_command).with([target], command, {}).returns(result_set)
 
       is_expected.to run.with_params(command, hostname).and_return(result_set)
     end
 
     it 'with given command and Target' do
-      executor.expects(:run_command).with([target], command).returns(result_set)
+      executor.expects(:run_command).with([target], command, {}).returns(result_set)
 
       is_expected.to run.with_params(command, target).and_return(result_set)
+    end
+
+    it 'with _run_as' do
+      executor.expects(:run_command).with([target], command, '_run_as' => 'root').returns(result_set)
+
+      is_expected.to run.with_params(command, target, '_run_as' => 'root').and_return(result_set)
     end
 
     context 'with multiple hosts' do
@@ -41,13 +47,13 @@ describe 'run_command' do
       let(:result_set) { Bolt::ResultSet.new([result, result2]) }
 
       it 'with propagates multiple hosts and returns multiple results' do
-        executor.expects(:run_command).with([target, target2], command).returns(result_set)
+        executor.expects(:run_command).with([target, target2], command, {}).returns(result_set)
 
         is_expected.to run.with_params(command, [hostname, hostname2]).and_return(result_set)
       end
 
       it 'with propagates multiple Targets and returns multiple results' do
-        executor.expects(:run_command).with([target, target2], command).returns(result_set)
+        executor.expects(:run_command).with([target, target2], command, {}).returns(result_set)
 
         is_expected.to run.with_params(command, [target, target2]).and_return(result_set)
       end
@@ -56,14 +62,14 @@ describe 'run_command' do
         let(:result2) { Bolt::Result.new(target2, error: { 'message' => hostname2 }) }
 
         it 'errors by default' do
-          executor.expects(:run_command).with([target, target2], command)
+          executor.expects(:run_command).with([target, target2], command, {})
                   .returns(result_set)
 
           is_expected.to run.with_params(command, [target, target2]).and_raise_error(Bolt::RunFailure)
         end
 
         it 'does not error with _catch_errors' do
-          executor.expects(:run_command).with([target, target2], command)
+          executor.expects(:run_command).with([target, target2], command, {})
                   .returns(result_set)
 
           is_expected.to run.with_params(command, [hostname, hostname2], '_catch_errors' => true)

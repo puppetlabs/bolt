@@ -396,6 +396,7 @@ PS
       end
       result_output
     end
+    private :execute
 
     # 10 minutes in seconds
     DEFAULT_EXECUTION_TIMEOUT = 10 * 60
@@ -510,7 +511,7 @@ PS
       end
     end
 
-    def run_command(command)
+    def run_command(command, _options = nil)
       output = execute(command)
       Bolt::Result.for_command(@target, output.stdout.string, output.stderr.string, output.exit_code)
     # TODO: we should rely on the executor for this
@@ -518,7 +519,7 @@ PS
       Bolt::Result.from_exception(@target, e)
     end
 
-    def run_script(script, arguments)
+    def run_script(script, arguments, _options = nil)
       with_remote_file(script) do |remote_path|
         if powershell_file?(remote_path)
           mapped_args = arguments.map do |a|
@@ -552,7 +553,7 @@ catch
       Bolt::Result.from_exception(@target, e)
     end
 
-    def run_task(task, input_method, arguments)
+    def run_task(task, input_method, arguments, _options = nil)
       if STDIN_METHODS.include?(input_method)
         stdin = JSON.dump(arguments)
       end

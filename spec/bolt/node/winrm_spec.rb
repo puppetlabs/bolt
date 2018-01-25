@@ -132,7 +132,7 @@ PS
     after(:each) { winrm_ssl.disconnect }
 
     it "executes a command on a host" do
-      expect(winrm_ssl.execute(command).stdout.string).to eq("#{user}\r\n")
+      expect(winrm_ssl.run_command(command)['stdout']).to eq("#{user}\r\n")
     end
 
     it "can upload a file to a host" do
@@ -146,10 +146,10 @@ PS
         )
 
         expect(
-          winrm_ssl.execute("type #{remote_path}").stdout.string
+          winrm_ssl.run_command("type #{remote_path}")['stdout']
         ).to eq("#{contents}\r\n")
 
-        winrm_ssl.execute("del #{remote_path}")
+        winrm_ssl.run_command("del #{remote_path}")
       end
     end
   end
@@ -159,7 +159,11 @@ PS
     after(:each) { winrm.disconnect }
 
     it "executes a command on a host", winrm: true do
-      expect(winrm.execute(command).stdout.string).to eq("#{user}\r\n")
+      expect(winrm.run_command(command)['stdout']).to eq("#{user}\r\n")
+    end
+
+    it "ignores _run_as", winrm: true do
+      expect(winrm.run_command(command, '_run_as' => 'root')['stdout']).to eq("#{user}\r\n")
     end
 
     it "reuses a PowerShell host / runspace for multiple commands", winrm: true do
@@ -175,11 +179,11 @@ PS
         "$ENV:A, $B, $script:C, $local:D, $global:E"
       ].join('; ')
 
-      result = winrm.execute(contents)
-      instance, runspace, *outputs = result.stdout.string.split("\r\n")
+      result = winrm.run_command(contents)
+      instance, runspace, *outputs = result['stdout'].split("\r\n")
 
-      result2 = winrm.execute(contents)
-      instance2, runspace2, *outputs2 = result2.stdout.string.split("\r\n")
+      result2 = winrm.run_command(contents)
+      instance2, runspace2, *outputs2 = result2['stdout'].split("\r\n")
 
       # Host should be identical (uniquely identified by Guid)
       expect(instance).to eq(instance2)
@@ -205,10 +209,10 @@ PS
         )
 
         expect(
-          winrm.execute("type #{remote_path}").stdout.string
+          winrm.run_command("type #{remote_path}")['stdout']
         ).to eq("#{contents}\r\n")
 
-        winrm.execute("del #{remote_path}")
+        winrm.run_command("del #{remote_path}")
       end
     end
 
@@ -217,6 +221,15 @@ PS
       with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
         expect(
           winrm.run_script(file.path, [])['stdout']
+        ).to eq("hellote\r\n")
+      end
+    end
+
+    it "ignores _run_as", winrm: true do
+      contents = "Write-Output \"hellote\""
+      with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
+        expect(
+          winrm.run_script(file.path, [], '_run_as' => 'root')['stdout']
         ).to eq("hellote\r\n")
       end
     end
@@ -335,6 +348,16 @@ SHELLWORDS
                     :"message two" => 'task has run' }
       with_tempfile_containing('task-test-winrm', contents, '.ps1') do |file|
         expect(winrm.run_task(file.path, 'environment', arguments).message)
+          .to eq("task is running task has run\r\n")
+      end
+    end
+
+    it "ignores _run_as", winrm: true do
+      contents = 'Write-Host "$env:PT_message_one ${env:PT_message two}"'
+      arguments = { :message_one => 'task is running',
+                    :"message two" => 'task has run' }
+      with_tempfile_containing('task-test-winrm', contents, '.ps1') do |file|
+        expect(winrm.run_task(file.path, 'environment', arguments, '_run_as' => 'root').message)
           .to eq("task is running task has run\r\n")
       end
     end

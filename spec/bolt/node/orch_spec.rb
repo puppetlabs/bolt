@@ -87,6 +87,10 @@ describe Bolt::Orch, orchestrator: true do
       expect(orch.run_task(taskpath, 'stdin', params)).to be_success
     end
 
+    it 'ignores _run_as' do
+      expect(orch.run_task(taskpath, 'stdin', params, '_run_as' => 'root')).to be_success
+    end
+
     context "when running noop" do
       let(:noop) { true }
 
@@ -161,6 +165,10 @@ describe Bolt::Orch, orchestrator: true do
 
       it 'captures stderr' do
         expect(orch.run_command(command)['stderr']).to eq("bye\n")
+      end
+
+      it 'ignores _run_as' do
+        expect(orch.run_command(command, '_run_as' => 'root')).to be_success
       end
     end
 
@@ -263,6 +271,10 @@ standard out
 
       it 'captures stderr' do
         expect(orch.run_script(script_path, args)['stderr']).to eq("standard error\n")
+      end
+
+      it 'ignores _run_as' do
+        expect(orch.run_script(script_path, args, '_run_as' => 'root')).to be_success
       end
     end
 

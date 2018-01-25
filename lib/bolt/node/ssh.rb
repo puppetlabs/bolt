@@ -15,6 +15,11 @@ module Bolt
       }
     end
 
+    def initialize(target, **kwargs)
+      super(target, **kwargs)
+      @conf_run_as = @run_as
+    end
+
     def protocol
       'ssh'
     end
@@ -253,16 +258,20 @@ SCRIPT
       end
     end
 
-    def run_command(command)
+    def run_command(command, options = {})
+      @run_as = options['_run_as'] || @conf_run_as
       output = execute(command, sudoable: true)
       Bolt::Result.for_command(@target, output.stdout.string, output.stderr.string, output.exit_code)
     # TODO: We should be able to rely on the excutor for this but it will mean
     # a test refactor
     rescue StandardError => e
       Bolt::Result.from_exception(@target, e)
+    ensure
+      @run_as = @conf_run_as
     end
 
-    def run_script(script, arguments)
+    def run_script(script, arguments, options = {})
+      @run_as = options['_run_as'] || @conf_run_as
       with_remote_file(script) do |remote_path|
         output = execute("'#{remote_path}' #{Shellwords.join(arguments)}",
                          sudoable: true)
@@ -272,9 +281,12 @@ SCRIPT
     # a test refactor
     rescue StandardError => e
       Bolt::Result.from_exception(@target, e)
+    ensure
+      @run_as = @conf_run_as
     end
 
-    def run_task(task, input_method, arguments)
+    def run_task(task, input_method, arguments, options = {})
+      @run_as = options['_run_as'] || @conf_run_as
       export_args = {}
       stdin, output = nil
 
@@ -309,6 +321,8 @@ SCRIPT
     # a test refactor
     rescue StandardError => e
       Bolt::Result.from_exception(@target, e)
+    ensure
+      @run_as = @conf_run_as
     end
   end
 end
