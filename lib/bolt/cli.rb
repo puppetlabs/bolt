@@ -1,18 +1,19 @@
 require 'uri'
-require 'optparse'
 require 'benchmark'
 require 'json'
+require 'io/console'
 require 'logging'
-require 'bolt/logger'
-require 'bolt/node'
-require 'bolt/version'
+require 'optparse'
+require 'bolt/config'
 require 'bolt/error'
 require 'bolt/executor'
-require 'bolt/target'
+require 'bolt/inventory'
+require 'bolt/logger'
+require 'bolt/node'
 require 'bolt/outputter'
-require 'bolt/config'
 require 'bolt/pal'
-require 'io/console'
+require 'bolt/target'
+require 'bolt/version'
 
 module Bolt
   class CLIError < Bolt::Error
@@ -135,8 +136,7 @@ HELP
                   '* protocol is `ssh` by default, may be `ssh` or `winrm`',
                   '* port defaults to `22` for SSH',
                   '* port defaults to `5985` or `5986` for WinRM, based on the --[no-]ssl setting') do |nodes|
-            results[:nodes] += parse_nodes(nodes)
-            results[:nodes].uniq!
+            results[:nodes] << get_arg_input(nodes).split(/[[:space:],]+/).reject(&:empty?)
           end
         end
         opts.on('-u', '--user USER',
@@ -214,6 +214,10 @@ HELP
         opts.on('--configfile CONFIG_PATH',
                 'Specify where to load the config file from') do |path|
           results[:configfile] = path
+        end
+        opts.on('--inventoryfile INVENTORY_PATH',
+                'Specify where to load the invenotry file from') do |path|
+          results[:inventoryfile] = path
         end
         opts.on_tail('--[no-]tty',
                      "Request a pseudo TTY on nodes that support it") do |tty|
@@ -309,11 +313,6 @@ HELP
     rescue Bolt::CLIError => e
       warn e.message
       raise e
-    end
-
-    def parse_nodes(nodes)
-      list = get_arg_input(nodes)
-      Target.parse_urls(list)
     end
 
     def parse_params(params)
@@ -426,15 +425,17 @@ HELP
         return 0
       end
 
+      inventory = Bolt::Inventory.from_config(@config)
+
       if options[:mode] == 'plan'
         executor = Bolt::Executor.new(@config, options[:noop], true)
-        result = pal.run_plan(options[:object], options[:task_options], executor)
+        result = pal.run_plan(options[:object], options[:task_options], executor, inventory)
         outputter.print_plan_result(result)
         # An exception would have been raised if the plan failed
         code = 0
       else
         executor = Bolt::Executor.new(@config, options[:noop])
-        targets = options[:nodes]
+        targets = inventory.get_targets(options[:nodes])
 
         results = nil
         outputter.print_head
@@ -458,7 +459,8 @@ HELP
               pal.run_task(options[:object],
                            targets,
                            options[:task_options],
-                           executor) do |event|
+                           executor,
+                           inventory) do |event|
                 outputter.print_event(event)
               end
             when 'file'

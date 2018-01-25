@@ -6,11 +6,12 @@ require 'bolt/target'
 describe 'file_upload' do
   include PuppetlabsSpec::Fixtures
   let(:executor) { mock('bolt_executor') }
+  let(:inventory) { mock('inventory') }
   let(:tasks_enabled) { true }
 
   around(:each) do |example|
     Puppet[:tasks] = tasks_enabled
-    Puppet.override(bolt_executor: executor) do
+    Puppet.override(bolt_executor: executor, bolt_inventory: inventory) do
       example.run
     end
   end
@@ -32,18 +33,21 @@ describe 'file_upload' do
 
     it 'with fully resolved path of file and destination' do
       executor.expects(:file_upload).with([target], full_path, destination).returns(result_set)
+      inventory.stubs(:get_targets).with(hostname).returns([target])
 
       is_expected.to run.with_params('test/uploads/index.html', destination, hostname).and_return(result_set)
     end
 
     it 'with fully resolved path of directory and destination' do
       executor.expects(:file_upload).with([target], full_dir_path, destination).returns(result_set)
+      inventory.stubs(:get_targets).with(hostname).returns([target])
 
       is_expected.to run.with_params('test/uploads', destination, hostname).and_return(result_set)
     end
 
     it 'with target specified as a Target' do
       executor.expects(:file_upload).with([target], full_dir_path, destination).returns(result_set)
+      inventory.stubs(:get_targets).with(target).returns([target])
 
       is_expected.to run.with_params('test/uploads', destination, target).and_return(result_set)
     end
@@ -59,6 +63,7 @@ describe 'file_upload' do
         executor
           .expects(:file_upload).with([target, target2], full_path, destination)
           .returns(result_set)
+        inventory.stubs(:get_targets).with([hostname, hostname2]).returns([target, target2])
 
         is_expected.to run.with_params('test/uploads/index.html', destination, [hostname, hostname2])
                           .and_return(result_set)
@@ -70,6 +75,7 @@ describe 'file_upload' do
         it 'errors by default' do
           executor.expects(:file_upload).with([target, target2], full_path, destination)
                   .returns(result_set)
+          inventory.expects(:get_targets).with([hostname, hostname2]).returns([target, target2])
 
           is_expected.to run.with_params('test/uploads/index.html', destination, [hostname, hostname2])
                             .and_raise_error(Bolt::RunFailure)
@@ -78,6 +84,7 @@ describe 'file_upload' do
         it 'does not error with _catch_errors' do
           executor.expects(:file_upload).with([target, target2], full_path, destination)
                   .returns(result_set)
+          inventory.expects(:get_targets).with([hostname, hostname2]).returns([target, target2])
 
           is_expected.to run.with_params('test/uploads/index.html', destination, [hostname, hostname2],
                                          '_catch_errors' => true)
@@ -87,6 +94,7 @@ describe 'file_upload' do
 
     it 'without nodes - does not invoke bolt' do
       executor.expects(:file_upload).never
+      inventory.expects(:get_targets).with([]).returns([])
 
       is_expected.to run.with_params('test/uploads/index.html', destination, [])
                         .and_return(Bolt::ResultSet.new([]))

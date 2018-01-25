@@ -3,11 +3,12 @@ require 'bolt/target'
 
 describe 'run_command' do
   let(:executor) { mock('bolt_executor') }
+  let(:inventory) { mock('inventory') }
   let(:tasks_enabled) { true }
 
   around(:each) do |example|
     Puppet[:tasks] = tasks_enabled
-    Puppet.override(bolt_executor: executor) do
+    Puppet.override(bolt_executor: executor, bolt_inventory: inventory) do
       example.run
     end
   end
@@ -24,18 +25,21 @@ describe 'run_command' do
 
     it 'with given command and host' do
       executor.expects(:run_command).with([target], command, {}).returns(result_set)
+      inventory.expects(:get_targets).with(hostname).returns([target])
 
       is_expected.to run.with_params(command, hostname).and_return(result_set)
     end
 
     it 'with given command and Target' do
       executor.expects(:run_command).with([target], command, {}).returns(result_set)
+      inventory.expects(:get_targets).with(target).returns([target])
 
       is_expected.to run.with_params(command, target).and_return(result_set)
     end
 
     it 'with _run_as' do
       executor.expects(:run_command).with([target], command, '_run_as' => 'root').returns(result_set)
+      inventory.expects(:get_targets).with(target).returns([target])
 
       is_expected.to run.with_params(command, target, '_run_as' => 'root').and_return(result_set)
     end
@@ -48,12 +52,15 @@ describe 'run_command' do
 
       it 'with propagates multiple hosts and returns multiple results' do
         executor.expects(:run_command).with([target, target2], command, {}).returns(result_set)
+                .returns(result_set)
+        inventory.expects(:get_targets).with([hostname, hostname2]).returns([target, target2])
 
         is_expected.to run.with_params(command, [hostname, hostname2]).and_return(result_set)
       end
 
       it 'with propagates multiple Targets and returns multiple results' do
         executor.expects(:run_command).with([target, target2], command, {}).returns(result_set)
+        inventory.expects(:get_targets).with([target, target2]).returns([target, target2])
 
         is_expected.to run.with_params(command, [target, target2]).and_return(result_set)
       end
@@ -64,6 +71,7 @@ describe 'run_command' do
         it 'errors by default' do
           executor.expects(:run_command).with([target, target2], command, {})
                   .returns(result_set)
+          inventory.expects(:get_targets).with([target, target2]).returns([target, target2])
 
           is_expected.to run.with_params(command, [target, target2]).and_raise_error(Bolt::RunFailure)
         end
@@ -71,6 +79,7 @@ describe 'run_command' do
         it 'does not error with _catch_errors' do
           executor.expects(:run_command).with([target, target2], command, {})
                   .returns(result_set)
+          inventory.expects(:get_targets).with([hostname, hostname2]).returns([target, target2])
 
           is_expected.to run.with_params(command, [hostname, hostname2], '_catch_errors' => true)
         end
@@ -79,6 +88,7 @@ describe 'run_command' do
 
     it 'without nodes - does not invoke bolt' do
       executor.expects(:run_command).never
+      inventory.expects(:get_targets).with([]).returns([])
 
       is_expected.to run.with_params(command, []).and_return(Bolt::ResultSet.new([]))
     end

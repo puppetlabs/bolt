@@ -52,7 +52,7 @@ describe Bolt::Config do
 
       config.load_file(nil)
 
-      expect(@log_output.readline).to match(/WARN.*Config files found at #{default_path}, #{alt_path}, using the first/)
+      expect(@log_output.readline).to match(/WARN.*Found configs at #{default_path}, #{alt_path}, using the first/)
     end
 
     it "loads from the specified file" do

@@ -28,7 +28,7 @@ module Bolt
 
     def from_targets(targets)
       targets.map do |target|
-        Bolt::Node.from_target(target, config: @config)
+        Bolt::Node.from_target(target)
       end
     end
     private :from_targets

@@ -24,6 +24,21 @@ module Bolt
       @options = options || {}
     end
 
+    def update_conf(conf)
+      @protocol = conf[:transport]
+
+      t_conf = conf[:transports][protocol.to_sym]
+      # Override url methods
+      url_keys = %i[user password port]
+      @user = t_conf[:user]
+      @password = t_conf[:password]
+      @port = t_conf[:port]
+
+      @options = t_conf.reject { |k, _| url_keys.include?(k) }.merge(@options)
+
+      self
+    end
+
     def parse(string)
       if string =~ %r{^[^:]+://}
         Addressable::URI.parse(string)
@@ -35,7 +50,7 @@ module Bolt
     private :parse
 
     def eql?(other)
-      self.class.equal?(other.class) && @uri == other.uri && @options == other.options
+      self.class.equal?(other.class) && @uri == other.uri
     end
     alias == eql?
 
@@ -51,30 +66,30 @@ module Bolt
       @uri_obj.hostname
     end
 
-    def port
-      @uri_obj.port
-    end
-
     # name is currently just uri but should be be used instead to identify the
     # Target ouside the transport or uri options.
     def name
       uri
     end
 
+    def port
+      @uri_obj.port || @port
+    end
+
+    def protocol
+      @uri_obj.scheme || @protocol
+    end
+
     def user
       Addressable::URI.unencode_component(
-        @uri_obj.user
+        @uri_obj.user || @user
       )
     end
 
     def password
       Addressable::URI.unencode_component(
-        @uri_obj.password
+        @uri_obj.password || @password
       )
-    end
-
-    def protocol
-      @uri_obj.scheme
     end
   end
 end

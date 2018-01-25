@@ -30,7 +30,8 @@ Puppet::Functions.create_function(:file_upload, Puppet::Functions::InternalFunct
     end
 
     executor = Puppet.lookup(:bolt_executor) { nil }
-    unless executor && Puppet.features.bolt?
+    inventory = Puppet.lookup(:bolt_inventory) { nil }
+    unless executor && inventory && Puppet.features.bolt?
       raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
         Puppet::Pops::Issues::TASK_MISSING_BOLT, action: _('do file uploads')
       )
@@ -44,8 +45,7 @@ Puppet::Functions.create_function(:file_upload, Puppet::Functions::InternalFunct
     end
 
     # Ensure that that given targets are all Target instances
-    targets = [targets] unless targets.is_a?(Array)
-    targets = targets.flatten.map { |t| t.is_a?(String) ? Bolt::Target.from_uri(t) : t }
+    targets = inventory.get_targets(targets)
     if targets.empty?
       call_function('debug', "Simulating file upload of '#{found}' - no targets given - no action taken")
       r = Bolt::ResultSet.new([])

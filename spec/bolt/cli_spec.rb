@@ -39,7 +39,7 @@ describe "Bolt::CLI" do
 
   def stub_config(config, file_content = nil)
     file_content ||= {}
-    allow(config).to receive(:read_config_file).and_return(file_content)
+    allow(Bolt::Util).to receive(:read_config_file).and_return(file_content)
     allow(Bolt::Config).to receive(:new).and_return(config)
   end
 
@@ -151,17 +151,17 @@ describe "Bolt::CLI" do
 
       it "accepts a single node" do
         cli = Bolt::CLI.new(%w[command run --nodes foo])
-        expect(cli.parse).to include(nodes: [target])
+        expect(cli.parse).to include(nodes: [['foo']])
       end
 
       it "accepts multiple nodes" do
         cli = Bolt::CLI.new(%w[command run --nodes foo,bar])
-        expect(cli.parse).to include(nodes: targets)
+        expect(cli.parse).to include(nodes: [%w[foo bar]])
       end
 
       it "accepts multiple nodes across multiple declarations" do
         cli = Bolt::CLI.new(%w[command run --nodes foo,bar --nodes bar,more,bars])
-        expect(cli.parse).to include(nodes: targets + [Bolt::Target.from_uri('more'), Bolt::Target.from_uri('bars')])
+        expect(cli.parse).to include(nodes: [%w[foo bar], %w[bar more bars]])
       end
 
       it "reads from stdin when --nodes is '-'" do
@@ -172,7 +172,7 @@ NODES
         cli = Bolt::CLI.new(%w[command run --nodes -])
         allow(STDIN).to receive(:read).and_return(nodes)
         result = cli.parse
-        expect(result[:nodes]).to eq(targets)
+        expect(result[:nodes]).to eq([%w[foo bar]])
       end
 
       it "reads from a file when --nodes starts with @" do
@@ -183,7 +183,7 @@ NODES
         with_tempfile_containing('nodes-args', nodes) do |file|
           cli = Bolt::CLI.new(%W[command run --nodes @#{file.path}])
           result = cli.parse
-          expect(result[:nodes]).to eq(targets)
+          expect(result[:nodes]).to eq([%w[foo bar]])
         end
       end
 
@@ -192,13 +192,8 @@ NODES
         with_tempfile_containing('nodes-args', nodes) do |file|
           cli = Bolt::CLI.new(%W[command run --nodes @#{file.path}])
           result = cli.parse
-          expect(result[:nodes]).to eq(targets + [Bolt::Target.from_uri('baz'), Bolt::Target.from_uri('qux')])
+          expect(result[:nodes]).to eq([%w[foo bar baz qux]])
         end
-      end
-
-      it "accepts multiple nodes but is uniq" do
-        cli = Bolt::CLI.new(%w[command run --nodes foo,bar,foo])
-        expect(cli.parse).to include(nodes: targets)
       end
 
       it "generates an error message if no nodes given" do

@@ -10,7 +10,7 @@ describe Bolt::WinRM do
   include BoltSpec::Files
 
   def mk_config(conf)
-    Bolt::Config.new(transports: { winrm: conf })
+    Bolt::Config.new(transport: 'winrm', transports: { winrm: conf })
   end
 
   let(:host) { ENV['BOLT_WINRM_HOST'] || 'localhost' }
@@ -21,8 +21,8 @@ describe Bolt::WinRM do
   let(:command) { "echo $env:UserName" }
   let(:config) { mk_config(ssl: false, user: user, password: password) }
   let(:ssl_config) { mk_config(cacert: 'resources/ca.pem', user: user, password: password) }
-  let(:winrm) { Bolt::WinRM.new(target, config: config) }
-  let(:winrm_ssl) { Bolt::WinRM.new(target(host, ssl_port), config: ssl_config) }
+  let(:winrm) { Bolt::WinRM.new(target) }
+  let(:winrm_ssl) { Bolt::WinRM.new(target(h: host, p: ssl_port, conf: ssl_config)) }
   let(:echo_script) { <<PS }
 foreach ($i in $args)
 {
@@ -30,8 +30,8 @@ foreach ($i in $args)
 }
 PS
 
-  def target(h = host, p = port)
-    Bolt::Target.from_uri("#{h}:#{p}")
+  def target(h: host, p: port, conf: config)
+    Bolt::Target.from_uri("#{h}:#{p}").update_conf(conf)
   end
 
   def stub_winrm_to_raise(klass, message)
@@ -44,7 +44,7 @@ PS
   context "when connecting fails", winrm: true do
     it "raises Node::ConnectError if the connection is refused" do
       port = TCPServer.open(0) { |socket| socket.addr[1] }
-      winrm = Bolt::WinRM.new(target(host, port))
+      winrm = Bolt::WinRM.new(target(h: host, p: port))
 
       # The connection should fail immediately; this timeout helps ensure that
       # and avoids a hang
@@ -58,7 +58,7 @@ PS
     end
 
     it "raises Node::ConnectError if the node name can't be resolved" do
-      winrm = Bolt::WinRM.new(target('totally-not-there'), config: config)
+      winrm = Bolt::WinRM.new(target(h: 'totally-not-there', conf: config))
       exec_time = Time.now
       expect_node_error(Bolt::Node::ConnectError,
                         'CONNECT_ERROR',
@@ -73,7 +73,7 @@ PS
       TCPServer.open(0) do |socket|
         port = socket.addr[1]
         config[:transports][:winrm][:connect_timeout] = 2
-        winrm = Bolt::WinRM.new(target(host, port), config: config)
+        winrm = Bolt::WinRM.new(target(h: host, p: port, conf: config))
 
         Timeout.timeout(3) do
           expect_node_error(Bolt::Node::ConnectError,
@@ -592,7 +592,7 @@ PS
     describe "when tmpdir is specified", winrm: true do
       let(:tmpdir) { 'C:\mytmp' }
       let(:config) { mk_config(tmpdir: 'C:\mytmp', ssl: false, user: user, password: password) }
-      let(:winrm) { Bolt::WinRM.new(target, config: config) }
+      let(:winrm) { Bolt::WinRM.new(target) }
 
       it 'uploads scripts to the specified tmpdir' do
         contents = "Write-Host $PSScriptRoot"

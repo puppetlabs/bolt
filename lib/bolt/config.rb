@@ -6,6 +6,7 @@ module Bolt
   Config = Struct.new(
     :concurrency,
     :format,
+    :inventoryfile,
     :log_level,
     :modulepath,
     :transport,
@@ -69,38 +70,13 @@ module Bolt
       [File.join(root_path, 'bolt.yaml'), File.join(root_path, 'bolt.yml')]
     end
 
-    def read_config_file(path)
-      path_passed = path
-      if path.nil?
-        found_default = default_paths.select { |p| File.exist?(p) }
-        if found_default.size > 1
-          @logger.warn "Config files found at #{found_default.join(', ')}, using the first"
-        end
-        # Use first found, fall back to first default and try to load even if it didn't exist
-        path = found_default.first || default_paths.first
-      end
-
-      path = File.expand_path(path)
-      # safe_load doesn't work with psych in ruby 2.0
-      # The user controls the configfile so this isn't a problem
-      # rubocop:disable YAMLLoad
-      File.open(path, "r:UTF-8") { |f| YAML.load(f.read) }
-    rescue Errno::ENOENT
-      if path_passed
-        raise Bolt::CLIError, "Could not read config file: #{path}"
-      end
-    # In older releases of psych SyntaxError is not a subclass of Exception
-    rescue Psych::SyntaxError
-      raise Bolt::CLIError, "Could not parse config file: #{path}"
-    rescue Psych::Exception
-      raise Bolt::CLIError, "Could not parse config file: #{path}"
-    rescue IOError, SystemCallError
-      raise Bolt::CLIError, "Could not read config file: #{path}"
-    end
-
     def update_from_file(data)
       if data['modulepath']
         self[:modulepath] = data['modulepath'].split(File::PATH_SEPARATOR)
+      end
+
+      if data['inventoryfile']
+        self[:inventoryfile] = data['inventoryfile']
       end
 
       if data['concurrency']
@@ -166,12 +142,12 @@ module Bolt
     end
 
     def load_file(path)
-      data = read_config_file(path)
+      data = Bolt::Util.read_config_file(path, default_paths, 'config')
       update_from_file(data) if data
     end
 
     def update_from_cli(options)
-      %i[concurrency transport format modulepath].each do |key|
+      %i[concurrency transport format modulepath inventoryfile].each do |key|
         self[key] = options[key] if options[key]
       end
 
@@ -198,6 +174,11 @@ module Bolt
           end
         end
       end
+    end
+
+    def transport_conf
+      { transport: self[:transport],
+        transports: self[:transports] }
     end
 
     def validate

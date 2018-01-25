@@ -27,7 +27,8 @@ Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFuncti
     end
 
     executor = Puppet.lookup(:bolt_executor) { nil }
-    unless executor && Puppet.features.bolt?
+    inventory = Puppet.lookup(:bolt_inventory) { nil }
+    unless executor && inventory && Puppet.features.bolt?
       raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
         Puppet::Pops::Issues::TASK_MISSING_BOLT, action: _('run a script')
       )
@@ -46,7 +47,9 @@ Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFuncti
     end
 
     # Ensure that that given targets are all Target instances)
-    targets = [targets].flatten.map { |t| t.is_a?(String) ? Bolt::Target.from_uri(t) : t }
+    targets = inventory.get_targets(targets)
+
+    #
     r = if targets.empty?
           Bolt::ResultSet.new([])
         else

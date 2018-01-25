@@ -19,8 +19,8 @@ module Bolt
       @target.port || default_port
     end
 
-    def initialize(target, **kwargs)
-      super(target, **kwargs)
+    def initialize(target)
+      super(target)
       @extensions = DEFAULT_EXTENSIONS.to_set.merge(@extensions || [])
       @logger.debug { "WinRM initialized for #{@extensions.to_a} extensions" }
     end

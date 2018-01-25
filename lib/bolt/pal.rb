@@ -79,12 +79,12 @@ module Bolt
       r
     end
 
-    def with_bolt_executor(executor, &block)
-      Puppet.override(bolt_executor: executor, &block)
+    def with_bolt_executor(executor, inventory, &block)
+      Puppet.override({ bolt_executor: executor, bolt_inventory: inventory }, &block)
     end
 
-    def in_plan_compiler(executor)
-      with_bolt_executor(executor) do
+    def in_plan_compiler(executor, inventory)
+      with_bolt_executor(executor, inventory) do
         with_puppet_settings do |opts|
           in_bolt_compiler(opts) do |compiler|
             yield compiler
@@ -93,8 +93,8 @@ module Bolt
       end
     end
 
-    def in_task_compiler(executor)
-      with_bolt_executor(executor) do
+    def in_task_compiler(executor, inventory)
+      with_bolt_executor(executor, inventory) do
         in_bolt_compiler do |compiler|
           yield compiler
         end
@@ -158,14 +158,14 @@ module Bolt
       }
     end
 
-    def run_task(object, targets, params, executor, &eventblock)
-      in_task_compiler(executor) do |compiler|
+    def run_task(object, targets, params, executor, inventory, &eventblock)
+      in_task_compiler(executor, inventory) do |compiler|
         compiler.call_function('run_task', object, targets, params, &eventblock)
       end
     end
 
-    def run_plan(object, params, executor)
-      in_plan_compiler(executor) do |compiler|
+    def run_plan(object, params, executor = nil, inventory = nil)
+      in_plan_compiler(executor, inventory) do |compiler|
         compiler.call_function('run_plan', object, params)
       end
     end
