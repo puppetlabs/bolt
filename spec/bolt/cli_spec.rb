@@ -7,8 +7,7 @@ describe "Bolt::CLI" do
   let(:target) { Bolt::Target.from_uri('foo') }
 
   before(:each) do
-    @output = StringIO.new
-    outputter = Bolt::Outputter::Human.new(@output)
+    outputter = Bolt::Outputter::Human.new(StringIO.new)
 
     allow_any_instance_of(Bolt::CLI).to receive(:outputter).and_return(outputter)
     allow_any_instance_of(Bolt::CLI).to receive(:warn)
@@ -558,6 +557,7 @@ NODES
       let(:executor) { double('executor', noop: false) }
       let(:cli) { Bolt::CLI.new({}) }
       let(:targets) { [target] }
+      let(:output) { StringIO.new }
       let(:result_vals) { [{}] }
       let(:fail_vals) { [{ '_error' => {} }] }
       let(:result_set) do
@@ -577,8 +577,7 @@ NODES
       before :each do
         allow(Bolt::Executor).to receive(:new).and_return(executor)
 
-        @output = StringIO.new
-        outputter = Bolt::Outputter::JSON.new(@output)
+        outputter = Bolt::Outputter::JSON.new(output)
 
         allow(cli).to receive(:outputter).and_return(outputter)
       end
@@ -597,7 +596,7 @@ NODES
             object: 'whoami'
           }
           expect(cli.execute(options)).to eq(0)
-          expect(JSON.parse(@output.string)).to be
+          expect(JSON.parse(output.string)).to be
         end
 
         it "returns 2 if any node fails" do
@@ -632,7 +631,7 @@ NODES
             .and_return(Bolt::ResultSet.new([]))
 
           expect(cli.execute(options)).to eq(0)
-          expect(JSON.parse(@output.string)).to be
+          expect(JSON.parse(output.string)).to be
         end
 
         it "errors for non-existent scripts" do
@@ -641,7 +640,7 @@ NODES
           expect { cli.execute(options) }.to raise_error(
             Bolt::CLIError, /The script '#{script}' does not exist/
           )
-          expect(JSON.parse(@output.string)).to be
+          expect(JSON.parse(output.string)).to be
         end
 
         it "errors for unreadable scripts" do
@@ -650,7 +649,7 @@ NODES
           expect { cli.execute(options) }.to raise_error(
             Bolt::CLIError, /The script '#{script}' is unreadable/
           )
-          expect(JSON.parse(@output.string)).to be
+          expect(JSON.parse(output.string)).to be
         end
 
         it "errors for scripts that aren't files" do
@@ -659,7 +658,7 @@ NODES
           expect { cli.execute(options) }.to raise_error(
             Bolt::CLIError, /The script '#{script}' is not a file/
           )
-          expect(JSON.parse(@output.string)).to be
+          expect(JSON.parse(output.string)).to be
         end
 
         it "returns 2 if any node fails" do
@@ -683,7 +682,7 @@ NODES
             action: 'show'
           }
           cli.execute(options)
-          tasks = JSON.parse(@output.string)
+          tasks = JSON.parse(output.string)
           [
             ['sample', nil],
             ['sample::echo', nil],
@@ -707,7 +706,7 @@ NODES
             object: task_name
           }
           cli.execute(options)
-          json = JSON.parse(@output.string)
+          json = JSON.parse(output.string)
           json.delete('executable')
           expect(json).to eq(
             "name" => "sample::params",
@@ -784,7 +783,7 @@ NODES
             action: 'show'
           }
           cli.execute(options)
-          plan_list = JSON.parse(@output.string)
+          plan_list = JSON.parse(output.string)
           [
             ['sample'],
             ['sample::single_task'],
@@ -848,7 +847,7 @@ NODES
             task_options: task_params
           }
           expect(cli.execute(options)).to eq(0)
-          expect(JSON.parse(@output.string)).to be
+          expect(JSON.parse(output.string)).to be
         end
 
         it "returns 2 if any node fails" do
@@ -887,7 +886,7 @@ NODES
           expect { cli.execute(options) }.to raise_error(
             Bolt::CLIError, /Task not found: dne::task1/
           )
-          expect(JSON.parse(@output.string)).to be
+          expect(JSON.parse(output.string)).to be
         end
 
         it "errors for non-existent tasks" do
@@ -904,7 +903,7 @@ NODES
           expect { cli.execute(options) }.to raise_error(
             Bolt::CLIError, /Task not found: sample::dne/
           )
-          expect(JSON.parse(@output.string)).to be
+          expect(JSON.parse(output.string)).to be
         end
 
         it "raises errors from the executor" do
@@ -948,7 +947,7 @@ NODES
             task_options: task_params
           }
           cli.execute(options)
-          expect(JSON.parse(@output.string)).to be
+          expect(JSON.parse(output.string)).to be
         end
 
         it "runs a task passing input on stdin" do
@@ -970,7 +969,7 @@ NODES
             task_options: task_params
           }
           cli.execute(options)
-          expect(JSON.parse(@output.string)).to be
+          expect(JSON.parse(output.string)).to be
         end
 
         it "runs a powershell task passing input on stdin" do
@@ -992,7 +991,7 @@ NODES
             task_options: task_params
           }
           cli.execute(options)
-          expect(JSON.parse(@output.string)).to be
+          expect(JSON.parse(output.string)).to be
         end
 
         describe 'task parameters validation' do
@@ -1021,7 +1020,7 @@ NODES
                \s*has\ no\ parameter\ named\ 'foo'\n
                \s*has\ no\ parameter\ named\ 'bar'/x
             )
-            expect(JSON.parse(@output.string)).to be
+            expect(JSON.parse(output.string)).to be
           end
 
           it "errors when required parameters are not specified" do
@@ -1033,7 +1032,7 @@ NODES
                \s*expects\ a\ value\ for\ parameter\ 'mandatory_integer'\n
                \s*expects\ a\ value\ for\ parameter\ 'mandatory_boolean'/x
             )
-            expect(JSON.parse(@output.string)).to be
+            expect(JSON.parse(output.string)).to be
           end
 
           it "errors when the specified parameter values don't match the expected data types" do
@@ -1052,7 +1051,7 @@ NODES
                \s*parameter\ 'optional_string'\ expects\ a\ value\ of\ type\ Undef\ or\ String,
                                               \ got\ Integer/x
             )
-            expect(JSON.parse(@output.string)).to be
+            expect(JSON.parse(output.string)).to be
           end
 
           it "errors when the specified parameter values are outside of the expected ranges" do
@@ -1071,7 +1070,7 @@ NODES
                \s*parameter\ 'optional_integer'\ expects\ a\ value\ of\ type\ Undef\ or\ Integer\[-5,\ 5\],
                                                \ got\ Integer\[10,\ 10\]/x
             )
-            expect(JSON.parse(@output.string)).to be
+            expect(JSON.parse(output.string)).to be
           end
 
           it "runs the task when the specified parameters are successfully validated" do
@@ -1088,7 +1087,7 @@ NODES
             )
 
             cli.execute(options)
-            expect(JSON.parse(@output.string)).to be
+            expect(JSON.parse(output.string)).to be
           end
         end
       end
@@ -1118,7 +1117,7 @@ NODES
             task_options: plan_params
           }
           cli.execute(options)
-          expect(JSON.parse(@output.string)).to eq(
+          expect(JSON.parse(output.string)).to eq(
             [{ 'node' => 'foo', 'status' => 'success', 'result' => { '_output' => 'yes' } }]
           )
         end
@@ -1165,7 +1164,7 @@ NODES
             task_options: plan_params
           }
           cli.execute(options)
-          expect(JSON.parse(@output.string)).to eq(
+          expect(JSON.parse(output.string)).to eq(
             [
               {
                 'node' => 'foo',
@@ -1207,7 +1206,7 @@ NODES
             .and_return(Bolt::ResultSet.new([]))
 
           cli.execute(options)
-          expect(JSON.parse(@output.string)).to be
+          expect(JSON.parse(output.string)).to be
         end
 
         it "returns 2 if any node fails" do
@@ -1227,7 +1226,7 @@ NODES
           expect { cli.execute(options) }.to raise_error(
             Bolt::CLIError, /The source file '#{source}' does not exist/
           )
-          expect(JSON.parse(@output.string)).to be
+          expect(JSON.parse(output.string)).to be
         end
 
         it "errors if the local file is unreadable" do
@@ -1236,7 +1235,7 @@ NODES
           expect { cli.execute(options) }.to raise_error(
             Bolt::CLIError, /The source file '#{source}' is unreadable/
           )
-          expect(JSON.parse(@output.string)).to be
+          expect(JSON.parse(output.string)).to be
         end
 
         it "errors if the local file is a directory" do
@@ -1245,7 +1244,7 @@ NODES
           expect { cli.execute(options) }.to raise_error(
             Bolt::CLIError, /The source file '#{source}' is not a file/
           )
-          expect(JSON.parse(@output.string)).to be
+          expect(JSON.parse(output.string)).to be
         end
       end
     end
@@ -1254,12 +1253,12 @@ NODES
       let(:executor) { double('executor', noop: true) }
       let(:cli) { Bolt::CLI.new({}) }
       let(:targets) { [target] }
+      let(:output) { StringIO.new }
 
       before :each do
         allow(Bolt::Executor).to receive(:new).with(config, true).and_return(executor)
 
-        @output = StringIO.new
-        outputter = Bolt::Outputter::JSON.new(@output)
+        outputter = Bolt::Outputter::JSON.new(output)
 
         allow(cli).to receive(:outputter).and_return(outputter)
       end
@@ -1289,7 +1288,7 @@ NODES
             noop: true
           }
           cli.execute(options)
-          expect(JSON.parse(@output.string)).to be
+          expect(JSON.parse(output.string)).to be
         end
 
         it "errors on a task that doesn't support noop" do
