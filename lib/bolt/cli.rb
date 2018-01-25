@@ -11,6 +11,7 @@ require 'bolt/executor'
 require 'bolt/target'
 require 'bolt/outputter'
 require 'bolt/config'
+require 'bolt/pal'
 require 'io/console'
 
 module Bolt
@@ -394,50 +395,30 @@ HELP
 
     def execute(options)
       if options[:mode] == 'plan' || options[:mode] == 'task'
-        begin
-          if Gem.win_platform?
-            # Windows 'fix' for openssl behaving strangely. Prevents very slow operation
-            # of random_bytes later when establishing winrm connections from a Windows host.
-            # See https://github.com/rails/rails/issues/25805 for background.
-            require 'openssl'
-            OpenSSL::Random.random_bytes(1)
-          end
-
-          require_relative '../../vendored/require_vendored'
-        rescue LoadError
-          raise Bolt::CLIError, "Puppet must be installed to execute tasks"
-        end
-
-        # Now that puppet is loaded we can include puppet mixins in data types
-        Bolt::ResultSet.include_iterable
-
-        Puppet::Util::Log.newdestination(:console)
-        Puppet[:log_level] = if @config[:log_level] == :debug
-                               'debug'
-                             else
-                               'notice'
-                             end
+        pal = Bolt::PAL.new(@config)
       end
 
       if options[:action] == 'show'
         if options[:mode] == 'task'
           if options[:object]
-            outputter.print_task_info(get_task_info(options[:object]))
+            outputter.print_task_info(pal.get_task_info(options[:object]))
           else
-            outputter.print_table(list_tasks)
+            outputter.print_table(pal.list_tasks)
             outputter.print_message("\nUse `bolt task show <task-name>` to view "\
                                   "details and parameters for a specific "\
                                   "task.")
           end
         elsif options[:mode] == 'plan'
-          outputter.print_table(list_plans)
+          outputter.print_table(pal.list_plans)
         end
         return 0
       end
 
       if options[:mode] == 'plan'
         executor = Bolt::Executor.new(@config, options[:noop], true)
-        execute_plan(executor, options)
+        result = pal.run_plan(options[:object], options[:task_options], executor)
+        outputter.print_plan(result)
+        # An exception would have been raised if the plan failed
         code = 0
       else
         executor = Bolt::Executor.new(@config, options[:noop])
@@ -462,7 +443,10 @@ HELP
                 outputter.print_event(event)
               end
             when 'task'
-              execute_task(executor, options) do |event|
+              pal.run_task(options[:object],
+                           targets,
+                           options[:task_options],
+                           executor) do |event|
                 outputter.print_event(event)
               end
             when 'file'
@@ -488,28 +472,6 @@ HELP
       raise e
     end
 
-    def with_bolt_executor(executor, &block)
-      Puppet.override(bolt_executor: executor, &block)
-    end
-
-    def execute_task(executor, options, &block)
-      with_bolt_executor(executor) do
-        run_task(options[:object],
-                 options[:nodes],
-                 options[:task_options],
-                 &block)
-      end
-    end
-
-    def execute_plan(executor, options)
-      # Plans return null here?
-      result = with_bolt_executor(executor) do
-        run_plan(options[:object],
-                 options[:task_options])
-      end
-      outputter.print_plan(result)
-    end
-
     def validate_file(type, path)
       if path.nil?
         raise Bolt::CLIError, "A #{type} must be specified"
@@ -532,89 +494,6 @@ HELP
 
     def outputter
       @outputter ||= Bolt::Outputter.for_format(@config[:format])
-    end
-
-    # Runs a block in a PAL script compiler configured for Bolt.  Catches
-    # exceptions thrown by the block and re-raises them ensuring they are
-    # Bolt::Errors since the script compiler block will squash all exceptions.
-    def in_bolt_compiler(opts = [])
-      Puppet.initialize_settings(opts)
-      r = Puppet::Pal.in_tmp_environment('bolt', modulepath: [BOLTLIB_PATH] + @config[:modulepath], facts: {}) do |pal|
-        pal.with_script_compiler do |compiler|
-          begin
-            yield compiler
-          rescue Puppet::PreformattedError => err
-            # Puppet sometimes rescues exceptions notes the location and reraises
-            # For now return the original error. Exception cause support was added in Ruby 2.1
-            # so we fall back to reporting the error we got for Ruby 2.0.
-            if err.respond_to?(:cause) && err.cause
-              if err.cause.is_a? Bolt::Error
-                err.cause
-              else
-                e = Bolt::CLIError.new(err.cause.message)
-                e.set_backtrace(err.cause.backtrace)
-                e
-              end
-            else
-              e = Bolt::CLIError.new(err.message)
-              e.set_backtrace(err.backtrace)
-              e
-            end
-          rescue StandardError => err
-            e = Bolt::CLIError.new(err.message)
-            e.set_backtrace(err.backtrace)
-            e
-          end
-        end
-      end
-
-      if r.is_a? StandardError
-        raise r
-      end
-      r
-    end
-
-    def list_tasks
-      in_bolt_compiler do |compiler|
-        tasks = compiler.list_tasks
-        tasks.map(&:name).sort.map do |task_name|
-          task_sig = compiler.task_signature(task_name)
-          [task_name, task_sig.task.description]
-        end
-      end
-    end
-
-    def list_plans
-      in_bolt_compiler do |compiler|
-        compiler.list_plans.map { |plan| [plan.name] }.sort
-      end
-    end
-
-    def get_task_info(task_name)
-      task = in_bolt_compiler do |compiler|
-        compiler.task_signature(task_name)
-      end
-      raise Bolt::CLIError, "Could not find task #{task_name} in your modulepath" if task.nil?
-      task.task_hash
-    end
-
-    def run_task(name, targets, args, &block)
-      args = args.merge('_catch_errors' => true)
-      in_bolt_compiler do |compiler|
-        compiler.call_function('run_task', name, targets, args, &block)
-      end
-    end
-
-    def run_plan(plan, args)
-      Dir.mktmpdir('bolt') do |dir|
-        cli = []
-        Puppet::Settings::REQUIRED_APP_SETTINGS.each do |setting|
-          cli << "--#{setting}" << dir
-        end
-        in_bolt_compiler(cli) do |compiler|
-          compiler.call_function('run_plan', plan, args)
-        end
-      end
     end
   end
 end

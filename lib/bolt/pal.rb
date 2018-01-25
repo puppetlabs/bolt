@@ -1,17 +1,34 @@
-# TODO: This is currently used only for testing. I will refactor the CLI to use
-# this in a separate PR
+require 'bolt/executor'
+require 'bolt/error'
+
 module Bolt
   class PAL
     BOLTLIB_PATH = File.join(__FILE__, '../../../modules')
 
     def initialize(config)
-      # TODO: how should we manage state? Does noop go here?
-      # This allows us to copypaste from BOLT::CLI for now
+      # Nothing works without initialized this global state. Reinitializing
+      # is safe and in practice only happen in tests
+      self.class.load_puppet
+      self.class.configure_logging(config[:log_level])
+
       @config = config
     end
 
-    # WARNING: Nothing in here works without calling this!
+    # Puppet logging is global so this is class method to avoid confusion
+    def self.configure_logging(log_level)
+      Puppet[:log_level] = log_level == :debug ? 'debug' : 'notice'
+      Puppet::Util::Log.newdestination(:console)
+    end
+
     def self.load_puppet
+      if Gem.win_platform?
+        # Windows 'fix' for openssl behaving strangely. Prevents very slow operation
+        # of random_bytes later when establishing winrm connections from a Windows host.
+        # See https://github.com/rails/rails/issues/25805 for background.
+        require 'openssl'
+        OpenSSL::Random.random_bytes(1)
+      end
+
       begin
         require_relative '../../vendored/require_vendored'
       rescue LoadError
@@ -20,14 +37,6 @@ module Bolt
 
       # Now that puppet is loaded we can include puppet mixins in data types
       Bolt::ResultSet.include_iterable
-
-      Puppet::Util::Log.newdestination(:console)
-      Puppet[:log_level] = 'notice'
-      # Puppet[:log_level] = if @config[:log_level] == :debug
-      #                       'debug'
-      #                     else
-      #                       'notice'
-      #                     end
     end
 
     # Runs a block in a PAL script compiler configured for Bolt.  Catches
@@ -41,8 +50,9 @@ module Bolt
             yield compiler
           rescue Puppet::PreformattedError => err
             # Puppet sometimes rescues exceptions notes the location and reraises
-            # For now return the original error.
-            if err.cause
+            # For now return the original error. Exception cause support was added in Ruby 2.1
+            # so we fall back to reporting the error we got for Ruby 2.0.
+            if err.respond_to?(:cause) && err.cause
               if err.cause.is_a? Bolt::Error
                 err.cause
               else
@@ -73,8 +83,7 @@ module Bolt
       Puppet.override(bolt_executor: executor, &block)
     end
 
-    def in_plan_compiler(noop)
-      executor = Bolt::Executor.new(@config, noop, true)
+    def in_plan_compiler(executor)
       with_bolt_executor(executor) do
         with_puppet_settings do |opts|
           in_bolt_compiler(opts) do |compiler|
@@ -84,10 +93,9 @@ module Bolt
       end
     end
 
-    def in_task_compiler(noop)
-      executor = Bolt::Executor.new(@config, noop)
+    def in_task_compiler(executor)
       with_bolt_executor(executor) do
-        in_bolt_compiler(opts) do |compiler|
+        in_bolt_compiler do |compiler|
           yield compiler
         end
       end
@@ -100,6 +108,42 @@ module Bolt
           cli << "--#{setting}" << dir
         end
         yield cli
+      end
+    end
+
+    def list_tasks
+      in_bolt_compiler do |compiler|
+        tasks = compiler.list_tasks
+        tasks.map(&:name).sort.map do |task_name|
+          task_sig = compiler.task_signature(task_name)
+          [task_name, task_sig.task.description]
+        end
+      end
+    end
+
+    def get_task_info(task_name)
+      task = in_bolt_compiler do |compiler|
+        compiler.task_signature(task_name)
+      end
+      raise Bolt::CLIError, "Could not find task #{task_name} in your modulepath" if task.nil?
+      task.task_hash
+    end
+
+    def list_plans
+      in_bolt_compiler do |compiler|
+        compiler.list_plans.map { |plan| [plan.name] }.sort
+      end
+    end
+
+    def run_task(object, targets, params, executor, &eventblock)
+      in_task_compiler(executor) do |compiler|
+        compiler.call_function('run_task', object, targets, params, &eventblock)
+      end
+    end
+
+    def run_plan(object, params, executor)
+      in_plan_compiler(executor) do |compiler|
+        compiler.call_function('run_plan', object, params)
       end
     end
   end
