@@ -395,6 +395,14 @@ HELP
     def execute(options)
       if options[:mode] == 'plan' || options[:mode] == 'task'
         begin
+          if Gem.win_platform?
+            # Windows 'fix' for openssl behaving strangely. Prevents very slow operation
+            # of random_bytes later when establishing winrm connections from a Windows host.
+            # See https://github.com/rails/rails/issues/25805 for background.
+            require 'openssl'
+            OpenSSL::Random.random_bytes(1)
+          end
+
           require_relative '../../vendored/require_vendored'
         rescue LoadError
           raise Bolt::CLIError, "Puppet must be installed to execute tasks"
