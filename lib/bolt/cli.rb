@@ -35,6 +35,7 @@ Available subcommands:
     bolt task show <task>            Show documentation for task
     bolt task run <task> [params]    Run a Puppet task
     bolt plan show                   Show list of available plans
+    bolt plan show <plan>            Show details for plan
     bolt plan run <plan> [params]    Run a Puppet task plan
     bolt file upload <src> <dest>    Upload a local file
 
@@ -46,6 +47,7 @@ Usage: bolt task <action> <task> [options] [parameters]
 
 Available actions are:
     show                             Show list of available tasks
+    show <task>                      Show documentation for task
     run                              Run a Puppet task
 
 Parameters are of the form <parameter>=<value>.
@@ -76,6 +78,7 @@ Usage: bolt plan <action> <plan> [options] [parameters]
 
 Available actions are:
     show                             Show list of available plans
+    show <plan>                      Show details for plan
     run                              Run a Puppet task plan
 
 Parameters are of the form <parameter>=<value>.
@@ -405,11 +408,16 @@ HELP
           else
             outputter.print_table(pal.list_tasks)
             outputter.print_message("\nUse `bolt task show <task-name>` to view "\
-                                  "details and parameters for a specific "\
-                                  "task.")
+                                    "details and parameters for a specific task.")
           end
         elsif options[:mode] == 'plan'
-          outputter.print_table(pal.list_plans)
+          if options[:object]
+            outputter.print_plan_info(pal.get_plan_info(options[:object]))
+          else
+            outputter.print_table(pal.list_plans)
+            outputter.print_message("\nUse `bolt plan show <plan-name>` to view "\
+                                    "details and parameters for a specific plan.")
+          end
         end
         return 0
       end
@@ -417,7 +425,7 @@ HELP
       if options[:mode] == 'plan'
         executor = Bolt::Executor.new(@config, options[:noop], true)
         result = pal.run_plan(options[:object], options[:task_options], executor)
-        outputter.print_plan(result)
+        outputter.print_plan_result(result)
         # An exception would have been raised if the plan failed
         code = 0
       else

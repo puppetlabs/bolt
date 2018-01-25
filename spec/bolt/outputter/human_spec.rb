@@ -83,7 +83,7 @@ TASK_OUTPUT
   end
 
   it "prints empty results from a plan" do
-    outputter.print_plan([])
+    outputter.print_plan_result([])
     expect(output.string).to eq("[]\n")
   end
 
@@ -97,7 +97,7 @@ TASK_OUTPUT
                         'partial_result' => { 'stdout' => 'no', 'stderr' => '', 'exit_code' => 2 },
                         'details' => { 'exit_code' => 2 } } } }
     ]
-    outputter.print_plan(result)
+    outputter.print_plan_result(result)
 
     result_hash = JSON.parse(output.string)
     expect(result_hash).to eq(result)
@@ -105,13 +105,13 @@ TASK_OUTPUT
 
   it "formats hash results from a plan" do
     result = { 'some' => 'data' }
-    outputter.print_plan(result)
+    outputter.print_plan_result(result)
     expect(JSON.parse(output.string)).to eq(result)
   end
 
   it "prints simple output from a plan" do
     result = "some data"
-    outputter.print_plan(result)
+    outputter.print_plan_result(result)
     expect(output.string.strip).to eq("\"#{result}\"")
   end
 

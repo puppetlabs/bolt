@@ -135,6 +135,29 @@ module Bolt
       end
     end
 
+    def get_plan_info(plan_name)
+      plan = in_bolt_compiler do |compiler|
+        compiler.plan_signature(plan_name)
+      end
+      raise Bolt::CLIError, "Could not find plan #{plan_name} in your modulepath" if plan.nil?
+      elements = plan.params_type.elements
+      {
+        'name' => plan_name,
+        'parameters' =>
+          unless elements.nil? || elements.empty?
+            elements.map { |e|
+              p = {
+                'name' => e.name,
+                'type' => e.value_type
+              }
+              # TODO: when the default value can be obtained use the actual value instead of nil
+              p['default_value'] = nil if e.key_type.is_a?(Puppet::Pops::Types::POptionalType)
+              p
+            }
+          end
+      }
+    end
+
     def run_task(object, targets, params, executor, &eventblock)
       in_task_compiler(executor) do |compiler|
         compiler.call_function('run_task', object, targets, params, &eventblock)

@@ -64,7 +64,7 @@ describe "Bolt::Outputter::JSON" do
                         'partial_result' => { 'stdout' => 'no', 'stderr' => '', 'exit_code' => 2 },
                         'details' => { 'exit_code' => 2 } } } }
     ]
-    outputter.print_plan(result)
+    outputter.print_plan_result(result)
 
     result_hash = JSON.parse(output.string)
     expect(result_hash).to eq(result)
@@ -72,7 +72,7 @@ describe "Bolt::Outputter::JSON" do
 
   it "prints non-ExecutionResult from a plan" do
     result = "some data"
-    outputter.print_plan(result)
+    outputter.print_plan_result(result)
     expect(output.string.strip).to eq('"' + result + '"')
   end
 

@@ -104,10 +104,10 @@ module Bolt
           task['parameters'].each do |k, v|
             pretty_params << "- #{k}: #{v['type']}\n"
             pretty_params << "    #{v['description']}\n" if v['description']
-            usage << if !v['type'].to_s.include? "Optional"
-                       " #{k}=<value>"
-                     else
+            usage << if v['type'].is_a?(Puppet::Pops::Types::POptionalType)
                        " [#{k}=<value>]"
+                     else
+                       " #{k}=<value>"
                      end
           end
         end
@@ -122,7 +122,35 @@ module Bolt
         @stream.puts(task_info)
       end
 
-      def print_plan(result)
+      # @param [Hash] A hash representing the plan
+      def print_plan_info(plan)
+        # Building lots of strings...
+        pretty_params = ""
+        plan_info = ""
+        usage = "bolt plan run #{plan['name']}"
+
+        if plan['parameters']
+          plan['parameters'].each do |p|
+            name = p['name']
+            pretty_params << "- #{name}: #{p['type']}\n"
+            usage << if p.include?('default_value')
+                       # TODO: print the default value when available
+                       " [#{name}=<value>]"
+                     else
+                       " #{name}=<value>"
+                     end
+          end
+        end
+
+        plan_info << "\n#{plan['name']}"
+        plan_info << "\n\n"
+        plan_info << "USAGE:\n#{usage}\n\n"
+        plan_info << "PARAMETERS:\n#{pretty_params}\n" if plan['parameters']
+        @stream.puts(plan_info)
+      end
+
+      # @param [Hash] A hash representing the plan result
+      def print_plan_result(result)
         # If the object has a json representation display it
         if result.respond_to?(:to_json)
           # Guard against to_json methods that don't accept options
