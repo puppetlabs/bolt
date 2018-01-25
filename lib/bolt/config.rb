@@ -18,14 +18,15 @@ module Bolt
       format: 'human'
     }.freeze
 
-    TRANSPORT_OPTIONS = %i[insecure password run_as sudo_password extensions
-                           key tty tmpdir user connect_timeout cacert
+    TRANSPORT_OPTIONS = %i[insecure disable_ssh_agent password run_as sudo_password
+                           extensions key tty tmpdir user connect_timeout cacert
                            token_file orch_task_environment service_url].freeze
 
     TRANSPORT_DEFAULTS = {
       connect_timeout: 10,
       orch_task_environment: 'production',
       insecure: false,
+      disable_ssh_agent: false,
       tty: false
     }.freeze
 
@@ -102,6 +103,9 @@ module Bolt
         end
         if data['ssh']['insecure']
           self[:transports][:ssh][:insecure] = data['ssh']['insecure']
+        end
+        if data['ssh']['disable-ssh-agent']
+          self[:transports][:ssh][:disable_ssh_agent] = data['ssh']['disable-ssh-agent']
         end
         if data['ssh']['connect-timeout']
           self[:transports][:ssh][:connect_timeout] = data['ssh']['connect-timeout']

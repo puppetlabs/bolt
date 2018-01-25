@@ -40,6 +40,7 @@ module Bolt
                                   else
                                     Net::SSH::Verifiers::Secure.new
                                   end
+      options[:use_agent] = !@disable_ssh_agent
       options[:timeout] = @connect_timeout if @connect_timeout
 
       @session = Net::SSH.start(@target.host, @user, options)

@@ -20,6 +20,7 @@ describe Bolt::SSH do
   let(:key) { ENV['BOLT_SSH_KEY'] || Dir[".vagrant/**/private_key"] }
   let(:command) { "pwd" }
   let(:config) { mk_config(user: user, password: password) }
+  let(:disable_ssh_agent) { mk_config(disable_ssh_agent: true, user: user, password: password) }
   let(:insecure) { mk_config(insecure: true, user: user, password: password) }
   let(:ssh) { Bolt::SSH.new(target, config: config) }
   let(:echo_script) { <<BASH }
@@ -40,6 +41,30 @@ BASH
   end
 
   context "when connecting", ssh: true do
+    it "enables net-ssh::use_agent by default" do
+      allow(Net::SSH)
+        .to receive(:start)
+        .with(anything,
+              anything,
+              hash_including(
+                use_agent: true
+              ))
+      ssh.connect
+    end
+
+    it "disables net-ssh::use_agent if disable-ssh-agent is true" do
+      ssh = Bolt::SSH.new(target, config: disable_ssh_agent)
+
+      allow(Net::SSH)
+        .to receive(:start)
+        .with(anything,
+              anything,
+              hash_including(
+                use_agent: false
+              ))
+      ssh.connect
+    end
+
     it "performs secure host key verification by default" do
       allow(Net::SSH)
         .to receive(:start)
