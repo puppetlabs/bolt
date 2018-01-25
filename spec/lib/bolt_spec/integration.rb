@@ -14,7 +14,7 @@ module BoltSpec
       output.string
     end
 
-    def run_one_node(arguments)
+    def _run_node(arguments)
       output = run_cli(arguments)
 
       begin
@@ -22,11 +22,22 @@ module BoltSpec
       rescue JSON::ParserError
         expect(output.string).to eq("Output should be JSON")
       end
+      result
+    end
+    private :_run_node
 
+    def run_one_node(arguments)
+      result = _run_node(arguments)
       if result['_error'] ||
          (result['items'] && result['items'][0] && result['items'][0]['status'] != 'success')
         expect(result).to eq("Should have succeed on node" => true)
       end
+      result['items'][0]['result']
+    end
+
+    def run_failed_node(arguments)
+      result = _run_node(arguments)
+      expect(result['_error'] || (result['items'] && result['items'][0] && result['items'][0]['status'] != 'success'))
       result['items'][0]['result']
     end
   end

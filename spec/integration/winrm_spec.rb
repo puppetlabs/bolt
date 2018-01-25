@@ -23,9 +23,21 @@ describe "when runnning over the winrm transport", winrm: true do
       expect(result['stdout'].strip).to eq(user)
     end
 
+    it 'reports errors when command fails' do
+      result = run_failed_node(%w[command run boop] + config_flags)
+      expect(result['_error']['kind']).to eq('puppetlabs.tasks/command-error')
+      expect(result['_error']['msg']).to eq('The command failed with exit code 1')
+    end
+
     it 'runs a task', reset_puppet_settings: true do
       result = run_one_node(%W[task run #{stdin_task} message=somemessage] + config_flags)
       expect(result['_output'].strip).to match(/STDIN: {"messa/)
+    end
+
+    it 'reports errors when task fails', reset_puppet_settings: true do
+      result = run_failed_node(%w[task run results::win] + config_flags)
+      expect(result['_error']['kind']).to eq('puppetlabs.tasks/task-error')
+      expect(result['_error']['msg']).to eq("The task failed with exit code 1:\n")
     end
 
     it 'passes noop to a task that supports noop', reset_puppet_settings: true do
