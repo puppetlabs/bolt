@@ -699,16 +699,10 @@ OUTPUT
                 ['/c', /^".*"$/])
           .and_return(output)
         with_tempfile_containing('script-py-winrm', 'print(42)', '.py') do |file|
-          expect(
+          expect {
             winrm.run_script(file.path, []).value
-          ).to eq(
-            '_error' => {
-              'kind' => 'puppetlabs.tasks/task_file_error',
-              'msg' => "File extension .py is not enabled, to run it please add to 'winrm: extensions'",
-              'details' => {},
-              'issue_code' => 'FILETYPE_ERROR'
-            }
-          )
+          }.to raise_error(Bolt::Node::FileError,
+                           "File extension .py is not enabled, to run it please add to 'winrm: extensions'")
         end
       end
 
@@ -720,16 +714,10 @@ OUTPUT
                 anything)
           .and_return(output)
         with_tempfile_containing('task-py-winrm', 'print(42)', '.py') do |file|
-          expect(
+          expect {
             winrm.run_task(file.path, 'stdin', {}).value
-          ).to eq(
-            '_error' => {
-              'kind' => 'puppetlabs.tasks/task_file_error',
-              'msg' => "File extension .py is not enabled, to run it please add to 'winrm: extensions'",
-              'details' => {},
-              'issue_code' => 'FILETYPE_ERROR'
-            }
-          )
+          }.to raise_error(Bolt::Node::FileError,
+                           "File extension .py is not enabled, to run it please add to 'winrm: extensions'")
         end
       end
 

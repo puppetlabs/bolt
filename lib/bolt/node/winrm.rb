@@ -464,9 +464,6 @@ PS
     def upload(source, destination)
       write_remote_file(source, destination)
       Bolt::Result.for_upload(@target, source, destination)
-    # TODO: we should rely on the executor for this
-    rescue StandardError => ex
-      Bolt::Result.from_exception(@target, ex)
     end
 
     def write_remote_file(source, destination)
@@ -514,9 +511,6 @@ PS
     def run_command(command, _options = nil)
       output = execute(command)
       Bolt::Result.for_command(@target, output.stdout.string, output.stderr.string, output.exit_code)
-    # TODO: we should rely on the executor for this
-    rescue StandardError => e
-      Bolt::Result.from_exception(@target, e)
     end
 
     def run_script(script, arguments, _options = nil)
@@ -548,9 +542,6 @@ catch
         end
         Bolt::Result.for_command(@target, output.stdout.string, output.stderr.string, output.exit_code)
       end
-    # TODO: we should rely on the executor for this
-    rescue StandardError => e
-      Bolt::Result.from_exception(@target, e)
     end
 
     def run_task(task, input_method, arguments, _options = nil)
@@ -592,9 +583,6 @@ try { & "#{remote_path}" @taskArgs } catch { exit 1 }
                               output.stderr.string,
                               output.exit_code)
       end
-    # TODO: we should rely on the executor for this
-    rescue StandardError => e
-      Bolt::Result.from_exception(@target, e)
     end
 
     def escape_arguments(arguments)

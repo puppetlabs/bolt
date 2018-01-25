@@ -83,6 +83,17 @@ describe "Bolt::Executor" do
         expect(results).to include(start_event(node.target))
       end
     end
+
+    it 'catches errors' do
+      node_results.each_key do |node|
+        expect(node).to receive(:run_command).with(command, {}).and_raise(Bolt::Error, 'failed', 'my-exception')
+      end
+
+      executor.run_command(targets, command) do |result|
+        expect(result.error_hash['msg']).to eq('failed')
+        expect(result.error_hash['kind']).to eq('my-exception')
+      end
+    end
   end
 
   context 'executes running a script' do
@@ -138,6 +149,17 @@ describe "Bolt::Executor" do
       node_results.each do |node, result|
         expect(results).to include(success_event(result))
         expect(results).to include(start_event(node.target))
+      end
+    end
+
+    it 'catches errors' do
+      node_results.each_key do |node|
+        expect(node).to receive(:run_script).with(script, [], {}).and_raise(Bolt::Error, 'failed', 'my-exception')
+      end
+
+      executor.run_script(targets, script, []) do |result|
+        expect(result.error_hash['msg']).to eq('failed')
+        expect(result.error_hash['kind']).to eq('my-exception')
       end
     end
   end
@@ -208,6 +230,20 @@ describe "Bolt::Executor" do
         expect(results).to include(start_event(node.target))
       end
     end
+
+    it 'catches errors' do
+      node_results.each_key do |node|
+        expect(node)
+          .to receive(:run_task)
+          .with(task, 'both', task_arguments, {})
+          .and_raise(Bolt::Error, 'failed', 'my-exception')
+      end
+
+      executor.run_task(targets, task, 'both', task_arguments) do |result|
+        expect(result.error_hash['msg']).to eq('failed')
+        expect(result.error_hash['kind']).to eq('my-exception')
+      end
+    end
   end
 
   context 'uploading a file' do
@@ -240,6 +276,20 @@ describe "Bolt::Executor" do
       node_results.each do |node, result|
         expect(results).to include(success_event(result))
         expect(results).to include(start_event(node.target))
+      end
+    end
+
+    it 'catches errors' do
+      node_results.each_key do |node|
+        expect(node)
+          .to receive(:upload)
+          .with(script, dest)
+          .and_raise(Bolt::Error, 'failed', 'my-exception')
+      end
+
+      executor.file_upload(targets, script, dest) do |result|
+        expect(result.error_hash['msg']).to eq('failed')
+        expect(result.error_hash['kind']).to eq('my-exception')
       end
     end
   end
