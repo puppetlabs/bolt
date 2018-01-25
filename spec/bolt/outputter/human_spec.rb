@@ -62,7 +62,37 @@ PARAMETERS:
 - icing: Cream cheese
     Rich, tangy, sweet
 
-TASK_OUTPUT
+    TASK_OUTPUT
+  end
+
+  it "formats a plan" do
+    plan = {
+      'name' => 'planity_plan',
+      'parameters' => [
+        {
+          'name' => 'foo',
+          'type' => 'Bar'
+        },
+        {
+          'name' => 'baz',
+          'type' => 'Bar',
+          'default_value' => nil
+        }
+      ]
+    }
+    outputter.print_plan_info(plan)
+    expect(output.string).to eq(<<-PLAN_OUTPUT)
+
+planity_plan
+
+USAGE:
+bolt plan run planity_plan foo=<value> [baz=<value>]
+
+PARAMETERS:
+- foo: Bar
+- baz: Bar
+
+    PLAN_OUTPUT
   end
 
   it "prints CommandResults" do

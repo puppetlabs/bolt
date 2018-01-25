@@ -698,7 +698,7 @@ NODES
           end
         end
 
-        it "shows an individual task data in json" do
+        it "shows an individual task data" do
           task_name = 'sample::params'
           options = {
             mode: 'task',
@@ -761,7 +761,7 @@ NODES
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
         end
 
-        it "task show displays an error if the task is not in modulepath" do
+        it "task show displays an error" do
           options = {
             mode: 'task',
             action: 'show',
@@ -793,6 +793,35 @@ NODES
             expect(plan_list).to include(plan)
           end
         end
+
+        it "shows an individual plan data" do
+          plan_name = 'sample::optional_params_task'
+          options = {
+            mode: 'plan',
+            action: 'show',
+            object: plan_name
+          }
+          cli.execute(options)
+          json = JSON.parse(output.string)
+          expect(json).to eq(
+            "name" => "sample::optional_params_task",
+            "parameters" => [
+              {
+                "name" => "param_mandatory",
+                "type" => "String"
+              },
+              {
+                "name" => "param_optional",
+                "type" => "Optional[String]"
+              },
+              {
+                "name" => "param_with_default_value",
+                "type" => "String",
+                "default_value" => nil
+              }
+            ]
+          )
+        end
       end
 
       context "when available plans include an error", reset_puppet_settings: true do
@@ -819,6 +848,22 @@ NODES
             task_options: plan_params
           }
           expect { cli.execute(options) }.to raise_error(/^Syntax error at/)
+        end
+      end
+
+      context "when the plan is not in the modulepath", reset_puppet_settings: true do
+        before :each do
+          cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
+        end
+
+        it "plan show displays an error" do
+          options = {
+            mode: 'plan',
+            action: 'show',
+            object: 'abcdefg'
+          }
+          expect { cli.execute(options) }.to raise_error(Bolt::CLIError,
+                                                         "Could not find plan abcdefg in your modulepath")
         end
       end
 
