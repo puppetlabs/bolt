@@ -20,7 +20,7 @@ describe Bolt::WinRM do
   let(:password) { ENV['BOLT_WINRM_PASSWORD'] || "vagrant" }
   let(:command) { "echo $env:UserName" }
   let(:config) { mk_config(insecure: true, user: user, password: password) }
-  let(:ssl_config) { mk_config(cacert: 'resources/cert.pem', user: user, password: password) }
+  let(:ssl_config) { mk_config(cacert: 'resources/ca.pem', user: user, password: password) }
   let(:winrm) { Bolt::WinRM.new(target, config: config) }
   let(:winrm_ssl) { Bolt::WinRM.new(target(host, ssl_port), config: ssl_config) }
   let(:echo_script) { <<PS }

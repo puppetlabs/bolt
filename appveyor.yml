@@ -40,9 +40,8 @@ before_test:
       # https://stackoverflow.com/questions/20286306/error-while-adding-a-local-group-to-local-user-using-powershell
       $group.Add("WinNT://$ENV:COMPUTERNAME/$ENV:BOLT_WINRM_USER,user")
       # configure WinRM to use resources/cert.pfx for SSL
-      $thumbprint = "B888D0548D394D9678131A36A4869E4C56F20E4F"
-      Import-PfxCertificate -FilePath resources/cert.pfx -CertStoreLocation cert:\\LocalMachine\\My -Password (ConvertTo-SecureString -String vagrant -Force -AsPlainText)
-      winrm create winrm/config/Listener?Address=*+Transport=HTTPS "@{Hostname=`"localhost`";CertificateThumbprint=`"$thumbprint`"}"
+      ($cert = Import-PfxCertificate -FilePath resources/cert.pfx -CertStoreLocation cert:\\LocalMachine\\My -Password (ConvertTo-SecureString -String vagrant -Force -AsPlainText)) | Format-List
+      New-WSManInstance -ResourceURI winrm/config/Listener -SelectorSet @{Address='*';Transport='HTTPS'} -ValueSet @{Hostname='localhost';CertificateThumbprint=$cert.Thumbprint} | Format-List
 
 test_script:
   - bundle exec rake appveyor

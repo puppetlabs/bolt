@@ -3,9 +3,9 @@ echo "vagrant ALL=(ALL) ALL" > /etc/sudoers.d/vagrant
 SCRIPT
 
 windows_enable_winrm_ssl = <<SCRIPT
-$thumbprint = "B888D0548D394D9678131A36A4869E4C56F20E4F"
-Import-PfxCertificate -FilePath C:\\cert.pfx -CertStoreLocation cert:\\LocalMachine\\My -Password (ConvertTo-SecureString -String vagrant -Force -AsPlainText)
-New-WSManInstance -ResourceURI winrm/config/Listener -SelectorSet @{Address='*';Transport="HTTPS"} -ValueSet @{Hostname="localhost";CertificateThumbprint="$thumbprint"}
+($cert = Import-PfxCertificate -FilePath C:\\cert.pfx -CertStoreLocation cert:\\LocalMachine\\My -Password (ConvertTo-SecureString -String vagrant -Force -AsPlainText)) | Format-List
+New-WSManInstance -ResourceURI winrm/config/Listener -SelectorSet @{Address='*';Transport='HTTPS'} -ValueSet @{Hostname='localhost';CertificateThumbprint=$cert.Thumbprint} | Format-List
+New-NetFirewallRule -DisplayName 'Windows Remote Management (HTTPS-In)' -Direction Inbound -Protocol TCP -LocalPort 5986 -Action Allow | Format-List
 SCRIPT
 
 Vagrant.configure("2") do |config|

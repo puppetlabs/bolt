@@ -54,6 +54,25 @@ describe "Bolt::Outputter::JSON" do
     expect(JSON.parse(output.string)).to eq(task)
   end
 
+  it "formats a plan" do
+    plan = {
+      'name' => 'planity_plan',
+      'parameters' => [
+        {
+          'name' => 'foo',
+          'type' => 'Bar'
+        },
+        {
+          'name' => 'baz',
+          'type' => 'Bar',
+          'default_value' => nil
+        }
+      ]
+    }
+    outputter.print_plan_info(plan)
+    expect(JSON.parse(output.string)).to eq(plan)
+  end
+
   it "formats ExecutionResult from a plan" do
     result = [
       { 'node' => 'node1', 'status' => 'finished', 'result' => { '_output' => 'yes' } },
@@ -64,7 +83,7 @@ describe "Bolt::Outputter::JSON" do
                         'partial_result' => { 'stdout' => 'no', 'stderr' => '', 'exit_code' => 2 },
                         'details' => { 'exit_code' => 2 } } } }
     ]
-    outputter.print_plan(result)
+    outputter.print_plan_result(result)
 
     result_hash = JSON.parse(output.string)
     expect(result_hash).to eq(result)
@@ -72,7 +91,7 @@ describe "Bolt::Outputter::JSON" do
 
   it "prints non-ExecutionResult from a plan" do
     result = "some data"
-    outputter.print_plan(result)
+    outputter.print_plan_result(result)
     expect(output.string.strip).to eq('"' + result + '"')
   end
 
