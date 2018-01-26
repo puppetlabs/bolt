@@ -39,10 +39,10 @@ Now open `~/.puppetlabs/bolt.yml` and set up the bolt module path. The module pa
 ```
 ---
 modulepath: "~/.puppetlabs/task-modules/site:~/.puppetlabs/task-modules/modules"
-# If you have to pass --insecure to skip host key verifaction you can
+# If you have to pass --no-host-key-check to skip host key verifaction you can
 # uncomment these lines.
 #ssh:
-#  insecure: true
+#  host-key-check: true
 ```
 
 # Install Puppet using Bolt
