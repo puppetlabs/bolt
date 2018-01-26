@@ -22,10 +22,10 @@ test_name "C1005xx: \
     nodes_csv = ssh_nodes.map(&:hostname).join(',')
     bolt_command = "bolt file upload #{dir}/#{source} /tmp/#{dest}"
     flags = {
-      '--nodes'     => nodes_csv,
-      '--user'      => user,
-      '--password'  => password,
-      '--insecure'  => nil
+      '--nodes'              => nodes_csv,
+      '--user'               => user,
+      '--password'           => password,
+      '--no-host-key-check'  => nil
     }
 
     result = bolt_command_on(bolt, bolt_command, flags)

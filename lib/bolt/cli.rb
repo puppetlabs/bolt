@@ -134,7 +134,7 @@ HELP
                   '* Windows nodes must specify protocol with winrm://',
                   '* protocol is `ssh` by default, may be `ssh` or `winrm`',
                   '* port defaults to `22` for SSH',
-                  '* port defaults to `5985` or `5986` for WinRM, based on the --insecure setting') do |nodes|
+                  '* port defaults to `5985` or `5986` for WinRM, based on the --[no-]ssl setting') do |nodes|
             results[:nodes] += parse_nodes(nodes)
             results[:nodes].uniq!
           end
@@ -185,9 +185,13 @@ HELP
                 "Output format to use: human or json") do |format|
           results[:format] = format
         end
-        opts.on('-k', '--insecure',
-                "Whether to connect insecurely ") do |insecure|
-          results[:insecure] = insecure
+        opts.on('--[no-]host-key-check',
+                "Check host keys with SSH") do |host_key_check|
+          results[:host_key_check] = host_key_check
+        end
+        opts.on('--[no-]ssl',
+                "Use SSL with WinRM") do |ssl|
+          results[:ssl] = ssl
         end
         opts.on('--transport TRANSPORT', TRANSPORTS,
                 "Specify a default transport: #{TRANSPORTS.join(', ')}") do |t|

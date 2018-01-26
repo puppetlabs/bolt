@@ -10,7 +10,7 @@ describe "when running a plan that manipulates an execution result", ssh: true d
 
   let(:modulepath) { File.join(__dir__, '../fixtures/modules') }
   let(:uri) { conn_uri('ssh', true) }
-  let(:config_flags) { %W[--insecure --format json --modulepath #{modulepath}] }
+  let(:config_flags) { %W[--no-host-key-check --format json --modulepath #{modulepath}] }
 
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
 
@@ -19,7 +19,7 @@ describe "when running a plan that manipulates an execution result", ssh: true d
   end
 
   context 'when using CLI options' do
-    let(:config_flags) { %W[--insecure --format json --modulepath #{modulepath}] }
+    let(:config_flags) { %W[--no-host-key-check --format json --modulepath #{modulepath}] }
 
     it 'returns true on success' do
       params = { target: uri }.to_json

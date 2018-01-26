@@ -34,10 +34,10 @@ test_name "C100553: \
     bolt_command = "bolt plan run test::my_unix_plan nodes=#{nodes_csv}"
 
     flags = {
-      '-u'            => user,
-      '--modulepath'  => "#{dir}/modules",
-      '-p'            => password,
-      '--insecure'    => nil
+      '-u'                     => user,
+      '--modulepath'           => "#{dir}/modules",
+      '-p'                     => password,
+      '--no-host-key-check'    => nil
     }
 
     result = bolt_command_on(bolt, bolt_command, flags)

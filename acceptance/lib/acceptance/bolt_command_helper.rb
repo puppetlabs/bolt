@@ -7,7 +7,8 @@ module Acceptance
     # @option flags [String] '--nodes' the nodes to run on
     # @option flags [String] '--user' the user to run the command as
     # @option flags [String] '--password' the password for the user
-    # @option flags [nil] '--insecure' specify nil to use
+    # @option flags [nil] '--no-host-key-check' specify nil to use
+    # @option flags [nil] '--no-ssl' specify nil to use
     # @param [Hash] opts the options hash for this method
     def bolt_command_on(host, command, flags = {}, opts = {})
       platform = host['platform']

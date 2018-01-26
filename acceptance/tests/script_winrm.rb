@@ -24,7 +24,7 @@ test_name "C100549: \
       '--nodes'     => nodes_csv,
       '-u'          => user,
       '-p'          => password,
-      '--insecure'  => nil
+      '--no-ssl'    => nil
     }
 
     result = bolt_command_on(bolt, bolt_command, flags)

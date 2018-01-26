@@ -44,7 +44,7 @@ test_name "C100554: \
       '--modulepath'  => "#{dir}/modules",
       '-u'            => user,
       '-p'            => password,
-      '--insecure'    => nil
+      '--no-ssl'      => nil
     }
 
     result = bolt_command_on(bolt, bolt_command, flags)

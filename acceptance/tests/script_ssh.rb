@@ -23,10 +23,10 @@ test_name "C100548: \
     bolt_command = "bolt script run #{script}"
 
     flags = {
-      '--nodes'     => nodes_csv,
-      '-u'          => user,
-      '-p'          => password,
-      '--insecure'  => nil
+      '--nodes'              => nodes_csv,
+      '-u'                   => user,
+      '-p'                   => password,
+      '--no-host-key-check'  => nil
     }
 
     result = bolt_command_on(bolt, bolt_command, flags)

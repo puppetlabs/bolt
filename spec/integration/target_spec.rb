@@ -14,7 +14,7 @@ describe "when running a plan that manipulates an execution result", ssh: true d
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
 
   context 'when using CLI options' do
-    let(:config_flags) { %W[--insecure --format json --modulepath #{modulepath}] }
+    let(:config_flags) { %W[--no-host-key-check --format json --modulepath #{modulepath}] }
 
     it 'returns execution results' do
       params = { node: uri }.to_json

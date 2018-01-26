@@ -20,7 +20,7 @@ describe Bolt::SSH do
   let(:key) { ENV['BOLT_SSH_KEY'] || Dir[".vagrant/**/private_key"] }
   let(:command) { "pwd" }
   let(:config) { mk_config(user: user, password: password) }
-  let(:insecure) { mk_config(insecure: true, user: user, password: password) }
+  let(:no_host_key_check) { mk_config(host_key_check: false, user: user, password: password) }
   let(:ssh) { Bolt::SSH.new(target, config: config) }
   let(:echo_script) { <<BASH }
 for var in "$@"
@@ -51,8 +51,8 @@ BASH
       ssh.connect
     end
 
-    it "downgrades to lenient if insecure is true" do
-      ssh = Bolt::SSH.new(target, config: insecure)
+    it "downgrades to lenient if host_key_check is false" do
+      ssh = Bolt::SSH.new(target, config: no_host_key_check)
 
       allow(Net::SSH)
         .to receive(:start)
@@ -73,7 +73,7 @@ BASH
     end
 
     it "raises ConnectError if authentication fails" do
-      ssh = Bolt::SSH.new(target, config: insecure)
+      ssh = Bolt::SSH.new(target, config: no_host_key_check)
 
       allow(Net::SSH)
         .to receive(:start)
@@ -140,7 +140,7 @@ BASH
   end
 
   context "when executing with private key" do
-    let(:config) { mk_config(insecure: true, key: key, user: user) }
+    let(:config) { mk_config(host_key_check: false, key: key, user: user) }
 
     before(:each) { ssh.connect }
     after(:each) { ssh.disconnect }
@@ -169,7 +169,7 @@ BASH
   end
 
   context "when executing" do
-    let(:ssh) { Bolt::SSH.new(target, config: insecure) }
+    let(:ssh) { Bolt::SSH.new(target, config: no_host_key_check) }
 
     before(:each) { ssh.connect }
     after(:each) { ssh.disconnect }
@@ -356,7 +356,7 @@ SHELL
 
   context 'When tmpdir is specified' do
     let(:tmpdir) { '/tmp/mytempdir' }
-    let(:config) { mk_config(insecure: true, tmpdir: tmpdir, user: user, password: password) }
+    let(:config) { mk_config(host_key_check: false, tmpdir: tmpdir, user: user, password: password) }
 
     before(:each) { ssh.connect }
     after(:each) do
@@ -386,7 +386,9 @@ SHELL
   end
 
   context "with sudo" do
-    let(:config) { mk_config(insecure: true, sudo_password: password, run_as: 'root', user: user, password: password) }
+    let(:config) {
+      mk_config(host_key_check: false, sudo_password: password, run_as: 'root', user: user, password: password)
+    }
 
     before(:each) { ssh.connect }
     after(:each) { ssh.disconnect }
@@ -406,7 +408,7 @@ SHELL
 
     context "requesting a pty" do
       let(:config) {
-        mk_config(insecure: true, sudo_password: password, run_as: 'root',
+        mk_config(host_key_check: false, sudo_password: password, run_as: 'root',
                   tty: true, user: user, password: password)
       }
 
@@ -416,7 +418,9 @@ SHELL
     end
 
     context "as non-root" do
-      let(:config) { mk_config(insecure: true, sudo_password: password, run_as: user, user: user, password: password) }
+      let(:config) {
+        mk_config(host_key_check: false, sudo_password: password, run_as: user, user: user, password: password)
+      }
 
       it "can override run_as for command via an option", ssh: true do
         expect(ssh.run_command('whoami', '_run_as' => 'root')['stdout']).to eq("root\n")
@@ -439,7 +443,7 @@ SHELL
 
     context "with an incorrect password" do
       let(:config) {
-        mk_config(insecure: true, sudo_password: 'nonsense', run_as: 'root',
+        mk_config(host_key_check: false, sudo_password: 'nonsense', run_as: 'root',
                   user: user, password: password)
       }
 
@@ -453,7 +457,7 @@ SHELL
     end
 
     context "with no password" do
-      let(:config) { mk_config(insecure: true, run_as: 'root', user: user, password: password) }
+      let(:config) { mk_config(host_key_check: false, run_as: 'root', user: user, password: password) }
 
       it "returns a failed result", ssh: true do
         expect {

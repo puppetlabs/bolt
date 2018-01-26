@@ -19,7 +19,7 @@ describe Bolt::WinRM do
   let(:user) { ENV['BOLT_WINRM_USER'] || "vagrant" }
   let(:password) { ENV['BOLT_WINRM_PASSWORD'] || "vagrant" }
   let(:command) { "echo $env:UserName" }
-  let(:config) { mk_config(insecure: true, user: user, password: password) }
+  let(:config) { mk_config(ssl: false, user: user, password: password) }
   let(:ssl_config) { mk_config(cacert: 'resources/ca.pem', user: user, password: password) }
   let(:winrm) { Bolt::WinRM.new(target, config: config) }
   let(:winrm_ssl) { Bolt::WinRM.new(target(host, ssl_port), config: ssl_config) }
@@ -591,7 +591,7 @@ PS
 
     describe "when tmpdir is specified", winrm: true do
       let(:tmpdir) { 'C:\mytmp' }
-      let(:config) { mk_config(tmpdir: 'C:\mytmp', insecure: true, user: user, password: password) }
+      let(:config) { mk_config(tmpdir: 'C:\mytmp', ssl: false, user: user, password: password) }
       let(:winrm) { Bolt::WinRM.new(target, config: config) }
 
       it 'uploads scripts to the specified tmpdir' do
@@ -722,7 +722,7 @@ OUTPUT
       end
 
       context "with extensions specified" do
-        let(:config) { mk_config(insecure: true, extensions: ['.py'], user: user, password: password) }
+        let(:config) { mk_config(ssl: false, extensions: ['.py'], user: user, password: password) }
 
         it "can apply an arbitrary script", winrm: true do
           allow(winrm)

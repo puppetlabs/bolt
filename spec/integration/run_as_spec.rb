@@ -12,7 +12,7 @@ describe "when running a plan using run_as", ssh: true do
   let(:uri) { conn_uri('ssh', true) }
   let(:user) { conn_info('ssh')[:user] }
   let(:password) { conn_info('ssh')[:password] }
-  let(:config_flags) { %W[--insecure --format json --modulepath #{modulepath}] }
+  let(:config_flags) { %W[--no-host-key-check --format json --modulepath #{modulepath}] }
 
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
 
@@ -21,7 +21,7 @@ describe "when running a plan using run_as", ssh: true do
   end
 
   context 'when using CLI options' do
-    let(:config_flags) { %W[--insecure --format json --sudo-password #{password} --modulepath #{modulepath}] }
+    let(:config_flags) { %W[--no-host-key-check --format json --sudo-password #{password} --modulepath #{modulepath}] }
 
     it 'runs sudo when specified' do
       params = { target: uri }.to_json

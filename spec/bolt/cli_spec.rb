@@ -319,23 +319,23 @@ NODES
       end
     end
 
-    describe "insecure" do
-      it "accepts `-k`" do
-        cli = Bolt::CLI.new(%w[command run -k --nodes foo])
+    describe "host_key_check" do
+      it "accepts `--host-key-check`" do
+        cli = Bolt::CLI.new(%w[command run --host-key-check --nodes foo])
         cli.parse
-        expect(cli.config[:transports][:ssh][:insecure]).to eq(true)
+        expect(cli.config[:transports][:ssh][:host_key_check]).to eq(true)
       end
 
-      it "accepts `--insecure`" do
-        cli = Bolt::CLI.new(%w[command run --insecure --nodes foo])
+      it "accepts `--no-host-key-check`" do
+        cli = Bolt::CLI.new(%w[command run --no-host-key-check --nodes foo])
         cli.parse
-        expect(cli.config[:transports][:ssh][:insecure]).to eq(true)
+        expect(cli.config[:transports][:ssh][:host_key_check]).to eq(false)
       end
 
-      it "defaults to false" do
+      it "defaults to true" do
         cli = Bolt::CLI.new(%w[command run --nodes foo])
         cli.parse
-        expect(cli.config[:transports][:ssh][:insecure]).to eq(false)
+        expect(cli.config[:transports][:ssh][:host_key_check]).to eq(true)
       end
     end
 
@@ -1381,14 +1381,15 @@ NODES
         'format' => 'json',
         'ssh' => {
           'private-key' => '/bar/foo',
-          'insecure' => true,
+          'host-key-check' => false,
           'connect-timeout' => 4,
           'run-as' => 'Fakey McFakerson'
         },
         'winrm' => {
           'connect-timeout' => 7,
           'cacert' => '/path/to/winrm-cacert',
-          'extensions' => ['.py', '.bat']
+          'extensions' => ['.py', '.bat'],
+          'ssl' => false
         },
         'pcp' => {
           'task-environment' => 'testenv',
@@ -1400,7 +1401,7 @@ NODES
 
     it 'reads modulepath' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --insecure])
+        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-host-key-check])
         cli.parse
         expect(cli.config[:modulepath]).to eq(['/foo/bar', '/baz/qux'])
       end
@@ -1408,7 +1409,7 @@ NODES
 
     it 'reads concurrency' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --insecure])
+        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-host-key-check])
         cli.parse
         expect(cli.config[:concurrency]).to eq(14)
       end
@@ -1416,7 +1417,7 @@ NODES
 
     it 'reads format' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --insecure])
+        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-host-key-check])
         cli.parse
         expect(cli.config[:format]).to eq('json')
       end
@@ -1424,23 +1425,23 @@ NODES
 
     it 'reads private-key for ssh' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --insecure])
+        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-host-key-check])
         cli.parse
         expect(cli.config[:transports][:ssh][:key]).to eq('/bar/foo')
       end
     end
 
-    it 'reads insecure for ssh' do
+    it 'reads host_key_check for ssh' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --insecure])
+        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo])
         cli.parse
-        expect(cli.config[:transports][:ssh][:insecure]).to eq(true)
+        expect(cli.config[:transports][:ssh][:host_key_check]).to eq(false)
       end
     end
 
     it 'reads run-as for ssh' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --password bar --insecure])
+        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --password bar --no-host-key-check])
         cli.parse
         expect(cli.config[:transports][:ssh][:run_as]).to eq('Fakey McFakerson')
       end
@@ -1448,16 +1449,24 @@ NODES
 
     it 'reads separate connect-timeout for ssh and winrm' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --insecure])
+        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-host-key-check --no-ssl])
         cli.parse
         expect(cli.config[:transports][:ssh][:connect_timeout]).to eq(4)
         expect(cli.config[:transports][:winrm][:connect_timeout]).to eq(7)
       end
     end
 
+    it 'reads ssl for winrm' do
+      with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
+        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo])
+        cli.parse
+        expect(cli.config[:transports][:winrm][:ssl]).to eq(false)
+      end
+    end
+
     it 'reads extensions for winrm' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --insecure])
+        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-ssl])
         cli.parse
         expect(cli.config[:transports][:winrm][:extensions]).to eq(['.py', '.bat'])
       end
@@ -1467,7 +1476,7 @@ NODES
       new_config = complete_config.clone
       new_config['winrm'] = { 'extensions' => 'py' }
       with_tempfile_containing('conf', YAML.dump(new_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --insecure])
+        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-ssl])
         cli.parse
         expect(cli.config[:transports][:winrm][:extensions]).to eq(['.py'])
       end
@@ -1475,7 +1484,7 @@ NODES
 
     it 'reads task environment for pcp' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --insecure])
+        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo])
         cli.parse
         expect(cli.config[:transports][:pcp][:orch_task_environment]).to eq('testenv')
       end
@@ -1483,7 +1492,7 @@ NODES
 
     it 'reads service url for pcp' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --insecure])
+        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo])
         cli.parse
         expect(cli.config[:transports][:pcp][:service_url]).to eql('http://foo.org')
       end
@@ -1491,7 +1500,7 @@ NODES
 
     it 'reads token file for pcp' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --insecure])
+        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo])
         cli.parse
         expect(cli.config[:transports][:pcp][:token_file]).to eql('/path/to/token')
       end
@@ -1499,7 +1508,7 @@ NODES
 
     it 'reads separate cacert file for pcp and winrm' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --insecure])
+        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-host-key-check --no-ssl])
         cli.parse
         expect(cli.config[:transports][:pcp][:cacert]).to eql('/path/to/cacert')
         expect(cli.config[:transports][:winrm][:cacert]).to eql('/path/to/winrm-cacert')
@@ -1515,7 +1524,7 @@ NODES
     end
 
     it 'raises an error if a config file is specified and invalid' do
-      cli = Bolt::CLI.new(%W[command run --configfile #{File.join(configdir, 'invalid.yml')} --nodes foo --insecure])
+      cli = Bolt::CLI.new(%W[command run --configfile #{File.join(configdir, 'invalid.yml')} --nodes foo])
       expect {
         cli.parse
       }.to raise_error(Bolt::CLIError, /Could not parse/)

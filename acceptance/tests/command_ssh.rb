@@ -15,10 +15,10 @@ test_name "C100546: \
     command = 'echo """hello from $(hostname)"""'
     bolt_command = "bolt command run '#{command}'"
     flags = {
-      '--nodes'     => nodes_csv,
-      '-u'          => user,
-      '-p'          => password,
-      '--insecure'  => nil
+      '--nodes'              => nodes_csv,
+      '-u'                   => user,
+      '-p'                   => password,
+      '--no-host-key-check'  => nil
     }
 
     result = bolt_command_on(bolt, bolt_command, flags)

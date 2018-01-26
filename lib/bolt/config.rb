@@ -18,15 +18,24 @@ module Bolt
       format: 'human'
     }.freeze
 
-    TRANSPORT_OPTIONS = %i[insecure password run_as sudo_password extensions
-                           key tty tmpdir user connect_timeout cacert
+    TRANSPORT_OPTIONS = %i[host_key_check password run_as sudo_password extensions
+                           ssl key tty tmpdir user connect_timeout cacert
                            token_file orch_task_environment service_url].freeze
 
     TRANSPORT_DEFAULTS = {
       connect_timeout: 10,
       orch_task_environment: 'production',
-      insecure: false,
       tty: false
+    }.freeze
+
+    TRANSPORT_SPECIFIC_DEFAULTS = {
+      ssh: {
+        host_key_check: true
+      },
+      winrm: {
+        ssl: true
+      },
+      pcp: {}
     }.freeze
 
     TRANSPORTS = %i[ssh winrm pcp].freeze
@@ -43,6 +52,12 @@ module Bolt
         end
         TRANSPORT_DEFAULTS.each do |k, v|
           unless self[:transports][transport][k]
+            self[:transports][transport][k] = v
+          end
+        end
+
+        TRANSPORT_SPECIFIC_DEFAULTS[transport].each do |k, v|
+          unless self[:transports][transport].key? k
             self[:transports][transport][k] = v
           end
         end
@@ -100,8 +115,8 @@ module Bolt
         if data['ssh']['private-key']
           self[:transports][:ssh][:key] = data['ssh']['private-key']
         end
-        if data['ssh']['insecure']
-          self[:transports][:ssh][:insecure] = data['ssh']['insecure']
+        if data['ssh'].key?('host-key-check')
+          self[:transports][:ssh][:host_key_check] = data['ssh']['host-key-check']
         end
         if data['ssh']['connect-timeout']
           self[:transports][:ssh][:connect_timeout] = data['ssh']['connect-timeout']
@@ -118,8 +133,8 @@ module Bolt
         if data['winrm']['connect-timeout']
           self[:transports][:winrm][:connect_timeout] = data['winrm']['connect-timeout']
         end
-        if data['winrm']['insecure']
-          self[:transports][:winrm][:insecure] = data['winrm']['insecure']
+        if data['winrm'].key?('ssl')
+          self[:transports][:winrm][:ssl] = data['winrm']['ssl']
         end
         if data['winrm']['tmpdir']
           self[:transports][:winrm][:tmpdir] = data['winrm']['tmpdir']
@@ -167,9 +182,20 @@ module Bolt
       end
 
       TRANSPORT_OPTIONS.each do |key|
-        # TODO: We should eventually make these transport specific
         TRANSPORTS.each do |transport|
-          self[:transports][transport][key] = options[key] if options[key]
+          unless %i[ssl host_key_check].any? { |k| k == key }
+            self[:transports][transport][key] = options[key] if options[key]
+            next
+          end
+          if key == :ssl && transport == :winrm
+            # this defaults to true so we need to check the presence of the key
+            self[:transports][transport][key] = options[key] if options.key?(key)
+            next
+          elsif key == :host_key_check && transport == :ssh
+            # this defaults to true so we need to check the presence of the key
+            self[:transports][transport][key] = options[key] if options.key?(key)
+            next
+          end
         end
       end
     end

@@ -15,7 +15,7 @@ module Bolt
     HTTPS_PORT = 5986
 
     def port
-      default_port = @insecure ? HTTP_PORT : HTTPS_PORT
+      default_port = @ssl ? HTTPS_PORT : HTTP_PORT
       @target.port || default_port
     end
 
@@ -26,12 +26,12 @@ module Bolt
     end
 
     def connect
-      if @insecure
-        scheme = 'http'
-        transport = :negotiate
-      else
+      if @ssl
         scheme = 'https'
         transport = :ssl
+      else
+        scheme = 'http'
+        transport = :negotiate
       end
       endpoint = "#{scheme}://#{@target.host}:#{port}/wsman"
       options = { endpoint: endpoint,
@@ -54,8 +54,8 @@ module Bolt
     rescue Timeout::Error
       # If we're using the default port with SSL, a timeout probably means the
       # host doesn't support SSL.
-      if !@insecure && port == HTTPS_PORT
-        theres_your_problem = "\nUse --insecure if this host isn't configured to use SSL for WinRM"
+      if @ssl && port == HTTPS_PORT
+        theres_your_problem = "\nUse --no-ssl if this host isn't configured to use SSL for WinRM"
       end
       raise Bolt::Node::ConnectError.new(
         "Timeout after #{@connect_timeout} seconds connecting to #{endpoint}#{theres_your_problem}",
@@ -68,7 +68,7 @@ module Bolt
       )
     rescue OpenSSL::SSL::SSLError => e
       # If we're using SSL with the default non-SSL port, mention that as a likely problem
-      if !@insecure && port == HTTP_PORT
+      if @ssl && port == HTTP_PORT
         theres_your_problem = "\nAre you using SSL to connect to a non-SSL port?"
       end
       raise Bolt::Node::ConnectError.new(
