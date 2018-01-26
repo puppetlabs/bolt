@@ -37,82 +37,81 @@ describe "Bolt::Executor" do
     allow(executor).to receive(:from_targets).with(targets).and_return(node_results.map(&:first))
   end
 
-  it "executes a command on all nodes" do
-    node_results.each do |node, result|
-      expect(node).to receive(:run_command).with(command, {}).and_return(result)
-    end
-
-    executor.run_command(targets, command, {})
-  end
-
-  it 'passes _run_as to the command' do
-    executor.run_as = 'foo'
-    node_results.each do |node, result|
-      expect(node).to receive(:run_command).with(command, '_run_as' => 'foo').and_return(result)
-    end
-
-    executor.run_command(targets, command)
-  end
-
-  context 'nodes with run_as' do
-    let(:node_results) { mock_node_results('foo') }
-
-    it 'does not pass _run_as to command' do
-      executor.run_as = 'foo'
+  context 'running a command' do
+    it 'executes on all nodes' do
       node_results.each do |node, result|
         expect(node).to receive(:run_command).with(command, {}).and_return(result)
       end
 
-      executor.run_command(targets, command)
-    end
-  end
-
-  it "yields each command result" do
-    node_results.each do |node, result|
-      expect(node).to receive(:run_command).with(command, {}).and_return(result)
+      executor.run_command(targets, command, {})
     end
 
-    results = []
-    executor.run_command(targets, command) do |result|
-      results << result
-    end
-
-    node_results.each do |node, result|
-      expect(results).to include(success_event(result))
-      expect(results).to include(start_event(node.target))
-    end
-  end
-
-  it "runs a script on all nodes" do
-    node_results.each do |node, result|
-      expect(node).to receive(:run_script).with(script, [], {}).and_return(result)
-    end
-
-    results = executor.run_script(targets, script, [], {})
-    results.each do |result|
-      expect(result).to be_instance_of(Bolt::Result)
-    end
-  end
-
-  it 'passes _run_as to the script' do
-    executor.run_as = 'foo'
-    node_results.each do |node, result|
-      expect(node).to receive(:run_script).with(script, [], '_run_as' => 'foo').and_return(result)
-    end
-
-    results = executor.run_script(targets, script, [])
-    results.each do |result|
-      expect(result).to be_instance_of(Bolt::Result)
-    end
-  end
-
-  context 'nodes with run_as' do
-    let(:node_results) { mock_node_results('foo') }
-
-    it 'does not pass _run_as to script' do
+    it 'passes _run_as' do
       executor.run_as = 'foo'
       node_results.each do |node, result|
+        expect(node).to receive(:run_command).with(command, '_run_as' => 'foo').and_return(result)
+      end
+
+      executor.run_command(targets, command)
+    end
+
+    context 'nodes with run_as' do
+      let(:node_results) { mock_node_results('foo') }
+
+      it 'does not pass _run_as' do
+        executor.run_as = 'foo'
+        node_results.each do |node, result|
+          expect(node).to receive(:run_command).with(command, {}).and_return(result)
+        end
+
+        executor.run_command(targets, command)
+      end
+    end
+
+    it "yields each result" do
+      node_results.each do |node, result|
+        expect(node).to receive(:run_command).with(command, {}).and_return(result)
+      end
+
+      results = []
+      executor.run_command(targets, command) do |result|
+        results << result
+      end
+
+      node_results.each do |node, result|
+        expect(results).to include(success_event(result))
+        expect(results).to include(start_event(node.target))
+      end
+    end
+
+    it 'catches errors' do
+      node_results.each_key do |node|
+        expect(node).to receive(:run_command).with(command, {}).and_raise(Bolt::Error, 'failed', 'my-exception')
+      end
+
+      executor.run_command(targets, command) do |result|
+        expect(result.error_hash['msg']).to eq('failed')
+        expect(result.error_hash['kind']).to eq('my-exception')
+      end
+    end
+  end
+
+  context 'executes running a script' do
+    it "on all nodes" do
+      node_results.each do |node, result|
         expect(node).to receive(:run_script).with(script, [], {}).and_return(result)
+      end
+
+      results = executor.run_script(targets, script, [], {})
+      results.each do |result|
+        expect(result).to be_instance_of(Bolt::Result)
+      end
+    end
+
+    it 'passes _run_as' do
+      executor.run_as = 'foo'
+      node_results.each do |node, result|
+        expect(node).to receive(:run_script).with(script, [], '_run_as' => 'foo').and_return(result)
       end
 
       results = executor.run_script(targets, script, [])
@@ -120,58 +119,53 @@ describe "Bolt::Executor" do
         expect(result).to be_instance_of(Bolt::Result)
       end
     end
-  end
 
-  it "yields each script result" do
-    node_results.each do |node, result|
-      expect(node).to receive(:run_script).with(script, [], {}).and_return(result)
+    context 'nodes with run_as' do
+      let(:node_results) { mock_node_results('foo') }
+
+      it 'does not pass _run_as' do
+        executor.run_as = 'foo'
+        node_results.each do |node, result|
+          expect(node).to receive(:run_script).with(script, [], {}).and_return(result)
+        end
+
+        results = executor.run_script(targets, script, [])
+        results.each do |result|
+          expect(result).to be_instance_of(Bolt::Result)
+        end
+      end
     end
 
-    results = []
-    executor.run_script(targets, script, []) do |result|
-      results << result
+    it "yields each result" do
+      node_results.each do |node, result|
+        expect(node).to receive(:run_script).with(script, [], {}).and_return(result)
+      end
+
+      results = []
+      executor.run_script(targets, script, []) do |result|
+        results << result
+      end
+
+      node_results.each do |node, result|
+        expect(results).to include(success_event(result))
+        expect(results).to include(start_event(node.target))
+      end
     end
 
-    node_results.each do |node, result|
-      expect(results).to include(success_event(result))
-      expect(results).to include(start_event(node.target))
-    end
-  end
+    it 'catches errors' do
+      node_results.each_key do |node|
+        expect(node).to receive(:run_script).with(script, [], {}).and_raise(Bolt::Error, 'failed', 'my-exception')
+      end
 
-  it "runs a task on all nodes" do
-    node_results.each do |node, result|
-      expect(node)
-        .to receive(:run_task)
-        .with(task, 'both', task_arguments, {})
-        .and_return(result)
-    end
-
-    results = executor.run_task(targets, task, 'both', task_arguments, {})
-    results.each do |result|
-      expect(result).to be_instance_of(Bolt::Result)
-    end
-  end
-
-  it 'passes _run_as to the task' do
-    executor.run_as = 'foo'
-    node_results.each do |node, result|
-      expect(node)
-        .to receive(:run_task)
-        .with(task, 'both', task_arguments, '_run_as' => 'foo')
-        .and_return(result)
-    end
-
-    results = executor.run_task(targets, task, 'both', task_arguments, {})
-    results.each do |result|
-      expect(result).to be_instance_of(Bolt::Result)
+      executor.run_script(targets, script, []) do |result|
+        expect(result.error_hash['msg']).to eq('failed')
+        expect(result.error_hash['kind']).to eq('my-exception')
+      end
     end
   end
 
-  context 'nodes with run_as' do
-    let(:node_results) { mock_node_results('foo') }
-
-    it 'does not pass _run_as to task' do
-      executor.run_as = 'foo'
+  context 'running a task' do
+    it "executes on all nodes" do
       node_results.each do |node, result|
         expect(node)
           .to receive(:run_task)
@@ -184,55 +178,119 @@ describe "Bolt::Executor" do
         expect(result).to be_instance_of(Bolt::Result)
       end
     end
+
+    it 'passes _run_as' do
+      executor.run_as = 'foo'
+      node_results.each do |node, result|
+        expect(node)
+          .to receive(:run_task)
+          .with(task, 'both', task_arguments, '_run_as' => 'foo')
+          .and_return(result)
+      end
+
+      results = executor.run_task(targets, task, 'both', task_arguments, {})
+      results.each do |result|
+        expect(result).to be_instance_of(Bolt::Result)
+      end
+    end
+
+    context 'nodes with run_as' do
+      let(:node_results) { mock_node_results('foo') }
+
+      it 'does not pass _run_as' do
+        executor.run_as = 'foo'
+        node_results.each do |node, result|
+          expect(node)
+            .to receive(:run_task)
+            .with(task, 'both', task_arguments, {})
+            .and_return(result)
+        end
+
+        results = executor.run_task(targets, task, 'both', task_arguments, {})
+        results.each do |result|
+          expect(result).to be_instance_of(Bolt::Result)
+        end
+      end
+    end
+
+    it "yields each result" do
+      node_results.each do |node, result|
+        expect(node)
+          .to receive(:run_task)
+          .with(task, 'both', task_arguments, {})
+          .and_return(result)
+      end
+
+      results = []
+      executor.run_task(targets, task, 'both', task_arguments) do |result|
+        results << result
+      end
+      node_results.each do |node, result|
+        expect(results).to include(success_event(result))
+        expect(results).to include(start_event(node.target))
+      end
+    end
+
+    it 'catches errors' do
+      node_results.each_key do |node|
+        expect(node)
+          .to receive(:run_task)
+          .with(task, 'both', task_arguments, {})
+          .and_raise(Bolt::Error, 'failed', 'my-exception')
+      end
+
+      executor.run_task(targets, task, 'both', task_arguments) do |result|
+        expect(result.error_hash['msg']).to eq('failed')
+        expect(result.error_hash['kind']).to eq('my-exception')
+      end
+    end
   end
 
-  it "yields each task result" do
-    node_results.each do |node, result|
-      expect(node)
-        .to receive(:run_task)
-        .with(task, 'both', task_arguments, {})
-        .and_return(result)
+  context 'uploading a file' do
+    it "executes on all nodes" do
+      node_results.each do |node, result|
+        expect(node)
+          .to receive(:upload)
+          .with(script, dest)
+          .and_return(result)
+      end
+
+      results = executor.file_upload(targets, script, dest)
+      results.each do |result|
+        expect(result).to be_instance_of(Bolt::Result)
+      end
     end
 
-    results = []
-    executor.run_task(targets, task, 'both', task_arguments) do |result|
-      results << result
-    end
-    node_results.each do |node, result|
-      expect(results).to include(success_event(result))
-      expect(results).to include(start_event(node.target))
-    end
-  end
+    it "yields each result" do
+      node_results.each do |node, result|
+        expect(node)
+          .to receive(:upload)
+          .with(script, dest)
+          .and_return(result)
+      end
 
-  it "uploads a file on all nodes" do
-    node_results.each do |node, result|
-      expect(node)
-        .to receive(:upload)
-        .with(script, dest)
-        .and_return(result)
-    end
-
-    results = executor.file_upload(targets, script, dest)
-    results.each do |result|
-      expect(result).to be_instance_of(Bolt::Result)
-    end
-  end
-
-  it "yields each upload result" do
-    node_results.each do |node, result|
-      expect(node)
-        .to receive(:upload)
-        .with(script, dest)
-        .and_return(result)
+      results = []
+      executor.file_upload(targets, script, dest) do |result|
+        results << result
+      end
+      node_results.each do |node, result|
+        expect(results).to include(success_event(result))
+        expect(results).to include(start_event(node.target))
+      end
     end
 
-    results = []
-    executor.file_upload(targets, script, dest) do |result|
-      results << result
-    end
-    node_results.each do |node, result|
-      expect(results).to include(success_event(result))
-      expect(results).to include(start_event(node.target))
+    it 'catches errors' do
+      node_results.each_key do |node|
+        expect(node)
+          .to receive(:upload)
+          .with(script, dest)
+          .and_raise(Bolt::Error, 'failed', 'my-exception')
+      end
+
+      executor.file_upload(targets, script, dest) do |result|
+        expect(result.error_hash['msg']).to eq('failed')
+        expect(result.error_hash['kind']).to eq('my-exception')
+      end
     end
   end
 

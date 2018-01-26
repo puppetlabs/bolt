@@ -300,16 +300,18 @@ SHELL
       it 'returns an error result for upload', ssh: true do
         contents = "kljhdfg"
         with_tempfile_containing('upload-test', contents) do |file|
-          expect(ssh.upload(file.path, "/home/#{user}/upload-test").error_hash['msg']).to eq('no write')
+          expect {
+            ssh.upload(file.path, "/home/#{user}/upload-test")
+          }.to raise_error(Bolt::Node::FileError, 'no write')
         end
       end
 
       it 'returns an error result for run_command', ssh: true do
         contents = "#!/bin/sh\necho hellote"
         with_tempfile_containing('script test', contents) do |file|
-          expect(
-            ssh.run_script(file.path, []).error_hash['msg']
-          ).to eq("no write")
+          expect {
+            ssh.run_script(file.path, [])
+          }.to raise_error(Bolt::Node::FileError, 'no write')
         end
       end
 
@@ -317,7 +319,9 @@ SHELL
         contents = "#!/bin/sh\necho -n ${PT_message_one} ${PT_message_two}"
         arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
         with_tempfile_containing('tasks test', contents) do |file|
-          expect(ssh.run_task(file.path, 'environment', arguments).error_hash['msg']).to eq("no write")
+          expect {
+            ssh.run_task(file.path, 'environment', arguments)
+          }.to raise_error(Bolt::Node::FileError, 'no write')
         end
       end
     end
@@ -332,9 +336,9 @@ SHELL
       it 'errors when it tries to run a script', ssh: true do
         contents = "#!/bin/sh\necho hellote"
         with_tempfile_containing('script test', contents) do |file|
-          expect(
+          expect {
             ssh.run_script(file.path, []).error_hash['msg']
-          ).to eq("no tmpdir")
+          }.to raise_error(Bolt::Node::FileError, 'no tmpdir')
         end
       end
 
@@ -342,7 +346,9 @@ SHELL
         contents = "#!/bin/sh\necho -n ${PT_message_one} ${PT_message_two}"
         arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
         with_tempfile_containing('tasks test', contents) do |file|
-          expect(ssh.run_task(file.path, 'environment', arguments).error_hash['msg']).to eq("no tmpdir")
+          expect {
+            ssh.run_task(file.path, 'environment', arguments)
+          }.to raise_error(Bolt::Node::FileError, 'no tmpdir')
         end
       end
     end
@@ -364,9 +370,9 @@ SHELL
     it "errors when tmpdir doesn't exist", ssh: true do
       contents = "#!/bin/sh\n echo $0"
       with_tempfile_containing('script dir', contents) do |file|
-        result = ssh.run_script(file.path, [])
-        expect(result.success?).to eq(false)
-        expect(result.error_hash['msg']).to match(/Could not make tempdir.*#{Regexp.escape(tmpdir)}/)
+        expect {
+          ssh.run_script(file.path, [])
+        }.to raise_error(Bolt::Node::FileError, /Could not make tempdir.*#{Regexp.escape(tmpdir)}/)
       end
     end
 
@@ -438,12 +444,11 @@ SHELL
       }
 
       it "returns a failed result", ssh: true do
-        expect(ssh.run_command('whoami').error_hash).to eq(
-          'kind' => 'puppetlabs.tasks/escalate-error',
-          'msg' => "Sudo password for user #{user} not recognized on #{hostname}:#{port}",
-          'details' => {},
-          'issue_code' => 'BAD_PASSWORD'
-        )
+        expect {
+          ssh.run_command('whoami')
+             .to raise_error(Bolt::Node::EscalateError,
+                             "Sudo password for user #{user} not recognized on #{hostname}:#{port}")
+        }
       end
     end
 
@@ -451,12 +456,11 @@ SHELL
       let(:config) { mk_config(insecure: true, run_as: 'root', user: user, password: password) }
 
       it "returns a failed result", ssh: true do
-        expect(ssh.run_command('whoami').error_hash).to eq(
-          'kind' => 'puppetlabs.tasks/escalate-error',
-          'msg' => "Sudo password for user #{user} was not provided for #{hostname}:#{port}",
-          'details' => {},
-          'issue_code' => 'NO_PASSWORD'
-        )
+        expect {
+          ssh.run_command('whoami')
+             .to raise_error(Bolt::Node::EscalateError,
+                             "Sudo password for user #{user} was not provided for #{hostname}:#{port}")
+        }
       end
     end
   end

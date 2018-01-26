@@ -90,6 +90,13 @@ module Bolt
     end
     private :get_run_as
 
+    def with_exception_handling(node)
+      yield
+    rescue StandardError => e
+      Bolt::Result.from_exception(node.target, e)
+    end
+    private :with_exception_handling
+
     def run_command(targets, command, options = {})
       nodes = from_targets(targets)
       @logger.info("Starting command run '#{command}' on #{nodes.map(&:uri)}")
@@ -97,7 +104,9 @@ module Bolt
 
       r = on(nodes, callback) do |node|
         @logger.debug("Running command '#{command}' on #{node.uri}")
-        node_result = node.run_command(command, get_run_as(node, options))
+        node_result = with_exception_handling(node) do
+          node.run_command(command, get_run_as(node, options))
+        end
         @logger.debug("Result on #{node.uri}: #{JSON.dump(node_result.value)}")
         node_result
       end
@@ -113,7 +122,9 @@ module Bolt
 
       r = on(nodes, callback) do |node|
         @logger.debug { "Running script '#{script}' on #{node.uri}" }
-        node_result = node.run_script(script, arguments, get_run_as(node, options))
+        node_result = with_exception_handling(node) do
+          node.run_script(script, arguments, get_run_as(node, options))
+        end
         @logger.debug("Result on #{node.uri}: #{JSON.dump(node_result.value)}")
         node_result
       end
@@ -129,7 +140,9 @@ module Bolt
 
       r = on(nodes, callback) do |node|
         @logger.debug { "Running task run '#{task}' on #{node.uri}" }
-        node_result = node.run_task(task, input_method, arguments, get_run_as(node, options))
+        node_result = with_exception_handling(node) do
+          node.run_task(task, input_method, arguments, get_run_as(node, options))
+        end
         @logger.debug("Result on #{node.uri}: #{JSON.dump(node_result.value)}")
         node_result
       end
@@ -144,7 +157,9 @@ module Bolt
 
       r = on(nodes, callback) do |node|
         @logger.debug { "Uploading: '#{source}' to #{destination} on #{node.uri}" }
-        node_result = node.upload(source, destination)
+        node_result = with_exception_handling(node) do
+          node.upload(source, destination)
+        end
         @logger.debug("Result on #{node.uri}: #{JSON.dump(node_result.value)}")
         node_result
       end

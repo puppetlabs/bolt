@@ -168,8 +168,6 @@ module Bolt
     def upload(source, destination)
       write_remote_file(source, destination)
       Bolt::Result.for_upload(@target, source, destination)
-    rescue StandardError => e
-      Bolt::Result.from_exception(@target, e)
     end
 
     def write_remote_file(source, destination)
@@ -262,10 +260,6 @@ SCRIPT
       @run_as = options['_run_as'] || @conf_run_as
       output = execute(command, sudoable: true)
       Bolt::Result.for_command(@target, output.stdout.string, output.stderr.string, output.exit_code)
-    # TODO: We should be able to rely on the excutor for this but it will mean
-    # a test refactor
-    rescue StandardError => e
-      Bolt::Result.from_exception(@target, e)
     ensure
       @run_as = @conf_run_as
     end
@@ -277,10 +271,6 @@ SCRIPT
                          sudoable: true)
         Bolt::Result.for_command(@target, output.stdout.string, output.stderr.string, output.exit_code)
       end
-    # TODO: We should be able to rely on the excutor for this but it will mean
-    # a test refactor
-    rescue StandardError => e
-      Bolt::Result.from_exception(@target, e)
     ensure
       @run_as = @conf_run_as
     end
@@ -316,11 +306,6 @@ SCRIPT
       Bolt::Result.for_task(@target, output.stdout.string,
                             output.stderr.string,
                             output.exit_code)
-
-    # TODO: We should be able to rely on the excutor for this but it will mean
-    # a test refactor
-    rescue StandardError => e
-      Bolt::Result.from_exception(@target, e)
     ensure
       @run_as = @conf_run_as
     end
