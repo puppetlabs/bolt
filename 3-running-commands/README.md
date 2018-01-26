@@ -36,9 +36,9 @@ Finished on node1:
     21:19:23 up 13 min,  0 users,  load average: 0.08, 0.03, 0.04
 ```
 
-If you receive an error reading `Host key verification failed` you should make sure the correct host keys are in your `known_hosts` file or pass `--insecure` to future bolt commands. Bolt will not honor `StrictHostKeyChecking` in you ssh config.
+If you receive an error reading `Host key verification failed` you should make sure the correct host keys are in your `known_hosts` file or pass `--no-host-key-check` to future bolt commands. Bolt will not honor `StrictHostKeyChecking` in you ssh config.
 
-`bolt` can also run commands against multiple nodes by passing a command separated list. Replace `node1,node2,node3` in the following with two or more of your own nodes. If you get an error about `Host key verification` run the rest of the examples with the `--insecure` flag to disable host key verification.
+`bolt` can also run commands against multiple nodes by passing a command separated list. Replace `node1,node2,node3` in the following with two or more of your own nodes. If you get an error about `Host key verification` run the rest of the examples with the `--no-host-key-check` flag to disable host key verification.
 
 ```
 $ bolt command run uptime --nodes node1,node2,node3
@@ -89,9 +89,9 @@ bolt --help
 bolt command run <command> --nodes winrm://<node> --user <user> --password <password>
 ```
 
-Note the `winrm://` prefix for the node address. Also note the `--username` and `--password` flags for passing authentication information. Unless you have SSL setup for WinRM communication, you will also need to supply the `--insecure` flag.
+Note the `winrm://` prefix for the node address. Also note the `--username` and `--password` flags for passing authentication information. Unless you have SSL setup for WinRM communication, you will also need to supply the `--no-ssl` flag.
 
-If you get an error about `unknown protocol`, you may not have SSL setup for WinRM communication and should run the rest of the examples with the `--insecure` flag.
+If you get an error about `unknown protocol`, you may not have SSL setup for WinRM communication and should run the rest of the examples with the `--no-ssl` flag.
 
 You can see all of the available flags by running:
 
@@ -123,9 +123,9 @@ The above example accesses a single node. You can also provide a command separat
 bolt command run <command> --nodes winrm://<node>,winrm://<node> --user <user> --password <password>
 ```
 
-By default `bolt` will use ssl when executing over WinRM.  If you would like to use http use the `--insecure` flag.  
+By default `bolt` will use ssl when executing over WinRM.  If you would like to use http use the `--no-ssl` flag.
 ```
-bolt command run <command> --insecure --nodes winrm://<node>,winrm://<node> --user <user> --password <password>
+bolt command run <command> --no-ssl --nodes winrm://<node>,winrm://<node> --user <user> --password <password>
 ```
 # Next steps
 
