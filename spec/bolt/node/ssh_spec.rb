@@ -16,7 +16,7 @@ describe Bolt::SSH do
   let(:hostname) { ENV['BOLT_SSH_HOST'] || "localhost" }
   let(:user) { ENV['BOLT_SSH_USER'] || "vagrant" }
   let(:password) { ENV['BOLT_SSH_PASSWORD'] || "vagrant" }
-  let(:port) { ENV['BOLT_SSH_PORT'] || 2224 }
+  let(:port) { ENV['BOLT_SSH_PORT'] || 20022 }
   let(:key) { ENV['BOLT_SSH_KEY'] || Dir[".vagrant/**/private_key"] }
   let(:command) { "pwd" }
   let(:config) { mk_config(user: user, password: password) }

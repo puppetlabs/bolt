@@ -4,9 +4,9 @@ module BoltSpec
       tu = transport.upcase
       default_port = case transport
                      when 'ssh'
-                       2224
+                       20022
                      when 'winrm'
-                       55985
+                       25985
                      end
 
       {
