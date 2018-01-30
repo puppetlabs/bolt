@@ -39,6 +39,16 @@ RSpec.configure do |config|
     mocks.verify_partial_doubles = true
   end
 
+  config.before :each do
+    @puppet_logs = []
+    Puppet::Util::Log.newdestination(Puppet::Test::LogCollector.new(@puppet_logs))
+  end
+
+  config.after :each do
+    @puppet_logs.clear
+    Puppet::Util::Log.close_all
+  end
+
   # This will be default in future rspec, leave it on
   config.shared_context_metadata_behavior = :apply_to_host_groups
 

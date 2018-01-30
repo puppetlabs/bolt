@@ -11,6 +11,9 @@ describe "Bolt::CLI" do
 
     allow_any_instance_of(Bolt::CLI).to receive(:outputter).and_return(outputter)
     allow_any_instance_of(Bolt::CLI).to receive(:warn)
+
+    # This will turn on logging to the console by default... not ideal for tests
+    allow(Bolt::PAL).to receive(:configure_logging)
   end
 
   def stub_file(path)
@@ -747,12 +750,16 @@ NODES
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/invalid_mods')]
         end
 
-        it "task show displays an error" do
+        it "task show prints a warning but shows other valid tasks" do
           options = {
             mode: 'task',
             action: 'show'
           }
-          expect { cli.execute(options) }.to raise_error(/unexpected token at/)
+          cli.execute(options)
+          json = JSON.parse(output.string)
+          expect(json).to eq([['sample::ok', nil]])
+
+          expect(@puppet_logs.first.message).to match(/unexpected token.*params\.json/m)
         end
       end
 
@@ -829,12 +836,17 @@ NODES
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/invalid_mods')]
         end
 
-        it "plan show displays an error" do
+        it "plan show prints a warning but shows other valid plans" do
           options = {
             mode: 'plan',
             action: 'show'
           }
-          expect { cli.execute(options) }.to raise_error(/^Syntax error at/)
+
+          cli.execute(options)
+          json = JSON.parse(output.string)
+          expect(json).to eq([['sample::ok']])
+
+          expect(@puppet_logs.first.message).to match(/^Syntax error at.*single_task.pp/m)
         end
 
         it "plan run displays an error" do
