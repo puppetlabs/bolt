@@ -29,23 +29,23 @@ describe "when runnning over the winrm transport", winrm: true do
       expect(result['_error']['msg']).to eq('The command failed with exit code 1')
     end
 
-    it 'runs a task', reset_puppet_settings: true do
+    it 'runs a task', :reset_puppet_settings do
       result = run_one_node(%W[task run #{stdin_task} message=somemessage] + config_flags)
       expect(result['_output'].strip).to match(/STDIN: {"messa/)
     end
 
-    it 'reports errors when task fails', reset_puppet_settings: true do
+    it 'reports errors when task fails', :reset_puppet_settings do
       result = run_failed_node(%w[task run results::win] + config_flags)
       expect(result['_error']['kind']).to eq('puppetlabs.tasks/task-error')
       expect(result['_error']['msg']).to eq("The task failed with exit code 1:\n")
     end
 
-    it 'passes noop to a task that supports noop', reset_puppet_settings: true do
+    it 'passes noop to a task that supports noop', :reset_puppet_settings do
       result = run_one_node(%w[task run sample::ps_noop message=somemessage --noop] + config_flags)
       expect(result['_output'].strip).to eq("somemessage with noop true")
     end
 
-    it 'does not pass noop to a task by default', reset_puppet_settings: true do
+    it 'does not pass noop to a task by default', :reset_puppet_settings do
       result = run_one_node(%w[task run sample::ps_noop message=somemessage] + config_flags)
       expect(result['_output'].strip).to eq("somemessage with noop")
     end
@@ -62,7 +62,7 @@ describe "when runnning over the winrm transport", winrm: true do
       end
     end
 
-    it 'runs a task', reset_puppet_settings: true do
+    it 'runs a task', :reset_puppet_settings do
       with_tempfile_containing('conf', YAML.dump(config)) do |conf|
         result = run_one_node(%W[task run #{stdin_task} message=somemessage --configfile #{conf.path}] + config_flags)
         expect(result['_output'].strip).to match(/STDIN: {"messa/)

@@ -34,7 +34,7 @@ describe "Bolt::Executor" do
   let(:node_results) { mock_node_results }
 
   before(:each) do
-    allow(executor).to receive(:from_targets).with(targets).and_return(node_results.map(&:first))
+    allow(executor).to receive(:from_targets).with(targets).and_return(node_results.keys)
   end
 
   context 'running a command' do

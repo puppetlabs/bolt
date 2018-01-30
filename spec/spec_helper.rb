@@ -60,6 +60,6 @@ RSpec.configure do |config|
 
   # Make it possible to include the 'reset puppet settings' shared context
   # in a group (or even an individual test) by specifying
-  # `reset_puppet_settings: true' metadata on the group/test
-  config.include_context 'reset puppet settings', reset_puppet_settings: true
+  # `:reset_puppet_settings' metadata on the group/test
+  config.include_context 'reset puppet settings', :reset_puppet_settings
 end
