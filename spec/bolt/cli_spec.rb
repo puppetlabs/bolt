@@ -738,6 +738,10 @@ NODES
               "optional_integer" => {
                 "description" => "Optional integer parameter",
                 "type" => "Optional[Integer[-5, 5]]"
+              },
+              "no_type" => {
+                "description" => "A parameter without a type",
+                'type' => 'Any'
               }
             },
             "supports_noop" => true
