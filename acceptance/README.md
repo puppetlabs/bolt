@@ -27,6 +27,9 @@ directory of your `bolt` git clone.
 The following environment variables are used in conjunction with the
 rake tasks:
 
+BEAKER_KEYFILE _required_ (for rake task)
+    : The path to the file Beaker should use as the ssh key (usually 
+    `~/.ssh/id_rsa-acceptance`)
 BOLT_CONTOLLER  _required_ (for rake task)
     :  Operating system and architecture to be used for the node running
     `bolt`. This value should be expressed in the notation used by
@@ -95,6 +98,7 @@ GIT_SHA
 ####  Gem
 Example to test latest available gem from https://rubygems.org
 ```
+BEAKER_KEYFILE=~/.ssh/id_rsa-mykey          \
 BOLT_CONTROLLER=centos7-64                  \
 BOLT_NODES=ubuntu1604-64,windows10ent-64    \
 SSH_PASSWORD='S3@ret3'                      \
@@ -106,6 +110,7 @@ Example to test specific gem version from https://rubygems.mymirror.example.org
 ```
 GEM_VERSION=0.5.0                           \
 GEM_SOURCE=https://rubygems.mymirror.example.org  \
+BEAKER_KEYFILE=~/.ssh/id_rsa-mykey          \
 BOLT_CONTROLLER=centos7-64                  \
 BOLT_NODES=ubuntu1604-64,windows10ent-64    \
 SSH_PASSWORD='S3@ret3'                      \
@@ -116,6 +121,7 @@ bundle exec rake test:gem
 #### Git
 Example to test latest git commit to master on https://github.com/puppetlabs/bolt
 ```
+BEAKER_KEYFILE=~/.ssh/id_rsa-mykey          \
 BOLT_CONTROLLER=centos7-64                  \
 BOLT_NODES=ubuntu1604-64,windows10ent-64    \
 SSH_PASSWORD='S3@ret3'                      \
@@ -125,6 +131,7 @@ bundle exec rake test:git
 
 Example to test specific SHA on https://github.com/puppetlabs/bolt
 ```
+BEAKER_KEYFILE=~/.ssh/id_rsa-mykey          \
 GIT_SHA=309e197                             \
 BOLT_CONTROLLER=centos7-64                  \
 BOLT_NODES=ubuntu1604-64,windows10ent-64    \
@@ -137,6 +144,7 @@ Example to test topic branch on fork of bolt on GitHub
 ```
 GIT_FORK=octocat/bolt.git                   \
 GIT_BRANCH=my-topic-branch                  \
+BEAKER_KEYFILE=~/.ssh/id_rsa-mykey          \
 BOLT_CONTROLLER=centos7-64                  \
 BOLT_NODES=ubuntu1604-64,windows10ent-64    \
 SSH_PASSWORD='S3@ret3'                      \
@@ -210,5 +218,5 @@ SSH_USER=root                      \
 SSH_PASSWORD='S3@ret3'             \
 WINRM_USER=Administator            \
 WINRM_PASSWORD='S3@ret3'           \
-bundle exec beaker exec ./tests
+bundle exec beaker exec -t ./tests
 ```
