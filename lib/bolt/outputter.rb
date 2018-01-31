@@ -14,6 +14,15 @@ module Bolt
     def initialize(stream = $stdout)
       @stream = stream
     end
+
+    # This method replaces data types tha have the name 'Data'
+    # with the string 'Any'
+    # This was a problem when using 'bolt task show <task_name>'
+    def replace_data_type(params)
+      params.map do |_, v|
+        v['type'] = 'Any' if v['type'].to_s == 'Data'
+      end
+    end
   end
 end
 

@@ -101,6 +101,7 @@ module Bolt
         usage = "bolt task run --nodes, -n <node-name> #{task['name']}"
 
         if task['parameters']
+          replace_data_type(task['parameters'])
           task['parameters'].each do |k, v|
             pretty_params << "- #{k}: #{v['type']}\n"
             pretty_params << "    #{v['description']}\n" if v['description']

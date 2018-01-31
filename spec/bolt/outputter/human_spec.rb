@@ -65,6 +65,38 @@ PARAMETERS:
     TASK_OUTPUT
   end
 
+  it 'converts Data (undef) to Any' do
+    task = {
+      'name' => 'sticky_bun',
+      'description' => 'A delicious sweet bun with nuts',
+      'parameters' => {
+        'glaze' => {
+          'type' => 'Sticky',
+          'description' => 'Sweet'
+        },
+        'pecans' => {
+          'description' => 'The best kind of nut',
+          'type' => 'Data'
+        }
+      }
+    }
+    outputter.print_task_info(task)
+    expect(output.string).to eq(<<-TASK_OUTPUT)
+
+sticky_bun - A delicious sweet bun with nuts
+
+USAGE:
+bolt task run --nodes, -n <node-name> sticky_bun glaze=<value> pecans=<value>
+
+PARAMETERS:
+- glaze: Sticky
+    Sweet
+- pecans: Any
+    The best kind of nut
+
+    TASK_OUTPUT
+  end
+
   it "formats a plan" do
     plan = {
       'name' => 'planity_plan',
