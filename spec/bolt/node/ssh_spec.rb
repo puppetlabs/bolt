@@ -257,11 +257,11 @@ SHELLWORDS
       end
     end
 
-    it "doesn't call with_task_wrapper", ssh: true do
+    it "doesn't generate a task wrapper when not needed", ssh: true do
       contents = "#!/bin/sh\necho -n ${PT_message_one} ${PT_message_two}"
       arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
       with_tempfile_containing('tasks test', contents) do |file|
-        expect(ssh).not_to receive(:with_task_wrapper)
+        expect(ssh).not_to receive(:make_wrapper_stringio)
         ssh.run_task(file.path, 'environment', arguments)
       end
     end

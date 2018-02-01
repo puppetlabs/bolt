@@ -212,30 +212,30 @@ module Bolt
       tmppath || result.stdout.string.chomp
     end
 
+    # A helper to create and delete a tempdir on the remote system. Yields the
+    # directory name.
     def with_remote_tempdir
       dir = make_tempdir
-      begin
-        yield dir
-      ensure
-        output =  execute("rm -rf '#{dir}'")
-        if output.exit_code != 0
-          logger.warn("Failed to clean up tempdir '#{dir}': #{output.stderr.string}")
-        end
+      yield dir
+    ensure
+      output =  execute("rm -rf '#{dir}'")
+      if output.exit_code != 0
+        logger.warn("Failed to clean up tempdir '#{dir}': #{output.stderr.string}")
       end
     end
 
-    def with_remote_script(dir, file)
-      remote_path = "#{dir}/#{File.basename(file)}"
+    def write_remote_executable(dir, file, filename = nil)
+      filename ||= File.basename(file)
+      remote_path = "#{dir}/#{filename}"
       write_remote_file(file, remote_path)
       make_executable(remote_path)
-      yield remote_path
+      remote_path
     end
 
-    def with_remote_file(file)
-      with_remote_tempdir do |dir|
-        with_remote_script(dir, file) do |remote_path|
-          yield remote_path
-        end
+    def make_executable(path)
+      result = execute("chmod u+x '#{path}'")
+      if result.exit_code != 0
+        raise FileError.new("Could not make file '#{path}' executable: #{result.stderr.string}", 'CHMOD_ERROR')
       end
     end
 
@@ -248,32 +248,11 @@ EOF
 SCRIPT
     end
 
-    def make_executable(path)
-      result = execute("chmod u+x '#{path}'")
-      if result.exit_code != 0
-        raise FileError.new("Could not make file '#{path}' executable: #{result.stderr.string}", 'CHMOD_ERROR')
-      end
-    end
-
-    def with_task_wrapper(remote_task, dir, stdin)
-      wrapper = make_wrapper_stringio(remote_task, stdin)
-      command = "#{dir}/wrapper.sh"
-      write_remote_file(wrapper, command)
-      make_executable(command)
-      yield command
-    end
-
-    def with_remote_task(task_file, stdin)
-      with_remote_tempdir do |dir|
-        with_remote_script(dir, task_file) do |remote_task|
-          if stdin
-            with_task_wrapper(remote_task, dir, stdin) do |command|
-              yield command
-            end
-          else
-            yield remote_task
-          end
-        end
+    def write_remote_task(dir, task_file, stdin)
+      remote_task = write_remote_script(dir, task_file)
+      if stdin
+      else
+        remote_task
       end
     end
 
@@ -287,7 +266,8 @@ SCRIPT
 
     def run_script(script, arguments, options = {})
       @run_as = options['_run_as'] || @conf_run_as
-      with_remote_file(script) do |remote_path|
+      with_remote_tempdir do |dir|
+        remote_path = write_remote_executable(dir, script)
         output = execute("'#{remote_path}' #{Shellwords.join(arguments)}",
                          sudoable: true)
         Bolt::Result.for_command(@target, output.stdout.string, output.stderr.string, output.exit_code)
@@ -313,16 +293,20 @@ SCRIPT
 
       command = export_args.empty? ? '' : "#{export_args} "
 
-      if @run_as
-        with_remote_task(task, stdin) do |remote_path|
-          command += "'#{remote_path}'"
-          output = execute(command, sudoable: true)
+      execute_options = {}
+
+      with_remote_tempdir do |dir|
+        remote_task_path = write_remote_executable(dir, task)
+        if @run_as && stdin
+          wrapper = make_wrapper_stringio(remote_task_path, stdin)
+          remote_wrapper_path = write_remote_executable(dir, wrapper, 'wrapper.sh')
+          command += "'#{remote_wrapper_path}'"
+        else
+          command += "'#{remote_task_path}'"
+          execute_options[:stdin] = stdin
         end
-      else
-        with_remote_file(task) do |remote_path|
-          command += "'#{remote_path}'"
-          output = execute(command, stdin: stdin)
-        end
+        execute_options[:sudoable] = true if @run_as
+        output = execute(command, **execute_options)
       end
       Bolt::Result.for_task(@target, output.stdout.string,
                             output.stderr.string,
