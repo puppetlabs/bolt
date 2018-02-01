@@ -406,6 +406,18 @@ SHELL
       end
     end
 
+    it "can upload a file as root", ssh: true do
+      contents = "upload file test as root content"
+      dest = '/tmp/root-file-upload-test'
+      with_tempfile_containing('tasks test upload as root', contents) do |file|
+        expect(ssh.upload(file.path, dest).message).to match(/Uploaded/)
+        expect(ssh.run_command("cat #{dest}")['stdout']).to eq(contents)
+        expect(ssh.run_command("stat -c %U #{dest}")['stdout'].chomp).to eq('root')
+      end
+
+      ssh.execute("rm #{dest}", sudoable: true, run_as: 'root')
+    end
+
     context "requesting a pty" do
       let(:config) {
         mk_config(host_key_check: false, sudo_password: password, run_as: 'root',

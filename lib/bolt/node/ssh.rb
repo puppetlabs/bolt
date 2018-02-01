@@ -188,7 +188,24 @@ module Bolt
     end
 
     def upload(source, destination)
-      write_remote_file(source, destination)
+      with_remote_tempdir do |dir|
+        basename = File.basename(destination)
+        tmpfile = "#{dir}/#{basename}"
+        write_remote_file(source, tmpfile)
+        # pass over file ownership if we're using run-as to be a different user
+        if @run_as && @user != @run_as
+          result = execute("chown '#{@run_as}:' '#{tmpfile}'", sudoable: true, run_as: 'root')
+          if result.exit_code != 0
+            message = "Could not change owner of temporary file '#{tmpfile}' to #{@run_as}: #{result.stderr.string}"
+            raise FileError.new(message, 'CHOWN_ERROR')
+          end
+        end
+        result = execute("mv '#{tmpfile}' '#{destination}'")
+        if result.exit_code != 0
+          message = "Could not move temporary file '#{tmpfile}' to #{destination}: #{result.stderr.string}"
+          raise FileError.new(message, 'MV_ERROR')
+        end
+      end
       Bolt::Result.for_upload(@target, source, destination)
     end
 
