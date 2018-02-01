@@ -15,6 +15,11 @@ module Bolt
       }
     end
 
+    def initialize(target)
+      super(target)
+      @user = @user || Net::SSH::Config.for(target.host)[:user] || Etc.getlogin
+    end
+
     def protocol
       'ssh'
     end
