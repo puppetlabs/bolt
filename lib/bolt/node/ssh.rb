@@ -133,14 +133,10 @@ module Bolt
 
     def execute(command, sudoable: false, **options)
       result_output = Bolt::Node::Output.new
-      use_sudo = sudoable && @run_as
+      run_as = options[:run_as] || @run_as
+      use_sudo = sudoable && run_as && @user != run_as
       if use_sudo
-        user_clause = if @run_as
-                        "-u #{@run_as}"
-                      else
-                        ''
-                      end
-        command = "sudo -S #{user_clause} -p '#{sudo_prompt}' #{command}"
+        command = "sudo -S -u #{run_as} -p '#{sudo_prompt}' #{command}"
       end
 
       @logger.debug { "Executing: #{command}" }
