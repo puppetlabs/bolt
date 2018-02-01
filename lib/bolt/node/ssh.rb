@@ -187,7 +187,8 @@ module Bolt
       result_output
     end
 
-    def upload(source, destination)
+    def upload(source, destination, options = {})
+      @run_as = options['_run_as'] || @conf_run_as
       with_remote_tempdir do |dir|
         basename = File.basename(destination)
         tmpfile = "#{dir}/#{basename}"
@@ -207,6 +208,8 @@ module Bolt
         end
       end
       Bolt::Result.for_upload(@target, source, destination)
+    ensure
+      @run_as = @conf_run_as
     end
 
     def write_remote_file(source, destination)

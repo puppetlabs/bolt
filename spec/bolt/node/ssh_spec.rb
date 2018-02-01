@@ -451,6 +451,18 @@ SHELL
           expect(ssh.run_task(file.path, 'environment', {}, '_run_as' => 'root').message).to eq("root\n")
         end
       end
+
+      it "can override run_as for file upload via an option", ssh: true do
+        contents = "upload file test as root content"
+        dest = '/tmp/root-file-upload-test'
+        with_tempfile_containing('tasks test upload as root', contents) do |file|
+          expect(ssh.upload(file.path, dest, '_run_as' => 'root').message).to match(/Uploaded/)
+          expect(ssh.run_command("cat #{dest}", '_run_as' => 'root')['stdout']).to eq(contents)
+          expect(ssh.run_command("stat -c %U #{dest}", '_run_as' => 'root')['stdout'].chomp).to eq('root')
+        end
+
+        ssh.execute("rm #{dest}", sudoable: true, run_as: 'root')
+      end
     end
 
     context "with an incorrect password" do

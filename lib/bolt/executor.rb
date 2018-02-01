@@ -150,7 +150,7 @@ module Bolt
       r
     end
 
-    def file_upload(targets, source, destination)
+    def file_upload(targets, source, destination, options = {})
       nodes = from_targets(targets)
       @logger.info("Starting file upload from #{source} to #{destination} on #{nodes.map(&:uri)}")
       callback = block_given? ? Proc.new : nil
@@ -158,7 +158,7 @@ module Bolt
       r = on(nodes, callback) do |node|
         @logger.debug { "Uploading: '#{source}' to #{destination} on #{node.uri}" }
         node_result = with_exception_handling(node) do
-          node.upload(source, destination)
+          node.upload(source, destination, options)
         end
         @logger.debug("Result on #{node.uri}: #{JSON.dump(node_result.value)}")
         node_result
