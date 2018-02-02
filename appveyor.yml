@@ -14,6 +14,9 @@ environment:
   matrix:
     - RUBY_VERSION: 200
     - RUBY_VERSION: 24
+    - APPVEYOR_BUILD_WORKER_CLOUD: GCE
+      APPVEYOR_BUILD_WORKER_IMAGE: 2012R2 PS4
+      RUBY_VERSION: 24
 
 install:
   - set PATH=C:\Ruby%RUBY_VERSION%\bin;%PATH%
