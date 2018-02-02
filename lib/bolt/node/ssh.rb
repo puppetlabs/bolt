@@ -7,6 +7,37 @@ require 'bolt/node/output'
 
 module Bolt
   class SSH < Node
+    class RemoteTempdir
+      def initialize(node, path)
+        @node = node
+        @owner = node.user
+        @path = path
+        @logger = node.logger
+      end
+
+      def to_s
+        @path
+      end
+
+      def chown(owner)
+        return if owner.nil? || owner == @owner
+
+        @owner = owner
+        result = @node.execute("chown -R '#{@owner}': '#{@path}'", sudoable: true, run_as: 'root')
+        if result.exit_code != 0
+          message = "Could not change owner of '#{@path}' to #{@owner}: #{result.stderr.string}"
+          raise Bolt::Node::FileError.new(message, 'CHOWN_ERROR')
+        end
+      end
+
+      def delete
+        result = @node.execute("rm -rf '#{@path}'", sudoable: true, run_as: @owner)
+        if result.exit_code != 0
+          @logger.warn("Failed to clean up tempdir '#{@path}': #{result.stderr.string}")
+        end
+      end
+    end
+
     def self.initialize_transport(logger)
       require 'net/ssh/krb'
     rescue LoadError
@@ -194,14 +225,8 @@ module Bolt
         tmpfile = "#{dir}/#{basename}"
         write_remote_file(source, tmpfile)
         # pass over file ownership if we're using run-as to be a different user
-        if @run_as && @user != @run_as
-          result = execute("chown '#{@run_as}:' '#{tmpfile}'", sudoable: true, run_as: 'root')
-          if result.exit_code != 0
-            message = "Could not change owner of temporary file '#{tmpfile}' to #{@run_as}: #{result.stderr.string}"
-            raise FileError.new(message, 'CHOWN_ERROR')
-          end
-        end
-        result = execute("mv '#{tmpfile}' '#{destination}'")
+        dir.chown(@run_as)
+        result = execute("mv '#{tmpfile}' '#{destination}'", sudoable: true)
         if result.exit_code != 0
           message = "Could not move temporary file '#{tmpfile}' to #{destination}: #{result.stderr.string}"
           raise FileError.new(message, 'MV_ERROR')
@@ -219,7 +244,6 @@ module Bolt
     end
 
     def make_tempdir
-      tmppath = nil
       if @tmpdir
         tmppath = "#{@tmpdir}/#{SecureRandom.uuid}"
         command = "mkdir -m 700 #{tmppath}"
@@ -230,7 +254,8 @@ module Bolt
       if result.exit_code != 0
         raise FileError.new("Could not make tempdir: #{result.stderr.string}", 'TEMPDIR_ERROR')
       end
-      tmppath || result.stdout.string.chomp
+      path = tmppath || result.stdout.string.chomp
+      RemoteTempdir.new(self, path)
     end
 
     # A helper to create and delete a tempdir on the remote system. Yields the
@@ -239,10 +264,7 @@ module Bolt
       dir = make_tempdir
       yield dir
     ensure
-      output =  execute("rm -rf '#{dir}'")
-      if output.exit_code != 0
-        logger.warn("Failed to clean up tempdir '#{dir}': #{output.stderr.string}")
-      end
+      dir.delete if dir
     end
 
     def write_remote_executable(dir, file, filename = nil)
@@ -269,14 +291,6 @@ EOF
 SCRIPT
     end
 
-    def write_remote_task(dir, task_file, stdin)
-      remote_task = write_remote_script(dir, task_file)
-      if stdin
-      else
-        remote_task
-      end
-    end
-
     def run_command(command, options = {})
       @run_as = options['_run_as'] || @conf_run_as
       output = execute(command, sudoable: true)
@@ -289,6 +303,7 @@ SCRIPT
       @run_as = options['_run_as'] || @conf_run_as
       with_remote_tempdir do |dir|
         remote_path = write_remote_executable(dir, script)
+        dir.chown(@run_as)
         output = execute("'#{remote_path}' #{Shellwords.join(arguments)}",
                          sudoable: true)
         Bolt::Result.for_command(@target, output.stdout.string, output.stderr.string, output.exit_code)
@@ -326,6 +341,8 @@ SCRIPT
           command += "'#{remote_task_path}'"
           execute_options[:stdin] = stdin
         end
+        dir.chown(@run_as)
+
         execute_options[:sudoable] = true if @run_as
         output = execute(command, **execute_options)
       end
