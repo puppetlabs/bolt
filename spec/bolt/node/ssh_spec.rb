@@ -21,7 +21,7 @@ describe Bolt::SSH do
   let(:command) { "pwd" }
   let(:config) { mk_config(user: user, password: password) }
   let(:no_host_key_check) { mk_config(host_key_check: false, user: user, password: password) }
-  let(:ssh) { Bolt::SSH.new(target, config: config) }
+  let(:ssh) { Bolt::SSH.new(target) }
   let(:echo_script) { <<BASH }
 for var in "$@"
 do
@@ -29,8 +29,8 @@ do
 done
 BASH
 
-  def target(h = hostname, p = port)
-    Bolt::Target.from_uri("#{h}:#{p}")
+  def target(h: hostname, p: port, conf: config)
+    Bolt::Target.from_uri("#{h}:#{p}").update_conf(conf.transport_conf)
   end
 
   def result_value(stdout = nil, stderr = nil, exit_code = 0)
@@ -52,7 +52,7 @@ BASH
     end
 
     it "downgrades to lenient if host_key_check is false" do
-      ssh = Bolt::SSH.new(target, config: no_host_key_check)
+      ssh = Bolt::SSH.new(target(conf: no_host_key_check))
 
       allow(Net::SSH)
         .to receive(:start)
@@ -73,7 +73,7 @@ BASH
     end
 
     it "raises ConnectError if authentication fails" do
-      ssh = Bolt::SSH.new(target, config: no_host_key_check)
+      ssh = Bolt::SSH.new(target(conf: no_host_key_check))
 
       allow(Net::SSH)
         .to receive(:start)
@@ -88,7 +88,7 @@ BASH
 
     it "returns Node::ConnectError if the node name can't be resolved" do
       # even with default timeout, name resolution fails in < 1
-      ssh = Bolt::SSH.new(target('totally-not-there'))
+      ssh = Bolt::SSH.new(target(h: 'totally-not-there'))
       exec_time = Time.now
       expect_node_error(Bolt::Node::ConnectError,
                         'CONNECT_ERROR',
@@ -101,7 +101,7 @@ BASH
 
     it "returns Node::ConnectError if the connection is refused" do
       # even with default timeout, connection refused fails in < 1
-      ssh = Bolt::SSH.new(target(hostname, 65535))
+      ssh = Bolt::SSH.new(target(h: hostname, p: 65535))
       exec_time = Time.now
       expect_node_error(Bolt::Node::ConnectError,
                         'CONNECT_ERROR',
@@ -128,7 +128,7 @@ BASH
         port = server.addr[1]
 
         timeout = mk_config(connect_timeout: 2, user: 'bad', password: 'password')
-        ssh = Bolt::SSH.new(target(hostname, port), config: timeout)
+        ssh = Bolt::SSH.new(target(h: hostname, p: port, conf: timeout))
 
         exec_time = Time.now
         expect {
@@ -169,7 +169,7 @@ BASH
   end
 
   context "when executing" do
-    let(:ssh) { Bolt::SSH.new(target, config: no_host_key_check) }
+    let(:ssh) { Bolt::SSH.new(target(conf: no_host_key_check)) }
 
     before(:each) { ssh.connect }
     after(:each) { ssh.disconnect }

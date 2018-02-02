@@ -8,8 +8,8 @@ module Bolt
     STDIN_METHODS       = %w[both stdin].freeze
     ENVIRONMENT_METHODS = %w[both environment].freeze
 
-    def self.from_target(target, **kwargs)
-      klass = case target.protocol || kwargs[:config][:transport]
+    def self.from_target(target)
+      klass = case target.protocol
               when 'winrm'
                 Bolt::WinRM
               when 'pcp'
@@ -17,19 +17,19 @@ module Bolt
               else
                 Bolt::SSH
               end
-      klass.new(target, **kwargs)
+      klass.new(target)
     end
 
     def self.initialize_transport(_logger); end
 
     attr_reader :logger, :user, :password, :connect_timeout, :target, :run_as
 
-    def initialize(target, config: Bolt::Config.new)
+    def initialize(target)
       @target = target
 
-      transport_conf = config[:transports][protocol.to_sym]
-      @user = @target.user || transport_conf[:user]
-      @password = @target.password || transport_conf[:password]
+      transport_conf = target.options
+      @user = @target.user
+      @password = @target.password
       @key = transport_conf[:key]
       @cacert = transport_conf[:cacert]
       @tty = transport_conf[:tty]
@@ -38,6 +38,7 @@ module Bolt
       @connect_timeout = transport_conf[:connect_timeout]
       @sudo_password = transport_conf[:sudo_password]
       @run_as = transport_conf[:run_as]
+      @conf_run_as = transport_conf[:run_as]
       @tmpdir = transport_conf[:tmpdir]
       @service_url = transport_conf[:service_url]
       @token_file = transport_conf[:token_file]

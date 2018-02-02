@@ -4,13 +4,14 @@ require 'bolt/target'
 describe 'run_task' do
   include PuppetlabsSpec::Fixtures
   let(:executor) { mock('bolt_executor') }
+  let(:inventory) { mock('inventory') }
 
   around(:each) do |example|
     Puppet[:tasks] = true
     Puppet.features.stubs(:bolt?).returns(true)
     executor.stubs(:noop).returns(false)
 
-    Puppet.override(bolt_executor: executor) do
+    Puppet.override(bolt_executor: executor, bolt_inventory: inventory) do
       example.run
     end
   end
@@ -31,6 +32,7 @@ describe 'run_task' do
       executable = File.join(tasks_root, 'echo.sh')
 
       executor.expects(:run_task).with([target], executable, 'both', default_args, {}).returns(result_set)
+      inventory.expects(:get_targets).with(hostname).returns([target])
 
       is_expected.to run.with_params('Test::Echo', hostname, default_args).and_return(result_set)
     end
@@ -40,6 +42,7 @@ describe 'run_task' do
 
       executor.expects(:run_task).with([target], executable, 'environment', default_args, {})
               .returns(result_set)
+      inventory.expects(:get_targets).with(hostname).returns([target])
 
       is_expected.to run.with_params('Test::Meta', hostname, default_args).and_return(result_set)
     end
@@ -49,6 +52,7 @@ describe 'run_task' do
 
       executor.expects(:run_task).with([target], executable, 'environment', default_args, '_run_as' => 'root')
               .returns(result_set)
+      inventory.expects(:get_targets).with(hostname).returns([target])
 
       args = default_args.merge('_run_as' => 'root')
       is_expected.to run.with_params('Test::Meta', hostname, args).and_return(result_set)
@@ -58,12 +62,14 @@ describe 'run_task' do
       executable = File.join(tasks_root, 'yes.sh')
 
       executor.expects(:run_task).with([target], executable, 'both', {}, {}).returns(result_set)
+      inventory.expects(:get_targets).with(hostname).returns([target])
 
       is_expected.to run.with_params('test::yes', hostname).and_return(result_set)
     end
 
     it 'when called with no destinations - does not invoke bolt' do
       executor.expects(:run_task).never
+      inventory.expects(:get_targets).with([]).returns([])
 
       is_expected.to run.with_params('Test::Yes', []).and_return(Bolt::ResultSet.new([]))
     end
@@ -76,6 +82,7 @@ describe 'run_task' do
 
         executor.expects(:run_task).with([target, target2], executable, 'environment', default_args, {})
                 .returns(result_set)
+        inventory.expects(:get_targets).with([hostname, [[hostname2]], []]).returns([target, target2])
 
         is_expected.to run.with_params('Test::Meta', [hostname, [[hostname2]], []], default_args)
                           .and_return(result_set)
@@ -86,6 +93,7 @@ describe 'run_task' do
 
         executor.expects(:run_task).with([target, target2], executable, 'environment', default_args, {})
                 .returns(result_set)
+        inventory.expects(:get_targets).with([target, [[target2]], []]).returns([target, target2])
 
         is_expected.to run.with_params('Test::Meta', [target, [[target2]], []], default_args)
                           .and_return(result_set)
@@ -100,6 +108,7 @@ describe 'run_task' do
 
           executor.expects(:run_task).with([target, target2], executable, 'environment', default_args, {})
                   .returns(result_set)
+          inventory.expects(:get_targets).with([hostname, hostname2]).returns([target, target2])
 
           is_expected.to run.with_params('Test::Meta', [hostname, hostname2], default_args)
                             .and_raise_error(Bolt::RunFailure)
@@ -110,6 +119,7 @@ describe 'run_task' do
 
           executor.expects(:run_task).with([target, target2], executable, 'environment', default_args, {})
                   .returns(result_set)
+          inventory.expects(:get_targets).with([hostname, hostname2]).returns([target, target2])
 
           args = default_args.merge('_catch_errors' => true)
           is_expected.to run.with_params('Test::Meta', [hostname, hostname2], args)
@@ -120,6 +130,7 @@ describe 'run_task' do
     context 'when called on a module that contains manifests/init.pp' do
       it 'the call does not load init.pp' do
         executor.expects(:run_task).never
+        inventory.expects(:get_targets).with([]).returns([])
 
         is_expected.to run.with_params('test::echo', [])
       end
@@ -130,6 +141,7 @@ describe 'run_task' do
         executable = File.join(tasks_root, 'init.sh')
 
         executor.expects(:run_task).with([target], executable, 'both', {}, {}).returns(result_set)
+        inventory.expects(:get_targets).with(hostname).returns([target])
 
         is_expected.to run.with_params('test', hostname).and_return(result_set)
       end

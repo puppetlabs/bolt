@@ -6,11 +6,12 @@ require 'bolt/result_set'
 describe 'run_script' do
   include PuppetlabsSpec::Fixtures
   let(:executor) { mock('bolt_executor') }
+  let(:inventory) { mock('inventory') }
   let(:tasks_enabled) { true }
 
   around(:each) do |example|
     Puppet[:tasks] = tasks_enabled
-    Puppet.override(bolt_executor: executor) do
+    Puppet.override(bolt_executor: executor, bolt_inventory: inventory) do
       example.run
     end
   end
@@ -28,18 +29,21 @@ describe 'run_script' do
 
     it 'with fully resolved path of file' do
       executor.expects(:run_script).with([target], full_path, [], {}).returns(result_set)
+      inventory.expects(:get_targets).with(hostname).returns([target])
 
       is_expected.to run.with_params('test/uploads/hostname.sh', hostname).and_return(result_set)
     end
 
     it 'with host given as Target' do
       executor.expects(:run_script).with([target], full_path, [], {}).returns(result_set)
+      inventory.expects(:get_targets).with(target).returns([target])
 
       is_expected.to run.with_params('test/uploads/hostname.sh', target).and_return(result_set)
     end
 
     it 'with given arguments as a hash of {arguments => [value]}' do
       executor.expects(:run_script).with([target], full_path, %w[hello world], {}).returns(result_set)
+      inventory.expects(:get_targets).with(hostname).returns([target])
 
       is_expected.to run.with_params('test/uploads/hostname.sh',
                                      hostname,
@@ -48,12 +52,14 @@ describe 'run_script' do
 
     it 'with given arguments as a hash of {arguments => []}' do
       executor.expects(:run_script).with([target], full_path, [], {}).returns(result_set)
+      inventory.expects(:get_targets).with(target).returns([target])
 
       is_expected.to run.with_params('test/uploads/hostname.sh', target, 'arguments' => []).and_return(result_set)
     end
 
     it 'with _run_as' do
       executor.expects(:run_script).with([target], full_path, [], '_run_as' => 'root').returns(result_set)
+      inventory.expects(:get_targets).with(target).returns([target])
 
       is_expected.to run.with_params('test/uploads/hostname.sh', target, '_run_as' => 'root').and_return(result_set)
     end
@@ -67,6 +73,7 @@ describe 'run_script' do
       it 'with propagated multiple hosts and returns multiple results' do
         executor.expects(:run_script).with([target, target2], full_path, [], {})
                 .returns(result_set)
+        inventory.expects(:get_targets).with([hostname, hostname2]).returns([target, target2])
 
         is_expected.to run.with_params('test/uploads/hostname.sh', [hostname, hostname2]).and_return(result_set)
       end
@@ -77,6 +84,7 @@ describe 'run_script' do
         it 'errors by default' do
           executor.expects(:run_script).with([target, target2], full_path, [], {})
                   .returns(result_set)
+          inventory.expects(:get_targets).with([hostname, hostname2]).returns([target, target2])
 
           is_expected.to run.with_params('test/uploads/hostname.sh', [hostname, hostname2])
                             .and_raise_error(Bolt::RunFailure)
@@ -85,6 +93,7 @@ describe 'run_script' do
         it 'does not error with _catch_errors' do
           executor.expects(:run_script).with([target, target2], full_path, [], {})
                   .returns(result_set)
+          inventory.expects(:get_targets).with([hostname, hostname2]).returns([target, target2])
 
           is_expected.to run.with_params('test/uploads/hostname.sh', [hostname, hostname2], '_catch_errors' => true)
         end
@@ -93,6 +102,7 @@ describe 'run_script' do
 
     it 'without nodes - does not invoke bolt' do
       executor.expects(:run_script).never
+      inventory.expects(:get_targets).with([]).returns([])
 
       is_expected.to run
         .with_params('test/uploads/hostname.sh', []).and_return(Bolt::ResultSet.new([]))

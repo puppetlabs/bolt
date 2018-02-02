@@ -15,11 +15,6 @@ module Bolt
       }
     end
 
-    def initialize(target, **kwargs)
-      super(target, **kwargs)
-      @conf_run_as = @run_as
-    end
-
     def protocol
       'ssh'
     end
