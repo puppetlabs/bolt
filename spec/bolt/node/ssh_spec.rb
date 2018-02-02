@@ -14,10 +14,10 @@ describe Bolt::SSH do
   end
 
   let(:hostname) { ENV['BOLT_SSH_HOST'] || "localhost" }
-  let(:user) { ENV['BOLT_SSH_USER'] || "vagrant" }
-  let(:password) { ENV['BOLT_SSH_PASSWORD'] || "vagrant" }
-  let(:port) { ENV['BOLT_SSH_PORT'] || 20022 }
-  let(:key) { ENV['BOLT_SSH_KEY'] || Dir[".vagrant/**/private_key"] }
+  let(:user) { ENV['BOLT_SSH_USER'] || "bolt" }
+  let(:password) { ENV['BOLT_SSH_PASSWORD'] || "bolt" }
+  let(:port) { ENV['BOLT_SSH_PORT'] || 2224 }
+  let(:key) { ENV['BOLT_SSH_KEY'] || Dir["spec/fixtures/keys/id_rsa"] }
   let(:command) { "pwd" }
   let(:config) { mk_config(user: user, password: password) }
   let(:no_host_key_check) { mk_config(host_key_check: false, user: user, password: password) }
@@ -140,7 +140,7 @@ BASH
   end
 
   context "when executing with private key" do
-    let(:config) { mk_config(host_key_check: false, key: key, user: user) }
+    let(:config) { mk_config(host_key_check: false, key: key, user: user, port: port) }
 
     before(:each) { ssh.connect }
     after(:each) { ssh.disconnect }

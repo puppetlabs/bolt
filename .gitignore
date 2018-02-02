@@ -31,3 +31,5 @@ Gemfile.local
 
 .vagrant/
 .byebug_history
+
+acceptance/hosts.yaml
