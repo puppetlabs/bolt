@@ -400,6 +400,15 @@ HELP
     end
 
     def execute(options)
+      message = nil
+
+      handler = Signal.trap :INT do |signo|
+        @logger.info(
+          "Exiting after receiving SIG#{Signal.signame(signo)} signal." << (message ? ' ' << message : '')
+        )
+        exit!
+      end
+
       if options[:mode] == 'plan' || options[:mode] == 'task'
         pal = Bolt::PAL.new(@config)
       end
@@ -426,6 +435,7 @@ HELP
       end
 
       inventory = Bolt::Inventory.from_config(@config)
+      message = 'There may be processes left executing on some nodes.'
 
       if options[:mode] == 'plan'
         executor = Bolt::Executor.new(@config, options[:noop], true)
@@ -484,6 +494,9 @@ HELP
     rescue Bolt::Error => e
       outputter.fatal_error(e)
       raise e
+    ensure
+      # restore original signal handler
+      Signal.trap :INT, handler if handler
     end
 
     def validate_file(type, path)

@@ -14,8 +14,8 @@ describe Bolt::WinRM do
   end
 
   let(:host) { ENV['BOLT_WINRM_HOST'] || 'localhost' }
-  let(:port) { ENV['BOLT_WINRM_PORT'] || 55985 }
-  let(:ssl_port) { ENV['BOLT_WINRM_SSL_PORT'] || 55986 }
+  let(:port) { ENV['BOLT_WINRM_PORT'] || 25985 }
+  let(:ssl_port) { ENV['BOLT_WINRM_SSL_PORT'] || 25986 }
   let(:user) { ENV['BOLT_WINRM_USER'] || "vagrant" }
   let(:password) { ENV['BOLT_WINRM_PASSWORD'] || "vagrant" }
   let(:command) { "echo $env:UserName" }

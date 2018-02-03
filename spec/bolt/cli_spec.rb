@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'signal_helper'
 require 'bolt_spec/files'
 require 'bolt/cli'
 
@@ -168,10 +169,10 @@ describe "Bolt::CLI" do
       end
 
       it "reads from stdin when --nodes is '-'" do
-        nodes = <<NODES
+        nodes = <<-'NODES'
 foo
 bar
-NODES
+        NODES
         cli = Bolt::CLI.new(%w[command run --nodes -])
         allow(STDIN).to receive(:read).and_return(nodes)
         result = cli.parse
@@ -179,10 +180,10 @@ NODES
       end
 
       it "reads from a file when --nodes starts with @" do
-        nodes = <<NODES
+        nodes = <<-'NODES'
 foo
 bar
-NODES
+        NODES
         with_tempfile_containing('nodes-args', nodes) do |file|
           cli = Bolt::CLI.new(%W[command run --nodes @#{file.path}])
           result = cli.parse
@@ -554,6 +555,7 @@ NODES
     describe "execute" do
       let(:executor) { double('executor', noop: false) }
       let(:cli) { Bolt::CLI.new({}) }
+      let(:cli_logger) { Logging.logger[cli] }
       let(:targets) { [target] }
       let(:output) { StringIO.new }
       let(:result_vals) { [{}] }
@@ -580,19 +582,40 @@ NODES
         allow(cli).to receive(:outputter).and_return(outputter)
       end
 
+      it "traps SIGINT early", :signals_self do
+        expect(Bolt::PAL) .to receive(:new) do
+          Process.kill :INT, Process.pid
+          sync_thread.join(1) # give ruby some time to handle the signal
+          raise 'early exit'
+        end
+
+        allow(cli_logger).to receive(:info)
+        expect(cli_logger).to receive(:info).with(
+          'Exiting after receiving SIGINT signal.'
+        )
+        expect(cli).to receive(:exit!) do
+          sync_thread.kill
+        end
+
+        expect { cli.execute(mode: 'plan') }.to raise_error('early exit')
+      end
+
       context 'when running a command' do
+        let(:options) {
+          {
+            nodes: targets,
+            mode: 'command',
+            action: 'run',
+            object: 'whoami'
+          }
+        }
+
         it "executes the 'whoami' command" do
           expect(executor)
             .to receive(:run_command)
             .with(targets, 'whoami')
             .and_return(Bolt::ResultSet.new([]))
 
-          options = {
-            nodes: targets,
-            mode: 'command',
-            action: 'run',
-            object: 'whoami'
-          }
           expect(cli.execute(options)).to eq(0)
           expect(JSON.parse(output.string)).to be
         end
@@ -603,13 +626,25 @@ NODES
             .with(targets, 'whoami')
             .and_return(fail_set)
 
-          options = {
-            nodes: targets,
-            mode: 'command',
-            action: 'run',
-            object: 'whoami'
-          }
           expect(cli.execute(options)).to eq(2)
+        end
+
+        it "traps SIGINT", :signals_self do
+          expect(executor).to receive(:run_command).with(targets, 'whoami') do
+            Process.kill :INT, Process.pid
+            sync_thread.join(1) # give ruby some time to handle the signal
+            Bolt::ResultSet.new([])
+          end
+
+          allow(cli_logger).to receive(:info)
+          expect(cli_logger).to receive(:info).with(
+            'Exiting after receiving SIGINT signal. There may be processes left executing on some nodes.'
+          )
+          expect(cli).to receive(:exit!) do
+            sync_thread.kill
+          end
+
+          cli.execute(options)
         end
       end
 
@@ -667,9 +702,29 @@ NODES
 
           expect(cli.execute(options)).to eq(2)
         end
+
+        it "traps SIGINT", :signals_self do
+          stub_file(script)
+
+          expect(executor).to receive(:run_script).with(targets, script, []) do
+            Process.kill :INT, Process.pid
+            sync_thread.join(1) # give ruby some time to handle the signal
+            Bolt::ResultSet.new([])
+          end
+
+          allow(cli_logger).to receive(:info)
+          expect(cli_logger).to receive(:info).with(
+            'Exiting after receiving SIGINT signal. There may be processes left executing on some nodes.'
+          )
+          expect(cli).to receive(:exit!) do
+            sync_thread.kill
+          end
+
+          cli.execute(options)
+        end
       end
 
-      context "when showing available tasks", reset_puppet_settings: true do
+      context "when showing available tasks", :reset_puppet_settings do
         before :each do
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
         end
@@ -744,7 +799,7 @@ NODES
         end
       end
 
-      context "when available tasks include an error", reset_puppet_settings: true do
+      context "when available tasks include an error", :reset_puppet_settings do
         before :each do
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/invalid_mods')]
         end
@@ -762,7 +817,7 @@ NODES
         end
       end
 
-      context "when the task is not in the modulepath", reset_puppet_settings: true do
+      context "when the task is not in the modulepath", :reset_puppet_settings do
         before :each do
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
         end
@@ -778,7 +833,7 @@ NODES
         end
       end
 
-      context "when showing available plans", reset_puppet_settings: true do
+      context "when showing available plans", :reset_puppet_settings do
         before :each do
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
         end
@@ -830,7 +885,7 @@ NODES
         end
       end
 
-      context "when available plans include an error", reset_puppet_settings: true do
+      context "when available plans include an error", :reset_puppet_settings do
         before :each do
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/invalid_mods')]
         end
@@ -862,7 +917,7 @@ NODES
         end
       end
 
-      context "when the plan is not in the modulepath", reset_puppet_settings: true do
+      context "when the plan is not in the modulepath", :reset_puppet_settings do
         before :each do
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
         end
@@ -878,16 +933,25 @@ NODES
         end
       end
 
-      context "when running a task", reset_puppet_settings: true do
+      context "when running a task", :reset_puppet_settings do
+        let(:task_name) { 'sample::echo' }
+        let(:task_params) { { 'message' => 'hi' } }
+        let(:options) {
+          {
+            nodes: targets,
+            mode: 'task',
+            action: 'run',
+            object: task_name,
+            task_options: task_params
+          }
+        }
+        let(:input_method) { 'both' }
+
         before :each do
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
         end
 
         it "runs a task given a name" do
-          task_name = 'sample::echo'
-          task_params = { 'message' => 'hi' }
-          input_method = 'both'
-
           expect(executor)
             .to receive(:run_task)
             .with(
@@ -895,22 +959,11 @@ NODES
               %r{modules/sample/tasks/echo.sh$}, input_method, task_params, {}
             ).and_return(Bolt::ResultSet.new([]))
 
-          options = {
-            nodes: targets,
-            mode: 'task',
-            action: 'run',
-            object: task_name,
-            task_options: task_params
-          }
           expect(cli.execute(options)).to eq(0)
           expect(JSON.parse(output.string)).to be
         end
 
         it "returns 2 if any node fails" do
-          task_name = 'sample::echo'
-          task_params = { 'message' => 'hi' }
-          input_method = 'both'
-
           expect(executor)
             .to receive(:run_task)
             .with(
@@ -918,27 +971,12 @@ NODES
               %r{modules/sample/tasks/echo.sh$}, input_method, task_params, {}
             ).and_return(fail_set)
 
-          options = {
-            nodes: targets,
-            mode: 'task',
-            action: 'run',
-            object: task_name,
-            task_options: task_params
-          }
           expect(cli.execute(options)).to eq(2)
         end
 
         it "errors for non-existent modules" do
-          task_name = 'dne::task1'
-          task_params = { 'message' => 'hi' }
+          task_name.replace 'dne::task1'
 
-          options = {
-            nodes: targets,
-            mode: 'task',
-            action: 'run',
-            object: task_name,
-            task_options: task_params
-          }
           expect { cli.execute(options) }.to raise_error(
             Bolt::CLIError, /Task not found: dne::task1/
           )
@@ -946,16 +984,8 @@ NODES
         end
 
         it "errors for non-existent tasks" do
-          task_name = 'sample::dne'
-          task_params = { 'message' => 'hi' }
+          task_name.replace 'sample::dne'
 
-          options = {
-            nodes: targets,
-            mode: 'task',
-            action: 'run',
-            object: task_name,
-            task_options: task_params
-          }
           expect { cli.execute(options) }.to raise_error(
             Bolt::CLIError, /Task not found: sample::dne/
           )
@@ -963,8 +993,7 @@ NODES
         end
 
         it "raises errors from the executor" do
-          task_name = 'sample::echo'
-          input_method = 'both'
+          task_params.clear
 
           expect(executor)
             .to receive(:run_task)
@@ -973,20 +1002,11 @@ NODES
               %r{modules/sample/tasks/echo.sh$}, input_method, {}, {}
             ).and_raise("Could not connect to target")
 
-          options = {
-            nodes: targets,
-            mode: 'task',
-            action: 'run',
-            object: task_name,
-            task_options: {}
-          }
           expect { cli.execute(options) }.to raise_error(/Could not connect to target/)
         end
 
         it "runs an init task given a module name" do
-          task_name = 'sample'
-          task_params = { 'message' => 'hi' }
-          input_method = 'both'
+          task_name.replace 'sample'
 
           expect(executor)
             .to receive(:run_task)
@@ -995,20 +1015,12 @@ NODES
               %r{modules/sample/tasks/init.sh$}, input_method, task_params, {}
             ).and_return(Bolt::ResultSet.new([]))
 
-          options = {
-            nodes: targets,
-            mode: 'task',
-            action: 'run',
-            object: task_name,
-            task_options: task_params
-          }
           cli.execute(options)
           expect(JSON.parse(output.string)).to be
         end
 
         it "runs a task passing input on stdin" do
-          task_name = 'sample::stdin'
-          task_params = { 'message' => 'hi' }
+          task_name.replace 'sample::stdin'
           input_method = 'stdin'
 
           expect(executor)
@@ -1017,20 +1029,12 @@ NODES
                   %r{modules/sample/tasks/stdin.sh$}, input_method, task_params, {})
             .and_return(Bolt::ResultSet.new([]))
 
-          options = {
-            nodes: targets,
-            mode: 'task',
-            action: 'run',
-            object: task_name,
-            task_options: task_params
-          }
           cli.execute(options)
           expect(JSON.parse(output.string)).to be
         end
 
         it "runs a powershell task passing input on stdin" do
-          task_name = 'sample::winstdin'
-          task_params = { 'message' => 'hi' }
+          task_name.replace 'sample::winstdin'
           input_method = 'stdin'
 
           expect(executor)
@@ -1039,30 +1043,34 @@ NODES
                   %r{modules/sample/tasks/winstdin.ps1$}, input_method, task_params, {})
             .and_return(Bolt::ResultSet.new([]))
 
-          options = {
-            nodes: targets,
-            mode: 'task',
-            action: 'run',
-            object: task_name,
-            task_options: task_params
-          }
           cli.execute(options)
           expect(JSON.parse(output.string)).to be
+        end
+
+        it "traps SIGINT", :signals_self do
+          expect(executor)
+            .to receive(:run_task)
+            .with(targets, %r{modules/sample/tasks/echo.sh$}, input_method, task_params, {}) do
+              Process.kill :INT, Process.pid
+              sync_thread.join(1) # give ruby some time to handle the signal
+              Bolt::ResultSet.new([])
+            end
+
+          allow(cli_logger).to receive(:info)
+          expect(cli_logger).to receive(:info).with(
+            'Exiting after receiving SIGINT signal. There may be processes left executing on some nodes.'
+          )
+          expect(cli).to receive(:exit!) do
+            sync_thread.kill
+          end
+
+          cli.execute(options)
         end
 
         describe 'task parameters validation' do
           let(:task_name) { 'sample::params' }
           let(:task_params) { {} }
           let(:input_method) { 'stdin' }
-          let(:options) {
-            {
-              nodes: targets,
-              mode: 'task',
-              action: 'run',
-              object: task_name,
-              task_options: task_params
-            }
-          }
 
           it "errors when unknown parameters are specified" do
             task_params.merge!(
@@ -1148,16 +1156,25 @@ NODES
         end
       end
 
-      context "when running a plan", reset_puppet_settings: true do
+      context "when running a plan", :reset_puppet_settings do
+        let(:plan_name) { 'sample::single_task' }
+        let(:plan_params) { { 'nodes' => targets.map(&:host).join(',') } }
+        let(:options) {
+          {
+            nodes: targets,
+            mode: 'plan',
+            action: 'run',
+            object: plan_name,
+            task_options: plan_params
+          }
+        }
+        let(:input_method) { 'both' }
+
         before :each do
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
         end
 
         it "formats results of a passing task" do
-          plan_name = 'sample::single_task'
-          plan_params = { 'nodes' => targets.map(&:host).join(',') }
-          input_method = 'both'
-
           expect(executor)
             .to receive(:run_task)
             .with(
@@ -1165,13 +1182,6 @@ NODES
               %r{modules/sample/tasks/echo.sh$}, input_method, { 'message' => 'hi there' }, {}
             ).and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0)]))
 
-          options = {
-            nodes: targets,
-            mode: 'plan',
-            action: 'run',
-            object: plan_name,
-            task_options: plan_params
-          }
           cli.execute(options)
           expect(JSON.parse(output.string)).to eq(
             [{ 'node' => 'foo', 'status' => 'success', 'result' => { '_output' => 'yes' } }]
@@ -1179,10 +1189,6 @@ NODES
         end
 
         it "raises errors from the executor" do
-          plan_name = 'sample::single_task'
-          plan_params = { 'nodes' => targets.map(&:host).join(',') }
-          input_method = 'both'
-
           expect(executor)
             .to receive(:run_task)
             .with(
@@ -1190,21 +1196,10 @@ NODES
               %r{modules/sample/tasks/echo.sh$}, input_method, { 'message' => 'hi there' }, {}
             ).and_raise("Could not connect to target")
 
-          options = {
-            nodes: targets,
-            mode: 'plan',
-            action: 'run',
-            object: plan_name,
-            task_options: plan_params
-          }
           expect { cli.execute(options) }.to raise_error(/Could not connect to target/)
         end
 
         it "formats results of a failing task" do
-          plan_name = 'sample::single_task'
-          plan_params = { 'nodes' => targets.map(&:host).join(',') }
-          input_method = 'both'
-
           expect(executor)
             .to receive(:run_task)
             .with(
@@ -1212,13 +1207,6 @@ NODES
               %r{modules/sample/tasks/echo.sh$}, input_method, { 'message' => 'hi there' }, {}
             ).and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'no', '', 1)]))
 
-          options = {
-            nodes: targets,
-            mode: 'plan',
-            action: 'run',
-            object: plan_name,
-            task_options: plan_params
-          }
           cli.execute(options)
           expect(JSON.parse(output.string)).to eq(
             [
@@ -1237,6 +1225,26 @@ NODES
               }
             ]
           )
+        end
+
+        it "traps SIGINT", :signals_self do
+          expect(executor)
+            .to receive(:run_task)
+            .with(targets, %r{modules/sample/tasks/echo.sh$}, input_method, { 'message' => 'hi there' }, {}) do
+              Process.kill :INT, Process.pid
+              sync_thread.join(1) # give ruby some time to handle the signal
+              Bolt::ResultSet.new([])
+            end
+
+          allow(cli_logger).to receive(:info)
+          expect(cli_logger).to receive(:info).with(
+            'Exiting after receiving SIGINT signal. There may be processes left executing on some nodes.'
+          )
+          expect(cli).to receive(:exit!) do
+            sync_thread.kill
+          end
+
+          cli.execute(options)
         end
       end
 
@@ -1319,65 +1327,49 @@ NODES
         allow(cli).to receive(:outputter).and_return(outputter)
       end
 
-      context "when running a task", reset_puppet_settings: true do
+      context "when running a task", :reset_puppet_settings do
+        let(:task_name) { 'sample::noop' }
+        let(:task_params) { { 'message' => 'hi' } }
+        let(:options) {
+          {
+            nodes: targets,
+            mode: 'task',
+            action: 'run',
+            object: task_name,
+            task_options: task_params,
+            noop: true
+          }
+        }
+        let(:input_method) { 'both' }
+
         before :each do
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
         end
 
         it "runs a task that supports noop" do
-          task_name = 'sample::noop'
-          task_params = { 'message' => 'hi' }
-          input_method = 'both'
-
           expect(executor)
             .to receive(:run_task)
             .with(targets,
                   %r{modules/sample/tasks/noop.sh$}, input_method, task_params.merge('_noop' => true), {})
             .and_return(Bolt::ResultSet.new([]))
 
-          options = {
-            nodes: targets,
-            mode: 'task',
-            action: 'run',
-            object: task_name,
-            task_options: task_params,
-            noop: true
-          }
           cli.execute(options)
           expect(JSON.parse(output.string)).to be
         end
 
         it "errors on a task that doesn't support noop" do
-          task_name = 'sample::no_noop'
-          task_params = { 'message' => 'hi' }
+          task_name.replace 'sample::no_noop'
 
           expect(executor).not_to receive(:run_task)
 
-          options = {
-            nodes: targets,
-            mode: 'task',
-            action: 'run',
-            object: task_name,
-            task_options: task_params,
-            noop: true
-          }
           expect { cli.execute(options) }.to raise_error('Task does not support noop')
         end
 
         it "errors on a task without metadata" do
-          task_name = 'sample::echo'
-          task_params = { 'message' => 'hi' }
+          task_name.replace 'sample::echo'
 
           expect(executor).not_to receive(:run_task)
 
-          options = {
-            nodes: targets,
-            mode: 'task',
-            action: 'run',
-            object: task_name,
-            task_options: task_params,
-            noop: true
-          }
           expect { cli.execute(options) }.to raise_error('Task does not support noop')
         end
       end

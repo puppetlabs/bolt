@@ -36,23 +36,23 @@ describe "when runnning over the ssh transport", ssh: true do
       expect(result['_error']['msg']).to eq('The command failed with exit code 127')
     end
 
-    it 'runs a task', reset_puppet_settings: true do
+    it 'runs a task', :reset_puppet_settings do
       result = run_one_node(%W[task run #{stdin_task} message=somemessage] + config_flags)
       expect(result['message'].strip).to eq("somemessage")
     end
 
-    it 'reports errors when task fails', reset_puppet_settings: true do
+    it 'reports errors when task fails', :reset_puppet_settings do
       result = run_failed_node(%w[task run results fail=true] + config_flags)
       expect(result['_error']['kind']).to eq('puppetlabs.tasks/task-error')
       expect(result['_error']['msg']).to eq('The task failed with exit code 1')
     end
 
-    it 'passes noop to a task that supports noop', reset_puppet_settings: true do
+    it 'passes noop to a task that supports noop', :reset_puppet_settings do
       result = run_one_node(%w[task run sample::noop message=somemessage --noop] + config_flags)
       expect(result['_output'].strip).to eq("somemessage with noop true")
     end
 
-    it 'does not pass noop to a task by default', reset_puppet_settings: true do
+    it 'does not pass noop to a task by default', :reset_puppet_settings do
       result = run_one_node(%w[task run sample::noop message=somemessage] + config_flags)
       expect(result['_output'].strip).to eq("somemessage with noop")
     end
@@ -83,14 +83,14 @@ describe "when runnning over the ssh transport", ssh: true do
       end
     end
 
-    it 'runs a task', reset_puppet_settings: true do
+    it 'runs a task', :reset_puppet_settings do
       with_tempfile_containing('conf', YAML.dump(config)) do |conf|
         result = run_one_node(%W[task run #{stdin_task} message=somemessage --configfile #{conf.path}] + config_flags)
         expect(result['message'].strip).to eq("somemessage")
       end
     end
 
-    it 'runs a task as a specified user', reset_puppet_settings: true do
+    it 'runs a task as a specified user', :reset_puppet_settings do
       config['ssh']['run-as'] = user
 
       with_tempfile_containing('conf', YAML.dump(config)) do |conf|
