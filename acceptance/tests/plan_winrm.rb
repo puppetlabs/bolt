@@ -97,7 +97,7 @@ plan test::winrm_retry_plan($nodes) {
   end
 
   step "execute `bolt plan run` via WinRM with verbose, human readable output" do
-    bolt_command = "bolt plan run test::my_win_plan nodes=#{nodes_csv}"
+    bolt_command = "bolt plan run test::winrm_retry_plan nodes=#{nodes_csv}"
     flags = {
       '--modulepath'  => "#{dir}/modules",
       '-u'            => user,
