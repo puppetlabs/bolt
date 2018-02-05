@@ -3,6 +3,7 @@ AllCops:
   Exclude:
     - 'vendor/**/*'
     - 'vendored/**/*'
+    - 'acceptance/vendor/**/*'
 
 # Checks for if and unless statements that would fit on one line if written as a
 # modifier if/unless.
