@@ -78,7 +78,7 @@ plan test::ssh_retry_plan($nodes) {
                      "The task did not succeed on #{node.hostname}")
       end
     else
-      logger.warning("There were not enough nodes to verify that some nodes succeeded")
+      logger.warn("There were not enough nodes to verify that some nodes succeeded")
     end
 
     # Verify that the retry run succeeded with expected nodes
