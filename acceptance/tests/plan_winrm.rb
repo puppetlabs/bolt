@@ -49,7 +49,7 @@ plan test::winrm_retry_plan($nodes) {
   end
 
   step "execute `bolt plan run` via WinRM with json output" do
-    bolt_command = "bolt plan run test::my_win_plan nodes=#{nodes_csv}"
+    bolt_command = "bolt plan run test::winrm_retry_plan nodes=#{nodes_csv}"
     flags = {
       '--modulepath'  => "#{dir}/modules",
       '-u'            => user,
@@ -85,7 +85,7 @@ plan test::winrm_retry_plan($nodes) {
                      "The task did not succeed on #{node.hostname}")
       end
     else
-      logger.warning("There were not enough nodes to verify that some nodes succeeded")
+      logger.warn("There were not enough nodes to verify that some nodes succeeded")
     end
 
     # Verify that the retry run succeeded with expected nodes
