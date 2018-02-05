@@ -1,11 +1,10 @@
 require 'spec_helper'
 require 'bolt_spec/files'
-require 'bolt/node'
-require 'bolt/node/ssh'
+require 'bolt/transport/orch'
 require 'bolt/cli'
 require 'open3'
 
-describe Bolt::Orch, orchestrator: true do
+describe Bolt::Transport::Orch, orchestrator: true do
   include BoltSpec::Files
 
   let(:hostname) { "localhost" }
@@ -13,7 +12,7 @@ describe Bolt::Orch, orchestrator: true do
     Bolt::Target.new(hostname).update_conf(Bolt::Config.new.transport_conf)
   end
 
-  let(:orch) { Bolt::Orch.new(target) }
+  let(:orch) { Bolt::Transport::Orch.new({}) }
 
   let(:task) { "foo" }
   let(:task_environment) { 'production' }
@@ -82,23 +81,23 @@ describe Bolt::Orch, orchestrator: true do
     end
 
     it "executes a task on a host" do
-      expect(orch.run_task(taskpath, 'stdin', params).value)
+      expect(orch.run_task(target, taskpath, 'stdin', params).value)
         .to eq(result)
     end
 
     it "returns a success" do
-      expect(orch.run_task(taskpath, 'stdin', params)).to be_success
+      expect(orch.run_task(target, taskpath, 'stdin', params)).to be_success
     end
 
     it 'ignores _run_as' do
-      expect(orch.run_task(taskpath, 'stdin', params, '_run_as' => 'root')).to be_success
+      expect(orch.run_task(target, taskpath, 'stdin', params, '_run_as' => 'root')).to be_success
     end
 
     context "when running noop" do
       let(:noop) { true }
 
       it "handles the _noop param" do
-        expect(orch.run_task(taskpath, 'stdin', params.merge('_noop' => true))).to be_success
+        expect(orch.run_task(target, taskpath, 'stdin', params.merge('_noop' => true))).to be_success
       end
     end
 
@@ -106,11 +105,11 @@ describe Bolt::Orch, orchestrator: true do
       let(:result_state) { 'skipped' }
 
       it 'returns a failure' do
-        expect(orch.run_task(taskpath, 'stdin', params)).not_to be_success
+        expect(orch.run_task(target, taskpath, 'stdin', params)).not_to be_success
       end
 
       it 'includes an appropriate error in the returned result' do
-        expect(orch.run_task(taskpath, 'stdin', params).error_hash).to eq(
+        expect(orch.run_task(target, taskpath, 'stdin', params).error_hash).to eq(
           'kind' => 'puppetlabs.tasks/skipped-node',
           'msg' => "Node #{hostname} was skipped",
           'details' => {}
@@ -122,12 +121,12 @@ describe Bolt::Orch, orchestrator: true do
       let(:result_state) { 'failed' }
 
       it "returns a failure" do
-        expect(orch.run_task(taskpath, 'stdin', params)).not_to be_success
+        expect(orch.run_task(target, taskpath, 'stdin', params)).not_to be_success
       end
 
       context "when there is an error and no exitcode" do
         it "does not report success" do
-          expect(orch.run_task(taskpath, 'stdin', params)).not_to be_success
+          expect(orch.run_task(target, taskpath, 'stdin', params)).not_to be_success
         end
       end
 
@@ -135,7 +134,7 @@ describe Bolt::Orch, orchestrator: true do
         let(:result) { { '_error' => { 'details' => { 'exit_code' => '3' } } } }
 
         it "does not report success" do
-          expect(orch.run_task(taskpath, 'stdin', params)).not_to be_success
+          expect(orch.run_task(target, taskpath, 'stdin', params)).not_to be_success
         end
       end
     end
@@ -159,19 +158,19 @@ describe Bolt::Orch, orchestrator: true do
       let(:command) { 'echo hi!; echo bye >&2' }
 
       it 'returns a success' do
-        expect(orch.run_command(command)).to be_success
+        expect(orch.run_command(target, command)).to be_success
       end
 
       it 'captures stdout' do
-        expect(orch.run_command(command)['stdout']).to eq("hi!\n")
+        expect(orch.run_command(target, command)['stdout']).to eq("hi!\n")
       end
 
       it 'captures stderr' do
-        expect(orch.run_command(command)['stderr']).to eq("bye\n")
+        expect(orch.run_command(target, command)['stderr']).to eq("bye\n")
       end
 
       it 'ignores _run_as' do
-        expect(orch.run_command(command, '_run_as' => 'root')).to be_success
+        expect(orch.run_command(target, command, '_run_as' => 'root')).to be_success
       end
     end
 
@@ -179,19 +178,19 @@ describe Bolt::Orch, orchestrator: true do
       let(:command) { 'echo hi!; echo bye >&2; exit 23' }
 
       it 'returns a failure' do
-        expect(orch.run_command(command)).not_to be_success
+        expect(orch.run_command(target, command)).not_to be_success
       end
 
       it 'captures exit_code' do
-        expect(orch.run_command(command)['exit_code']).to eq(23)
+        expect(orch.run_command(target, command)['exit_code']).to eq(23)
       end
 
       it 'captures stdout' do
-        expect(orch.run_command(command)['stdout']).to eq("hi!\n")
+        expect(orch.run_command(target, command)['stdout']).to eq("hi!\n")
       end
 
       it 'captures stderr' do
-        expect(orch.run_command(command)['stderr']).to eq("bye\n")
+        expect(orch.run_command(target, command)['stderr']).to eq("bye\n")
       end
     end
   end
@@ -224,7 +223,7 @@ describe Bolt::Orch, orchestrator: true do
     end
 
     it 'should write the file' do
-      expect(orch.upload(source_path, dest_path).value).to eq(
+      expect(orch.upload(target, source_path, dest_path).value).to eq(
         '_output' => "Uploaded '#{source_path}' to '#{hostname}:#{dest_path}'"
       )
 
@@ -258,12 +257,12 @@ describe Bolt::Orch, orchestrator: true do
       let(:script_path) { File.join(base_path, 'spec', 'fixtures', 'scripts', 'success.sh') }
 
       it 'returns a success' do
-        expect(orch.run_script(script_path, args)).to be_success
+        expect(orch.run_script(target, script_path, args)).to be_success
       end
 
       it 'captures stdout' do
         expect(
-          orch.run_script(script_path, args)['stdout']
+          orch.run_script(target, script_path, args)['stdout']
         ).to eq(<<-OUT)
 arg: with spaces
 arg: nospaces
@@ -273,11 +272,11 @@ standard out
       end
 
       it 'captures stderr' do
-        expect(orch.run_script(script_path, args)['stderr']).to eq("standard error\n")
+        expect(orch.run_script(target, script_path, args)['stderr']).to eq("standard error\n")
       end
 
       it 'ignores _run_as' do
-        expect(orch.run_script(script_path, args, '_run_as' => 'root')).to be_success
+        expect(orch.run_script(target, script_path, args, '_run_as' => 'root')).to be_success
       end
     end
 
@@ -285,19 +284,19 @@ standard out
       let(:script_path) { File.join(base_path, 'spec', 'fixtures', 'scripts', 'failure.sh') }
 
       it 'returns a failure' do
-        expect(orch.run_script(script_path, args)).not_to be_success
+        expect(orch.run_script(target, script_path, args)).not_to be_success
       end
 
       it 'captures exit_code' do
-        expect(orch.run_script(script_path, args)['exit_code']).to eq(34)
+        expect(orch.run_script(target, script_path, args)['exit_code']).to eq(34)
       end
 
       it 'captures stdout' do
-        expect(orch.run_script(script_path, args)['stdout']).to eq("standard out\n")
+        expect(orch.run_script(target, script_path, args)['stdout']).to eq("standard out\n")
       end
 
       it 'captures stderr' do
-        expect(orch.run_script(script_path, args)['stderr']).to eq("standard error\n")
+        expect(orch.run_script(target, script_path, args)['stderr']).to eq("standard error\n")
       end
     end
   end
