@@ -461,7 +461,7 @@ PS
       end
     end
 
-    def upload(source, destination)
+    def upload(source, destination, _options = nil)
       write_remote_file(source, destination)
       Bolt::Result.for_upload(@target, source, destination)
     end

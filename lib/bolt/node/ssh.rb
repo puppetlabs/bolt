@@ -7,12 +7,48 @@ require 'bolt/node/output'
 
 module Bolt
   class SSH < Node
+    class RemoteTempdir
+      def initialize(node, path)
+        @node = node
+        @owner = node.user
+        @path = path
+        @logger = node.logger
+      end
+
+      def to_s
+        @path
+      end
+
+      def chown(owner)
+        return if owner.nil? || owner == @owner
+
+        @owner = owner
+        result = @node.execute("chown -R '#{@owner}': '#{@path}'", sudoable: true, run_as: 'root')
+        if result.exit_code != 0
+          message = "Could not change owner of '#{@path}' to #{@owner}: #{result.stderr.string}"
+          raise Bolt::Node::FileError.new(message, 'CHOWN_ERROR')
+        end
+      end
+
+      def delete
+        result = @node.execute("rm -rf '#{@path}'", sudoable: true, run_as: @owner)
+        if result.exit_code != 0
+          @logger.warn("Failed to clean up tempdir '#{@path}': #{result.stderr.string}")
+        end
+      end
+    end
+
     def self.initialize_transport(logger)
       require 'net/ssh/krb'
     rescue LoadError
       logger.debug {
         "Authentication method 'gssapi-with-mic' is not available"
       }
+    end
+
+    def initialize(target)
+      super(target)
+      @user = @user || Net::SSH::Config.for(target.host)[:user] || Etc.getlogin
     end
 
     def protocol
@@ -128,14 +164,10 @@ module Bolt
 
     def execute(command, sudoable: false, **options)
       result_output = Bolt::Node::Output.new
-      use_sudo = sudoable && @run_as
+      run_as = options[:run_as] || @run_as
+      use_sudo = sudoable && run_as && @user != run_as
       if use_sudo
-        user_clause = if @run_as
-                        "-u #{@run_as}"
-                      else
-                        ''
-                      end
-        command = "sudo -S #{user_clause} -p '#{sudo_prompt}' #{command}"
+        command = "sudo -S -u #{run_as} -p '#{sudo_prompt}' #{command}"
       end
 
       @logger.debug { "Executing: #{command}" }
@@ -186,9 +218,23 @@ module Bolt
       result_output
     end
 
-    def upload(source, destination)
-      write_remote_file(source, destination)
+    def upload(source, destination, options = {})
+      @run_as = options['_run_as'] || @conf_run_as
+      with_remote_tempdir do |dir|
+        basename = File.basename(destination)
+        tmpfile = "#{dir}/#{basename}"
+        write_remote_file(source, tmpfile)
+        # pass over file ownership if we're using run-as to be a different user
+        dir.chown(@run_as)
+        result = execute("mv '#{tmpfile}' '#{destination}'", sudoable: true)
+        if result.exit_code != 0
+          message = "Could not move temporary file '#{tmpfile}' to #{destination}: #{result.stderr.string}"
+          raise FileError.new(message, 'MV_ERROR')
+        end
+      end
       Bolt::Result.for_upload(@target, source, destination)
+    ensure
+      @run_as = @conf_run_as
     end
 
     def write_remote_file(source, destination)
@@ -198,7 +244,6 @@ module Bolt
     end
 
     def make_tempdir
-      tmppath = nil
       if @tmpdir
         tmppath = "#{@tmpdir}/#{SecureRandom.uuid}"
         command = "mkdir -m 700 #{tmppath}"
@@ -209,33 +254,31 @@ module Bolt
       if result.exit_code != 0
         raise FileError.new("Could not make tempdir: #{result.stderr.string}", 'TEMPDIR_ERROR')
       end
-      tmppath || result.stdout.string.chomp
+      path = tmppath || result.stdout.string.chomp
+      RemoteTempdir.new(self, path)
     end
 
+    # A helper to create and delete a tempdir on the remote system. Yields the
+    # directory name.
     def with_remote_tempdir
       dir = make_tempdir
-      begin
-        yield dir
-      ensure
-        output =  execute("rm -rf '#{dir}'")
-        if output.exit_code != 0
-          logger.warn("Failed to clean up tempdir '#{dir}': #{output.stderr.string}")
-        end
-      end
+      yield dir
+    ensure
+      dir.delete if dir
     end
 
-    def with_remote_script(dir, file)
-      remote_path = "#{dir}/#{File.basename(file)}"
+    def write_remote_executable(dir, file, filename = nil)
+      filename ||= File.basename(file)
+      remote_path = "#{dir}/#{filename}"
       write_remote_file(file, remote_path)
       make_executable(remote_path)
-      yield remote_path
+      remote_path
     end
 
-    def with_remote_file(file)
-      with_remote_tempdir do |dir|
-        with_remote_script(dir, file) do |remote_path|
-          yield remote_path
-        end
+    def make_executable(path)
+      result = execute("chmod u+x '#{path}'")
+      if result.exit_code != 0
+        raise FileError.new("Could not make file '#{path}' executable: #{result.stderr.string}", 'CHMOD_ERROR')
       end
     end
 
@@ -248,35 +291,6 @@ EOF
 SCRIPT
     end
 
-    def make_executable(path)
-      result = execute("chmod u+x '#{path}'")
-      if result.exit_code != 0
-        raise FileError.new("Could not make file '#{path}' executable: #{result.stderr.string}", 'CHMOD_ERROR')
-      end
-    end
-
-    def with_task_wrapper(remote_task, dir, stdin)
-      wrapper = make_wrapper_stringio(remote_task, stdin)
-      command = "#{dir}/wrapper.sh"
-      write_remote_file(wrapper, command)
-      make_executable(command)
-      yield command
-    end
-
-    def with_remote_task(task_file, stdin)
-      with_remote_tempdir do |dir|
-        with_remote_script(dir, task_file) do |remote_task|
-          if stdin
-            with_task_wrapper(remote_task, dir, stdin) do |command|
-              yield command
-            end
-          else
-            yield remote_task
-          end
-        end
-      end
-    end
-
     def run_command(command, options = {})
       @run_as = options['_run_as'] || @conf_run_as
       output = execute(command, sudoable: true)
@@ -287,7 +301,9 @@ SCRIPT
 
     def run_script(script, arguments, options = {})
       @run_as = options['_run_as'] || @conf_run_as
-      with_remote_file(script) do |remote_path|
+      with_remote_tempdir do |dir|
+        remote_path = write_remote_executable(dir, script)
+        dir.chown(@run_as)
         output = execute("'#{remote_path}' #{Shellwords.join(arguments)}",
                          sudoable: true)
         Bolt::Result.for_command(@target, output.stdout.string, output.stderr.string, output.exit_code)
@@ -313,16 +329,22 @@ SCRIPT
 
       command = export_args.empty? ? '' : "#{export_args} "
 
-      if @run_as
-        with_remote_task(task, stdin) do |remote_path|
-          command += "'#{remote_path}'"
-          output = execute(command, sudoable: true)
+      execute_options = {}
+
+      with_remote_tempdir do |dir|
+        remote_task_path = write_remote_executable(dir, task)
+        if @run_as && stdin
+          wrapper = make_wrapper_stringio(remote_task_path, stdin)
+          remote_wrapper_path = write_remote_executable(dir, wrapper, 'wrapper.sh')
+          command += "'#{remote_wrapper_path}'"
+        else
+          command += "'#{remote_task_path}'"
+          execute_options[:stdin] = stdin
         end
-      else
-        with_remote_file(task) do |remote_path|
-          command += "'#{remote_path}'"
-          output = execute(command, stdin: stdin)
-        end
+        dir.chown(@run_as)
+
+        execute_options[:sudoable] = true if @run_as
+        output = execute(command, **execute_options)
       end
       Bolt::Result.for_task(@target, output.stdout.string,
                             output.stderr.string,

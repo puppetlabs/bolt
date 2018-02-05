@@ -257,11 +257,11 @@ SHELLWORDS
       end
     end
 
-    it "doesn't call with_task_wrapper", ssh: true do
+    it "doesn't generate a task wrapper when not needed", ssh: true do
       contents = "#!/bin/sh\necho -n ${PT_message_one} ${PT_message_two}"
       arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
       with_tempfile_containing('tasks test', contents) do |file|
-        expect(ssh).not_to receive(:with_task_wrapper)
+        expect(ssh).not_to receive(:make_wrapper_stringio)
         ssh.run_task(file.path, 'environment', arguments)
       end
     end
@@ -406,6 +406,18 @@ SHELL
       end
     end
 
+    it "can upload a file as root", ssh: true do
+      contents = "upload file test as root content"
+      dest = '/tmp/root-file-upload-test'
+      with_tempfile_containing('tasks test upload as root', contents) do |file|
+        expect(ssh.upload(file.path, dest).message).to match(/Uploaded/)
+        expect(ssh.run_command("cat #{dest}")['stdout']).to eq(contents)
+        expect(ssh.run_command("stat -c %U #{dest}")['stdout'].chomp).to eq('root')
+      end
+
+      ssh.execute("rm #{dest}", sudoable: true, run_as: 'root')
+    end
+
     context "requesting a pty" do
       let(:config) {
         mk_config(host_key_check: false, sudo_password: password, run_as: 'root',
@@ -438,6 +450,18 @@ SHELL
         with_tempfile_containing('tasks test', contents) do |file|
           expect(ssh.run_task(file.path, 'environment', {}, '_run_as' => 'root').message).to eq("root\n")
         end
+      end
+
+      it "can override run_as for file upload via an option", ssh: true do
+        contents = "upload file test as root content"
+        dest = '/tmp/root-file-upload-test'
+        with_tempfile_containing('tasks test upload as root', contents) do |file|
+          expect(ssh.upload(file.path, dest, '_run_as' => 'root').message).to match(/Uploaded/)
+          expect(ssh.run_command("cat #{dest}", '_run_as' => 'root')['stdout']).to eq(contents)
+          expect(ssh.run_command("stat -c %U #{dest}", '_run_as' => 'root')['stdout'].chomp).to eq('root')
+        end
+
+        ssh.execute("rm #{dest}", sudoable: true, run_as: 'root')
       end
     end
 

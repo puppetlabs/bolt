@@ -251,7 +251,7 @@ describe "Bolt::Executor" do
       node_results.each do |node, result|
         expect(node)
           .to receive(:upload)
-          .with(script, dest)
+          .with(script, dest, {})
           .and_return(result)
       end
 
@@ -265,7 +265,7 @@ describe "Bolt::Executor" do
       node_results.each do |node, result|
         expect(node)
           .to receive(:upload)
-          .with(script, dest)
+          .with(script, dest, {})
           .and_return(result)
       end
 
@@ -283,7 +283,7 @@ describe "Bolt::Executor" do
       node_results.each_key do |node|
         expect(node)
           .to receive(:upload)
-          .with(script, dest)
+          .with(script, dest, {})
           .and_raise(Bolt::Error, 'failed', 'my-exception')
       end
 
@@ -372,7 +372,7 @@ describe "Bolt::Executor" do
       node_results.each do |node, result|
         expect(node)
           .to receive(:upload)
-          .with(script, dest)
+          .with(script, dest, {})
           .and_return(result)
       end
 

@@ -50,7 +50,7 @@ Puppet::Functions.create_function(:file_upload, Puppet::Functions::InternalFunct
       call_function('debug', "Simulating file upload of '#{found}' - no targets given - no action taken")
       r = Bolt::ResultSet.new([])
     else
-      r = executor.file_upload(targets, found, destination)
+      r = executor.file_upload(targets, found, destination, options.select { |k, _| k == '_run_as' })
     end
 
     if !r.ok && !options['_catch_errors']
