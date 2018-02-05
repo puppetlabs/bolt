@@ -1,6 +1,6 @@
 module BoltSpec
   module Integration
-    def run_cli(arguments)
+    def run_cli(arguments, rescue_exec: false)
       cli = Bolt::CLI.new(arguments)
 
       # prevent tests from reading users config
@@ -11,12 +11,22 @@ module BoltSpec
       allow(cli).to receive(:outputter).and_return(outputter)
 
       opts = cli.parse
-      cli.execute(opts)
+
+      if rescue_exec
+        err_kls = error_support ? Bolt::Error : StandardError
+        begin
+          cli.execute(opts)
+        # rubocop:disable HandleExceptions
+        rescue err_kls
+        end
+      else
+        cli.execute(opts)
+      end
       output.string
     end
 
-    def run_cli_json(arguments)
-      output = run_cli(arguments)
+    def run_cli_json(arguments, **opts)
+      output = run_cli(arguments, **opts)
 
       begin
         result = JSON.parse(output)
@@ -39,6 +49,11 @@ module BoltSpec
       result = run_cli_json(arguments)
       expect(result['_error'] || (result['items'] && result['items'][0] && result['items'][0]['status'] != 'success'))
       result['items'][0]['result']
+    end
+
+    def error_support
+      minor = RUBY_VERSION.split('.')[1].to_i
+      minor >= 1
     end
   end
 end
