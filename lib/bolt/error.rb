@@ -42,4 +42,11 @@ module Bolt
       @error_code = 2
     end
   end
+
+  class PlanFailure < Error
+    def initialize(*args)
+      super(*args)
+      @error_code = 2
+    end
+  end
 end
