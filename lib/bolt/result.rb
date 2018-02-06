@@ -109,6 +109,14 @@ module Bolt
       eql?(other)
     end
 
+    def to_json(opts = nil)
+      status_hash.to_json(opts)
+    end
+
+    def to_s
+      to_json
+    end
+
     # TODO: remove in favor of ok?
     def success?
       ok?
