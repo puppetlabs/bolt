@@ -5,25 +5,17 @@ module Bolt
   module Transport
     class WinRM
       class Connection
-        attr_reader :logger, :password, :connect_timeout, :target
+        attr_reader :logger, :target
 
         def initialize(target)
           @target = target
 
-          transport_conf = target.options
+          default_port = target.options[:ssl] ? HTTPS_PORT : HTTP_PORT
+          @port = @target.port || default_port
           @user = @target.user
-          @password = @target.password
-          @cacert = transport_conf[:cacert]
-          @ssl = transport_conf[:ssl]
-          @connect_timeout = transport_conf[:connect_timeout]
-          @tmpdir = transport_conf[:tmpdir]
-          @extensions = DEFAULT_EXTENSIONS.to_set.merge(transport_conf[:extensions] || [])
+          @extensions = DEFAULT_EXTENSIONS.to_set.merge(target.options[:extensions] || [])
 
           @logger = Logging.logger[@target.host]
-        end
-
-        def uri
-          @target.uri
         end
 
         STDIN_METHODS       = %w[both stdin].freeze
@@ -32,28 +24,23 @@ module Bolt
         HTTP_PORT = 5985
         HTTPS_PORT = 5986
 
-        def port
-          default_port = @ssl ? HTTPS_PORT : HTTP_PORT
-          @target.port || default_port
-        end
-
         def connect
-          if @ssl
+          if target.options[:ssl]
             scheme = 'https'
             transport = :ssl
           else
             scheme = 'http'
             transport = :negotiate
           end
-          endpoint = "#{scheme}://#{@target.host}:#{port}/wsman"
+          endpoint = "#{scheme}://#{target.host}:#{@port}/wsman"
           options = { endpoint: endpoint,
                       user: @user,
-                      password: @password,
+                      password: target.password,
                       retry_limit: 1,
                       transport: transport,
-                      ca_trust_path: @cacert }
+                      ca_trust_path: target.options[:cacert] }
 
-          Timeout.timeout(@connect_timeout) do
+          Timeout.timeout(target.options[:connect_timeout]) do
             @connection = ::WinRM::Connection.new(options)
             transport_logger = Logging.logger[::WinRM]
             transport_logger.level = :warn
@@ -66,11 +53,11 @@ module Bolt
         rescue Timeout::Error
           # If we're using the default port with SSL, a timeout probably means the
           # host doesn't support SSL.
-          if @ssl && port == HTTPS_PORT
+          if target.options[:ssl] && @port == HTTPS_PORT
             theres_your_problem = "\nUse --no-ssl if this host isn't configured to use SSL for WinRM"
           end
           raise Bolt::Node::ConnectError.new(
-            "Timeout after #{@connect_timeout} seconds connecting to #{endpoint}#{theres_your_problem}",
+            "Timeout after #{target.options[:connect_timeout]} seconds connecting to #{endpoint}#{theres_your_problem}",
             'CONNECT_ERROR'
           )
         rescue ::WinRM::WinRMAuthorizationError
@@ -80,7 +67,7 @@ module Bolt
           )
         rescue OpenSSL::SSL::SSLError => e
           # If we're using SSL with the default non-SSL port, mention that as a likely problem
-          if @ssl && port == HTTP_PORT
+          if target.options[:ssl] && @port == HTTP_PORT
             theres_your_problem = "\nAre you using SSL to connect to a non-SSL port?"
           end
           raise Bolt::Node::ConnectError.new(
@@ -474,7 +461,7 @@ PS
 
         def upload(source, destination, _options = nil)
           write_remote_file(source, destination)
-          Bolt::Result.for_upload(@target, source, destination)
+          Bolt::Result.for_upload(target, source, destination)
         end
 
         def write_remote_file(source, destination)
@@ -484,7 +471,7 @@ PS
         end
 
         def make_tempdir
-          find_parent = @tmpdir ? "\"#{@tmpdir}\"" : '[System.IO.Path]::GetTempPath()'
+          find_parent = target.options[:tmpdir] ? "\"#{target.options[:tmpdir]}\"" : '[System.IO.Path]::GetTempPath()'
           result = execute(<<-PS)
 $parent = #{find_parent}
 $name = [System.IO.Path]::GetRandomFileName()
@@ -521,7 +508,7 @@ PS
 
         def run_command(command, _options = nil)
           output = execute(command)
-          Bolt::Result.for_command(@target, output.stdout.string, output.stderr.string, output.exit_code)
+          Bolt::Result.for_command(target, output.stdout.string, output.stderr.string, output.exit_code)
         end
 
         def run_script(script, arguments, _options = nil)
@@ -551,7 +538,7 @@ catch
               args += escape_arguments(arguments)
               output = execute_process(path, args)
             end
-            Bolt::Result.for_command(@target, output.stdout.string, output.stderr.string, output.exit_code)
+            Bolt::Result.for_command(target, output.stdout.string, output.stderr.string, output.exit_code)
           end
         end
 
@@ -590,7 +577,7 @@ try { & "#{remote_path}" @taskArgs } catch { exit 1 }
                 path, args = *process_from_extension(remote_path)
                 execute_process(path, args, stdin)
               end
-            Bolt::Result.for_task(@target, output.stdout.string,
+            Bolt::Result.for_task(target, output.stdout.string,
                                   output.stderr.string,
                                   output.exit_code)
           end
