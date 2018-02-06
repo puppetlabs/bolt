@@ -1,6 +1,4 @@
-require 'json'
 require 'logging'
-require 'shellwords'
 require 'bolt/node/errors'
 require 'bolt/node/output'
 
@@ -38,9 +36,6 @@ module Bolt
             end
           end
         end
-
-        STDIN_METHODS       = %w[both stdin].freeze
-        ENVIRONMENT_METHODS = %w[both environment].freeze
 
         attr_reader :logger, :user, :target
 
@@ -132,7 +127,7 @@ module Bolt
         end
 
         def handled_sudo(channel, data)
-          if data == sudo_prompt
+          if data.lines.include?(sudo_prompt)
             if target.options[:sudo_password]
               channel.send_data "#{target.options[:sudo_password]}\n"
               channel.wait
@@ -215,32 +210,6 @@ module Bolt
           result_output
         end
 
-        def running_as(target, user)
-          original_run_as = target.options[:run_as]
-          target.options[:run_as] = user || target.options[:run_as]
-          yield
-        ensure
-          target.options[:run_as] = original_run_as
-        end
-
-        def upload(source, destination, options = {})
-          running_as(target, options['_run_as']) do
-            with_remote_tempdir do |dir|
-              basename = File.basename(destination)
-              tmpfile = "#{dir}/#{basename}"
-              write_remote_file(source, tmpfile)
-              # pass over file ownership if we're using run-as to be a different user
-              dir.chown(target.options[:run_as])
-              result = execute("mv '#{tmpfile}' '#{destination}'", sudoable: true)
-              if result.exit_code != 0
-                message = "Could not move temporary file '#{tmpfile}' to #{destination}: #{result.stderr.string}"
-                raise Bolt::Node::FileError.new(message, 'MV_ERROR')
-              end
-            end
-            Bolt::Result.for_upload(target, source, destination)
-          end
-        end
-
         def write_remote_file(source, destination)
           @session.scp.upload!(source, destination)
         rescue StandardError => e
@@ -284,74 +253,6 @@ module Bolt
           if result.exit_code != 0
             message = "Could not make file '#{path}' executable: #{result.stderr.string}"
             raise Bolt::Node::FileError.new(message, 'CHMOD_ERROR')
-          end
-        end
-
-        def make_wrapper_stringio(task_path, stdin)
-          StringIO.new(<<-SCRIPT)
-#!/bin/sh
-'#{task_path}' <<EOF
-#{stdin}
-EOF
-SCRIPT
-        end
-
-        def run_command(command, options = {})
-          running_as(target, options['_run_as']) do
-            output = execute(command, sudoable: true)
-            Bolt::Result.for_command(target, output.stdout.string, output.stderr.string, output.exit_code)
-          end
-        end
-
-        def run_script(script, arguments, options = {})
-          running_as(target, options['_run_as']) do
-            with_remote_tempdir do |dir|
-              remote_path = write_remote_executable(dir, script)
-              dir.chown(target.options[:run_as])
-              output = execute("'#{remote_path}' #{Shellwords.join(arguments)}",
-                               sudoable: true)
-              Bolt::Result.for_command(target, output.stdout.string, output.stderr.string, output.exit_code)
-            end
-          end
-        end
-
-        def run_task(task, input_method, arguments, options = {})
-          running_as(target, options['_run_as']) do
-            export_args = {}
-            stdin, output = nil
-
-            if STDIN_METHODS.include?(input_method)
-              stdin = JSON.dump(arguments)
-            end
-
-            if ENVIRONMENT_METHODS.include?(input_method)
-              export_args = arguments.map do |env, val|
-                "PT_#{env}='#{val}'"
-              end.join(' ')
-            end
-
-            command = export_args.empty? ? '' : "#{export_args} "
-
-            execute_options = {}
-
-            with_remote_tempdir do |dir|
-              remote_task_path = write_remote_executable(dir, task)
-              if target.options[:run_as] && stdin
-                wrapper = make_wrapper_stringio(remote_task_path, stdin)
-                remote_wrapper_path = write_remote_executable(dir, wrapper, 'wrapper.sh')
-                command += "'#{remote_wrapper_path}'"
-              else
-                command += "'#{remote_task_path}'"
-                execute_options[:stdin] = stdin
-              end
-              dir.chown(target.options[:run_as])
-
-              execute_options[:sudoable] = true if target.options[:run_as]
-              output = execute(command, **execute_options)
-            end
-            Bolt::Result.for_task(target, output.stdout.string,
-                                  output.stderr.string,
-                                  output.exit_code)
           end
         end
       end

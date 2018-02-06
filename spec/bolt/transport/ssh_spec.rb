@@ -249,7 +249,7 @@ SHELLWORDS
     it "doesn't generate a task wrapper when not needed", ssh: true do
       contents = "#!/bin/sh\necho -n ${PT_message_one} ${PT_message_two}"
       arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-      expect_any_instance_of(Bolt::Transport::SSH::Connection).not_to receive(:make_wrapper_stringio)
+      expect(ssh).not_to receive(:make_wrapper_stringio)
       with_tempfile_containing('tasks test', contents) do |file|
         ssh.run_task(target, file.path, 'environment', arguments)
       end
