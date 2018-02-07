@@ -4,9 +4,10 @@
 
 > **Time**: Approximately 10 minutes
 
-In this exercise you will further explore Puppet Plans and see how to use the output of tasks as input to tasks in the plan.
+In this exercise you will further explore Puppet Plans:
 
 - [Write a plan which uses input and output](#write-a-plan-which-uses-input-and-output)
+- [Write a plan which handles errors](#write-a-plan-which-handles-errors)
 
 # Prerequisites
 
@@ -109,7 +110,7 @@ Plan aborted: run_command 'false' failed on 3 nodes
 
 This shows that the plan stopped executing immediately after the `run_command()` failed, so we didn't see either of the notices.
 
-For our error-handling code to execute, we need to prevent the plan from stopping immediately on error. We can do that by passing `_catch_error => true` to `run_command`. `_catch_error` will make `run_command` return a `ResultSet` like normal, even if the command fails.
+For our error-handling code to execute, we need to prevent the plan from stopping immediately on error. We can do that by passing `_catch_errors => true` to `run_command`. `_catch_errors` will make `run_command` return a `ResultSet` like normal, even if the command fails.
 
 Save this new plan as `modules/exercise9/plans/catch_error.pp`:
 
@@ -123,7 +124,6 @@ plan exercise9::catch_error(String $nodes) {
     notice("The command failed")
   }
 }
-
 ```
 
 Run this plan to see the difference:
@@ -138,7 +138,7 @@ Now the `notice` statement gets executed and we see our output:
 Notice: Scope(<module>/exercise9/plans/catch_error.pp, 7): The command failed
 ```
 
-The `_catch_error` argument can be passed to `run_command`, `run_task`, `run_script`, and `file_upload`.
+The `_catch_errors` argument can be passed to `run_command`, `run_task`, `run_script`, and `file_upload`.
 
 # Next steps
 
