@@ -29,7 +29,7 @@ It is also useful to have some familiarity with running commands with `bolt` so 
 These exercises will use the [task-modules](https://github.com/puppetlabs/task-modules) control repo. Like many control repos this repository contains some modules committed directly in the `site` directory and manages other with a `Puppetfile`.
 
 ```
-mkdir ~/.puppetlabs
+mkdir -p ~/.puppetlabs
 cd ~/.puppetlabs
 git clone git@github.com:puppetlabs/task-modules.git
 ```
