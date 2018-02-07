@@ -180,14 +180,18 @@ describe Bolt::Inventory do
       expect(Bolt::Inventory.new(data).validate).to be_nil
     end
 
-    it 'fails with unamed groups' do
+    it 'fails with unnamed groups' do
       data = { 'groups' => [{}] }
-      expect { Bolt::Inventory.new(data).validate }.to raise_error(Bolt::Inventory::ValidationError)
+      expect {
+        Bolt::Inventory.new(data).validate
+      }.to raise_error(Bolt::Inventory::ValidationError, /Group does not have a name/)
     end
 
     it 'fails with duplicate groups' do
       data = { 'groups' => [{ 'name' => 'group1' }, { 'name' => 'group1' }] }
-      expect { Bolt::Inventory.new(data).validate }.to raise_error(Bolt::Inventory::ValidationError)
+      expect {
+        Bolt::Inventory.new(data).validate
+      }.to raise_error(Bolt::Inventory::ValidationError, /Tried to redefine group group1/)
     end
   end
 

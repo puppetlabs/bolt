@@ -1,7 +1,7 @@
 module Bolt
   class Inventory
     # Group is a specific implementation of Inventory based on nested
-    # structred data.
+    # structured data.
     class Group
       attr_accessor :name, :nodes, :groups, :config, :rest
 
@@ -30,29 +30,38 @@ module Bolt
         @rest = data.reject { |k, _| %w[name nodes config groups].include? k }
       end
 
-      def validate(used_names = [], depth = 0)
-        raise ValidationError.new("Group does not have a name", nil)  unless @name
+      def validate(used_names = Set.new, node_names = Set.new, depth = 0)
+        raise ValidationError.new("Group does not have a name", nil) unless @name
         if used_names.include?(@name)
           raise ValidationError.new("Tried to redefine group #{@name}", @name)
         end
         raise ValidationError.new("Invalid Group name #{@name}", @name) unless @name =~ /\A[a-z0-9_]+\Z/
 
+        if node_names.include?(@name)
+          raise ValidationError.new("Group #{@name} conflicts with node of the same name", @name)
+        end
         raise ValidationError.new("Group #{@name} is too deeply nested", @name) if depth > 1
 
         used_names << @name
 
         @nodes.each do |n|
-          raise ValidationError.new("node #{n['name']} does not have a name", @name) unless n['name']
+          raise ValidationError.new("node #{n['name']} does not have a name", n['name']) unless n['name']
+          if used_names.include?(n['name'])
+            raise ValidationError.new("Group #{n['name']} conflicts with node of the same name", n['name'])
+          end
+
+          node_names << n['name']
         end
 
         @groups.each do |g|
           begin
-            g.validate(used_names, depth + 1)
+            g.validate(used_names, node_names, depth + 1)
           rescue ValidationError => e
             e.add_parent(@name)
             raise e
           end
         end
+
         nil
       end
 

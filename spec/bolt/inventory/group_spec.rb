@@ -75,7 +75,7 @@ describe Bolt::Inventory::Group do
       }
     end
 
-    it 'uses the childs node defintion' do
+    it 'uses the childs node definition' do
       expect(group.data_for('node1')['config']['ssh']['user']).to eq('child_node')
     end
   end
@@ -98,7 +98,7 @@ describe Bolt::Inventory::Group do
       }
     end
 
-    it 'uses the parents node defintion' do
+    it 'uses the parents node definition' do
       expect(group.data_for('node1')['config']['ssh']['user']).to eq('parent_node')
     end
   end
@@ -120,7 +120,7 @@ describe Bolt::Inventory::Group do
       }
     end
 
-    it 'uses the childs group defintion' do
+    it 'uses the childs group definition' do
       expect(group.data_for('node1')['config']['ssh']['user']).to eq('child_group')
     end
   end
@@ -155,7 +155,7 @@ describe Bolt::Inventory::Group do
       }
     end
 
-    it 'uses the first childs node defintion' do
+    it 'uses the first childs node definition' do
       expect(node1_ssh).to eq('child1_node')
     end
   end
@@ -190,7 +190,7 @@ describe Bolt::Inventory::Group do
       }
     end
 
-    it 'uses the first childs node defintion' do
+    it 'uses the first childs node definition' do
       expect(node1_ssh).to eq('child2_node')
     end
   end
@@ -225,7 +225,7 @@ describe Bolt::Inventory::Group do
       }
     end
 
-    it 'uses the first childs group defintion' do
+    it 'uses the first childs group definition' do
       expect(node1_ssh).to eq('child1_group')
     end
   end
@@ -260,8 +260,59 @@ describe Bolt::Inventory::Group do
       }
     end
 
-    it 'uses the second childs group defintion' do
+    it 'uses the second childs group definition' do
       expect(node1_ssh).to eq('child2_group')
+    end
+  end
+
+  context 'where a group name conflicts with a prior node name' do
+    let(:data) do
+      {
+        'name' => 'group1',
+        'nodes' => [{ 'name' => 'foo1' }],
+        'groups' => [{ 'name' => 'foo1' }]
+      }
+    end
+
+    it 'raises an error' do
+      expect { group.validate }.to raise_error(Bolt::Inventory::ValidationError, /conflicts with node/)
+    end
+  end
+
+  context 'where a group name conflicts with a child node name' do
+    let(:data) do
+      {
+        'name' => 'group1',
+        'groups' => [
+          {
+            'name' => 'foo1',
+            'nodes' => [{ 'name' => 'foo1' }]
+          }
+        ]
+      }
+    end
+
+    it 'raises an error' do
+      expect { group.validate }.to raise_error(Bolt::Inventory::ValidationError, /conflicts with node/)
+    end
+  end
+
+  context 'where a group name conflicts with a child node of another group' do
+    let(:data) do
+      {
+        'name' => 'group1',
+        'groups' => [
+          { 'name' => 'foo1' },
+          {
+            'name' => 'foo2',
+            'nodes' => [{ 'name' => 'foo1' }]
+          }
+        ]
+      }
+    end
+
+    it 'raises an error' do
+      expect { group.validate }.to raise_error(Bolt::Inventory::ValidationError, /conflicts with node/)
     end
   end
 end
