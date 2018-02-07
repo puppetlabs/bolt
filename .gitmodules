@@ -10,3 +10,6 @@
 	path = vendored/facter
 	url = https://github.com/puppetlabs/facter
 	branch = 2.x
+[submodule "vendored/puppetdb"]
+	path = vendored/puppetdb
+	url = https://github.com/puppetlabs/puppetdb
