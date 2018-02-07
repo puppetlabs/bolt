@@ -54,6 +54,7 @@ module Bolt
             rescue StandardError => ex
               Bolt::Result.from_exception(target, ex)
             end
+          @logger.debug("Result on #{target.uri}: #{JSON.dump(result.value)}")
           results.concat([result])
           @notifier.notify(callback, type: :node_result, result: result) if callback
         end
@@ -97,11 +98,7 @@ module Bolt
 
       r = on(targets, callback) do |transport, target|
         @logger.debug("Running command '#{command}' on #{target.uri}")
-        target_result = with_exception_handling(target) do
-          transport.run_command(target, command, get_run_as(target, options))
-        end
-        @logger.debug("Result on #{target.uri}: #{JSON.dump(target_result.value)}")
-        target_result
+        transport.run_command(target, command, get_run_as(target, options))
       end
       @logger.info(summary('command', command, r))
       r
@@ -114,11 +111,7 @@ module Bolt
 
       r = on(targets, callback) do |transport, target|
         @logger.debug { "Running script '#{script}' on #{target.uri}" }
-        target_result = with_exception_handling(target) do
-          transport.run_script(target, script, arguments, get_run_as(target, options))
-        end
-        @logger.debug("Result on #{target.uri}: #{JSON.dump(target_result.value)}")
-        target_result
+        transport.run_script(target, script, arguments, get_run_as(target, options))
       end
       @logger.info(summary('script', script, r))
       r
@@ -131,11 +124,7 @@ module Bolt
 
       r = on(targets, callback) do |transport, target|
         @logger.debug { "Running task run '#{task}' on #{target.uri}" }
-        target_result = with_exception_handling(target) do
-          transport.run_task(target, task, input_method, arguments, get_run_as(target, options))
-        end
-        @logger.debug("Result on #{target.uri}: #{JSON.dump(target_result.value)}")
-        target_result
+        transport.run_task(target, task, input_method, arguments, get_run_as(target, options))
       end
       @logger.info(summary('task', task, r))
       r
@@ -147,11 +136,7 @@ module Bolt
 
       r = on(targets, callback) do |transport, target|
         @logger.debug { "Uploading: '#{source}' to #{destination} on #{target.uri}" }
-        target_result = with_exception_handling(target) do
-          transport.upload(target, source, destination, options)
-        end
-        @logger.debug("Result on #{target.uri}: #{JSON.dump(target_result.value)}")
-        target_result
+        transport.upload(target, source, destination, options)
       end
       @logger.info(summary('upload', source, r))
       r
