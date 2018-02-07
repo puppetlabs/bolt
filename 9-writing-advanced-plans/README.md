@@ -7,6 +7,7 @@
 In this exercise you will further explore Puppet Plans:
 
 - [Write a plan which uses input and output](#write-a-plan-which-uses-input-and-output)
+- [Write a plan with custom Ruby functions](#write-a-plan-with-custom-ruby-functions)
 - [Write a plan which handles errors](#write-a-plan-which-handles-errors)
 
 # Prerequisites
@@ -95,6 +96,103 @@ Here we've shown how to capture the output from a task and then reuse it as part
 * A plan which uses a task to check how long since a machine was last rebooted, and then runs another task to reboot the machine only on nodes that have been up for more than a week
 * A plan which uses a task to identify the operating system of a machine and then run a different task on each different operating system
 
+# Write a plan with custom Ruby functions
+
+Bolt supports a powerful extension mechanism via Puppet functions. These are functions written in Puppet or Ruby that are accessible from within plans, and are in fact how many Bolt features are implemented. You can declare Puppet functions within a module and use them in your plans. Many existing Puppet functions, such as `length` from [puppetlabs-stdlib], can be used in plans. Here we'll provide examples of using and writing custom Puppet functions in Ruby.
+
+Let's use the `length` function to print how many volumes are on each of our test nodes. Save the following as `modules/exercise9/plans/count_volumes.pp`:
+
+```puppet
+plan exercise9::count_volumes (TargetSpec $nodes) {
+  $result = run_command('df', $nodes)
+  $result.map |$r| {
+    $line_count = $r['stdout'].split("\n").length - 1
+    "${$r.target.name} has ${$line_count} volumes"
+  }
+}
+```
+
+The `length` function accepts a `String` type, so it can be invoked directly on a string. To use that function, we'll need to install it locally:
+
+```bash
+git clone https://github.com/puppetlabs/puppetlabs-stdlib ./modules/stdlib
+```
+
+Then run the plan to see what happens:
+
+```bash
+bolt plan run exercise9::count_volumes nodes=$NODE --modulepath ./modules
+```
+
+You should see output like the following:
+
+```bash
+2018-02-22T15:33:21.666706 INFO   Bolt::Executor: Starting command run 'df -h' on ["node1", "node2", "node3"]
+2018-02-22T15:33:21.980383 INFO   Bolt::Executor: Ran command 'df -h' on 3 nodes with 0 failures
+[
+  "node1 has 7 volumes",
+  "node2 has 7 volumes",
+  "node3 has 7 volumes"
+]
+```
+
+Unfortunately not all Puppet functions can be used with Bolt. Let's write a plan to list the unique volumes across our nodes. A helpful function for this would be `unique`, but [puppetlabs-stdlib] includes a Puppet 3-compatible version that we can't use.
+
+Let's write our own. Save the following as `modules/exercise9/lib/puppet/functions/unique.rb`:
+
+```ruby
+Puppet::Functions.create_function(:unique) do
+  dispatch :unique do
+    param 'Array[Data]', :vals
+  end
+
+  def unique(vals)
+    vals.uniq
+  end
+end
+```
+
+Then save the following as `modules/exercise9/plans/unique_volumes.pp`:
+
+```puppet
+plan exercise9::unique_volumes (TargetSpec $nodes) {
+  $result = run_command('df', $nodes)
+  $volumes = $result.reduce([]) |$arr, $r| {
+    $lines = $r['stdout'].split("\n")[1,-1]
+    $volumes = $lines.map |$line| {
+      $line.split(' ')[-1]
+    }
+    $arr + $volumes
+  }
+
+  $volumes.unique
+}
+```
+
+This plan collects the last column of each line output by `df` (except the header), and prints a list of unique mount points. Run the plan to see it in action:
+
+```bash
+bolt plan run exercise9::unique_volumes nodes=$NODE --modulepath ./modules
+```
+
+You should see output like the following:
+
+```bash
+2018-02-22T15:48:51.992621 INFO   Bolt::Executor: Starting command run 'df' on ["node1", "node2", "node3"]
+2018-02-22T15:48:52.305331 INFO   Bolt::Executor: Ran command 'df' on 3 nodes with 0 failures
+[
+  "/",
+  "/dev",
+  "/dev/shm",
+  "/run",
+  "/sys/fs/cgroup",
+  "/boot",
+  "/run/user/1000"
+]
+```
+
+See [Puppet's custom function docs](https://puppet.com/docs/puppet/5.4/functions_basics.html) for more on writing custom functions.
+
 # Write a plan which handles errors
 
 By default, any task or command that fails will cause the plan to abort immediately. To see this behavior in action, save the following as `modules/exercise9/plans/error.pp`:
@@ -166,3 +264,5 @@ Congratulations, you should now have a basic understanding of `bolt` and Puppet 
 * Start writing Tasks for one of your existing Puppet modules
 * Head over to the [Puppet Slack](https://slack.puppet.com/) and talk to the `bolt` developers and other users
 * Try out the [Puppet Development Kit](https://puppet.com/download-puppet-development-kit) [(docs)](https://docs.puppet.com/pdk/latest/index.html) which has a few features to make authoring tasks even easier
+
+[puppetlabs-stdlib]: https://github.com/puppetlabs/puppetlabs-stdlib
