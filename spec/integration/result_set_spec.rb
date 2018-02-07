@@ -32,5 +32,11 @@ describe "when running a plan that manipulates an execution result", ssh: true d
       output = run_cli(['plan', 'run', 'results::test_methods', "--params", params] + config_flags)
       expect(output.strip).to eq('false')
     end
+
+    it 'exposes errrors for results' do
+      params = { target: uri }.to_json
+      output = run_cli(['plan', 'run', 'results::test_error', "--params", params] + config_flags)
+      expect(output.strip).to eq('"The task failed with exit code 1"')
+    end
   end
 end
