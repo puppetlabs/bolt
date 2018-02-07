@@ -38,11 +38,13 @@ module Bolt
         end
 
         attr_reader :logger, :user, :target
+        attr_writer :run_as
 
         def initialize(target)
           @target = target
 
           @user = @target.user || Net::SSH::Config.for(target.host)[:user] || Etc.getlogin
+          @run_as = nil
 
           @logger = Logging.logger[@target.host]
         end
@@ -122,6 +124,21 @@ module Bolt
           end
         end
 
+        # This method allows the @run_as variable to be used as a per-operation
+        # override for the user to run as. When @run_as is unset, the user
+        # specified on the target will be used.
+        def run_as
+          @run_as || target.options[:run_as]
+        end
+
+        # Run as the specified user for the duration of the block.
+        def running_as(user)
+          @run_as = user
+          yield
+        ensure
+          @run_as = nil
+        end
+
         def sudo_prompt
           '[sudo] Bolt needs to run as another user, password: '
         end
@@ -156,7 +173,7 @@ module Bolt
 
         def execute(command, sudoable: false, **options)
           result_output = Bolt::Node::Output.new
-          run_as = options[:run_as] || target.options[:run_as]
+          run_as = options[:run_as] || self.run_as
           use_sudo = sudoable && run_as && @user != run_as
           if use_sudo
             command = "sudo -S -u #{run_as} -p '#{sudo_prompt}' #{command}"

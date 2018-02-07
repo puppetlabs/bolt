@@ -38,25 +38,15 @@ module Bolt
         end
       end
 
-      def running_as(connection, user)
-        target = connection.target
-        original_run_as = target.options[:run_as]
-        target.options[:run_as] = user
-        yield
-      ensure
-        target.options[:run_as] = original_run_as
-      end
-
       def upload(target, source, destination, options = {})
-        run_as = options['_run_as'] || target.options[:run_as]
         with_connection(target) do |conn|
-          running_as(conn, run_as) do
+          conn.running_as(options['_run_as']) do
             conn.with_remote_tempdir do |dir|
               basename = File.basename(destination)
               tmpfile = "#{dir}/#{basename}"
               conn.write_remote_file(source, tmpfile)
               # pass over file ownership if we're using run-as to be a different user
-              dir.chown(run_as)
+              dir.chown(conn.run_as)
               result = conn.execute("mv '#{tmpfile}' '#{destination}'", sudoable: true)
               if result.exit_code != 0
                 message = "Could not move temporary file '#{tmpfile}' to #{destination}: #{result.stderr.string}"
@@ -69,9 +59,8 @@ module Bolt
       end
 
       def run_command(target, command, options = {})
-        run_as = options['_run_as'] || target.options[:run_as]
         with_connection(target) do |conn|
-          running_as(conn, run_as) do
+          conn.running_as(options['_run_as']) do
             output = conn.execute(command, sudoable: true)
             Bolt::Result.for_command(target, output.stdout.string, output.stderr.string, output.exit_code)
           end
@@ -79,12 +68,11 @@ module Bolt
       end
 
       def run_script(target, script, arguments, options = {})
-        run_as = options['_run_as'] || target.options[:run_as]
         with_connection(target) do |conn|
-          running_as(conn, run_as) do
+          conn.running_as(options['_run_as']) do
             conn.with_remote_tempdir do |dir|
               remote_path = conn.write_remote_executable(dir, script)
-              dir.chown(run_as)
+              dir.chown(conn.run_as)
               output = conn.execute("'#{remote_path}' #{Shellwords.join(arguments)}", sudoable: true)
               Bolt::Result.for_command(target, output.stdout.string, output.stderr.string, output.exit_code)
             end
@@ -93,9 +81,8 @@ module Bolt
       end
 
       def run_task(target, task, input_method, arguments, options = {})
-        run_as = options['_run_as'] || target.options[:run_as]
         with_connection(target) do |conn|
-          running_as(conn, run_as) do
+          conn.running_as(options['_run_as']) do
             export_args = {}
             stdin, output = nil
 
@@ -115,7 +102,7 @@ module Bolt
 
             conn.with_remote_tempdir do |dir|
               remote_task_path = conn.write_remote_executable(dir, task)
-              if run_as && stdin
+              if conn.run_as && stdin
                 wrapper = make_wrapper_stringio(remote_task_path, stdin)
                 remote_wrapper_path = conn.write_remote_executable(dir, wrapper, 'wrapper.sh')
                 command += "'#{remote_wrapper_path}'"
@@ -123,9 +110,9 @@ module Bolt
                 command += "'#{remote_task_path}'"
                 execute_options[:stdin] = stdin
               end
-              dir.chown(run_as)
+              dir.chown(conn.run_as)
 
-              execute_options[:sudoable] = true if run_as
+              execute_options[:sudoable] = true if conn.run_as
               output = conn.execute(command, **execute_options)
             end
             Bolt::Result.for_task(target, output.stdout.string,
