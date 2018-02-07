@@ -31,7 +31,11 @@ module Bolt
         conn.connect
         yield conn
       ensure
-        conn.disconnect if conn
+        begin
+          conn.disconnect if conn
+        rescue StandardError => ex
+          @logger.info("Failed to close connection to #{target.uri} : #{ex.message}")
+        end
       end
 
       def running_as(connection, user)
