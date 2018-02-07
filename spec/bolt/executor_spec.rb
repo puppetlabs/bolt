@@ -28,7 +28,7 @@ describe "Bolt::Executor" do
 
   let(:targets) { [Bolt::Target.new("target1"), Bolt::Target.new("target2")] }
   let(:node_results) { mock_node_results }
-  let(:ssh) { executor.transports['ssh'] }
+  let(:ssh) { executor.transport('ssh') }
 
   context 'running a command' do
     it 'executes on all nodes' do

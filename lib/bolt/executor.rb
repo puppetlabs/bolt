@@ -19,9 +19,9 @@ module Bolt
       @logger = Logging.logger[self]
 
       @transports = {
-        'ssh' => Bolt::Transport::SSH.new(config[:transports][:ssh] || {}),
-        'winrm' => Bolt::Transport::WinRM.new(config[:transports][:winrm] || {}),
-        'pcp' => Bolt::Transport::Orch.new(config[:transports][:pcp] || {})
+        'ssh' => Concurrent::Delay.new { Bolt::Transport::SSH.new(config[:transports][:ssh] || {}) },
+        'winrm' => Concurrent::Delay.new { Bolt::Transport::WinRM.new(config[:transports][:winrm] || {}) },
+        'pcp' => Concurrent::Delay.new { Bolt::Transport::Orch.new(config[:transports][:pcp] || {}) }
       }
 
       # If a specific elevated log level has been requested, honor that.
@@ -32,6 +32,10 @@ module Bolt
       @noop = noop
       @run_as = nil
       @notifier = Bolt::Notifier.new
+    end
+
+    def transport(transport)
+      @transports[transport || 'ssh'].value
     end
 
     def on(targets, callback = nil)
@@ -45,9 +49,8 @@ module Bolt
         pool.post do
           result =
             begin
-              transport = @transports[target.protocol || 'ssh']
               @notifier.notify(callback, type: :node_start, target: target) if callback
-              yield transport, target
+              yield transport(target.protocol), target
             rescue StandardError => ex
               Bolt::Result.from_exception(target, ex)
             end
