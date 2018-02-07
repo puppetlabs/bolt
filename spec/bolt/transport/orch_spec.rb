@@ -27,13 +27,14 @@ describe Bolt::Transport::Orch, orchestrator: true do
   let(:base_path) { File.expand_path(File.join(File.dirname(__FILE__), '..', '..', '..')) }
 
   def mock_client
+    orch_client = instance_double("OrchestratorClient")
+
     body = { task: task, environment: task_environment, noop: noop, params: params, scope: scope }
     results = [{ 'state' => result_state, 'result' => result }]
 
-    orch_client = instance_double("OrchestratorClient")
-    orch.instance_variable_set(:@client, orch_client)
-
     expect(orch_client).to(receive(:run_task).with(body).and_return(results))
+
+    allow(orch).to receive(:client).and_return(orch_client)
   end
 
   def bolt_task_client
@@ -41,7 +42,7 @@ describe Bolt::Transport::Orch, orchestrator: true do
     body = { task: 'bolt', environment: task_environment, noop: noop, params: params, scope: scope }
 
     orch_client = instance_double("OrchestratorClient")
-    orch.instance_variable_set(:@client, orch_client)
+    allow(orch).to receive(:client).and_return(orch_client)
     allow(orch_client).to(receive(:run_task).with(body) do
       Open3.popen3("ruby #{bolt_task};") do |stdin, stdout, stderr, wt|
         stdin.write(params.to_json)

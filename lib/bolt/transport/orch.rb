@@ -1,4 +1,5 @@
 require 'base64'
+require 'concurrent'
 require 'json'
 require 'orchestrator_client'
 
@@ -8,13 +9,17 @@ module Bolt
       CONF_FILE = File.expand_path('~/.puppetlabs/client-tools/orchestrator.conf')
       BOLT_MOCK_FILE = 'bolt/tasks/init'.freeze
 
-      attr_reader :client, :logger
+      attr_reader :logger
 
       def initialize(config)
         client_keys = %i[service-url token-file cacert]
         client_opts = config.select { |k, _v| client_keys.include?(k) }
-        @client = OrchestratorClient.new(client_opts, true)
+        @client = Concurrent::Delay.new { OrchestratorClient.new(client_opts, true) }
         @logger = Logging.logger[self]
+      end
+
+      def client
+        @client.value
       end
 
       def upload(target, source, destination, _options = {})
