@@ -138,10 +138,7 @@ module Bolt
     # Is it crazy for this to behave differently outside a compiler?
     def error
       if error_hash
-        Puppet::DataTypes::Error.new(error_hash['msg'],
-                                     error_hash['kind'],
-                                     nil, nil,
-                                     error_hash['details'])
+        Puppet::DataTypes::Error.from_asserted_hash(error_hash)
 
       end
     end
