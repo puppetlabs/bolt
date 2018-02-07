@@ -31,6 +31,8 @@ module Bolt
       @logger.level = @config[:log_level] || default_log_level
       @noop = noop
       @run_as = nil
+      @pool = Concurrent::CachedThreadPool.new(max_threads: @config[:concurrency])
+      @logger.debug { "Started with #{@config[:concurrency]} max thread(s)" }
       @notifier = Bolt::Notifier.new
     end
 
@@ -39,28 +41,21 @@ module Bolt
     end
 
     def on(targets, callback = nil)
-      results = Concurrent::Array.new
-
-      poolsize = [targets.length, @config[:concurrency]].min
-      pool = Concurrent::FixedThreadPool.new(poolsize)
-      @logger.debug { "Started with #{poolsize} thread(s)" }
-
-      targets.each { |target|
-        pool.post do
-          result =
-            begin
-              @notifier.notify(callback, type: :node_start, target: target) if callback
-              yield transport(target.protocol), target
-            rescue StandardError => ex
-              Bolt::Result.from_exception(target, ex)
-            end
-          @logger.debug("Result on #{target.uri}: #{JSON.dump(result.value)}")
-          results.concat([result])
-          @notifier.notify(callback, type: :node_result, result: result) if callback
+      result_futures = targets.map do |target|
+        Concurrent::Future.execute(executor: @pool) do
+          begin
+            @notifier.notify(callback, type: :node_start, target: target) if callback
+            result = yield transport(target.protocol), target
+            @logger.debug("Result on #{target.uri}: #{JSON.dump(result.value)}")
+            @notifier.notify(callback, type: :node_result, result: result) if callback
+            result
+          rescue StandardError => ex
+            Bolt::Result.from_exception(target, ex)
+          end
         end
-      }
-      pool.shutdown
-      pool.wait_for_termination
+      end
+
+      results = result_futures.map(&:value)
 
       @notifier.shutdown
 
