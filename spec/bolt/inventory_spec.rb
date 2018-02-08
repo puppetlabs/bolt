@@ -224,8 +224,33 @@ describe Bolt::Inventory do
     it 'should not use ssl' do
       expect(target.options[:ssl]).to eq(false)
     end
+  end
 
-    context 'with inventory' do
+  def targets(names)
+    names.map { |n| Bolt::Target.new(n) }
+  end
+
+  describe 'get_targets' do
+    let(:inventory) { Bolt::Inventory.from_config(config) }
+
+    it 'should parse a single target URI' do
+      name = 'nonode'
+      expect(inventory.get_targets(name)).to eq(targets([name]))
+    end
+
+    it 'should parse an array of target URIs' do
+      names = ['pcp://a', 'winrm://b', 'c']
+      expect(inventory.get_targets(names)).to eq(targets(names))
+    end
+
+    it 'should parse a nested array of target URIs and Targets' do
+      names = [['a'], Bolt::Target.new('b'), ['c', 'ssh://d']]
+      expect(inventory.get_targets(names)).to eq(targets(['a', 'b', 'c', 'ssh://d']))
+    end
+
+    it 'should split a comma-separated list of target URIs' do
+      ts = targets(['ssh://a', 'winrm://b:5000', 'u:p@c'])
+      expect(inventory.get_targets('ssh://a, winrm://b:5000, u:p@c')).to eq(ts)
     end
   end
 end

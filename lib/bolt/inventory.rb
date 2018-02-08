@@ -94,7 +94,8 @@ module Bolt
       elsif targets.is_a? Array
         targets.map { |tish| expand_targets(tish) }
       elsif targets.is_a? String
-        Bolt::Target.new(targets)
+        # Expand a comma-separated list
+        targets.split(/[[:space:],]+/).reject(&:empty?).map { |t| Bolt::Target.new(t) }
       end
     end
   end
