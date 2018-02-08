@@ -10,7 +10,7 @@ describe Bolt::Orch, orchestrator: true do
 
   let(:hostname) { "localhost" }
   let(:target) do
-    Bolt::Target.from_uri(hostname).update_conf(Bolt::Config.new.transport_conf)
+    Bolt::Target.new(hostname).update_conf(Bolt::Config.new.transport_conf)
   end
 
   let(:orch) { Bolt::Orch.new(target) }

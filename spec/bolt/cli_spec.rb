@@ -5,7 +5,7 @@ require 'bolt/cli'
 
 describe "Bolt::CLI" do
   include BoltSpec::Files
-  let(:target) { Bolt::Target.from_uri('foo') }
+  let(:target) { Bolt::Target.new('foo') }
 
   before(:each) do
     outputter = Bolt::Outputter::Human.new(StringIO.new)
@@ -151,7 +151,7 @@ describe "Bolt::CLI" do
     end
 
     describe "nodes" do
-      let(:targets) { [target, Bolt::Target.from_uri('bar')] }
+      let(:targets) { [target, Bolt::Target.new('bar')] }
 
       it "accepts a single node" do
         cli = Bolt::CLI.new(%w[command run --nodes foo])

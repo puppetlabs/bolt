@@ -5,7 +5,7 @@ require 'bolt/target'
 require 'bolt/node'
 
 def from_uri(uri, config)
-  Bolt::Node.from_target(Bolt::Target.from_uri(uri).update_conf(config))
+  Bolt::Node.from_target(Bolt::Target.new(uri).update_conf(config))
 end
 
 describe Bolt::Node do

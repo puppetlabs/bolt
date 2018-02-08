@@ -18,7 +18,7 @@ describe 'run_script' do
 
   context 'it calls bolt executor run_script' do
     let(:hostname) { 'test.example.com' }
-    let(:target) { Bolt::Target.from_uri(hostname) }
+    let(:target) { Bolt::Target.new(hostname) }
     let(:result) { Bolt::Result.new(target, value: { 'stdout' => hostname }) }
     let(:result_set) { Bolt::ResultSet.new([result]) }
     let(:module_root) { File.expand_path(fixtures('modules', 'test')) }
@@ -66,7 +66,7 @@ describe 'run_script' do
 
     context 'with multiple destinations' do
       let(:hostname2) { 'test.testing.com' }
-      let(:target2) { Bolt::Target.from_uri(hostname2) }
+      let(:target2) { Bolt::Target.new(hostname2) }
       let(:result2) { Bolt::Result.new(target2, value: { 'stdout' => hostname2 }) }
       let(:result_set) { Bolt::ResultSet.new([result, result2]) }
 
