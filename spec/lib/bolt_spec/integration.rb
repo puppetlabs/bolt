@@ -29,7 +29,7 @@ module BoltSpec
       output = run_cli(arguments, **opts)
 
       begin
-        result = JSON.parse(output)
+        result = JSON.parse(output, quirks_mode: true)
       rescue JSON::ParserError
         expect(output.string).to eq("Output should be JSON")
       end

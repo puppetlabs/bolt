@@ -8,6 +8,8 @@
 #   }
 #   run_plan('myplan', { x => 'testing' })
 #
+require 'bolt/error'
+
 Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction) do
   dispatch :run_plan do
     scope_param
@@ -29,7 +31,7 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
       )
     end
 
-    use_args = named_args.reject { |k, _| k.start_with?('_') }
+    params = named_args.reject { |k, _| k.start_with?('_') }
 
     loaders = closure_scope.compiler.loaders
     # The perspective of the environment is wanted here (for now) to not have to
@@ -41,10 +43,22 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
         old_run_as = executor.run_as
         executor.run_as = run_as
       end
-      result = func.class.dispatcher.dispatchers[0].call_by_name_with_scope(scope, use_args, true)
-      if run_as
-        executor.run_as = old_run_as
+
+      begin
+        result = func.class.dispatcher.dispatchers[0].call_by_name_with_scope(scope, params, true)
+      rescue Puppet::PreformattedError => err
+        if named_args['_catch_errors'] &&
+           err.respond_to?(:cause) && err.cause && err.cause.is_a?(Bolt::Error)
+          result = err.cause.to_puppet_error
+        else
+          raise err
+        end
+      ensure
+        if run_as
+          executor.run_as = old_run_as
+        end
       end
+
       return result
     end
     # Could not find plan
