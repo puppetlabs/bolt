@@ -5,6 +5,58 @@ require 'bolt/inventory'
 describe Bolt::Inventory do
   include BoltSpec::Config
 
+  let(:data) {
+    {
+      'nodes' => [
+        'node1',
+        { 'name' =>  'node2' },
+        { 'name' =>  'node3',
+          'config' => {
+            'ssh' => {
+              'user' => 'me'
+            }
+          } }
+      ],
+      'config' => {
+        'ssh' => {
+          'user' => 'you',
+          'insecure' => 'true',
+          'port' => '2222'
+        }
+      },
+      'groups' => [
+        { 'name' => 'group1',
+          'nodes' => [
+            { 'name' => 'node4',
+              'config' => {
+                'ssh' => {
+                  'user' => 'me'
+                }
+              } },
+            'node5',
+            'node6',
+            'node7'
+          ],
+          'config' => {
+            'ssh' => {
+              'insecure' => false
+            }
+          } },
+        { 'name' => 'group2',
+          'nodes' => [
+            { 'name' => 'node6',
+              'config' => {
+                'ssh' => { 'user' => 'someone' }
+              } },
+            'node7', 'node8'
+          ],
+          'config' => { 'ssh' => {
+            'insecure' => 'maybe'
+          } } }
+      ]
+    }
+  }
+
   describe :config_for do
     context 'with nodes at the top level' do
       let(:data) {
@@ -87,56 +139,6 @@ describe Bolt::Inventory do
     end
 
     context 'with data in the group' do
-      let(:data) {
-        {
-          'nodes' => [
-            'node1',
-            { 'name' =>  'node2' },
-            { 'name' =>  'node3',
-              'config' => {
-                'ssh' => {
-                  'user' => 'me'
-                }
-              } }
-          ],
-          'config' => {
-            'ssh' => {
-              'user' => 'you',
-              'insecure' => 'true',
-              'port' => '2222'
-            }
-          },
-          'groups' => [
-            { 'name' => 'group1',
-              'nodes' => [
-                { 'name' => 'node4',
-                  'config' => {
-                    'ssh' => {
-                      'user' => 'me'
-                    }
-                  } },
-                'node5',
-                'node6',
-                'node7'
-              ],
-              'config' => {
-                'ssh' => {
-                  'insecure' => false
-                }
-              } },
-            { 'name' => 'group2',
-              'nodes' => [
-                { 'name' => 'node6',
-                  'config' => {
-                    'ssh' => { 'user' => 'someone' }
-                  } },
-                'node7', 'node8'
-              ],
-              'config' => { 'ssh' => {
-                'insecure' => 'maybe'
-              } } }
-          ]
-        } }
       let(:inventory) { Bolt::Inventory.new(data) }
 
       it 'should use value from lowest node definition' do
@@ -175,55 +177,6 @@ describe Bolt::Inventory do
     end
 
     it 'accepts non-empty inventory' do
-      data = {
-        'nodes' => [
-          'node1',
-          { 'name' =>  'node2' },
-          { 'name' =>  'node3',
-            'config' => {
-              'ssh' => {
-                'user' => 'me'
-              }
-            } }
-        ],
-        'config' => {
-          'ssh' => {
-            'user' => 'you',
-            'insecure' => 'true',
-            'port' => '2222'
-          }
-        },
-        'groups' => [
-          { 'name' => 'group1',
-            'nodes' => [
-              { 'name' => 'node4',
-                'config' => {
-                  'ssh' => {
-                    'user' => 'me'
-                  }
-                } },
-              'node5',
-              'node6',
-              'node7'
-            ],
-            'config' => {
-              'ssh' => {
-                'insecure' => false
-              }
-            } },
-          { 'name' => 'group2',
-            'nodes' => [
-              { 'name' => 'node6',
-                'config' => {
-                  'ssh' => { 'user' => 'someone' }
-                } },
-              'node7', 'node8'
-            ],
-            'config' => { 'ssh' => {
-              'insecure' => 'maybe'
-            } } }
-        ]
-      }
       expect(Bolt::Inventory.new(data).validate).to be_nil
     end
 
