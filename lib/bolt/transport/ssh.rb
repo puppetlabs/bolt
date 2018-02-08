@@ -1,19 +1,16 @@
 require 'bolt/node/errors'
-require 'bolt/transport/ssh/connection'
+require 'bolt/transport/base'
 require 'json'
-require 'logging'
 require 'shellwords'
 
 module Bolt
   module Transport
-    class SSH
-      attr_reader :logger
-
+    class SSH < Base
       STDIN_METHODS       = %w[both stdin].freeze
       ENVIRONMENT_METHODS = %w[both environment].freeze
 
-      def initialize(_config)
-        @logger = Logging.logger[self]
+      def initialize(_config, _executor = Concurrent.global_immediate_executor)
+        super
 
         require 'net/ssh'
         require 'net/scp'
@@ -34,7 +31,7 @@ module Bolt
         begin
           conn.disconnect if conn
         rescue StandardError => ex
-          @logger.info("Failed to close connection to #{target.uri} : #{ex.message}")
+          logger.info("Failed to close connection to #{target.uri} : #{ex.message}")
         end
       end
 
@@ -133,3 +130,5 @@ SCRIPT
     end
   end
 end
+
+require 'bolt/transport/ssh/connection'

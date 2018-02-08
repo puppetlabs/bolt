@@ -178,6 +178,7 @@ describe "Bolt::Executor" do
       results = executor.run_task(targets, task, 'both', task_arguments, {})
       results.each do |result|
         expect(result).to be_instance_of(Bolt::Result)
+        expect(result).to be_success
       end
     end
 
@@ -199,17 +200,20 @@ describe "Bolt::Executor" do
     context 'nodes with run_as' do
       let(:targets) {
         [Bolt::Target.new("target1", run_as: 'foo'),
-         Bolt::Target.new("target2", run_as: 'foo')]
+         Bolt::Target.new("target2")]
       }
 
-      it 'does not pass _run_as' do
-        executor.run_as = 'foo'
-        node_results.each do |target, result|
-          expect(ssh)
-            .to receive(:run_task)
-            .with(target, task, 'both', task_arguments, {})
-            .and_return(result)
-        end
+      it 'does not pass _run_as for nodes that specify run_as' do
+        executor.run_as = 'bar'
+        expect(ssh)
+          .to receive(:run_task)
+          .with(targets[0], task, 'both', task_arguments, {})
+          .and_return(node_results[targets[0]])
+
+        expect(ssh)
+          .to receive(:run_task)
+          .with(targets[1], task, 'both', task_arguments, '_run_as' => 'bar')
+          .and_return(node_results[targets[1]])
 
         results = executor.run_task(targets, task, 'both', task_arguments, {})
         results.each do |result|

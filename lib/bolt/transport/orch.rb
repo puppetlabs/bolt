@@ -2,24 +2,29 @@ require 'base64'
 require 'concurrent'
 require 'json'
 require 'orchestrator_client'
+require 'bolt/transport/base'
+require 'bolt/result'
 
 module Bolt
   module Transport
-    class Orch
+    class Orch < Base
       CONF_FILE = File.expand_path('~/.puppetlabs/client-tools/orchestrator.conf')
       BOLT_MOCK_FILE = 'bolt/tasks/init'.freeze
 
-      attr_reader :logger
+      def initialize(config, executor = Concurrent.global_immediate_executor)
+        super
 
-      def initialize(config)
         client_keys = %i[service-url token-file cacert]
         client_opts = config.select { |k, _v| client_keys.include?(k) }
         @client = Concurrent::Delay.new { OrchestratorClient.new(client_opts, true) }
-        @logger = Logging.logger[self]
       end
 
       def client
-        @client.value
+        if @client.value.nil?
+          raise @client.reason
+        else
+          @client.value
+        end
       end
 
       def upload(target, source, destination, _options = {})
@@ -58,36 +63,75 @@ module Bolt
         unwrap_bolt_result(target, run_task(target, BOLT_MOCK_FILE, 'stdin', params))
       end
 
-      def run_task(target, task, _inputmethod, arguments, _options = {})
-        body = { task: task_name_from_path(task),
-                 environment: target.options[:orch_task_environment],
-                 noop: arguments['_noop'],
-                 params: arguments.reject { |k, _| k == '_noop' },
-                 scope: {
-                   nodes: [target.host]
-                 } }
-        results = client.run_task(body)
-        node_result = results[0]
-        state = node_result['state']
-        result = node_result['result']
+      def build_request(targets, task, arguments)
+        { task: task_name_from_path(task),
+          # XXX What to do with multiple targets?
+          environment: targets.first.options[:orch_task_environment],
+          noop: arguments['_noop'],
+          params: arguments.reject { |k, _| k == '_noop' },
+          scope: {
+            nodes: targets.map(&:host)
+          } }
+      end
 
-        # If it's finished or already has a proper error simply pass it to the
-        # the result otherwise make sure an error is generated
-        if state == 'finished' || result['_error']
-          Bolt::Result.new(target, value: result)
-        elsif state == 'skipped'
-          Bolt::Result.new(
-            target,
-            value: { '_error' => {
-              'kind' => 'puppetlabs.tasks/skipped-node',
-              'msg' => "Node #{target.host} was skipped",
-              'details' => {}
-            } }
-          )
-        else
-          # Make a generic error with a unkown exit_code
-          Bolt::Result.for_task(target, result.to_json, '', 'unknown')
+      def process_run_results(targets, results)
+        targets_by_name = Hash[targets.map(&:name).zip(targets)]
+        results.map do |node_result|
+          target = targets_by_name[node_result['name']]
+          state = node_result['state']
+          result = node_result['result']
+
+          # If it's finished or already has a proper error simply pass it to the
+          # the result otherwise make sure an error is generated
+          if state == 'finished' || (result && result['_error'])
+            Bolt::Result.new(target, value: result)
+          elsif state == 'skipped'
+            Bolt::Result.new(
+              target,
+              value: { '_error' => {
+                'kind' => 'puppetlabs.tasks/skipped-node',
+                'msg' => "Node #{target.host} was skipped",
+                'details' => {}
+              } }
+            )
+          else
+            # Make a generic error with a unkown exit_code
+            Bolt::Result.for_task(target, result.to_json, '', 'unknown')
+          end
         end
+      end
+
+      def batch_task(targets, task, _inputmethod, arguments, _options = {})
+        callback = block_given? ? Proc.new : proc {}
+        body = build_request(targets, task, arguments)
+
+        # Make promises to hold the eventual results. The `set` operation is
+        # fast, so they can just execute in the thread that's creating them,
+        # using the :immediate executor.
+        result_ivars = Hash[targets.map { |target| [target, Concurrent::Promise.new(executor: :immediate)] }]
+
+        @executor.post do
+          targets.each do |target|
+            callback.call(type: :node_start, target: target)
+          end
+          results = client.run_task(body)
+
+          process_run_results(targets, results).each do |result|
+            callback.call(type: :node_result, result: result)
+            result_ivars[result.target].set(result)
+          end
+        end
+
+        result_ivars.values
+      end
+
+      def run_task(target, task, _inputmethod, arguments, _options = {})
+        # batch_task([target], task, _inputmethod, arguments, _options = {})
+        body = build_request([target], task, arguments)
+
+        results = client.run_task(body)
+
+        process_run_results([target], results).first
       end
 
       # This avoids a refactor to pass more task data around

@@ -112,17 +112,19 @@ module Bolt
       r
     end
 
-    def run_task(targets, task, input_method, arguments, options = {})
+    def run_task(targets, task, input_method, arguments, options = {}, &callback)
       @logger.info("Starting task #{task} on #{targets.map(&:uri)}")
       @logger.debug("Arguments: #{arguments} Input method: #{input_method}")
-      callback = block_given? ? Proc.new : nil
+      notify = proc { |event| @notifier.notify(callback, event) if callback }
+      options = { '_run_as' => run_as }.merge(options) if run_as
 
-      r = on(targets, callback) do |transport, target|
-        @logger.debug { "Running task run '#{task}' on #{target.uri}" }
-        transport.run_task(target, task, input_method, arguments, get_run_as(target, options))
+      result_futures = targets.group_by(&:protocol).flat_map do |protocol, batch|
+        transport(protocol).batch_task(batch, task, input_method, arguments, options, &notify)
       end
-      @logger.info(summary('task', task, r))
-      r
+      results = ResultSet.new(result_futures.map(&:value))
+      @logger.info(summary('task', task, results))
+      @notifier.shutdown
+      results
     end
 
     def file_upload(targets, source, destination, options = {})
