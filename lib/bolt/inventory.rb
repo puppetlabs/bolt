@@ -35,19 +35,26 @@ module Bolt
 
       inventory = new(data, config)
       inventory.validate
+      inventory.collect_groups
       inventory
     end
 
     def initialize(data, config = nil)
       @logger = Logging.logger[self]
       # Config is saved to add config options to targets
-      @config = config || {}
+      @config = config || Bolt::Config.new
       @data = data ||= {}
       @groups = Group.new(data.merge('name' => 'all'))
+      @group_lookup = {}
     end
 
     def validate
       @groups.validate
+    end
+
+    def collect_groups
+      # Provide a lookup map for finding a group by name
+      @group_lookup = @groups.collect_groups
     end
 
     def get_targets(targets)
@@ -87,6 +94,17 @@ module Bolt
       conf = Bolt::Util.deep_merge(@config.transport_conf, inv_conf)
       target.update_conf(conf)
     end
+    private :update_target
+
+    # If target is a group name, expand it to the members of that group. Else return [target].
+    def resolve_group(target)
+      if (group = @group_lookup[target])
+        group.node_names
+      else
+        [target]
+      end
+    end
+    private :resolve_group
 
     def expand_targets(targets)
       if targets.is_a? Bolt::Target
@@ -95,8 +113,12 @@ module Bolt
         targets.map { |tish| expand_targets(tish) }
       elsif targets.is_a? String
         # Expand a comma-separated list
-        targets.split(/[[:space:],]+/).reject(&:empty?).map { |t| Bolt::Target.new(t) }
+        targets.split(/[[:space:],]+/).reject(&:empty?).map do |name|
+          ts = resolve_group(name)
+          ts.map { |t| Bolt::Target.new(t) }
+        end
       end
     end
+    private :expand_targets
   end
 end

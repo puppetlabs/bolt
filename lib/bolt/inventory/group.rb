@@ -101,9 +101,24 @@ module Bolt
         }
       end
 
+      # Returns all nodes contained within the group, which includes nodes from subgroups.
       def node_names
+        @groups.inject(local_node_names) do |acc, g|
+          acc.merge(g.node_names)
+        end
+      end
+
+      # Return a mapping of group names to group.
+      def collect_groups
+        @groups.inject(name => self) do |acc, g|
+          acc.merge(g.collect_groups)
+        end
+      end
+
+      def local_node_names
         @_node_names ||= Set.new(nodes.map { |n| n['name'] })
       end
+      private :local_node_names
 
       def node_collect(node_name)
         data = @groups.inject(nil) do |acc, g|
@@ -127,7 +142,7 @@ module Bolt
 
         if data
           data_merge(group_data, data)
-        elsif node_names.include?(node_name)
+        elsif local_node_names.include?(node_name)
           group_data
         end
       end

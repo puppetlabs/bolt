@@ -31,6 +31,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
         }
       } }
   end
+  let(:target) { conn[:host] }
 
   let(:modulepath) { fixture_path('modules') }
   let(:config_flags) {
@@ -41,9 +42,9 @@ describe 'running with an inventory file', reset_puppet_settings: true do
      '--password', conn[:password]]
   }
 
-  let(:run_command) { ['command', 'run', whoami, '--nodes', conn[:host]] + config_flags }
+  let(:run_command) { ['command', 'run', whoami, '--nodes', target] + config_flags }
 
-  let(:run_plan) { ['plan', 'run', 'inventory', "command=#{whoami}", "host=#{conn[:host]}"] + config_flags }
+  let(:run_plan) { ['plan', 'run', 'inventory', "command=#{whoami}", "host=#{target}"] + config_flags }
 
   around(:each) do |example|
     with_tempfile_containing('inventory', inventory.to_json, '.yml') do |f|
@@ -61,8 +62,19 @@ describe 'running with an inventory file', reset_puppet_settings: true do
     end
 
     it 'connects to run a plan' do
-      # result = run_cli(run_plan)
       expect(run_cli_json(run_plan)[0]['status']).to eq('success')
+    end
+
+    context 'with a group' do
+      let(:target) { 'all' }
+
+      it 'runs a command' do
+        expect(run_one_node(run_command)).to be
+      end
+
+      it 'runs a plan using a group' do
+        expect(run_cli_json(run_plan)[0]['status']).to eq('success')
+      end
     end
   end
 
@@ -76,6 +88,18 @@ describe 'running with an inventory file', reset_puppet_settings: true do
 
     it 'connects to run a plan' do
       expect(run_cli_json(run_plan)[0]['status']).to eq('success')
+    end
+
+    context 'with a group' do
+      let(:target) { 'all' }
+
+      it 'connects to run a command' do
+        expect(run_one_node(run_command)).to be
+      end
+
+      it 'connects to run a plan' do
+        expect(run_cli_json(run_plan)[0]['status']).to eq('success')
+      end
     end
   end
 end
