@@ -174,7 +174,7 @@ describe Bolt::Inventory do
       expect(Bolt::Inventory.new({}).validate).to be_nil
     end
 
-    it 'accepts empty inventory' do
+    it 'accepts non-empty inventory' do
       data = {
         'nodes' => [
           'node1',

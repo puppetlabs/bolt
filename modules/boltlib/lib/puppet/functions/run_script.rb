@@ -46,7 +46,7 @@ Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFuncti
       )
     end
 
-    # Ensure that that given targets are all Target instances)
+    # Ensure that given targets are all Target instances)
     targets = inventory.get_targets(targets)
 
     #

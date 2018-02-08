@@ -81,7 +81,7 @@ Puppet::Functions.create_function(:run_task) do
       end
     end
 
-    # Ensure that that given targets are all Target instances
+    # Ensure that given targets are all Target instances
     targets = inventory.get_targets(targets)
     if targets.empty?
       Bolt::ResultSet.new([])

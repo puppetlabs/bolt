@@ -35,7 +35,7 @@ Puppet::Functions.create_function(:run_command) do
       )
     end
 
-    # Ensure that that given targets are all Target instances
+    # Ensure that given targets are all Target instances
     targets = inventory.get_targets(targets)
 
     if targets.empty?
