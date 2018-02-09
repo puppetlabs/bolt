@@ -138,6 +138,20 @@ $ bolt task run package name=puppet action=status --nodes sshnode1.example.com,w
 
 The global transport option and any transport specific config option can be set in the inventory file. You can also set `user` and `password` for specific transports.
 
+When an inventory is present, node selection can also be done by specifying group names:
+
+```
+$ bolt command run hostname --nodes ssh_nodes
+```
+
+or using wildcard matching against node names enumerated in the inventory:
+
+```
+$ bolt command run hostname --nodes 'sshnode*.example.com'
+```
+
+Note that - in place of wildcard matching - shell-specific expansions (such as `sshnode{1,2}.example.com`) can also be useful ways to specify a pattern of nodes to run.
+
 
 ## Usage examples
 

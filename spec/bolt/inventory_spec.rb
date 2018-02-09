@@ -293,6 +293,17 @@ describe Bolt::Inventory do
         targets = inventory.get_targets('group1,a')
         expect(targets).to eq(targets(%w[node4 node5 node6 node7 a]))
       end
+
+      it 'should match wildcard selectors' do
+        targets = inventory.get_targets('node*')
+        expect(targets).to eq(targets(%w[node1 node2 node3 node4 node5 node6 node7 node8]))
+      end
+
+      it 'should fail if wildcard selector matches nothing' do
+        expect {
+          inventory.get_targets('*node')
+        }.to raise_error(Bolt::Inventory::WildcardError, /Found 0 nodes matching wildcard pattern \*node/)
+      end
     end
   end
 end

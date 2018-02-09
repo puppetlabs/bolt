@@ -26,6 +26,12 @@ module Bolt
       end
     end
 
+    class WildcardError < Bolt::Error
+      def initialize(target)
+        super("Found 0 nodes matching wildcard pattern #{target}", 'bolt.inventory/wildcard-error')
+      end
+    end
+
     def self.default_paths
       [File.expand_path(File.join('~', '.puppetlabs', 'bolt', 'inventory.yaml'))]
     end
@@ -96,15 +102,31 @@ module Bolt
     end
     private :update_target
 
-    # If target is a group name, expand it to the members of that group. Else return [target].
-    def resolve_group(target)
+    # If target is a group name, expand it to the members of that group.
+    # If a wildcard string, match against nodes in inventory (or error if none found).
+    # Else return [target].
+    def resolve_name(target)
       if (group = @group_lookup[target])
         group.node_names
+      elsif target.include?('*')
+        # Try to wildcard match nodes in inventory
+        # Ignore case because hostnames are generally case-insensitive
+        regexp = Regexp.new("^#{Regexp.escape(target).gsub('\*', '.*?')}$", Regexp::IGNORECASE)
+
+        nodes = []
+        @groups.node_names.each do |node|
+          if node =~ regexp
+            nodes << node
+          end
+        end
+
+        raise(WildcardError, target) if nodes.empty?
+        nodes
       else
         [target]
       end
     end
-    private :resolve_group
+    private :resolve_name
 
     def expand_targets(targets)
       if targets.is_a? Bolt::Target
@@ -114,7 +136,7 @@ module Bolt
       elsif targets.is_a? String
         # Expand a comma-separated list
         targets.split(/[[:space:],]+/).reject(&:empty?).map do |name|
-          ts = resolve_group(name)
+          ts = resolve_name(name)
           ts.map { |t| Bolt::Target.new(t) }
         end
       end
