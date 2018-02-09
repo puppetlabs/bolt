@@ -45,7 +45,14 @@ module Bolt
         used_names << @name
 
         @nodes.each do |n|
-          raise ValidationError.new("node #{n['name']} does not have a name", n['name']) unless n['name']
+          # Require nodes to be referenced only by their host name
+          host = Addressable::URI.parse('//' + n['name']).host
+          ipv6host = Addressable::URI.parse('//[' + n['name'] + ']').host
+          if n['name'] != host && n['name'] != ipv6host
+            raise ValidationError.new("Invalid node name #{n['name']}", n['name'])
+          end
+
+          raise ValidationError.new("Node #{n['name']} does not have a name", n['name']) unless n['name']
           if used_names.include?(n['name'])
             raise ValidationError.new("Group #{n['name']} conflicts with node of the same name", n['name'])
           end

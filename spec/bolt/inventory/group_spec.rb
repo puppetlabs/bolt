@@ -288,22 +288,22 @@ describe Bolt::Inventory::Group do
     end
   end
 
-  context 'with nodes in multiple group levels' do
+  context 'with IP-based nodes in multiple group levels' do
     let(:data) do
       {
         'name' => 'group0',
-        'nodes' => [{ 'name' => 'node1' }],
+        'nodes' => [{ 'name' => '127.0.0.1' }],
         'groups' => [
           {
             'name' => 'group1',
-            'nodes' => [{ 'name' => 'node2' }]
+            'nodes' => [{ 'name' => '2001:db8:0:1' }]
           }
         ]
       }
     end
 
     it 'should find two nodes' do
-      expect(group.node_names.to_a).to eq(%w[node1 node2])
+      expect(group.node_names.to_a).to eq(%w[127.0.0.1 2001:db8:0:1])
     end
 
     it 'should collect 2 groups' do
@@ -315,7 +315,20 @@ describe Bolt::Inventory::Group do
 
     it 'should find one node in the subgroup' do
       groups = group.collect_groups
-      expect(groups['group1'].node_names.to_a).to eq(%w[node2])
+      expect(groups['group1'].node_names.to_a).to eq(%w[2001:db8:0:1])
+    end
+  end
+
+  context 'where a node uses an invalid name' do
+    let(:data) do
+      {
+        'name' => 'group1',
+        'nodes' => [{ 'name' => 'foo1:22' }]
+      }
+    end
+
+    it 'raises an error' do
+      expect { group.validate }.to raise_error(Bolt::Inventory::ValidationError, /Invalid node name/)
     end
   end
 
