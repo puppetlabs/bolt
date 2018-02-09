@@ -37,6 +37,14 @@ module Bolt
 
       # Now that puppet is loaded we can include puppet mixins in data types
       Bolt::ResultSet.include_iterable
+
+      # TODO: This is a hack for PUP-8441 remove it once that is fixed
+      require_relative '../../vendored/puppet/lib/puppet/datatypes/impl/error.rb'
+      Puppet::DataTypes::Error.class_eval do
+        def to_json(opts = nil)
+          _pcore_init_hash.to_json(opts)
+        end
+      end
     end
 
     # Runs a block in a PAL script compiler configured for Bolt.  Catches
@@ -47,13 +55,7 @@ module Bolt
       r = Puppet::Pal.in_tmp_environment('bolt', modulepath: [BOLTLIB_PATH] + @config[:modulepath], facts: {}) do |pal|
         pal.with_script_compiler do |compiler|
           begin
-            result = yield compiler
-            # TODO: remove after PUP-8441 adds to_json to Errors
-            # This hack won't handle nested errors
-            if result.is_a? Puppet::DataTypes::Error
-              result = result._pcore_init_hash
-            end
-            result
+            yield compiler
           rescue Puppet::PreformattedError => err
             # Puppet sometimes rescues exceptions notes the location and reraises
             # For now return the original error. Exception cause support was added in Ruby 2.1
