@@ -170,7 +170,7 @@ module Bolt
       def fatal_error(e)
         @stream.puts(colorize(:red, e.message))
         if e.is_a? Bolt::RunFailure
-          @stream.puts ::JSON.pretty_generate(e.resultset)
+          @stream.puts ::JSON.pretty_generate(e.result_set)
         end
       end
     end

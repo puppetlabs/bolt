@@ -25,20 +25,24 @@ module Bolt
     def to_json(opts = nil)
       to_h.to_json(opts)
     end
+
+    def to_puppet_error
+      Puppet::DataTypes::Error.from_asserted_hash(to_h)
+    end
   end
 
   class RunFailure < Error
-    attr_reader :resultset
+    attr_reader :result_set
 
-    def initialize(resultset, action, object)
+    def initialize(result_set, action, object)
       details = {
-        action: action,
-        object: object,
-        failed_targets: resultset.error_set.names
+        'action' => action,
+        'object' =>  object,
+        'result_set' => result_set
       }
-      message = "Plan aborted: #{action} '#{object}' failed on #{details[:failed_targets].length} nodes"
+      message = "Plan aborted: #{action} '#{object}' failed on #{result_set.error_set.length} nodes"
       super(message, 'bolt/run-failure', details)
-      @resultset = resultset
+      @result_set = result_set
       @error_code = 2
     end
   end

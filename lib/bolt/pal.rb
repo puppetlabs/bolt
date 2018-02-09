@@ -47,7 +47,13 @@ module Bolt
       r = Puppet::Pal.in_tmp_environment('bolt', modulepath: [BOLTLIB_PATH] + @config[:modulepath], facts: {}) do |pal|
         pal.with_script_compiler do |compiler|
           begin
-            yield compiler
+            result = yield compiler
+            # TODO: remove after PUP-8441 adds to_json to Errors
+            # This hack won't handle nested errors
+            if result.is_a? Puppet::DataTypes::Error
+              result = result._pcore_init_hash
+            end
+            result
           rescue Puppet::PreformattedError => err
             # Puppet sometimes rescues exceptions notes the location and reraises
             # For now return the original error. Exception cause support was added in Ruby 2.1
