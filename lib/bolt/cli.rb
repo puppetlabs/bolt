@@ -18,7 +18,6 @@ module Bolt
   class CLIError < Bolt::Error
     def initialize(msg)
       super(msg, "bolt/cli-error")
-      @error_code = error_code if error_code
     end
   end
 
@@ -318,7 +317,7 @@ HELP
       options[:targets] = inventory.get_targets(options[:nodes]) if options[:nodes]
 
       options
-    rescue Bolt::CLIError => e
+    rescue Bolt::Error => e
       warn e.message
       raise e
     end

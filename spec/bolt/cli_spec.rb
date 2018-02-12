@@ -1382,6 +1382,7 @@ bar
     let(:configdir) { File.join(__dir__, '..', 'fixtures', 'configs') }
     let(:complete_config) do
       { 'modulepath' => "/foo/bar#{File::PATH_SEPARATOR}/baz/qux",
+        'inventoryfile' => File.join(__dir__, '..', 'fixtures', 'inventory', 'empty.yml'),
         'concurrency' => 14,
         'format' => 'json',
         'ssh' => {
@@ -1533,6 +1534,17 @@ bar
       expect {
         cli.parse
       }.to raise_error(Bolt::CLIError, /Could not parse/)
+    end
+  end
+
+  describe 'inventoryfile' do
+    let(:inventorydir) { File.join(__dir__, '..', 'fixtures', 'configs') }
+
+    it 'raises an error if a inventory file is specified and invalid' do
+      cli = Bolt::CLI.new(%W[command run --inventoryfile #{File.join(inventorydir, 'invalid.yml')} --nodes foo])
+      expect {
+        cli.parse
+      }.to raise_error(Bolt::Error, /Could not parse/)
     end
   end
 end
