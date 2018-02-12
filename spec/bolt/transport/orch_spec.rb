@@ -309,6 +309,26 @@ describe Bolt::Transport::Orch, orchestrator: true do
       end
     end
 
+    describe :batch_script do
+      let(:args) { ['with spaces', 'nospaces', 'echo $HOME; cat /etc/passwd'] }
+      let(:script_path) { File.join(base_path, 'spec', 'fixtures', 'scripts', 'success.sh') }
+      let(:params) {
+        content = Base64.encode64(File.read(script_path))
+
+        {
+          action: 'script',
+          content: content,
+          arguments: args
+        }
+      }
+
+      it 'returns a success' do
+        results = orch.batch_script(targets, script_path, args).map(&:value)
+        expect(results[0]).to be_success
+        expect(results[1]).to be_success
+      end
+    end
+
     describe :run_script do
       let(:args) { ['with spaces', 'nospaces', 'echo $HOME; cat /etc/passwd'] }
       let(:params) {

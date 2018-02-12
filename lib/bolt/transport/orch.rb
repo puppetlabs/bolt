@@ -111,6 +111,18 @@ module Bolt
         promises.map { |promise| promise.then { |result| unwrap_bolt_result(result.target, result) } }
       end
 
+      def batch_script(targets, script, arguments, _options = {})
+        content = File.open(script, &:read)
+        content = Base64.encode64(content)
+        params = {
+          action: 'script',
+          content: content,
+          arguments: arguments
+        }
+        promises = batch_task(targets, BOLT_MOCK_FILE, 'stdin', params)
+        promises.map { |promise| promise.then { |result| unwrap_bolt_result(result.target, result) } }
+      end
+
       def batch_task(targets, task, _inputmethod, arguments, _options = {})
         callback = block_given? ? Proc.new : proc {}
         body = build_request(targets, task, arguments)

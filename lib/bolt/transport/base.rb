@@ -52,6 +52,14 @@ module Bolt
         end
       end
 
+      def batch_script(targets, script, arguments, options = {})
+        callback = Proc.new if block_given?
+        on(targets, callback) do |target|
+          @logger.debug { "Running script '#{script}' on #{target.uri}" }
+          run_script(target, script, arguments, filter_options(target, options))
+        end
+      end
+
       def run_command(*_args)
         raise NotImplementedError, "run_command() must be implemented by the transport class"
       end
