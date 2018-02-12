@@ -69,6 +69,10 @@ ssh:
 
 `modulepath`: The module path to load tasks and plan code from. This is a list of directories separated by the OS-specific path separator (`:` on Linux/macOS, `;` on Windows).
 
+`transport`: The transport to use when none is specified in the url(default: `ssh`)
+
+`inventoryfile`: The path to the `inventory.yaml` file(default: `~/.puppetlabs/bolt/inventory.yaml`
+
 ### `ssh` transport configuration options
 
 `host-key-check`: If false, host key validation will be skipped when connecting over SSH. (default: true)
@@ -102,6 +106,37 @@ ssh:
 `token-file`: The token certificate used to authorize requests to the `service-url`. If not specified, will attempt to read local PE Client Tools configuration for the same setting from `orchestrator.conf`. (default: `~/.puppetlabs/token`)
 
 `task-environment`: The environment from which Orchestrator will serve task implementations. (default: `production`)
+
+### Node specific configruation with the inventory file.
+
+The inventory file allows you to group nodes and set up node specific configuration defaults. To set up default for ssh and winrm connections create and inventoryfile at `~/.puppetlabs/bolt/inventory.yaml` with the following content.
+
+```yaml
+groups:
+  - name: ssh_nodes
+    nodes:
+      - sshnode1.example.com
+      - sshnode2.example.com
+    config:
+      transport: ssh
+  - name: win_nodes
+    nodes:
+      - winnode1.example.com
+      - winnode2.example.com
+    config:
+      transport: winrm
+      transports:
+        winrm:
+          ssl: false
+```
+
+You can then leave the transport option off of the url when targeting those nodes.
+
+```
+$ bolt task run package name=puppet action=status --nodes sshnode1.example.com,winnode1.example.com
+```
+
+The global transport option and any transport specific config option can be set in the inventory file. You can also set `user` and `password` for specific transports.
 
 
 ## Usage examples
