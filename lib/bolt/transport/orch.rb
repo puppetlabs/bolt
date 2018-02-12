@@ -17,6 +17,7 @@ module Bolt
         client_keys = %i[service-url token-file cacert]
         client_opts = config.select { |k, _v| client_keys.include?(k) }
         @client = Concurrent::Delay.new { OrchestratorClient.new(client_opts, true) }
+        @client_lock = Mutex.new
       end
 
       def client
@@ -65,7 +66,6 @@ module Bolt
 
       def build_request(targets, task, arguments)
         { task: task_name_from_path(task),
-          # XXX What to do with multiple targets?
           environment: targets.first.options[:orch_task_environment],
           noop: arguments['_noop'],
           params: arguments.reject { |k, _| k == '_noop' },
@@ -143,26 +143,33 @@ module Bolt
 
       def batch_task(targets, task, _inputmethod, arguments, _options = {})
         callback = block_given? ? Proc.new : proc {}
-        body = build_request(targets, task, arguments)
+        targets.group_by { |target| target.options[:orch_task_environment] }.flat_map do |_environment, env_targets|
+          body = build_request(env_targets, task, arguments)
 
-        # Make promises to hold the eventual results. The `set` operation is
-        # fast, so they can just execute in the thread that's creating them,
-        # using the :immediate executor.
-        result_ivars = Hash[targets.map { |target| [target, Concurrent::Promise.new(executor: :immediate)] }]
+          # Make promises to hold the eventual results. The `set` operation is
+          # fast, so they can just execute in the thread that's creating them,
+          # using the :immediate executor.
+          result_ivars = Hash[env_targets.map { |target| [target, Concurrent::Promise.new(executor: :immediate)] }]
 
-        @executor.post do
-          targets.each do |target|
-            callback.call(type: :node_start, target: target)
+          @executor.post do
+            env_targets.each do |target|
+              callback.call(type: :node_start, target: target)
+            end
+
+            # The orchestrator client isn't thread-safe, so we have to do this
+            # serially for now
+            results = @client_lock.synchronize do
+              client.run_task(body)
+            end
+
+            process_run_results(env_targets, results).each do |result|
+              callback.call(type: :node_result, result: result)
+              result_ivars[result.target].set(result)
+            end
           end
-          results = client.run_task(body)
 
-          process_run_results(targets, results).each do |result|
-            callback.call(type: :node_result, result: result)
-            result_ivars[result.target].set(result)
-          end
+          result_ivars.values
         end
-
-        result_ivars.values
       end
 
       def run_task(target, task, _inputmethod, arguments, _options = {})

@@ -172,6 +172,20 @@ describe Bolt::Transport::Orch, orchestrator: true do
       expect(node_results[0]).to be_success
       expect(node_results[1]).to be_success
     end
+
+    it "executes targets with different environments in separate batches" do
+      result1 = [{ 'name' => 'node1', 'state' => 'finished', 'result' => { '_output' => 'hello' } }]
+      result2 = [{ 'name' => 'node2', 'state' => 'finished', 'result' => { '_output' => 'goodbye' } }]
+      expect(orch.client).to receive(:run_task).and_return(result1).ordered
+      expect(orch.client).to receive(:run_task).and_return(result2).ordered
+      targets[1].options[:orch_task_environment] = 'development'
+
+      node_results = orch.batch_task(targets, taskpath, 'stdin', params).map(&:value)
+      expect(node_results[0].value).to eq('_output' => 'hello')
+      expect(node_results[1].value).to eq('_output' => 'goodbye')
+      expect(node_results[0]).to be_success
+      expect(node_results[1]).to be_success
+    end
   end
 
   describe :run_task do
