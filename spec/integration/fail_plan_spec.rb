@@ -71,4 +71,15 @@ describe "When a plan fails" do
       expect(result['msg']).to match(/error::fail/)
     end
   end
+
+  it 'outputs nested errors' do
+    if error_support
+      result = run_cli_json(['plan', 'run', 'error::nested'] + config_flags)
+      expect(result).to eq('error' => [{
+                             'msg' => 'oops',
+                             'kind' => 'test/oops',
+                             'details' => { 'some' => 'info' }
+                           }])
+    end
+  end
 end
