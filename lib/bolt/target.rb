@@ -10,14 +10,6 @@ module Bolt
       new(hash['uri'], hash['options'])
     end
 
-    def self.from_uri(uri)
-      new(uri)
-    end
-
-    def self.parse_urls(urls)
-      urls.split(/[[:space:],]+/).reject(&:empty?).uniq.map { |url| from_uri(url) }
-    end
-
     def initialize(uri, options = nil)
       @uri = uri
       @uri_obj = parse(uri)

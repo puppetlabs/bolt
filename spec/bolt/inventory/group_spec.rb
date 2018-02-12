@@ -39,8 +39,14 @@ describe Bolt::Inventory::Group do
       expect(group.node_data('node1')).to eq('config' => {}, 'groups' => [])
     end
 
-    it 'should include node1' do
-      expect(group.node_names).to include('node1')
+    it 'should find three nodes' do
+      expect(group.node_names.to_a).to eq(%w[node1 node2 node3])
+    end
+
+    it 'should collect one group' do
+      groups = group.collect_groups
+      expect(groups.size).to eq(1)
+      expect(groups['group1']).to eq(group)
     end
 
     it 'should return a hash for a string node' do
@@ -59,6 +65,7 @@ describe Bolt::Inventory::Group do
   context 'with data at all levels' do
     let(:data) do
       {
+        'name' => 'group0',
         'nodes' => [{
           'name' => 'node1',
           'config' => { 'ssh' => { 'user' => 'parent_node' } }
@@ -75,8 +82,24 @@ describe Bolt::Inventory::Group do
       }
     end
 
-    it 'uses the childs node defintion' do
+    it 'uses the childs node definition' do
       expect(group.data_for('node1')['config']['ssh']['user']).to eq('child_node')
+    end
+
+    it 'should find one node' do
+      expect(group.node_names.to_a).to eq(%w[node1])
+    end
+
+    it 'should collect 2 groups' do
+      groups = group.collect_groups
+      expect(groups.size).to eq(2)
+      expect(groups['group0']).to eq(group)
+      expect(groups['group1'].name).to eq('group1')
+    end
+
+    it 'should find one node in the subgroup' do
+      groups = group.collect_groups
+      expect(groups['group1'].node_names.to_a).to eq(%w[node1])
     end
   end
 
@@ -98,7 +121,7 @@ describe Bolt::Inventory::Group do
       }
     end
 
-    it 'uses the parents node defintion' do
+    it 'uses the parents node definition' do
       expect(group.data_for('node1')['config']['ssh']['user']).to eq('parent_node')
     end
   end
@@ -120,7 +143,7 @@ describe Bolt::Inventory::Group do
       }
     end
 
-    it 'uses the childs group defintion' do
+    it 'uses the childs group definition' do
       expect(group.data_for('node1')['config']['ssh']['user']).to eq('child_group')
     end
   end
@@ -155,7 +178,7 @@ describe Bolt::Inventory::Group do
       }
     end
 
-    it 'uses the first childs node defintion' do
+    it 'uses the first childs node definition' do
       expect(node1_ssh).to eq('child1_node')
     end
   end
@@ -190,7 +213,7 @@ describe Bolt::Inventory::Group do
       }
     end
 
-    it 'uses the first childs node defintion' do
+    it 'uses the first childs node definition' do
       expect(node1_ssh).to eq('child2_node')
     end
   end
@@ -225,7 +248,7 @@ describe Bolt::Inventory::Group do
       }
     end
 
-    it 'uses the first childs group defintion' do
+    it 'uses the first childs group definition' do
       expect(node1_ssh).to eq('child1_group')
     end
   end
@@ -260,8 +283,103 @@ describe Bolt::Inventory::Group do
       }
     end
 
-    it 'uses the second childs group defintion' do
+    it 'uses the second childs group definition' do
       expect(node1_ssh).to eq('child2_group')
+    end
+  end
+
+  context 'with IP-based nodes in multiple group levels' do
+    let(:data) do
+      {
+        'name' => 'group0',
+        'nodes' => [{ 'name' => '127.0.0.1' }],
+        'groups' => [
+          {
+            'name' => 'group1',
+            'nodes' => [{ 'name' => '2001:db8:0:1' }]
+          }
+        ]
+      }
+    end
+
+    it 'should find two nodes' do
+      expect(group.node_names.to_a).to eq(%w[127.0.0.1 2001:db8:0:1])
+    end
+
+    it 'should collect 2 groups' do
+      groups = group.collect_groups
+      expect(groups.size).to eq(2)
+      expect(groups['group0']).to eq(group)
+      expect(groups['group1'].name).to eq('group1')
+    end
+
+    it 'should find one node in the subgroup' do
+      groups = group.collect_groups
+      expect(groups['group1'].node_names.to_a).to eq(%w[2001:db8:0:1])
+    end
+  end
+
+  context 'where a node uses an invalid name' do
+    let(:data) do
+      {
+        'name' => 'group1',
+        'nodes' => [{ 'name' => 'foo1:22' }]
+      }
+    end
+
+    it 'raises an error' do
+      expect { group.validate }.to raise_error(Bolt::Inventory::ValidationError, /Invalid node name/)
+    end
+  end
+
+  context 'where a group name conflicts with a prior node name' do
+    let(:data) do
+      {
+        'name' => 'group1',
+        'nodes' => [{ 'name' => 'foo1' }],
+        'groups' => [{ 'name' => 'foo1' }]
+      }
+    end
+
+    it 'raises an error' do
+      expect { group.validate }.to raise_error(Bolt::Inventory::ValidationError, /conflicts with node/)
+    end
+  end
+
+  context 'where a group name conflicts with a child node name' do
+    let(:data) do
+      {
+        'name' => 'group1',
+        'groups' => [
+          {
+            'name' => 'foo1',
+            'nodes' => [{ 'name' => 'foo1' }]
+          }
+        ]
+      }
+    end
+
+    it 'raises an error' do
+      expect { group.validate }.to raise_error(Bolt::Inventory::ValidationError, /conflicts with node/)
+    end
+  end
+
+  context 'where a group name conflicts with a child node of another group' do
+    let(:data) do
+      {
+        'name' => 'group1',
+        'groups' => [
+          { 'name' => 'foo1' },
+          {
+            'name' => 'foo2',
+            'nodes' => [{ 'name' => 'foo1' }]
+          }
+        ]
+      }
+    end
+
+    it 'raises an error' do
+      expect { group.validate }.to raise_error(Bolt::Inventory::ValidationError, /conflicts with node/)
     end
   end
 end

@@ -6,7 +6,7 @@ describe "Bolt::Outputter::Human" do
   let(:output) { StringIO.new }
   let(:outputter) { Bolt::Outputter::Human.new(output) }
   let(:config) { Bolt::Config.new }
-  let(:target) { Bolt::Target.from_uri('node1') }
+  let(:target) { Bolt::Target.new('node1') }
   let(:results) { { node1: Bolt::Result.new(target, message: "ok") } }
 
   it "starts items in head" do
@@ -23,7 +23,7 @@ describe "Bolt::Outputter::Human" do
   it "prints status" do
     outputter.print_head
     outputter.print_result(Bolt::Result.new(target))
-    outputter.print_result(Bolt::Result.new(Bolt::Target.from_uri('node2'), error: { 'msg' => 'oops' }))
+    outputter.print_result(Bolt::Result.new(Bolt::Target.new('node2'), error: { 'msg' => 'oops' }))
     outputter.print_summary(results, 10.0)
     lines = output.string
     expect(lines).to match(/Finished on node1/)

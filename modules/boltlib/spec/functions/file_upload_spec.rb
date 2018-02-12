@@ -18,7 +18,7 @@ describe 'file_upload' do
 
   context 'it calls bolt executor file_upload' do
     let(:hostname) { 'test.example.com' }
-    let(:target) { Bolt::Target.from_uri(hostname) }
+    let(:target) { Bolt::Target.new(hostname) }
 
     let(:message) { 'uploaded' }
     let(:result) { Bolt::Result.new(target, message: message) }
@@ -63,7 +63,7 @@ describe 'file_upload' do
 
     context 'with multiple destinations' do
       let(:hostname2) { 'test.testing.com' }
-      let(:target2) { Bolt::Target.from_uri(hostname2) }
+      let(:target2) { Bolt::Target.new(hostname2) }
       let(:message2) { 'received' }
       let(:result2) { Bolt::Result.new(target2, message: message2) }
       let(:result_set) { Bolt::ResultSet.new([result, result2]) }

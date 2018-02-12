@@ -136,7 +136,7 @@ HELP
                   '* protocol is `ssh` by default, may be `ssh` or `winrm`',
                   '* port defaults to `22` for SSH',
                   '* port defaults to `5985` or `5986` for WinRM, based on the --[no-]ssl setting') do |nodes|
-            results[:nodes] << get_arg_input(nodes).split(/[[:space:],]+/).reject(&:empty?)
+            results[:nodes] << get_arg_input(nodes)
           end
         end
         opts.on('-u', '--user USER',
@@ -259,6 +259,12 @@ HELP
       parser
     end
 
+    # Only call after @config has been initialized.
+    def inventory
+      Bolt::Inventory.from_config(@config)
+    end
+    private :inventory
+
     def parse
       if @argv.empty?
         options[:help] = true
@@ -308,6 +314,9 @@ HELP
       options[:leftovers] = remaining
 
       validate(options)
+
+      # After validation, initialize inventory and targets. Errors here are better to catch early.
+      options[:targets] = inventory.get_targets(options[:nodes]) if options[:nodes]
 
       options
     rescue Bolt::CLIError => e
@@ -434,7 +443,6 @@ HELP
         return 0
       end
 
-      inventory = Bolt::Inventory.from_config(@config)
       message = 'There may be processes left executing on some nodes.'
 
       if options[:mode] == 'plan'
@@ -445,7 +453,7 @@ HELP
         code = 0
       else
         executor = Bolt::Executor.new(@config, options[:noop])
-        targets = inventory.get_targets(options[:nodes])
+        targets = options[:targets]
 
         results = nil
         outputter.print_head

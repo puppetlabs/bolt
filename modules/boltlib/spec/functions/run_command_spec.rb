@@ -15,7 +15,7 @@ describe 'run_command' do
 
   context 'it calls bolt executor run_command' do
     let(:hostname) { 'test.example.com' }
-    let(:target) { Bolt::Target.from_uri(hostname) }
+    let(:target) { Bolt::Target.new(hostname) }
     let(:command) { 'hostname' }
     let(:result) { Bolt::Result.new(target, value: { 'stdout' => hostname }) }
     let(:result_set) { Bolt::ResultSet.new([result]) }
@@ -46,7 +46,7 @@ describe 'run_command' do
 
     context 'with multiple hosts' do
       let(:hostname2) { 'test.testing.com' }
-      let(:target2) { Bolt::Target.from_uri(hostname2) }
+      let(:target2) { Bolt::Target.new(hostname2) }
       let(:result2) { Bolt::Result.new(target2, value: { 'stdout' => hostname2 }) }
       let(:result_set) { Bolt::ResultSet.new([result, result2]) }
 

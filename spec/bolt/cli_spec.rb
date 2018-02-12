@@ -5,7 +5,7 @@ require 'bolt/cli'
 
 describe "Bolt::CLI" do
   include BoltSpec::Files
-  let(:target) { Bolt::Target.from_uri('foo') }
+  let(:target) { Bolt::Target.new('foo') }
 
   before(:each) do
     outputter = Bolt::Outputter::Human.new(StringIO.new)
@@ -151,21 +151,22 @@ describe "Bolt::CLI" do
     end
 
     describe "nodes" do
-      let(:targets) { [target, Bolt::Target.from_uri('bar')] }
+      let(:targets) { [target, Bolt::Target.new('bar')] }
 
       it "accepts a single node" do
         cli = Bolt::CLI.new(%w[command run --nodes foo])
-        expect(cli.parse).to include(nodes: [['foo']])
+        expect(cli.parse).to include(targets: [target])
       end
 
       it "accepts multiple nodes" do
         cli = Bolt::CLI.new(%w[command run --nodes foo,bar])
-        expect(cli.parse).to include(nodes: [%w[foo bar]])
+        expect(cli.parse).to include(targets: targets)
       end
 
       it "accepts multiple nodes across multiple declarations" do
         cli = Bolt::CLI.new(%w[command run --nodes foo,bar --nodes bar,more,bars])
-        expect(cli.parse).to include(nodes: [%w[foo bar], %w[bar more bars]])
+        extra_targets = [Bolt::Target.new('more'), Bolt::Target.new('bars')]
+        expect(cli.parse).to include(targets: targets + extra_targets)
       end
 
       it "reads from stdin when --nodes is '-'" do
@@ -176,7 +177,7 @@ bar
         cli = Bolt::CLI.new(%w[command run --nodes -])
         allow(STDIN).to receive(:read).and_return(nodes)
         result = cli.parse
-        expect(result[:nodes]).to eq([%w[foo bar]])
+        expect(result[:targets]).to eq(targets)
       end
 
       it "reads from a file when --nodes starts with @" do
@@ -187,7 +188,7 @@ bar
         with_tempfile_containing('nodes-args', nodes) do |file|
           cli = Bolt::CLI.new(%W[command run --nodes @#{file.path}])
           result = cli.parse
-          expect(result[:nodes]).to eq([%w[foo bar]])
+          expect(result[:targets]).to eq(targets)
         end
       end
 
@@ -196,7 +197,8 @@ bar
         with_tempfile_containing('nodes-args', nodes) do |file|
           cli = Bolt::CLI.new(%W[command run --nodes @#{file.path}])
           result = cli.parse
-          expect(result[:nodes]).to eq([%w[foo bar baz qux]])
+          extra_targets = [Bolt::Target.new('baz'), Bolt::Target.new('qux')]
+          expect(result[:targets]).to eq(targets + extra_targets)
         end
       end
 
@@ -603,7 +605,7 @@ bar
       context 'when running a command' do
         let(:options) {
           {
-            nodes: targets,
+            targets: targets,
             mode: 'command',
             action: 'run',
             object: 'whoami'
@@ -651,7 +653,7 @@ bar
       context "when running a script" do
         let(:script) { 'bar.sh' }
         let(:options) {
-          { nodes: targets, mode: 'script', action: 'run', object: script,
+          { targets: targets, mode: 'script', action: 'run', object: script,
             leftovers: [] }
         }
 
@@ -938,7 +940,7 @@ bar
         let(:task_params) { { 'message' => 'hi' } }
         let(:options) {
           {
-            nodes: targets,
+            targets: targets,
             mode: 'task',
             action: 'run',
             object: task_name,
@@ -1161,7 +1163,7 @@ bar
         let(:plan_params) { { 'nodes' => targets.map(&:host).join(',') } }
         let(:options) {
           {
-            nodes: targets,
+            targets: targets,
             mode: 'plan',
             action: 'run',
             object: plan_name,
@@ -1253,7 +1255,7 @@ bar
         let(:dest) { '/path/to/remote' }
         let(:options) {
           {
-            nodes: targets,
+            targets: targets,
             mode: 'file',
             action: 'upload',
             object: source,
@@ -1332,7 +1334,7 @@ bar
         let(:task_params) { { 'message' => 'hi' } }
         let(:options) {
           {
-            nodes: targets,
+            targets: targets,
             mode: 'task',
             action: 'run',
             object: task_name,

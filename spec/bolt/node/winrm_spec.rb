@@ -31,7 +31,7 @@ foreach ($i in $args)
 PS
 
   def target(h: host, p: port, conf: config)
-    Bolt::Target.from_uri("#{h}:#{p}").update_conf(conf)
+    Bolt::Target.new("#{h}:#{p}").update_conf(conf)
   end
 
   def stub_winrm_to_raise(klass, message)

@@ -20,8 +20,8 @@ describe 'run_task' do
     let(:hostname) { 'a.b.com' }
     let(:hostname2) { 'x.y.com' }
     let(:message) { 'the message' }
-    let(:target) { Bolt::Target.from_uri(hostname) }
-    let(:target2) { Bolt::Target.from_uri(hostname2) }
+    let(:target) { Bolt::Target.new(hostname) }
+    let(:target2) { Bolt::Target.new(hostname2) }
     let(:result) { Bolt::Result.new(target, value: { '_output' => message }) }
     let(:result2) { Bolt::Result.new(target2, value: { '_output' => message }) }
     let(:result_set) { Bolt::ResultSet.new([result]) }

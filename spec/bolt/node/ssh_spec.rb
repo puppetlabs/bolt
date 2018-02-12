@@ -30,7 +30,7 @@ done
 BASH
 
   def target(h: hostname, p: port, conf: config)
-    Bolt::Target.from_uri("#{h}:#{p}").update_conf(conf.transport_conf)
+    Bolt::Target.new("#{h}:#{p}").update_conf(conf.transport_conf)
   end
 
   def result_value(stdout = nil, stderr = nil, exit_code = 0)

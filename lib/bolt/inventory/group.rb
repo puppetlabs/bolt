@@ -1,7 +1,7 @@
 module Bolt
   class Inventory
     # Group is a specific implementation of Inventory based on nested
-    # structred data.
+    # structured data.
     class Group
       attr_accessor :name, :nodes, :groups, :config, :rest
 
@@ -30,29 +30,45 @@ module Bolt
         @rest = data.reject { |k, _| %w[name nodes config groups].include? k }
       end
 
-      def validate(used_names = [], depth = 0)
-        raise ValidationError.new("Group does not have a name", nil)  unless @name
+      def validate(used_names = Set.new, node_names = Set.new, depth = 0)
+        raise ValidationError.new("Group does not have a name", nil) unless @name
         if used_names.include?(@name)
           raise ValidationError.new("Tried to redefine group #{@name}", @name)
         end
         raise ValidationError.new("Invalid Group name #{@name}", @name) unless @name =~ /\A[a-z0-9_]+\Z/
 
+        if node_names.include?(@name)
+          raise ValidationError.new("Group #{@name} conflicts with node of the same name", @name)
+        end
         raise ValidationError.new("Group #{@name} is too deeply nested", @name) if depth > 1
 
         used_names << @name
 
         @nodes.each do |n|
-          raise ValidationError.new("node #{n['name']} does not have a name", @name) unless n['name']
+          # Require nodes to be referenced only by their host name
+          host = Addressable::URI.parse('//' + n['name']).host
+          ipv6host = Addressable::URI.parse('//[' + n['name'] + ']').host
+          if n['name'] != host && n['name'] != ipv6host
+            raise ValidationError.new("Invalid node name #{n['name']}", n['name'])
+          end
+
+          raise ValidationError.new("Node #{n['name']} does not have a name", n['name']) unless n['name']
+          if used_names.include?(n['name'])
+            raise ValidationError.new("Group #{n['name']} conflicts with node of the same name", n['name'])
+          end
+
+          node_names << n['name']
         end
 
         @groups.each do |g|
           begin
-            g.validate(used_names, depth + 1)
+            g.validate(used_names, node_names, depth + 1)
           rescue ValidationError => e
             e.add_parent(@name)
             raise e
           end
         end
+
         nil
       end
 
@@ -92,9 +108,24 @@ module Bolt
         }
       end
 
+      # Returns all nodes contained within the group, which includes nodes from subgroups.
       def node_names
+        @groups.inject(local_node_names) do |acc, g|
+          acc.merge(g.node_names)
+        end
+      end
+
+      # Return a mapping of group names to group.
+      def collect_groups
+        @groups.inject(name => self) do |acc, g|
+          acc.merge(g.collect_groups)
+        end
+      end
+
+      def local_node_names
         @_node_names ||= Set.new(nodes.map { |n| n['name'] })
       end
+      private :local_node_names
 
       def node_collect(node_name)
         data = @groups.inject(nil) do |acc, g|
@@ -118,7 +149,7 @@ module Bolt
 
         if data
           data_merge(group_data, data)
-        elsif node_names.include?(node_name)
+        elsif local_node_names.include?(node_name)
           group_data
         end
       end

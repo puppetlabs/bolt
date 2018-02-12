@@ -5,7 +5,7 @@
 
 require 'bolt/error'
 
-Puppet::Functions.create_function(:fail_plan, Puppet::Functions::InternalFunction) do
+Puppet::Functions.create_function(:fail_plan) do
   dispatch :from_args do
     param 'String[1]', :msg
     optional_param 'String[1]', :kind
