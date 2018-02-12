@@ -60,6 +60,14 @@ module Bolt
         end
       end
 
+      def batch_upload(targets, source, destination, options = {})
+        callback = Proc.new if block_given?
+        on(targets, callback) do |target|
+          @logger.debug { "Uploading: '#{source}' to #{destination} on #{target.uri}" }
+          upload(target, source, destination, filter_options(target, options))
+        end
+      end
+
       def run_command(*_args)
         raise NotImplementedError, "run_command() must be implemented by the transport class"
       end

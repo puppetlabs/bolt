@@ -40,29 +40,6 @@ module Bolt
       @transports[transport || 'ssh'].value
     end
 
-    def on(targets, callback = nil)
-      result_futures = targets.map do |target|
-        Concurrent::Future.execute(executor: @pool) do
-          begin
-            @notifier.notify(callback, type: :node_start, target: target) if callback
-            result = yield transport(target.protocol), target
-            @logger.debug("Result on #{target.uri}: #{JSON.dump(result.value)}")
-            @notifier.notify(callback, type: :node_result, result: result) if callback
-            result
-          rescue StandardError => ex
-            Bolt::Result.from_exception(target, ex)
-          end
-        end
-      end
-
-      results = result_futures.map(&:value)
-
-      @notifier.shutdown
-
-      Bolt::ResultSet.new(results)
-    end
-    private :on
-
     def summary(action, object, result)
       fc = result.error_set.length
       npl = result.length == 1 ? '' : 's'
@@ -70,22 +47,6 @@ module Bolt
       "Ran #{action} '#{object}' on #{result.length} node#{npl} with #{fc} failure#{fpl}"
     end
     private :summary
-
-    def get_run_as(target, options)
-      if target.options[:run_as].nil? && run_as
-        { '_run_as' => run_as }.merge(options)
-      else
-        options
-      end
-    end
-    private :get_run_as
-
-    def with_exception_handling(target)
-      yield
-    rescue StandardError => e
-      Bolt::Result.from_exception(target, e)
-    end
-    private :with_exception_handling
 
     def run_command(targets, command, options = {}, &callback)
       @logger.info("Starting command run '#{command}' on #{targets.map(&:uri)}")
@@ -131,16 +92,18 @@ module Bolt
       results
     end
 
-    def file_upload(targets, source, destination, options = {})
+    def file_upload(targets, source, destination, options = {}, &callback)
       @logger.info("Starting file upload from #{source} to #{destination} on #{targets.map(&:uri)}")
-      callback = block_given? ? Proc.new : nil
+      notify = proc { |event| @notifier.notify(callback, event) if callback }
+      options = { '_run_as' => run_as }.merge(options) if run_as
 
-      r = on(targets, callback) do |transport, target|
-        @logger.debug { "Uploading: '#{source}' to #{destination} on #{target.uri}" }
-        transport.upload(target, source, destination, options)
+      result_futures = targets.group_by(&:protocol).flat_map do |protocol, batch|
+        transport(protocol).batch_upload(batch, source, destination, options, &notify)
       end
-      @logger.info(summary('upload', source, r))
-      r
+      results = ResultSet.new(result_futures.map(&:value))
+      @logger.info(summary('upload', source, results))
+      @notifier.shutdown
+      results
     end
   end
 end

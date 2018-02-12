@@ -123,6 +123,24 @@ module Bolt
         promises.map { |promise| promise.then { |result| unwrap_bolt_result(result.target, result) } }
       end
 
+      def batch_upload(targets, source, destination, _options = {})
+        content = File.open(source, &:read)
+        content = Base64.encode64(content)
+        mode = File.stat(source).mode
+        params = {
+          action: 'upload',
+          path: destination,
+          content: content,
+          mode: mode
+        }
+        promises = batch_task(targets, BOLT_MOCK_FILE, 'stdin', params)
+        promises.map do |promise|
+          promise.then do |result|
+            result.error_hash ? result : Bolt::Result.for_upload(result.target, source, destination)
+          end
+        end
+      end
+
       def batch_task(targets, task, _inputmethod, arguments, _options = {})
         callback = block_given? ? Proc.new : proc {}
         body = build_request(targets, task, arguments)

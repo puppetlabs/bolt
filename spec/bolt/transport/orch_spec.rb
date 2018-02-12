@@ -271,7 +271,7 @@ describe Bolt::Transport::Orch, orchestrator: true do
       end
     end
 
-    describe :upload do
+    describe 'uploading files' do
       let(:source_path) { File.join(base_path, 'spec', 'fixtures', 'scripts', 'success.sh') }
       let(:dest_path) { 'success.sh' } # to be prepended with a temp dir in the 'around(:each)' block
       let(:params) {
@@ -294,18 +294,30 @@ describe Bolt::Transport::Orch, orchestrator: true do
         end
       end
 
-      it 'should write the file' do
-        expect(orch.upload(target, source_path, dest_path).value).to eq(
-          '_output' => "Uploaded '#{source_path}' to '#{hostname}:#{dest_path}'"
-        )
+      describe :batch_upload do
+        it 'should write the file' do
+          results = orch.batch_upload(targets, source_path, dest_path).map(&:value)
+          expect(results[0]).to be_success
+          expect(results[1]).to be_success
+          expect(results[0].message).to match(/Uploaded '#{source_path}' to '#{targets[0].host}:#{dest_path}/)
+          expect(results[1].message).to match(/Uploaded '#{source_path}' to '#{targets[1].host}:#{dest_path}/)
+        end
+      end
 
-        source_mode = File.stat(source_path).mode
-        dest_mode = File.stat(dest_path).mode
-        expect(dest_mode).to eq(source_mode)
+      describe :upload do
+        it 'should write the file' do
+          expect(orch.upload(target, source_path, dest_path).value).to eq(
+            '_output' => "Uploaded '#{source_path}' to '#{hostname}:#{dest_path}'"
+          )
 
-        source_content = File.read(source_path)
-        dest_content = File.read(dest_path)
-        expect(dest_content).to eq(source_content)
+          source_mode = File.stat(source_path).mode
+          dest_mode = File.stat(dest_path).mode
+          expect(dest_mode).to eq(source_mode)
+
+          source_content = File.read(source_path)
+          dest_content = File.read(dest_path)
+          expect(dest_content).to eq(source_content)
+        end
       end
     end
 
