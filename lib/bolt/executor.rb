@@ -87,16 +87,18 @@ module Bolt
     end
     private :with_exception_handling
 
-    def run_command(targets, command, options = {})
+    def run_command(targets, command, options = {}, &callback)
       @logger.info("Starting command run '#{command}' on #{targets.map(&:uri)}")
-      callback = block_given? ? Proc.new : nil
+      notify = proc { |event| @notifier.notify(callback, event) if callback }
+      options = { '_run_as' => run_as }.merge(options) if run_as
 
-      r = on(targets, callback) do |transport, target|
-        @logger.debug("Running command '#{command}' on #{target.uri}")
-        transport.run_command(target, command, get_run_as(target, options))
+      result_futures = targets.group_by(&:protocol).flat_map do |protocol, batch|
+        transport(protocol).batch_command(batch, command, options, &notify)
       end
-      @logger.info(summary('command', command, r))
-      r
+      results = ResultSet.new(result_futures.map(&:value))
+      @logger.info(summary('command', command, results))
+      @notifier.shutdown
+      results
     end
 
     def run_script(targets, script, arguments, options = {})

@@ -185,7 +185,7 @@ describe Bolt::Transport::Orch, orchestrator: true do
   context 'using the bolt task wrapper' do
     before(:each) do
       bolt_task = File.expand_path(File.join(base_path, 'tasks', 'init.rb'))
-      allow(orch.client).to(receive(:run_task) do
+      allow(orch.client).to(receive(:run_task) do |body|
         Open3.popen3("ruby #{bolt_task};") do |stdin, stdout, stderr, wt|
           stdin.write(params.to_json)
           stdin.close
@@ -194,9 +194,30 @@ describe Bolt::Transport::Orch, orchestrator: true do
           exit_code = wt.value.exitstatus
           expect(err).to be_empty
           expect(exit_code).to eq(0)
-          [{ 'state' => 'finished', 'result' => JSON.parse(output) }]
+
+          body[:scope][:nodes].map do |node|
+            { 'name' => node, 'state' => 'finished', 'result' => JSON.parse(output) }
+          end
         end
       end)
+    end
+
+    describe :batch_command do
+      let(:options) { {} }
+      let(:params) {
+        {
+          action: 'command',
+          command: command,
+          options: options
+        }
+      }
+      let(:command) { 'echo hi!; echo bye >&2' }
+
+      it 'returns a success' do
+        results = orch.batch_command(targets, command).map(&:value)
+        expect(results[0]).to be_success
+        expect(results[1]).to be_success
+      end
     end
 
     describe :run_command do

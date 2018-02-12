@@ -101,6 +101,16 @@ module Bolt
         end
       end
 
+      def batch_command(targets, command, _options = {})
+        promises = batch_task(targets,
+                              BOLT_MOCK_FILE,
+                              'stdin',
+                              action: 'command',
+                              command: command,
+                              options: {})
+        promises.map { |promise| promise.then { |result| unwrap_bolt_result(result.target, result) } }
+      end
+
       def batch_task(targets, task, _inputmethod, arguments, _options = {})
         callback = block_given? ? Proc.new : proc {}
         body = build_request(targets, task, arguments)
