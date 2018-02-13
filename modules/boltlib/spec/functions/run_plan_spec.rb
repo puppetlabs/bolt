@@ -55,7 +55,9 @@ describe 'run_plan' do
 
     context 'handles exceptions by' do
       it 'failing with error for non-existent plan name' do
-        is_expected.to run.with_params('not_a_plan_name').and_raise_error(/Unknown plan/)
+        is_expected.to run.with_params('not_a_plan_name').and_raise_error(
+          /Could not find plan with name "not_a_plan_name"/
+        )
       end
 
       it 'failing with type mismatch error if given args does not match parameters' do

@@ -49,7 +49,8 @@ Puppet::Functions.create_function(:run_task) do
     task_signature = Puppet::Pal::ScriptCompiler.new(closure_scope.compiler).task_signature(task_name)
     if task_signature.nil?
       raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
-        Puppet::Pops::Issues::UNKNOWN_TASK, type_name: task_name
+        Puppet::Pops::Issues.issue(:UNKNOWN_TASK, :task_name) { Bolt::Error.unknown_task(task_name) },
+        task_name: task_name
       )
     end
 

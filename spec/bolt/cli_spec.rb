@@ -834,7 +834,7 @@ bar
             cli.execute(options)
           }.to raise_error(
             Bolt::CLIError,
-            "Could not find task with name abcdefg. Use 'bolt task show' for a list of available tasks."
+            "Could not find task with name \"abcdefg\". Use 'bolt task show' for a list of available tasks."
           )
         end
       end
@@ -938,7 +938,7 @@ bar
             cli.execute(options)
           }.to raise_error(
             Bolt::CLIError,
-            "Could not find plan with name abcdefg. Use 'bolt plan show' for a list of available plans."
+            "Could not find plan with name \"abcdefg\". Use 'bolt plan show' for a list of available plans."
           )
         end
       end
@@ -988,7 +988,7 @@ bar
           task_name.replace 'dne::task1'
 
           expect { cli.execute(options) }.to raise_error(
-            Bolt::CLIError, /Task not found: dne::task1/
+            Bolt::CLIError, /Could not find task with name "dne::task1"/
           )
           expect(JSON.parse(output.string)).to be
         end
@@ -997,7 +997,7 @@ bar
           task_name.replace 'sample::dne'
 
           expect { cli.execute(options) }.to raise_error(
-            Bolt::CLIError, /Task not found: sample::dne/
+            Bolt::CLIError, /Could not find task with name "sample::dne"/
           )
           expect(JSON.parse(output.string)).to be
         end
@@ -1235,6 +1235,15 @@ bar
               }
             ]
           )
+        end
+
+        it "errors for non-existent plans" do
+          plan_name.replace 'sample::dne'
+
+          expect { cli.execute(options) }.to raise_error(
+            Bolt::CLIError, /Could not find plan with name "sample::dne"/
+          )
+          expect(JSON.parse(output.string)).to be
         end
 
         it "traps SIGINT", :signals_self do

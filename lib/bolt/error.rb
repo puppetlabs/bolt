@@ -29,6 +29,14 @@ module Bolt
     def to_puppet_error
       Puppet::DataTypes::Error.from_asserted_hash(to_h)
     end
+
+    def self.unknown_task(task)
+      "Could not find task with name \"#{task}\". Use 'bolt task show' for a list of available tasks."
+    end
+
+    def self.unknown_plan(plan)
+      "Could not find plan with name \"#{plan}\". Use 'bolt plan show' for a list of available plans."
+    end
   end
 
   class RunFailure < Error

@@ -61,7 +61,10 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
 
       return result
     end
+
     # Could not find plan
-    raise ArgumentError, "Function #{self.class.name}(): Unknown plan: '#{plan_name}'"
+    raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
+      Puppet::Pops::Issues.issue(:UNKNOWN_PLAN) { Bolt::Error.unknown_plan(plan_name) }
+    )
   end
 end
