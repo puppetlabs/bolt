@@ -830,8 +830,12 @@ bar
             action: 'show',
             object: 'abcdefg'
           }
-          expect { cli.execute(options) }.to raise_error(Bolt::CLIError,
-                                                         "Could not find task abcdefg in your modulepath")
+          expect {
+            cli.execute(options)
+          }.to raise_error(
+            Bolt::CLIError,
+            "Could not find task with name abcdefg. Use 'bolt task show' for a list of available tasks."
+          )
         end
       end
 
@@ -930,8 +934,12 @@ bar
             action: 'show',
             object: 'abcdefg'
           }
-          expect { cli.execute(options) }.to raise_error(Bolt::CLIError,
-                                                         "Could not find plan abcdefg in your modulepath")
+          expect {
+            cli.execute(options)
+          }.to raise_error(
+            Bolt::CLIError,
+            "Could not find plan with name abcdefg. Use 'bolt plan show' for a list of available plans."
+          )
         end
       end
 

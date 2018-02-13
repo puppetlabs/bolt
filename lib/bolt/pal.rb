@@ -133,7 +133,12 @@ module Bolt
       task = in_bolt_compiler do |compiler|
         compiler.task_signature(task_name)
       end
-      raise Bolt::CLIError, "Could not find task #{task_name} in your modulepath" if task.nil?
+
+      if task.nil?
+        raise Bolt::CLIError,
+              "Could not find task with name #{task_name}. Use 'bolt task show' for a list of available tasks."
+      end
+
       task.task_hash
     end
 
@@ -147,7 +152,12 @@ module Bolt
       plan = in_bolt_compiler do |compiler|
         compiler.plan_signature(plan_name)
       end
-      raise Bolt::CLIError, "Could not find plan #{plan_name} in your modulepath" if plan.nil?
+
+      if plan.nil?
+        raise Bolt::CLIError,
+              "Could not find plan with name #{plan_name}. Use 'bolt plan show' for a list of available plans."
+      end
+
       elements = plan.params_type.elements
       {
         'name' => plan_name,
