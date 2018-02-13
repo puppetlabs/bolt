@@ -17,10 +17,11 @@ describe Bolt::Transport::Orch, orchestrator: true do
      Bolt::Target.new('node2').update_conf(Bolt::Config.new.transport_conf)]
   end
 
+  let(:mock_client) { instance_double("OrchestratorClient", run_task: results) }
+
   let(:orch) do
-    client = instance_double("OrchestratorClient", run_task: results)
     orch = Bolt::Transport::Orch.new({})
-    allow(orch).to receive(:client).and_return(client)
+    allow(orch).to receive(:create_client).and_return(mock_client)
     orch
   end
 
@@ -160,31 +161,50 @@ describe Bolt::Transport::Orch, orchestrator: true do
     end
   end
 
-  describe :batch_task do
-    it "executes a task on a host" do
-      results = [{ 'name' => 'node1', 'state' => 'finished', 'result' => { '_output' => 'hello' } },
-                 { 'name' => 'node2', 'state' => 'finished', 'result' => { '_output' => 'goodbye' } }]
-      allow(orch.client).to receive(:run_task).and_return(results)
+  describe :batches do
+    let(:targets) do
+      [Bolt::Target.new('a', orch_task_environment: 'production'),
+       Bolt::Target.new('b', orch_task_environment: 'development'),
+       Bolt::Target.new('c', orch_task_environment: 'test'),
+       Bolt::Target.new('d', orch_task_environment: 'development')]
+    end
 
-      node_results = orch.batch_task(targets, taskpath, 'stdin', params).map(&:value)
+    it "splits targets in different environments into separate batches" do
+      batches = Set.new([[targets[0]],
+                         [targets[1], targets[3]],
+                         [targets[2]]])
+      expect(Set.new(orch.batches(targets))).to eq(batches)
+    end
+  end
+
+  describe :batch_task do
+    let(:results) do
+      [{ 'name' => 'node1', 'state' => 'finished', 'result' => { '_output' => 'hello' } },
+       { 'name' => 'node2', 'state' => 'finished', 'result' => { '_output' => 'goodbye' } }]
+    end
+
+    it "executes a task on a host" do
+      allow(mock_client).to receive(:run_task).and_return(results)
+
+      node_results = orch.batch_task(targets, taskpath, 'stdin', params)
       expect(node_results[0].value).to eq('_output' => 'hello')
       expect(node_results[1].value).to eq('_output' => 'goodbye')
       expect(node_results[0]).to be_success
       expect(node_results[1]).to be_success
     end
 
-    it "executes targets with different environments in separate batches" do
-      result1 = [{ 'name' => 'node1', 'state' => 'finished', 'result' => { '_output' => 'hello' } }]
-      result2 = [{ 'name' => 'node2', 'state' => 'finished', 'result' => { '_output' => 'goodbye' } }]
-      expect(orch.client).to receive(:run_task).and_return(result1).ordered
-      expect(orch.client).to receive(:run_task).and_return(result2).ordered
-      targets[1].options[:orch_task_environment] = 'development'
+    it 'emits events for each target' do
+      allow(mock_client).to receive(:run_task).and_return(results)
 
-      node_results = orch.batch_task(targets, taskpath, 'stdin', params).map(&:value)
-      expect(node_results[0].value).to eq('_output' => 'hello')
-      expect(node_results[1].value).to eq('_output' => 'goodbye')
-      expect(node_results[0]).to be_success
-      expect(node_results[1]).to be_success
+      events = []
+      results = orch.batch_task(targets, taskpath, 'stdin', params) do |event|
+        events << event
+      end
+
+      results.each do |result|
+        expect(events).to include(type: :node_start, target: result.target)
+        expect(events).to include(type: :node_result, result: result)
+      end
     end
   end
 
@@ -199,7 +219,7 @@ describe Bolt::Transport::Orch, orchestrator: true do
   context 'using the bolt task wrapper' do
     before(:each) do
       bolt_task = File.expand_path(File.join(base_path, 'tasks', 'init.rb'))
-      allow(orch.client).to(receive(:run_task) do |body|
+      allow(mock_client).to(receive(:run_task) do |body|
         Open3.popen3("ruby #{bolt_task};") do |stdin, stdout, stderr, wt|
           stdin.write(params.to_json)
           stdin.close
@@ -228,9 +248,21 @@ describe Bolt::Transport::Orch, orchestrator: true do
       let(:command) { 'echo hi!; echo bye >&2' }
 
       it 'returns a success' do
-        results = orch.batch_command(targets, command).map(&:value)
+        results = orch.batch_command(targets, command)
         expect(results[0]).to be_success
         expect(results[1]).to be_success
+      end
+
+      it 'emits events for each target' do
+        events = []
+        results = orch.batch_command(targets, command) do |event|
+          events << event
+        end
+
+        results.each do |result|
+          expect(events).to include(type: :node_start, target: result.target)
+          expect(events).to include(type: :node_result, result: result)
+        end
       end
     end
 
@@ -310,11 +342,23 @@ describe Bolt::Transport::Orch, orchestrator: true do
 
       describe :batch_upload do
         it 'should write the file' do
-          results = orch.batch_upload(targets, source_path, dest_path).map(&:value)
+          results = orch.batch_upload(targets, source_path, dest_path)
           expect(results[0]).to be_success
           expect(results[1]).to be_success
           expect(results[0].message).to match(/Uploaded '#{source_path}' to '#{targets[0].host}:#{dest_path}/)
           expect(results[1].message).to match(/Uploaded '#{source_path}' to '#{targets[1].host}:#{dest_path}/)
+        end
+
+        it 'emits events for each target' do
+          events = []
+          results = orch.batch_upload(targets, source_path, dest_path) do |event|
+            events << event
+          end
+
+          results.each do |result|
+            expect(events).to include(type: :node_start, target: result.target)
+            expect(events).to include(type: :node_result, result: result)
+          end
         end
       end
 
@@ -349,9 +393,21 @@ describe Bolt::Transport::Orch, orchestrator: true do
       }
 
       it 'returns a success' do
-        results = orch.batch_script(targets, script_path, args).map(&:value)
+        results = orch.batch_script(targets, script_path, args)
         expect(results[0]).to be_success
         expect(results[1]).to be_success
+      end
+
+      it 'emits events for each target' do
+        events = []
+        results = orch.batch_script(targets, script_path, args) do |event|
+          events << event
+        end
+
+        results.each do |result|
+          expect(events).to include(type: :node_start, target: result.target)
+          expect(events).to include(type: :node_result, result: result)
+        end
       end
     end
 

@@ -11,21 +11,15 @@ module Bolt
       CONF_FILE = File.expand_path('~/.puppetlabs/client-tools/orchestrator.conf')
       BOLT_MOCK_FILE = 'bolt/tasks/init'.freeze
 
-      def initialize(config, executor = Concurrent.global_immediate_executor)
+      def initialize(config)
         super
 
         client_keys = %i[service-url token-file cacert]
-        client_opts = config.select { |k, _v| client_keys.include?(k) }
-        @client = Concurrent::Delay.new { OrchestratorClient.new(client_opts, true) }
-        @client_lock = Mutex.new
+        @client_opts = config.select { |k, _v| client_keys.include?(k) }
       end
 
-      def client
-        if @client.value.nil?
-          raise @client.reason
-        else
-          @client.value
-        end
+      def create_client
+        OrchestratorClient.new(@client_opts, true)
       end
 
       def upload(target, source, destination, _options = {})
@@ -101,17 +95,20 @@ module Bolt
         end
       end
 
-      def batch_command(targets, command, _options = {})
-        promises = batch_task(targets,
-                              BOLT_MOCK_FILE,
-                              'stdin',
-                              action: 'command',
-                              command: command,
-                              options: {})
-        promises.map { |promise| promise.then { |result| unwrap_bolt_result(result.target, result) } }
+      def batch_command(targets, command, _options = {}, &callback)
+        results = run_task_job(targets,
+                               BOLT_MOCK_FILE,
+                               action: 'command',
+                               command: command,
+                               &callback)
+        callback ||= proc {}
+        results.map! { |result| unwrap_bolt_result(result.target, result) }
+        results.each do |result|
+          callback.call(type: :node_result, result: result)
+        end
       end
 
-      def batch_script(targets, script, arguments, _options = {})
+      def batch_script(targets, script, arguments, _options = {}, &callback)
         content = File.open(script, &:read)
         content = Base64.encode64(content)
         params = {
@@ -119,11 +116,15 @@ module Bolt
           content: content,
           arguments: arguments
         }
-        promises = batch_task(targets, BOLT_MOCK_FILE, 'stdin', params)
-        promises.map { |promise| promise.then { |result| unwrap_bolt_result(result.target, result) } }
+        callback ||= proc {}
+        results = run_task_job(targets, BOLT_MOCK_FILE, params, &callback)
+        results.map! { |result| unwrap_bolt_result(result.target, result) }
+        results.each do |result|
+          callback.call(type: :node_result, result: result)
+        end
       end
 
-      def batch_upload(targets, source, destination, _options = {})
+      def batch_upload(targets, source, destination, _options = {}, &callback)
         content = File.open(source, &:read)
         content = Base64.encode64(content)
         mode = File.stat(source).mode
@@ -133,50 +134,54 @@ module Bolt
           content: content,
           mode: mode
         }
-        promises = batch_task(targets, BOLT_MOCK_FILE, 'stdin', params)
-        promises.map do |promise|
-          promise.then do |result|
-            result.error_hash ? result : Bolt::Result.for_upload(result.target, source, destination)
+        callback ||= proc {}
+        results = run_task_job(targets, BOLT_MOCK_FILE, params, &callback)
+        results.map! do |result|
+          if result.error_hash
+            result
+          else
+            Bolt::Result.for_upload(result.target, source, destination)
+          end
+        end
+        results.each do |result|
+          callback.call(type: :node_result, result: result) if callback
+        end
+      end
+
+      def batches(targets)
+        targets.group_by { |target| target.options[:orch_task_environment] }.values
+      end
+
+      def run_task_job(targets, task, arguments)
+        body = build_request(targets, task, arguments)
+
+        targets.each do |target|
+          yield(type: :node_start, target: target) if block_given?
+        end
+
+        begin
+          results = create_client.run_task(body)
+
+          process_run_results(targets, results)
+        rescue StandardError => e
+          targets.map do |target|
+            Bolt::Result.from_exception(target, e)
           end
         end
       end
 
-      def batch_task(targets, task, _inputmethod, arguments, _options = {})
-        callback = block_given? ? Proc.new : proc {}
-        targets.group_by { |target| target.options[:orch_task_environment] }.flat_map do |_environment, env_targets|
-          body = build_request(env_targets, task, arguments)
-
-          # Make promises to hold the eventual results. The `set` operation is
-          # fast, so they can just execute in the thread that's creating them,
-          # using the :immediate executor.
-          result_ivars = Hash[env_targets.map { |target| [target, Concurrent::Promise.new(executor: :immediate)] }]
-
-          @executor.post do
-            env_targets.each do |target|
-              callback.call(type: :node_start, target: target)
-            end
-
-            # The orchestrator client isn't thread-safe, so we have to do this
-            # serially for now
-            results = @client_lock.synchronize do
-              client.run_task(body)
-            end
-
-            process_run_results(env_targets, results).each do |result|
-              callback.call(type: :node_result, result: result)
-              result_ivars[result.target].set(result)
-            end
-          end
-
-          result_ivars.values
+      def batch_task(targets, task, _inputmethod, arguments, _options = {}, &callback)
+        callback ||= proc {}
+        results = run_task_job(targets, task, arguments, &callback)
+        results.each do |result|
+          callback.call(type: :node_result, result: result)
         end
       end
 
       def run_task(target, task, _inputmethod, arguments, _options = {})
-        # batch_task([target], task, _inputmethod, arguments, _options = {})
         body = build_request([target], task, arguments)
 
-        results = client.run_task(body)
+        results = create_client.run_task(body)
 
         process_run_results([target], results).first
       end

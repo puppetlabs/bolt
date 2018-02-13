@@ -1,3 +1,5 @@
+# Used for $ERROR_INFO. This *must* be capitalized!
+require 'English'
 require 'json'
 require 'concurrent'
 require 'logging'
@@ -48,15 +50,59 @@ module Bolt
     end
     private :summary
 
+    # Execute the given block on a list of nodes in parallel, one thread per "batch".
+    #
+    # This is the main driver of execution on a list of targets. It first
+    # groups targets by transport, then divides each group into batches as
+    # defined by the transport. Each batch, along with the corresponding
+    # transport, is yielded to the block in turn and the results all collected
+    # into a single ResultSet.
+    def batch_execute(targets)
+      promises = targets.group_by(&:protocol).flat_map do |protocol, _protocol_targets|
+        transport = transport(protocol)
+        transport.batches(targets).flat_map do |batch|
+          batch_promises = Hash[Array(batch).map { |target| [target, Concurrent::Promise.new(executor: :immediate)] }]
+          # Pass this argument through to avoid retaining a reference to a
+          # local variable that will change on the next iteration of the loop.
+          @pool.post(batch_promises) do |result_promises|
+            begin
+              results = yield transport, batch
+              Array(results).each do |result|
+                result_promises[result.target].set(result)
+              end
+            # NotImplementedError can be thrown if the transport is implemented improperly
+            rescue StandardError, NotImplementedError => e
+              result_promises.each do |target, promise|
+                promise.set(Bolt::Result.from_exception(target, e))
+              end
+            ensure
+              # Make absolutely sure every promise gets a result to avoid a
+              # deadlock. Use whatever exception is causing this block to
+              # execute, or generate one if we somehow got here without an
+              # exception and some promise is still missing a result.
+              result_promises.each do |target, promise|
+                next if promise.fulfilled?
+                error = $ERROR_INFO || Bolt::Error.new("No result was returned for #{target.uri}",
+                                                       "puppetlabs.bolt/missing-result-error")
+                promise.set(Bolt::Result.from_exception(error))
+              end
+            end
+          end
+          batch_promises.values
+        end
+      end
+      ResultSet.new(promises.map(&:value))
+    end
+
     def run_command(targets, command, options = {}, &callback)
       @logger.info("Starting command run '#{command}' on #{targets.map(&:uri)}")
       notify = proc { |event| @notifier.notify(callback, event) if callback }
       options = { '_run_as' => run_as }.merge(options) if run_as
 
-      result_futures = targets.group_by(&:protocol).flat_map do |protocol, batch|
-        transport(protocol).batch_command(batch, command, options, &notify)
+      results = batch_execute(targets) do |transport, batch|
+        transport.batch_command(batch, command, options, &notify)
       end
-      results = ResultSet.new(result_futures.map(&:value))
+
       @logger.info(summary('command', command, results))
       @notifier.shutdown
       results
@@ -68,10 +114,10 @@ module Bolt
       notify = proc { |event| @notifier.notify(callback, event) if callback }
       options = { '_run_as' => run_as }.merge(options) if run_as
 
-      result_futures = targets.group_by(&:protocol).flat_map do |protocol, batch|
-        transport(protocol).batch_script(batch, script, arguments, options, &notify)
+      results = batch_execute(targets) do |transport, batch|
+        transport.batch_script(batch, script, arguments, options, &notify)
       end
-      results = ResultSet.new(result_futures.map(&:value))
+
       @logger.info(summary('script', script, results))
       @notifier.shutdown
       results
@@ -83,10 +129,10 @@ module Bolt
       notify = proc { |event| @notifier.notify(callback, event) if callback }
       options = { '_run_as' => run_as }.merge(options) if run_as
 
-      result_futures = targets.group_by(&:protocol).flat_map do |protocol, batch|
-        transport(protocol).batch_task(batch, task, input_method, arguments, options, &notify)
+      results = batch_execute(targets) do |transport, batch|
+        transport.batch_task(batch, task, input_method, arguments, options, &notify)
       end
-      results = ResultSet.new(result_futures.map(&:value))
+
       @logger.info(summary('task', task, results))
       @notifier.shutdown
       results
@@ -97,10 +143,10 @@ module Bolt
       notify = proc { |event| @notifier.notify(callback, event) if callback }
       options = { '_run_as' => run_as }.merge(options) if run_as
 
-      result_futures = targets.group_by(&:protocol).flat_map do |protocol, batch|
-        transport(protocol).batch_upload(batch, source, destination, options, &notify)
+      results = batch_execute(targets) do |transport, batch|
+        transport.batch_upload(batch, source, destination, options, &notify)
       end
-      results = ResultSet.new(result_futures.map(&:value))
+
       @logger.info(summary('upload', source, results))
       @notifier.shutdown
       results

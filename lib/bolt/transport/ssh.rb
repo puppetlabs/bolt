@@ -9,7 +9,7 @@ module Bolt
       STDIN_METHODS       = %w[both stdin].freeze
       ENVIRONMENT_METHODS = %w[both environment].freeze
 
-      def initialize(_config, _executor = Concurrent.global_immediate_executor)
+      def initialize(_config)
         super
 
         require 'net/ssh'

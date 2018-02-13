@@ -10,7 +10,7 @@ module Bolt
         -NoProfile -NonInteractive -NoLogo -ExecutionPolicy Bypass
       ].freeze
 
-      def initialize(_config, _executor = Concurrent.global_immediate_executor)
+      def initialize(_config)
         super
         require 'winrm'
         require 'winrm-fs'
