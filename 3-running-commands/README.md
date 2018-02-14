@@ -129,6 +129,6 @@ bolt command run <command> --no-ssl --nodes winrm://<node>,winrm://<node> --user
 ```
 # Next steps
 
-Now you know how to run adhoc commands with `bolt` you can move on to:
+Now that you know how to run adhoc commands with `bolt` you can move on to:
 
 1. [Running Scripts](../4-running-scripts)
