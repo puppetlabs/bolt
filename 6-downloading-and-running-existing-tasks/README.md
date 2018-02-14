@@ -26,7 +26,7 @@ It is also useful to have some familiarity with running commands with `bolt` so 
 
 # Clone the control repo and configure Bolt's modulepath
 
-These exercises will use the [task-modules](https://github.com/puppetlabs/task-modules) control repo. Like many control repos this repository contains some modules committed directly in the `site` directory and manages other with a `Puppetfile`.
+These exercises will use the [task-modules](https://github.com/puppetlabs/task-modules) control repo. Like many control repos this repository contains some modules committed directly in the `site` directory and manages others with a `Puppetfile`.
 
 ```
 mkdir -p ~/.puppetlabs
@@ -39,15 +39,15 @@ Now open `~/.puppetlabs/bolt.yml` and set up the bolt module path. The module pa
 ```
 ---
 modulepath: "~/.puppetlabs/task-modules/site:~/.puppetlabs/task-modules/modules"
-# If you have to pass --no-host-key-check to skip host key verifaction you can
+# If you have to pass --no-host-key-check to skip host key verification you can
 # uncomment these lines.
 #ssh:
-#  host-key-check: true
+#  host-key-check: false
 ```
 
 # Install Puppet using Bolt
 
-The [`install_puppet` task](https://github.com/puppetlabs/task-modules/blob/master/site/install_puppet/tasks/init.sh) in task-modules contains a task to install the puppet agent package on a node. This task need to run as root so if you're not logging in as root with vagrant you'll need to tell bolt to sudo to root with `--run-as root`
+The [`install_puppet` task](https://github.com/puppetlabs/task-modules/blob/master/site/install_puppet/tasks/init.sh) in task-modules contains a task to install the Puppet agent package on a node. This task needs to run as root so if you're not logging in as root with vagrant you'll need to tell bolt to sudo to root with `--run-as root`
 
 ```
 bolt task run install_puppet -n $NODE --run-as root
@@ -72,7 +72,7 @@ r10k puppetfile install ./Puppetfile
 
 # Inspect installed tasks
 
-Lets see what tasks we installed in the previous step.  
+Lets see what tasks we installed in the previous step.
 
 ```
 $ bolt task show
@@ -98,9 +98,9 @@ service                       Manage and inspect the state of services
 Use `bolt task show <task-name>` to view details and parameters for a specific task.
 ```
 
-# Use package task to check status of package
+# Use the package task to check status of package
 
-With Puppet installed on the node we can use some of the tasks that expose Puppet resources, like the package task which you just installed from the Puppet Forge with r10k.  We can use the bolt to show us the parameters used by the package task.  
+With Puppet installed on the node we can use some of the tasks that expose Puppet resources, like the package task which you just installed from the Puppet Forge with r10k.  We can use bolt to show us the parameters used by the package task.
 
 ```
 $ bolt task show package
@@ -115,8 +115,8 @@ PARAMETERS:
 - name: String[1, default]
     The name of the package to be manipulated
 - version: Optional[String[1, default]]
-    Version numbers must match the full version to install, including release if the provider uses a release moniker. 
-    Ranges or semver patterns are not accepted except for the gem package provider. 
+    Version numbers must match the full version to install, including release if the provider uses a release moniker.
+    Ranges or semver patterns are not accepted except for the gem package provider.
     For example, to install the bash package from the rpm bash-4.1.2-29.el6.x86_64.rpm, use the string '4.1.2-29.el6'.
 - provider: Optional[String[1, default]]
     The provider to use to manage or inspect the package, defaults to the system package manager
@@ -135,7 +135,7 @@ Finished on node1:
 Ran on 1 node in 3.81 seconds
 ```
 
-# Use package task to install a package
+# Use the package task to install a package
 
 The package task also supports other actions, including ensuring a package is installed. Let's install a package across all of our nodes using that action:
 
@@ -156,6 +156,6 @@ We've really only scratched the surface of Tasks in these exercises. You'll find
 
 # Next steps
 
-Now you know how to download and run third party tasks with `bolt` you can move on to:
+Now that you know how to download and run third party tasks with `bolt` you can move on to:
 
 1. [Writing Plans](../7-writing-plans)

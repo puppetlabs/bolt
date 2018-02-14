@@ -129,6 +129,6 @@ When passing nodes to `bolt` in the next section you will use `--nodes 127.0.0.1
 
 # Next steps
 
-Now you have nodes with which to experiment with `bolt` you can move on to:
+Now that you have nodes with which to experiment with `bolt` you can move on to:
 
 1. [Running Commands](../3-running-commands)

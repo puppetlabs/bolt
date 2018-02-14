@@ -138,10 +138,10 @@ Note:
 * `message` is optional. If it's not passed it will use the default value from the plan.
 * When running multiple steps in a plan only the last step will generate output
 
-Plans should be used whenever you want to run several commands together, often based on the output of previous commands and across multiple nodes. For instance removing a node from a load balancer before deploying the new version of the application, or clearing a cache after reindexing a search engine.
+Plans should be used whenever you want to run several commands together, often based on the output of previous commands and across multiple nodes. For instance removing a node from a load balancer before deploying the new version of the application, or clearing a cache after re-indexing a search engine.
 
 # Next steps
 
-Now you know how to download and run third party tasks with `bolt` you can move on to:
+Now that you know how to download and run third party tasks with `bolt` you can move on to:
 
 1. [Writing advanced Tasks](../8-writing-advanced-tasks)

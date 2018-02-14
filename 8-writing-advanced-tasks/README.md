@@ -16,7 +16,7 @@ For the following exercises you should already have `bolt` installed and have a 
 
 # Writing your first task with metadata
 
-Writing metadata helps those that consume your tasks know how to provide input to the tasks that you write.  Metadata for a task is written in JSON and is expected to have the same name as your task with a `.json` extension. So if you write a task called `foo_bar.py` you should write a corresponding `foo_bar.json`.  Lets start by writing a simple task that formats the parameters a user gives it.      
+Writing metadata helps those that consume your tasks know how to provide input to the tasks that you write.  Metadata for a task is written in JSON and is expected to have the same name as your task with a `.json` extension. So if you write a task called `foo_bar.py` you should write a corresponding `foo_bar.json`.  Lets start by writing a simple task that formats the parameters a user gives it.
 
 Save the following file to `modules/exercise8/tasks/great_metadata.py`:
 ```
@@ -81,7 +81,7 @@ Now lets write the accompanying metadata.  Well specify the parameters as types 
 
 # Using your task with metadata
 
-Use the following command to show to test that your task is listed with its description. 
+Use the following command to show to test that your task is listed with its description.
 
 ```
 $ bolt task show --modulepath ./modules
@@ -115,7 +115,7 @@ PARAMETERS:
 
 # Testing our task's metadata validation
 
-Bolt can use the types that you have specified in your metadata to validate parameters passed to your task.  Lets attempt to run your task with an incorrect value passed to the `action` parameter.  We will pass the params as a JSON string.  
+Bolt can use the types that you have specified in your metadata to validate parameters passed to your task.  Lets attempt to run your task with an incorrect value passed to the `action` parameter.  We will pass the params as a JSON string.
 
 ```
 $ bolt task run exercise8::great_metadata --nodes $NODE --modulepath ./modules --params '{"name":"poppey","action":"spinach","recursive":true}'
@@ -123,7 +123,7 @@ Task exercise8::great_metadata:
  parameter 'action' expects a match for Enum['restart', 'start', 'stop'], got 'spinach'
 ```
 
-If we correct our mistake we can see the task working correctly 
+If we correct our mistake we can see the task working correctly
 ```
 $ bolt task run exercise8::great_metadata --nodes $NODE --modulepath ./modules --params '{"name":"poppey","action":"start","recursive":true}'
 
@@ -249,6 +249,6 @@ Ran on 1 node in 0.63 second
 ```
 # Next steps
 
-Now you know how to use `--noop` and write metadata you can move on to:
+Now that you know how to use `--noop` and write metadata you can move on to:
 
 1. [Writing advanced Plans](../9-writing-advanced-plans)

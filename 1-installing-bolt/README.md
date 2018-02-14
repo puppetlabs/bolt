@@ -34,7 +34,7 @@ You can check everything has been installed correctly by running `bolt --help`.
 xcode-select --install
 ```
 
-macOS comes with Ruby already installed so you should be able to install `bolt` using the built-in `gem` tool: 
+macOS comes with Ruby already installed so you should be able to install `bolt` using the built-in `gem` tool:
 
 ```
 gem install bolt
@@ -70,6 +70,6 @@ gem install bolt
 
 # Next steps
 
-Now you have `bolt` installed you can move on to:
+Now that you have `bolt` installed you can move on to:
 
 1. [Acquiring nodes](../2-acquiring-nodes)

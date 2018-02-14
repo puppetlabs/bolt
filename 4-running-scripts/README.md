@@ -83,6 +83,6 @@ Ran on 1 node in 12.37 seconds
 
 # Next steps
 
-Now you know how to run existing scripts with `bolt` you can move on to:
+Now that you know how to run existing scripts with `bolt` you can move on to:
 
 1. [Writing Tasks](../5-writing-tasks)

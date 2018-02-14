@@ -134,6 +134,6 @@ required.
 
 # Next steps
 
-Now you know how to write tasks you can move on to:
+Now that you know how to write tasks you can move on to:
 
 1. [Downloading and running existing tasks](../6-downloading-and-running-existing-tasks)
