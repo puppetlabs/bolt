@@ -834,7 +834,7 @@ bar
             cli.execute(options)
           }.to raise_error(
             Bolt::CLIError,
-            "Could not find task with name \"abcdefg\". Use 'bolt task show' for a list of available tasks."
+            'Could not find a task named "abcdefg". For a list of available tasks, run "bolt task show"'
           )
         end
       end
@@ -938,7 +938,7 @@ bar
             cli.execute(options)
           }.to raise_error(
             Bolt::CLIError,
-            "Could not find plan with name \"abcdefg\". Use 'bolt plan show' for a list of available plans."
+            'Could not find a plan named "abcdefg". For a list of available plans, run "bolt plan show"'
           )
         end
       end
@@ -988,7 +988,7 @@ bar
           task_name.replace 'dne::task1'
 
           expect { cli.execute(options) }.to raise_error(
-            Bolt::CLIError, /Could not find task with name "dne::task1"/
+            Bolt::CLIError, /Could not find a task named "dne::task1"/
           )
           expect(JSON.parse(output.string)).to be
         end
@@ -997,7 +997,7 @@ bar
           task_name.replace 'sample::dne'
 
           expect { cli.execute(options) }.to raise_error(
-            Bolt::CLIError, /Could not find task with name "sample::dne"/
+            Bolt::CLIError, /Could not find a task named "sample::dne"/
           )
           expect(JSON.parse(output.string)).to be
         end
@@ -1241,7 +1241,7 @@ bar
           plan_name.replace 'sample::dne'
 
           expect { cli.execute(options) }.to raise_error(
-            Bolt::CLIError, /Could not find plan with name "sample::dne"/
+            Bolt::CLIError, /Could not find a plan named "sample::dne"/
           )
           expect(JSON.parse(output.string)).to be
         end
