@@ -1,7 +1,10 @@
 require 'spec_helper'
+require 'bolt_spec/task'
 require 'bolt/executor'
 
 describe "Bolt::Executor" do
+  include BoltSpec::Task
+
   let(:config) { Bolt::Config.new(concurrency: 1) }
   let(:executor) { Bolt::Executor.new(config) }
   let(:command) { "hostname" }
@@ -171,11 +174,11 @@ describe "Bolt::Executor" do
       node_results.each do |target, result|
         expect(ssh)
           .to receive(:run_task)
-          .with(target, task, 'both', task_arguments, {})
+          .with(target, task_type(task), task_arguments, {})
           .and_return(result)
       end
 
-      results = executor.run_task(targets, task, 'both', task_arguments, {})
+      results = executor.run_task(targets, mock_task(task), task_arguments, {})
       results.each do |result|
         expect(result).to be_instance_of(Bolt::Result)
         expect(result).to be_success
@@ -187,11 +190,11 @@ describe "Bolt::Executor" do
       node_results.each do |target, result|
         expect(ssh)
           .to receive(:run_task)
-          .with(target, task, 'both', task_arguments, '_run_as' => 'foo')
+          .with(target, task_type(task), task_arguments, '_run_as' => 'foo')
           .and_return(result)
       end
 
-      results = executor.run_task(targets, task, 'both', task_arguments, {})
+      results = executor.run_task(targets, mock_task(task), task_arguments, {})
       results.each do |result|
         expect(result).to be_instance_of(Bolt::Result)
       end
@@ -207,15 +210,15 @@ describe "Bolt::Executor" do
         executor.run_as = 'bar'
         expect(ssh)
           .to receive(:run_task)
-          .with(targets[0], task, 'both', task_arguments, {})
+          .with(targets[0], task_type(task), task_arguments, {})
           .and_return(node_results[targets[0]])
 
         expect(ssh)
           .to receive(:run_task)
-          .with(targets[1], task, 'both', task_arguments, '_run_as' => 'bar')
+          .with(targets[1], task_type(task), task_arguments, '_run_as' => 'bar')
           .and_return(node_results[targets[1]])
 
-        results = executor.run_task(targets, task, 'both', task_arguments, {})
+        results = executor.run_task(targets, mock_task(task), task_arguments, {})
         results.each do |result|
           expect(result).to be_instance_of(Bolt::Result)
         end
@@ -226,12 +229,12 @@ describe "Bolt::Executor" do
       node_results.each do |target, result|
         expect(ssh)
           .to receive(:run_task)
-          .with(target, task, 'both', task_arguments, {})
+          .with(target, task_type(task), task_arguments, {})
           .and_return(result)
       end
 
       results = []
-      executor.run_task(targets, task, 'both', task_arguments) do |result|
+      executor.run_task(targets, mock_task(task), task_arguments) do |result|
         results << result
       end
       node_results.each do |target, result|
@@ -244,11 +247,11 @@ describe "Bolt::Executor" do
       node_results.each_key do |target|
         expect(ssh)
           .to receive(:run_task)
-          .with(target, task, 'both', task_arguments, {})
+          .with(target, task_type(task), task_arguments, {})
           .and_raise(Bolt::Error, 'failed', 'my-exception')
       end
 
-      executor.run_task(targets, task, 'both', task_arguments) do |result|
+      executor.run_task(targets, mock_task(task), task_arguments) do |result|
         expect(result.error_hash['msg']).to eq('failed')
         expect(result.error_hash['kind']).to eq('my-exception')
       end
@@ -365,11 +368,11 @@ describe "Bolt::Executor" do
       node_results.each do |target, result|
         expect(ssh)
           .to receive(:run_task)
-          .with(target, task, 'both', task_arguments, {})
+          .with(target, task_type(task), task_arguments, {})
           .and_return(result)
       end
 
-      executor.run_task(targets, task, 'both', task_arguments)
+      executor.run_task(targets, mock_task(task), task_arguments)
 
       expect(@log_output.readline).to match(/INFO.*Starting task service::restart on .*/)
       expect(@log_output.readline).to match(/INFO.*Ran task 'service::restart' on 2 nodes with 0 failures/)

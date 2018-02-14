@@ -9,7 +9,7 @@ module Bolt
   module Transport
     class Orch < Base
       CONF_FILE = File.expand_path('~/.puppetlabs/client-tools/orchestrator.conf')
-      BOLT_MOCK_FILE = 'bolt/tasks/init'.freeze
+      BOLT_MOCK_TASK = Struct.new(:name, :executable).new('bolt', 'bolt/tasks/init').freeze
 
       def initialize(config)
         super
@@ -23,7 +23,7 @@ module Bolt
       end
 
       def build_request(targets, task, arguments)
-        { task: task_name_from_path(task),
+        { task: task.name,
           environment: targets.first.options[:orch_task_environment],
           noop: arguments['_noop'],
           params: arguments.reject { |k, _| k == '_noop' },
@@ -61,7 +61,7 @@ module Bolt
 
       def batch_command(targets, command, _options = {}, &callback)
         results = run_task_job(targets,
-                               BOLT_MOCK_FILE,
+                               BOLT_MOCK_TASK,
                                action: 'command',
                                command: command,
                                &callback)
@@ -81,7 +81,7 @@ module Bolt
           arguments: arguments
         }
         callback ||= proc {}
-        results = run_task_job(targets, BOLT_MOCK_FILE, params, &callback)
+        results = run_task_job(targets, BOLT_MOCK_TASK, params, &callback)
         results.map! { |result| unwrap_bolt_result(result.target, result) }
         results.each do |result|
           callback.call(type: :node_result, result: result)
@@ -99,7 +99,7 @@ module Bolt
           mode: mode
         }
         callback ||= proc {}
-        results = run_task_job(targets, BOLT_MOCK_FILE, params, &callback)
+        results = run_task_job(targets, BOLT_MOCK_TASK, params, &callback)
         results.map! do |result|
           if result.error_hash
             result
@@ -134,27 +134,11 @@ module Bolt
         end
       end
 
-      def batch_task(targets, task, _inputmethod, arguments, _options = {}, &callback)
+      def batch_task(targets, task, arguments, _options = {}, &callback)
         callback ||= proc {}
         results = run_task_job(targets, task, arguments, &callback)
         results.each do |result|
           callback.call(type: :node_result, result: result)
-        end
-      end
-
-      # This avoids a refactor to pass more task data around
-      def task_name_from_path(path)
-        path = File.absolute_path(path)
-        parts = path.split(File::Separator)
-        if parts.length < 3 || parts[-2] != 'tasks'
-          raise ArgumentError, "Task path was not inside a module."
-        end
-        mod = parts[-3]
-        name = File.basename(path).split('.')[0]
-        if name == 'init'
-          mod
-        else
-          "#{mod}::#{name}"
         end
       end
 

@@ -18,6 +18,10 @@ describe 'run_task' do
     end
   end
 
+  def mock_task(executable, input_method)
+    responds_with(:executable, executable) & responds_with(:input_method, input_method)
+  end
+
   context 'it calls bolt executor run_task' do
     let(:hostname) { 'a.b.com' }
     let(:hostname2) { 'x.y.com' }
@@ -33,7 +37,7 @@ describe 'run_task' do
     it 'when running a task without metadata the input method is "both"' do
       executable = File.join(tasks_root, 'echo.sh')
 
-      executor.expects(:run_task).with([target], executable, 'both', default_args, {}).returns(result_set)
+      executor.expects(:run_task).with([target], mock_task(executable, 'both'), default_args, {}).returns(result_set)
       inventory.expects(:get_targets).with(hostname).returns([target])
 
       is_expected.to run.with_params('Test::Echo', hostname, default_args).and_return(result_set)
@@ -42,7 +46,7 @@ describe 'run_task' do
     it 'when running a task with metadata - the input method is specified by the metadata' do
       executable = File.join(tasks_root, 'meta.sh')
 
-      executor.expects(:run_task).with([target], executable, 'environment', default_args, {})
+      executor.expects(:run_task).with([target], mock_task(executable, 'environment'), default_args, {})
               .returns(result_set)
       inventory.expects(:get_targets).with(hostname).returns([target])
 
@@ -52,7 +56,8 @@ describe 'run_task' do
     it 'when called with _run_as - _run_as is passed to the executor' do
       executable = File.join(tasks_root, 'meta.sh')
 
-      executor.expects(:run_task).with([target], executable, 'environment', default_args, '_run_as' => 'root')
+      executor.expects(:run_task)
+              .with([target], mock_task(executable, 'environment'), default_args, '_run_as' => 'root')
               .returns(result_set)
       inventory.expects(:get_targets).with(hostname).returns([target])
 
@@ -63,7 +68,7 @@ describe 'run_task' do
     it 'when called without without args hash (for a task where this is allowed)' do
       executable = File.join(tasks_root, 'yes.sh')
 
-      executor.expects(:run_task).with([target], executable, 'both', {}, {}).returns(result_set)
+      executor.expects(:run_task).with([target], mock_task(executable, 'both'), {}, {}).returns(result_set)
       inventory.expects(:get_targets).with(hostname).returns([target])
 
       is_expected.to run.with_params('test::yes', hostname).and_return(result_set)
@@ -82,7 +87,7 @@ describe 'run_task' do
       it 'nodes can be specified as repeated nested arrays and strings and combine into one list of nodes' do
         executable = File.join(tasks_root, 'meta.sh')
 
-        executor.expects(:run_task).with([target, target2], executable, 'environment', default_args, {})
+        executor.expects(:run_task).with([target, target2], mock_task(executable, 'environment'), default_args, {})
                 .returns(result_set)
         inventory.expects(:get_targets).with([hostname, [[hostname2]], []]).returns([target, target2])
 
@@ -93,7 +98,7 @@ describe 'run_task' do
       it 'nodes can be specified as repeated nested arrays and Targets and combine into one list of nodes' do
         executable = File.join(tasks_root, 'meta.sh')
 
-        executor.expects(:run_task).with([target, target2], executable, 'environment', default_args, {})
+        executor.expects(:run_task).with([target, target2], mock_task(executable, 'environment'), default_args, {})
                 .returns(result_set)
         inventory.expects(:get_targets).with([target, [[target2]], []]).returns([target, target2])
 
@@ -108,7 +113,7 @@ describe 'run_task' do
         it 'errors by default' do
           executable = File.join(tasks_root, 'meta.sh')
 
-          executor.expects(:run_task).with([target, target2], executable, 'environment', default_args, {})
+          executor.expects(:run_task).with([target, target2], mock_task(executable, 'environment'), default_args, {})
                   .returns(result_set)
           inventory.expects(:get_targets).with([hostname, hostname2]).returns([target, target2])
 
@@ -119,7 +124,7 @@ describe 'run_task' do
         it 'does not error with _catch_errors' do
           executable = File.join(tasks_root, 'meta.sh')
 
-          executor.expects(:run_task).with([target, target2], executable, 'environment', default_args, {})
+          executor.expects(:run_task).with([target, target2], mock_task(executable, 'environment'), default_args, {})
                   .returns(result_set)
           inventory.expects(:get_targets).with([hostname, hostname2]).returns([target, target2])
 
@@ -142,7 +147,7 @@ describe 'run_task' do
       it 'finds task named after the module' do
         executable = File.join(tasks_root, 'init.sh')
 
-        executor.expects(:run_task).with([target], executable, 'both', {}, {}).returns(result_set)
+        executor.expects(:run_task).with([target], mock_task(executable, 'both'), {}, {}).returns(result_set)
         inventory.expects(:get_targets).with(hostname).returns([target])
 
         is_expected.to run.with_params('test', hostname).and_return(result_set)

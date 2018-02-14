@@ -75,7 +75,8 @@ catch
         end
       end
 
-      def run_task(target, task, input_method, arguments, _options = {})
+      def run_task(target, task, arguments, _options = {})
+        input_method = task.input_method
         with_connection(target) do |conn|
           if STDIN_METHODS.include?(input_method)
             stdin = JSON.dump(arguments)
@@ -91,7 +92,7 @@ catch
             end
           end
 
-          conn.with_remote_file(task) do |remote_path|
+          conn.with_remote_file(task.executable) do |remote_path|
             output =
               if powershell_file?(remote_path) && stdin.nil?
                 # NOTE: cannot redirect STDIN to a .ps1 script inside of PowerShell
