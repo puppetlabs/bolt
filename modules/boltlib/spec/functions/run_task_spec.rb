@@ -1,4 +1,6 @@
 require 'spec_helper'
+require 'bolt/result'
+require 'bolt/result_set'
 require 'bolt/target'
 
 describe 'run_task' do
