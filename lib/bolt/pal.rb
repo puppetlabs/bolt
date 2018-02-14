@@ -135,8 +135,7 @@ module Bolt
       end
 
       if task.nil?
-        raise Bolt::CLIError,
-              "Could not find task with name #{task_name}. Use 'bolt task show' for a list of available tasks."
+        raise Bolt::CLIError, Bolt::Error.unknown_task(task_name)
       end
 
       task.task_hash
@@ -154,8 +153,7 @@ module Bolt
       end
 
       if plan.nil?
-        raise Bolt::CLIError,
-              "Could not find plan with name #{plan_name}. Use 'bolt plan show' for a list of available plans."
+        raise Bolt::CLIError, Bolt::Error.unknown_plan(plan_name)
       end
 
       elements = plan.params_type.elements

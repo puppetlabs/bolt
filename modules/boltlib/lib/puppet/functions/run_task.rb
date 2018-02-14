@@ -48,9 +48,7 @@ Puppet::Functions.create_function(:run_task) do
     # TODO: use the compiler injection once PUP-8237 lands
     task_signature = Puppet::Pal::ScriptCompiler.new(closure_scope.compiler).task_signature(task_name)
     if task_signature.nil?
-      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
-        Puppet::Pops::Issues::UNKNOWN_TASK, type_name: task_name
-      )
+      raise with_stack(:UNKNOWN_TASK, Bolt::Error.unknown_task(task_name))
     end
 
     executor = Puppet.lookup(:bolt_executor) { nil }
@@ -63,12 +61,12 @@ Puppet::Functions.create_function(:run_task) do
 
     use_args = task_args.reject { |k, _| k.start_with?('_') }
 
-    task_signature.runnable_with?(use_args) do |mismatch|
-      raise Puppet::ParseError, mismatch
-    end || (raise Puppet::ParseError, 'Task parameters did not match')
+    task_signature.runnable_with?(use_args) do |mismatch_message|
+      raise with_stack(:TYPE_MISMATCH, mismatch_message)
+    end || (raise with_stack(:TYPE_MISMATCH, 'Task parameters do not match'))
 
     unless Puppet::Pops::Types::TypeFactory.data.instance?(use_args)
-      raise Puppet::ParseError, 'Task parameters is not of type Data'
+      raise with_stack(:TYPE_NOT_DATA, 'Task parameters is not of type Data')
     end
 
     task = task_signature.task
@@ -77,7 +75,7 @@ Puppet::Functions.create_function(:run_task) do
       if task.supports_noop
         use_args['_noop'] = true
       else
-        raise Puppet::ParseError, 'Task does not support noop'
+        raise with_stack(:TASK_NO_NOOP, 'Task does not support noop')
       end
     end
 
@@ -90,5 +88,10 @@ Puppet::Functions.create_function(:run_task) do
       options = task_args.select { |k, _| k == '_run_as' }
       executor.run_task(targets, task.executable, task.input_method, use_args, options, &block)
     end
+  end
+
+  def with_stack(kind, msg)
+    issue = Puppet::Pops::Issues.issue(kind) { msg }
+    Puppet::ParseErrorWithIssue.from_issue_and_stack(issue)
   end
 end
