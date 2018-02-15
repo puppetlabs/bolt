@@ -208,14 +208,6 @@ describe Bolt::Transport::Orch, orchestrator: true do
     end
   end
 
-  describe :run_task do
-    it "executes a task on a host" do
-      node_result = orch.run_task(target, taskpath, 'stdin', params)
-      expect(node_result.value).to eq(result)
-      expect(node_result).to be_success
-    end
-  end
-
   context 'using the bolt task wrapper' do
     before(:each) do
       bolt_task = File.expand_path(File.join(base_path, 'tasks', 'init.rb'))
@@ -251,6 +243,8 @@ describe Bolt::Transport::Orch, orchestrator: true do
         results = orch.batch_command(targets, command)
         expect(results[0]).to be_success
         expect(results[1]).to be_success
+        expect(results[0]['stdout']).to eq("hi!\n")
+        expect(results[0]['stderr']).to eq("bye\n")
       end
 
       it 'emits events for each target' do
@@ -264,55 +258,28 @@ describe Bolt::Transport::Orch, orchestrator: true do
           expect(events).to include(type: :node_result, result: result)
         end
       end
-    end
 
-    describe :run_command do
-      let(:options) { {} }
-      let(:params) {
-        {
-          action: 'command',
-          command: command,
-          options: options
-        }
-      }
-
-      context 'when it succeeds' do
-        let(:command) { 'echo hi!; echo bye >&2' }
-
-        it 'returns a success' do
-          expect(orch.run_command(target, command)).to be_success
-        end
-
-        it 'captures stdout' do
-          expect(orch.run_command(target, command)['stdout']).to eq("hi!\n")
-        end
-
-        it 'captures stderr' do
-          expect(orch.run_command(target, command)['stderr']).to eq("bye\n")
-        end
-
-        it 'ignores _run_as' do
-          expect(orch.run_command(target, command, '_run_as' => 'root')).to be_success
-        end
+      it 'ignores _run_as' do
+        results = orch.batch_command(targets, command, '_run_as' => 'root')
+        expect(results[0]).to be_success
+        expect(results[1]).to be_success
       end
 
       context 'when it fails' do
         let(:command) { 'echo hi!; echo bye >&2; exit 23' }
 
-        it 'returns a failure' do
-          expect(orch.run_command(target, command)).not_to be_success
-        end
+        it 'returns a failure with stdout, stderr and exit_code' do
+          results = orch.batch_command(targets, command)
 
-        it 'captures exit_code' do
-          expect(orch.run_command(target, command)['exit_code']).to eq(23)
-        end
+          expect(results[0]).not_to be_success
+          expect(results[0]['exit_code']).to eq(23)
+          expect(results[0]['stdout']).to eq("hi!\n")
+          expect(results[0]).not_to be_success
 
-        it 'captures stdout' do
-          expect(orch.run_command(target, command)['stdout']).to eq("hi!\n")
-        end
-
-        it 'captures stderr' do
-          expect(orch.run_command(target, command)['stderr']).to eq("bye\n")
+          expect(results[1]['exit_code']).to eq(23)
+          expect(results[1]['stdout']).to eq("hi!\n")
+          expect(results[1]['stderr']).to eq("bye\n")
+          expect(results[1]['stderr']).to eq("bye\n")
         end
       end
     end
@@ -361,22 +328,6 @@ describe Bolt::Transport::Orch, orchestrator: true do
           end
         end
       end
-
-      describe :upload do
-        it 'should write the file' do
-          expect(orch.upload(target, source_path, dest_path).value).to eq(
-            '_output' => "Uploaded '#{source_path}' to '#{hostname}:#{dest_path}'"
-          )
-
-          source_mode = File.stat(source_path).mode
-          dest_mode = File.stat(dest_path).mode
-          expect(dest_mode).to eq(source_mode)
-
-          source_content = File.read(source_path)
-          dest_content = File.read(dest_path)
-          expect(dest_content).to eq(source_content)
-        end
-      end
     end
 
     describe :batch_script do
@@ -409,30 +360,14 @@ describe Bolt::Transport::Orch, orchestrator: true do
           expect(events).to include(type: :node_result, result: result)
         end
       end
-    end
-
-    describe :run_script do
-      let(:args) { ['with spaces', 'nospaces', 'echo $HOME; cat /etc/passwd'] }
-      let(:params) {
-        content = Base64.encode64(File.read(script_path))
-
-        {
-          action: 'script',
-          content: content,
-          arguments: args
-        }
-      }
 
       context "when the script succeeds" do
         let(:script_path) { File.join(base_path, 'spec', 'fixtures', 'scripts', 'success.sh') }
 
-        it 'returns a success' do
-          expect(orch.run_script(target, script_path, args)).to be_success
-        end
-
         it 'captures stdout' do
+          results = orch.batch_script(targets, script_path, args)
           expect(
-            orch.run_script(target, script_path, args)['stdout']
+            results[0]['stdout']
           ).to eq(<<-OUT)
 arg: with spaces
 arg: nospaces
@@ -442,31 +377,33 @@ standard out
         end
 
         it 'captures stderr' do
-          expect(orch.run_script(target, script_path, args)['stderr']).to eq("standard error\n")
+          results = orch.batch_script(targets, script_path, args)
+          expect(results[0]['stderr']).to eq("standard error\n")
+          expect(results[1]['stderr']).to eq("standard error\n")
         end
 
         it 'ignores _run_as' do
-          expect(orch.run_script(target, script_path, args, '_run_as' => 'root')).to be_success
+          results = orch.batch_script(targets, script_path, args, '_run_as' => 'root')
+          expect(results[0]).to be_success
+          expect(results[1]).to be_success
         end
       end
 
       context "when the script fails" do
         let(:script_path) { File.join(base_path, 'spec', 'fixtures', 'scripts', 'failure.sh') }
 
-        it 'returns a failure' do
-          expect(orch.run_script(target, script_path, args)).not_to be_success
-        end
+        it 'returns a failure with stdout, stderr and exit_code' do
+          results = orch.batch_script(targets, script_path, args)
 
-        it 'captures exit_code' do
-          expect(orch.run_script(target, script_path, args)['exit_code']).to eq(34)
-        end
+          expect(results[0]).not_to be_success
+          expect(results[0]['exit_code']).to eq(34)
+          expect(results[0]['stdout']).to eq("standard out\n")
+          expect(results[0]['stderr']).to eq("standard error\n")
 
-        it 'captures stdout' do
-          expect(orch.run_script(target, script_path, args)['stdout']).to eq("standard out\n")
-        end
-
-        it 'captures stderr' do
-          expect(orch.run_script(target, script_path, args)['stderr']).to eq("standard error\n")
+          expect(results[1]).not_to be_success
+          expect(results[1]['exit_code']).to eq(34)
+          expect(results[1]['stdout']).to eq("standard out\n")
+          expect(results[1]['stderr']).to eq("standard error\n")
         end
       end
     end

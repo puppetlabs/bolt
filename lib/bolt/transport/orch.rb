@@ -22,42 +22,6 @@ module Bolt
         OrchestratorClient.new(@client_opts, true)
       end
 
-      def upload(target, source, destination, _options = {})
-        content = File.open(source, &:read)
-        content = Base64.encode64(content)
-        mode = File.stat(source).mode
-        params = {
-          action: 'upload',
-          path: destination,
-          content: content,
-          mode: mode
-        }
-        result = run_task(target, BOLT_MOCK_FILE, 'stdin', params)
-        result = Bolt::Result.for_upload(target, source, destination) unless result.error_hash
-        result
-      end
-
-      def run_command(target, command, _options = {})
-        result = run_task(target,
-                          BOLT_MOCK_FILE,
-                          'stdin',
-                          action: 'command',
-                          command: command,
-                          options: {})
-        unwrap_bolt_result(target, result)
-      end
-
-      def run_script(target, script, arguments, _options = {})
-        content = File.open(script, &:read)
-        content = Base64.encode64(content)
-        params = {
-          action: 'script',
-          content: content,
-          arguments: arguments
-        }
-        unwrap_bolt_result(target, run_task(target, BOLT_MOCK_FILE, 'stdin', params))
-      end
-
       def build_request(targets, task, arguments)
         { task: task_name_from_path(task),
           environment: targets.first.options[:orch_task_environment],
@@ -176,14 +140,6 @@ module Bolt
         results.each do |result|
           callback.call(type: :node_result, result: result)
         end
-      end
-
-      def run_task(target, task, _inputmethod, arguments, _options = {})
-        body = build_request([target], task, arguments)
-
-        results = create_client.run_task(body)
-
-        process_run_results([target], results).first
       end
 
       # This avoids a refactor to pass more task data around
