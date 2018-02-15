@@ -4,7 +4,7 @@ require 'bolt/node/output'
 
 module Bolt
   module Transport
-    class SSH
+    class SSH < Base
       class Connection
         class RemoteTempdir
           def initialize(node, path)

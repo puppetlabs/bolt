@@ -1,11 +1,8 @@
-require 'bolt/transport/winrm/connection'
-require 'logging'
+require 'bolt/transport/base'
 
 module Bolt
   module Transport
-    class WinRM
-      attr_reader :logger
-
+    class WinRM < Base
       STDIN_METHODS       = %w[both stdin].freeze
       ENVIRONMENT_METHODS = %w[both environment].freeze
 
@@ -14,8 +11,7 @@ module Bolt
       ].freeze
 
       def initialize(_config)
-        @logger = Logging.logger[self]
-
+        super
         require 'winrm'
         require 'winrm-fs'
       end
@@ -28,7 +24,7 @@ module Bolt
         begin
           conn.disconnect if conn
         rescue StandardError => ex
-          @logger.info("Failed to close connection to #{target.uri} : #{ex.message}")
+          logger.info("Failed to close connection to #{target.uri} : #{ex.message}")
         end
       end
 
@@ -164,3 +160,5 @@ try { & "#{remote_path}" @taskArgs } catch { exit 1 }
     end
   end
 end
+
+require 'bolt/transport/winrm/connection'
