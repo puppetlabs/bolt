@@ -13,7 +13,7 @@ describe Bolt::Transport::Orch, orchestrator: true do
   end
 
   let(:targets) do
-    [Bolt::Target.new('node1').update_conf(Bolt::Config.new.transport_conf),
+    [Bolt::Target.new('pcp://node1').update_conf(Bolt::Config.new.transport_conf),
      Bolt::Target.new('node2').update_conf(Bolt::Config.new.transport_conf)]
   end
 
