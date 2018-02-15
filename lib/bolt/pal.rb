@@ -112,7 +112,7 @@ module Bolt
     def with_puppet_settings
       Dir.mktmpdir('bolt') do |dir|
         cli = []
-        Puppet::Settings::REQUIRED_APP_SETTINGS.each do |setting|
+        Puppet::Settings::REQUIRED_APP_SETTINGS.reject { |k| k == :confdir }.each do |setting|
           cli << "--#{setting}" << dir
         end
         yield cli
