@@ -6,14 +6,10 @@
 # * The returned value contains information about the result per target.
 #
 Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFunction) do
-  local_types do
-    type 'TargetOrTargets = Variant[String[1], Target, Array[TargetOrTargets]]'
-  end
-
   dispatch :run_script do
     scope_param
     param 'String[1]', :script
-    param 'TargetOrTargets', :targets
+    param 'Boltlib::TargetSpec', :targets
     optional_param 'Hash[String[1], Any]', :options
     return_type 'ResultSet'
   end

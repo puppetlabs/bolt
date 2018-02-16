@@ -8,13 +8,9 @@
 require 'bolt/error'
 
 Puppet::Functions.create_function(:run_command) do
-  local_types do
-    type 'TargetOrTargets = Variant[String[1], Target, Array[TargetOrTargets]]'
-  end
-
   dispatch :run_command do
     param 'String[1]', :command
-    param 'TargetOrTargets', :targets
+    param 'Boltlib::TargetSpec', :targets
     optional_param 'Hash[String[1], Any]', :options
     return_type 'ResultSet'
   end

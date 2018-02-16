@@ -8,13 +8,9 @@
 require 'bolt/error'
 
 Puppet::Functions.create_function(:run_task) do
-  local_types do
-    type 'TargetOrTargets = Variant[String[1], Target, Array[TargetOrTargets]]'
-  end
-
   dispatch :run_task do
     param 'String[1]', :task_name
-    param 'TargetOrTargets', :targets
+    param 'Boltlib::TargetSpec', :targets
     optional_param 'Hash[String[1], Any]', :task_args
     return_type 'ResultSet'
   end
@@ -22,7 +18,7 @@ Puppet::Functions.create_function(:run_task) do
   # this is used from 'bolt task run'
   dispatch :run_task_raw do
     param 'String[1]', :task_name
-    param 'TargetOrTargets', :targets
+    param 'Boltlib::TargetSpec', :targets
     optional_param 'Hash[String[1], Any]', :task_args
     # return_type 'ResultSet'
     block_param

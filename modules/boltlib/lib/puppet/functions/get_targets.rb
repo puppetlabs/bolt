@@ -16,12 +16,8 @@
 require 'bolt/error'
 
 Puppet::Functions.create_function(:get_targets) do
-  local_types do
-    type 'TargetOrTargets = Variant[String[1], Target, Array[TargetOrTargets]]'
-  end
-
   dispatch :get_targets do
-    param 'TargetOrTargets', :names
+    param 'Boltlib::TargetSpec', :names
     return_type 'Array[Target]'
   end
 
