@@ -2,12 +2,14 @@ require 'spec_helper'
 require 'net/ssh'
 require 'bolt_spec/errors'
 require 'bolt_spec/files'
+require 'bolt_spec/task'
 require 'bolt/transport/ssh'
 require 'bolt/config'
 
 describe Bolt::Transport::SSH do
   include BoltSpec::Errors
   include BoltSpec::Files
+  include BoltSpec::Task
 
   def mk_config(conf)
     Bolt::Config.new(transports: { ssh: conf })
@@ -240,8 +242,8 @@ SHELLWORDS
     it "can run a task", ssh: true do
       contents = "#!/bin/sh\necho -n ${PT_message_one} ${PT_message_two}"
       arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-      with_tempfile_containing('tasks test', contents) do |file|
-        expect(ssh.run_task(target, file.path, 'environment', arguments).message)
+      with_task_containing('tasks_test', contents, 'environment') do |task|
+        expect(ssh.run_task(target, task, arguments).message)
           .to eq('Hello from task Goodbye')
       end
     end
@@ -250,16 +252,16 @@ SHELLWORDS
       contents = "#!/bin/sh\necho -n ${PT_message_one} ${PT_message_two}"
       arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
       expect(ssh).not_to receive(:make_wrapper_stringio)
-      with_tempfile_containing('tasks test', contents) do |file|
-        ssh.run_task(target, file.path, 'environment', arguments)
+      with_task_containing('tasks_test', contents, 'environment') do |task|
+        ssh.run_task(target, task, arguments)
       end
     end
 
     it "can run a task passing input on stdin", ssh: true do
       contents = "#!/bin/sh\ngrep 'message_one'"
       arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-      with_tempfile_containing('tasks test stdin', contents) do |file|
-        expect(ssh.run_task(target, file.path, 'stdin', arguments).value)
+      with_task_containing('tasks_test_stdin', contents, 'stdin') do |task|
+        expect(ssh.run_task(target, task, arguments).value)
           .to eq("message_one" => "Hello from task", "message_two" => "Goodbye")
       end
     end
@@ -271,8 +273,8 @@ echo -n ${PT_message_one} ${PT_message_two}
 grep 'message_one'
 SHELL
       arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-      with_tempfile_containing('tasks-test-both', contents) do |file|
-        expect(ssh.run_task(target, file.path, 'both', arguments).message).to eq(<<SHELL)
+      with_task_containing('tasks-test-both', contents, 'both') do |task|
+        expect(ssh.run_task(target, task, arguments).message).to eq(<<SHELL)
 Hello from task Goodbye{\"message_one\":\
 \"Hello from task\",\"message_two\":\"Goodbye\"}
 SHELL
@@ -307,9 +309,9 @@ SHELL
       it 'returns an error result for run_task', ssh: true do
         contents = "#!/bin/sh\necho -n ${PT_message_one} ${PT_message_two}"
         arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-        with_tempfile_containing('tasks test', contents) do |file|
+        with_task_containing('tasks_test', contents, 'environment') do |task|
           expect {
-            ssh.run_task(target, file.path, 'environment', arguments)
+            ssh.run_task(target, task, arguments)
           }.to raise_error(Bolt::Node::FileError, 'no write')
         end
       end
@@ -334,9 +336,9 @@ SHELL
       it "can run a task", ssh: true do
         contents = "#!/bin/sh\necho -n ${PT_message_one} ${PT_message_two}"
         arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-        with_tempfile_containing('tasks test', contents) do |file|
+        with_task_containing('tasks_test', contents, 'environment') do |task|
           expect {
-            ssh.run_task(target, file.path, 'environment', arguments)
+            ssh.run_task(target, task, arguments)
           }.to raise_error(Bolt::Node::FileError, 'no tmpdir')
         end
       end
@@ -381,8 +383,8 @@ SHELL
     it "can run a task passing input on stdin", ssh: true do
       contents = "#!/bin/sh\ngrep 'message_one'"
       arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-      with_tempfile_containing('tasks test stdin', contents) do |file|
-        expect(ssh.run_task(target, file.path, 'stdin', arguments).value)
+      with_task_containing('tasks_test_stdin', contents, 'stdin') do |task|
+        expect(ssh.run_task(target, task, arguments).value)
           .to eq("message_one" => "Hello from task", "message_two" => "Goodbye")
       end
     end
@@ -428,8 +430,8 @@ SHELL
 
       it "can override run_as for task via an option", ssh: true do
         contents = "#!/bin/sh\nwhoami"
-        with_tempfile_containing('tasks test', contents) do |file|
-          expect(ssh.run_task(target, file.path, 'environment', {}, '_run_as' => 'root').message).to eq("root\n")
+        with_task_containing('tasks_test', contents, 'environment') do |task|
+          expect(ssh.run_task(target, task, {}, '_run_as' => 'root').message).to eq("root\n")
         end
       end
 

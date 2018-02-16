@@ -1,11 +1,13 @@
 require 'spec_helper'
 require 'bolt_spec/files'
+require 'bolt_spec/task'
 require 'bolt/transport/orch'
 require 'bolt/cli'
 require 'open3'
 
 describe Bolt::Transport::Orch, orchestrator: true do
   include BoltSpec::Files
+  include BoltSpec::Task
 
   let(:hostname) { "localhost" }
   let(:target) do
@@ -29,7 +31,7 @@ describe Bolt::Transport::Orch, orchestrator: true do
     [{ 'name' => 'localhost', 'state' => result_state, 'result' => result }]
   end
 
-  let(:taskpath) { "foo/tasks/init" }
+  let(:mtask) { mock_task('foo', 'foo/tasks/init', 'input') }
   let(:params) { { param: 'val' } }
 
   let(:result_state) { 'finished' }
@@ -37,66 +39,42 @@ describe Bolt::Transport::Orch, orchestrator: true do
 
   let(:base_path) { File.expand_path(File.join(File.dirname(__FILE__), '..', '..', '..')) }
 
-  describe :task_name_from_path do
-    it 'finds a namespaced task' do
-      expect(orch.task_name_from_path('foo/tasks/bar.sh')).to eq('foo::bar')
-    end
-
-    it 'finds the init task with extension' do
-      expect(orch.task_name_from_path('foo/tasks/init.sh')).to eq('foo')
-    end
-
-    it 'finds the init task without extension' do
-      expect(orch.task_name_from_path('foo/tasks/init')).to eq('foo')
-    end
-
-    it 'errors when not in a module' do
-      expect { orch.task_name_from_path('foo/nottasks/init.sh') }
-        .to raise_error(ArgumentError)
-    end
-  end
-
   describe :build_request do
-    it "gets the task name from the path" do
-      body = orch.build_request(targets, 'foo/tasks/bar', {})
-      expect(body[:task]).to eq('foo::bar')
-    end
-
-    it "gets the task name if it's init" do
-      body = orch.build_request(targets, 'foo/tasks/init', {})
+    it "gets the task name from the task" do
+      body = orch.build_request(targets, mtask, {})
       expect(body[:task]).to eq('foo')
     end
 
     it "sets environment" do
       targets.first.options[:orch_task_environment] = 'development'
-      body = orch.build_request(targets, taskpath, {})
+      body = orch.build_request(targets, mtask, {})
       expect(body[:environment]).to eq('development')
     end
 
     it "omits noop if unspecified" do
-      body = orch.build_request(targets, taskpath, {})
+      body = orch.build_request(targets, mtask, {})
       expect(body[:noop]).to be_nil
     end
 
     it "sets noop to true if specified noop" do
-      body = orch.build_request(targets, taskpath, '_noop' => true)
+      body = orch.build_request(targets, mtask, '_noop' => true)
       expect(body[:noop]).to eq(true)
     end
 
     it "sets the parameters" do
       params = { 'foo' => 1, 'bar' => 'baz' }
-      body = orch.build_request(targets, taskpath, params)
+      body = orch.build_request(targets, mtask, params)
       expect(body[:params]).to eq(params)
     end
 
     it "doesn't pass noop as a parameter" do
       params = { 'foo' => 1, 'bar' => 'baz' }
-      body = orch.build_request(targets, taskpath, params.merge('_noop' => true))
+      body = orch.build_request(targets, mtask, params.merge('_noop' => true))
       expect(body[:params]).to eq(params)
     end
 
     it "sets the scope to the list of hosts" do
-      body = orch.build_request(targets, taskpath, params.merge('_noop' => true))
+      body = orch.build_request(targets, mtask, params.merge('_noop' => true))
       expect(body[:scope]).to eq(nodes: %w[node1 node2])
     end
   end
@@ -186,7 +164,7 @@ describe Bolt::Transport::Orch, orchestrator: true do
     it "executes a task on a host" do
       allow(mock_client).to receive(:run_task).and_return(results)
 
-      node_results = orch.batch_task(targets, taskpath, 'stdin', params)
+      node_results = orch.batch_task(targets, mtask, params)
       expect(node_results[0].value).to eq('_output' => 'hello')
       expect(node_results[1].value).to eq('_output' => 'goodbye')
       expect(node_results[0]).to be_success
@@ -197,7 +175,7 @@ describe Bolt::Transport::Orch, orchestrator: true do
       allow(mock_client).to receive(:run_task).and_return(results)
 
       events = []
-      results = orch.batch_task(targets, taskpath, 'stdin', params) do |event|
+      results = orch.batch_task(targets, mtask, params) do |event|
         events << event
       end
 

@@ -1,6 +1,7 @@
 require 'spec_helper'
 require 'bolt_spec/errors'
 require 'bolt_spec/files'
+require 'bolt_spec/task'
 require 'bolt/transport/winrm'
 require 'httpclient'
 require 'winrm'
@@ -8,6 +9,7 @@ require 'winrm'
 describe Bolt::Transport::WinRM do
   include BoltSpec::Errors
   include BoltSpec::Files
+  include BoltSpec::Task
 
   def mk_config(conf)
     Bolt::Config.new(transport: 'winrm', transports: { winrm: conf })
@@ -339,8 +341,8 @@ SHELLWORDS
       contents = 'Write-Host "$env:PT_message_one ${env:PT_message two}"'
       arguments = { :message_one => 'task is running',
                     :"message two" => 'task has run' }
-      with_tempfile_containing('task-test-winrm', contents, '.ps1') do |file|
-        expect(winrm.run_task(target, file.path, 'environment', arguments).message)
+      with_task_containing('task-test-winrm', contents, 'environment', '.ps1') do |task|
+        expect(winrm.run_task(target, task, arguments).message)
           .to eq("task is running task has run\r\n")
       end
     end
@@ -349,8 +351,8 @@ SHELLWORDS
       contents = 'Write-Host "$env:PT_message_one ${env:PT_message two}"'
       arguments = { :message_one => 'task is running',
                     :"message two" => 'task has run' }
-      with_tempfile_containing('task-test-winrm', contents, '.ps1') do |file|
-        expect(winrm.run_task(target, file.path, 'environment', arguments, '_run_as' => 'root').message)
+      with_task_containing('task-test-winrm', contents, 'environment', '.ps1') do |task|
+        expect(winrm.run_task(target, task, arguments, '_run_as' => 'root').message)
           .to eq("task is running task has run\r\n")
       end
     end
@@ -370,8 +372,8 @@ Height: $Height ($(if ($Height -ne $null) { $Height.GetType().Name } else { 'nul
       arguments = { Age: 30,
                     Height: 5.75,
                     Name: 'John Doe' }
-      with_tempfile_containing('task-params-test-winrm', contents, '.ps1') do |file|
-        expect(winrm.run_task(target, file.path, 'powershell', arguments).message)
+      with_task_containing('task-params-test-winrm', contents, 'powershell', '.ps1') do |task|
+        expect(winrm.run_task(target, task, arguments).message)
           .to match(/\AName: John Doe \(String\).*^Age: 30 \(Int\d+\).*^Height: 5.75 \((Double|Decimal)\).*\Z/m)
       end
     end
@@ -389,8 +391,8 @@ Height: $Height ($(if ($Height -ne $null) { $Height.GetType().Name } else { 'nul
           "bar: $bar ($(if ($bar -ne $null) { $bar.GetType().Name } else { 'null' }))"
       PS
       arguments = { bar: 30 } # note that the script doesn't recognize the 'bar' parameter
-      with_tempfile_containing('task-params-test-winrm', contents, '.ps1') do |file|
-        expect(winrm.run_task(target, file.path, 'powershell', arguments).error_hash)
+      with_task_containing('task-params-test-winrm', contents, 'powershell', '.ps1') do |task|
+        expect(winrm.run_task(target, task, arguments).error_hash)
           .to_not be_nil
       end
     end
@@ -409,8 +411,8 @@ bar: $bar ($(if ($bar -ne $null) { $bar.GetType().Name } else { 'null' }))
 "@
       PS
       arguments = { bar: 30 } # note that the script doesn't recognize the 'bar' parameter
-      with_tempfile_containing('task-params-test-winrm', contents, '.ps1') do |file|
-        expect(winrm.run_task(target, file.path, 'environment', arguments).message)
+      with_task_containing('task-params-test-winrm', contents, 'environment', '.ps1') do |task|
+        expect(winrm.run_task(target, task, arguments).message)
           .to match(/\Afoo:  \(String\).*^bar: 30 \(String\).*\Z/m) # note that $foo is an empty string and not null
       end
     end
@@ -454,8 +456,8 @@ $line = [Console]::In.ReadLine()
 Write-Host $line
 PS
       arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-      with_tempfile_containing('tasks-test-stdin-winrm', contents, '.ps1') do |file|
-        expect(winrm.run_task(target, file.path, 'stdin', arguments).value)
+      with_task_containing('tasks-test-stdin-winrm', contents, 'stdin', '.ps1') do |task|
+        expect(winrm.run_task(target, task, arguments).value)
           .to eq("message_one" => "Hello from task", "message_two" => "Goodbye")
       end
     end
@@ -467,9 +469,9 @@ $line = [Console]::In.ReadLine()
 Write-Host $line
 PS
       arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-      with_tempfile_containing('tasks-test-both-winrm', contents, '.ps1') do |file|
+      with_task_containing('tasks-test-both-winrm', contents, 'both', '.ps1') do |task|
         expect(
-          winrm.run_task(target, file.path, 'both', arguments).message
+          winrm.run_task(target, task, arguments).message
         ).to eq([
           "Hello from task Goodbye\r\n",
           "{\"message_one\":\"Hello from task\",\"message_two\":\"Goodbye\"}\r\n"
@@ -479,8 +481,8 @@ PS
 
     describe "when determining result" do
       it "fails to run a .pp task without Puppet agent installed", winrm: true do
-        with_tempfile_containing('task-pp-winrm', "notice('hi')", '.pp') do |file|
-          result = winrm.run_task(target, file.path, 'stdin', {})
+        with_task_containing('task-pp-winrm', "notice('hi')", 'stdin', '.pp') do |task|
+          result = winrm.run_task(target, task, {})
           expect(result).to_not be_success
         end
       end
@@ -613,9 +615,9 @@ PS
                  '-ExecutionPolicy', 'Bypass', '-File', /^".*"$/],
                 anything)
           .and_return(output)
-        with_tempfile_containing('task-ps1-winrm', contents, '.ps1') do |file|
+        with_task_containing('task-ps1-winrm', contents, 'stdin', '.ps1') do |task|
           expect(
-            winrm.run_task(target, file.path, 'stdin', {}).message
+            winrm.run_task(target, task, {}).message
           ).to eq("42")
         end
       end
@@ -640,9 +642,9 @@ PS
                 ['-S', /^".*"$/],
                 anything)
           .and_return(output)
-        with_tempfile_containing('task-rb-winrm', "puts 42", '.rb') do |file|
+        with_task_containing('task-rb-winrm', "puts 42", 'stdin', '.rb') do |task|
           expect(
-            winrm.run_task(target, file.path, 'stdin', {}).message
+            winrm.run_task(target, task, {}).message
           ).to eq("42")
         end
       end
@@ -677,9 +679,9 @@ OUTPUT
                 ['apply', /^".*"$/],
                 anything)
           .and_return(output)
-        with_tempfile_containing('task-pp-winrm', "notice('hi')", '.pp') do |file|
+        with_task_containing('task-pp-winrm', "notice('hi')", 'stdin', '.pp') do |task|
           expect(
-            winrm.run_task(target, file.path, 'stdin', {}).message
+            winrm.run_task(target, task, {}).message
           ).to eq("42")
         end
       end
@@ -705,9 +707,9 @@ OUTPUT
                 ['/c', /^".*"$/],
                 anything)
           .and_return(output)
-        with_tempfile_containing('task-py-winrm', 'print(42)', '.py') do |file|
+        with_task_containing('task-py-winrm', 'print(42)', 'stdin', '.py') do |task|
           expect {
-            winrm.run_task(target, file.path, 'stdin', {}).value
+            winrm.run_task(target, task, {}).value
           }.to raise_error(Bolt::Node::FileError,
                            "File extension .py is not enabled, to run it please add to 'winrm: extensions'")
         end
@@ -736,17 +738,17 @@ OUTPUT
                   ['/c', /^".*"$/],
                   anything)
             .and_return(output)
-          with_tempfile_containing('task-py-winrm', 'print(42)', '.py') do |file|
+          with_task_containing('task-py-winrm', 'print(42)', 'stdin', '.py') do |task|
             expect(
-              winrm.run_task(target, file.path, 'stdin', {}).message
+              winrm.run_task(target, task, {}).message
             ).to eq('42')
           end
         end
       end
 
       it "returns a friendly stderr msg with puppet.bat missing", winrm: true do
-        with_tempfile_containing('task-pp-winrm', "notice('hi')", '.pp') do |file|
-          result = winrm.run_task(target, file.path, 'stdin', {})
+        with_task_containing('task-pp-winrm', "notice('hi')", 'stdin', '.pp') do |task|
+          result = winrm.run_task(target, task, {})
           stderr = result.error_hash['msg']
           expect(stderr).to match(/^Could not find executable 'puppet\.bat'/)
           expect(stderr).to_not match(/CommandNotFoundException/)

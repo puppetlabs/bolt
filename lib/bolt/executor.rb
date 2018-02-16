@@ -123,17 +123,18 @@ module Bolt
       results
     end
 
-    def run_task(targets, task, input_method, arguments, options = {}, &callback)
-      @logger.info("Starting task #{task} on #{targets.map(&:uri)}")
-      @logger.debug("Arguments: #{arguments} Input method: #{input_method}")
+    def run_task(targets, task, arguments, options = {}, &callback)
+      task_name = task.name
+      @logger.info("Starting task #{task_name} on #{targets.map(&:uri)}")
+      @logger.debug("Arguments: #{arguments} Input method: #{task.input_method}")
       notify = proc { |event| @notifier.notify(callback, event) if callback }
       options = { '_run_as' => run_as }.merge(options) if run_as
 
       results = batch_execute(targets) do |transport, batch|
-        transport.batch_task(batch, task, input_method, arguments, options, &notify)
+        transport.batch_task(batch, task, arguments, options, &notify)
       end
 
-      @logger.info(summary('task', task, results))
+      @logger.info(summary('task', task_name, results))
       @notifier.shutdown
       results
     end

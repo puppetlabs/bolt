@@ -1,10 +1,12 @@
 require 'spec_helper'
 require 'signal_helper'
 require 'bolt_spec/files'
+require 'bolt_spec/task'
 require 'bolt/cli'
 
 describe "Bolt::CLI" do
   include BoltSpec::Files
+  include BoltSpec::Task
   let(:target) { Bolt::Target.new('foo') }
 
   before(:each) do
@@ -956,6 +958,8 @@ bar
           }
         }
         let(:input_method) { 'both' }
+        let(:task_path) { 'modules/sample/tasks/echo.sh$' }
+        let(:task_t) { task_type(task_name, Regexp.new(task_path), input_method) }
 
         before :each do
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
@@ -964,10 +968,8 @@ bar
         it "runs a task given a name" do
           expect(executor)
             .to receive(:run_task)
-            .with(
-              targets,
-              %r{modules/sample/tasks/echo.sh$}, input_method, task_params, {}
-            ).and_return(Bolt::ResultSet.new([]))
+            .with(targets, task_t, task_params, {})
+            .and_return(Bolt::ResultSet.new([]))
 
           expect(cli.execute(options)).to eq(0)
           expect(JSON.parse(output.string)).to be
@@ -976,10 +978,8 @@ bar
         it "returns 2 if any node fails" do
           expect(executor)
             .to receive(:run_task)
-            .with(
-              targets,
-              %r{modules/sample/tasks/echo.sh$}, input_method, task_params, {}
-            ).and_return(fail_set)
+            .with(targets, task_t, task_params, {})
+            .and_return(fail_set)
 
           expect(cli.execute(options)).to eq(2)
         end
@@ -1007,23 +1007,20 @@ bar
 
           expect(executor)
             .to receive(:run_task)
-            .with(
-              targets,
-              %r{modules/sample/tasks/echo.sh$}, input_method, {}, {}
-            ).and_raise("Could not connect to target")
+            .with(targets, task_t, {}, {})
+            .and_raise("Could not connect to target")
 
           expect { cli.execute(options) }.to raise_error(/Could not connect to target/)
         end
 
         it "runs an init task given a module name" do
           task_name.replace 'sample'
+          task_path.replace 'modules/sample/tasks/init.sh$'
 
           expect(executor)
             .to receive(:run_task)
-            .with(
-              targets,
-              %r{modules/sample/tasks/init.sh$}, input_method, task_params, {}
-            ).and_return(Bolt::ResultSet.new([]))
+            .with(targets, task_t, task_params, {})
+            .and_return(Bolt::ResultSet.new([]))
 
           cli.execute(options)
           expect(JSON.parse(output.string)).to be
@@ -1031,12 +1028,12 @@ bar
 
         it "runs a task passing input on stdin" do
           task_name.replace 'sample::stdin'
-          input_method = 'stdin'
+          task_path.replace 'modules/sample/tasks/stdin.sh$'
+          input_method.replace 'stdin'
 
           expect(executor)
             .to receive(:run_task)
-            .with(targets,
-                  %r{modules/sample/tasks/stdin.sh$}, input_method, task_params, {})
+            .with(targets, task_t, task_params, {})
             .and_return(Bolt::ResultSet.new([]))
 
           cli.execute(options)
@@ -1045,12 +1042,12 @@ bar
 
         it "runs a powershell task passing input on stdin" do
           task_name.replace 'sample::winstdin'
-          input_method = 'stdin'
+          task_path.replace 'modules/sample/tasks/winstdin.ps1$'
+          input_method.replace 'stdin'
 
           expect(executor)
             .to receive(:run_task)
-            .with(targets,
-                  %r{modules/sample/tasks/winstdin.ps1$}, input_method, task_params, {})
+            .with(targets, task_t, task_params, {})
             .and_return(Bolt::ResultSet.new([]))
 
           cli.execute(options)
@@ -1060,7 +1057,7 @@ bar
         it "traps SIGINT", :signals_self do
           expect(executor)
             .to receive(:run_task)
-            .with(targets, %r{modules/sample/tasks/echo.sh$}, input_method, task_params, {}) do
+            .with(targets, task_t, task_params, {}) do
               Process.kill :INT, Process.pid
               sync_thread.join(1) # give ruby some time to handle the signal
               Bolt::ResultSet.new([])
@@ -1081,6 +1078,7 @@ bar
           let(:task_name) { 'sample::params' }
           let(:task_params) { {} }
           let(:input_method) { 'stdin' }
+          let(:task_path) { %r{modules/sample/tasks/params.sh$} }
 
           it "errors when unknown parameters are specified" do
             task_params.merge!(
@@ -1150,8 +1148,7 @@ bar
           it "runs the task when the specified parameters are successfully validated" do
             expect(executor)
               .to receive(:run_task)
-              .with(targets,
-                    %r{modules/sample/tasks/params.sh$}, input_method, task_params, {})
+              .with(targets, task_t, task_params, {})
               .and_return(Bolt::ResultSet.new([]))
             task_params.merge!(
               'mandatory_string'  => ' ',
@@ -1178,7 +1175,7 @@ bar
             task_options: plan_params
           }
         }
-        let(:input_method) { 'both' }
+        let(:task_t) { task_type('sample::echo', %r{modules/sample/tasks/echo.sh$}, 'both') }
 
         before :each do
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
@@ -1187,10 +1184,8 @@ bar
         it "formats results of a passing task" do
           expect(executor)
             .to receive(:run_task)
-            .with(
-              targets,
-              %r{modules/sample/tasks/echo.sh$}, input_method, { 'message' => 'hi there' }, {}
-            ).and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0)]))
+            .with(targets, task_t, { 'message' => 'hi there' }, {})
+            .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0)]))
 
           cli.execute(options)
           expect(JSON.parse(output.string)).to eq(
@@ -1201,10 +1196,8 @@ bar
         it "raises errors from the executor" do
           expect(executor)
             .to receive(:run_task)
-            .with(
-              targets,
-              %r{modules/sample/tasks/echo.sh$}, input_method, { 'message' => 'hi there' }, {}
-            ).and_raise("Could not connect to target")
+            .with(targets, task_t, { 'message' => 'hi there' }, {})
+            .and_raise("Could not connect to target")
 
           expect { cli.execute(options) }.to raise_error(/Could not connect to target/)
         end
@@ -1212,10 +1205,8 @@ bar
         it "formats results of a failing task" do
           expect(executor)
             .to receive(:run_task)
-            .with(
-              targets,
-              %r{modules/sample/tasks/echo.sh$}, input_method, { 'message' => 'hi there' }, {}
-            ).and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'no', '', 1)]))
+            .with(targets, task_t, { 'message' => 'hi there' }, {})
+            .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'no', '', 1)]))
 
           cli.execute(options)
           expect(JSON.parse(output.string)).to eq(
@@ -1249,7 +1240,7 @@ bar
         it "traps SIGINT", :signals_self do
           expect(executor)
             .to receive(:run_task)
-            .with(targets, %r{modules/sample/tasks/echo.sh$}, input_method, { 'message' => 'hi there' }, {}) do
+            .with(targets, task_t, { 'message' => 'hi there' }, {}) do
               Process.kill :INT, Process.pid
               sync_thread.join(1) # give ruby some time to handle the signal
               Bolt::ResultSet.new([])
@@ -1359,7 +1350,7 @@ bar
             noop: true
           }
         }
-        let(:input_method) { 'both' }
+        let(:task_t) { task_type(task_name, %r{modules/sample/tasks/noop.sh$}, 'both') }
 
         before :each do
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
@@ -1368,8 +1359,7 @@ bar
         it "runs a task that supports noop" do
           expect(executor)
             .to receive(:run_task)
-            .with(targets,
-                  %r{modules/sample/tasks/noop.sh$}, input_method, task_params.merge('_noop' => true), {})
+            .with(targets, task_t, task_params.merge('_noop' => true), {})
             .and_return(Bolt::ResultSet.new([]))
 
           cli.execute(options)

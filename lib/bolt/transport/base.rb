@@ -75,12 +75,12 @@ module Bolt
       # The default implementation only supports batches of size 1 and will fail otherwise.
       #
       # Transports may override this method to implement their own batch processing.
-      def batch_task(targets, task, input_method, arguments, options = {}, &callback)
+      def batch_task(targets, task, arguments, options = {}, &callback)
         assert_batch_size_one("batch_task()", targets)
         target = targets.first
         with_events(target, callback) do
           @logger.debug { "Running task run '#{task}' on #{target.uri}" }
-          run_task(target, task, input_method, arguments, filter_options(target, options))
+          run_task(target, task, arguments, filter_options(target, options))
         end
       end
 

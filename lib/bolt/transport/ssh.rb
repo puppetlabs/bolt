@@ -77,7 +77,8 @@ module Bolt
         end
       end
 
-      def run_task(target, task, input_method, arguments, options = {})
+      def run_task(target, task, arguments, options = {})
+        input_method = task.input_method
         with_connection(target) do |conn|
           conn.running_as(options['_run_as']) do
             export_args = {}
@@ -98,7 +99,7 @@ module Bolt
             execute_options = {}
 
             conn.with_remote_tempdir do |dir|
-              remote_task_path = conn.write_remote_executable(dir, task)
+              remote_task_path = conn.write_remote_executable(dir, task.executable)
               if conn.run_as && stdin
                 wrapper = make_wrapper_stringio(remote_task_path, stdin)
                 remote_wrapper_path = conn.write_remote_executable(dir, wrapper, 'wrapper.sh')
