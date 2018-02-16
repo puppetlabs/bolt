@@ -47,6 +47,14 @@ module Bolt
       end
     end
 
+    # Create a top-level alias for TargetSpec so that users don't have to
+    # namespace it with Boltlib, which is just an implementation detail. This
+    # allows TargetSpec to feel like a built-in type in bolt, rather than
+    # something has been, no pun intended, "bolted on".
+    def add_target_spec(compiler)
+      compiler.evaluate_string('type TargetSpec = Boltlib::TargetSpec')
+    end
+
     # Runs a block in a PAL script compiler configured for Bolt.  Catches
     # exceptions thrown by the block and re-raises them ensuring they are
     # Bolt::Errors since the script compiler block will squash all exceptions.
@@ -54,6 +62,7 @@ module Bolt
       Puppet.initialize_settings(opts)
       r = Puppet::Pal.in_tmp_environment('bolt', modulepath: [BOLTLIB_PATH] + @config[:modulepath], facts: {}) do |pal|
         pal.with_script_compiler do |compiler|
+          add_target_spec(compiler)
           begin
             yield compiler
           rescue Puppet::PreformattedError => err

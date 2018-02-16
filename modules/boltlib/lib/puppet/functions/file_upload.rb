@@ -8,15 +8,11 @@
 require 'bolt/error'
 
 Puppet::Functions.create_function(:file_upload, Puppet::Functions::InternalFunction) do
-  local_types do
-    type 'TargetOrTargets = Variant[String[1], Target, Array[TargetOrTargets]]'
-  end
-
   dispatch :file_upload do
     scope_param
     param 'String[1]', :source
     param 'String[1]', :destination
-    param 'TargetOrTargets', :targets
+    param 'Boltlib::TargetSpec', :targets
     optional_param 'Hash[String[1], Any]', :options
     return_type 'ResultSet'
   end
