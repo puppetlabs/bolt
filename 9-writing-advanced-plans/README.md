@@ -68,7 +68,26 @@ bolt plan run exercise9::yesorno nodes=$NODE --modulepath ./modules
 When run you should see output like the following. Running it multiple times should result in different output, as the return value of the task is random the command should run on a different subset of nodes each time.
 
 ```bash
-[{"node":"node1","status":"success","result":{"stdout":" 22:41:43 up 18 min,  0 users,  load average: 0.00, 0.01, 0.05\n","stderr":"","exit_code":0}},{"node":"node3","status":"success","result":{"stdout":" 22:41:43 up 17 min,  0 users,  load average: 0.14, 0.05, 0.06\n","stderr":"","exit_code":0}}]
+[
+  {
+    "node": "node1",
+    "status": "success",
+    "result": {
+      "stdout": " 23:41:49 up 8 min,  0 users,  load average: 0.00, 0.03, 0.04\n",
+      "stderr": "",
+      "exit_code": 0
+    }
+  },
+  {
+    "node": "node2",
+    "status": "success",
+    "result": {
+      "stdout": " 23:41:49 up 7 min,  0 users,  load average: 0.32, 0.08, 0.05\n",
+      "stderr": "",
+      "exit_code": 0
+    }
+  }
+]
 ```
 
 Here we've shown how to capture the output from a task and then reuse it as part of the plan. More real-world uses for this might include:
