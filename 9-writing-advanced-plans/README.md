@@ -44,10 +44,9 @@ print(json.dumps({'answer': bool(random.getrandbits(1))}))
 Then we can write out the plan. Save the following as `modules/exercise9/plans/yesorno.pp`:
 
 ```puppet
-plan exercise9::yesorno(String $nodes) {
-  $all = $nodes.split(",")
-  $results = run_task('exercise9::yesorno', $all)
-  $subset = $results.filter |$result| { $result[answer] == true }.map |$result| { $result.target.name }
+plan exercise9::yesorno (TargetSpec $nodes) {
+  $results = run_task('exercise9::yesorno', $nodes)
+  $subset = $results.filter |$result| { $result[answer] == true }.map |$result| { $result.target }
   run_command("uptime", $subset)
 }
 ```
@@ -82,9 +81,8 @@ Here we've shown how to capture the output from a task and then reuse it as part
 By default, any task or command that fails will cause the plan to abort immediately. To see this behavior in action, save the following as `modules/exercise9/plans/error.pp`:
 
 ```puppet
-plan exercise9::error(String $nodes) {
-  $all = $nodes.split(",")
-  $results = run_command('false', $all)
+plan exercise9::error (TargetSpec $nodes) {
+  $results = run_command('false', $nodes)
   if $results.ok {
     notice("The command succeeded")
   } else {
@@ -115,9 +113,8 @@ For our error-handling code to execute, we need to prevent the plan from stoppin
 Save this new plan as `modules/exercise9/plans/catch_error.pp`:
 
 ```puppet
-plan exercise9::catch_error(String $nodes) {
-  $all = $nodes.split(",")
-  $results = run_command('false', $all, _catch_errors => true)
+plan exercise9::catch_error (TargetSpec $nodes) {
+  $results = run_command('false', $nodes, _catch_errors => true)
   if $results.ok {
     notice("The command succeeded")
   } else {

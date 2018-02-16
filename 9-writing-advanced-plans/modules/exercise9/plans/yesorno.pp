@@ -1,6 +1,5 @@
-plan exercise9::yesorno(String $nodes) {
-  $all = $nodes.split(",")
-  $results = run_task('exercise9::yesorno', $all)
-  $subset = $results.filter |$result| { $result[answer] == true }.map |$result| { $result.target.name }
+plan exercise9::yesorno (TargetSpec $nodes) {
+  $results = run_task('exercise9::yesorno', $nodes)
+  $subset = $results.filter |$result| { $result[answer] == true }.map |$result| { $result.target }
   run_command("uptime", $subset)
 }
