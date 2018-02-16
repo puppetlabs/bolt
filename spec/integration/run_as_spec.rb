@@ -22,6 +22,9 @@ describe "when running a plan using run_as", ssh: true do
 
   context 'when using CLI options' do
     let(:config_flags) { %W[--no-host-key-check --format json --sudo-password #{password} --modulepath #{modulepath}] }
+    let(:non_root_flags) {
+      %W[-u bolt -p bolt --no-host-key-check --format json --sudo-password bolt --modulepath #{modulepath}]
+    }
 
     it 'runs sudo when specified' do
       params = { target: uri }.to_json
@@ -39,6 +42,26 @@ describe "when running a plan using run_as", ssh: true do
       params = { target: uri }.to_json
       output = run_cli(['plan', 'run', 'test::except', "--params", params] + config_flags)
       expect(JSON.parse(output)).to eq(%W[root\n root\n root\n root\n root\n root\n])
+    end
+
+    it 'runs a plan as root passing in non-root user' do
+      non_root = 'test'
+      params = { target: uri, user: non_root }
+      output = run_plan('test::run_as_user', params)
+      parsed = JSON.parse(output)[0]
+      expect(parsed['result']['stdout']).to eq("#{non_root}\n")
+      expect(parsed['status']).to eq('success')
+      expect(parsed['result']['exit_code']).to eq(0)
+    end
+
+    it 'runs a plan as a non-root user passing in a non-root user' do
+      non_root = 'test'
+      params = { target: uri, user: non_root }.to_json
+      output = run_cli(['plan', 'run', 'test::run_as_user', "--params", params] + non_root_flags)
+      parsed = JSON.parse(output)[0]
+      expect(parsed['result']['stdout']).to eq("#{non_root}\n")
+      expect(parsed['status']).to eq('success')
+      expect(parsed['result']['exit_code']).to eq(0)
     end
   end
 end
