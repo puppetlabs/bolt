@@ -15,27 +15,42 @@ describe 'Target DataType' do
 
   let(:pal) { Bolt::PAL.new(config) }
 
+  let(:target_code) { "$target = Target('pcp://user1:pass1@example.com:33')\n" }
+
+  def target(attr)
+    code = target_code + attr
+    peval(code, pal)
+  end
+
   it 'should expose uri' do
-    code = <<PUPPET
-$target = Target('pcp://example.com')
-$target.uri
-PUPPET
-    expect(peval(code, pal)).to eq('pcp://example.com')
+    expect(target('$target.uri')).to eq('pcp://user1:pass1@example.com:33')
   end
 
   it 'should expose name' do
-    code = <<PUPPET
-$target = Target('pcp://example.com')
-$target.name
-PUPPET
-    expect(peval(code, pal)).to eq('pcp://example.com')
+    expect(target('$target.name')).to eq('pcp://user1:pass1@example.com:33')
   end
 
-  it 'should expose target' do
-    code = <<PUPPET
-$target = Target('pcp://example.com')
-$target.options
-PUPPET
-    expect(peval(code, pal)).to eq({})
+  it 'should expose host' do
+    expect(target('$target.host')).to eq('example.com')
+  end
+
+  it 'should expose protocol' do
+    expect(target('$target.protocol')).to eq('pcp')
+  end
+
+  it 'should expose port' do
+    expect(target('$target.port')).to eq(33)
+  end
+
+  it 'should expose user' do
+    expect(target('$target.user')).to eq('user1')
+  end
+
+  it 'should expose password' do
+    expect(target('$target.password')).to eq('pass1')
+  end
+
+  it 'should expose options' do
+    expect(target('$target.options')).to eq({})
   end
 end
