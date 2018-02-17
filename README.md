@@ -20,7 +20,7 @@ Bolt is a Ruby command-line tool for executing commands, scripts, and tasks on r
 
 > For complete usage and installation details, see the [Puppet Bolt docs](https://puppet.com/docs/bolt). 
 >
-> For contribution information, including alternate installation methods and running from source, see [CONTRIBUTING.md](./CONTRIBUTING.md).
+> To contribute information, including alternate installation methods and running from source code, see [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## Installation
 
@@ -52,7 +52,7 @@ To install and use Bolt on Windows systems, you must also install Ruby. You can 
 To configure Bolt, create a `~/.puppetlabs/bolt.yml` file. Global options live at the top level of the file while transport-specific options are configured for each transport. If a config option is set in the config file and passed with the corresponding command line flag, the flag will take precedence.
 
 
-example file:
+example config file:
 ```yaml
 ---
 modulepath: "~/.puppetlabs/bolt-code/site:~/.puppetlabs/bolt-code/modules"
@@ -101,11 +101,11 @@ ssh:
 
 ### `pcp` transport configuration options
 
-`service-url`: The URL of the Orchestrator service, usually of the form `https://puppet:8143`. If not specified, will attempt to read local PE Client Tools configuration for the same setting from `orchestrator.conf`.
+`service-url`: The URL of the Orchestrator service, usually of the form `https://puppet:8143`. If not specified, Bolt will attempt to read local PE Client Tools configuration for the same setting from `orchestrator.conf`.
 
-`cacert`: The CA certificate used to authenticate the `service-url`. If not specified, will attempt to read local PE Client Tools configuration for the same setting from `orchestrator.conf`.
+`cacert`: The CA certificate used to authenticate the `service-url`. If not specified, Bolt will attempt to read local PE Client Tools configuration for the same setting from `orchestrator.conf`.
 
-`token-file`: The token certificate used to authorize requests to the `service-url`. If not specified, will attempt to read local PE Client Tools configuration for the same setting from `orchestrator.conf`. (default: `~/.puppetlabs/token`)
+`token-file`: The token certificate used to authorize requests to the `service-url`. If not specified, Bolt will attempt to read local PE Client Tools configuration for the same setting from `orchestrator.conf`. (default: `~/.puppetlabs/token`)
 
 `task-environment`: The environment from which Orchestrator will serve task implementations. (default: `production`)
 
