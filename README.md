@@ -111,7 +111,9 @@ ssh:
 
 ### Node-specific configuration with the inventory file
 
-The inventory file allows you to group nodes and set up node-specific configuration defaults. To set up default for ssh and winrm connections, create an inventory file at `~/.puppetlabs/bolt/inventory.yaml` with the following content:
+The inventory file allows you to group nodes and set up node-specific configuration defaults. 
+
+To set up defaults for ssh and winrm connections, create an inventory file at `~/.puppetlabs/bolt/inventory.yaml` with the following content:
 
 ```yaml
 groups:
