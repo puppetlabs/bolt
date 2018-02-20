@@ -50,7 +50,7 @@ To use `rubocop`, perform the bundle install with no exclusions
 
 ## Testing
 
-Some tests require a Windows VMs or Linux containers. For Linux tests (recommended, if you're not sure) `docker-compose up -d` to bring these up with the `docker-compose.yaml` included with the `bolt` gem. For windows tests, execute `vagrant up` to bring these up with the provided Vagrantfile. Any tests that require this are tagged with `:winrm` or `:ssh` in rspec.
+Some tests require a Windows VMs or Linux containers. For Linux tests (recommended, if you're not sure) `docker-compose up -d --build` to bring these up with the `docker-compose.yaml` included with the `bolt` gem. For windows tests, execute `vagrant up` to bring these up with the provided Vagrantfile. Any tests that require this are tagged with `:winrm` or `:ssh` in rspec.
 
 To run all tests, run:
 

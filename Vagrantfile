@@ -1,7 +1,3 @@
-linux_provision = <<SCRIPT
-echo "vagrant ALL=(ALL) ALL" > /etc/sudoers.d/vagrant
-SCRIPT
-
 windows_enable_winrm_ssl = <<SCRIPT
 ($cert = Import-PfxCertificate -FilePath C:\\cert.pfx -CertStoreLocation cert:\\LocalMachine\\My -Password (ConvertTo-SecureString -String vagrant -Force -AsPlainText)) | Format-List
 New-WSManInstance -ResourceURI winrm/config/Listener -SelectorSet @{Address='*';Transport='HTTPS'} -ValueSet @{Hostname='localhost';CertificateThumbprint=$cert.Thumbprint} | Format-List
@@ -21,11 +17,5 @@ Vagrant.configure("2") do |config|
     windows.vm.provider "virtualbox" do |vb|
       vb.gui = false
     end
-  end
-
-  config.vm.define :linux do |linux|
-    linux.vm.box = "bento/centos-6.7"
-    linux.vm.network :forwarded_port, guest: 22, host: 20022, host_ip: "127.0.0.1", id: "ssh"
-    linux.vm.provision "shell", inline: linux_provision
   end
 end
