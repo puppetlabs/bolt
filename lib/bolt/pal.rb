@@ -3,7 +3,7 @@ require 'bolt/error'
 
 module Bolt
   class PAL
-    BOLTLIB_PATH = File.join(__FILE__, '../../../modules')
+    BOLTLIB_PATH = File.join(__FILE__, '../../../bolt-modules')
 
     def initialize(config)
       # Nothing works without initialized this global state. Reinitializing
