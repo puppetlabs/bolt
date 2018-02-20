@@ -347,6 +347,15 @@ SHELLWORDS
       end
     end
 
+    it "can run a task with arguments containing quotes", winrm: true do
+      contents = 'Write-Host "$env:PT_message"'
+      arguments = { message: "it's a hello world" }
+      with_task_containing('task-test-winrm', contents, 'environment', '.ps1') do |task|
+        expect(winrm.run_task(target, task, arguments).message)
+          .to eq("it's a hello world\r\n")
+      end
+    end
+
     it "ignores _run_as", winrm: true do
       contents = 'Write-Host "$env:PT_message_one ${env:PT_message two}"'
       arguments = { :message_one => 'task is running',

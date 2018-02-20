@@ -84,7 +84,7 @@ catch
 
           if ENVIRONMENT_METHODS.include?(input_method)
             arguments.each do |(arg, val)|
-              cmd = "[Environment]::SetEnvironmentVariable('PT_#{arg}', '#{val}')"
+              cmd = "[Environment]::SetEnvironmentVariable('PT_#{arg}', @'\n#{val}\n'@)"
               result = conn.execute(cmd)
               if result.exit_code != 0
                 raise EnvironmentVarError(var, value)
