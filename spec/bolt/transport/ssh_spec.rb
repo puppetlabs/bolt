@@ -175,6 +175,10 @@ BASH
       expect(ssh.run_command(target, "ssh -V").value['stderr']).to match(/OpenSSH/)
     end
 
+    it "can execute a command containing quotes", ssh: true do
+      expect(ssh.run_command(target, "echo 'hello \" world'").value).to eq(result_value("hello \" world\n"))
+    end
+
     it "can upload a file to a host", ssh: true do
       contents = "kljhdfg"
       with_tempfile_containing('upload-test', contents) do |file|
@@ -278,6 +282,18 @@ SHELL
 Hello from task Goodbye{\"message_one\":\
 \"Hello from task\",\"message_two\":\"Goodbye\"}
 SHELL
+      end
+    end
+
+    it "can run a task with params containing quotes", ssh: true do
+      contents = <<SHELL
+#!/bin/sh
+echo -n ${PT_message}
+SHELL
+
+      arguments = { message: "foo ' bar ' baz" }
+      with_task_containing('tasks_test_quotes', contents, 'both') do |task|
+        expect(ssh.run_task(target, task, arguments).message).to eq "foo ' bar ' baz"
       end
     end
 
