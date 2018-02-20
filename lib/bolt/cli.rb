@@ -100,7 +100,6 @@ HELP
                  'plan'    => %w[show run],
                  'file'    => %w[upload] }.freeze
     TRANSPORTS = %w[ssh winrm pcp].freeze
-    BOLTLIB_PATH = File.join(__FILE__, '../../../modules')
 
     attr_reader :parser, :config
     attr_accessor :options
