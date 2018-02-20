@@ -58,7 +58,7 @@ module Bolt
       @uri_obj.hostname
     end
 
-    # name is currently just uri but should be be used instead to identify the
+    # name is currently just uri but should be used instead to identify the
     # Target ouside the transport or uri options.
     def name
       uri

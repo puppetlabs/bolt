@@ -36,7 +36,9 @@ describe Bolt::Inventory::Group do
     end
 
     it 'should return empty data' do
-      expect(group.node_data('node1')).to eq('config' => {}, 'groups' => [])
+      expect(group.node_data('node1')).to eq('config' => {},
+                                             'vars' => {},
+                                             'groups' => [])
     end
 
     it 'should find three nodes' do

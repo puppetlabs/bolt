@@ -8,8 +8,8 @@ module Bolt
       def initialize(data)
         @logger = Logging.logger[self]
         @name = data['name']
-
         @nodes = {}
+
         if data['nodes']
           data['nodes'].each do |n|
             n = { 'name' => n } if n.is_a? String
@@ -21,6 +21,7 @@ module Bolt
           end
         end
 
+        @vars = data['vars'] || {}
         @config = data['config'] || {}
         @groups = if data['groups']
                     data['groups'].map { |g| Group.new(g) }
@@ -76,7 +77,7 @@ module Bolt
       end
 
       # The data functions below expect and return nil or a hash of the schema
-      # { 'config' => Hash , groups => Array }
+      # { 'config' => Hash , 'vars' => Hash, groups => Array }
       # As we add more options beyond config this schema will grow
       def data_for(node_name)
         data_merge(group_collect(node_name), node_collect(node_name))
@@ -85,6 +86,7 @@ module Bolt
       def node_data(node_name)
         if (data = @nodes[node_name])
           { 'config' => data['config'] || {},
+            'vars' => data['vars'] || {},
             # groups come from group_data
             'groups' => [] }
         end
@@ -92,11 +94,13 @@ module Bolt
 
       def group_data
         { 'config' => @config,
+          'vars'   => @vars,
           'groups' => [@name] }
       end
 
       def empty_data
         { 'config' => {},
+          'vars'   => {},
           'groups' => [] }
       end
 
@@ -107,6 +111,10 @@ module Bolt
 
         {
           'config' => Bolt::Util.deep_merge(data1['config'], data2['config']),
+          # Shallow merge instead of deep merge so that vars with a hash value
+          # are assigned a new hash, rather than merging the existing value
+          # with the value meant to replace it
+          'vars'   => data2['vars'].merge(data1['vars']),
           'groups' => data2['groups'] + data1['groups']
         }
       end

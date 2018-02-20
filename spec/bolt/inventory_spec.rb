@@ -295,9 +295,6 @@ describe Bolt::Inventory do
 
       it 'should split a comma-separated list of target URI and group name' do
         matched_nodes = %w[node4 node5 node6 node7 ssh://node8]
-        matched_nodes.each do |node|
-          expect_any_instance_of(Bolt::Inventory).to receive(:config_for).with(node)
-        end
         targets = inventory.get_targets('group1,ssh://node8')
         expect(targets).to eq(targets(matched_nodes))
       end
