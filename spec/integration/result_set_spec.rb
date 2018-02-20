@@ -9,7 +9,7 @@ describe "when running a plan that manipulates an execution result", ssh: true d
   include BoltSpec::Integration
 
   let(:modulepath) { File.join(__dir__, '../fixtures/modules') }
-  let(:uri) { conn_uri('ssh', true) }
+  let(:uri) { conn_uri('ssh', include_password: true) }
   let(:config_flags) { %W[--no-host-key-check --format json --modulepath #{modulepath}] }
 
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }

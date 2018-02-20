@@ -36,6 +36,18 @@ describe "when runnning over the ssh transport", ssh: true do
       expect(result['_error']['msg']).to eq('The command failed with exit code 127')
     end
 
+    context 'wrong port' do
+      let(:uri) { conn_uri('ssh', override_port: 62223) }
+
+      it 'reports errors when node is unreachable' do
+        result = run_failed_node(%W[command run #{whoami}] + config_flags)
+        expect(result['_error']['kind']).to eq('puppetlabs.tasks/connect-error')
+        expect(result['_error']['msg']).to match(
+          %r{Failed to connect to ssh:\/\/bolt@localhost:62223: Connection refused}
+        )
+      end
+    end
+
     it 'runs a task', :reset_puppet_settings do
       result = run_one_node(%W[task run #{stdin_task} message=somemessage] + config_flags)
       expect(result['message'].strip).to eq("somemessage")

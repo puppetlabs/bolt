@@ -47,7 +47,10 @@ module Bolt
         callback.call(type: :node_result, result: result) if callback
         result
       rescue StandardError => ex
-        Bolt::Result.from_exception(target, ex)
+        result = Bolt::Result.from_exception(target, ex)
+        @logger.debug("Failure on #{target.uri}: #{JSON.dump(result.value)}")
+        callback.call(type: :node_result, result: result) if callback
+        result
       end
 
       def filter_options(target, options)
