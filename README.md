@@ -16,9 +16,11 @@ Bolt is a Ruby command-line tool for executing commands, scripts, and tasks on r
 * Linux, OSX, Windows
 * Ruby 2.0+
 
-> For complete usage and installation details, see the [Puppet Bolt docs](https://puppet.com/docs/bolt). For contribution information, including alternate installation methods and running from source, see [CONTRIBUTING.md](./CONTRIBUTING.md).
-
 > Note that details of some exceptions generated within plans will be lost when using Ruby 2.0.
+
+> For complete usage and installation details, see the [Puppet Bolt docs](https://puppet.com/docs/bolt). 
+>
+> To contribute information, including alternate installation methods and running from source code, see [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## Installation
 
@@ -43,14 +45,14 @@ To install and use Bolt on Windows systems, you must also install Ruby. You can 
 
 1. Install Ruby.
 2. Refresh your environment by running `refreshenv`
-3. Install Bolt by running gem install bolt
+3. Install Bolt by running `gem install bolt`
 
 ## Configuring Bolt
 
-To configure Bolt create a `~/.puppetlabs/bolt.yml` file. Global options live at the top level of the file while transport specific options are configured for each transport. If a config options is set in the config file and passed with the corresponding command line flag the flag will take precedence.
+To configure Bolt, create a `~/.puppetlabs/bolt.yml` file. Global options live at the top level of the file while transport-specific options are configured for each transport. If a config option is set in the config file and passed with the corresponding command line flag, the flag will take precedence.
 
 
-example file:
+example config file:
 ```yaml
 ---
 modulepath: "~/.puppetlabs/bolt-code/site:~/.puppetlabs/bolt-code/modules"
@@ -99,17 +101,19 @@ ssh:
 
 ### `pcp` transport configuration options
 
-`service-url`: The URL of the Orchestrator service, usually of the form `https://puppet:8143`. If not specified, will attempt to read local PE Client Tools configuration for the same setting from `orchestrator.conf`.
+`service-url`: The URL of the Orchestrator service, usually of the form `https://puppet:8143`. If not specified, Bolt will attempt to read local PE Client Tools configuration for the same setting from `orchestrator.conf`.
 
-`cacert`: The CA certificate used to authenticate the `service-url`. If not specified, will attempt to read local PE Client Tools configuration for the same setting from `orchestrator.conf`.
+`cacert`: The CA certificate used to authenticate the `service-url`. If not specified, Bolt will attempt to read local PE Client Tools configuration for the same setting from `orchestrator.conf`.
 
-`token-file`: The token certificate used to authorize requests to the `service-url`. If not specified, will attempt to read local PE Client Tools configuration for the same setting from `orchestrator.conf`. (default: `~/.puppetlabs/token`)
+`token-file`: The token certificate used to authorize requests to the `service-url`. If not specified, Bolt will attempt to read local PE Client Tools configuration for the same setting from `orchestrator.conf`. (default: `~/.puppetlabs/token`)
 
 `task-environment`: The environment from which Orchestrator will serve task implementations. (default: `production`)
 
-### Node specific configruation with the inventory file.
+### Node-specific configuration with the inventory file
 
-The inventory file allows you to group nodes and set up node specific configuration defaults. To set up default for ssh and winrm connections create and inventoryfile at `~/.puppetlabs/bolt/inventory.yaml` with the following content.
+The inventory file allows you to group nodes and set up node-specific configuration defaults. 
+
+To set up defaults for ssh and winrm connections, create an inventory file at `~/.puppetlabs/bolt/inventory.yaml` with the following content:
 
 ```yaml
 groups:
@@ -136,7 +140,7 @@ You can then leave the transport option off of the url when targeting those node
 $ bolt task run package name=puppet action=status --nodes sshnode1.example.com,winnode1.example.com
 ```
 
-The global transport option and any transport specific config option can be set in the inventory file. You can also set `user` and `password` for specific transports.
+The global transport option and any transport-specific config option can be set in the inventory file. You can also set `user` and `password` for specific transports.
 
 When an inventory is present, node selection can also be done by specifying group names:
 
@@ -150,7 +154,7 @@ or using wildcard matching against node names enumerated in the inventory:
 $ bolt command run hostname --nodes 'sshnode*.example.com'
 ```
 
-Note that - in place of wildcard matching - shell-specific expansions (such as `sshnode{1,2}.example.com`) can also be useful ways to specify a pattern of nodes to run.
+Note that &mdash; in place of wildcard matching &mdash; shell-specific expansions (such as `sshnode{1,2}.example.com`) can also be useful ways to specify a pattern of nodes to run.
 
 
 ## Usage examples
@@ -237,7 +241,6 @@ Note that - in place of wildcard matching - shell-specific expansions (such as `
 ### Run the `sql` task from the `mysql` module
 
     $ bolt task run mysql::sql database=mydatabase sql="SHOW TABLES" --nodes neptune --modulepath ~/modules
-
 
 ### Run the `deploy` plan from the `webserver` module
 
