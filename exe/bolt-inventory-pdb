@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+
+require 'bolt_ext/puppetdb_inventory'
+
+exitcode = Bolt::PuppetDBInventory::CLI.new(ARGV).run
+exit exitcode
