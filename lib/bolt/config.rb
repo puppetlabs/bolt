@@ -8,6 +8,7 @@ module Bolt
     :format,
     :inventoryfile,
     :log_level,
+    :log,
     :modulepath,
     :transport,
     :transports
@@ -46,6 +47,10 @@ module Bolt
       @logger = Logging.logger[self]
       DEFAULTS.merge(kwargs).each { |k, v| self[k] = v }
 
+      # add an entry for the default console logger
+      self[:log] ||= {}
+      self[:log]['console'] ||= {}
+
       self[:transports] ||= {}
       TRANSPORTS.each do |transport|
         unless self[:transports][transport]
@@ -70,7 +75,29 @@ module Bolt
       [File.join(root_path, 'bolt.yaml'), File.join(root_path, 'bolt.yml')]
     end
 
+    def normalize_log(target)
+      return target if target == 'console'
+      target = target[5..-1] if target.start_with?('file:')
+      'file:' << File.expand_path(target)
+    end
+
     def update_from_file(data)
+      if data['log'].is_a?(Hash)
+        data['log'].each_pair do |k, v|
+          log = (self[:log][normalize_log(k)] ||= {})
+
+          next unless v.is_a?(Hash)
+
+          if v.key?('level')
+            log[:level] = v['level'].to_s
+          end
+
+          if v.key?('append')
+            log[:append] = v['append']
+          end
+        end
+      end
+
       if data['modulepath']
         self[:modulepath] = data['modulepath'].split(File::PATH_SEPARATOR)
       end
@@ -84,7 +111,7 @@ module Bolt
       end
 
       if data['format']
-        self[:format] = data['format'] if data['format']
+        self[:format] = data['format']
       end
 
       if data['ssh']
@@ -152,9 +179,9 @@ module Bolt
       end
 
       if options[:debug]
-        self[:log_level] = :debug
+        self[:log]['console'][:level] = :debug
       elsif options[:verbose]
-        self[:log_level] = :info
+        self[:log]['console'][:level] = :info
       end
 
       TRANSPORT_OPTIONS.each do |key|
@@ -184,6 +211,16 @@ module Bolt
     def validate
       TRANSPORTS.each do |transport|
         self[:transports][transport]
+      end
+
+      self[:log].each_pair do |name, params|
+        if params.key?(:level) && !Bolt::Logger.valid_level?(params[:level])
+          raise Bolt::CLIError,
+                "level of log #{name} must be one of: #{Bolt::Logger.levels.join(', ')}; received #{params[:level]}"
+        end
+        if params.key?(:append) && params[:append] != true && params[:append] != false
+          raise Bolt::CLIError, "append flag of log #{name} must be a Boolean, received #{params[:append]}"
+        end
       end
 
       unless %w[human json].include? self[:format]

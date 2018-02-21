@@ -20,7 +20,7 @@ Bolt is a Ruby command-line tool for executing commands, scripts, and tasks on r
 
 > Note that details of some exceptions generated within plans will be lost when using Ruby 2.0.
 
-> For complete usage and installation details, see the [Puppet Bolt docs](https://puppet.com/docs/bolt). 
+> For complete usage and installation details, see the [Puppet Bolt docs](https://puppet.com/docs/bolt).
 >
 > To contribute information, including alternate installation methods and running from source code, see [CONTRIBUTING.md](./CONTRIBUTING.md).
 
@@ -60,6 +60,12 @@ example config file:
 modulepath: "~/.puppetlabs/bolt-code/site:~/.puppetlabs/bolt-code/modules"
 concurrency: 10
 format: human
+log:
+  console:
+    level: :warn
+  ~/.bolt/debug.log:
+    level: :debug
+    append: false
 ssh:
   host-key-check: false
   private-key: ~/.ssh/bolt_id
@@ -72,6 +78,8 @@ ssh:
 `format`: The format to use when printing results. Options are `human` and `json` (default: `human`)
 
 `modulepath`: The module path to load tasks and plan code from. This is a list of directories separated by the OS-specific path separator (`:` on Linux/macOS, `;` on Windows).
+
+`log`: The logging configuration. A hash in which each entry describes a single log file - the key is a file path of the log file (optionally prefixed by the `file:` scheme) and the corresponding value is a hash of parameters of that log file. Supported parameters are: `level` - the logging level of the log file and `append` - a boolean flag determining whether the log file should be appended to or rather overwritten on each bolt invocation. A special log file named `console` can be used to override the logging level of the default console log.
 
 `transport`: The transport to use when none is specified in the url(default: `ssh`)
 
@@ -113,7 +121,7 @@ ssh:
 
 ### Node-specific configuration with the inventory file
 
-The inventory file allows you to group nodes and set up node-specific configuration defaults. 
+The inventory file allows you to group nodes and set up node-specific configuration defaults.
 
 To set up defaults for ssh and winrm connections, create an inventory file at `~/.puppetlabs/bolt/inventory.yaml` with the following content:
 

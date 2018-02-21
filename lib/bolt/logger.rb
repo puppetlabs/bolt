@@ -13,16 +13,64 @@ module Bolt
       return if Logging.initialized?
 
       Logging.init :debug, :info, :notice, :warn, :error, :fatal, :any
-      Logging.appenders.stderr(
-        'stderr',
-        layout: Logging.layouts.pattern(
-          pattern: '%d %-6l %c: %m\n',
-          date_pattern: '%Y-%m-%dT%H:%M:%S.%6N'
-        )
-      )
+
       root_logger = Logging.logger[:root]
-      root_logger.add_appenders :stderr
-      root_logger.level = :notice
+      root_logger.add_appenders Logging.appenders.stderr(
+        'console',
+        layout: default_layout,
+        level: default_level
+      )
+      # We set the root logger's level so that it logs everything but we do
+      # limit what's actually logged in every appender individually.
+      root_logger.level = :all
+    end
+
+    def self.configure(config)
+      root_logger = Logging.logger[:root]
+
+      config[:log].each_pair do |name, params|
+        appender = Logging.appenders[name]
+        if appender.nil?
+          unless name.start_with?('file:')
+            raise Bolt::Error.new("Unexpected log: #{name}", 'bolt/internal-error')
+          end
+
+          begin
+            appender = Logging.appenders.file(
+              name,
+              filename: name[5..-1], # strip the "file:" prefix
+              truncate: (params[:append] == false),
+              layout: default_layout,
+              level: default_level
+            )
+          rescue ArgumentError => e
+            raise Bolt::CLIError, "Failed to open log #{name}: #{e.message}"
+          end
+
+          root_logger.add_appenders appender
+        end
+
+        appender.level = params[:level] if params[:level]
+      end
+    end
+
+    def self.default_layout
+      @default_layout ||= Logging.layouts.pattern(
+        pattern: '%d %-6l %c: %m\n',
+        date_pattern: '%Y-%m-%dT%H:%M:%S.%6N'
+      )
+    end
+
+    def self.default_level
+      :notice
+    end
+
+    def self.valid_level?(level)
+      !Logging.level_num(level).nil?
+    end
+
+    def self.levels
+      Logging::LNAMES.map(&:downcase)
     end
 
     def self.reset_logging
