@@ -349,6 +349,13 @@ describe "Bolt::Executor" do
     let(:executor) { Bolt::Executor.new(config, nil, true) }
     let(:nodes_string) { results.map(&:first).map(&:uri) }
 
+    before :all do
+      @log_output.level = :info
+    end
+    after :all do
+      @log_output.level = :all
+    end
+
     it "logs commands" do
       node_results.each do |target, result|
         expect(ssh)
