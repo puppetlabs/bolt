@@ -11,7 +11,10 @@ before_script:
 
 script:
 - bundle exec rake travisci rubocop
-- cd bolt-modules/boltlib
+- pushd bolt-modules/boltlib
+- bundle exec rake spec
+- popd
+- cd modules/canary
 - bundle exec rake spec
 notifications:
   email: false

@@ -4,6 +4,7 @@ require 'bolt/error'
 module Bolt
   class PAL
     BOLTLIB_PATH = File.join(__FILE__, '../../../bolt-modules')
+    MODULES_PATH = File.join(__FILE__, '../../../modules')
 
     def initialize(config)
       # Nothing works without initialized this global state. Reinitializing
@@ -55,12 +56,16 @@ module Bolt
       compiler.evaluate_string('type TargetSpec = Boltlib::TargetSpec')
     end
 
+    def full_modulepath(modulepath)
+      [BOLTLIB_PATH, *modulepath, MODULES_PATH]
+    end
+
     # Runs a block in a PAL script compiler configured for Bolt.  Catches
     # exceptions thrown by the block and re-raises them ensuring they are
     # Bolt::Errors since the script compiler block will squash all exceptions.
     def in_bolt_compiler(opts = [])
       Puppet.initialize_settings(opts)
-      r = Puppet::Pal.in_tmp_environment('bolt', modulepath: [BOLTLIB_PATH] + @config[:modulepath], facts: {}) do |pal|
+      r = Puppet::Pal.in_tmp_environment('bolt', modulepath: full_modulepath(@config[:modulepath]), facts: {}) do |pal|
         pal.with_script_compiler do |compiler|
           add_target_spec(compiler)
           begin
