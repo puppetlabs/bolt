@@ -20,7 +20,7 @@ describe "When a plan fails" do
      '--modulepath', modulepath,
      '--no-host-key-check']
   }
-  let(:target) { conn_uri('ssh', true) }
+  let(:target) { conn_uri('ssh', include_password: true) }
 
   it 'returns the error object' do
     result = run_cli_json(['plan', 'run', 'error::args'] + config_flags, rescue_exec: true)

@@ -9,7 +9,7 @@ describe "when running a plan using run_as", ssh: true do
   include BoltSpec::Integration
 
   let(:modulepath) { File.join(__dir__, '../fixtures/run_as') }
-  let(:uri) { conn_uri('ssh', true) }
+  let(:uri) { conn_uri('ssh', include_password: true) }
   let(:user) { conn_info('ssh')[:user] }
   let(:password) { conn_info('ssh')[:password] }
   let(:config_flags) { %W[--no-host-key-check --format json --modulepath #{modulepath}] }

@@ -42,12 +42,15 @@ module Bolt
 
       def with_events(target, callback)
         callback.call(type: :node_start, target: target) if callback
-        result = yield
-        @logger.debug("Result on #{target.uri}: #{JSON.dump(result.value)}")
+
+        result = begin
+          yield
+        rescue StandardError => ex
+          Bolt::Result.from_exception(target, ex)
+        end
+
         callback.call(type: :node_result, result: result) if callback
         result
-      rescue StandardError => ex
-        Bolt::Result.from_exception(target, ex)
       end
 
       def filter_options(target, options)
