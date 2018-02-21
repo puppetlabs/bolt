@@ -18,8 +18,8 @@ describe Bolt::Transport::WinRM do
   let(:host) { ENV['BOLT_WINRM_HOST'] || 'localhost' }
   let(:port) { ENV['BOLT_WINRM_PORT'] || 25985 }
   let(:ssl_port) { ENV['BOLT_WINRM_SSL_PORT'] || 25986 }
-  let(:user) { ENV['BOLT_WINRM_USER'] || "vagrant" }
-  let(:password) { ENV['BOLT_WINRM_PASSWORD'] || "vagrant" }
+  let(:user) { ENV['BOLT_WINRM_USER'] || "bolt" }
+  let(:password) { ENV['BOLT_WINRM_PASSWORD'] || "bolt" }
   let(:command) { "echo $env:UserName" }
   let(:config) { mk_config(ssl: false, user: user, password: password) }
   let(:ssl_config) { mk_config(cacert: 'resources/ca.pem', user: user, password: password) }

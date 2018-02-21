@@ -18,7 +18,7 @@ describe Bolt::Transport::SSH do
   let(:hostname) { ENV['BOLT_SSH_HOST'] || "localhost" }
   let(:user) { ENV['BOLT_SSH_USER'] || "bolt" }
   let(:password) { ENV['BOLT_SSH_PASSWORD'] || "bolt" }
-  let(:port) { ENV['BOLT_SSH_PORT'] || 2224 }
+  let(:port) { ENV['BOLT_SSH_PORT'] || 20022 }
   let(:key) { ENV['BOLT_SSH_KEY'] || Dir["spec/fixtures/keys/id_rsa"] }
   let(:command) { "pwd" }
   let(:config) { mk_config(user: user, password: password) }

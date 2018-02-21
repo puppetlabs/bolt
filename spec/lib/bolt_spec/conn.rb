@@ -4,15 +4,15 @@ module BoltSpec
       tu = transport.upcase
       case transport
       when 'ssh'
-        default_port = 2224
+        default_port = 20022
         default_user = 'bolt'
         default_password = 'bolt'
         default_key = Dir["spec/fixtures/keys/id_rsa"]
       when 'winrm'
         default_port = 25985
-        default_user = 'vagrant'
-        default_password = 'vagrant'
-        default_key = Dir[".vagrant/**/private_key"]
+        default_user = 'bolt'
+        default_password = 'bolt'
+        default_key = Dir["spec/fixtures/keys/id_rsa"]
       else
         raise Error, "The transport must be either 'ssh' or 'winrm'"
       end

@@ -29,18 +29,12 @@ before_test:
       gem -v
       bundle -v
       type Gemfile.lock
-      $computer = [ADSI]"WinNT://."
-      $user = $computer.Create('user', $ENV:BOLT_WINRM_USER)
       Add-Type -AssemblyName System.Web
       $ENV:BOLT_WINRM_PASSWORD = "&aA4" + [System.Web.Security.Membership]::GeneratePassword(10, 3)
-      $user.SetPassword($ENV:BOLT_WINRM_PASSWORD)
-      $user.SetInfo()
-      $group = [ADSI]"WinNT://./Remote Management Users,group"
-      # cannot use '.' for host in the user path per
-      # https://stackoverflow.com/questions/20286306/error-while-adding-a-local-group-to-local-user-using-powershell
-      $group.Add("WinNT://$ENV:COMPUTERNAME/$ENV:BOLT_WINRM_USER,user")
+      ($user = New-LocalUser -Name $ENV:BOLT_WINRM_USER -Password (ConvertTo-SecureString -String $ENV:BOLT_WINRM_PASSWORD -Force -AsPlainText)) | Format-List
+      Add-LocalGroupMember -Group 'Remote Management Users' -Member $user
       # configure WinRM to use resources/cert.pfx for SSL
-      ($cert = Import-PfxCertificate -FilePath resources/cert.pfx -CertStoreLocation cert:\\LocalMachine\\My -Password (ConvertTo-SecureString -String vagrant -Force -AsPlainText)) | Format-List
+      ($cert = Import-PfxCertificate -FilePath resources/cert.pfx -CertStoreLocation cert:\\LocalMachine\\My -Password (ConvertTo-SecureString -String bolt -Force -AsPlainText)) | Format-List
       New-WSManInstance -ResourceURI winrm/config/Listener -SelectorSet @{Address='*';Transport='HTTPS'} -ValueSet @{Hostname='localhost';CertificateThumbprint=$cert.Thumbprint} | Format-List
 
 test_script:
