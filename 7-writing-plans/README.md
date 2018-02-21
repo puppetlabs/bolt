@@ -27,11 +27,8 @@ Plans allow for linking a set of commands, scripts and tasks together; and to pa
 Let's create a simple plan which takes a list of nodes and runs a command on them. Save the following as `modules/exercise7/plans/command.pp`:
 
 ```puppet
-plan exercise7::command(String $nodes) {
-  $nodes_array = split($nodes, ',')
-  run_command ("uptime",
-    $nodes_array,
-  )
+plan exercise7::command (TargetSpec $nodes) {
+  run_command("uptime", $nodes)
 }
 ```
 
@@ -39,12 +36,26 @@ We can run the plan like so:
 
 ```
 $ bolt plan run exercise7::command nodes=$NODE --modulepath ./modules
-ExecutionResult({'node1' => {'stdout' => " 23:08:34 up  2:02,  0 users,  load average: 0.00, 0.01, 0.05\n", 'stderr' => '', 'exit_code' => 0}})
+2018-02-16T15:35:47.843668 INFO   Bolt::Executor: Starting command run 'uptime' on ["node1"]
+2018-02-16T15:35:48.154690 INFO   Bolt::Executor: Ran command 'uptime' on 1 node with 0 failures
+[
+  {
+    "node": "node1",
+    "status": "success",
+    "result": {
+      "stdout": " 23:35:48 up 2 min,  0 users,  load average: 0.10, 0.09, 0.04\n",
+      "stderr": "",
+      "exit_code": 0
+    }
+  }
+]
 ```
 
 Note that:
 
 * `nodes` is passed as an argument like any other, rather than using a flag. This makes plans flexible when it comes to taking lists of different types of nodes for instance, or generating the list of nodes in code within the plan.
+
+    As a convention, we recommend using the `TargetSpec` type to denote nodes; it allows passing a single string describing a target URI or a comma-separated list of strings as supported by the `--nodes` argument to other commands. It also accepts an array of Targets, as resolved by calling the [`get_targets` method](https://puppet.com/docs/bolt/0.x/writing_plans.html#calling-basic-plan-functions), allowing you to iterate over Targets without needing to do your own string splitting, or as resolved from a group in an [inventory file](https://puppet.com/docs/bolt/0.x/inventory_file.html).
 
 
 # Write a plan using run_task
@@ -80,43 +91,50 @@ bolt task run exercise7::write filename=hello message=world --nodes=$NODE --modu
 Note that in this case the task doesn't output anything to stdout. It can be useful to still trace the running of the task, and for that the `--debug` flag is useful. Here is the output when run with debug:
 
 ```
-2017-10-03T11:14:14.308961  ERROR 2acquiringnodes_ssh_1: could not connect to ssh-agent: Agent not configured
-2017-10-03T11:14:14.322728  DEBUG 2acquiringnodes_ssh_1: Opened session
-2017-10-03T11:14:14.322822  INFO 2acquiringnodes_ssh_1: Running task '/modules/exercise7/tasks/write.sh'
-2017-10-03T11:14:14.322873  DEBUG 2acquiringnodes_ssh_1: arguments: {"filename"=>"hello", "message"=>"world"}
-input_method: both
-2017-10-03T11:14:14.331550  DEBUG 2acquiringnodes_ssh_1: Uploading /modules/exercise7/tasks/write.sh to /tmp/tmp.TJe5oOFIFa/write.sh
-2017-10-03T11:14:14.382893  DEBUG 2acquiringnodes_ssh_1: Executing: chmod u+x '/tmp/tmp.TJe5oOFIFa/write.sh'
-2017-10-03T11:14:14.386333  DEBUG 2acquiringnodes_ssh_1: Command returned successfully
-2017-10-03T11:14:14.386388  DEBUG 2acquiringnodes_ssh_1: Executing: export PT_filename='hello' PT_message='world' && '/tmp/tmp.TJe5oOFIFa/write.sh'
-2017-10-03T11:14:14.436844  DEBUG 2acquiringnodes_ssh_1: Command returned successfully
-2017-10-03T11:14:14.436880  DEBUG 2acquiringnodes_ssh_1: Executing: rm -f '/tmp/tmp.TJe5oOFIFa/write.sh'
-2017-10-03T11:14:14.496337  DEBUG 2acquiringnodes_ssh_1: Command returned successfully
-2017-10-03T11:14:14.496382  DEBUG 2acquiringnodes_ssh_1: Executing: rmdir '/tmp/tmp.TJe5oOFIFa'
+2018-02-16T15:36:31.643418 DEBUG  Bolt::Inventory: Did not find node1 in inventory
+2018-02-16T15:36:32.713360 DEBUG  Bolt::Executor: Started with 100 max thread(s)
+2018-02-16T15:36:32.932771 DEBUG  Bolt::Inventory: Did not find node1 in inventory
+2018-02-16T15:36:32.932869 INFO   Bolt::Executor: Starting task exercise7::write on ["node1"]
+2018-02-16T15:36:32.932892 DEBUG  Bolt::Executor: Arguments: {"filename"=>"hello", "message"=>"world"} Input method: both
+2018-02-16T15:36:33.178433 DEBUG  Bolt::Transport::SSH: Authentication method 'gssapi-with-mic' is not available
+2018-02-16T15:36:33.179532 DEBUG  Bolt::Transport::SSH: Running task run 'Task({'name' => 'exercise7::write', 'executable' => '/Users/michaelsmith/puppetlabs/tasks-hands-on-lab/7-writing-plans/modules/exercise7/tasks/write.sh'})' on node1
+Started on node1...
+2018-02-16T15:36:33.216451 DEBUG  node1: Opened session
+2018-02-16T15:36:33.216604 DEBUG  node1: Executing: mktemp -d
+2018-02-16T15:36:33.395440 DEBUG  node1: stdout: /tmp/tmp.I7ZTz4OmfY
 
-2017-10-03T11:14:14.552774  DEBUG 2acquiringnodes_ssh_1: Command returned successfully
-2017-10-03T11:14:14.596419  DEBUG 2acquiringnodes_ssh_1: Closed session
-2acquiringnodes_ssh_1:
+2018-02-16T15:36:33.395746 DEBUG  node1: Command returned successfully
+2018-02-16T15:36:33.411634 DEBUG  node1: Executing: chmod u+x '/tmp/tmp.I7ZTz4OmfY/write.sh'
+2018-02-16T15:36:33.423831 DEBUG  node1: Command returned successfully
+2018-02-16T15:36:33.424137 DEBUG  node1: Executing: PT_filename='hello' PT_message='world' '/tmp/tmp.I7ZTz4OmfY/write.sh'
+2018-02-16T15:36:33.436180 DEBUG  node1: Command returned successfully
+2018-02-16T15:36:33.436226 DEBUG  node1: Executing: rm -rf '/tmp/tmp.I7ZTz4OmfY'
+2018-02-16T15:36:33.447658 DEBUG  node1: Command returned successfully
+2018-02-16T15:36:33.447850 DEBUG  node1: Closed session
+2018-02-16T15:36:33.447918 DEBUG  Bolt::Transport::SSH: Result on node1: {"_output":""}
+Finished on node1:
 
-
-Ran on 1 node in 0.39 seconds
+  {
+  }
+2018-02-16T15:36:33.448381 INFO   Bolt::Executor: Ran task 'exercise7::write' on 1 node with 0 failures
+Ran on 1 node in 0.74 seconds
 ```
 
 Now lets write a plan that uses our task. Save the following as `modules/exercise7/plans/writeread.pp`:
 
 ```puppet
-plan exercise7::writeread(
-  String $nodes,
-  String $filename,
-  String $message = 'Hello',
+plan exercise7::writeread (
+  TargetSpec $nodes,
+  String     $filename,
+  String     $message = 'Hello',
 ) {
-  $nodes_array = split($nodes, ',')
-  run_task("exercise7::write",
-    $nodes_array,
+  run_task(
+    'exercise7::write',
+    $nodes,
     filename => $filename,
     message  => $message,
   )
-  run_command("cat /tmp/${filename}", $nodes_array)
+  run_command("cat /tmp/${filename}", $nodes)
 }
 ```
 

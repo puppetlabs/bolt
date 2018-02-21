@@ -1,13 +1,13 @@
-plan exercise7::writeread(
-  String $nodes,
-  String $filename,
-  String $message = 'Hello',
+plan exercise7::writeread (
+  TargetSpec $nodes,
+  String     $filename,
+  String     $message = 'Hello',
 ) {
-  $nodes_array = split($nodes, ',')
-  run_task("exercise7::write",
-    $nodes_array,
+  run_task(
+    'exercise7::write',
+    $nodes,
     filename => $filename,
     message  => $message,
   )
-  run_command("cat /tmp/${filename}", $nodes_array)
+  run_command("cat /tmp/${filename}", $nodes)
 }
