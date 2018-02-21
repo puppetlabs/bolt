@@ -44,7 +44,7 @@ module Bolt
               conn.write_remote_file(source, tmpfile)
               # pass over file ownership if we're using run-as to be a different user
               dir.chown(conn.run_as)
-              result = conn.execute("mv '#{tmpfile}' '#{destination}'", sudoable: true)
+              result = conn.execute(['mv', tmpfile, destination], sudoable: true)
               if result.exit_code != 0
                 message = "Could not move temporary file '#{tmpfile}' to #{destination}: #{result.stderr.string}"
                 raise Bolt::Node::FileError.new(message, 'MV_ERROR')
@@ -70,7 +70,7 @@ module Bolt
             conn.with_remote_tempdir do |dir|
               remote_path = conn.write_remote_executable(dir, script)
               dir.chown(conn.run_as)
-              output = conn.execute("'#{remote_path}' #{Shellwords.join(arguments)}", sudoable: true)
+              output = conn.execute([remote_path, *arguments], sudoable: true)
               Bolt::Result.for_command(target, output.stdout.string, output.stderr.string, output.exit_code)
             end
           end
@@ -81,31 +81,30 @@ module Bolt
         input_method = task.input_method
         with_connection(target) do |conn|
           conn.running_as(options['_run_as']) do
-            export_args = {}
             stdin, output = nil
+
+            command = []
+            execute_options = {}
 
             if STDIN_METHODS.include?(input_method)
               stdin = JSON.dump(arguments)
             end
 
             if ENVIRONMENT_METHODS.include?(input_method)
-              export_args = arguments.map do |env, val|
-                "PT_#{env}='#{val}'"
-              end.join(' ')
+              environment = arguments.inject({}) do |env, (param, val)|
+                env.merge("PT_#{param}" => val)
+              end
+              execute_options[:environment] = environment
             end
-
-            command = export_args.empty? ? '' : "#{export_args} "
-
-            execute_options = {}
 
             conn.with_remote_tempdir do |dir|
               remote_task_path = conn.write_remote_executable(dir, task.executable)
               if conn.run_as && stdin
                 wrapper = make_wrapper_stringio(remote_task_path, stdin)
                 remote_wrapper_path = conn.write_remote_executable(dir, wrapper, 'wrapper.sh')
-                command += "'#{remote_wrapper_path}'"
+                command << remote_wrapper_path
               else
-                command += "'#{remote_task_path}'"
+                command << remote_task_path
                 execute_options[:stdin] = stdin
               end
               dir.chown(conn.run_as)

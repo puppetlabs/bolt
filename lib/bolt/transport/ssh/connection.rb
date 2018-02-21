@@ -1,4 +1,5 @@
 require 'logging'
+require 'shellwords'
 require 'bolt/node/errors'
 require 'bolt/node/output'
 
@@ -22,7 +23,7 @@ module Bolt
             return if owner.nil? || owner == @owner
 
             @owner = owner
-            result = @node.execute("chown -R '#{@owner}': '#{@path}'", sudoable: true, run_as: 'root')
+            result = @node.execute(['chown', '-R', "#{@owner}:", @path], sudoable: true, run_as: 'root')
             if result.exit_code != 0
               message = "Could not change owner of '#{@path}' to #{@owner}: #{result.stderr.string}"
               raise Bolt::Node::FileError.new(message, 'CHOWN_ERROR')
@@ -30,7 +31,7 @@ module Bolt
           end
 
           def delete
-            result = @node.execute("rm -rf '#{@path}'", sudoable: true, run_as: @owner)
+            result = @node.execute(['rm', '-rf', @path], sudoable: true, run_as: @owner)
             if result.exit_code != 0
               @logger.warn("Failed to clean up tempdir '#{@path}': #{result.stderr.string}")
             end
@@ -175,20 +176,32 @@ module Bolt
           result_output = Bolt::Node::Output.new
           run_as = options[:run_as] || self.run_as
           use_sudo = sudoable && run_as && @user != run_as
+
+          command_str = command.is_a?(String) ? command : Shellwords.shelljoin(command)
           if use_sudo
-            command = "sudo -S -u #{run_as} -p '#{sudo_prompt}' #{command}"
+            sudo_str = Shellwords.shelljoin(["sudo", "-S", "-u", run_as, "-p", sudo_prompt])
+            command_str = "#{sudo_str} #{command_str}"
           end
 
-          @logger.debug { "Executing: #{command}" }
+          # Including the environment declarations in the shelljoin will escape
+          # the = sign, so we have to handle them separately.
+          if options[:environment]
+            env_decls = options[:environment].map do |env, val|
+              "#{env}=#{Shellwords.shellescape(val)}"
+            end
+            command_str = "#{env_decls.join(' ')} #{command_str}"
+          end
+
+          @logger.debug { "Executing: #{command_str}" }
 
           session_channel = @session.open_channel do |channel|
             # Request a pseudo tty
             channel.request_pty if target.options[:tty]
 
-            channel.exec(command) do |_, success|
+            channel.exec(command_str) do |_, success|
               unless success
                 raise Bolt::Node::ConnectError.new(
-                  "Could not execute command: #{command.inspect}",
+                  "Could not execute command: #{command_str.inspect}",
                   'EXEC_ERROR'
                 )
               end
@@ -236,9 +249,9 @@ module Bolt
         def make_tempdir
           if target.options[:tmpdir]
             tmppath = "#{target.options[:tmpdir]}/#{SecureRandom.uuid}"
-            command = "mkdir -m 700 #{tmppath}"
+            command = ['mkdir', '-m', 700, tmppath]
           else
-            command = 'mktemp -d'
+            command = ['mktemp', '-d']
           end
           result = execute(command)
           if result.exit_code != 0
@@ -266,7 +279,7 @@ module Bolt
         end
 
         def make_executable(path)
-          result = execute("chmod u+x '#{path}'")
+          result = execute(['chmod', 'u+x', path])
           if result.exit_code != 0
             message = "Could not make file '#{path}' executable: #{result.stderr.string}"
             raise Bolt::Node::FileError.new(message, 'CHMOD_ERROR')
