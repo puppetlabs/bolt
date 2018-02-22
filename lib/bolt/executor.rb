@@ -84,7 +84,7 @@ module Bolt
                 next if promise.fulfilled?
                 error = $ERROR_INFO || Bolt::Error.new("No result was returned for #{target.uri}",
                                                        "puppetlabs.bolt/missing-result-error")
-                promise.set(Bolt::Result.from_exception(error))
+                promise.set(Bolt::Result.from_exception(target, error))
               end
             end
           end

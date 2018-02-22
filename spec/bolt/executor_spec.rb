@@ -321,6 +321,19 @@ describe "Bolt::Executor" do
     end
   end
 
+  it "returns ensures that every target has a result, no matter what" do
+    result_set = executor.batch_execute(targets) do
+      # Intentionally *don't* return a result
+      []
+    end
+
+    expect(result_set.names).to eq([targets[0].name, targets[1].name])
+    result_set.each do |result|
+      expect(result).not_to be_success
+      expect(result.error_hash['msg']).to match(/No result was returned/)
+    end
+  end
+
   it "returns an exception result if the connect raises an unhandled error" do
     node_results.each_key do |_target|
       expect(ssh).to receive(:with_connection).and_raise("reset")
