@@ -235,13 +235,6 @@ bar
           }.to raise_error(Bolt::CLIExit)
         }.not_to output(/--nodes/).to_stdout
       end
-
-      it 'generates an error if --nodes is passed to plan' do
-        cli = Bolt::CLI.new(%w[plan run foo --nodes foobar.com])
-        expect {
-          cli.parse
-        }.to raise_error(Bolt::CLIError, /Unknown argument '--nodes'/)
-      end
     end
 
     describe "user" do
@@ -916,6 +909,7 @@ bar
           plan_params = { 'nodes' => targets.map(&:host).join(',') }
 
           options = {
+            nodes: [],
             mode: 'plan',
             action: 'run',
             object: plan_name,
@@ -1168,7 +1162,7 @@ bar
         let(:plan_params) { { 'nodes' => targets.map(&:host).join(',') } }
         let(:options) {
           {
-            targets: targets,
+            nodes: [],
             mode: 'plan',
             action: 'run',
             object: plan_name,
@@ -1179,6 +1173,31 @@ bar
 
         before :each do
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
+        end
+
+        it "uses the nodes passed using the --nodes option(s) as the 'nodes' plan parameter" do
+          plan_params.clear
+          options[:nodes] = targets.map(&:host)
+
+          expect(executor)
+            .to receive(:run_task)
+            .with(targets, task_t, { 'message' => 'hi there' }, {})
+            .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0)]))
+
+          cli.execute(options)
+          expect(JSON.parse(output.string)).to eq(
+            [{ 'node' => 'foo', 'status' => 'success', 'result' => { '_output' => 'yes' } }]
+          )
+        end
+
+        it "errors when the --nodes option(s) and the 'nodes' plan parameter are both specified" do
+          options[:nodes] = targets.map(&:host)
+
+          expect { cli.execute(options) }.to raise_error(
+            /A plan's 'nodes' parameter may be specified using the --nodes option, (?x:
+             )but in that case it must not be specified as a separate nodes=<value> (?x:
+             )parameter nor included in the JSON data passed in the --params option/
+          )
         end
 
         it "formats results of a passing task" do
