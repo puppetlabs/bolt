@@ -52,7 +52,7 @@ describe Bolt::Inventory do
               'config' => {
                 'ssh' => { 'user' => 'someone' }
               } },
-            'node7', 'node8'
+            'node7', 'ssh://node8'
           ],
           'config' => { 'ssh' => {
             'insecure' => 'maybe'
@@ -170,7 +170,11 @@ describe Bolt::Inventory do
       end
 
       it 'should use values from matching groups' do
-        expect(inventory.config_for('node8')[:ssh][:insecure]).to eq('maybe')
+        expect(inventory.config_for('ssh://node8')[:ssh][:insecure]).to eq('maybe')
+      end
+
+      it 'should only return config for exact matches' do
+        expect(inventory.config_for('node8')).to be_nil
       end
     end
   end
@@ -217,7 +221,7 @@ describe Bolt::Inventory do
       inventory = Bolt::Inventory.new(data)
       inventory.collect_groups
       targets = inventory.get_targets('group2')
-      expect(targets).to eq(targets(%w[node6 node7 node8]))
+      expect(targets).to eq(targets(%w[node6 node7 ssh://node8]))
     end
   end
 
@@ -290,13 +294,17 @@ describe Bolt::Inventory do
       end
 
       it 'should split a comma-separated list of target URI and group name' do
-        targets = inventory.get_targets('group1,a')
-        expect(targets).to eq(targets(%w[node4 node5 node6 node7 a]))
+        matched_nodes = %w[node4 node5 node6 node7 ssh://node8]
+        matched_nodes.each do |node|
+          expect_any_instance_of(Bolt::Inventory).to receive(:config_for).with(node)
+        end
+        targets = inventory.get_targets('group1,ssh://node8')
+        expect(targets).to eq(targets(matched_nodes))
       end
 
       it 'should match wildcard selectors' do
         targets = inventory.get_targets('node*')
-        expect(targets).to eq(targets(%w[node1 node2 node3 node4 node5 node6 node7 node8]))
+        expect(targets).to eq(targets(%w[node1 node2 node3 node4 node5 node6 node7]))
       end
 
       it 'should fail if wildcard selector matches nothing' do

@@ -91,9 +91,9 @@ module Bolt
     # Pass a target to get_targets for a public version of this
     # Should this reconfigure configured targets?
     def update_target(target)
-      inv_conf = config_for(target.host)
+      inv_conf = config_for(target.name)
       unless inv_conf
-        @logger.debug("Did not find #{target.host} in inventory")
+        @logger.debug("Did not find #{target.name} in inventory")
         inv_conf = {}
       end
 
