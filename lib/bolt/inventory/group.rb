@@ -9,15 +9,16 @@ module Bolt
         @name = data['name']
 
         @nodes = if data['nodes']
-                   data['nodes'].map do |n|
+                   data['nodes'].inject({}) do |acc,n|
                      if n.is_a? String
-                       { 'name' => n }
+                       acc[n] = {'name' => n}
                      else
-                       n
+                       acc[n['name']] = n
                      end
+                     acc
                    end
                  else
-                   []
+                   {}
                  end
         @config = data['config'] || {}
         @groups = if data['groups']
@@ -44,7 +45,7 @@ module Bolt
 
         used_names << @name
 
-        @nodes.each do |n|
+        @nodes.each_value do |n|
           # Require nodes to be referenced only by their host name
           host = Addressable::URI.parse('//' + n['name']).host
           ipv6host = Addressable::URI.parse('//[' + n['name'] + ']').host
@@ -80,7 +81,7 @@ module Bolt
       end
 
       def node_data(node_name)
-        if (data = @nodes.find { |n| n['name'] == node_name })
+        if (data = @nodes[node_name])
           { 'config' => data['config'] || {},
             # groups come from group_data
             'groups' => [] }
@@ -123,7 +124,7 @@ module Bolt
       end
 
       def local_node_names
-        @_node_names ||= Set.new(nodes.map { |n| n['name'] })
+        @_node_names ||= Set.new(nodes.keys { |n| n['name'] })
       end
       private :local_node_names
 
