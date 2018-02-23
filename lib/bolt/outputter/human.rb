@@ -72,7 +72,23 @@ module Bolt
       end
 
       def print_summary(results, elapsed_time)
-        @stream.puts format("Ran on %d node%s in %.2f seconds",
+        ok_set = results.ok_set
+        unless ok_set.empty?
+          @stream.puts format('Successful on %d node%s: %s',
+                              ok_set.size,
+                              ok_set.size == 1 ? '' : 's',
+                              ok_set.names.join(','))
+        end
+
+        error_set = results.error_set
+        unless error_set.empty?
+          @stream.puts format('Failed on %d node%s: %s',
+                              error_set.size,
+                              error_set.size == 1 ? '' : 's',
+                              error_set.names.join(','))
+        end
+
+        @stream.puts format('Ran on %d node%s in %.2f seconds',
                             results.size,
                             results.size == 1 ? '' : 's',
                             elapsed_time)

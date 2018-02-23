@@ -7,7 +7,15 @@ describe "Bolt::Outputter::Human" do
   let(:outputter) { Bolt::Outputter::Human.new(output) }
   let(:config) { Bolt::Config.new }
   let(:target) { Bolt::Target.new('node1') }
-  let(:results) { { node1: Bolt::Result.new(target, message: "ok") } }
+  let(:target2) { Bolt::Target.new('node2') }
+  let(:results) {
+    Bolt::ResultSet.new(
+      [
+        Bolt::Result.new(target, message: "ok"),
+        Bolt::Result.new(target2, error: { 'msg' => 'oops' })
+      ]
+    )
+  }
 
   it "starts items in head" do
     outputter.print_head
@@ -16,19 +24,60 @@ describe "Bolt::Outputter::Human" do
 
   it "allows empty items" do
     outputter.print_head
-    outputter.print_summary({}, 2.0)
+    outputter.print_summary(Bolt::ResultSet.new([]), 2.0)
     expect(output.string).to eq("Ran on 0 nodes in 2.00 seconds\n")
   end
 
   it "prints status" do
     outputter.print_head
-    outputter.print_result(Bolt::Result.new(target))
-    outputter.print_result(Bolt::Result.new(Bolt::Target.new('node2'), error: { 'msg' => 'oops' }))
+    results.each do |result|
+      outputter.print_result(result)
+    end
     outputter.print_summary(results, 10.0)
     lines = output.string
     expect(lines).to match(/Finished on node1/)
     expect(lines).to match(/Failed on node2/)
     expect(lines).to match(/oops/)
+    summary = lines.split("\n")[-3..-1]
+    expect(summary[0]).to eq('Successful on 1 node: node1')
+    expect(summary[1]).to eq('Failed on 1 node: node2')
+    expect(summary[2]).to eq('Ran on 2 nodes in 10.00 seconds')
+  end
+
+  context 'with multiple successes' do
+    let(:results) {
+      Bolt::ResultSet.new(
+        [
+          Bolt::Result.new(target, message: 'ok'),
+          Bolt::Result.new(target2, message: 'also ok')
+        ]
+      )
+    }
+
+    it 'prints success, omits failure' do
+      outputter.print_summary(results, 0.0)
+      summary = output.string.split("\n")
+      expect(summary[0]).to eq('Successful on 2 nodes: node1,node2')
+      expect(summary[1]).to eq('Ran on 2 nodes in 0.00 seconds')
+    end
+  end
+
+  context 'with multiple failures' do
+    let(:results) {
+      Bolt::ResultSet.new(
+        [
+          Bolt::Result.new(target, error: { 'msg' => 'oops' }),
+          Bolt::Result.new(target2, error: { 'msg' => 'also oops' })
+        ]
+      )
+    }
+
+    it 'prints success, omits failure' do
+      outputter.print_summary(results, 0.0)
+      summary = output.string.split("\n")
+      expect(summary[0]).to eq('Failed on 2 nodes: node1,node2')
+      expect(summary[1]).to eq('Ran on 2 nodes in 0.00 seconds')
+    end
   end
 
   it "formats a table" do
