@@ -11,15 +11,18 @@ module Bolt
       CONF_FILE = File.expand_path('~/.puppetlabs/client-tools/orchestrator.conf')
       BOLT_MOCK_TASK = Struct.new(:name, :executable).new('bolt', 'bolt/tasks/init').freeze
 
-      def initialize(config)
-        super
-
+      def create_client(opts)
         client_keys = %i[service-url token-file cacert]
-        @client_opts = config.select { |k, _v| client_keys.include?(k) }
-      end
+        client_opts = opts.reduce({}) do |acc, (k, v)|
+          if client_keys.include?(k)
+            acc.merge(k.to_s => v)
+          else
+            acc
+          end
+        end
+        @logger.debug("Creating orchestrator client for #{client_opts}")
 
-      def create_client
-        OrchestratorClient.new(@client_opts, true)
+        OrchestratorClient.new(client_opts, true)
       end
 
       def build_request(targets, task, arguments)
@@ -113,7 +116,11 @@ module Bolt
       end
 
       def batches(targets)
-        targets.group_by { |target| target.options[:orch_task_environment] }.values
+        targets.group_by do |target|
+          [target.options[:orch_task_environment],
+           target.options[:"service-url"],
+           target.options[:"token-file"]]
+        end.values
       end
 
       def run_task_job(targets, task, arguments)
@@ -124,9 +131,13 @@ module Bolt
         end
 
         begin
-          results = create_client.run_task(body)
+          results = create_client(targets.first.options).run_task(body)
 
           process_run_results(targets, results)
+        rescue OrchestratorClient::ApiError => e
+          targets.map do |target|
+            Bolt::Result.new(target, error: e.data)
+          end
         rescue StandardError => e
           targets.map do |target|
             Bolt::Result.from_exception(target, e)

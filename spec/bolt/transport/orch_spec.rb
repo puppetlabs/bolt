@@ -140,14 +140,33 @@ describe Bolt::Transport::Orch, orchestrator: true do
   end
 
   describe :batches do
-    let(:targets) do
-      [Bolt::Target.new('a', orch_task_environment: 'production'),
-       Bolt::Target.new('b', orch_task_environment: 'development'),
-       Bolt::Target.new('c', orch_task_environment: 'test'),
-       Bolt::Target.new('d', orch_task_environment: 'development')]
+    it "splits targets in different environments into separate batches" do
+      targets = [Bolt::Target.new('a', orch_task_environment: 'production'),
+                 Bolt::Target.new('b', orch_task_environment: 'development'),
+                 Bolt::Target.new('c', orch_task_environment: 'test'),
+                 Bolt::Target.new('d', orch_task_environment: 'development')]
+      batches = Set.new([[targets[0]],
+                         [targets[1], targets[3]],
+                         [targets[2]]])
+      expect(Set.new(orch.batches(targets))).to eq(batches)
     end
 
-    it "splits targets in different environments into separate batches" do
+    it "splits targets with different urls into separate batches" do
+      targets = [Bolt::Target.new('a'),
+                 Bolt::Target.new('b', :'service-url' => 'master2'),
+                 Bolt::Target.new('c', :'service-url' => 'master3'),
+                 Bolt::Target.new('d', :'service-url' => 'master2')]
+      batches = Set.new([[targets[0]],
+                         [targets[1], targets[3]],
+                         [targets[2]]])
+      expect(Set.new(orch.batches(targets))).to eq(batches)
+    end
+
+    it "splits targets with different tokens into separate batches" do
+      targets = [Bolt::Target.new('a'),
+                 Bolt::Target.new('b', :'token-file' => 'token2'),
+                 Bolt::Target.new('c', :'token-file' => 'token3'),
+                 Bolt::Target.new('d', :'token-file' => 'token2')]
       batches = Set.new([[targets[0]],
                          [targets[1], targets[3]],
                          [targets[2]]])
