@@ -9,18 +9,18 @@ module Bolt
         @logger = Logging.logger[self]
         @name = data['name']
 
-        @nodes = if data['nodes']
-                   data['nodes'].inject({}) do |acc,n|
-                     if n.is_a? String
-                       acc[n] = {'name' => n}
-                     else
-                       acc[n['name']] = n
-                     end
-                     acc
-                   end
-                 else
-                   {}
-                 end
+        @nodes = {}
+        if data['nodes']
+          data['nodes'].each do |n|
+            n = { 'name' => n } if n.is_a? String
+            if @nodes.include? n['name']
+              @logger.warn("Ignoring duplicate node in #{@name}: #{n}")
+            else
+              @nodes[n['name']] = n
+            end
+          end
+        end
+
         @config = data['config'] || {}
         @groups = if data['groups']
                     data['groups'].map { |g| Group.new(g) }
@@ -126,7 +126,7 @@ module Bolt
       end
 
       def local_node_names
-        @_node_names ||= Set.new(nodes.keys { |n| n['name'] })
+        Set.new(@nodes.keys)
       end
       private :local_node_names
 
@@ -152,7 +152,7 @@ module Bolt
 
         if data
           data_merge(group_data, data)
-        elsif local_node_names.include?(node_name)
+        elsif @nodes.include?(node_name)
           group_data
         end
       end
