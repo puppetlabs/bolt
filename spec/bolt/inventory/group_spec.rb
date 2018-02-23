@@ -296,14 +296,14 @@ describe Bolt::Inventory::Group do
         'groups' => [
           {
             'name' => 'group1',
-            'nodes' => [{ 'name' => '2001:db8:0:1' }]
+            'nodes' => [{ 'name' => '2001:db8:0:1:8080' }]
           }
         ]
       }
     end
 
     it 'should find two nodes' do
-      expect(group.node_names.to_a).to eq(%w[127.0.0.1 2001:db8:0:1])
+      expect(group.node_names.to_a).to eq(%w[127.0.0.1 2001:db8:0:1:8080])
     end
 
     it 'should collect 2 groups' do
@@ -315,7 +315,23 @@ describe Bolt::Inventory::Group do
 
     it 'should find one node in the subgroup' do
       groups = group.collect_groups
-      expect(groups['group1'].node_names.to_a).to eq(%w[2001:db8:0:1])
+      expect(groups['group1'].node_names.to_a).to eq(%w[2001:db8:0:1:8080])
+    end
+  end
+
+  context 'with full node URIs' do
+    let(:data) do
+      {
+        'name' => 'group0',
+        'nodes' => [
+          { 'name' => 'ssh://127.0.0.1:22' },
+          { 'name' => '127.0.0.1' }
+        ]
+      }
+    end
+
+    it 'should find two distinct nodes' do
+      expect(group.node_names.to_a).to eq(%w[ssh://127.0.0.1:22 127.0.0.1])
     end
   end
 
@@ -323,7 +339,7 @@ describe Bolt::Inventory::Group do
     let(:data) do
       {
         'name' => 'group1',
-        'nodes' => [{ 'name' => 'foo1:22' }]
+        'nodes' => [{ 'name' => 'foo:a/b@neptune"' }]
       }
     end
 

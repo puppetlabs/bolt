@@ -6,6 +6,7 @@ module Bolt
       attr_accessor :name, :nodes, :groups, :config, :rest
 
       def initialize(data)
+        @logger = Logging.logger[self]
         @name = data['name']
 
         @nodes = if data['nodes']
@@ -45,10 +46,11 @@ module Bolt
         used_names << @name
 
         @nodes.each do |n|
-          # Require nodes to be referenced only by their host name
-          host = Addressable::URI.parse('//' + n['name']).host
-          ipv6host = Addressable::URI.parse('//[' + n['name'] + ']').host
-          if n['name'] != host && n['name'] != ipv6host
+          # Require nodes to be parseable as a Target.
+          begin
+            Target.new(n['name'])
+          rescue Addressable::URI::InvalidURIError => e
+            @logger.debug(e)
             raise ValidationError.new("Invalid node name #{n['name']}", n['name'])
           end
 
