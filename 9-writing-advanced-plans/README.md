@@ -63,7 +63,7 @@ In the above plan we:
 You can see this plan in action by running:
 
 ```bash
-bolt plan run exercise9::yesorno nodes=$NODE --modulepath ./modules
+bolt plan run exercise9::yesorno nodes=all --modulepath ./modules
 ```
 
 When run you should see output like the following. Running it multiple times should result in different output, as the return value of the task is random the command should run on a different subset of nodes each time.
@@ -121,7 +121,7 @@ git clone https://github.com/puppetlabs/puppetlabs-stdlib ./modules/stdlib
 Then run the plan to see what happens:
 
 ```bash
-bolt plan run exercise9::count_volumes nodes=$NODE --modulepath ./modules
+bolt plan run exercise9::count_volumes nodes=all --modulepath ./modules
 ```
 
 You should see output like the following:
@@ -172,7 +172,7 @@ plan exercise9::unique_volumes (TargetSpec $nodes) {
 This plan collects the last column of each line output by `df` (except the header), and prints a list of unique mount points. Run the plan to see it in action:
 
 ```bash
-bolt plan run exercise9::unique_volumes nodes=$NODE --modulepath ./modules
+bolt plan run exercise9::unique_volumes nodes=all --modulepath ./modules
 ```
 
 You should see output like the following:
@@ -213,7 +213,7 @@ This plan runs a command that we know will fail (`false`) and collects the resul
 Run this plan to see what happens:
 
 ```bash
-bolt plan run exercise9::error nodes=$NODE --modulepath ./modules
+bolt plan run exercise9::error nodes=all --modulepath ./modules
 ```
 
 You should see output like the following:
@@ -243,7 +243,7 @@ plan exercise9::catch_error (TargetSpec $nodes) {
 Run this plan to see the difference:
 
 ```bash
-bolt plan run exercise9::catch_error nodes=$NODE --modulepath ./modules
+bolt plan run exercise9::catch_error nodes=all --modulepath ./modules
 ```
 
 Now the `notice` statement gets executed and we see our output:

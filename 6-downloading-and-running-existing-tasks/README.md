@@ -50,7 +50,7 @@ modulepath: "~/.puppetlabs/task-modules/site:~/.puppetlabs/task-modules/modules"
 The [`install_puppet` task](https://github.com/puppetlabs/task-modules/blob/master/site/install_puppet/tasks/init.sh) in task-modules contains a task to install the Puppet agent package on a node. This task needs to run as root so if you're not logging in as root with vagrant you'll need to tell bolt to sudo to root with `--run-as root`
 
 ```
-bolt task run install_puppet -n $NODE --run-as root
+bolt task run install_puppet -n all --run-as root
 ```
 
 This task may take a while and will produce a lot of output when it's done.
@@ -125,7 +125,7 @@ PARAMETERS:
 Let's quickly check on the status of a specific package using `bolt`:
 
 ```
-$ bolt task run package action=status name=bash --nodes $NODE
+$ bolt task run package action=status name=bash --nodes all
 Started on node1...
 Finished on node1:
   {
@@ -140,7 +140,7 @@ Ran on 1 node in 3.81 seconds
 The package task also supports other actions, including ensuring a package is installed. Let's install a package across all of our nodes using that action:
 
 ```
-$ bolt task run package action=install name=vim --nodes $NODE --run-as root
+$ bolt task run package action=install name=vim --nodes all --run-as root
 Started on node1...
 Finished on node1:
   {

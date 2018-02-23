@@ -47,7 +47,7 @@ echo $(hostname) received the message: $PT_message
 We can then run that task using `bolt`. Note the `message` argument. This will be expanded to the `PT_message` environment variable expected by our task. By naming parameters explictly it's easier for others to use your tasks.
 
 ```
-bolt task run exercise5 message=hello --nodes $NODE --modulepath ./modules
+bolt task run exercise5 message=hello --nodes all --modulepath ./modules
 ```
 
 This should result in output similar to:
@@ -117,7 +117,7 @@ else:
 We can then run the task against our nodes like so:
 
 ```
-$ bolt task run exercise5::gethost host=google.com --nodes $NODE --modulepath ./modules
+$ bolt task run exercise5::gethost host=google.com --nodes all --modulepath ./modules
 Started on node1...
 Finished on node1:
   google.com is available at 216.58.204.14 on localhost.localdomain

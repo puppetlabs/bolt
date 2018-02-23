@@ -35,7 +35,7 @@ plan exercise7::command (TargetSpec $nodes) {
 We can run the plan like so:
 
 ```
-$ bolt plan run exercise7::command nodes=$NODE --modulepath ./modules
+$ bolt plan run exercise7::command nodes=all --modulepath ./modules
 2018-02-16T15:35:47.843668 INFO   Bolt::Executor: Starting command run 'uptime' on ["node1"]
 2018-02-16T15:35:48.154690 INFO   Bolt::Executor: Ran command 'uptime' on 1 node with 0 failures
 [
@@ -85,7 +85,7 @@ This task simply accepts a filename and some content and saves a file to `/tmp`.
 You can run the task directly with the following command:
 
 ```
-bolt task run exercise7::write filename=hello message=world --nodes=$NODE --modulepath ./modules --debug
+bolt task run exercise7::write filename=hello message=world --nodes=all --modulepath ./modules --debug
 ```
 
 Note that in this case the task doesn't output anything to stdout. It can be useful to still trace the running of the task, and for that the `--debug` flag is useful. Here is the output when run with debug:
