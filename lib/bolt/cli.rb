@@ -183,7 +183,7 @@ Available options are:
                'Use SSL with WinRM') do |ssl|
           @options[:ssl] = ssl
         end
-        define('--transport TRANSPORT', TRANSPORTS,
+        define('--transport TRANSPORT', TRANSPORTS.map(&:to_s),
                'Specify a default transport: ' << TRANSPORTS.join(', ')) do |t|
           @options[:transport] = t
         end
@@ -286,7 +286,6 @@ Available options are:
                  'task'    => %w[show run],
                  'plan'    => %w[show run],
                  'file'    => %w[upload] }.freeze
-    TRANSPORTS = %w[ssh winrm pcp].freeze
 
     attr_reader :config, :options
 

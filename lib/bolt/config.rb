@@ -3,6 +3,8 @@ require 'bolt/cli'
 require 'logging'
 
 module Bolt
+  TRANSPORTS = %i[ssh winrm pcp].freeze
+
   Config = Struct.new(
     :concurrency,
     :format,
@@ -40,8 +42,6 @@ module Bolt
         :"task-environment" => 'production'
       }
     }.freeze
-
-    TRANSPORTS = %i[ssh winrm pcp].freeze
 
     def initialize(**kwargs)
       super()
