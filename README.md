@@ -178,75 +178,81 @@ Note that &mdash; in place of wildcard matching &mdash; shell-specific expansion
 ### Run a command over SSH
 
     $ bolt command run 'ssh -V' --nodes neptune
-    neptune:
-
-    OpenSSH_5.3p1, OpenSSL 1.0.1e-fips 11 Feb 2013
-
-    Ran on 1 node in 0.27 seconds
+    Started on neptune...
+    Finished on neptune:
+    STDERR:
+        OpenSSH_6.6.1p1, OpenSSL 1.0.1e-fips 11 Feb 2013
+    Ran on 1 node in 0.49 seconds
 
 ### Run a command over SSH against multiple hosts
 
     $ bolt command run 'ssh -V' --nodes neptune,mars
-    neptune:
-
-    OpenSSH_5.3p1, OpenSSL 1.0.1e-fips 11 Feb 2013
-
-    mars:
-
-    OpenSSH_6.6.1p1, OpenSSL 1.0.1e-fips 11 Feb 2013
-
-    Ran on 2 nodes in 0.27 seconds
+    Started on neptune...
+    Started on mars...
+    Finished on neptune:
+    STDERR:
+        OpenSSH_6.6.1p1, OpenSSL 1.0.1e-fips 11 Feb 2013
+    Finished on mars:
+    STDERR:
+        OpenSSH_6.6.1p1, OpenSSL 1.0.1e-fips 11 Feb 2013
+    Ran on 2 nodes in 0.44 seconds
 
 ### Run a command over WinRM
 
     $ bolt command run 'gpupdate /force' --nodes winrm://pluto --user Administrator --password <password>
-    pluto:
+    Started on pluto...
+    Finished on pluto:
+    STDOUT:
+        Updating policy...
 
-    Updating policy...
+        Computer Policy update has completed successfully.
 
-    Computer Policy update has completed successfully.
-
-    User Policy update has completed successfully.
-
+        User Policy update has completed successfully.
     Ran on 1 node in 11.21 seconds
 
 ### Run a command over WinRM against multiple hosts
 
     $ bolt command run '(Get-CimInstance Win32_OperatingSystem).version' --nodes winrm://pluto,winrm://mercury --user Administrator --password <password>
-    pluto:
-
-    6.3.9600
-
-    mercury:
-
-    10.0.14393
-
+    Started on pluto...
+    Started on mercury...
+    Finished on pluto:
+    STDOUT:
+        6.3.9600
+    Finished on mercury:
+    STDOUT:
+        10.0.14393
     Ran on 2 nodes in 6.03 seconds
 
 ### Run a bash script
 
     $ bolt script run ./install-puppet-agent.sh --nodes neptune
-    neptune: Installed puppet-agent 5.1.0
+    Started on neptune...
+    Finished on neptune:
+    STDOUT:
+        Installed puppet-agent 5.1.0
+    Ran on 1 node in 14.01 seconds
 
 ### Run a PowerShell script
 
     $ bolt script run Get-WUServiceManager.ps1 --nodes winrm://pluto --user Administrator --password <password>
-    pluto:
-
-    Name                  : Windows Server Update Service
-    ContentValidationCert : {}
-    ExpirationDate        : 6/18/5254 9:21:00 PM
-    IsManaged             : True
-    IsRegisteredWithAU    : True
-    IssueDate             : 1/1/2003 12:00:00 AM
-    OffersWindowsUpdates  : True
-    RedirectUrls          : System.__ComObject
-    ServiceID             : 3da21691-e39d-4da6-8a4b-b43877bcb1b7
-    IsScanPackageService  : False
-    CanRegisterWithAU     : True
-    ServiceUrl            :
-    SetupPrefix           :
-    IsDefaultAUService    : True
+    Started on pluto...
+    Finished on pluto:
+    STDOUT:
+        Name                  : Windows Server Update Service
+        ContentValidationCert : {}
+        ExpirationDate        : 6/18/5254 9:21:00 PM
+        IsManaged             : True
+        IsRegisteredWithAU    : True
+        IssueDate             : 1/1/2003 12:00:00 AM
+        OffersWindowsUpdates  : True
+        RedirectUrls          : System.__ComObject
+        ServiceID             : 3da21691-e39d-4da6-8a4b-b43877bcb1b7
+        IsScanPackageService  : False
+        CanRegisterWithAU     : True
+        ServiceUrl            :
+        SetupPrefix           :
+        IsDefaultAUService    : True
+    Ran on 1 node in 5.47 seconds
 
 ### Run the `sql` task from the `mysql` module
 
