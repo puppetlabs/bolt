@@ -3,7 +3,7 @@ require 'bolt/cli'
 require 'logging'
 
 module Bolt
-  TRANSPORTS = %i[ssh winrm pcp].freeze
+  TRANSPORTS = %i[ssh winrm pcp local].freeze
 
   Config = Struct.new(
     :concurrency,
@@ -40,7 +40,8 @@ module Bolt
       },
       pcp: {
         :"task-environment" => 'production'
-      }
+      },
+      local: {}
     }.freeze
 
     def initialize(**kwargs)
@@ -169,6 +170,12 @@ module Bolt
         end
         if data['pcp']['task-environment']
           self[:transports][:pcp][:"task-environment"] = data['pcp']['task-environment']
+        end
+      end
+
+      if data['local']
+        if data['local']['tmpdir']
+          self[:transports][:local][:tmpdir] = data['local']['tmpdir']
         end
       end
     end

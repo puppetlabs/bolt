@@ -51,6 +51,7 @@ module Bolt
       @config = config || Bolt::Config.new
       @data = data ||= {}
       @groups = Group.new(data.merge('name' => 'all'))
+      # TODO: add default entry for 'localhost'
       @group_lookup = {}
       @target_vars = {}
     end

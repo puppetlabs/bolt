@@ -175,6 +175,15 @@ Note that &mdash; in place of wildcard matching &mdash; shell-specific expansion
     Usage: bolt <subcommand> <action> [options]
     ...
 
+### Run a command locally
+
+    $ bolt command run 'ssh -V' --nodes local://localhost
+    Started on localhost...
+    Finished on localhost:
+    STDERR:
+        OpenSSH_7.6p1, LibreSSL 2.6.2
+    Ran on 1 node in 0.03 seconds
+
 ### Run a command over SSH
 
     $ bolt command run 'ssh -V' --nodes neptune
