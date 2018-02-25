@@ -3,9 +3,6 @@ require 'bolt/transport/base'
 module Bolt
   module Transport
     class WinRM < Base
-      STDIN_METHODS       = %w[both stdin].freeze
-      ENVIRONMENT_METHODS = %w[both environment].freeze
-
       PS_ARGS = %w[
         -NoProfile -NonInteractive -NoLogo -ExecutionPolicy Bypass
       ].freeze
