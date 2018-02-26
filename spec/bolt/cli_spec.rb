@@ -414,8 +414,8 @@ bar
         cli = Bolt::CLI.new(%w[command run --transport holodeck --nodes foo id])
         expect {
           cli.parse
-        }.to raise_error(OptionParser::InvalidArgument,
-                         /invalid argument: --transport holodeck/)
+        }.to raise_error(Bolt::CLIError,
+                         /Invalid parameter specified for option '--transport': holodeck/)
       end
     end
 

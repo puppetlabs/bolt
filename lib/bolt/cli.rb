@@ -433,6 +433,8 @@ Available options are:
       yield
     rescue OptionParser::MissingArgument => e
       raise Bolt::CLIError, "Option '#{e.args.first}' needs a parameter"
+    rescue OptionParser::InvalidArgument => e
+      raise Bolt::CLIError, "Invalid parameter specified for option '#{e.args.first}': #{e.args[1]}"
     rescue OptionParser::InvalidOption, OptionParser::AmbiguousOption => e
       raise Bolt::CLIError, "Unknown argument '#{e.args.first}'"
     end
