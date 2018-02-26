@@ -1,0 +1,61 @@
+---
+- - :approve
+  - CFPropertyList
+  - :who: bradejr
+    :why: 
+    :versions: []
+    :when: 2018-02-26 23:47:22.727579000 Z
+- - :whitelist
+  - MIT
+  - :who: bradejr
+    :why: 
+    :versions: []
+    :when: 2018-02-26 23:48:16.400477000 Z
+- - :whitelist
+  - Apache 2.0
+  - :who: bradejr
+    :why: 
+    :versions: []
+    :when: 2018-02-26 23:48:48.021244000 Z
+- - :whitelist
+  - ruby
+  - :who: bradejr
+    :why: 
+    :versions: []
+    :when: 2018-02-26 23:49:17.135760000 Z
+- - :whitelist
+  - Ruby
+  - :who: bradejr
+    :why: 
+    :versions: []
+    :when: 2018-02-26 23:49:33.016564000 Z
+- - :approve
+  - gettext
+  - :who: bradejr
+    :why: 
+    :versions: []
+    :when: 2018-02-26 23:50:00.597890000 Z
+- - :whitelist
+  - Simplified BSD
+  - :who: bradejr
+    :why: 
+    :versions: []
+    :when: 2018-02-26 23:50:22.302791000 Z
+- - :approve
+  - ffi
+  - :who: bradejr
+    :why: 
+    :versions: []
+    :when: 2018-02-26 23:50:46.376092000 Z
+- - :whitelist
+  - Artistic 2.0
+  - :who: bradejr
+    :why: 
+    :versions: []
+    :when: 2018-02-26 23:51:39.013184000 Z
+- - :approve
+  - puppetlabs_spec_helper
+  - :who: bradejr
+    :why: 
+    :versions: []
+    :when: 2018-02-26 23:56:53.530952000 Z
