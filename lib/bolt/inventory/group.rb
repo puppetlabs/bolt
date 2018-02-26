@@ -9,17 +9,18 @@ module Bolt
         @logger = Logging.logger[self]
         @name = data['name']
 
-        @nodes = if data['nodes']
-                   data['nodes'].map do |n|
-                     if n.is_a? String
-                       { 'name' => n }
-                     else
-                       n
-                     end
-                   end
-                 else
-                   []
-                 end
+        @nodes = {}
+        if data['nodes']
+          data['nodes'].each do |n|
+            n = { 'name' => n } if n.is_a? String
+            if @nodes.include? n['name']
+              @logger.warn("Ignoring duplicate node in #{@name}: #{n}")
+            else
+              @nodes[n['name']] = n
+            end
+          end
+        end
+
         @config = data['config'] || {}
         @groups = if data['groups']
                     data['groups'].map { |g| Group.new(g) }
@@ -45,7 +46,7 @@ module Bolt
 
         used_names << @name
 
-        @nodes.each do |n|
+        @nodes.each_value do |n|
           # Require nodes to be parseable as a Target.
           begin
             Target.new(n['name'])
@@ -82,7 +83,7 @@ module Bolt
       end
 
       def node_data(node_name)
-        if (data = @nodes.find { |n| n['name'] == node_name })
+        if (data = @nodes[node_name])
           { 'config' => data['config'] || {},
             # groups come from group_data
             'groups' => [] }
@@ -125,7 +126,7 @@ module Bolt
       end
 
       def local_node_names
-        @_node_names ||= Set.new(nodes.map { |n| n['name'] })
+        Set.new(@nodes.keys)
       end
       private :local_node_names
 
@@ -151,7 +152,7 @@ module Bolt
 
         if data
           data_merge(group_data, data)
-        elsif local_node_names.include?(node_name)
+        elsif @nodes.include?(node_name)
           group_data
         end
       end

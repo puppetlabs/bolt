@@ -335,6 +335,24 @@ describe Bolt::Inventory::Group do
     end
   end
 
+  context 'with a duplicate node' do
+    let(:data) do
+      {
+        'name' => 'group1',
+        'nodes' => [
+          { 'name' => 'node1',
+            'val' => 'a' },
+          { 'name' => 'node1',
+            'val' => 'b' }
+        ]
+      }
+    end
+
+    it 'uses the first value' do
+      expect(group.nodes['node1']['val']).to eq('a')
+    end
+  end
+
   context 'where a node uses an invalid name' do
     let(:data) do
       {
