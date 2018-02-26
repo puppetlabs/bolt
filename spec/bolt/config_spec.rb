@@ -106,5 +106,49 @@ describe Bolt::Config do
       )
       expect { config.validate }.to raise_error(Bolt::CLIError)
     end
+
+    it "accepts a boolean for host-key-check" do
+      config = {
+        transports: {
+          ssh: { host_key_check: false }
+        }
+      }
+      expect {
+        Bolt::Config.new(config).validate
+      }.not_to raise_error
+    end
+
+    it "does not accept host-key-check that is not a boolean" do
+      config = {
+        transports: {
+          ssh: { host_key_check: 'false' }
+        }
+      }
+      expect {
+        Bolt::Config.new(config).validate
+      }.to raise_error(Bolt::CLIError)
+    end
+
+    it "accepts a boolean for ssl" do
+      config = {
+        transports: {
+          winrm: { ssl: false }
+        }
+      }
+      expect {
+        Bolt::Config.new(config).validate
+      }.not_to raise_error
+    end
+
+    it "does not accept ssl that is not a boolean" do
+      config = {
+        transports: {
+          winrm: { ssl: 'false' }
+        }
+      }
+      expect {
+        Bolt::Config.new(config).validate
+      }.to raise_error(Bolt::CLIError)
+    end
   end
 end

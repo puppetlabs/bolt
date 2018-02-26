@@ -232,6 +232,16 @@ module Bolt
                      "user to escalate to with --run-as")
       end
 
+      host_key = self[:transports][:ssh][:host_key_check]
+      unless !!host_key == host_key
+        raise Bolt::CLIError, 'host-key-check option must be a Boolean true or false'
+      end
+
+      ssl_flag = self[:transports][:winrm][:ssl]
+      unless !!ssl_flag == ssl_flag
+        raise Bolt::CLIError, 'ssl option must be a Boolean true or false'
+      end
+
       self[:transports].each_value do |v|
         timeout_value = v[:connect_timeout]
         unless timeout_value.is_a?(Integer) || timeout_value.nil?
