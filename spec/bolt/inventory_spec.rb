@@ -9,6 +9,13 @@ describe Bolt::Inventory do
     names.map { |n| Bolt::Target.new(n) }
   end
 
+  def get_target(inventory, name)
+    targets = inventory.get_targets(name)
+    expect(targets.size).to eq(1)
+    expect(targets[0].name).to eq(name)
+    targets[0]
+  end
+
   let(:data) {
     {
       'nodes' => [
@@ -24,7 +31,7 @@ describe Bolt::Inventory do
       'config' => {
         'ssh' => {
           'user' => 'you',
-          'insecure' => 'true',
+          'host-key-check' => false,
           'port' => '2222'
         }
       },
@@ -43,7 +50,7 @@ describe Bolt::Inventory do
           ],
           'config' => {
             'ssh' => {
-              'insecure' => false
+              'host-key-check' => true
             }
           } },
         { 'name' => 'group2',
@@ -54,130 +61,23 @@ describe Bolt::Inventory do
               } },
             'node7', 'ssh://node8'
           ],
-          'config' => { 'ssh' => {
-            'insecure' => 'maybe'
-          } } }
+          'config' => {
+            'ssh' => {
+              'host-key-check' => false,
+              'port' => '2223'
+            }
+          } }
       ]
     }
   }
 
-  describe :config_for do
-    context 'with nodes at the top level' do
-      let(:data) {
-        {
-          'name' => 'group1',
-          'nodes' => [
-            'node1',
-            { 'name' =>  'node2' },
-            { 'name' =>  'node3',
-              'config' => {
-                'ssh' => true
-              } }
-          ]
-        }
-      }
-      let(:inventory) { Bolt::Inventory.new(data) }
-
-      it 'should initialize' do
-        expect(inventory).to be
-      end
-
-      it 'should return {} for a string node' do
-        expect(inventory.config_for('node1')).to eq({})
-      end
-
-      it 'should return {} for a hash node with no config' do
-        expect(inventory.config_for('node2')).to eq({})
-      end
-
-      it 'should return config for the node' do
-        expect(inventory.config_for('node3')).to eq(ssh: true)
-      end
-
-      it 'should return nil for an unknown node' do
-        expect(inventory.config_for('node5')).to be_nil
-      end
-    end
-
-    context 'with data in the group' do
-      let(:data) {
-        {
-          'nodes' => [
-            'node1',
-            { 'name' =>  'node2' },
-            { 'name' =>  'node3',
-              'config' => {
-                'ssh' => {
-                  'user' => 'me'
-                }
-              } }
-          ],
-          'config' => {
-            'ssh' => {
-              'user' => 'you',
-              'insecure' => 'true'
-            }
-          }
-        } }
-      let(:inventory) { Bolt::Inventory.new(data) }
-
-      it 'should return group config for string nodes' do
-        expect(inventory.config_for('node1')).to eq(ssh: {
-                                                      user: 'you',
-                                                      insecure: 'true'
-                                                    })
-      end
-
-      it 'should return group config for array nodes' do
-        expect(inventory.config_for('node2')).to eq(ssh: {
-                                                      user: 'you',
-                                                      insecure: 'true'
-                                                    })
-      end
-      it 'should merge config for from nodes' do
-        expect(inventory.config_for('node3')).to eq(ssh: {
-                                                      user: 'me',
-                                                      insecure: 'true'
-                                                    })
-      end
-    end
-
-    context 'with data in the group' do
-      let(:inventory) { Bolt::Inventory.new(data) }
-
-      it 'should use value from lowest node definition' do
-        expect(inventory.config_for('node4')[:ssh][:user]).to eq('me')
-      end
-
-      it 'should use values from the lowest group' do
-        expect(inventory.config_for('node4')[:ssh][:insecure]).to eq(false)
-      end
-
-      it 'should include values from parents' do
-        expect(inventory.config_for('node4')[:ssh][:port]).to eq('2222')
-      end
-
-      it 'should use values from the lowest group' do
-        expect(inventory.config_for('node4')[:ssh][:port]).to eq('2222')
-      end
-
-      it 'should use values from the first group' do
-        expect(inventory.config_for('node6')[:ssh][:insecure]).to eq(false)
-      end
-
-      it 'should prefer values from a node over an earlier group' do
-        expect(inventory.config_for('node6')[:ssh][:user]).to eq('someone')
-      end
-
-      it 'should use values from matching groups' do
-        expect(inventory.config_for('ssh://node8')[:ssh][:insecure]).to eq('maybe')
-      end
-
-      it 'should only return config for exact matches' do
-        expect(inventory.config_for('node8')).to be_nil
-      end
-    end
-  end
+  let(:ssh_target_option_defaults) {
+    {
+      connect_timeout: 10,
+      tty: false,
+      host_key_check: true
+    }
+  }
 
   describe :validate do
     it 'accepts empty inventory' do
@@ -308,6 +208,263 @@ describe Bolt::Inventory do
         expect {
           inventory.get_targets('*node')
         }.to raise_error(Bolt::Inventory::WildcardError, /Found 0 nodes matching wildcard pattern \*node/)
+      end
+    end
+
+    context 'with data in the group' do
+      let(:inventory) { Bolt::Inventory.new(data) }
+
+      it 'should use value from lowest node definition' do
+        expect(get_target(inventory, 'node4').user).to eq('me')
+      end
+
+      it 'should use values from the lowest group' do
+        expect(get_target(inventory, 'node4').options).to eq(ssh_target_option_defaults.merge(host_key_check: true))
+      end
+
+      it 'should include values from parents' do
+        expect(get_target(inventory, 'node4').port).to eq('2222')
+      end
+
+      it 'should use values from the first group' do
+        expect(get_target(inventory, 'node6').options).to eq(ssh_target_option_defaults.merge(host_key_check: true))
+      end
+
+      it 'should prefer values from a node over an earlier group' do
+        expect(get_target(inventory, 'node6').user).to eq('someone')
+      end
+
+      it 'should use values from matching groups' do
+        expect(get_target(inventory, 'ssh://node8').port).to eq('2223')
+      end
+
+      it 'should only return config for exact matches' do
+        expect(inventory.get_targets('node8')).to eq(targets(['node8']))
+      end
+    end
+
+    context 'with nodes at the top level' do
+      let(:data) {
+        {
+          'name' => 'group1',
+          'nodes' => [
+            'node1',
+            { 'name' =>  'node2' },
+            { 'name' =>  'node3',
+              'config' => {
+                'ssh' => {
+                  'data' => true,
+                  'port' => '2224'
+                }
+              } }
+          ]
+        }
+      }
+      let(:inventory) { Bolt::Inventory.new(data) }
+
+      it 'should initialize' do
+        expect(inventory).to be
+      end
+
+      it 'should return {} for a string node' do
+        expect(get_target(inventory, 'node1').options).to eq(ssh_target_option_defaults)
+      end
+
+      it 'should return {} for a hash node with no config' do
+        expect(get_target(inventory, 'node2').options).to eq(ssh_target_option_defaults)
+      end
+
+      it 'should return config for the node' do
+        target = get_target(inventory, 'node3')
+        expect(target.options).to eq(ssh_target_option_defaults)
+        expect(target.port).to eq('2224')
+      end
+
+      it 'should return the raw target for an unknown node' do
+        expect(inventory.get_targets('node5')).to eq(targets(['node5']))
+      end
+    end
+
+    context 'with simple data in the group' do
+      let(:data) {
+        {
+          'nodes' => [
+            'node1',
+            { 'name' =>  'node2' },
+            { 'name' =>  'node3',
+              'config' => {
+                'ssh' => {
+                  'user' => 'me'
+                }
+              } }
+          ],
+          'config' => {
+            'ssh' => {
+              'user' => 'you',
+              'host-key-check' => false
+            }
+          }
+        } }
+      let(:inventory) { Bolt::Inventory.new(data) }
+
+      it 'should return group config for string nodes' do
+        target = get_target(inventory, 'node1')
+        expect(target.options).to eq(ssh_target_option_defaults.merge(host_key_check: false))
+        expect(target.user).to eq('you')
+      end
+
+      it 'should return group config for array nodes' do
+        target = get_target(inventory, 'node2')
+        expect(target.options).to eq(ssh_target_option_defaults.merge(host_key_check: false))
+        expect(target.user).to eq('you')
+      end
+
+      it 'should merge config for from nodes' do
+        target = get_target(inventory, 'node3')
+        expect(target.options).to eq(ssh_target_option_defaults.merge(host_key_check: false))
+        expect(target.user).to eq('me')
+      end
+    end
+
+    context 'with config errors in data' do
+      let(:inventory) { Bolt::Inventory.new(data) }
+
+      context 'host-key-check' do
+        let(:data) {
+          {
+            'nodes' => ['node'],
+            'config' => { 'ssh' => { 'host-key-check' => 'false' } }
+          }
+        }
+
+        it 'fails validation' do
+          expect { inventory.get_targets('node') }.to raise_error(Bolt::CLIError)
+        end
+      end
+
+      context 'connect-timeout' do
+        let(:data) {
+          {
+            'nodes' => ['node'],
+            'config' => { 'winrm' => { 'connect-timeout' => '10' } }
+          }
+        }
+
+        it 'fails validation' do
+          expect { inventory.get_targets('node') }.to raise_error(Bolt::CLIError)
+        end
+      end
+
+      context 'ssl' do
+        let(:data) {
+          {
+            'nodes' => ['node'],
+            'config' => { 'winrm' => { 'ssl' => 'true' } }
+          }
+        }
+
+        it 'fails validation' do
+          expect { inventory.get_targets('node') }.to raise_error(Bolt::CLIError)
+        end
+      end
+    end
+
+    context 'with all options in the config' do
+      def common_data(transport)
+        {
+          'user' => 'me' + transport,
+          'password' => 'you' + transport,
+          'port' => '12345' + transport,
+          'private-key' => 'anything',
+          'ssl' => false,
+          'host-key-check' => false,
+          'connect-timeout' => transport.size,
+          'tmpdir' => '/' + transport,
+          'run-as' => 'root',
+          'sudo-password' => 'nothing',
+          'extensions' => '.py',
+          'service-url' => 'https://master',
+          'cacert' => transport + '.pem',
+          'token-file' => 'token',
+          'task-environment' => 'prod'
+        }
+      end
+
+      let(:data) {
+        {
+          'nodes' => ['ssh://node', 'winrm://node', 'pcp://node', 'node'],
+          'config' => {
+            'transport' => 'winrm',
+            'modulepath' => 'nonsense',
+            'ssh' => common_data('ssh'),
+            'winrm' => common_data('winrm'),
+            'pcp' => common_data('pcp')
+          }
+        }
+      }
+      let(:conf) { Bolt::Config.new }
+      let(:inventory) { Bolt::Inventory.new(data, conf) }
+
+      it 'should not modify existing config' do
+        get_target(inventory, 'ssh://node')
+        expect(conf[:modulepath]).to be_nil
+        expect(conf[:transport]).to eq('ssh')
+        expect(conf[:transports][:ssh][:host_key_check]).to be true
+        expect(conf[:transports][:winrm][:ssl]).to be true
+      end
+
+      it 'uses the configured transport' do
+        target = get_target(inventory, 'node')
+        expect(target.protocol).to eq('winrm')
+      end
+
+      it 'only uses configured options for ssh' do
+        target = get_target(inventory, 'ssh://node')
+        expect(target.protocol).to eq('ssh')
+        expect(target.user).to eq('messh')
+        expect(target.password).to eq('youssh')
+        expect(target.port).to eq('12345ssh')
+        expect(target.options).to eq(
+          connect_timeout: 3,
+          tty: false,
+          host_key_check: false,
+          key: "anything",
+          tmpdir: "/ssh",
+          run_as: "root",
+          sudo_password: "nothing"
+        )
+      end
+
+      it 'only uses configured options for winrm' do
+        target = get_target(inventory, 'winrm://node')
+        expect(target.protocol).to eq('winrm')
+        expect(target.user).to eq('mewinrm')
+        expect(target.password).to eq('youwinrm')
+        expect(target.port).to eq('12345winrm')
+        expect(target.options).to eq(
+          connect_timeout: 5,
+          tty: false,
+          ssl: false,
+          tmpdir: "/winrm",
+          cacert: "winrm.pem",
+          extensions: [".py"]
+        )
+      end
+
+      it 'only uses configured options for pcp' do
+        target = get_target(inventory, 'pcp://node')
+        expect(target.protocol).to eq('pcp')
+        expect(target.user).to be nil
+        expect(target.password).to be nil
+        expect(target.port).to be nil
+        expect(target.options).to eq(
+          connect_timeout: 10,
+          task_environment: "prod",
+          tty: false,
+          :"service-url" => "https://master",
+          cacert: "pcp.pem",
+          :"token-file" => "token"
+        )
       end
     end
   end

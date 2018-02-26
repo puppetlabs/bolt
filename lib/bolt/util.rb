@@ -42,13 +42,6 @@ module Bolt
         end
         hash1.merge(hash2, &recursive_merge)
       end
-
-      def symbolize_keys(hash)
-        hash.each_with_object({}) do |(k, v), acc|
-          k = k.to_sym
-          acc[k] = v.is_a?(Hash) ? symbolize_keys(v) : v
-        end
-      end
     end
   end
 end

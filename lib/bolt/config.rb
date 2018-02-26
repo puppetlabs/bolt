@@ -71,6 +71,15 @@ module Bolt
       end
     end
 
+    def deep_clone
+      copy = clone
+      copy[:transports] = self[:transports].clone
+      TRANSPORTS.each do |transport|
+        copy[:transports][transport] = self[:transports][transport].clone
+      end
+      copy
+    end
+
     def default_paths
       root_path = File.expand_path(File.join('~', '.puppetlabs'))
       [File.join(root_path, 'bolt.yaml'), File.join(root_path, 'bolt.yml')]
@@ -168,6 +177,7 @@ module Bolt
         end
       end
     end
+    private :update_from_file
 
     def load_file(path)
       data = Bolt::Util.read_config_file(path, default_paths, 'config')
@@ -201,6 +211,27 @@ module Bolt
             next
           end
         end
+      end
+    end
+
+    def update_from_inventory(data)
+      update_from_file(data)
+
+      if data['transport']
+        self[:transport] = data['transport']
+      end
+
+      # Add options that aren't allowed in a config file, but are allowed in inventory
+      %w[user password port].each do |opt|
+        (TRANSPORTS - [:pcp]).each do |transport|
+          if data[transport.to_s] && data[transport.to_s][opt]
+            self[:transports][transport][opt.to_sym] = data[transport.to_s][opt]
+          end
+        end
+      end
+
+      if data['ssh'] && data['ssh']['sudo-password']
+        self[:transports][:ssh][:sudo_password] = data['ssh']['sudo-password']
       end
     end
 
