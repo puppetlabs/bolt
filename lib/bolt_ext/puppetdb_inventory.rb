@@ -197,7 +197,7 @@ query results.
 
         inventory_file = positional_args.shift
         unless inventory_file
-          raise "--inventory is a required option"
+          raise "Please specify an input file (see --help for details)"
         end
 
         if positional_args.any?
