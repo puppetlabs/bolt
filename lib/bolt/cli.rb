@@ -206,7 +206,7 @@ Available options are:
           @options[:configfile] = path
         end
         define('--inventoryfile INVENTORY_PATH',
-               'Specify where to load the invenotry file from') do |path|
+               'Specify where to load the inventory file from') do |path|
           @options[:inventoryfile] = path
         end
         define_tail('--[no-]tty',
