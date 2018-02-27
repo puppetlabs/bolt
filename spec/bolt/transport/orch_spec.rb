@@ -46,7 +46,7 @@ describe Bolt::Transport::Orch, orchestrator: true do
     end
 
     it "sets environment" do
-      targets.first.options[:orch_task_environment] = 'development'
+      targets.first.options[:task_environment] = 'development'
       body = orch.build_request(targets, mtask, {})
       expect(body[:environment]).to eq('development')
     end
@@ -141,10 +141,10 @@ describe Bolt::Transport::Orch, orchestrator: true do
 
   describe :batches do
     it "splits targets in different environments into separate batches" do
-      targets = [Bolt::Target.new('a', orch_task_environment: 'production'),
-                 Bolt::Target.new('b', orch_task_environment: 'development'),
-                 Bolt::Target.new('c', orch_task_environment: 'test'),
-                 Bolt::Target.new('d', orch_task_environment: 'development')]
+      targets = [Bolt::Target.new('a', task_environment: 'production'),
+                 Bolt::Target.new('b', task_environment: 'development'),
+                 Bolt::Target.new('c', task_environment: 'test'),
+                 Bolt::Target.new('d', task_environment: 'development')]
       batches = Set.new([[targets[0]],
                          [targets[1], targets[3]],
                          [targets[2]]])

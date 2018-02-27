@@ -1517,7 +1517,7 @@ bar
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo])
         cli.parse
-        expect(cli.config[:transports][:pcp][:orch_task_environment]).to eq('testenv')
+        expect(cli.config[:transports][:pcp][:task_environment]).to eq('testenv')
       end
     end
 
@@ -1525,7 +1525,7 @@ bar
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo])
         cli.parse
-        expect(cli.config[:transports][:pcp][:service_url]).to eql('http://foo.org')
+        expect(cli.config[:transports][:pcp][:"service-url"]).to eql('http://foo.org')
       end
     end
 
@@ -1533,7 +1533,7 @@ bar
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo])
         cli.parse
-        expect(cli.config[:transports][:pcp][:token_file]).to eql('/path/to/token')
+        expect(cli.config[:transports][:pcp][:"token-file"]).to eql('/path/to/token')
       end
     end
 

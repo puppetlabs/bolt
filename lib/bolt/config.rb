@@ -22,11 +22,10 @@ module Bolt
 
     TRANSPORT_OPTIONS = %i[host_key_check password run_as sudo_password extensions
                            ssl key tty tmpdir user connect_timeout cacert
-                           token_file orch_task_environment service_url].freeze
+                           token-file task_environment service-url].freeze
 
     TRANSPORT_DEFAULTS = {
       connect_timeout: 10,
-      orch_task_environment: 'production',
       tty: false
     }.freeze
 
@@ -37,7 +36,9 @@ module Bolt
       winrm: {
         ssl: true
       },
-      pcp: {}
+      pcp: {
+        task_environment: 'production'
+      }
     }.freeze
 
     TRANSPORTS = %i[ssh winrm pcp].freeze
@@ -154,16 +155,16 @@ module Bolt
 
       if data['pcp']
         if data['pcp']['service-url']
-          self[:transports][:pcp][:service_url] = data['pcp']['service-url']
+          self[:transports][:pcp][:"service-url"] = data['pcp']['service-url']
         end
         if data['pcp']['cacert']
           self[:transports][:pcp][:cacert] = data['pcp']['cacert']
         end
         if data['pcp']['token-file']
-          self[:transports][:pcp][:token_file] = data['pcp']['token-file']
+          self[:transports][:pcp][:"token-file"] = data['pcp']['token-file']
         end
         if data['pcp']['task-environment']
-          self[:transports][:pcp][:orch_task_environment] = data['pcp']['task-environment']
+          self[:transports][:pcp][:task_environment] = data['pcp']['task-environment']
         end
       end
     end
@@ -186,7 +187,7 @@ module Bolt
 
       TRANSPORT_OPTIONS.each do |key|
         TRANSPORTS.each do |transport|
-          unless %i[ssl host_key_check].any? { |k| k == key }
+          unless %i[ssl host_key_check task_environment].any? { |k| k == key }
             self[:transports][transport][key] = options[key] if options[key]
             next
           end
