@@ -24,7 +24,8 @@ module Bolt
   class CLIExit < StandardError; end
 
   class CLI
-    BANNER = <<-HELP.freeze
+    class BoltOptionParser < OptionParser
+      BANNER = <<-HELP.freeze
 Usage: bolt <subcommand> <action> [options]
 
 Available subcommands:
@@ -39,9 +40,9 @@ Available subcommands:
     bolt file upload <src> <dest>    Upload a local file
 
 where [options] are:
-HELP
+      HELP
 
-    TASK_HELP = <<-HELP.freeze
+      TASK_HELP = <<-HELP.freeze
 Usage: bolt task <action> <task> [options] [parameters]
 
 Available actions are:
@@ -52,27 +53,27 @@ Available actions are:
 Parameters are of the form <parameter>=<value>.
 
 Available options are:
-HELP
+      HELP
 
-    COMMAND_HELP = <<-HELP.freeze
+      COMMAND_HELP = <<-HELP.freeze
 Usage: bolt command <action> <command> [options]
 
 Available actions are:
     run                              Run a command remotely
 
 Available options are:
-HELP
+      HELP
 
-    SCRIPT_HELP = <<-HELP.freeze
+      SCRIPT_HELP = <<-HELP.freeze
 Usage: bolt script <action> <script> [[arg1] ... [argN]] [options]
 
 Available actions are:
     run                              Upload a local script and run it remotely
 
 Available options are:
-HELP
+      HELP
 
-    PLAN_HELP = <<-HELP.freeze
+      PLAN_HELP = <<-HELP.freeze
 Usage: bolt plan <action> <plan> [options] [parameters]
 
 Available actions are:
@@ -83,16 +84,202 @@ Available actions are:
 Parameters are of the form <parameter>=<value>.
 
 Available options are:
-HELP
+      HELP
 
-    FILE_HELP = <<-HELP.freeze
+      FILE_HELP = <<-HELP.freeze
 Usage: bolt file <action> [options]
 
 Available actions are:
     upload <src> <dest>              Upload local file <src> to <dest> on each node
 
 Available options are:
-HELP
+      HELP
+
+      # A helper mixin for OptionParser::Switch instances which will allow
+      # us to show/hide particular switch in the help message produced by
+      # the OptionParser#help method on demand.
+      module SwitchHider
+        attr_accessor :hide
+
+        def summarize(*args)
+          return self if hide
+          super
+        end
+      end
+
+      def initialize(options)
+        super()
+
+        @options = options
+
+        @nodes = define('-n', '--nodes NODES',
+                        'Node(s) to connect to in URI format [protocol://]host[:port] (Optional)',
+                        'Eg. --nodes bolt.puppet.com',
+                        'Eg. --nodes localhost,ssh://nix.com:2222,winrm://windows.puppet.com',
+                        # An empty line in a switch description causes the OptionParser#help
+                        # method to raise an exception. Specifying a line containing only a
+                        # newline is the closest one can get to the empty line without
+                        # triggering that exception.
+                        "\n",
+                        '* NODES can either be comma-separated, \'@<file>\' to read',
+                        '* nodes from a file, or \'-\' to read from stdin',
+                        '* Windows nodes must specify protocol with winrm://',
+                        '* protocol is `ssh` by default, may be `ssh` or `winrm`',
+                        '* port defaults to `22` for SSH',
+                        '* port defaults to `5985` or `5986` for WinRM, based on the --[no-]ssl setting') do |nodes|
+          @options[:nodes] << get_arg_input(nodes)
+        end.extend(SwitchHider)
+        define('-u', '--user USER',
+               'User to authenticate as (Optional)') do |user|
+          @options[:user] = user
+        end
+        define('-p', '--password [PASSWORD]',
+               'Password to authenticate with (Optional).',
+               'Omit the value to prompt for the password.') do |password|
+          if password.nil?
+            STDOUT.print "Please enter your password: "
+            @options[:password] = STDIN.noecho(&:gets).chomp
+            STDOUT.puts
+          else
+            @options[:password] = password
+          end
+        end
+        define('--private-key KEY',
+               'Private ssh key to authenticate with (Optional)') do |key|
+          @options[:key] = key
+        end
+        define('--tmpdir DIR',
+               'The directory to upload and execute temporary files on the target (Optional)') do |tmpdir|
+          @options[:tmpdir] = tmpdir
+        end
+        define('-c', '--concurrency CONCURRENCY', Integer,
+               'Maximum number of simultaneous connections ' \
+               '(Optional, defaults to 100)') do |concurrency|
+          @options[:concurrency] = concurrency
+        end
+        define('--connect-timeout TIMEOUT', Integer,
+               'Connection timeout (Optional)') do |timeout|
+          @options[:connect_timeout] = timeout
+        end
+        define('--modulepath MODULES',
+               'List of directories containing modules, ' \
+               'separated by ' << File::PATH_SEPARATOR) do |modulepath|
+          @options[:modulepath] = modulepath.split(File::PATH_SEPARATOR)
+        end
+        define('--params PARAMETERS',
+               'Parameters to a task or plan') do |params|
+          @options[:task_options] = parse_params(params)
+        end
+
+        define('--format FORMAT',
+               'Output format to use: human or json') do |format|
+          @options[:format] = format
+        end
+        define('--[no-]host-key-check',
+               'Check host keys with SSH') do |host_key_check|
+          @options[:host_key_check] = host_key_check
+        end
+        define('--[no-]ssl',
+               'Use SSL with WinRM') do |ssl|
+          @options[:ssl] = ssl
+        end
+        define('--transport TRANSPORT', TRANSPORTS,
+               'Specify a default transport: ' << TRANSPORTS.join(', ')) do |t|
+          @options[:transport] = t
+        end
+        define('--run-as USER',
+               'User to run as using privilege escalation') do |user|
+          @options[:run_as] = user
+        end
+        define('--sudo-password [PASSWORD]',
+               'Password for privilege escalation') do |password|
+          if password.nil?
+            STDOUT.print "Please enter your privilege escalation password: "
+            @options[:sudo_password] = STDIN.noecho(&:gets).chomp
+            STDOUT.puts
+          else
+            @options[:sudo_password] = password
+          end
+        end
+        define('--configfile CONFIG_PATH',
+               'Specify where to load the config file from') do |path|
+          @options[:configfile] = path
+        end
+        define('--inventoryfile INVENTORY_PATH',
+               'Specify where to load the invenotry file from') do |path|
+          @options[:inventoryfile] = path
+        end
+        define_tail('--[no-]tty',
+                    'Request a pseudo TTY on nodes that support it') do |tty|
+          @options[:tty] = tty
+        end
+        define_tail('--noop',
+                    'Execute a task that supports it in noop mode') do |_|
+          @options[:noop] = true
+        end
+        define_tail('-h', '--help', 'Display help') do |_|
+          @options[:help] = true
+        end
+        define_tail('--verbose', 'Display verbose logging') do |_|
+          @options[:verbose] = true
+        end
+        define_tail('--debug', 'Display debug logging') do |_|
+          @options[:debug] = true
+        end
+        define_tail('--version', 'Display the version') do |_|
+          puts Bolt::VERSION
+          raise Bolt::CLIExit
+        end
+
+        update
+      end
+
+      def update
+        # Update the banner according to the mode
+        self.banner = case @options[:mode]
+                      when 'plan'
+                        PLAN_HELP
+                      when 'command'
+                        COMMAND_HELP
+                      when 'script'
+                        SCRIPT_HELP
+                      when 'task'
+                        TASK_HELP
+                      when 'file'
+                        FILE_HELP
+                      else
+                        BANNER
+                      end
+
+        # Only show the --nodes switch in the help message produced by
+        # the #help method when not dealing with plans
+        @nodes.hide = (@options[:mode] == 'plan')
+      end
+
+      def parse_params(params)
+        json = get_arg_input(params)
+        JSON.parse(json)
+      rescue JSON::ParserError => err
+        raise Bolt::CLIError, "Unable to parse --params value as JSON: #{err}"
+      end
+
+      def get_arg_input(value)
+        if value.start_with?('@')
+          file = value.sub(/^@/, '')
+          read_arg_file(file)
+        elsif value == '-'
+          STDIN.read
+        else
+          value
+        end
+      end
+
+      def read_arg_file(file)
+        File.read(file)
+      rescue StandardError => err
+        raise Bolt::CLIError, "Error attempting to read #{file}: #{err}"
+      end
+    end
 
     COMMANDS = { 'command' => %w[run],
                  'script'  => %w[run],
@@ -101,196 +288,63 @@ HELP
                  'file'    => %w[upload] }.freeze
     TRANSPORTS = %w[ssh winrm pcp].freeze
 
-    attr_reader :parser, :config
-    attr_accessor :options
+    attr_reader :config, :options
 
     def initialize(argv)
       Bolt::Logger.initialize_logging
-      @argv    = argv
+      @logger = Logging.logger[self]
+
+      @config = Bolt::Config.new
+
+      @argv = argv
+
       @options = {
         nodes: []
       }
-      @config = Bolt::Config.new
-
-      # parse mode and object, use COMMANDS as a whitelist
-      @options[:mode] = argv[0] if COMMANDS.keys.any? { |mode| argv[0] == mode }
-      @options[:object] = argv[1] if COMMANDS.values.flatten.uniq.any? { |object| argv[1] == object }
-      @parser = create_option_parser(@options)
-      @logger = Logging.logger[self]
-    end
-
-    def create_option_parser(results)
-      parser = OptionParser.new('') do |opts|
-        unless results[:mode] == 'plan'
-          opts.on('-n', '--nodes NODES',
-                  'Node(s) to connect to in URI format [protocol://]host[:port] (Optional)',
-                  'Eg. --nodes bolt.puppet.com',
-                  'Eg. --nodes localhost,ssh://nix.com:2222,winrm://windows.puppet.com',
-                  "\n",
-                  '* NODES can either be comma-separated, \'@<file>\' to read',
-                  '* nodes from a file, or \'-\' to read from stdin',
-                  '* Windows nodes must specify protocol with winrm://',
-                  '* protocol is `ssh` by default, may be `ssh` or `winrm`',
-                  '* port defaults to `22` for SSH',
-                  '* port defaults to `5985` or `5986` for WinRM, based on the --[no-]ssl setting') do |nodes|
-            results[:nodes] << get_arg_input(nodes)
-          end
-        end
-        opts.on('-u', '--user USER',
-                "User to authenticate as (Optional)") do |user|
-          results[:user] = user
-        end
-        opts.on('-p', '--password [PASSWORD]',
-                'Password to authenticate with (Optional).',
-                'Omit the value to prompt for the password.') do |password|
-          if password.nil?
-            STDOUT.print "Please enter your password: "
-            results[:password] = STDIN.noecho(&:gets).chomp
-            STDOUT.puts
-          else
-            results[:password] = password
-          end
-        end
-        opts.on('--private-key KEY',
-                "Private ssh key to authenticate with (Optional)") do |key|
-          results[:key] = key
-        end
-        opts.on('--tmpdir DIR',
-                "The directory to upload and execute temporary files on the target (Optional)") do |tmpdir|
-          results[:tmpdir] = tmpdir
-        end
-        opts.on('-c', '--concurrency CONCURRENCY', Integer,
-                "Maximum number of simultaneous connections " \
-                "(Optional, defaults to 100)") do |concurrency|
-          results[:concurrency] = concurrency
-        end
-        opts.on('--connect-timeout TIMEOUT', Integer,
-                "Connection timeout (Optional)") do |timeout|
-          results[:connect_timeout] = timeout
-        end
-        opts.on('--modulepath MODULES',
-                "List of directories containing modules, " \
-                "separated by #{File::PATH_SEPARATOR}") do |modulepath|
-          results[:modulepath] = modulepath.split(File::PATH_SEPARATOR)
-        end
-        opts.on('--params PARAMETERS',
-                "Parameters to a task or plan") do |params|
-          results[:task_options] = parse_params(params)
-        end
-
-        opts.on('--format FORMAT',
-                "Output format to use: human or json") do |format|
-          results[:format] = format
-        end
-        opts.on('--[no-]host-key-check',
-                "Check host keys with SSH") do |host_key_check|
-          results[:host_key_check] = host_key_check
-        end
-        opts.on('--[no-]ssl',
-                "Use SSL with WinRM") do |ssl|
-          results[:ssl] = ssl
-        end
-        opts.on('--transport TRANSPORT', TRANSPORTS,
-                "Specify a default transport: #{TRANSPORTS.join(', ')}") do |t|
-          results[:transport] = t
-        end
-        opts.on('--run-as USER',
-                "User to run as using privilege escalation") do |user|
-          results[:run_as] = user
-        end
-        opts.on('--sudo-password [PASSWORD]',
-                'Password for privilege escalation') do |password|
-          if password.nil?
-            STDOUT.print "Please enter your privilege escalation password: "
-            results[:sudo_password] = STDIN.noecho(&:gets).chomp
-            STDOUT.puts
-          else
-            results[:sudo_password] = password
-          end
-        end
-        opts.on('--configfile CONFIG_PATH',
-                'Specify where to load the config file from') do |path|
-          results[:configfile] = path
-        end
-        opts.on('--inventoryfile INVENTORY_PATH',
-                'Specify where to load the invenotry file from') do |path|
-          results[:inventoryfile] = path
-        end
-        opts.on_tail('--[no-]tty',
-                     "Request a pseudo TTY on nodes that support it") do |tty|
-          results[:tty] = tty
-        end
-        opts.on_tail('--noop',
-                     "Execute a task that supports it in noop mode") do |_|
-          results[:noop] = true
-        end
-        opts.on_tail('-h', '--help', 'Display help') do |_|
-          results[:help] = true
-        end
-        opts.on_tail('--verbose', 'Display verbose logging') do |_|
-          results[:verbose] = true
-        end
-        opts.on_tail('--debug', 'Display debug logging') do |_|
-          results[:debug] = true
-        end
-        opts.on_tail('--version', 'Display the version') do |_|
-          puts Bolt::VERSION
-          raise Bolt::CLIExit
-        end
-      end
-
-      parser.banner = case results[:mode]
-                      when "plan"
-                        PLAN_HELP
-                      when "command"
-                        COMMAND_HELP
-                      when "script"
-                        SCRIPT_HELP
-                      when "task"
-                        TASK_HELP
-                      when "file"
-                        FILE_HELP
-                      else
-                        BANNER
-                      end
-      parser
     end
 
     # Only call after @config has been initialized.
     def inventory
-      Bolt::Inventory.from_config(@config)
+      Bolt::Inventory.from_config(config)
     end
     private :inventory
 
     def parse
-      if @argv.empty?
-        options[:help] = true
-      end
+      parser = BoltOptionParser.new(options)
 
-      remaining = handle_parser_errors do
-        parser.permute(@argv)
-      end
+      if @argv.empty? ||
+         begin
+           # RuboCop apparently doesn't realize this is a block and issues
+           # the Lint/AssignmentInCondition warning for every assignment in
+           # it, so we disable that warning here.
+           # rubocop:disable Lint/AssignmentInCondition
+           remaining = handle_parser_errors do
+             parser.permute(@argv)
+           end
 
-      # Shortcut to handle help before other errors may be generated
-      options[:mode] = remaining.shift
+           # Set the mode
+           options[:mode] = remaining.shift
 
-      if options[:mode] == 'help'
-        options[:help] = true
+           if options[:mode] == 'help'
+             options[:help] = true
+             options[:mode] = remaining.shift
+           end
 
-        # regenerate options parser with new mode
-        options[:mode] = remaining.shift
-        @parser = create_option_parser(options)
-      end
+           # Update the parser for the new mode
+           parser.update
 
-      if options[:help]
+           options[:help]
+           # rubocop:enable Lint/AssignmentInCondition
+         end
+      then # rubocop:disable Style/MultilineIfThen
         puts parser.help
         raise Bolt::CLIExit
       end
 
-      @config.load_file(options[:configfile])
-      @config.update_from_cli(options)
-      @config.validate
-      Logging.logger[:root].level = @config[:log_level] || :notice
+      config.load_file(options[:configfile])
+      config.update_from_cli(options)
+      config.validate
+      Logging.logger[:root].level = config[:log_level] || :notice
 
       # This section handles parsing non-flag options which are
       # mode specific rather then part of the config
@@ -313,36 +367,14 @@ HELP
       validate(options)
 
       # After validation, initialize inventory and targets. Errors here are better to catch early.
-      options[:targets] = inventory.get_targets(options[:nodes]) if options[:nodes]
+      unless options[:action] == 'show' || options[:mode] == 'plan'
+        options[:targets] = inventory.get_targets(options[:nodes]) if options[:nodes]
+      end
 
       options
     rescue Bolt::Error => e
       warn e.message
       raise e
-    end
-
-    def parse_params(params)
-      json = get_arg_input(params)
-      JSON.parse(json)
-    rescue JSON::ParserError => err
-      raise Bolt::CLIError, "Unable to parse --params value as JSON: #{err}"
-    end
-
-    def get_arg_input(value)
-      if value.start_with?('@')
-        file = value.sub(/^@/, '')
-        read_arg_file(file)
-      elsif value == '-'
-        STDIN.read
-      else
-        value
-      end
-    end
-
-    def read_arg_file(file)
-      File.read(file)
-    rescue StandardError => err
-      raise Bolt::CLIError, "Error attempting to read #{file}: #{err}"
     end
 
     def validate(options)
@@ -385,7 +417,7 @@ HELP
         raise Bolt::CLIError, "Option '--nodes' must be specified"
       end
 
-      if %w[task plan].include?(options[:mode]) && @config[:modulepath].nil?
+      if %w[task plan].include?(options[:mode]) && config[:modulepath].nil?
         raise Bolt::CLIError,
               "Option '--modulepath' must be specified when using" \
               " a task or plan"
@@ -401,6 +433,8 @@ HELP
       yield
     rescue OptionParser::MissingArgument => e
       raise Bolt::CLIError, "Option '#{e.args.first}' needs a parameter"
+    rescue OptionParser::InvalidArgument => e
+      raise Bolt::CLIError, "Invalid parameter specified for option '#{e.args.first}': #{e.args[1]}"
     rescue OptionParser::InvalidOption, OptionParser::AmbiguousOption => e
       raise Bolt::CLIError, "Unknown argument '#{e.args.first}'"
     end
@@ -416,7 +450,7 @@ HELP
       end
 
       if options[:mode] == 'plan' || options[:mode] == 'task'
-        pal = Bolt::PAL.new(@config)
+        pal = Bolt::PAL.new(config)
       end
 
       if options[:action] == 'show'
@@ -443,13 +477,22 @@ HELP
       message = 'There may be processes left executing on some nodes.'
 
       if options[:mode] == 'plan'
-        executor = Bolt::Executor.new(@config, options[:noop], true)
+        unless options[:nodes].empty?
+          if options[:task_options]['nodes']
+            raise Bolt::CLIError,
+                  "A plan's 'nodes' parameter may be specified using the --nodes option, but in that " \
+                  "case it must not be specified as a separate nodes=<value> parameter nor included " \
+                  "in the JSON data passed in the --params option"
+          end
+          options[:task_options]['nodes'] = options[:nodes].join(',')
+        end
+        executor = Bolt::Executor.new(config, options[:noop], true)
         result = pal.run_plan(options[:object], options[:task_options], executor, inventory)
         outputter.print_plan_result(result)
         # An exception would have been raised if the plan failed
         code = 0
       else
-        executor = Bolt::Executor.new(@config, options[:noop])
+        executor = Bolt::Executor.new(config, options[:noop])
         targets = options[:targets]
 
         results = nil
@@ -525,7 +568,7 @@ HELP
     end
 
     def outputter
-      @outputter ||= Bolt::Outputter.for_format(@config[:format])
+      @outputter ||= Bolt::Outputter.for_format(config[:format])
     end
   end
 end
