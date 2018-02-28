@@ -72,12 +72,7 @@ module Bolt
     end
 
     def deep_clone
-      copy = clone
-      copy[:transports] = self[:transports].clone
-      TRANSPORTS.each do |transport|
-        copy[:transports][transport] = self[:transports][transport].clone
-      end
-      copy
+      Bolt::Util.deep_clone(self)
     end
 
     def default_paths
