@@ -83,6 +83,8 @@ module Bolt
           end
         elsif File.exist?(DEFAULT_CONFIG)
           config = JSON.parse(File.read(DEFAULT_CONFIG))
+        else
+          config = {}
         end
         config.fetch('puppetdb', {})
       end
