@@ -305,13 +305,13 @@ bar
       end
     end
 
-    describe "log level" do
-      let(:root_logger) { Logging.logger[:root] }
-      after(:each) { root_logger.level = :notice }
+    describe "console log level" do
+      let(:console_log) { Logging.appenders['console'] }
+      after(:each) { console_log.level = :notice }
       it "is not sensitive to ordering of debug and verbose" do
         cli = Bolt::CLI.new(%w[command run --nodes foo --debug --verbose])
         cli.parse
-        expect(root_logger.level).to eq(Logging.level_num(:debug))
+        expect(console_log.level).to eq(Logging.level_num(:debug))
       end
     end
 
@@ -552,7 +552,6 @@ bar
     describe "execute" do
       let(:executor) { double('executor', noop: false) }
       let(:cli) { Bolt::CLI.new({}) }
-      let(:cli_logger) { Logging.logger[cli] }
       let(:targets) { [target] }
       let(:output) { StringIO.new }
       let(:result_vals) { [{}] }
@@ -580,21 +579,21 @@ bar
       end
 
       it "traps SIGINT early", :signals_self do
-        expect(Bolt::PAL) .to receive(:new) do
+        options = double(Hash)
+        expect(options) .to receive(:[]) do
           Process.kill :INT, Process.pid
           sync_thread.join(1) # give ruby some time to handle the signal
           raise 'early exit'
         end
 
-        allow(cli_logger).to receive(:info)
-        expect(cli_logger).to receive(:info).with(
-          'Exiting after receiving SIGINT signal.'
-        )
         expect(cli).to receive(:exit!) do
           sync_thread.kill
         end
 
-        expect { cli.execute(mode: 'plan') }.to raise_error('early exit')
+        expect { cli.execute(options) }.to raise_error('early exit')
+        expect(@log_output.readlines.last).to match(
+          /INFO +Bolt::CLI *: *Exiting after receiving SIGINT signal\.$/
+        )
       end
 
       context 'when running a command' do
@@ -633,15 +632,15 @@ bar
             Bolt::ResultSet.new([])
           end
 
-          allow(cli_logger).to receive(:info)
-          expect(cli_logger).to receive(:info).with(
-            'Exiting after receiving SIGINT signal. There may be processes left executing on some nodes.'
-          )
           expect(cli).to receive(:exit!) do
             sync_thread.kill
           end
 
           cli.execute(options)
+          expect(@log_output.readlines.last).to match(
+            /INFO +Bolt::CLI *: *Exiting after receiving SIGINT signal\. (?x:
+             )There may be processes left executing on some nodes\.$/
+          )
         end
       end
 
@@ -709,15 +708,15 @@ bar
             Bolt::ResultSet.new([])
           end
 
-          allow(cli_logger).to receive(:info)
-          expect(cli_logger).to receive(:info).with(
-            'Exiting after receiving SIGINT signal. There may be processes left executing on some nodes.'
-          )
           expect(cli).to receive(:exit!) do
             sync_thread.kill
           end
 
           cli.execute(options)
+          expect(@log_output.readlines.last).to match(
+            /INFO +Bolt::CLI *: *Exiting after receiving SIGINT signal\. (?x:
+             )There may be processes left executing on some nodes\.$/
+          )
         end
       end
 
@@ -1057,15 +1056,15 @@ bar
               Bolt::ResultSet.new([])
             end
 
-          allow(cli_logger).to receive(:info)
-          expect(cli_logger).to receive(:info).with(
-            'Exiting after receiving SIGINT signal. There may be processes left executing on some nodes.'
-          )
           expect(cli).to receive(:exit!) do
             sync_thread.kill
           end
 
           cli.execute(options)
+          expect(@log_output.readlines.last).to match(
+            /INFO +Bolt::CLI *: *Exiting after receiving SIGINT signal\. (?x:
+             )There may be processes left executing on some nodes\.$/
+          )
         end
 
         describe 'task parameters validation' do
@@ -1265,15 +1264,15 @@ bar
               Bolt::ResultSet.new([])
             end
 
-          allow(cli_logger).to receive(:info)
-          expect(cli_logger).to receive(:info).with(
-            'Exiting after receiving SIGINT signal. There may be processes left executing on some nodes.'
-          )
           expect(cli).to receive(:exit!) do
             sync_thread.kill
           end
 
           cli.execute(options)
+          expect(@log_output.readlines.last).to match(
+            /INFO +Bolt::CLI *: *Exiting after receiving SIGINT signal\. (?x:
+             )There may be processes left executing on some nodes\.$/
+          )
         end
       end
 

@@ -344,7 +344,7 @@ Available options are:
       config.load_file(options[:configfile])
       config.update_from_cli(options)
       config.validate
-      Logging.logger[:root].level = config[:log_level] || :notice
+      Bolt::Logger.configure(config)
 
       # This section handles parsing non-flag options which are
       # mode specific rather then part of the config

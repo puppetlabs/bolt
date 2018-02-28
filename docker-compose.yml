@@ -3,4 +3,4 @@ services:
   ubuntu_node:
     build: .
     ports:
-      - "2224:22"
+      - "20022:22"

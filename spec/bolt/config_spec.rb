@@ -67,28 +67,44 @@ describe Bolt::Config do
   end
 
   describe "validate" do
+    it "does not accept invalid log levels" do
+      config = Bolt::Config.new(
+        log: {
+          'file:/bolt.log' => { level: :foo }
+        }
+      )
+      expect { config.validate }.to raise_error(
+        'level of log file:/bolt.log must be one of: debug, info, notice, warn, error, fatal, any; received foo'
+      )
+    end
+
+    it "does not accept invalid append flag values" do
+      config = Bolt::Config.new(
+        log: {
+          'file:/bolt.log' => { append: :foo }
+        }
+      )
+      expect { config.validate }.to raise_error('append flag of log file:/bolt.log must be a Boolean, received foo')
+    end
+
     it "accepts integers for connection-timeout" do
-      config = {
+      config = Bolt::Config.new(
         transports: {
           ssh: { connect_timeout: 42 },
           winrm: { connect_timeout: 999 },
           pcp: {}
         }
-      }
-      expect {
-        Bolt::Config.new(config).validate
-      }.not_to raise_error
+      )
+      expect { config.validate }.not_to raise_error
     end
 
     it "does not accept values that are not integers" do
-      config = {
+      config = Bolt::Config.new(
         transports: {
           ssh: { connect_timeout: '42s' }
         }
-      }
-      expect {
-        Bolt::Config.new(config).validate
-      }.to raise_error(Bolt::CLIError)
+      )
+      expect { config.validate }.to raise_error(Bolt::CLIError)
     end
   end
 end
