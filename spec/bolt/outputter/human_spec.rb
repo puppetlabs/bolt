@@ -33,6 +33,7 @@ describe "Bolt::Outputter::Human" do
     results.each do |result|
       outputter.print_result(result)
     end
+    expect(outputter).to receive(:colorize).with(:red, 'Failed on 1 node: node2').and_call_original
     outputter.print_summary(results, 10.0)
     lines = output.string
     expect(lines).to match(/Finished on node1/)

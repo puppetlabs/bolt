@@ -82,10 +82,11 @@ module Bolt
 
         error_set = results.error_set
         unless error_set.empty?
-          @stream.puts format('Failed on %d node%s: %s',
-                              error_set.size,
-                              error_set.size == 1 ? '' : 's',
-                              error_set.names.join(','))
+          @stream.puts colorize(:red,
+                                format('Failed on %d node%s: %s',
+                                       error_set.size,
+                                       error_set.size == 1 ? '' : 's',
+                                       error_set.names.join(',')))
         end
 
         @stream.puts format('Ran on %d node%s in %.2f seconds',
