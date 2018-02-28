@@ -22,7 +22,7 @@ module Bolt
 
     TRANSPORT_OPTIONS = %i[host_key_check password run_as sudo_password extensions
                            ssl key tty tmpdir user connect_timeout cacert
-                           token-file task_environment service-url].freeze
+                           token-file task-environment service-url].freeze
 
     TRANSPORT_DEFAULTS = {
       connect_timeout: 10,
@@ -37,7 +37,7 @@ module Bolt
         ssl: true
       },
       pcp: {
-        task_environment: 'production'
+        :"task-environment" => 'production'
       }
     }.freeze
 
@@ -168,7 +168,7 @@ module Bolt
           self[:transports][:pcp][:"token-file"] = data['pcp']['token-file']
         end
         if data['pcp']['task-environment']
-          self[:transports][:pcp][:task_environment] = data['pcp']['task-environment']
+          self[:transports][:pcp][:"task-environment"] = data['pcp']['task-environment']
         end
       end
     end
@@ -192,7 +192,7 @@ module Bolt
 
       TRANSPORT_OPTIONS.each do |key|
         TRANSPORTS.each do |transport|
-          unless %i[ssl host_key_check task_environment].any? { |k| k == key }
+          unless %i[ssl host_key_check task-environment].any? { |k| k == key }
             self[:transports][transport][key] = options[key] if options[key]
             next
           end

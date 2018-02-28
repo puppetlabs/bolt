@@ -480,7 +480,7 @@ describe Bolt::Inventory do
         expect(target.port).to be nil
         expect(target.options).to eq(
           connect_timeout: 10,
-          task_environment: "prod",
+          :"task-environment" => "prod",
           tty: false,
           :"service-url" => "https://master",
           cacert: "pcp.pem",

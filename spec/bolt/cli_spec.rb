@@ -1517,7 +1517,7 @@ bar
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo])
         cli.parse
-        expect(cli.config[:transports][:pcp][:task_environment]).to eq('testenv')
+        expect(cli.config[:transports][:pcp][:"task-environment"]).to eq('testenv')
       end
     end
 
