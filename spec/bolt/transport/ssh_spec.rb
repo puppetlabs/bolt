@@ -424,7 +424,7 @@ SHELL
       }
 
       it "can execute a command when a tty is requested", ssh: true do
-        expect(ssh.run_command(target, 'whoami')['stdout']).to eq("\r\nroot\r\n")
+        expect(ssh.run_command(target, 'whoami')['stdout'].strip).to eq('root')
       end
     end
 
