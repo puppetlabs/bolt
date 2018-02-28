@@ -9,7 +9,12 @@ module Bolt
   class PuppetDBInventory
     class Client
       def self.from_config(config)
-        uri = URI.parse(config['server_urls'].first)
+        uri = if config['server_urls'].is_a? String
+                config['server_urls']
+              else
+                config['server_urls'].first
+              end
+        uri = URI.parse(uri)
         uri.port ||= 8081
 
         cacert = File.expand_path(config['cacert'])
@@ -83,6 +88,8 @@ module Bolt
           end
         elsif File.exist?(DEFAULT_CONFIG)
           config = JSON.parse(File.read(DEFAULT_CONFIG))
+        else
+          config = {}
         end
         config.fetch('puppetdb', {})
       end
