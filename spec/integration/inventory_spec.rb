@@ -29,6 +29,9 @@ describe 'running with an inventory file', reset_puppet_settings: true do
           ssh: { host_key_check: false },
           winrm: { ssl: false }
         }
+      },
+      vars: {
+        daffy: "duck"
       } }
   end
   let(:target) { conn[:host] }
@@ -74,6 +77,19 @@ describe 'running with an inventory file', reset_puppet_settings: true do
 
       it 'runs a plan using a group' do
         expect(run_cli_json(run_plan)[0]['status']).to eq('success')
+      end
+    end
+
+    context 'with variables set' do
+      let(:var_plan) { ['plan', 'run', 'vars', "host=#{target}"] + config_flags }
+      let(:output) { "Vars for localhost: {daffy => duck, bugs => bunny}\n" }
+      it 'sets a variable on the target' do
+        expect(run_cli_json(var_plan)[0]['result']['stdout']).to eq(output)
+      end
+
+      it 'preserves variables between runs', :reset_puppet_settings do
+        run_cli_json(run_command)
+        expect(run_cli_json(var_plan)[0]['result']['stdout']).to eq(output)
       end
     end
   end

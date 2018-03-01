@@ -52,6 +52,7 @@ module Bolt
       @data = data ||= {}
       @groups = Group.new(data.merge('name' => 'all'))
       @group_lookup = {}
+      @target_vars = {}
     end
 
     def validate
@@ -73,12 +74,20 @@ module Bolt
       targets.map { |t| update_target(t) }
     end
 
-    # Should this be a public method?
     def config_for(node_name)
       data = @groups.data_for(node_name)
       if data
         Bolt::Util.symbolize_keys(data['config'])
       end
+    end
+
+    def set_var(target, key, value)
+      data = { key => value }
+      set_vars_from_hash(target.name, data)
+    end
+
+    def vars(target)
+      @target_vars[target.name]
     end
 
     #### PRIVATE ####
@@ -88,16 +97,30 @@ module Bolt
       @groups.data_for(node_name)['groups'] || {}
     end
 
+    def transform_data(data)
+      if data
+        data['config'] = Bolt::Util.symbolize_keys(data['config'])
+      end
+      data
+    end
+
     # Pass a target to get_targets for a public version of this
     # Should this reconfigure configured targets?
     def update_target(target)
-      inv_conf = config_for(target.name)
-      unless inv_conf
+      data = @groups.data_for(target.name)
+      processed = transform_data(data) || {}
+      unless processed['config']
         @logger.debug("Did not find #{target.name} in inventory")
-        inv_conf = {}
+        processed['config'] = {}
       end
 
-      conf = Bolt::Util.deep_merge(@config.transport_conf, inv_conf)
+      unless processed['vars']
+        @logger.debug("Did not find any variables for #{target.name} in inventory")
+        processed['vars'] = {}
+      end
+
+      set_vars_from_hash(target.name, processed['vars']) || {}
+      conf = Bolt::Util.deep_merge(@config.transport_conf, processed['config'])
       target.update_conf(conf)
     end
     private :update_target
@@ -142,5 +165,16 @@ module Bolt
       end
     end
     private :expand_targets
+
+    def set_vars_from_hash(target_name, data)
+      if data
+        # Instantiate empty vars hash in case no vars are defined
+        @target_vars[target_name] = @target_vars[target_name] || {}
+        # Assign target new merged vars hash
+        # This is essentially a copy-on-write to maintain the immutability of @target_vars
+        @target_vars[target_name] = @target_vars[target_name].merge(data).freeze
+      end
+    end
+    private :set_vars_from_hash
   end
 end
