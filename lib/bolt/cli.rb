@@ -416,12 +416,6 @@ Available options are:
         raise Bolt::CLIError, "Option '--nodes' must be specified"
       end
 
-      if %w[task plan].include?(options[:mode]) && config[:modulepath].nil?
-        raise Bolt::CLIError,
-              "Option '--modulepath' must be specified when using" \
-              " a task or plan"
-      end
-
       if options[:noop] && (options[:mode] != 'task' || options[:action] != 'run')
         raise Bolt::CLIError,
               "Option '--noop' may only be specified when running a task"
