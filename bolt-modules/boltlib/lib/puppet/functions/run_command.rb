@@ -1,3 +1,5 @@
+require 'bolt/error'
+
 # Runs a command on the given set of targets and returns the result from each command execution.
 #
 # * This function does nothing if the list of targets is empty.
@@ -5,8 +7,6 @@
 # * A target is a String with a targets's hostname or a Target.
 # * The returned value contains information about the result per target.
 #
-require 'bolt/error'
-
 Puppet::Functions.create_function(:run_command) do
   dispatch :run_command do
     param 'String[1]', :command

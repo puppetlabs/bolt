@@ -1,3 +1,5 @@
+require 'bolt/error'
+
 # Uploads the given file or directory to the given set of targets and returns the result from each upload.
 #
 # * This function does nothing if the list of targets is empty.
@@ -5,8 +7,6 @@
 # * A target is a String with a targets's hostname or a Target.
 # * The returned value contains information about the result per target.
 #
-require 'bolt/error'
-
 Puppet::Functions.create_function(:file_upload, Puppet::Functions::InternalFunction) do
   dispatch :file_upload do
     scope_param

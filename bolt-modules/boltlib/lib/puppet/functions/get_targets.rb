@@ -1,3 +1,5 @@
+require 'bolt/error'
+
 # Parses common ways of referring to targets and returns an array of Targets.
 #
 # Accepts input consisting of
@@ -12,9 +14,6 @@
 # - ['host1', 'group1', 'winrm://host2:54321']
 #
 # Returns an array of unique Targets resolved from any target URIs and groups.
-
-require 'bolt/error'
-
 Puppet::Functions.create_function(:get_targets) do
   dispatch :get_targets do
     param 'Boltlib::TargetSpec', :names
