@@ -43,10 +43,37 @@ module Bolt
         hash1.merge(hash2, &recursive_merge)
       end
 
-      def symbolize_keys(hash)
-        hash.each_with_object({}) do |(k, v), acc|
-          k = k.to_sym
-          acc[k] = v.is_a?(Hash) ? symbolize_keys(v) : v
+      # Performs a deep_clone, using an identical copy if the cloned structure contains multiple
+      # references to the same object and prevents endless recursion.
+      # Credit to Jan Molic via https://github.com/rubyworks/facets/blob/master/LICENSE.txt
+      def deep_clone(obj, cloned = {})
+        cloned[obj.object_id] if cloned.include?(obj.object_id)
+
+        begin
+          cl = obj.clone
+        rescue TypeError
+          # unclonable (TrueClass, Fixnum, ...)
+          cloned[obj.object_id] = obj
+          return obj
+        else
+          cloned[obj.object_id] = cl
+          cloned[cl.object_id] = cl
+
+          if cl.is_a? Hash
+            obj.each { |k, v| cl[k] = deep_clone(v, cloned) }
+          elsif cl.is_a? Array
+            cl.collect! { |v| deep_clone(v, cloned) }
+          elsif cl.is_a? Struct
+            obj.each_pair { |k, v| cl[k] = deep_clone(v, cloned) }
+          end
+
+          cl.instance_variables.each do |var|
+            v = cl.instance_eval { var }
+            v_cl = deep_clone(v, cloned)
+            cl.instance_eval { @var = v_cl }
+          end
+
+          return cl
         end
       end
     end

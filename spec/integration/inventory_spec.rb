@@ -16,19 +16,15 @@ describe 'running with an inventory file', reset_puppet_settings: true do
       { name: conn[:host],
         config: {
           transport: conn[:protocol],
-          transports: {
-            conn[:protocol] => {
-              user: conn[:user],
-              port: conn[:port]
-            }
+          conn[:protocol] => {
+            user: conn[:user],
+            port: conn[:port]
           }
         } }
     ],
       config: {
-        transports: {
-          ssh: { host_key_check: false },
-          winrm: { ssl: false }
-        }
+        ssh: { 'host-key-check' => false },
+        winrm: { ssl: false }
       },
       vars: {
         daffy: "duck"

@@ -74,13 +74,6 @@ module Bolt
       targets.map { |t| update_target(t) }
     end
 
-    def config_for(node_name)
-      data = @groups.data_for(node_name)
-      if data
-        Bolt::Util.symbolize_keys(data['config'])
-      end
-    end
-
     def set_var(target, key, value)
       data = { key => value }
       set_vars_from_hash(target.name, data)
@@ -96,32 +89,31 @@ module Bolt
     def groups_in(node_name)
       @groups.data_for(node_name)['groups'] || {}
     end
-
-    def transform_data(data)
-      if data
-        data['config'] = Bolt::Util.symbolize_keys(data['config'])
-      end
-      data
-    end
+    private :groups_in
 
     # Pass a target to get_targets for a public version of this
     # Should this reconfigure configured targets?
     def update_target(target)
-      data = @groups.data_for(target.name)
-      processed = transform_data(data) || {}
-      unless processed['config']
+      data = @groups.data_for(target.name) || {}
+
+      unless data['config']
         @logger.debug("Did not find #{target.name} in inventory")
-        processed['config'] = {}
+        data['config'] = {}
       end
 
-      unless processed['vars']
+      unless data['vars']
         @logger.debug("Did not find any variables for #{target.name} in inventory")
-        processed['vars'] = {}
+        data['vars'] = {}
       end
 
-      set_vars_from_hash(target.name, processed['vars']) || {}
-      conf = Bolt::Util.deep_merge(@config.transport_conf, processed['config'])
-      target.update_conf(conf)
+      set_vars_from_hash(target.name, data['vars'])
+
+      # Use Config object to ensure config section is treated consistently with config file
+      conf = @config.deep_clone
+      conf.update_from_inventory(data['config'])
+      conf.validate
+
+      target.update_conf(conf.transport_conf)
     end
     private :update_target
 

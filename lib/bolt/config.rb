@@ -22,11 +22,10 @@ module Bolt
 
     TRANSPORT_OPTIONS = %i[host_key_check password run_as sudo_password extensions
                            ssl key tty tmpdir user connect_timeout cacert
-                           token_file orch_task_environment service_url].freeze
+                           token-file task-environment service-url].freeze
 
     TRANSPORT_DEFAULTS = {
       connect_timeout: 10,
-      orch_task_environment: 'production',
       tty: false
     }.freeze
 
@@ -37,7 +36,9 @@ module Bolt
       winrm: {
         ssl: true
       },
-      pcp: {}
+      pcp: {
+        :"task-environment" => 'production'
+      }
     }.freeze
 
     TRANSPORTS = %i[ssh winrm pcp].freeze
@@ -68,6 +69,10 @@ module Bolt
           end
         end
       end
+    end
+
+    def deep_clone
+      Bolt::Util.deep_clone(self)
     end
 
     def default_paths
@@ -154,19 +159,20 @@ module Bolt
 
       if data['pcp']
         if data['pcp']['service-url']
-          self[:transports][:pcp][:service_url] = data['pcp']['service-url']
+          self[:transports][:pcp][:"service-url"] = data['pcp']['service-url']
         end
         if data['pcp']['cacert']
           self[:transports][:pcp][:cacert] = data['pcp']['cacert']
         end
         if data['pcp']['token-file']
-          self[:transports][:pcp][:token_file] = data['pcp']['token-file']
+          self[:transports][:pcp][:"token-file"] = data['pcp']['token-file']
         end
         if data['pcp']['task-environment']
-          self[:transports][:pcp][:orch_task_environment] = data['pcp']['task-environment']
+          self[:transports][:pcp][:"task-environment"] = data['pcp']['task-environment']
         end
       end
     end
+    private :update_from_file
 
     def load_file(path)
       data = Bolt::Util.read_config_file(path, default_paths, 'config')
@@ -186,7 +192,7 @@ module Bolt
 
       TRANSPORT_OPTIONS.each do |key|
         TRANSPORTS.each do |transport|
-          unless %i[ssl host_key_check].any? { |k| k == key }
+          unless %i[ssl host_key_check task-environment].any? { |k| k == key }
             self[:transports][transport][key] = options[key] if options[key]
             next
           end
@@ -200,6 +206,27 @@ module Bolt
             next
           end
         end
+      end
+    end
+
+    def update_from_inventory(data)
+      update_from_file(data)
+
+      if data['transport']
+        self[:transport] = data['transport']
+      end
+
+      # Add options that aren't allowed in a config file, but are allowed in inventory
+      %w[user password port].each do |opt|
+        (TRANSPORTS - [:pcp]).each do |transport|
+          if data[transport.to_s] && data[transport.to_s][opt]
+            self[:transports][transport][opt.to_sym] = data[transport.to_s][opt]
+          end
+        end
+      end
+
+      if data['ssh'] && data['ssh']['sudo-password']
+        self[:transports][:ssh][:sudo_password] = data['ssh']['sudo-password']
       end
     end
 
@@ -230,6 +257,16 @@ module Bolt
       if self[:transports][:ssh][:sudo_password] && self[:transports][:ssh][:run_as].nil?
         @logger.warn("--sudo-password will not be used without specifying a " \
                      "user to escalate to with --run-as")
+      end
+
+      host_key = self[:transports][:ssh][:host_key_check]
+      unless !!host_key == host_key
+        raise Bolt::CLIError, 'host-key-check option must be a Boolean true or false'
+      end
+
+      ssl_flag = self[:transports][:winrm][:ssl]
+      unless !!ssl_flag == ssl_flag
+        raise Bolt::CLIError, 'ssl option must be a Boolean true or false'
       end
 
       self[:transports].each_value do |v|

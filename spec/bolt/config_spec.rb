@@ -27,6 +27,35 @@ describe Bolt::Config do
     end
   end
 
+  describe "deep_clone" do
+    let(:conf) { config.deep_clone }
+
+    {
+      concurrency: -1,
+      modulepath: '/foo',
+      transport: 'anything',
+      format: 'other'
+    }.each do |k, v|
+      it "updates #{k} in the copy to #{v}" do
+        conf[k] = v
+        expect(conf[k]).to eq(v)
+        expect(config[k]).not_to eq(v)
+      end
+    end
+
+    {
+      ssh: :host_key_check,
+      winrm: :ssl,
+      pcp: :foo
+    }.each do |transport, key|
+      it "updates #{transport} #{key} in the copy to false" do
+        conf[:transports][transport][key] = false
+        expect(conf[:transports][transport][key]).to eq(false)
+        expect(config[:transports][transport][key]).not_to eq(false)
+      end
+    end
+  end
+
   describe "load_file" do
     let(:default_path) { File.expand_path(File.join('~', '.puppetlabs', 'bolt.yaml')) }
     let(:alt_path) { File.expand_path(File.join('~', '.puppetlabs', 'bolt.yml')) }
@@ -105,6 +134,50 @@ describe Bolt::Config do
         }
       )
       expect { config.validate }.to raise_error(Bolt::CLIError)
+    end
+
+    it "accepts a boolean for host-key-check" do
+      config = {
+        transports: {
+          ssh: { host_key_check: false }
+        }
+      }
+      expect {
+        Bolt::Config.new(config).validate
+      }.not_to raise_error
+    end
+
+    it "does not accept host-key-check that is not a boolean" do
+      config = {
+        transports: {
+          ssh: { host_key_check: 'false' }
+        }
+      }
+      expect {
+        Bolt::Config.new(config).validate
+      }.to raise_error(Bolt::CLIError)
+    end
+
+    it "accepts a boolean for ssl" do
+      config = {
+        transports: {
+          winrm: { ssl: false }
+        }
+      }
+      expect {
+        Bolt::Config.new(config).validate
+      }.not_to raise_error
+    end
+
+    it "does not accept ssl that is not a boolean" do
+      config = {
+        transports: {
+          winrm: { ssl: 'false' }
+        }
+      }
+      expect {
+        Bolt::Config.new(config).validate
+      }.to raise_error(Bolt::CLIError)
     end
   end
 end

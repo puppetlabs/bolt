@@ -27,7 +27,7 @@ module Bolt
 
       def build_request(targets, task, arguments)
         { task: task.name,
-          environment: targets.first.options[:orch_task_environment],
+          environment: targets.first.options[:"task-environment"],
           noop: arguments['_noop'],
           params: arguments.reject { |k, _| k == '_noop' },
           scope: {
@@ -117,7 +117,7 @@ module Bolt
 
       def batches(targets)
         targets.group_by do |target|
-          [target.options[:orch_task_environment],
+          [target.options[:"task-environment"],
            target.options[:"service-url"],
            target.options[:"token-file"]]
         end.values
