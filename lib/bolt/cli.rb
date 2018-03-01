@@ -304,7 +304,7 @@ Available options are:
 
     # Only call after @config has been initialized.
     def inventory
-      Bolt::Inventory.from_config(config)
+      @inventory ||= Bolt::Inventory.from_config(config)
     end
     private :inventory
 
