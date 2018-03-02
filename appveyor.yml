@@ -43,3 +43,5 @@ test_script:
   - bundle exec rake spec
   - cd ../../modules/canary
   - bundle exec rake spec
+  - cd ../../modules/aggregate
+  - bundle exec rake spec

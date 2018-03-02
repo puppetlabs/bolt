@@ -14,8 +14,12 @@ script:
 - pushd bolt-modules/boltlib
 - bundle exec rake spec
 - popd
-- cd modules/canary
+- pushd modules/canary
 - bundle exec rake spec
+- popd
+- pushd modules/aggregate
+- bundle exec rake spec
+- popd
 notifications:
   email: false
   hipchat:
