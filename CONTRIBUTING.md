@@ -47,14 +47,21 @@ To run Bolt from source:
 To use `rubocop`, perform the bundle install with no exclusions
 
     bundle install --path .bundle
+    bundle exec rake rubocop
 
 ## Testing
 
 Some tests require a Windows VMs or Linux containers. For Linux tests (recommended, if you're not sure) `docker-compose up -d --build` to bring these up with the `docker-compose.yaml` included with the `bolt` gem. For windows tests, execute `vagrant up` to bring these up with the provided Vagrantfile. Any tests that require this are tagged with `:winrm` or `:ssh` in rspec.
 
+Additional tests may run in a local environment and require certain shell capabilities. Currently the only case is a Bash-like environment and is tagged with `:bash` in rspec.
+
 To run all tests, run:
 
     $ bundle exec rake test
+
+To run specific versions of tagged tests, run the `integration` target with the tag appended, e.g.:
+
+    $ bundle exec rake integration:bash
 
 To exclude tests that rely on Vagrant, run:
 
@@ -67,4 +74,3 @@ To use `rubocop` on Windows, you must install the `ruby.devkit` and the MSYS2 ba
     choco install ruby.devkit
     refreshenv
     ridk install    # Choose the base install and complete the Wizard selections.
-

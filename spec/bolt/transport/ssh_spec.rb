@@ -313,7 +313,7 @@ SHELL
         end
       end
 
-      it 'returns an error result for run_command', ssh: true do
+      it 'returns an error result for run_script', ssh: true do
         contents = "#!/bin/sh\necho hellote"
         with_tempfile_containing('script test', contents) do |file|
           expect {
@@ -361,7 +361,7 @@ SHELL
     end
   end
 
-  context 'When tmpdir is specified' do
+  context 'when tmpdir is specified' do
     let(:tmpdir) { '/tmp/mytempdir' }
     let(:config) { mk_config(host_key_check: false, tmpdir: tmpdir, user: user, password: password) }
 

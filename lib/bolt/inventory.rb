@@ -42,6 +42,7 @@ module Bolt
       inventory = new(data, config)
       inventory.validate
       inventory.collect_groups
+      inventory.add_localhost
       inventory
     end
 
@@ -62,6 +63,16 @@ module Bolt
     def collect_groups
       # Provide a lookup map for finding a group by name
       @group_lookup = @groups.collect_groups
+    end
+
+    def add_localhost
+      # Append a 'localhost' group if not already present.
+      unless @group_lookup.include?('localhost') || @groups.node_names.include?('localhost')
+        @groups.nodes['localhost'] = {
+          'name' => 'localhost',
+          'config' => { 'transport' => 'local' }
+        }
+      end
     end
 
     def get_targets(targets)

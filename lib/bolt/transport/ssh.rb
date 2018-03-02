@@ -6,9 +6,6 @@ require 'shellwords'
 module Bolt
   module Transport
     class SSH < Base
-      STDIN_METHODS       = %w[both stdin].freeze
-      ENVIRONMENT_METHODS = %w[both environment].freeze
-
       def initialize(_config)
         super
 

@@ -10,6 +10,7 @@ require 'bolt/result_set'
 require 'bolt/transport/ssh'
 require 'bolt/transport/winrm'
 require 'bolt/transport/orch'
+require 'bolt/transport/local'
 
 module Bolt
   class Executor
@@ -23,7 +24,8 @@ module Bolt
       @transports = {
         'ssh' => Concurrent::Delay.new { Bolt::Transport::SSH.new(config[:transports][:ssh] || {}) },
         'winrm' => Concurrent::Delay.new { Bolt::Transport::WinRM.new(config[:transports][:winrm] || {}) },
-        'pcp' => Concurrent::Delay.new { Bolt::Transport::Orch.new(config[:transports][:pcp] || {}) }
+        'pcp' => Concurrent::Delay.new { Bolt::Transport::Orch.new(config[:transports][:pcp] || {}) },
+        'local' => Concurrent::Delay.new { Bolt::Transport::Local.new(config[:transports][:local] || {}) }
       }
 
       # If a specific elevated log level has been requested, honor that.
@@ -39,7 +41,10 @@ module Bolt
     end
 
     def transport(transport)
-      @transports[transport || 'ssh'].value
+      impl = @transports[transport || 'ssh']
+      # If there was an error creating the transport, ensure it gets thrown
+      impl.no_error!
+      impl.value
     end
 
     def summary(action, object, result)
