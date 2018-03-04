@@ -5,6 +5,7 @@ gemspec
 group(:test) do
   gem "beaker-hostgenerator"
   gem "rubocop", '0.50.0', require: false
+  gem 'license_finder', '~> 3.0.4'
 end
 
 if File.exist? "Gemfile.local"

@@ -27,6 +27,11 @@ end
 desc "Run tests and style checker"
 task test: %w[spec rubocop]
 
+desc 'Check for unapproved licenses in dependencies'
+task(:license_finder) do
+  system('license_finder --decisions-file=.dependency_decisions.yml') || raise(StandardError, 'Unapproved license(s) found on dependencies')
+end
+
 task :default do
   system "rake --tasks"
 end
