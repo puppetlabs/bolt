@@ -63,10 +63,12 @@ module Bolt
     # transport, is yielded to the block in turn and the results all collected
     # into a single ResultSet.
     def batch_execute(targets)
-      promises = targets.group_by(&:protocol).flat_map do |protocol, _protocol_targets|
+      promises = targets.group_by(&:protocol).flat_map do |protocol, protocol_targets|
         transport = transport(protocol)
-        transport.batches(targets).flat_map do |batch|
-          batch_promises = Hash[Array(batch).map { |target| [target, Concurrent::Promise.new(executor: :immediate)] }]
+        transport.batches(protocol_targets).flat_map do |batch|
+          batch_promises = Array(batch).each_with_object({}) do |target, h|
+            h[target] = Concurrent::Promise.new(executor: :immediate)
+          end
           # Pass this argument through to avoid retaining a reference to a
           # local variable that will change on the next iteration of the loop.
           @pool.post(batch_promises) do |result_promises|

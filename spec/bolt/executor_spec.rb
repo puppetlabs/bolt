@@ -321,16 +321,22 @@ describe "Bolt::Executor" do
     end
   end
 
-  it "returns ensures that every target has a result, no matter what" do
-    result_set = executor.batch_execute(targets) do
-      # Intentionally *don't* return a result
-      []
-    end
+  context "targets with different protocols" do
+    let(:targets) {
+      [Bolt::Target.new('ssh://node1'), Bolt::Target.new('winrm://node2'), Bolt::Target.new('pcp://node3')]
+    }
 
-    expect(result_set.names).to eq([targets[0].name, targets[1].name])
-    result_set.each do |result|
-      expect(result).not_to be_success
-      expect(result.error_hash['msg']).to match(/No result was returned/)
+    it "returns ensures that every target has a result, no matter what" do
+      result_set = executor.batch_execute(targets) do
+        # Intentionally *don't* return a result
+        []
+      end
+
+      expect(result_set.names).to eq(targets.map(&:name))
+      result_set.each do |result|
+        expect(result).not_to be_success
+        expect(result.error_hash['msg']).to match(/No result was returned/)
+      end
     end
   end
 
