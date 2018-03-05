@@ -428,7 +428,7 @@ describe Bolt::Inventory do
 
       it 'should not modify existing config' do
         get_target(inventory, 'ssh://node')
-        expect(conf[:modulepath]).to be_nil
+        expect(conf[:modulepath]).to eq([])
         expect(conf[:transport]).to eq('ssh')
         expect(conf[:transports][:ssh][:host_key_check]).to be true
         expect(conf[:transports][:winrm][:ssl]).to be true

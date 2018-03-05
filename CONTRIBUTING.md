@@ -7,6 +7,17 @@ Please submit new issues on the GitHub issue tracker: https://github.com/puppetl
 Internally, Puppet uses JIRA for tracking work, so nontrivial bugs or enhancement
 requests may migrate to JIRA tickets in the "BOLT" project: https://tickets.puppetlabs.com/browse/BOLT/
 
+## Types of Improvements
+
+The Bolt ecosystem is extensible via Puppet modules such as those hosted on the [Forge](https://forge.puppet.com/). Many improvements to the Bolt plan ecosystem can be added there as new modules.
+
+There are certain types of improvements that we believe make sense in Bolt itself:
+
+* New Transports. Transports API is a work-in-progress, but is something we aim to stabilize. Currently these can't be extended via modules, although in the future they likely will be.
+* Core functionality we believe makes Bolt a better tool, such as the `aggregate` and `canary` plans included in `modules`.
+* New ways of interacting with plan progress and output, such as prompts to continue or output processors.
+* New inventory sources. This is experimental right now, but we're working towards patterns for getting inventory into Bolt and how to refer to it from within a plan.
+
 ## Pull Requests
 
 Pull requests are also welcome on GitHub: https://github.com/puppetlabs/bolt

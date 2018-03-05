@@ -1,3 +1,5 @@
+require 'bolt/error'
+
 # Runs the `plan` referenced by its name passing giving arguments to it given as a hash of name to value mappings.
 # A plan is autoloaded from under <root>/plans if not already defined.
 #
@@ -8,8 +10,6 @@
 #   }
 #   run_plan('myplan', { x => 'testing' })
 #
-require 'bolt/error'
-
 Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction) do
   dispatch :run_plan do
     scope_param

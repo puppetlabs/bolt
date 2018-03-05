@@ -41,3 +41,7 @@ test_script:
   - bundle exec rake appveyor
   - cd bolt-modules/boltlib
   - bundle exec rake spec
+  - cd ../../modules/canary
+  - bundle exec rake spec
+  - cd ../../modules/aggregate
+  - bundle exec rake spec

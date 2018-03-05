@@ -19,7 +19,8 @@ module Bolt
     DEFAULTS = {
       concurrency: 100,
       transport: 'ssh',
-      format: 'human'
+      format: 'human',
+      modulepath: []
     }.freeze
 
     TRANSPORT_OPTIONS = %i[host_key_check password run_as sudo_password extensions
