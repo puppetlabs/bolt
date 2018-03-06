@@ -14,6 +14,7 @@ module Bolt
       @uri = uri
       @uri_obj = parse(uri)
       @options = options || {}
+      @options.freeze
     end
 
     def update_conf(conf)
