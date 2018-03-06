@@ -1,9 +1,18 @@
 require 'yaml'
-require 'bolt/cli'
 require 'logging'
+require 'bolt/cli'
+require 'bolt/transport/ssh'
+require 'bolt/transport/winrm'
+require 'bolt/transport/orch'
+require 'bolt/transport/local'
 
 module Bolt
-  TRANSPORTS = %i[ssh winrm pcp local].freeze
+  TRANSPORTS = {
+    ssh: Bolt::Transport::SSH,
+    winrm: Bolt::Transport::WinRM,
+    pcp: Bolt::Transport::Orch,
+    local: Bolt::Transport::Local
+  }.freeze
 
   Config = Struct.new(
     :concurrency,
@@ -25,25 +34,25 @@ module Bolt
       puppetdb: {}
     }.freeze
 
-    TRANSPORT_OPTIONS = %i[password run_as sudo_password extensions
-                           key tty tmpdir user connect_timeout
+    TRANSPORT_OPTIONS = %i[password run-as sudo-password extensions
+                           key tty tmpdir user connect-timeout
                            cacert token-file service-url].freeze
 
     TRANSPORT_DEFAULTS = {
-      connect_timeout: 10,
-      tty: false
+      'connect-timeout' => 10,
+      'tty' => false
     }.freeze
 
     TRANSPORT_SPECIFIC_DEFAULTS = {
       ssh: {
-        host_key_check: true
+        'host-key-check' => true
       },
       winrm: {
-        ssl: true
+        'ssl' => true
       },
       pcp: {
-        :"task-environment" => 'production',
-        :"local-validation" => false
+        'task-environment' => 'production',
+        'local-validation' => false
       },
       local: {}
     }.freeze
@@ -58,10 +67,9 @@ module Bolt
       self[:log]['console'] ||= {}
 
       self[:transports] ||= {}
-      TRANSPORTS.each do |transport|
-        unless self[:transports][transport]
-          self[:transports][transport] = {}
-        end
+      TRANSPORTS.each_key do |transport|
+        self[:transports][transport] ||= {}
+
         TRANSPORT_DEFAULTS.each do |k, v|
           unless self[:transports][transport][k]
             self[:transports][transport][k] = v
@@ -112,81 +120,16 @@ module Bolt
         self[:modulepath] = data['modulepath'].split(File::PATH_SEPARATOR)
       end
 
-      if data['inventoryfile']
-        self[:inventoryfile] = data['inventoryfile']
-      end
-
-      if data['concurrency']
-        self[:concurrency] = data['concurrency']
-      end
-
-      if data['format']
-        self[:format] = data['format']
-      end
-
-      if data['puppetdb']
-        self[:puppetdb] = data['puppetdb']
-      end
-
-      if data['ssh']
-        if data['ssh']['private-key']
-          self[:transports][:ssh][:key] = data['ssh']['private-key']
-        end
-        if data['ssh'].key?('host-key-check')
-          self[:transports][:ssh][:host_key_check] = data['ssh']['host-key-check']
-        end
-        if data['ssh']['connect-timeout']
-          self[:transports][:ssh][:connect_timeout] = data['ssh']['connect-timeout']
-        end
-        if data['ssh']['tmpdir']
-          self[:transports][:ssh][:tmpdir] = data['ssh']['tmpdir']
-        end
-        if data['ssh']['run-as']
-          self[:transports][:ssh][:run_as] = data['ssh']['run-as']
+      %w[inventoryfile concurrency format puppetdb].each do |key|
+        if data[key]
+          self[key.to_sym] = data[key]
         end
       end
 
-      if data['winrm']
-        if data['winrm']['connect-timeout']
-          self[:transports][:winrm][:connect_timeout] = data['winrm']['connect-timeout']
-        end
-        if data['winrm'].key?('ssl')
-          self[:transports][:winrm][:ssl] = data['winrm']['ssl']
-        end
-        if data['winrm']['tmpdir']
-          self[:transports][:winrm][:tmpdir] = data['winrm']['tmpdir']
-        end
-        if data['winrm']['cacert']
-          self[:transports][:winrm][:cacert] = data['winrm']['cacert']
-        end
-        if data['winrm']['extensions']
-          # Accept a single entry or a list, ensure each is prefixed with '.'
-          self[:transports][:winrm][:extensions] =
-            [data['winrm']['extensions']].flatten.map { |ext| ext[0] != '.' ? '.' + ext : ext }
-        end
-      end
-
-      if data['pcp']
-        if data['pcp']['service-url']
-          self[:transports][:pcp][:"service-url"] = data['pcp']['service-url']
-        end
-        if data['pcp']['cacert']
-          self[:transports][:pcp][:cacert] = data['pcp']['cacert']
-        end
-        if data['pcp']['token-file']
-          self[:transports][:pcp][:"token-file"] = data['pcp']['token-file']
-        end
-        if data['pcp']['task-environment']
-          self[:transports][:pcp][:"task-environment"] = data['pcp']['task-environment']
-        end
-        if data['pcp'].key?('local-validation') # this defaults to true so we need to check the presence of the key
-          self[:transports][:pcp][:"local-validation"] = data['pcp']['local-validation']
-        end
-      end
-
-      if data['local']
-        if data['local']['tmpdir']
-          self[:transports][:local][:tmpdir] = data['local']['tmpdir']
+      TRANSPORTS.each do |key, impl|
+        if data[key.to_s]
+          selected = data[key.to_s].select { |k| impl.options.include?(k) }
+          self[:transports][key].merge!(selected)
         end
       end
     end
@@ -208,19 +151,19 @@ module Bolt
         self[:log]['console'][:level] = :info
       end
 
-      TRANSPORTS.each do |transport|
+      TRANSPORTS.each_key do |transport|
         transport = self[:transports][transport]
         TRANSPORT_OPTIONS.each do |key|
-          transport[key] = options[key] if options[key]
+          transport[key.to_s] = options[key] if options[key]
         end
       end
 
       if options.key?(:ssl) # this defaults to true so we need to check the presence of the key
-        self[:transports][:winrm][:ssl] = options[:ssl]
+        self[:transports][:winrm]['ssl'] = options[:ssl]
       end
 
-      if options.key?(:host_key_check) # this defaults to true so we need to check the presence of the key
-        self[:transports][:ssh][:host_key_check] = options[:host_key_check]
+      if options.key?(:'host-key-check') # this defaults to true so we need to check the presence of the key
+        self[:transports][:ssh]['host-key-check'] = options[:'host-key-check']
       end
     end
 
@@ -230,19 +173,6 @@ module Bolt
       if data['transport']
         self[:transport] = data['transport']
       end
-
-      # Add options that aren't allowed in a config file, but are allowed in inventory
-      %w[user password port].each do |opt|
-        (TRANSPORTS - [:pcp]).each do |transport|
-          if data[transport.to_s] && data[transport.to_s][opt]
-            self[:transports][transport][opt.to_sym] = data[transport.to_s][opt]
-          end
-        end
-      end
-
-      if data['ssh'] && data['ssh']['sudo-password']
-        self[:transports][:ssh][:sudo_password] = data['ssh']['sudo-password']
-      end
     end
 
     def transport_conf
@@ -251,7 +181,7 @@ module Bolt
     end
 
     def validate
-      TRANSPORTS.each do |transport|
+      TRANSPORTS.each_key do |transport|
         self[:transports][transport]
       end
 
@@ -269,28 +199,28 @@ module Bolt
         raise Bolt::CLIError, "Unsupported format: '#{self[:format]}'"
       end
 
-      if self[:transports][:ssh][:sudo_password] && self[:transports][:ssh][:run_as].nil?
+      if self[:transports][:ssh]['sudo-password'] && self[:transports][:ssh]['run-as'].nil?
         @logger.warn("--sudo-password will not be used without specifying a " \
                      "user to escalate to with --run-as")
       end
 
-      host_key = self[:transports][:ssh][:host_key_check]
+      host_key = self[:transports][:ssh]['host-key-check']
       unless !!host_key == host_key
         raise Bolt::CLIError, 'host-key-check option must be a Boolean true or false'
       end
 
-      ssl_flag = self[:transports][:winrm][:ssl]
+      ssl_flag = self[:transports][:winrm]['ssl']
       unless !!ssl_flag == ssl_flag
         raise Bolt::CLIError, 'ssl option must be a Boolean true or false'
       end
 
-      validation_flag = self[:transports][:pcp][:"local-validation"]
+      validation_flag = self[:transports][:pcp]['local-validation']
       unless !!validation_flag == validation_flag
         raise Bolt::CLIError, 'local-validation option must be a Boolean true or false'
       end
 
       self[:transports].each_value do |v|
-        timeout_value = v[:connect_timeout]
+        timeout_value = v['connect-timeout']
         unless timeout_value.is_a?(Integer) || timeout_value.nil?
           error_msg = "connect-timeout value must be an Integer, received #{timeout_value}:#{timeout_value.class}"
           raise Bolt::CLIError, error_msg

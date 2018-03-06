@@ -12,7 +12,8 @@ describe Bolt::Transport::SSH do
   include BoltSpec::Task
 
   def mk_config(conf)
-    Bolt::Config.new(transports: { ssh: conf })
+    stringified = conf.each_with_object({}) { |(k, v), coll| coll[k.to_s] = v }
+    Bolt::Config.new(transports: { ssh: stringified })
   end
 
   let(:hostname) { ENV['BOLT_SSH_HOST'] || "localhost" }
@@ -22,8 +23,8 @@ describe Bolt::Transport::SSH do
   let(:key) { ENV['BOLT_SSH_KEY'] || Dir["spec/fixtures/keys/id_rsa"] }
   let(:command) { "pwd" }
   let(:config) { mk_config(user: user, password: password) }
-  let(:no_host_key_check) { mk_config(host_key_check: false, user: user, password: password) }
-  let(:ssh) { Bolt::Transport::SSH.new(config) }
+  let(:no_host_key_check) { mk_config('host-key-check' => false, user: user, password: password) }
+  let(:ssh) { Bolt::Transport::SSH.new }
   let(:echo_script) { <<BASH }
 for var in "$@"
 do
@@ -55,7 +56,7 @@ BASH
       ssh.with_connection(target) {}
     end
 
-    it "downgrades to lenient if host_key_check is false" do
+    it "downgrades to lenient if host-key-check is false" do
       allow(Net::SSH)
         .to receive(:start)
         .with(anything,
@@ -125,7 +126,7 @@ BASH
       TCPServer.open(0) do |server|
         port = server.addr[1]
 
-        timeout = mk_config(connect_timeout: 2, user: 'bad', password: 'password')
+        timeout = mk_config('connect-timeout' => 2, user: 'bad', password: 'password')
 
         exec_time = Time.now
         expect {
@@ -137,7 +138,7 @@ BASH
   end
 
   context "when executing with private key" do
-    let(:config) { mk_config(host_key_check: false, key: key, user: user, port: port) }
+    let(:config) { mk_config('host-key-check' => false, key: key, user: user, port: port) }
 
     it "executes a command on a host", ssh: true do
       expect(ssh.run_command(target, command).value['stdout']).to eq("/home/#{user}\n")
@@ -363,7 +364,7 @@ SHELL
 
   context 'when tmpdir is specified' do
     let(:tmpdir) { '/tmp/mytempdir' }
-    let(:config) { mk_config(host_key_check: false, tmpdir: tmpdir, user: user, password: password) }
+    let(:config) { mk_config('host-key-check' => false, tmpdir: tmpdir, user: user, password: password) }
 
     after(:each) do
       ssh.run_command(target, "rm -rf #{tmpdir}")
@@ -389,7 +390,8 @@ SHELL
 
   context "with sudo" do
     let(:config) {
-      mk_config(host_key_check: false, sudo_password: password, run_as: 'root', user: user, password: password)
+      mk_config('host-key-check' => false, 'sudo-password' => password, 'run-as' => 'root',
+                user: user, password: password)
     }
 
     it "can execute a command", ssh: true do
@@ -419,7 +421,7 @@ SHELL
 
     context "requesting a pty" do
       let(:config) {
-        mk_config(host_key_check: false, sudo_password: password, run_as: 'root',
+        mk_config('host-key-check' => false, 'sudo-password' => password, 'run-as' => 'root',
                   tty: true, user: user, password: password)
       }
 
@@ -430,7 +432,8 @@ SHELL
 
     context "as non-root" do
       let(:config) {
-        mk_config(host_key_check: false, sudo_password: password, run_as: user, user: user, password: password)
+        mk_config('host-key-check' => false, 'sudo-password' => password, 'run_as' => user,
+                  user: user, password: password)
       }
 
       it "can override run_as for command via an option", ssh: true do
@@ -466,7 +469,7 @@ SHELL
 
     context "with an incorrect password" do
       let(:config) {
-        mk_config(host_key_check: false, sudo_password: 'nonsense', run_as: 'root',
+        mk_config('host-key-check' => false, 'sudo-password' => 'nonsense', 'run-as' => 'root',
                   user: user, password: password)
       }
 
@@ -480,7 +483,7 @@ SHELL
     end
 
     context "with no password" do
-      let(:config) { mk_config(host_key_check: false, run_as: 'root', user: user, password: password) }
+      let(:config) { mk_config('host-key-check' => false, 'run-as' => 'root', user: user, password: password) }
 
       it "returns a failed result", ssh: true do
         expect {

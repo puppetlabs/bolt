@@ -44,9 +44,9 @@ describe Bolt::Config do
     end
 
     {
-      ssh: :host_key_check,
-      winrm: :ssl,
-      pcp: :foo
+      ssh: 'host-key-check',
+      winrm: 'ssl',
+      pcp: 'foo'
     }.each do |transport, key|
       it "updates #{transport} #{key} in the copy to false" do
         conf[:transports][transport][key] = false
@@ -119,8 +119,8 @@ describe Bolt::Config do
     it "accepts integers for connection-timeout" do
       config = Bolt::Config.new(
         transports: {
-          ssh: { connect_timeout: 42 },
-          winrm: { connect_timeout: 999 },
+          ssh: { 'connect-timeout' => 42 },
+          winrm: { 'connect-timeout' => 999 },
           pcp: {}
         }
       )
@@ -130,7 +130,7 @@ describe Bolt::Config do
     it "does not accept values that are not integers" do
       config = Bolt::Config.new(
         transports: {
-          ssh: { connect_timeout: '42s' }
+          ssh: { 'connect-timeout' => '42s' }
         }
       )
       expect { config.validate }.to raise_error(Bolt::CLIError)
@@ -139,7 +139,7 @@ describe Bolt::Config do
     it "accepts a boolean for host-key-check" do
       config = {
         transports: {
-          ssh: { host_key_check: false }
+          ssh: { 'host-key-check' => false }
         }
       }
       expect {
@@ -150,7 +150,7 @@ describe Bolt::Config do
     it "does not accept host-key-check that is not a boolean" do
       config = {
         transports: {
-          ssh: { host_key_check: 'false' }
+          ssh: { 'host-key-check' => 'false' }
         }
       }
       expect {
@@ -161,7 +161,7 @@ describe Bolt::Config do
     it "accepts a boolean for ssl" do
       config = {
         transports: {
-          winrm: { ssl: false }
+          winrm: { 'ssl' => false }
         }
       }
       expect {
@@ -172,7 +172,7 @@ describe Bolt::Config do
     it "does not accept ssl that is not a boolean" do
       config = {
         transports: {
-          winrm: { ssl: 'false' }
+          winrm: { 'ssl' => 'false' }
         }
       }
       expect {
@@ -183,7 +183,7 @@ describe Bolt::Config do
     it "accepts a boolean for local-validation" do
       config = {
         transports: {
-          pcp: { :'local-validation' => true }
+          pcp: { 'local-validation' => true }
         }
       }
       expect {
@@ -194,7 +194,7 @@ describe Bolt::Config do
     it "does not accept local-validation that is not a boolean" do
       config = {
         transports: {
-          pcp: { :'local-validation' => 'false' }
+          pcp: { 'local-validation' => 'false' }
         }
       }
       expect {

@@ -53,8 +53,8 @@ describe "Bolt::Executor" do
 
     context 'nodes with run_as' do
       let(:targets) {
-        [Bolt::Target.new("target1", run_as: 'foo'),
-         Bolt::Target.new("target2", run_as: 'foo')]
+        [Bolt::Target.new("target1", 'run-as' => 'foo'),
+         Bolt::Target.new("target2", 'run-as' => 'foo')]
       }
 
       it 'does not pass _run_as' do
@@ -121,8 +121,8 @@ describe "Bolt::Executor" do
 
     context 'nodes with run_as' do
       let(:targets) {
-        [Bolt::Target.new("target1", run_as: 'foo'),
-         Bolt::Target.new("target2", run_as: 'foo')]
+        [Bolt::Target.new("target1", 'run-as' => 'foo'),
+         Bolt::Target.new("target2", 'run-as' => 'foo')]
       }
 
       it 'does not pass _run_as' do
@@ -202,7 +202,7 @@ describe "Bolt::Executor" do
 
     context 'nodes with run_as' do
       let(:targets) {
-        [Bolt::Target.new("target1", run_as: 'foo'),
+        [Bolt::Target.new("target1", 'run-as' => 'foo'),
          Bolt::Target.new("target2")]
       }
 

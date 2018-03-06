@@ -7,13 +7,18 @@ module Bolt
       class Connection
         attr_reader :logger, :target
 
+        DEFAULT_EXTENSIONS = ['.ps1', '.rb', '.pp'].freeze
+
         def initialize(target)
           @target = target
 
-          default_port = target.options[:ssl] ? HTTPS_PORT : HTTP_PORT
+          default_port = target.options['ssl'] ? HTTPS_PORT : HTTP_PORT
           @port = @target.port || default_port
           @user = @target.user
-          @extensions = DEFAULT_EXTENSIONS.to_set.merge(target.options[:extensions] || [])
+
+          # Accept a single entry or a list, ensure each is prefixed with '.'
+          extensions = [target.options['extensions'] || []].flatten.map { |ext| ext[0] != '.' ? '.' + ext : ext }
+          @extensions = DEFAULT_EXTENSIONS.to_set.merge(extensions)
 
           @logger = Logging.logger[@target.host]
         end
@@ -22,7 +27,7 @@ module Bolt
         HTTPS_PORT = 5986
 
         def connect
-          if target.options[:ssl]
+          if target.options['ssl']
             scheme = 'https'
             transport = :ssl
           else
@@ -35,9 +40,9 @@ module Bolt
                       password: target.password,
                       retry_limit: 1,
                       transport: transport,
-                      ca_trust_path: target.options[:cacert] }
+                      ca_trust_path: target.options['cacert'] }
 
-          Timeout.timeout(target.options[:connect_timeout]) do
+          Timeout.timeout(target.options['connect-timeout']) do
             @connection = ::WinRM::Connection.new(options)
             transport_logger = Logging.logger[::WinRM]
             transport_logger.level = :warn
@@ -50,11 +55,11 @@ module Bolt
         rescue Timeout::Error
           # If we're using the default port with SSL, a timeout probably means the
           # host doesn't support SSL.
-          if target.options[:ssl] && @port == HTTPS_PORT
-            theres_your_problem = "\nUse --no-ssl if this host isn't configured to use SSL for WinRM"
+          if target.options['ssl'] && @port == HTTPS_PORT
+            the_problem = "\nUse --no-ssl if this host isn't configured to use SSL for WinRM"
           end
           raise Bolt::Node::ConnectError.new(
-            "Timeout after #{target.options[:connect_timeout]} seconds connecting to #{endpoint}#{theres_your_problem}",
+            "Timeout after #{target.options['connect-timeout']} seconds connecting to #{endpoint}#{the_problem}",
             'CONNECT_ERROR'
           )
         rescue ::WinRM::WinRMAuthorizationError
@@ -64,7 +69,7 @@ module Bolt
           )
         rescue OpenSSL::SSL::SSLError => e
           # If we're using SSL with the default non-SSL port, mention that as a likely problem
-          if target.options[:ssl] && @port == HTTP_PORT
+          if target.options['ssl'] && @port == HTTP_PORT
             theres_your_problem = "\nAre you using SSL to connect to a non-SSL port?"
           end
           raise Bolt::Node::ConnectError.new(
@@ -419,12 +424,6 @@ exit $(Invoke-Interpreter @invokeArgs)
 PS
         end
 
-        DEFAULT_EXTENSIONS = ['.ps1', '.rb', '.pp'].freeze
-
-        PS_ARGS = %w[
-          -NoProfile -NonInteractive -NoLogo -ExecutionPolicy Bypass
-        ].freeze
-
         def write_remote_file(source, destination)
           fs = ::WinRM::FS::FileManager.new(@connection)
           # TODO: raise FileError here if this fails
@@ -432,7 +431,7 @@ PS
         end
 
         def make_tempdir
-          find_parent = target.options[:tmpdir] ? "\"#{target.options[:tmpdir]}\"" : '[System.IO.Path]::GetTempPath()'
+          find_parent = target.options['tmpdir'] ? "\"#{target.options['tmpdir']}\"" : '[System.IO.Path]::GetTempPath()'
           result = execute(<<-PS)
 $parent = #{find_parent}
 $name = [System.IO.Path]::GetRandomFileName()

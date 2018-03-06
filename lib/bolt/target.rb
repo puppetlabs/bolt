@@ -22,11 +22,11 @@ module Bolt
 
       t_conf = conf[:transports][protocol.to_sym]
       # Override url methods
-      url_keys = %i[user password port]
-      @user = t_conf[:user]
-      @password = t_conf[:password]
-      @port = t_conf[:port]
+      @user = t_conf['user']
+      @password = t_conf['password']
+      @port = t_conf['port']
 
+      url_keys = %w[user password port]
       @options = t_conf.reject { |k, _| url_keys.include?(k) }.merge(@options)
 
       self

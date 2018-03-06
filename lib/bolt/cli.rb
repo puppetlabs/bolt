@@ -164,7 +164,7 @@ Available options are:
         end
         define('--connect-timeout TIMEOUT', Integer,
                'Connection timeout (Optional)') do |timeout|
-          @options[:connect_timeout] = timeout
+          @options[:'connect-timeout'] = timeout
         end
         define('--modulepath MODULES',
                'List of directories containing modules, ' \
@@ -182,28 +182,28 @@ Available options are:
         end
         define('--[no-]host-key-check',
                'Check host keys with SSH') do |host_key_check|
-          @options[:host_key_check] = host_key_check
+          @options[:'host-key-check'] = host_key_check
         end
         define('--[no-]ssl',
                'Use SSL with WinRM') do |ssl|
           @options[:ssl] = ssl
         end
-        define('--transport TRANSPORT', TRANSPORTS.map(&:to_s),
-               'Specify a default transport: ' << TRANSPORTS.join(', ')) do |t|
+        define('--transport TRANSPORT', TRANSPORTS.keys.map(&:to_s),
+               'Specify a default transport: ' << TRANSPORTS.keys.join(', ')) do |t|
           @options[:transport] = t
         end
         define('--run-as USER',
                'User to run as using privilege escalation') do |user|
-          @options[:run_as] = user
+          @options[:'run-as'] = user
         end
         define('--sudo-password [PASSWORD]',
                'Password for privilege escalation') do |password|
           if password.nil?
             STDOUT.print "Please enter your privilege escalation password: "
-            @options[:sudo_password] = STDIN.noecho(&:gets).chomp
+            @options[:'sudo-password'] = STDIN.noecho(&:gets).chomp
             STDOUT.puts
           else
-            @options[:sudo_password] = password
+            @options[:'sudo-password'] = password
           end
         end
         define('--configfile CONFIG_PATH',

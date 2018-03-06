@@ -12,7 +12,8 @@ describe Bolt::Transport::WinRM do
   include BoltSpec::Task
 
   def mk_config(conf)
-    Bolt::Config.new(transport: 'winrm', transports: { winrm: conf })
+    stringified = conf.each_with_object({}) { |(k, v), coll| coll[k.to_s] = v }
+    Bolt::Config.new(transport: 'winrm', transports: { winrm: stringified })
   end
 
   let(:host) { ENV['BOLT_WINRM_HOST'] || 'localhost' }
@@ -23,8 +24,8 @@ describe Bolt::Transport::WinRM do
   let(:command) { "echo $env:UserName" }
   let(:config) { mk_config(ssl: false, user: user, password: password) }
   let(:ssl_config) { mk_config(cacert: 'resources/ca.pem', user: user, password: password) }
-  let(:winrm) { Bolt::Transport::WinRM.new(config) }
-  let(:winrm_ssl) { Bolt::Transport::WinRM.new(ssl_config) }
+  let(:winrm) { Bolt::Transport::WinRM.new }
+  let(:winrm_ssl) { Bolt::Transport::WinRM.new }
   let(:echo_script) { <<PS }
 foreach ($i in $args)
 {
@@ -75,7 +76,7 @@ PS
     it "adheres to the specified timeout" do
       TCPServer.open(0) do |socket|
         port = socket.addr[1]
-        config[:transports][:winrm][:connect_timeout] = 2
+        config[:transports][:winrm]['connect-timeout'] = 2
 
         Timeout.timeout(3) do
           expect_node_error(Bolt::Node::ConnectError,
@@ -130,8 +131,10 @@ PS
   end
 
   context "connecting over SSL", winrm: true do
+    let(:target) { make_target(p: ssl_port, conf: ssl_config) }
+
     it "executes a command on a host" do
-      expect(winrm_ssl.run_command(target, command)['stdout']).to eq("#{user}\r\n")
+      expect(winrm.run_command(target, command)['stdout']).to eq("#{user}\r\n")
     end
 
     it "can upload a file to a host" do
@@ -139,16 +142,16 @@ PS
       remote_path = 'C:\Windows\Temp\upload-test-winrm-ssl'
       with_tempfile_containing('upload-test-winrm-ssl', contents, '.ps1') do |file|
         expect(
-          winrm_ssl.upload(target, file.path, remote_path).value
+          winrm.upload(target, file.path, remote_path).value
         ).to eq(
           '_output' => "Uploaded '#{file.path}' to '#{target.host}:#{remote_path}'"
         )
 
         expect(
-          winrm_ssl.run_command(target, "type #{remote_path}")['stdout']
+          winrm.run_command(target, "type #{remote_path}")['stdout']
         ).to eq("#{contents}\r\n")
 
-        winrm_ssl.run_command(target, "del #{remote_path}")
+        winrm.run_command(target, "del #{remote_path}")
       end
     end
   end
@@ -725,7 +728,7 @@ OUTPUT
       end
 
       context "with extensions specified" do
-        let(:config) { mk_config(ssl: false, extensions: ['.py'], user: user, password: password) }
+        let(:config) { mk_config(ssl: false, extensions: 'py', user: user, password: password) }
 
         it "can apply an arbitrary script", winrm: true do
           expect_any_instance_of(Bolt::Transport::WinRM::Connection)

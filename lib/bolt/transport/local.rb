@@ -7,8 +7,12 @@ require 'bolt/result'
 module Bolt
   module Transport
     class Local < Base
-      def initialize(config = nil)
-        super(config)
+      def self.options
+        %w[tmpdir]
+      end
+
+      def initialize
+        super
 
         if Gem.win_platform?
           raise NotImplementedError, "The local transport is not yet implemented on Windows"
@@ -51,14 +55,14 @@ module Bolt
       end
 
       def run_command(target, command, _options = {})
-        in_tmpdir(target.options[:tmpdir]) do |_|
+        in_tmpdir(target.options['tmpdir']) do |_|
           output = @conn.execute(command, {})
           Bolt::Result.for_command(target, output.stdout.string, output.stderr.string, output.exit_code)
         end
       end
 
       def run_script(target, script, arguments, _options = {})
-        with_tmpscript(File.absolute_path(script), target.options[:tmpdir]) do |file|
+        with_tmpscript(File.absolute_path(script), target.options['tmpdir']) do |file|
           logger.debug "Running '#{file}' with #{arguments}"
 
           if arguments.empty?
@@ -76,7 +80,7 @@ module Bolt
         stdin = STDIN_METHODS.include?(input_method) ? JSON.dump(arguments) : nil
         env = ENVIRONMENT_METHODS.include?(input_method) ? arguments : nil
 
-        with_tmpscript(task.executable, target.options[:tmpdir]) do |script|
+        with_tmpscript(task.executable, target.options['tmpdir']) do |script|
           logger.debug("Running '#{script}' with #{arguments}")
 
           output = @conn.execute(script, stdin: stdin, env: env)

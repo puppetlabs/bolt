@@ -11,6 +11,10 @@ module Bolt
       CONF_FILE = File.expand_path('~/.puppetlabs/client-tools/orchestrator.conf')
       BOLT_MOCK_TASK = Struct.new(:name, :executable).new('bolt', 'bolt/tasks/init').freeze
 
+      def self.options
+        %w[service-url cacert token-file task-environment local-validation]
+      end
+
       def create_client(opts)
         client_keys = %i[service-url token-file cacert]
         client_opts = opts.reduce({}) do |acc, (k, v)|
@@ -27,7 +31,7 @@ module Bolt
 
       def build_request(targets, task, arguments)
         { task: task.name,
-          environment: targets.first.options[:"task-environment"],
+          environment: targets.first.options["task-environment"],
           noop: arguments['_noop'],
           params: arguments.reject { |k, _| k == '_noop' },
           scope: {
@@ -117,9 +121,9 @@ module Bolt
 
       def batches(targets)
         targets.group_by do |target|
-          [target.options[:"task-environment"],
-           target.options[:"service-url"],
-           target.options[:"token-file"]]
+          [target.options['task-environment'],
+           target.options['service-url'],
+           target.options['token-file']]
         end.values
       end
 
