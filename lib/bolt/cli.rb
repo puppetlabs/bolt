@@ -451,7 +451,7 @@ Available options are:
 
     def puppetdb_client
       return @puppetdb_client if @puppetdb_client
-      puppetdb_config = Bolt::PuppetDB::Config.new(nil, {})
+      puppetdb_config = Bolt::PuppetDB::Config.new(nil, config.puppetdb)
       @puppetdb_client = Bolt::PuppetDB::Client.from_config(puppetdb_config)
     end
 

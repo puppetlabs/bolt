@@ -12,6 +12,7 @@ module Bolt
     :log_level,
     :log,
     :modulepath,
+    :puppetdb,
     :transport,
     :transports
   ) do
@@ -20,7 +21,8 @@ module Bolt
       concurrency: 100,
       transport: 'ssh',
       format: 'human',
-      modulepath: []
+      modulepath: [],
+      puppetdb: {}
     }.freeze
 
     TRANSPORT_OPTIONS = %i[host_key_check password run_as sudo_password extensions
@@ -119,6 +121,10 @@ module Bolt
 
       if data['format']
         self[:format] = data['format']
+      end
+
+      if data['puppetdb']
+        self[:puppetdb] = data['puppetdb']
       end
 
       if data['ssh']
