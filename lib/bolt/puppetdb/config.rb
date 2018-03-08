@@ -19,7 +19,7 @@ module Bolt
           if File.exist?(filename)
             config = JSON.parse(File.read(filename))
           else
-            raise "config file #{filename} does not exist"
+            raise Bolt::PuppetDBError, "config file #{filename} does not exist"
           end
         elsif File.exist?(DEFAULT_CONFIG)
           config = JSON.parse(File.read(DEFAULT_CONFIG))
@@ -50,21 +50,21 @@ module Bolt
 
       def validate_file_exists(file)
         if @settings[file] && !File.exist?(@settings[file])
-          raise "#{file} file #{@settings[file]} does not exist"
+          raise Bolt::PuppetDBError, "#{file} file #{@settings[file]} does not exist"
         end
       end
 
       def validate
         unless @settings['server_urls']
-          raise "server_urls must be specified in the config file or with --url"
+          raise Bolt::PuppetDBError, "server_urls must be specified"
         end
         unless @settings['cacert']
-          raise "cacert must be specified in the config file or with --cacert"
+          raise Bolt::PuppetDBError, "cacert must be specified"
         end
 
         if (@settings['cert'] && !@settings['key']) ||
            (!@settings['cert'] && @settings['key'])
-          raise "cert and key must be specified together"
+          raise Bolt::PuppetDBError, "cert and key must be specified together"
         end
 
         validate_file_exists('cacert')

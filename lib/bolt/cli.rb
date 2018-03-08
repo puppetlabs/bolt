@@ -10,6 +10,7 @@ require 'bolt/executor'
 require 'bolt/inventory'
 require 'bolt/logger'
 require 'bolt/outputter'
+require 'bolt/puppetdb'
 require 'bolt/pal'
 require 'bolt/target'
 require 'bolt/version'
@@ -128,6 +129,10 @@ Available options are:
                         '* port defaults to `22` for SSH',
                         '* port defaults to `5985` or `5986` for WinRM, based on the --[no-]ssl setting') do |nodes|
           @options[:nodes] << get_arg_input(nodes)
+        end.extend(SwitchHider)
+        @query = define('-q', '--query QUERY',
+                        'Query PuppetDB to determine the targets') do |query|
+          @options[:query] = query
         end.extend(SwitchHider)
         define('-u', '--user USER',
                'User to authenticate as (Optional)') do |user|
@@ -251,9 +256,12 @@ Available options are:
                         BANNER
                       end
 
-        # Only show the --nodes switch in the help message produced by
-        # the #help method when not dealing with plans
-        @nodes.hide = (@options[:mode] == 'plan')
+        # Only show the --nodes and --query switches in the help message
+        # produced by the #help method when not dealing with plans
+        if @options[:mode] == 'plan'
+          @nodes.hide = true
+          @query.hide = true
+        end
       end
 
       def parse_params(params)
@@ -367,7 +375,12 @@ Available options are:
 
       # After validation, initialize inventory and targets. Errors here are better to catch early.
       unless options[:action] == 'show' || options[:mode] == 'plan'
-        options[:targets] = inventory.get_targets(options[:nodes]) if options[:nodes]
+        if options[:query]
+          nodes = query_puppetdb_nodes(options[:query])
+          options[:targets] = inventory.get_targets(nodes)
+        else
+          options[:targets] = inventory.get_targets(options[:nodes])
+        end
       end
 
       options
@@ -412,8 +425,12 @@ Available options are:
         end
       end
 
-      if options[:nodes].empty? && options[:mode] != 'plan' && options[:action] != 'show'
-        raise Bolt::CLIError, "Option '--nodes' must be specified"
+      if options[:mode] != 'plan' && options[:action] != 'show'
+        if options[:nodes].empty? && options[:query].nil?
+          raise Bolt::CLIError, "Targets must be specified with '--nodes' or '--query'"
+        elsif options[:nodes].any? && options[:query]
+          raise Bolt::CLIError, "Only one of '--nodes' or '--query' may be specified"
+        end
       end
 
       if options[:noop] && (options[:mode] != 'task' || options[:action] != 'run')
@@ -430,6 +447,18 @@ Available options are:
       raise Bolt::CLIError, "Invalid parameter specified for option '#{e.args.first}': #{e.args[1]}"
     rescue OptionParser::InvalidOption, OptionParser::AmbiguousOption => e
       raise Bolt::CLIError, "Unknown argument '#{e.args.first}'"
+    end
+
+    def puppetdb_client
+      return @puppetdb_client if @puppetdb_client
+      puppetdb_config = Bolt::PuppetDB::Config.new(nil, {})
+      @puppetdb_client = Bolt::PuppetDB::Client.from_config(puppetdb_config)
+    end
+
+    def query_puppetdb_nodes(query)
+      puppetdb_client.query_certnames(query)
+    rescue StandardError => e
+      raise Bolt::CLIError, "Could not retrieve targets from PuppetDB: #{e}"
     end
 
     def execute(options)

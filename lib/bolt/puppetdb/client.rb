@@ -38,11 +38,12 @@ module Bolt
 
         response = http_client.post("#{@uri}/pdb/query/v4", body: body, header: headers)
         if response.code != 200
-          raise "Failed to query PuppetDB: #{response.body}"
+          raise Bolt::PuppetDBError, "Failed to query PuppetDB: #{response.body}"
         else
           results = JSON.parse(response.body)
           if results.first && !results.first.key?('certname')
-            raise "Query results did not contain a 'certname' field: got #{results.first.keys.join(', ')}"
+            fields = results.first.keys
+            raise Bolt::PuppetDBError, "Query results did not contain a 'certname' field: got #{fields.join(', ')}"
           end
           results.map { |result| result['certname'] }.uniq
         end

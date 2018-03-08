@@ -215,7 +215,7 @@ bar
         cli = Bolt::CLI.new(%w[command run])
         expect {
           cli.parse
-        }.to raise_error(Bolt::CLIError, /Option '--nodes' must be specified/)
+        }.to raise_error(Bolt::CLIError, /Targets must be specified/)
       end
 
       it 'does not list nodes in plan --help' do
@@ -234,6 +234,42 @@ bar
             cli.parse
           }.to raise_error(Bolt::CLIExit)
         }.not_to output(/--nodes/).to_stdout
+      end
+    end
+
+    describe "query" do
+      it "accepts a query" do
+        cli = Bolt::CLI.new(%w[command run id --query nodes{}])
+        allow(cli).to receive(:query_puppetdb_nodes).and_return([])
+
+        result = cli.parse
+        expect(result[:query]).to eq('nodes{}')
+      end
+
+      it "resolves targets based on the query" do
+        cli = Bolt::CLI.new(%w[command run id --query nodes{}])
+        allow(cli).to receive(:query_puppetdb_nodes).and_return(%w[foo bar])
+
+        targets = [Bolt::Target.new('foo'), Bolt::Target.new('bar')]
+
+        result = cli.parse
+        expect(result[:targets]).to eq(targets)
+      end
+
+      it "fails if it can't retrieve targets from PuppetDB" do
+        cli = Bolt::CLI.new(%w[command run id --query nodes{}])
+        puppetdb = double('puppetdb')
+        allow(puppetdb).to receive(:query_certnames).and_raise(Bolt::PuppetDBError, "failed to puppetdb the nodes")
+        allow(cli).to receive(:puppetdb_client).and_return(puppetdb)
+
+        expect { cli.parse }
+          .to raise_error(Bolt::CLIError, /Could not retrieve targets from PuppetDB.*failed to puppetdb the nodes/)
+      end
+
+      it "fails if both --nodes and --query are specified" do
+        cli = Bolt::CLI.new(%w[command run id --query nodes{} --nodes foo,bar])
+
+        expect { cli.parse }.to raise_error(Bolt::CLIError, /Only one/)
       end
     end
 
