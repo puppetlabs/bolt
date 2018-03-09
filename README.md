@@ -166,6 +166,30 @@ $ bolt command run hostname --nodes 'sshnode*.example.com'
 
 Note that &mdash; in place of wildcard matching &mdash; shell-specific expansions (such as `sshnode{1,2}.example.com`) can also be useful ways to specify a pattern of nodes to run.
 
+### Querying PuppetDB for targets
+
+In addition to the inventory file, you can query PuppetDB to generate lists of targets.
+
+First, add the necessary configuration to `~/.puppetlabs/bolt.yaml`.
+
+```yaml
+puppetdb:
+  server_urls: ["https://puppetdb.example.com:8081"]
+  cacert: /path/to/cacert
+  # Use cert+key for FOSS PuppetDB
+  cert: /path/to/cert
+  key: /path/to/key
+  # Use a token for PE PuppetDB
+  token: ~/.puppetlabs/token
+```
+
+Now you can target nodes using a PuppetDB query.
+
+```
+$ bolt command run hostname --query 'inventory { facts.os.family = "Linux" }'
+```
+
+Note that the results of the query must include a `certname` field, which will be used to identify the target.
 
 ## Usage examples
 
