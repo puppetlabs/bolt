@@ -5,13 +5,16 @@ require 'bolt/target'
 
 describe 'run_task' do
   include PuppetlabsSpec::Fixtures
-  let(:executor) { mock('bolt_executor') }
-  let(:inventory) { mock('inventory') }
+  let(:executor) {
+    mock('Bolt::Executor').tap do |executor|
+      executor.stubs(:noop).returns(false)
+    end
+  }
+  let(:inventory) { mock('Bolt::Inventory') }
 
   around(:each) do |example|
     Puppet[:tasks] = true
     Puppet.features.stubs(:bolt?).returns(true)
-    executor.stubs(:noop).returns(false)
 
     Puppet.override(bolt_executor: executor, bolt_inventory: inventory) do
       example.run
@@ -155,6 +158,8 @@ describe 'run_task' do
     end
 
     it 'when called with non existing task - reports an unknown task error' do
+      inventory.expects(:get_targets).with([]).returns([])
+
       is_expected.to run.with_params('test::nonesuch', []).and_raise_error(
         /Could not find a task named "test::nonesuch"/
       )
@@ -164,7 +169,12 @@ describe 'run_task' do
   context 'it validates the task parameters' do
     let(:task_name) { 'Test::Params' }
     let(:hostname) { 'a.b.com' }
+    let(:target) { Bolt::Target.new(hostname) }
     let(:task_params) { {} }
+
+    before :each do
+      inventory.expects(:get_targets).with(hostname).returns([target])
+    end
 
     it 'errors when unknown parameters are specified' do
       task_params.merge!(
