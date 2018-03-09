@@ -240,9 +240,14 @@ Available options are:
       end
 
       def update
+        # show the --nodes and --query switches by default
+        @nodes.hide = @query.hide = false
+
         # Update the banner according to the mode
         self.banner = case @options[:mode]
                       when 'plan'
+                        # don't show the --nodes and --query switches in the plan help
+                        @nodes.hide = @query.hide = true
                         PLAN_HELP
                       when 'command'
                         COMMAND_HELP
@@ -255,13 +260,6 @@ Available options are:
                       else
                         BANNER
                       end
-
-        # Only show the --nodes and --query switches in the help message
-        # produced by the #help method when not dealing with plans
-        if @options[:mode] == 'plan'
-          @nodes.hide = true
-          @query.hide = true
-        end
       end
 
       def parse_params(params)

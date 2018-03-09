@@ -25,9 +25,9 @@ module Bolt
       puppetdb: {}
     }.freeze
 
-    TRANSPORT_OPTIONS = %i[host_key_check password run_as sudo_password extensions
-                           ssl key tty tmpdir user connect_timeout cacert
-                           token-file task-environment service-url].freeze
+    TRANSPORT_OPTIONS = %i[password run_as sudo_password extensions
+                           key tty tmpdir user connect_timeout
+                           cacert token-file service-url].freeze
 
     TRANSPORT_DEFAULTS = {
       connect_timeout: 10,
@@ -42,7 +42,8 @@ module Bolt
         ssl: true
       },
       pcp: {
-        :"task-environment" => 'production'
+        :"task-environment" => 'production',
+        :"local-validation" => true
       },
       local: {}
     }.freeze
@@ -178,6 +179,9 @@ module Bolt
         if data['pcp']['task-environment']
           self[:transports][:pcp][:"task-environment"] = data['pcp']['task-environment']
         end
+        if data['pcp'].key?('local-validation') # this defaults to true so we need to check the presence of the key
+          self[:transports][:pcp][:"local-validation"] = data['pcp']['local-validation']
+        end
       end
 
       if data['local']
@@ -204,22 +208,19 @@ module Bolt
         self[:log]['console'][:level] = :info
       end
 
-      TRANSPORT_OPTIONS.each do |key|
-        TRANSPORTS.each do |transport|
-          unless %i[ssl host_key_check task-environment].any? { |k| k == key }
-            self[:transports][transport][key] = options[key] if options[key]
-            next
-          end
-          if key == :ssl && transport == :winrm
-            # this defaults to true so we need to check the presence of the key
-            self[:transports][transport][key] = options[key] if options.key?(key)
-            next
-          elsif key == :host_key_check && transport == :ssh
-            # this defaults to true so we need to check the presence of the key
-            self[:transports][transport][key] = options[key] if options.key?(key)
-            next
-          end
+      TRANSPORTS.each do |transport|
+        transport = self[:transports][transport]
+        TRANSPORT_OPTIONS.each do |key|
+          transport[key] = options[key] if options[key]
         end
+      end
+
+      if options.key?(:ssl) # this defaults to true so we need to check the presence of the key
+        self[:transports][:winrm][:ssl] = options[:ssl]
+      end
+
+      if options.key?(:host_key_check) # this defaults to true so we need to check the presence of the key
+        self[:transports][:ssh][:host_key_check] = options[:host_key_check]
       end
     end
 
@@ -281,6 +282,11 @@ module Bolt
       ssl_flag = self[:transports][:winrm][:ssl]
       unless !!ssl_flag == ssl_flag
         raise Bolt::CLIError, 'ssl option must be a Boolean true or false'
+      end
+
+      validation_flag = self[:transports][:pcp][:"local-validation"]
+      unless !!validation_flag == validation_flag
+        raise Bolt::CLIError, 'local-validation option must be a Boolean true or false'
       end
 
       self[:transports].each_value do |v|
