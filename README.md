@@ -119,6 +119,10 @@ ssh:
 
 `task-environment`: The environment from which Orchestrator will serve task implementations. (default: `production`)
 
+### `local` transport configuration options
+
+`tmpdir`: The directory to store temporary files and use as the working directory for local execution. (default: `Dir.mktmpdir`)
+
 ### Node-specific configuration with the inventory file
 
 The inventory file allows you to group nodes and set up node-specific configuration defaults.
