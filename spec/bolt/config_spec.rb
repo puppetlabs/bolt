@@ -179,5 +179,27 @@ describe Bolt::Config do
         Bolt::Config.new(config).validate
       }.to raise_error(Bolt::CLIError)
     end
+
+    it "accepts a boolean for local-validation" do
+      config = {
+        transports: {
+          pcp: { :'local-validation' => false }
+        }
+      }
+      expect {
+        Bolt::Config.new(config).validate
+      }.not_to raise_error
+    end
+
+    it "does not accept local-validation that is not a boolean" do
+      config = {
+        transports: {
+          pcp: { :'local-validation' => 'false' }
+        }
+      }
+      expect {
+        Bolt::Config.new(config).validate
+      }.to raise_error(Bolt::CLIError)
+    end
   end
 end

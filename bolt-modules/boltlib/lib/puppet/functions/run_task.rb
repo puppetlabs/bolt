@@ -41,12 +41,6 @@ Puppet::Functions.create_function(:run_task) do
       )
     end
 
-    # TODO: use the compiler injection once PUP-8237 lands
-    task_signature = Puppet::Pal::ScriptCompiler.new(closure_scope.compiler).task_signature(task_name)
-    if task_signature.nil?
-      raise with_stack(:UNKNOWN_TASK, Bolt::Error.unknown_task(task_name))
-    end
-
     executor = Puppet.lookup(:bolt_executor) { nil }
     inventory = Puppet.lookup(:bolt_inventory) { nil }
     unless executor && inventory && Puppet.features.bolt?
@@ -55,17 +49,37 @@ Puppet::Functions.create_function(:run_task) do
       )
     end
 
+    # Ensure that given targets are all Target instances
+    targets = inventory.get_targets(targets)
+
     use_args = task_args.reject { |k, _| k.start_with?('_') }
 
-    task_signature.runnable_with?(use_args) do |mismatch_message|
-      raise with_stack(:TYPE_MISMATCH, mismatch_message)
-    end || (raise with_stack(:TYPE_MISMATCH, 'Task parameters do not match'))
+    # Don't bother loading the local task definition if all targets use the 'pcp' transport
+    # and the local-validation option is set to false for all of them
+    if !targets.empty? && targets.all? { |t| t.protocol == 'pcp' && t.options[:'local-validation'] == false }
+      # create a fake task
+      task = Puppet::Pops::Types::TypeFactory.task.from_hash(
+        'name'          => task_name,
+        'executable'    => '',
+        'supports_noop' => true
+      )
+    else
+      # TODO: use the compiler injection once PUP-8237 lands
+      task_signature = Puppet::Pal::ScriptCompiler.new(closure_scope.compiler).task_signature(task_name)
+      if task_signature.nil?
+        raise with_stack(:UNKNOWN_TASK, Bolt::Error.unknown_task(task_name))
+      end
+
+      task_signature.runnable_with?(use_args) do |mismatch_message|
+        raise with_stack(:TYPE_MISMATCH, mismatch_message)
+      end || (raise with_stack(:TYPE_MISMATCH, 'Task parameters do not match'))
+
+      task = task_signature.task
+    end
 
     unless Puppet::Pops::Types::TypeFactory.data.instance?(use_args)
       raise with_stack(:TYPE_NOT_DATA, 'Task parameters is not of type Data')
     end
-
-    task = task_signature.task
 
     if executor.noop
       if task.supports_noop
@@ -75,8 +89,6 @@ Puppet::Functions.create_function(:run_task) do
       end
     end
 
-    # Ensure that given targets are all Target instances
-    targets = inventory.get_targets(targets)
     if targets.empty?
       Bolt::ResultSet.new([])
     else

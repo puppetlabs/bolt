@@ -1117,9 +1117,9 @@ bar
 
             expect { cli.execute(options) }.to raise_error(
               Bolt::CLIError,
-              /Task\ sample::params:\n
-               \s*has\ no\ parameter\ named\ 'foo'\n
-               \s*has\ no\ parameter\ named\ 'bar'/x
+              /Task sample::params:\n(?x:
+               )\s*has no parameter named 'foo'\n(?x:
+               )\s*has no parameter named 'bar'/
             )
             expect(JSON.parse(output.string)).to be
           end
@@ -1129,9 +1129,9 @@ bar
 
             expect { cli.execute(options) }.to raise_error(
               Bolt::CLIError,
-              /Task\ sample::params:\n
-               \s*expects\ a\ value\ for\ parameter\ 'mandatory_integer'\n
-               \s*expects\ a\ value\ for\ parameter\ 'mandatory_boolean'/x
+              /Task sample::params:\n(?x:
+               )\s*expects a value for parameter 'mandatory_integer'\n(?x:
+               )\s*expects a value for parameter 'mandatory_boolean'/
             )
             expect(JSON.parse(output.string)).to be
           end
@@ -1147,10 +1147,10 @@ bar
 
             expect { cli.execute(options) }.to raise_error(
               Bolt::CLIError,
-              /Task\ sample::params:\n
-               \s*parameter\ 'mandatory_boolean'\ expects\ a\ Boolean\ value,\ got\ String\n
-               \s*parameter\ 'optional_string'\ expects\ a\ value\ of\ type\ Undef\ or\ String,
-                                              \ got\ Integer/x
+              /Task sample::params:\n(?x:
+               )\s*parameter 'mandatory_boolean' expects a Boolean value, got String\n(?x:
+               )\s*parameter 'optional_string' expects a value of type Undef or String,(?x:
+                                             ) got Integer/
             )
             expect(JSON.parse(output.string)).to be
           end
@@ -1166,10 +1166,10 @@ bar
 
             expect { cli.execute(options) }.to raise_error(
               Bolt::CLIError,
-              /Task\ sample::params:\n
-               \s*parameter\ 'mandatory_string'\ expects\ a\ String\[1,\ 10\]\ value,\ got\ String\n
-               \s*parameter\ 'optional_integer'\ expects\ a\ value\ of\ type\ Undef\ or\ Integer\[-5,\ 5\],
-                                               \ got\ Integer\[10,\ 10\]/x
+              /Task sample::params:\n(?x:
+               )\s*parameter 'mandatory_string' expects a String\[1, 10\] value, got String\n(?x:
+               )\s*parameter 'optional_integer' expects a value of type Undef or Integer\[-5, 5\],(?x:
+                                              ) got Integer\[10, 10\]/
             )
             expect(JSON.parse(output.string)).to be
           end
@@ -1188,6 +1188,69 @@ bar
 
             cli.execute(options)
             expect(JSON.parse(output.string)).to be
+          end
+
+          context "when the pcp transport's local-validation setting is set to false" do
+            let(:task_params) {
+              # these are not legal parameters for the 'sample::params' task
+              # according to the local task definition
+              {
+                'foo' => nil,
+                'bar' => nil
+              }
+            }
+
+            before :each do
+              cli.config.transports[:pcp][:'local-validation'] = false
+            end
+
+            context "when some targets don't use the PCP transport" do
+              it "errors as usual if the task is not available locally" do
+                task_name.replace 'unknown::task'
+
+                expect { cli.execute(options) }.to raise_error(
+                  Bolt::CLIError, /Could not find a task named "unknown::task"/
+                )
+                expect(JSON.parse(output.string)).to be
+              end
+
+              it "errors as usual if invalid (according to the local task definition) parameters are specified" do
+                expect { cli.execute(options) }.to raise_error(
+                  Bolt::CLIError,
+                  /Task sample::params:\n(?x:
+                   )\s*has no parameter named 'foo'\n(?x:
+                   )\s*has no parameter named 'bar'/
+                )
+                expect(JSON.parse(output.string)).to be
+              end
+            end
+
+            context "when all targets use the PCP transport" do
+              let(:target) { Bolt::Target.new('pcp://foo') }
+              let(:task_t) { task_type(task_name, /\A\z/, 'both') }
+
+              it "runs the task even when it is not installed locally" do
+                task_name.replace 'unknown::task'
+
+                expect(executor)
+                  .to receive(:run_task)
+                  .with(targets, task_t, task_params, {})
+                  .and_return(Bolt::ResultSet.new([]))
+
+                cli.execute(options)
+                expect(JSON.parse(output.string)).to be
+              end
+
+              it "runs the task even when invalid (according to the local task definition) parameters are specified" do
+                expect(executor)
+                  .to receive(:run_task)
+                  .with(targets, task_t, task_params, {})
+                  .and_return(Bolt::ResultSet.new([]))
+
+                cli.execute(options)
+                expect(JSON.parse(output.string)).to be
+              end
+            end
           end
         end
       end
@@ -1384,7 +1447,7 @@ bar
       let(:output) { StringIO.new }
 
       before :each do
-        allow(Bolt::Executor).to receive(:new).with(config, true).and_return(executor)
+        expect(Bolt::Executor).to receive(:new).with(config, true).and_return(executor)
 
         outputter = Bolt::Outputter::JSON.new(output)
 
@@ -1462,7 +1525,8 @@ bar
           'task-environment' => 'testenv',
           'service-url' => 'http://foo.org',
           'token-file' => '/path/to/token',
-          'cacert' => '/path/to/cacert'
+          'cacert' => '/path/to/cacert',
+          'local-validation' => false
         } }
     end
 
@@ -1570,6 +1634,14 @@ bar
         cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo])
         cli.parse
         expect(cli.config[:transports][:pcp][:"token-file"]).to eql('/path/to/token')
+      end
+    end
+
+    it 'reads local-validation option for pcp' do
+      with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
+        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo])
+        cli.parse
+        expect(cli.config[:transports][:pcp][:"local-validation"]).to eql(false)
       end
     end
 
