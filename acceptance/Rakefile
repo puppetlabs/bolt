@@ -16,7 +16,7 @@ rototiller_task :host_config do |task|
              else
                'ssh'
              end
-    node = node + roles.join(',') + '.'
+    node = node + roles.join(',') + '.{type=aio}'
     n_new << node
   end
   nodes_final = n_new.join('-')
@@ -103,6 +103,24 @@ namespace :test do
     task.add_env(name: 'SSH_PASSWORD')
     task.add_env(name: 'WINRM_USER', default: 'Administrator')
     task.add_env(name: 'WINRM_PASSWORD')
+    task.add_command do |cmd|
+      cmd.name = 'beaker'
+      cmd.add_option(*beaker_options)
+    end
+  end
+
+  desc "Run bolt acceptance tests against a package"
+  task package: :host_config
+  rototiller_task :package do |task|
+    beaker_options << {
+      name: '--options',
+      add_argument: { name: 'config/package/options.rb' }
+    }
+    task.add_env(name: 'SSH_USER', default: 'root')
+    task.add_env(name: 'SSH_PASSWORD')
+    task.add_env(name: 'WINRM_USER', default: 'Administrator')
+    task.add_env(name: 'WINRM_PASSWORD')
+    task.add_env(name: 'SHA')
     task.add_command do |cmd|
       cmd.name = 'beaker'
       cmd.add_option(*beaker_options)

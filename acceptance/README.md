@@ -92,6 +92,11 @@ GIT_SHA
     pre-suites to determine what git ref should be checked out for testing.
     This variable supercedes `GIT_BRANCH` if provided.
 
+SHA
+    :  When testing via package install, this value will be used by the test
+    pre-suites to determine what package version should be installed for
+    testing.
+
 ## Running Tests on the vcloud
 
 ### Rake tasks
@@ -150,6 +155,18 @@ BOLT_NODES=ubuntu1604-64,windows10ent-64    \
 SSH_PASSWORD='S3@ret3'                      \
 WINRM_PASSWORD='S3@ret3'                    \
 bundle exec rake test:git
+```
+
+#### Package
+Example to test a specific package version from Puppet's internal package repos
+```
+SHA=261d55b5cc1e8a6d00f4ff4573e17048bea08c10 \
+BEAKER_KEYFILE=~/.ssh/id_rsa-mykey           \
+BOLT_CONTROLLER=centos7-64                   \
+BOLT_NODES=ubuntu1604-64,windows10ent-64     \
+SSH_PASSWORD='S3@ret3'                       \
+WINRM_PASSWORD='S3@ret3'                     \
+bundle exec rake test:package
 ```
 
 ### Beaker
