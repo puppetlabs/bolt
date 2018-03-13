@@ -183,10 +183,6 @@ module Bolt
     end
 
     def validate
-      TRANSPORTS.each_key do |transport|
-        self[:transports][transport]
-      end
-
       self[:log].each_pair do |name, params|
         if params.key?(:level) && !Bolt::Logger.valid_level?(params[:level])
           raise Bolt::CLIError,
@@ -201,39 +197,8 @@ module Bolt
         raise Bolt::CLIError, "Unsupported format: '#{self[:format]}'"
       end
 
-      if self[:transports][:ssh]['sudo-password'] && self[:transports][:ssh]['run-as'].nil?
-        @logger.warn("--sudo-password will not be used without specifying a " \
-                     "user to escalate to with --run-as")
-      end
-
-      host_key = self[:transports][:ssh]['host-key-check']
-      unless !!host_key == host_key
-        raise Bolt::CLIError, 'host-key-check option must be a Boolean true or false'
-      end
-
-      ssl_flag = self[:transports][:winrm]['ssl']
-      unless !!ssl_flag == ssl_flag
-        raise Bolt::CLIError, 'ssl option must be a Boolean true or false'
-      end
-
-      validation_flag = self[:transports][:pcp]['local-validation']
-      unless !!validation_flag == validation_flag
-        raise Bolt::CLIError, 'local-validation option must be a Boolean true or false'
-      end
-
-      if (key_opt = self[:transports][:ssh]['private-key'])
-        unless key_opt.instance_of?(String) || (key_opt.instance_of?(Hash) && key_opt.include?('key-data'))
-          raise Bolt::CLIError,
-                "private-key option must be the path to a private key file or a hash containing the 'key-data'"
-        end
-      end
-
-      self[:transports].each_value do |v|
-        timeout_value = v['connect-timeout']
-        unless timeout_value.is_a?(Integer) || timeout_value.nil?
-          error_msg = "connect-timeout value must be an Integer, received #{timeout_value}:#{timeout_value.class}"
-          raise Bolt::CLIError, error_msg
-        end
+      TRANSPORTS.each do |transport, impl|
+        impl.validate(self[:transports][transport])
       end
     end
   end

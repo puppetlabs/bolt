@@ -10,6 +10,33 @@ module Bolt
         %w[port user password sudo-password private-key host-key-check connect-timeout tmpdir run-as]
       end
 
+      def self.validate(options)
+        logger = Logging.logger[self]
+
+        if options['sudo-password'] && options['run-as'].nil?
+          logger.warn("--sudo-password will not be used without specifying a " \
+                       "user to escalate to with --run-as")
+        end
+
+        host_key = options['host-key-check']
+        unless !!host_key == host_key
+          raise Bolt::CLIError, 'host-key-check option must be a Boolean true or false'
+        end
+
+        if (key_opt = options['private-key'])
+          unless key_opt.instance_of?(String) || (key_opt.instance_of?(Hash) && key_opt.include?('key-data'))
+            raise Bolt::CLIError,
+                  "private-key option must be the path to a private key file or a hash containing the 'key-data'"
+          end
+        end
+
+        timeout_value = options['connect-timeout']
+        unless timeout_value.is_a?(Integer) || timeout_value.nil?
+          error_msg = "connect-timeout value must be an Integer, received #{timeout_value}:#{timeout_value.class}"
+          raise Bolt::CLIError, error_msg
+        end
+      end
+
       def initialize
         super
 

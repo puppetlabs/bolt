@@ -11,6 +11,19 @@ module Bolt
         %w[port user password connect-timeout ssl tmpdir cacert extensions]
       end
 
+      def self.validate(options)
+        ssl_flag = options['ssl']
+        unless !!ssl_flag == ssl_flag
+          raise Bolt::CLIError, 'ssl option must be a Boolean true or false'
+        end
+
+        timeout_value = options['connect-timeout']
+        unless timeout_value.is_a?(Integer) || timeout_value.nil?
+          error_msg = "connect-timeout value must be an Integer, received #{timeout_value}:#{timeout_value.class}"
+          raise Bolt::CLIError, error_msg
+        end
+      end
+
       def initialize
         super
         require 'winrm'
