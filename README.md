@@ -119,7 +119,7 @@ ssh:
 
 `task-environment`: The environment from which Orchestrator will serve task implementations. (default: `production`)
 
-`local-validation`: Whether or not to perform validation of task parameters against the locally installed copy of a task when the task is run exclusively on targets which use the `pcp` transport. If set to false (and the task is run exclusively on targets which use the `pcp` transport) no validation of the task parameters is performed by bolt and the task doesn't even need to be installed locally. If a task is run on targets which use different transports (which may or may not include `pcp`) the validation of the task parameters is performed irrespective of this setting. (default: true)
+`local-validation`: Whether or not to perform validation of task parameters against the locally installed copy of a task when the task is run exclusively on targets which use the `pcp` transport. If set to false (and the task is run exclusively on targets which use the `pcp` transport) no validation of the task parameters is performed by bolt and the task doesn't even need to be installed locally. If a task is run on targets which use different transports (which may or may not include `pcp`) the validation of the task parameters is performed irrespective of this setting. (default: false)
 
 ### `local` transport configuration options
 

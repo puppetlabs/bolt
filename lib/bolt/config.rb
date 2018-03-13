@@ -43,7 +43,7 @@ module Bolt
       },
       pcp: {
         :"task-environment" => 'production',
-        :"local-validation" => true
+        :"local-validation" => false
       },
       local: {}
     }.freeze

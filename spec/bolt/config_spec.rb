@@ -183,7 +183,7 @@ describe Bolt::Config do
     it "accepts a boolean for local-validation" do
       config = {
         transports: {
-          pcp: { :'local-validation' => false }
+          pcp: { :'local-validation' => true }
         }
       }
       expect {
