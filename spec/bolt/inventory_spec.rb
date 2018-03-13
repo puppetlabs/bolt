@@ -408,7 +408,7 @@ describe Bolt::Inventory do
           'cacert' => transport + '.pem',
           'token-file' => 'token',
           'task-environment' => 'prod',
-          'local-validation' => false
+          'local-validation' => true
         }
       end
 
@@ -486,7 +486,7 @@ describe Bolt::Inventory do
           :"service-url" => "https://master",
           cacert: "pcp.pem",
           :"token-file" => "token",
-          :"local-validation" => false
+          :"local-validation" => true
         )
       end
     end

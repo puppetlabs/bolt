@@ -1190,7 +1190,7 @@ bar
             expect(JSON.parse(output.string)).to be
           end
 
-          context "when the pcp transport's local-validation setting is set to false" do
+          context "when the pcp transport's local-validation setting is set to true" do
             let(:task_params) {
               # these are not legal parameters for the 'sample::params' task
               # according to the local task definition
@@ -1199,10 +1199,42 @@ bar
                 'bar' => nil
               }
             }
+            let(:target) { Bolt::Target.new('pcp://foo') }
+            let(:task_t) { task_type(task_name, /\A\z/, 'both') }
 
             before :each do
-              cli.config.transports[:pcp][:'local-validation'] = false
+              cli.config.transports[:pcp][:'local-validation'] = true
             end
+
+            it "errors as usual if the task is not available locally" do
+              task_name.replace 'unknown::task'
+
+              expect { cli.execute(options) }.to raise_error(
+                Bolt::CLIError, /Could not find a task named "unknown::task"/
+              )
+              expect(JSON.parse(output.string)).to be
+            end
+
+            it "errors as usual if invalid (according to the local task definition) parameters are specified" do
+              expect { cli.execute(options) }.to raise_error(
+                Bolt::CLIError,
+                /Task sample::params:\n(?x:
+                 )\s*has no parameter named 'foo'\n(?x:
+                 )\s*has no parameter named 'bar'/
+              )
+              expect(JSON.parse(output.string)).to be
+            end
+          end
+
+          context "when the pcp transport's local-validation setting is false" do
+            let(:task_params) {
+              # these are not legal parameters for the 'sample::params' task
+              # according to the local task definition
+              {
+                'foo' => nil,
+                'bar' => nil
+              }
+            }
 
             context "when some targets don't use the PCP transport" do
               it "errors as usual if the task is not available locally" do
