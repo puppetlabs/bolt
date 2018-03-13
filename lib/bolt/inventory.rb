@@ -5,6 +5,8 @@ require 'bolt/inventory/group'
 
 module Bolt
   class Inventory
+    ENVIRONMENT_VAR = 'BOLT_INVENTORY'.freeze
+
     class ValidationError < Bolt::Error
       attr_accessor :path
       def initialize(message, offending_group)
@@ -37,7 +39,19 @@ module Bolt
     end
 
     def self.from_config(config)
-      data = Bolt::Util.read_config_file(config[:inventoryfile], default_paths, 'inventory')
+      if ENV.include?(ENVIRONMENT_VAR)
+        begin
+          # rubocop:disable YAMLLoad
+          data = YAML.load(ENV[ENVIRONMENT_VAR])
+        # In older releases of psych SyntaxError is not a subclass of Exception
+        rescue Psych::SyntaxError
+          raise Bolt::CLIError, "Could not parse inventory from $#{ENVIRONMENT_VAR}"
+        rescue Psych::Exception
+          raise Bolt::CLIError, "Could not parse inventory from $#{ENVIRONMENT_VAR}"
+        end
+      else
+        data = Bolt::Util.read_config_file(config[:inventoryfile], default_paths, 'inventory')
+      end
 
       inventory = new(data, config)
       inventory.validate
