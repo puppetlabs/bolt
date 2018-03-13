@@ -1701,5 +1701,17 @@ bar
         cli.parse
       }.to raise_error(Bolt::Error, /Could not parse/)
     end
+
+    context 'with BOLT_INVENTORY set' do
+      before(:each) { ENV['BOLT_INVENTORY'] = '---' }
+      after(:each) { ENV.delete('BOLT_INVENTORY') }
+
+      it 'errors when BOLT_INVENTORY is set' do
+        cli = Bolt::CLI.new(%W[command run --inventoryfile #{File.join(inventorydir, 'invalid.yml')} --nodes foo])
+        expect {
+          cli.parse
+        }.to raise_error(Bolt::Error, /BOLT_INVENTORY is set/)
+      end
+    end
   end
 end

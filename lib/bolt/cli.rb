@@ -212,6 +212,9 @@ Available options are:
         end
         define('--inventoryfile INVENTORY_PATH',
                'Specify where to load the inventory file from') do |path|
+          if ENV.include?(Bolt::Inventory::ENVIRONMENT_VAR)
+            raise Bolt::CLIError, "Cannot pass inventory file when #{Bolt::Inventory::ENVIRONMENT_VAR} is set"
+          end
           @options[:inventoryfile] = path
         end
         define_tail('--[no-]tty',

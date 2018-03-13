@@ -159,6 +159,26 @@ describe Bolt::Inventory do
     end
   end
 
+  context 'with BOLT_INVENTORY set' do
+    let(:inventory) { Bolt::Inventory.from_config(config) }
+    let(:target) { inventory.get_targets('node1')[0] }
+
+    before(:each) do
+      ENV['BOLT_INVENTORY'] = {
+        'nodes' => ['node1'],
+        'config' => {
+          'transport' => 'winrm'
+        }
+      }.to_yaml
+    end
+
+    after(:each) { ENV.delete('BOLT_INVENTORY') }
+
+    it 'should have the default protocol' do
+      expect(target.protocol).to eq('winrm')
+    end
+  end
+
   context 'with config' do
     let(:inventory) {
       Bolt::Inventory.from_config(config(transport: 'winrm',
