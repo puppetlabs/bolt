@@ -20,7 +20,7 @@ For the following exercises you should already have `bolt` installed and have a 
 
 # Running shell commands on Linux nodes
 
-`bolt` by default uses SSH for transport, and will reuse your existing SSH configuration for authentication. If you can SSH to a node using an SSH another client then `bolt` should just work. That normally means just providing configuration in `~/.ssh/config`. Running a command against a remote node is done with the following:
+`bolt` by default uses SSH for transport, and will reuse your existing SSH configuration for authentication. If you can SSH to a node then `bolt` should just work. That normally means just providing configuration in `~/.ssh/config`. Running a command against a remote node is done with the following:
 
 ```
 bolt command run <command> --nodes <nodes>
@@ -36,9 +36,9 @@ Finished on node1:
     21:19:23 up 13 min,  0 users,  load average: 0.08, 0.03, 0.04
 ```
 
-If you receive an error reading `Host key verification failed` you should make sure the correct host keys are in your `known_hosts` file or pass `--no-host-key-check` to future bolt commands. Bolt will not honor `StrictHostKeyChecking` in you ssh config.
+If you receive an error reading `Host key verification failed` you should make sure the correct host keys are in your `known_hosts` file or pass `--no-host-key-check` to future bolt commands. Bolt will not honor `StrictHostKeyChecking` in your ssh config.
 
-`bolt` can also run commands against multiple nodes by passing a command separated list. Replace `node1,node2,node3` in the following with two or more of your own nodes. If you get an error about `Host key verification` run the rest of the examples with the `--no-host-key-check` flag to disable host key verification.
+`bolt` can also run commands against multiple nodes by passing a comma-separated list. Replace `node1,node2,node3` in the following with two or more of your own nodes. If you get an error about `Host key verification` run the rest of the examples with the `--no-host-key-check` flag to disable host key verification.
 
 ```
 $ bolt command run uptime --nodes node1,node2,node3
@@ -117,7 +117,7 @@ If you're trying `bolt` out using Windows run the following command. This should
 bolt command run "gps | select ProcessName" --nodes $WINNODE
 ```
 
-The above example accesses a single node. You can also provide a command separated list of nodes like so:
+The above example accesses a single node. You can also provide a comma-separated list of nodes like so:
 
 ```
 bolt command run <command> --nodes winrm://<node>,winrm://<node> --user <user> --password <password>
