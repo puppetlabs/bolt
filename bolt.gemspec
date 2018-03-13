@@ -36,6 +36,9 @@ Gem::Specification.new do |spec|
   spec.add_dependency "winrm", "~> 2.0"
   spec.add_dependency "winrm-fs", "~> 1.1.0"
   spec.add_dependency "logging", "~> 2.2"
+  spec.add_dependency 'rbnacl'
+  spec.add_dependency 'rbnacl-libsodium'
+  spec.add_dependency 'bcrypt_pbkdf'
 
   # Dependencies of our vendored puppet, etc
   spec.add_dependency "CFPropertyList", "~> 2.2"
