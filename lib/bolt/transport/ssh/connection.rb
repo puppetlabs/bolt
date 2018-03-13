@@ -70,13 +70,13 @@ module Bolt
 
           options[:port] = target.port if target.port
           options[:password] = target.password if target.password
-          options[:keys] = target.options[:key] if target.options[:key]
-          options[:verify_host_key] = if target.options[:host_key_check]
+          options[:keys] = target.options['key'] if target.options['key']
+          options[:verify_host_key] = if target.options['host-key-check']
                                         Net::SSH::Verifiers::Secure.new
                                       else
                                         Net::SSH::Verifiers::Lenient.new
                                       end
-          options[:timeout] = target.options[:connect_timeout] if target.options[:connect_timeout]
+          options[:timeout] = target.options['connect-timeout'] if target.options['connect-timeout']
 
           # Mirroring:
           # https://github.com/net-ssh/net-ssh/blob/master/lib/net/ssh/authentication/agent.rb#L80
@@ -108,7 +108,7 @@ module Bolt
           )
         rescue Net::SSH::ConnectionTimeout
           raise Bolt::Node::ConnectError.new(
-            "Timeout after #{target.options[:connect_timeout]} seconds connecting to #{target.uri}",
+            "Timeout after #{target.options['connect-timeout']} seconds connecting to #{target.uri}",
             'CONNECT_ERROR'
           )
         rescue StandardError => e
@@ -129,7 +129,7 @@ module Bolt
         # override for the user to run as. When @run_as is unset, the user
         # specified on the target will be used.
         def run_as
-          @run_as || target.options[:run_as]
+          @run_as || target.options['run-as']
         end
 
         # Run as the specified user for the duration of the block.
@@ -146,8 +146,8 @@ module Bolt
 
         def handled_sudo(channel, data)
           if data.lines.include?(sudo_prompt)
-            if target.options[:sudo_password]
-              channel.send_data "#{target.options[:sudo_password]}\n"
+            if target.options['sudo-password']
+              channel.send_data "#{target.options['sudo-password']}\n"
               channel.wait
               return true
             else
@@ -196,7 +196,7 @@ module Bolt
 
           session_channel = @session.open_channel do |channel|
             # Request a pseudo tty
-            channel.request_pty if target.options[:tty]
+            channel.request_pty if target.options['tty']
 
             channel.exec(command_str) do |_, success|
               unless success
@@ -247,8 +247,8 @@ module Bolt
         end
 
         def make_tempdir
-          if target.options[:tmpdir]
-            tmppath = "#{target.options[:tmpdir]}/#{SecureRandom.uuid}"
+          if target.options['tmpdir']
+            tmppath = "#{target.options['tmpdir']}/#{SecureRandom.uuid}"
             command = ['mkdir', '-m', 700, tmppath]
           else
             command = ['mktemp', '-d']

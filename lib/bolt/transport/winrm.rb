@@ -7,7 +7,11 @@ module Bolt
         -NoProfile -NonInteractive -NoLogo -ExecutionPolicy Bypass
       ].freeze
 
-      def initialize(_config)
+      def self.options
+        %w[port user password connect-timeout ssl tmpdir cacert extensions]
+      end
+
+      def initialize
         super
         require 'winrm'
         require 'winrm-fs'

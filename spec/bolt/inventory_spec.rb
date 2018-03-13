@@ -73,9 +73,9 @@ describe Bolt::Inventory do
 
   let(:ssh_target_option_defaults) {
     {
-      connect_timeout: 10,
-      tty: false,
-      host_key_check: true
+      'connect-timeout' => 10,
+      'tty' => false,
+      'host-key-check' => true
     }
   }
 
@@ -163,7 +163,7 @@ describe Bolt::Inventory do
     let(:inventory) {
       Bolt::Inventory.from_config(config(transport: 'winrm',
                                          transports: { winrm: {
-                                           ssl: false
+                                           'ssl' => false
                                          } }))
     }
     let(:target) { inventory.get_targets('nonode')[0] }
@@ -173,7 +173,7 @@ describe Bolt::Inventory do
     end
 
     it 'should not use ssl' do
-      expect(target.options[:ssl]).to eq(false)
+      expect(target.options['ssl']).to eq(false)
     end
   end
 
@@ -240,7 +240,7 @@ describe Bolt::Inventory do
       end
 
       it 'should use values from the lowest group' do
-        expect(get_target(inventory, 'node4').options).to eq(ssh_target_option_defaults.merge(host_key_check: true))
+        expect(get_target(inventory, 'node4').options).to eq(ssh_target_option_defaults.merge('host-key-check' => true))
       end
 
       it 'should include values from parents' do
@@ -248,7 +248,7 @@ describe Bolt::Inventory do
       end
 
       it 'should use values from the first group' do
-        expect(get_target(inventory, 'node6').options).to eq(ssh_target_option_defaults.merge(host_key_check: true))
+        expect(get_target(inventory, 'node6').options).to eq(ssh_target_option_defaults.merge('host-key-check' => true))
       end
 
       it 'should prefer values from a node over an earlier group' do
@@ -330,19 +330,19 @@ describe Bolt::Inventory do
 
       it 'should return group config for string nodes' do
         target = get_target(inventory, 'node1')
-        expect(target.options).to eq(ssh_target_option_defaults.merge(host_key_check: false))
+        expect(target.options).to eq(ssh_target_option_defaults.merge('host-key-check' => false))
         expect(target.user).to eq('you')
       end
 
       it 'should return group config for array nodes' do
         target = get_target(inventory, 'node2')
-        expect(target.options).to eq(ssh_target_option_defaults.merge(host_key_check: false))
+        expect(target.options).to eq(ssh_target_option_defaults.merge('host-key-check' => false))
         expect(target.user).to eq('you')
       end
 
       it 'should merge config for from nodes' do
         target = get_target(inventory, 'node3')
-        expect(target.options).to eq(ssh_target_option_defaults.merge(host_key_check: false))
+        expect(target.options).to eq(ssh_target_option_defaults.merge('host-key-check' => false))
         expect(target.user).to eq('me')
       end
     end
@@ -396,7 +396,7 @@ describe Bolt::Inventory do
           'user' => 'me' + transport,
           'password' => 'you' + transport,
           'port' => '12345' + transport,
-          'private-key' => 'anything',
+          'key' => 'anything',
           'ssl' => false,
           'host-key-check' => false,
           'connect-timeout' => transport.size,
@@ -431,8 +431,8 @@ describe Bolt::Inventory do
         get_target(inventory, 'ssh://node')
         expect(conf[:modulepath]).to eq([])
         expect(conf[:transport]).to eq('ssh')
-        expect(conf[:transports][:ssh][:host_key_check]).to be true
-        expect(conf[:transports][:winrm][:ssl]).to be true
+        expect(conf[:transports][:ssh]['host-key-check']).to be true
+        expect(conf[:transports][:winrm]['ssl']).to be true
       end
 
       it 'uses the configured transport' do
@@ -447,13 +447,13 @@ describe Bolt::Inventory do
         expect(target.password).to eq('youssh')
         expect(target.port).to eq('12345ssh')
         expect(target.options).to eq(
-          connect_timeout: 3,
-          tty: false,
-          host_key_check: false,
-          key: "anything",
-          tmpdir: "/ssh",
-          run_as: "root",
-          sudo_password: "nothing"
+          'connect-timeout' => 3,
+          'tty' => false,
+          'host-key-check' => false,
+          'key' => "anything",
+          'tmpdir' => "/ssh",
+          'run-as' => "root",
+          'sudo-password' => "nothing"
         )
       end
 
@@ -464,12 +464,12 @@ describe Bolt::Inventory do
         expect(target.password).to eq('youwinrm')
         expect(target.port).to eq('12345winrm')
         expect(target.options).to eq(
-          connect_timeout: 5,
-          tty: false,
-          ssl: false,
-          tmpdir: "/winrm",
-          cacert: "winrm.pem",
-          extensions: [".py"]
+          'connect-timeout' => 5,
+          'tty' => false,
+          'ssl' => false,
+          'tmpdir' => "/winrm",
+          'cacert' => "winrm.pem",
+          'extensions' => ".py"
         )
       end
 
@@ -480,13 +480,13 @@ describe Bolt::Inventory do
         expect(target.password).to be nil
         expect(target.port).to be nil
         expect(target.options).to eq(
-          connect_timeout: 10,
-          :"task-environment" => "prod",
-          tty: false,
-          :"service-url" => "https://master",
-          cacert: "pcp.pem",
-          :"token-file" => "token",
-          :"local-validation" => true
+          'connect-timeout' => 10,
+          'task-environment' => "prod",
+          'tty' => false,
+          'service-url' => "https://master",
+          'cacert' => "pcp.pem",
+          'token-file' => "token",
+          'local-validation' => true
         )
       end
     end

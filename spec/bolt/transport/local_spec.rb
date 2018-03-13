@@ -212,7 +212,7 @@ SHELL
 
     context 'when tmpdir is specified' do
       let(:tmpdir) { '/tmp/mytempdir' }
-      let(:target2) { Bolt::Target.new('local://anything', tmpdir: tmpdir) }
+      let(:target2) { Bolt::Target.new('local://anything', 'tmpdir' => tmpdir) }
 
       after(:each) do
         local.run_command(target, "rm -rf #{tmpdir}")

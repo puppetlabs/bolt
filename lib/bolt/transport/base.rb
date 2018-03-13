@@ -39,7 +39,12 @@ module Bolt
 
       attr_reader :logger
 
-      def initialize(_config)
+      # Returns options this transport supports
+      def self.options
+        raise NotImplementedError, "self.options() must be implemented by the transport class"
+      end
+
+      def initialize
         @logger = Logging.logger[self]
       end
 
@@ -57,7 +62,7 @@ module Bolt
       end
 
       def filter_options(target, options)
-        if target.options[:run_as]
+        if target.options['run-as']
           options.reject { |k, _v| k == '_run_as' }
         else
           options

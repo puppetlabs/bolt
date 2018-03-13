@@ -7,10 +7,6 @@ require 'bolt/result'
 require 'bolt/config'
 require 'bolt/notifier'
 require 'bolt/result_set'
-require 'bolt/transport/ssh'
-require 'bolt/transport/winrm'
-require 'bolt/transport/orch'
-require 'bolt/transport/local'
 
 module Bolt
   class Executor
@@ -21,12 +17,9 @@ module Bolt
       @config = config
       @logger = Logging.logger[self]
 
-      @transports = {
-        'ssh' => Concurrent::Delay.new { Bolt::Transport::SSH.new(config[:transports][:ssh] || {}) },
-        'winrm' => Concurrent::Delay.new { Bolt::Transport::WinRM.new(config[:transports][:winrm] || {}) },
-        'pcp' => Concurrent::Delay.new { Bolt::Transport::Orch.new(config[:transports][:pcp] || {}) },
-        'local' => Concurrent::Delay.new { Bolt::Transport::Local.new(config[:transports][:local] || {}) }
-      }
+      @transports = Bolt::TRANSPORTS.each_with_object({}) do |(key, val), coll|
+        coll[key.to_s] = Concurrent::Delay.new { val.new }
+      end
 
       # If a specific elevated log level has been requested, honor that.
       # Otherwise, escalate the log level to "info" if running in plan mode, so

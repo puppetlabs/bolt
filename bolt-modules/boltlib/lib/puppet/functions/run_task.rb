@@ -56,7 +56,7 @@ Puppet::Functions.create_function(:run_task) do
 
     # Don't bother loading the local task definition if all targets use the 'pcp' transport
     # and the local-validation option is set to false for all of them
-    if !targets.empty? && targets.all? { |t| t.protocol == 'pcp' && t.options[:'local-validation'] == false }
+    if !targets.empty? && targets.all? { |t| t.protocol == 'pcp' && t.options['local-validation'] == false }
       # create a fake task
       task = Puppet::Pops::Types::TypeFactory.task.from_hash(
         'name'          => task_name,

@@ -6,7 +6,11 @@ require 'shellwords'
 module Bolt
   module Transport
     class SSH < Base
-      def initialize(_config)
+      def self.options
+        %w[port user password sudo-password key host-key-check connect-timeout tmpdir run-as]
+      end
+
+      def initialize
         super
 
         require 'net/ssh'
