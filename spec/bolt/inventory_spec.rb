@@ -416,7 +416,7 @@ describe Bolt::Inventory do
           'user' => 'me' + transport,
           'password' => 'you' + transport,
           'port' => '12345' + transport,
-          'key' => 'anything',
+          'private-key' => 'anything',
           'ssl' => false,
           'host-key-check' => false,
           'connect-timeout' => transport.size,
@@ -470,7 +470,7 @@ describe Bolt::Inventory do
           'connect-timeout' => 3,
           'tty' => false,
           'host-key-check' => false,
-          'key' => "anything",
+          'private-key' => "anything",
           'tmpdir' => "/ssh",
           'run-as' => "root",
           'sudo-password' => "nothing"

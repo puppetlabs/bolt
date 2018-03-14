@@ -158,6 +158,28 @@ describe Bolt::Config do
       }.to raise_error(Bolt::CLIError)
     end
 
+    it "accepts a private-key hash" do
+      config = {
+        transports: {
+          ssh: { 'private-key' => { 'key-data' => "foo" } }
+        }
+      }
+      expect {
+        Bolt::Config.new(config).validate
+      }.not_to raise_error
+    end
+
+    it "does not accept a private-key hash without data" do
+      config = {
+        transports: {
+          ssh: { 'private-key' => { 'not-data' => "foo" } }
+        }
+      }
+      expect {
+        Bolt::Config.new(config).validate
+      }.to raise_error(Bolt::CLIError)
+    end
+
     it "accepts a boolean for ssl" do
       config = {
         transports: {

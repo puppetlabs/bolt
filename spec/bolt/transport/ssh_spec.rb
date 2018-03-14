@@ -5,6 +5,7 @@ require 'bolt_spec/files'
 require 'bolt_spec/task'
 require 'bolt/transport/ssh'
 require 'bolt/config'
+require 'bolt/util'
 
 describe Bolt::Transport::SSH do
   include BoltSpec::Errors
@@ -12,15 +13,15 @@ describe Bolt::Transport::SSH do
   include BoltSpec::Task
 
   def mk_config(conf)
-    stringified = conf.each_with_object({}) { |(k, v), coll| coll[k.to_s] = v }
-    Bolt::Config.new(transports: { ssh: stringified })
+    conf = Bolt::Util.walk_keys(conf, &:to_s)
+    Bolt::Config.new(transports: { ssh: conf })
   end
 
   let(:hostname) { ENV['BOLT_SSH_HOST'] || "localhost" }
   let(:user) { ENV['BOLT_SSH_USER'] || "bolt" }
   let(:password) { ENV['BOLT_SSH_PASSWORD'] || "bolt" }
   let(:port) { ENV['BOLT_SSH_PORT'] || 20022 }
-  let(:key) { ENV['BOLT_SSH_KEY'] || Dir["spec/fixtures/keys/id_rsa"] }
+  let(:key) { ENV['BOLT_SSH_KEY'] || Dir["spec/fixtures/keys/id_rsa"][0] }
   let(:command) { "pwd" }
   let(:config) { mk_config(user: user, password: password) }
   let(:no_host_key_check) { mk_config('host-key-check' => false, user: user, password: password) }
@@ -138,7 +139,7 @@ BASH
   end
 
   context "when executing with private key" do
-    let(:config) { mk_config('host-key-check' => false, key: key, user: user, port: port) }
+    let(:config) { mk_config('host-key-check' => false, 'private-key' => key, user: user, port: port) }
 
     it "executes a command on a host", ssh: true do
       expect(ssh.run_command(target, command).value['stdout']).to eq("/home/#{user}\n")
@@ -162,6 +163,19 @@ BASH
 
         ssh.run_command(target, "rm #{remote_path}")
       end
+    end
+  end
+
+  context "when executing with private key data" do
+    let(:config) do
+      key_data = File.open(key, 'r', &:read)
+      mk_config('host-key-check' => false,
+                'private-key' => { 'key-data' => key_data },
+                user: user, port: port)
+    end
+
+    it "executes a command on a host", ssh: true do
+      expect(ssh.run_command(target, command).value['stdout']).to eq("/home/#{user}\n")
     end
   end
 

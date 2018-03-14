@@ -7,7 +7,7 @@ module Bolt
   module Transport
     class SSH < Base
       def self.options
-        %w[port user password sudo-password key host-key-check connect-timeout tmpdir run-as]
+        %w[port user password sudo-password private-key host-key-check connect-timeout tmpdir run-as]
       end
 
       def initialize

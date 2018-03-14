@@ -68,9 +68,16 @@ module Bolt
             non_interactive: true
           }
 
+          if (key = target.options['private-key'])
+            if key.instance_of?(String)
+              options[:keys] = key
+            else
+              options[:key_data] = [key['key-data']]
+            end
+          end
+
           options[:port] = target.port if target.port
           options[:password] = target.password if target.password
-          options[:keys] = target.options['key'] if target.options['key']
           options[:verify_host_key] = if target.options['host-key-check']
                                         Net::SSH::Verifiers::Secure.new
                                       else
