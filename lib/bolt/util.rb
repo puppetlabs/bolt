@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Bolt
   module Util
     # CODEREVIEW I hate mixing in random modules

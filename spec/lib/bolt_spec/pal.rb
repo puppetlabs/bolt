@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BoltSpec
   module PAL
     include BoltSpec::Files

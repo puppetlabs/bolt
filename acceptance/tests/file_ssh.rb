@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 require 'bolt_command_helper'
-extend Acceptance::BoltCommandHelper
 
 test_name "C1005xx: \
            bolt file upload should copy local file to remote hosts via ssh" do
+  extend Acceptance::BoltCommandHelper
 
   ssh_nodes = select_hosts(roles: ['ssh'])
   skip_test('no applicable nodes to test on') if ssh_nodes.empty?

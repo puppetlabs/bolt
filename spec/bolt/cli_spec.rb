@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'signal_helper'
 require 'bolt_spec/files'
@@ -308,7 +310,7 @@ bar
         cli = Bolt::CLI.new(%w[  command run
                                  --private-key ~/.ssh/google_compute_engine
                                  --nodes foo])
-        expect(cli.parse).to include(:'private-key' => '~/.ssh/google_compute_engine')
+        expect(cli.parse).to include('private-key': '~/.ssh/google_compute_engine')
         expect(cli.config[:transports][:ssh]['private-key']).to eq('~/.ssh/google_compute_engine')
       end
 
@@ -375,7 +377,7 @@ bar
     describe "connect-timeout" do
       it "accepts a specific timeout" do
         cli = Bolt::CLI.new(%w[command run --connect-timeout 123 --nodes foo])
-        expect(cli.parse).to include(:'connect-timeout' => 123)
+        expect(cli.parse).to include('connect-timeout': 123)
       end
 
       it "generates an error message if no timeout value is given" do
@@ -412,7 +414,7 @@ bar
     describe "sudo-password" do
       it "accepts a password" do
         cli = Bolt::CLI.new(%w[command run --sudo-password opensez --run-as alibaba --nodes foo])
-        expect(cli.parse).to include(:'sudo-password' => 'opensez')
+        expect(cli.parse).to include('sudo-password': 'opensez')
       end
 
       it "prompts the user for sudo-password if not specified" do
@@ -421,7 +423,7 @@ bar
         allow(STDOUT).to receive(:print).with(pw_prompt)
         allow(STDOUT).to receive(:puts)
         cli = Bolt::CLI.new(%w[command run --nodes foo --run-as alibaba --sudo-password])
-        expect(cli.parse).to include(:'sudo-password' => 'opensez')
+        expect(cli.parse).to include('sudo-password': 'opensez')
       end
     end
 
@@ -976,7 +978,7 @@ bar
       end
 
       context "when running a task", :reset_puppet_settings do
-        let(:task_name) { 'sample::echo' }
+        let(:task_name) { +'sample::echo' }
         let(:task_params) { { 'message' => 'hi' } }
         let(:options) {
           {
@@ -987,8 +989,8 @@ bar
             task_options: task_params
           }
         }
-        let(:input_method) { 'both' }
-        let(:task_path) { 'modules/sample/tasks/echo.sh$' }
+        let(:input_method) { +'both' }
+        let(:task_path) { +'modules/sample/tasks/echo.sh$' }
         let(:task_t) { task_type(task_name, Regexp.new(task_path), input_method) }
 
         before :each do
@@ -1105,9 +1107,9 @@ bar
         end
 
         describe 'task parameters validation' do
-          let(:task_name) { 'sample::params' }
+          let(:task_name) { +'sample::params' }
           let(:task_params) { {} }
-          let(:input_method) { 'stdin' }
+          let(:input_method) { +'stdin' }
           let(:task_path) { %r{modules/sample/tasks/params.sh$} }
 
           it "errors when unknown parameters are specified" do
@@ -1289,7 +1291,7 @@ bar
       end
 
       context "when running a plan", :reset_puppet_settings do
-        let(:plan_name) { 'sample::single_task' }
+        let(:plan_name) { +'sample::single_task' }
         let(:plan_params) { { 'nodes' => targets.map(&:host).join(',') } }
         let(:options) {
           {
@@ -1488,7 +1490,7 @@ bar
       end
 
       context "when running a task", :reset_puppet_settings do
-        let(:task_name) { 'sample::noop' }
+        let(:task_name) { +'sample::noop' }
         let(:task_params) { { 'message' => 'hi' } }
         let(:options) {
           {

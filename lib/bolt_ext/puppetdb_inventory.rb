@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 require 'bolt/puppetdb/config'
 require 'json'
@@ -99,11 +100,11 @@ query results.
           puts result
         end
 
-        return 0
+        0
       rescue StandardError => e
         puts "Error: #{e}"
         puts e.backtrace if @trace
-        return 1
+        1
       end
 
       def resolve_group(group)

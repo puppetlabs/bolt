@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.shared_context 'synchronization thread' do
   let(:sync_thread) { Thread.new { Thread.stop } }
 

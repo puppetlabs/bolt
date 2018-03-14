@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'bolt/error'
 
 # Runs a given instance of a `Task` on the given set of targets and returns the result from each.

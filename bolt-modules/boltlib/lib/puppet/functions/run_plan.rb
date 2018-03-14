@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'bolt/error'
 
 # Runs the `plan` referenced by its name passing giving arguments to it given as a hash of name to value mappings.

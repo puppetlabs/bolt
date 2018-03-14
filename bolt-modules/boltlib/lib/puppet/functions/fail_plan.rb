@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'bolt/error'
 
 # Raises a Bolt::PlanFailure exception to signal to callers that the plan failed
@@ -20,7 +22,7 @@ Puppet::Functions.create_function(:fail_plan) do
     raise Bolt::PlanFailure.new(msg, kind || 'bolt/plan-failure', details, issue_code)
   end
 
-  def from_error(e)
-    from_args(e.message, e.kind, e.details, e.issue_code)
+  def from_error(err)
+    from_args(err.message, err.kind, err.details, err.issue_code)
   end
 end

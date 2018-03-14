@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Puppet::DataTypes.create_type('Target') do
   interface <<-PUPPET
     attributes => {

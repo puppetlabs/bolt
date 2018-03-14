@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 test_name "Install Git" do
   step "Ensure Git is installed on Bolt controller" do
     result = nil

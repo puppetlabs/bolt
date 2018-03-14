@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Puppet::Functions.create_function(:'results::make_result') do
   dispatch :create do
     param 'String', :uri

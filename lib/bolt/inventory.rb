@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'set'
 require 'bolt/util'
 require 'bolt/target'
@@ -5,7 +7,7 @@ require 'bolt/inventory/group'
 
 module Bolt
   class Inventory
-    ENVIRONMENT_VAR = 'BOLT_INVENTORY'.freeze
+    ENVIRONMENT_VAR = 'BOLT_INVENTORY'
 
     class ValidationError < Bolt::Error
       attr_accessor :path

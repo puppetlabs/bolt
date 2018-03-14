@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../../../vendored/require_vendored.rb'
 
 # Ensure tasks are enabled when rspec-puppet sets up an environment

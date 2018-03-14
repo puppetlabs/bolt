@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'bolt/node/errors'
 require 'bolt/node/output'
 
@@ -90,7 +92,7 @@ module Bolt
         end
 
         def disconnect
-          @session.close if @session
+          @session&.close
           @logger.debug { "Closed session" }
         end
 
@@ -383,7 +385,7 @@ PS
           @shell_initialized = true
         end
 
-        def execute(command, _ = {})
+        def execute(command)
           result_output = Bolt::Node::Output.new
 
           @logger.debug { "Executing command: #{command}" }

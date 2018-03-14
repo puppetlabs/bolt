@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 gem_source = ENV['GEM_SOURCE'] || "https://rubygems.org"
 gem_version = ENV['BOLT_GEM'] || ""
 

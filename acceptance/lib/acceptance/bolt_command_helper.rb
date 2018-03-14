@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Acceptance
   module BoltCommandHelper
     # A helper to build a bolt command used in acceptance testing

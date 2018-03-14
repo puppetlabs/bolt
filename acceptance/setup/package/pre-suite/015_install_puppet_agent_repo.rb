@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 step 'Install puppet-agent package' do
   case bolt.platform
   when /((?:sles|el)-\d+)/

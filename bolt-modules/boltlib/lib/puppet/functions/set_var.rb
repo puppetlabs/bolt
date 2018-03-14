@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'bolt/error'
 
 # Sets a variable { key => value } for a target.

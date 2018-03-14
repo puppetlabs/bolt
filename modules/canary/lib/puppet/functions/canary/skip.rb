@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Returns a ResultSet with canary/skipped-node errors for each Target provided.
 #
 # This function takes a single parameter:

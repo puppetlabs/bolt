@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Merges two ResultSets into a new ResultSet
 Puppet::Functions.create_function(:'canary::merge') do
   dispatch :merge_results do

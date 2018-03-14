@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 test_name "Install Ruby" do
   step "Ensure Ruby is installed on Bolt controller" do
     result = nil

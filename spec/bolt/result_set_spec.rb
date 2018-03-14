@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'json'
 require 'bolt'
@@ -20,8 +22,8 @@ describe Bolt::Result do
   end
 
   it 'is creates the correct json' do
-    # rubocop:disable LineLength
-    expected = '[{"node":"node1","status":"success","result":{"key":"val1"}},{"node":"node1","status":"failure","result":{"key":"val2","_error":{"kind":"bolt/oops"}}}]'
+    expected = '[{"node":"node1","status":"success","result":{"key":"val1"}},'\
+      '{"node":"node1","status":"failure","result":{"key":"val2","_error":{"kind":"bolt/oops"}}}]'
     expect(result_set.to_json).to eq(expected)
   end
 end

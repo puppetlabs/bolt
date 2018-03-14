@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Bolt
   class Node
     class BaseError < Bolt::Error

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'logging'
 
 module Bolt
@@ -53,7 +55,7 @@ module Bolt
       end
 
       def with_events(target, callback)
-        callback.call(type: :node_start, target: target) if callback
+        callback&.call(type: :node_start, target: target)
 
         result = begin
           yield
@@ -61,7 +63,7 @@ module Bolt
           Bolt::Result.from_exception(target, ex)
         end
 
-        callback.call(type: :node_result, result: result) if callback
+        callback&.call(type: :node_result, result: result)
         result
       end
 

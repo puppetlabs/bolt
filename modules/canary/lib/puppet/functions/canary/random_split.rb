@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Splits an array into two groups, where the 1st group is a randomly selected
 # sample of the input (of the specified size) and the 2nd group is the remainder.
 #

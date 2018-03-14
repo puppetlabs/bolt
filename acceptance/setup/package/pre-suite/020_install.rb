@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 step 'Install Bolt package' do
   bolt_sha = ENV['SHA']
 

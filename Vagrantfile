@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 windows_provision = <<SCRIPT
 # add the bolt user account
 ($user = New-LocalUser -Name bolt -Password (ConvertTo-SecureString -String bolt -Force -AsPlainText)) | Format-List
