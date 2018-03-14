@@ -1,0 +1,10 @@
+{
+  "parameters": {
+    "string_bool": {
+      "type": "Variant[String, Boolean]"
+    },
+    "array": {
+      "type": "Array"
+    }
+  }
+}
