@@ -103,6 +103,8 @@ ssh:
 
 `ssl`: If false, skip requiring SSL for connections. (default: true)
 
+`ssl-verify`: If false, skip remote host SSL certificate verification (for self-signed certs). (default: true)
+
 `cacert`: The CA certificate used to authenticate SSL connections. (default: uses system CA certificates)
 
 `tmpdir`: The directory to store temporary files on the target node. (default: `[System.IO.Path]::GetTempPath()`)

@@ -57,7 +57,7 @@ To run Bolt from source:
 
 To use `rubocop`, perform the bundle install with no exclusions
 
-    bundle install --path .bundle
+    bundle install --path .bundle --with test
     bundle exec rake rubocop
 
 ## Testing

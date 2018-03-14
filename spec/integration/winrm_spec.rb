@@ -16,7 +16,10 @@ describe "when runnning over the winrm transport", winrm: true do
   let(:user) { conn_info('winrm')[:user] }
 
   context 'when using CLI options' do
-    let(:config_flags) { %W[--nodes #{uri} --no-ssl --format json --modulepath #{modulepath} --password #{password}] }
+    let(:config_flags) {
+      %W[--nodes #{uri} --no-ssl --no-ssl-verify --format json --modulepath #{modulepath}
+         --password #{password}]
+    }
 
     it 'runs a command' do
       result = run_one_node(%W[command run #{whoami}] + config_flags)
@@ -52,7 +55,14 @@ describe "when runnning over the winrm transport", winrm: true do
   end
 
   context 'when using a configfile' do
-    let(:config) { { 'format' => 'json', 'modulepath' => modulepath, 'winrm' => { 'ssl' => false } } }
+    let(:config) {
+      {
+        'format' => 'json',
+        'modulepath' => modulepath,
+        'winrm' => { 'ssl' => false,
+                     'ssl-verify' => false }
+      }
+    }
     let(:config_flags) { %W[--nodes #{uri} --password #{password}] }
 
     it 'runs a command' do

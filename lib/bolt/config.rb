@@ -48,7 +48,8 @@ module Bolt
         'host-key-check' => true
       },
       winrm: {
-        'ssl' => true
+        'ssl' => true,
+        'ssl-verify' => true
       },
       pcp: {
         'task-environment' => 'production',
@@ -162,6 +163,10 @@ module Bolt
 
       if options.key?(:ssl) # this defaults to true so we need to check the presence of the key
         self[:transports][:winrm]['ssl'] = options[:ssl]
+      end
+
+      if options.key?(:'ssl-verify') # this defaults to true so we need to check the presence of the key
+        self[:transports][:winrm]['ssl-verify'] = options[:'ssl-verify']
       end
 
       if options.key?(:'host-key-check') # this defaults to true so we need to check the presence of the key
