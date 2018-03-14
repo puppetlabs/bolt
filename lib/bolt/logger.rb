@@ -18,11 +18,11 @@ module Bolt
       root_logger.add_appenders Logging.appenders.stderr(
         'console',
         layout: default_layout,
-        level: default_level
+        level: :all
       )
       # We set the root logger's level so that it logs everything but we do
       # limit what's actually logged in every appender individually.
-      root_logger.level = :all
+      root_logger.level = default_level
     end
 
     def self.configure(config)
