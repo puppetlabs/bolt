@@ -116,18 +116,18 @@ Available options are:
         @options = options
 
         @nodes = define('-n', '--nodes NODES',
-                        'Node(s) to connect to in URI format [protocol://]host[:port] (Optional)',
-                        'Eg. --nodes bolt.puppet.com',
-                        'Eg. --nodes localhost,ssh://nix.com:2222,winrm://windows.puppet.com',
+                        'Node(s) to connect to in URI format or group name (Optional)',
+                        ' --nodes localhost,node_group,ssh://nix.com:2222,winrm://windows.puppet.com',
                         # An empty line in a switch description causes the OptionParser#help
                         # method to raise an exception. Specifying a line containing only a
                         # newline is the closest one can get to the empty line without
                         # triggering that exception.
                         "\n",
-                        '* NODES can either be comma-separated, \'@<file>\' to read',
-                        '* nodes from a file, or \'-\' to read from stdin',
-                        '* Windows nodes must specify protocol with winrm://',
-                        '* protocol is `ssh` by default, may be `ssh` or `winrm`',
+                        '* URI format is [protocol://]host[:port]',
+                        '* NODES can be a comma-separated list of URI format and/or group names',
+                        '* NODES can also be \'@<file>\' to read from a file or \'-\' to read from stdin',
+                        '* Windows nodes must specify protocol with winrm:// unless otherwise configured',
+                        "* protocol is `ssh` by default; may be #{TRANSPORTS.keys.join(', ')}",
                         '* port defaults to `22` for SSH',
                         '* port defaults to `5985` or `5986` for WinRM, based on the --[no-]ssl setting') do |nodes|
           @options[:nodes] << get_arg_input(nodes)
