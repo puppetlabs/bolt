@@ -1552,7 +1552,8 @@ bar
           'connect-timeout' => 7,
           'cacert' => '/path/to/winrm-cacert',
           'extensions' => ['.py', '.bat'],
-          'ssl' => false
+          'ssl' => false,
+          'ssl-verify' => false
         },
         'pcp' => {
           'task-environment' => 'testenv',
@@ -1625,6 +1626,14 @@ bar
         cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo])
         cli.parse
         expect(cli.config[:transports][:winrm]['ssl']).to eq(false)
+      end
+    end
+
+    it 'reads ssl-verify for winrm' do
+      with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
+        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo])
+        cli.parse
+        expect(cli.config[:transports][:winrm]['ssl-verify']).to eq(false)
       end
     end
 

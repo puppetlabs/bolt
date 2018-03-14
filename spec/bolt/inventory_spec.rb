@@ -183,7 +183,8 @@ describe Bolt::Inventory do
     let(:inventory) {
       Bolt::Inventory.from_config(config(transport: 'winrm',
                                          transports: { winrm: {
-                                           'ssl' => false
+                                           'ssl' => false,
+                                           'ssl-verify' => false
                                          } }))
     }
     let(:target) { inventory.get_targets('nonode')[0] }
@@ -194,6 +195,10 @@ describe Bolt::Inventory do
 
     it 'should not use ssl' do
       expect(target.options['ssl']).to eq(false)
+    end
+    
+    it 'should not use ssl-verify' do
+      expect(target.options['ssl-verify']).to eq(false)
     end
   end
 
@@ -408,6 +413,19 @@ describe Bolt::Inventory do
           expect { inventory.get_targets('node') }.to raise_error(Bolt::CLIError)
         end
       end
+      
+      context 'ssl-verify' do
+        let(:data) {
+          {
+            'nodes' => ['node'],
+            'config' => { 'winrm' => { 'ssl-verify' => 'true' } }
+          }
+        }
+
+        it 'fails validation' do
+          expect { inventory.get_targets('node') }.to raise_error(Bolt::CLIError)
+        end
+      end
     end
 
     context 'with all options in the config' do
@@ -418,6 +436,7 @@ describe Bolt::Inventory do
           'port' => '12345' + transport,
           'private-key' => 'anything',
           'ssl' => false,
+          'ssl-verify' => false,
           'host-key-check' => false,
           'connect-timeout' => transport.size,
           'tmpdir' => '/' + transport,
@@ -453,6 +472,7 @@ describe Bolt::Inventory do
         expect(conf[:transport]).to eq('ssh')
         expect(conf[:transports][:ssh]['host-key-check']).to be true
         expect(conf[:transports][:winrm]['ssl']).to be true
+        expect(conf[:transports][:winrm]['ssl-verify']).to be true
       end
 
       it 'uses the configured transport' do
@@ -487,6 +507,7 @@ describe Bolt::Inventory do
           'connect-timeout' => 5,
           'tty' => false,
           'ssl' => false,
+          'ssl-verify' => false,
           'tmpdir' => "/winrm",
           'cacert' => "winrm.pem",
           'extensions' => ".py"

@@ -24,7 +24,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
     ],
       config: {
         ssh: { 'host-key-check' => false },
-        winrm: { ssl: false }
+        winrm: { ssl: false, 'ssl-verify' => false }
       },
       vars: {
         daffy: "duck"

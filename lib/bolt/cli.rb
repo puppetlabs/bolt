@@ -188,6 +188,10 @@ Available options are:
                'Use SSL with WinRM') do |ssl|
           @options[:ssl] = ssl
         end
+        define('--[no-]ssl-verify',
+               'Verify remote host SSL certificate with WinRM') do |ssl_verify|
+          @options[:'ssl-verify'] = ssl_verify
+        end
         define('--transport TRANSPORT', TRANSPORTS.keys.map(&:to_s),
                'Specify a default transport: ' << TRANSPORTS.keys.join(', ')) do |t|
           @options[:transport] = t

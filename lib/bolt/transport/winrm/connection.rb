@@ -40,7 +40,8 @@ module Bolt
                       password: target.password,
                       retry_limit: 1,
                       transport: transport,
-                      ca_trust_path: target.options['cacert'] }
+                      ca_trust_path: target.options['cacert'],
+                      no_ssl_peer_verification: !target.options['ssl-verify'] }
 
           Timeout.timeout(target.options['connect-timeout']) do
             @connection = ::WinRM::Connection.new(options)
@@ -71,6 +72,9 @@ module Bolt
           # If we're using SSL with the default non-SSL port, mention that as a likely problem
           if target.options['ssl'] && @port == HTTP_PORT
             theres_your_problem = "\nAre you using SSL to connect to a non-SSL port?"
+          end
+          if target.options['ssl-verify'] && e.message.include?('certificate verify failed')
+            theres_your_problem = "\nIs the remote host using a self-signed SSL certificate? Use --no-ssl-verify to disable remote host SSL verification."
           end
           raise Bolt::Node::ConnectError.new(
             "Failed to connect to #{endpoint}: #{e.message}#{theres_your_problem}",

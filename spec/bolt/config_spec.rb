@@ -46,6 +46,7 @@ describe Bolt::Config do
     {
       ssh: 'host-key-check',
       winrm: 'ssl',
+      winrm: 'ssl-verify',
       pcp: 'foo'
     }.each do |transport, key|
       it "updates #{transport} #{key} in the copy to false" do
@@ -195,6 +196,28 @@ describe Bolt::Config do
       config = {
         transports: {
           winrm: { 'ssl' => 'false' }
+        }
+      }
+      expect {
+        Bolt::Config.new(config).validate
+      }.to raise_error(Bolt::CLIError)
+    end
+
+    it "accepts a boolean for ssl-verify" do
+      config = {
+        transports: {
+          winrm: { 'ssl-verify' => false }
+        }
+      }
+      expect {
+        Bolt::Config.new(config).validate
+      }.not_to raise_error
+    end
+
+    it "does not accept ssl-verify that is not a boolean" do
+      config = {
+        transports: {
+          winrm: { 'ssl-verify' => 'false' }
         }
       }
       expect {
