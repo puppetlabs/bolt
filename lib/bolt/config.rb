@@ -97,7 +97,7 @@ module Bolt
     def normalize_log(target)
       return target if target == 'console'
       target = target[5..-1] if target.start_with?('file:')
-      'file:' << File.expand_path(target)
+      'file:' + File.expand_path(target)
     end
 
     def update_from_file(data)

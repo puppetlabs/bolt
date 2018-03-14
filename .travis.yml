@@ -3,7 +3,7 @@ language: ruby
 cache: bundler
 rvm:
 - 2.4
-- 2.1
+- 2.3
 before_script:
 - eval `ssh-agent`
 - cat Gemfile.lock
