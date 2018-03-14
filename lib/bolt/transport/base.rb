@@ -44,6 +44,10 @@ module Bolt
         raise NotImplementedError, "self.options() must be implemented by the transport class"
       end
 
+      def self.validate(_options)
+        raise NotImplementedError, "self.validate() must be implemented by the transport class"
+      end
+
       def initialize
         @logger = Logging.logger[self]
       end

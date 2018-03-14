@@ -15,6 +15,13 @@ module Bolt
         %w[service-url cacert token-file task-environment local-validation]
       end
 
+      def self.validate(options)
+        validation_flag = options['local-validation']
+        unless !!validation_flag == validation_flag
+          raise Bolt::CLIError, 'local-validation option must be a Boolean true or false'
+        end
+      end
+
       def create_client(opts)
         client_keys = %i[service-url token-file cacert]
         client_opts = opts.reduce({}) do |acc, (k, v)|
@@ -24,7 +31,7 @@ module Bolt
             acc
           end
         end
-        @logger.debug("Creating orchestrator client for #{client_opts}")
+        logger.debug("Creating orchestrator client for #{client_opts}")
 
         OrchestratorClient.new(client_opts, true)
       end

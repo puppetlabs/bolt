@@ -11,6 +11,8 @@ module Bolt
         %w[tmpdir]
       end
 
+      def self.validate(_options); end
+
       def initialize
         super
 
