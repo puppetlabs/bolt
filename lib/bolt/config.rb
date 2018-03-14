@@ -35,7 +35,7 @@ module Bolt
     }.freeze
 
     TRANSPORT_OPTIONS = %i[password run-as sudo-password extensions
-                           key tty tmpdir user connect-timeout
+                           private-key tty tmpdir user connect-timeout
                            cacert token-file service-url].freeze
 
     TRANSPORT_DEFAULTS = {
@@ -154,7 +154,9 @@ module Bolt
       TRANSPORTS.each_key do |transport|
         transport = self[:transports][transport]
         TRANSPORT_OPTIONS.each do |key|
-          transport[key.to_s] = options[key] if options[key]
+          if options[key]
+            transport[key.to_s] = Bolt::Util.walk_keys(options[key], &:to_s)
+          end
         end
       end
 
@@ -217,6 +219,13 @@ module Bolt
       validation_flag = self[:transports][:pcp]['local-validation']
       unless !!validation_flag == validation_flag
         raise Bolt::CLIError, 'local-validation option must be a Boolean true or false'
+      end
+
+      if (key_opt = self[:transports][:ssh]['private-key'])
+        unless key_opt.instance_of?(String) || (key_opt.instance_of?(Hash) && key_opt.include?('key-data'))
+          raise Bolt::CLIError,
+                "private-key option must be the path to a private key file or a hash containing the 'key-data'"
+        end
       end
 
       self[:transports].each_value do |v|

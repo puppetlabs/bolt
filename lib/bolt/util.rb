@@ -43,6 +43,21 @@ module Bolt
         hash1.merge(hash2, &recursive_merge)
       end
 
+      # Accepts a Data object and returns a copy with all hash keys
+      # modifed by block. use &:to_s to stringify keys or :to_sym to symbolize them
+      def walk_keys(data, &block)
+        if data.is_a? Hash
+          data.each_with_object({}) do |(k, v), acc|
+            v = walk_keys(v, &block)
+            acc[yield(k)] = v
+          end
+        elsif data.is_a? Array
+          data.map { |v| walk_keys(v, &block) }
+        else
+          data
+        end
+      end
+
       # Performs a deep_clone, using an identical copy if the cloned structure contains multiple
       # references to the same object and prevents endless recursion.
       # Credit to Jan Molic via https://github.com/rubyworks/facets/blob/master/LICENSE.txt

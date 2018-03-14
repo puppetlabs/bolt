@@ -151,7 +151,7 @@ Available options are:
         end
         define('--private-key KEY',
                'Private ssh key to authenticate with (Optional)') do |key|
-          @options[:key] = key
+          @options[:'private-key'] = key
         end
         define('--tmpdir DIR',
                'The directory to upload and execute temporary files on the target (Optional)') do |tmpdir|

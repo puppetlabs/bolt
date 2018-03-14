@@ -3,6 +3,7 @@ require 'signal_helper'
 require 'bolt_spec/files'
 require 'bolt_spec/task'
 require 'bolt/cli'
+require 'bolt/util'
 
 describe "Bolt::CLI" do
   include BoltSpec::Files
@@ -307,8 +308,8 @@ bar
         cli = Bolt::CLI.new(%w[  command run
                                  --private-key ~/.ssh/google_compute_engine
                                  --nodes foo])
-        expect(cli.parse).to include(key: '~/.ssh/google_compute_engine')
-        expect(cli.config[:transports][:ssh]['key']).to eq('~/.ssh/google_compute_engine')
+        expect(cli.parse).to include(:'private-key' => '~/.ssh/google_compute_engine')
+        expect(cli.config[:transports][:ssh]['private-key']).to eq('~/.ssh/google_compute_engine')
       end
 
       it "generates an error message if no key value is given" do
@@ -1542,7 +1543,7 @@ bar
         'concurrency' => 14,
         'format' => 'json',
         'ssh' => {
-          'key' => '/bar/foo',
+          'private-key' => '/bar/foo',
           'host-key-check' => false,
           'connect-timeout' => 4,
           'run-as' => 'Fakey McFakerson'
@@ -1590,7 +1591,7 @@ bar
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-host-key-check])
         cli.parse
-        expect(cli.config[:transports][:ssh]['key']).to eq('/bar/foo')
+        expect(cli.config[:transports][:ssh]['private-key']).to eq('/bar/foo')
       end
     end
 
