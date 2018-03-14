@@ -15,17 +15,11 @@ module Bolt
         end
 
         path = File.expand_path(path)
-        # safe_load doesn't work with psych in ruby 2.0
-        # The user controls the configfile so this isn't a problem
-        # rubocop:disable YAMLLoad
-        File.open(path, "r:UTF-8") { |f| YAML.load(f.read) }
+        File.open(path, "r:UTF-8") { |f| YAML.safe_load(f.read) }
       rescue Errno::ENOENT
         if path_passed
           raise Bolt::CLIError, "Could not read #{file_name} file: #{path}"
         end
-      # In older releases of psych SyntaxError is not a subclass of Exception
-      rescue Psych::SyntaxError
-        raise Bolt::CLIError, "Could not parse #{file_name} file: #{path}"
       rescue Psych::Exception
         raise Bolt::CLIError, "Could not parse #{file_name} file: #{path}"
       rescue IOError, SystemCallError

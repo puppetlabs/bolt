@@ -41,11 +41,7 @@ module Bolt
     def self.from_config(config)
       if ENV.include?(ENVIRONMENT_VAR)
         begin
-          # rubocop:disable YAMLLoad
-          data = YAML.load(ENV[ENVIRONMENT_VAR])
-        # In older releases of psych SyntaxError is not a subclass of Exception
-        rescue Psych::SyntaxError
-          raise Bolt::CLIError, "Could not parse inventory from $#{ENVIRONMENT_VAR}"
+          data = YAML.safe_load(ENV[ENVIRONMENT_VAR])
         rescue Psych::Exception
           raise Bolt::CLIError, "Could not parse inventory from $#{ENVIRONMENT_VAR}"
         end
