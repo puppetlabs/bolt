@@ -43,16 +43,17 @@ describe Bolt::Config do
       end
     end
 
-    {
-      ssh: 'host-key-check',
-      winrm: 'ssl',
-      winrm: 'ssl-verify',
-      pcp: 'foo'
-    }.each do |transport, key|
-      it "updates #{transport} #{key} in the copy to false" do
-        conf[:transports][transport][key] = false
-        expect(conf[:transports][transport][key]).to eq(false)
-        expect(config[:transports][transport][key]).not_to eq(false)
+    [{ssh: 'host-key-check'},
+     {winrm: 'ssl'},
+     {winrm: 'ssl-verify'},
+     {pcp: 'foo'}
+    ].each do |hash|
+      hash.each do |transport, key|
+        it "updates #{transport} #{key} in the copy to false" do
+          conf[:transports][transport][key] = false
+          expect(conf[:transports][transport][key]).to eq(false)
+          expect(config[:transports][transport][key]).not_to eq(false)
+        end
       end
     end
   end

@@ -196,7 +196,7 @@ describe Bolt::Inventory do
     it 'should not use ssl' do
       expect(target.options['ssl']).to eq(false)
     end
-    
+
     it 'should not use ssl-verify' do
       expect(target.options['ssl-verify']).to eq(false)
     end
@@ -413,7 +413,7 @@ describe Bolt::Inventory do
           expect { inventory.get_targets('node') }.to raise_error(Bolt::CLIError)
         end
       end
-      
+
       context 'ssl-verify' do
         let(:data) {
           {

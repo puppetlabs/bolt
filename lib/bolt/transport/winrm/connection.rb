@@ -74,7 +74,9 @@ module Bolt
             theres_your_problem = "\nAre you using SSL to connect to a non-SSL port?"
           end
           if target.options['ssl-verify'] && e.message.include?('certificate verify failed')
-            theres_your_problem = "\nIs the remote host using a self-signed SSL certificate? Use --no-ssl-verify to disable remote host SSL verification."
+            theres_your_problem = "\nIs the remote host using a self-signed SSL"\
+                                  "certificate? Use --no-ssl-verify to disable "\
+                                  "remote host SSL verification."
           end
           raise Bolt::Node::ConnectError.new(
             "Failed to connect to #{endpoint}: #{e.message}#{theres_your_problem}",

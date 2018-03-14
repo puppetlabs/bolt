@@ -16,7 +16,7 @@ module Bolt
         unless !!ssl_flag == ssl_flag
           raise Bolt::CLIError, 'ssl option must be a Boolean true or false'
         end
-        
+
         ssl_verify_flag = options['ssl-verify']
         unless !!ssl_verify_flag == ssl_verify_flag
           raise Bolt::CLIError, 'ssl-verify option must be a Boolean true or false'
