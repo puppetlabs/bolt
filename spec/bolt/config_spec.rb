@@ -43,10 +43,11 @@ describe Bolt::Config do
       end
     end
 
-    [{ssh: 'host-key-check'},
-     {winrm: 'ssl'},
-     {winrm: 'ssl-verify'},
-     {pcp: 'foo'}
+    [
+      { ssh: 'host-key-check' },
+      { winrm: 'ssl' },
+      { winrm: 'ssl-verify' },
+      { pcp: 'foo' }
     ].each do |hash|
       hash.each do |transport, key|
         it "updates #{transport} #{key} in the copy to false" do
