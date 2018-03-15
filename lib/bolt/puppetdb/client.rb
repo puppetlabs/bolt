@@ -43,11 +43,11 @@ module Bolt
           raise Bolt::PuppetDBError, "Failed to query PuppetDB: #{response.body}"
         else
           results = JSON.parse(response.body)
-          if results.first && !results.first.key?('certname')
-            fields = results.first.keys
+          if results&.first && !results.first&.key?('certname')
+            fields = results.first&.keys
             raise Bolt::PuppetDBError, "Query results did not contain a 'certname' field: got #{fields.join(', ')}"
           end
-          results.map { |result| result['certname'] }.uniq
+          results&.map { |result| result['certname'] }.uniq
         end
       end
 

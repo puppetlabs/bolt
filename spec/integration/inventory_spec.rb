@@ -30,6 +30,13 @@ describe 'running with an inventory file', reset_puppet_settings: true do
       },
       vars: {
         daffy: "duck"
+      },
+      facts: {
+        scooby: 'doo',
+        cloud: {
+          provider: 'Azure',
+          foo: 'bar'
+        }
       } }
   end
   let(:target) { conn[:host] }
@@ -88,6 +95,24 @@ describe 'running with an inventory file', reset_puppet_settings: true do
       it 'preserves variables between runs', :reset_puppet_settings do
         run_cli_json(run_command)
         expect(run_cli_json(var_plan)[0]['result']['stdout']).to eq(output)
+      end
+    end
+
+    context 'with facts set' do
+      # This also asserts the deep_merge works
+      let(:fact_plan) { ['plan', 'run', 'facts', "host=#{target}"] + config_flags }
+      let(:output) {
+        "Facts for localhost: {scooby => doo, cloud => {provider => AWS, " \
+        "foo => bar}, kernel => Linux}\n"
+      }
+
+      it 'sets a facts hash on the target' do
+        expect(run_cli_json(fact_plan)[0]['result']['stdout']).to eq(output)
+      end
+
+      it 'preserves facts between runs', :reset_puppet_settings do
+        run_cli_json(run_command)
+        expect(run_cli_json(fact_plan)[0]['result']['stdout']).to eq(output)
       end
     end
   end

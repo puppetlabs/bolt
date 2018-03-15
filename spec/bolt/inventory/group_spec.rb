@@ -40,6 +40,7 @@ describe Bolt::Inventory::Group do
     it 'should return empty data' do
       expect(group.node_data('node1')).to eq('config' => {},
                                              'vars' => {},
+                                             'facts' => {},
                                              'groups' => [])
     end
 
