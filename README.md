@@ -62,9 +62,9 @@ concurrency: 10
 format: human
 log:
   console:
-    level: :warn
+    level: warn
   ~/.bolt/debug.log:
-    level: :debug
+    level: debug
     append: false
 ssh:
   host-key-check: false
