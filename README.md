@@ -194,7 +194,7 @@ puppetdb:
 Now you can target nodes using a PuppetDB query.
 
 ```
-$ bolt command run hostname --query 'inventory { facts.os.family = "Linux" }'
+$ bolt command run hostname --query 'inventory { facts.kernel = "Linux" }'
 ```
 
 Note that the results of the query must include a `certname` field, which will be used to identify the target.
