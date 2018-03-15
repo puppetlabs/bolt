@@ -154,6 +154,13 @@ PS
         winrm.run_command(target, "del #{remote_path}")
       end
     end
+
+    it "skips verification with ssl-verify: false" do
+      target.options.delete('cacert')
+      target.options['ssl-verify'] = false
+
+      expect(winrm.run_command(target, command)['stdout']).to eq("#{user}\r\n")
+    end
   end
 
   context "with an open connection" do
