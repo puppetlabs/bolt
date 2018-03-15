@@ -154,6 +154,10 @@ describe Bolt::Inventory do
       expect(inventory).to be
     end
 
+    it 'the all group should be empty' do
+      expect(inventory.get_targets('all')).to eq([])
+    end
+
     it 'should have the default protocol' do
       expect(target.protocol).to eq('ssh')
     end

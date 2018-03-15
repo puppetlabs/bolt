@@ -56,7 +56,6 @@ module Bolt
       inventory = new(data, config)
       inventory.validate
       inventory.collect_groups
-      inventory.add_localhost
       inventory
     end
 
@@ -77,16 +76,6 @@ module Bolt
     def collect_groups
       # Provide a lookup map for finding a group by name
       @group_lookup = @groups.collect_groups
-    end
-
-    def add_localhost
-      # Append a 'localhost' group if not already present.
-      unless @group_lookup.include?('localhost') || @groups.node_names.include?('localhost')
-        @groups.nodes['localhost'] = {
-          'name' => 'localhost',
-          'config' => { 'transport' => 'local' }
-        }
-      end
     end
 
     def get_targets(targets)
@@ -119,10 +108,15 @@ module Bolt
     # Pass a target to get_targets for a public version of this
     # Should this reconfigure configured targets?
     def update_target(target)
-      data = @groups.data_for(target.name) || {}
+      data = @groups.data_for(target.name)
+
+      unless data
+        data = {}
+        data['config'] = { 'transport' => 'local' } if target.name == 'localhost'
+      end
 
       unless data['config']
-        @logger.debug("Did not find #{target.name} in inventory")
+        @logger.debug("Did not find config for #{target.name} in inventory")
         data['config'] = {}
       end
 
