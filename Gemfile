@@ -4,6 +4,7 @@ gemspec
 
 group(:test) do
   gem "beaker-hostgenerator"
+  gem "gettext-setup", '~> 0.28', require: false
   gem "rubocop", '0.50.0', require: false
 end
 
