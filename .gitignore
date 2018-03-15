@@ -7,6 +7,7 @@
 /pkg/
 /spec/reports/
 /spec/examples.txt
+/spec/fixtures/configs/debug.log
 /test/tmp/
 /test/version_tmp/
 /tmp/

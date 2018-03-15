@@ -1542,6 +1542,15 @@ bar
         'inventoryfile' => File.join(__dir__, '..', 'fixtures', 'inventory', 'empty.yml'),
         'concurrency' => 14,
         'format' => 'json',
+        'log' => {
+          'console' => {
+            'level' => 'warn'
+          },
+          File.join(configdir, 'debug.log') => {
+            'level' => 'debug',
+            'append' => false
+          }
+        },
         'ssh' => {
           'private-key' => '/bar/foo',
           'host-key-check' => false,
@@ -1585,6 +1594,18 @@ bar
         cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-host-key-check])
         cli.parse
         expect(cli.config[:format]).to eq('json')
+      end
+    end
+
+    it 'reads log file' do
+      with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
+        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-host-key-check])
+        cli.parse
+        normalized_path = File.expand_path(File.join(configdir, 'debug.log'))
+        expect(cli.config[:log]).to eq(
+          'console' => { level: 'warn' },
+          "file:#{normalized_path}" => { level: 'debug', append: false }
+        )
       end
     end
 
