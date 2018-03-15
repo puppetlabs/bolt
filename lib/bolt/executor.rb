@@ -9,6 +9,7 @@ require 'bolt/result'
 require 'bolt/config'
 require 'bolt/notifier'
 require 'bolt/result_set'
+require 'bolt/puppetdb'
 
 module Bolt
   class Executor
@@ -153,6 +154,18 @@ module Bolt
       @logger.info(summary('upload', source, results))
       @notifier.shutdown
       results
+    end
+
+    def puppetdb_client
+      return @puppetdb_client if @puppetdb_client
+      puppetdb_config = Bolt::PuppetDB::Config.new(nil, @config.puppetdb)
+      @puppetdb_client = Bolt::PuppetDB::Client.from_config(puppetdb_config)
+    end
+
+    def puppetdb_fact(certnames)
+      puppetdb_client.facts_for_node(certnames)
+    rescue StandardError => e
+      raise Bolt::CLIError, "Could not retrieve targets from PuppetDB: #{e}"
     end
   end
 end
