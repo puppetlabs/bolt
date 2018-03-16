@@ -26,6 +26,12 @@ Puppet::Functions.create_function(:set_var) do
 
     inventory = Puppet.lookup(:bolt_inventory) { nil }
 
+    unless inventory
+      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
+        Puppet::Pops::Issues::TASK_MISSING_BOLT, action: _('set a var on a target')
+      )
+    end
+
     inventory.set_var(target, key, value)
   end
 end

@@ -65,6 +65,7 @@ module Bolt
       @groups = Group.new(data.merge('name' => 'all'))
       @group_lookup = {}
       @target_vars = {}
+      @target_facts = {}
     end
 
     def validate
@@ -95,6 +96,15 @@ module Bolt
       @target_vars[target.name]
     end
 
+    def add_facts(target, new_facts = {})
+      @logger.warn("No facts to add") if new_facts.empty?
+      set_facts(target.name, new_facts)
+    end
+
+    def facts(target)
+      @target_facts[target.name]
+    end
+
     #### PRIVATE ####
     #
     # For debugging only now
@@ -118,12 +128,10 @@ module Bolt
         data['config'] = {}
       end
 
-      unless data['vars']
-        @logger.debug("Did not find any variables for #{target.name} in inventory")
-        data['vars'] = {}
-      end
-
-      set_vars_from_hash(target.name, data['vars'])
+      # These should only get set from the inventory if they have not yet
+      # been instantiated
+      set_vars_from_hash(target.name, data['vars']) unless @target_vars[target.name]
+      set_facts(target.name, data['facts']) unless @target_facts[target.name]
 
       # Use Config object to ensure config section is treated consistently with config file
       conf = @config.deep_clone
@@ -175,15 +183,23 @@ module Bolt
     end
     private :expand_targets
 
-    def set_vars_from_hash(target_name, data)
+    def set_vars_from_hash(tname, data)
       if data
         # Instantiate empty vars hash in case no vars are defined
-        @target_vars[target_name] = @target_vars[target_name] || {}
+        @target_vars[tname] ||= {}
         # Assign target new merged vars hash
         # This is essentially a copy-on-write to maintain the immutability of @target_vars
-        @target_vars[target_name] = @target_vars[target_name].merge(data).freeze
+        @target_vars[tname] = @target_vars[tname].merge(data).freeze
       end
     end
     private :set_vars_from_hash
+
+    def set_facts(tname, hash)
+      if hash
+        @target_facts[tname] ||= {}
+        @target_facts[tname] = Bolt::Util.deep_merge(@target_facts[tname], hash).freeze
+      end
+    end
+    private :set_facts
   end
 end

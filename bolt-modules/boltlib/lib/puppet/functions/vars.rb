@@ -18,11 +18,17 @@ Puppet::Functions.create_function(:vars) do
   def vars(target)
     unless Puppet[:tasks]
       raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
-        Puppet::Pops::Issues::TASK_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, operation: 'set_var'
+        Puppet::Pops::Issues::TASK_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, operation: 'vars'
       )
     end
 
     inventory = Puppet.lookup(:bolt_inventory) { nil }
+
+    unless inventory
+      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
+        Puppet::Pops::Issues::TASK_MISSING_BOLT, action: _('get vars')
+      )
+    end
 
     inventory.vars(target)
   end
