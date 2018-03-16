@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BoltSpec
   module Integration
     def run_cli(arguments, rescue_exec: false)
@@ -19,6 +21,7 @@ module BoltSpec
         # rubocop:disable HandleExceptions
         rescue err_kls
         end
+        # rubocop:enable HandleExceptions
       else
         cli.execute(opts)
       end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BoltSpec
   module Errors
     def expect_node_error(klass, issue_code, message)

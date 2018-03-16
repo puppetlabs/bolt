@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Uploads the given script to the given set of targets and returns the result of having each target execute the script.
 #
 # * This function does nothing if the list of targets is empty.
@@ -45,7 +47,6 @@ Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFuncti
     # Ensure that given targets are all Target instances)
     targets = inventory.get_targets(targets)
 
-    #
     r = if targets.empty?
           Bolt::ResultSet.new([])
         else

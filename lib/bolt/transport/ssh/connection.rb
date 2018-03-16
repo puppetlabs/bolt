@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'logging'
 require 'shellwords'
 require 'bolt/node/errors'
@@ -274,7 +276,7 @@ module Bolt
           dir = make_tempdir
           yield dir
         ensure
-          dir.delete if dir
+          dir&.delete
         end
 
         def write_remote_executable(dir, file, filename = nil)

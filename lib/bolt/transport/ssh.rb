@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'bolt/node/errors'
 require 'bolt/transport/base'
 require 'json'
@@ -57,7 +59,7 @@ module Bolt
         yield conn
       ensure
         begin
-          conn.disconnect if conn
+          conn&.disconnect
         rescue StandardError => ex
           logger.info("Failed to close connection to #{target.uri} : #{ex.message}")
         end

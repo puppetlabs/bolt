@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'base64'
 require 'concurrent'
 require 'json'
@@ -122,7 +124,7 @@ module Bolt
           end
         end
         results.each do |result|
-          callback.call(type: :node_result, result: result) if callback
+          callback&.call(type: :node_result, result: result)
         end
       end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Used for $ERROR_INFO. This *must* be capitalized!
 require 'English'
 require 'json'

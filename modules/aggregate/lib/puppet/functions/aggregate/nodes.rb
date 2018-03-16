@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Aggregates the key/value pairs in the results of a ResultSet into a hash
 # mapping the keys to a hash of each distinct value and the list of nodes
 # returning that value for the key.

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'bolt_spec/errors'
 require 'bolt_spec/files'

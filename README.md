@@ -16,9 +16,7 @@ Bolt is a Ruby command-line tool for executing commands, scripts, and tasks on r
 ## Supported platforms
 
 * Linux, OSX, Windows
-* Ruby 2.0+
-
-> Note that details of some exceptions generated within plans will be lost when using Ruby 2.0.
+* Ruby 2.3+
 
 > For complete usage and installation details, see the [Puppet Bolt docs](https://puppet.com/docs/bolt).
 >
@@ -62,9 +60,9 @@ concurrency: 10
 format: human
 log:
   console:
-    level: :warn
+    level: warn
   ~/.bolt/debug.log:
-    level: :debug
+    level: debug
     append: false
 ssh:
   host-key-check: false

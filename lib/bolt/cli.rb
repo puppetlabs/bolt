@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'uri'
 require 'benchmark'
 require 'json'
@@ -26,7 +28,7 @@ module Bolt
 
   class CLI
     class BoltOptionParser < OptionParser
-      BANNER = <<-HELP.freeze
+      BANNER = <<-HELP
 Usage: bolt <subcommand> <action> [options]
 
 Available subcommands:
@@ -43,7 +45,7 @@ Available subcommands:
 where [options] are:
       HELP
 
-      TASK_HELP = <<-HELP.freeze
+      TASK_HELP = <<-HELP
 Usage: bolt task <action> <task> [options] [parameters]
 
 Available actions are:
@@ -56,7 +58,7 @@ Parameters are of the form <parameter>=<value>.
 Available options are:
       HELP
 
-      COMMAND_HELP = <<-HELP.freeze
+      COMMAND_HELP = <<-HELP
 Usage: bolt command <action> <command> [options]
 
 Available actions are:
@@ -65,7 +67,7 @@ Available actions are:
 Available options are:
       HELP
 
-      SCRIPT_HELP = <<-HELP.freeze
+      SCRIPT_HELP = <<-HELP
 Usage: bolt script <action> <script> [[arg1] ... [argN]] [options]
 
 Available actions are:
@@ -74,7 +76,7 @@ Available actions are:
 Available options are:
       HELP
 
-      PLAN_HELP = <<-HELP.freeze
+      PLAN_HELP = <<-HELP
 Usage: bolt plan <action> <plan> [options] [parameters]
 
 Available actions are:
@@ -87,7 +89,7 @@ Parameters are of the form <parameter>=<value>.
 Available options are:
       HELP
 
-      FILE_HELP = <<-HELP.freeze
+      FILE_HELP = <<-HELP
 Usage: bolt file <action> [options]
 
 Available actions are:
@@ -168,7 +170,7 @@ Available options are:
         end
         define('--modulepath MODULES',
                'List of directories containing modules, ' \
-               'separated by ' << File::PATH_SEPARATOR) do |modulepath|
+               "separated by #{File::PATH_SEPARATOR}") do |modulepath|
           @options[:modulepath] = modulepath.split(File::PATH_SEPARATOR)
         end
         define('--params PARAMETERS',
@@ -193,7 +195,7 @@ Available options are:
           @options[:'ssl-verify'] = ssl_verify
         end
         define('--transport TRANSPORT', TRANSPORTS.keys.map(&:to_s),
-               'Specify a default transport: ' << TRANSPORTS.keys.join(', ')) do |t|
+               "Specify a default transport: #{TRANSPORTS.keys.join(', ')}") do |t|
           @options[:transport] = t
         end
         define('--run-as USER',
@@ -321,34 +323,28 @@ Available options are:
     end
     private :inventory
 
+    def help?(parser, remaining)
+      # Set the mode
+      options[:mode] = remaining.shift
+
+      if options[:mode] == 'help'
+        options[:help] = true
+        options[:mode] = remaining.shift
+      end
+
+      # Update the parser for the new mode
+      parser.update
+
+      options[:help]
+    end
+    private :help?
+
     def parse
       parser = BoltOptionParser.new(options)
 
-      if @argv.empty? ||
-         begin
-           # RuboCop apparently doesn't realize this is a block and issues
-           # the Lint/AssignmentInCondition warning for every assignment in
-           # it, so we disable that warning here.
-           # rubocop:disable Lint/AssignmentInCondition
-           remaining = handle_parser_errors do
-             parser.permute(@argv)
-           end
-
-           # Set the mode
-           options[:mode] = remaining.shift
-
-           if options[:mode] == 'help'
-             options[:help] = true
-             options[:mode] = remaining.shift
-           end
-
-           # Update the parser for the new mode
-           parser.update
-
-           options[:help]
-           # rubocop:enable Lint/AssignmentInCondition
-         end
-      then # rubocop:disable Style/MultilineIfThen
+      # This part aims to handle both `bolt <mode> --help` and `bolt help <mode>`.
+      remaining = handle_parser_errors { parser.permute(@argv) } unless @argv.empty?
+      if @argv.empty? || help?(parser, remaining)
         puts parser.help
         raise Bolt::CLIExit
       end
@@ -471,7 +467,7 @@ Available options are:
 
       handler = Signal.trap :INT do |signo|
         @logger.info(
-          "Exiting after receiving SIG#{Signal.signame(signo)} signal." << (message ? ' ' << message : '')
+          "Exiting after receiving SIG#{Signal.signame(signo)} signal.#{message ? ' ' + message : ''}"
         )
         exit!
       end

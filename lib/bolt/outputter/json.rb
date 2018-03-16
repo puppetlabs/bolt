@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Bolt
   class Outputter
     class JSON < Bolt::Outputter
@@ -32,9 +34,9 @@ module Bolt
         @stream.puts "],\n"
         @preceding_item = false
         @items_open = false
-        @stream.puts format('"node_count": %d, "elapsed_time": %d }',
-                            results.size,
-                            elapsed_time)
+        @stream.puts format('"node_count": %<size>d, "elapsed_time": %<elapsed>d }',
+                            size: results.size,
+                            elapsed: elapsed_time)
       end
 
       def print_table(results)
@@ -55,10 +57,10 @@ module Bolt
         @stream.puts result.to_json
       end
 
-      def fatal_error(e)
+      def fatal_error(err)
         @stream.puts "],\n" if @items_open
         @stream.puts '"_error": ' if @object_open
-        @stream.puts e.to_json
+        @stream.puts err.to_json
         @stream.puts '}' if @object_open
       end
 

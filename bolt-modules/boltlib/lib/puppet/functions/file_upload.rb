@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'bolt/error'
 
 # Uploads the given file or directory to the given set of targets and returns the result from each upload.

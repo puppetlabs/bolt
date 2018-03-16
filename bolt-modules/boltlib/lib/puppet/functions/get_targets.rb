@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'bolt/error'
 
 # Parses common ways of referring to targets and returns an array of Targets.

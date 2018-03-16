@@ -1,7 +1,10 @@
+# frozen_string_literal: true
+
 require 'bolt_command_helper'
-extend Acceptance::BoltCommandHelper
 
 test_name "A user can use 'plan show'" do
+  extend Acceptance::BoltCommandHelper
+
   dir = bolt.tmpdir('plan_show')
 
   flags = {

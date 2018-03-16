@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'bolt/config'
 require 'bolt_spec/conn'
 

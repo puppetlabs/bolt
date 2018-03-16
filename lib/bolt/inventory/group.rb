@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Bolt
   class Inventory
     # Group is a specific implementation of Inventory based on nested
@@ -10,14 +12,12 @@ module Bolt
         @name = data['name']
         @nodes = {}
 
-        if data['nodes']
-          data['nodes'].each do |n|
-            n = { 'name' => n } if n.is_a? String
-            if @nodes.include? n['name']
-              @logger.warn("Ignoring duplicate node in #{@name}: #{n}")
-            else
-              @nodes[n['name']] = n
-            end
+        data['nodes']&.each do |n|
+          n = { 'name' => n } if n.is_a? String
+          if @nodes.include? n['name']
+            @logger.warn("Ignoring duplicate node in #{@name}: #{n}")
+          else
+            @nodes[n['name']] = n
           end
         end
 

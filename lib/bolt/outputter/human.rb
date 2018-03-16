@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'terminal-table'
 module Bolt
   class Outputter
@@ -74,25 +76,25 @@ module Bolt
       def print_summary(results, elapsed_time)
         ok_set = results.ok_set
         unless ok_set.empty?
-          @stream.puts format('Successful on %d node%s: %s',
-                              ok_set.size,
-                              ok_set.size == 1 ? '' : 's',
-                              ok_set.names.join(','))
+          @stream.puts format('Successful on %<size>d node%<plural>s: %<names>s',
+                              size: ok_set.size,
+                              plural: ok_set.size == 1 ? '' : 's',
+                              names: ok_set.names.join(','))
         end
 
         error_set = results.error_set
         unless error_set.empty?
           @stream.puts colorize(:red,
-                                format('Failed on %d node%s: %s',
-                                       error_set.size,
-                                       error_set.size == 1 ? '' : 's',
-                                       error_set.names.join(',')))
+                                format('Failed on %<size>d node%<plural>s: %<names>s',
+                                       size: error_set.size,
+                                       plural: error_set.size == 1 ? '' : 's',
+                                       names: error_set.names.join(',')))
         end
 
-        @stream.puts format('Ran on %d node%s in %.2f seconds',
-                            results.size,
-                            results.size == 1 ? '' : 's',
-                            elapsed_time)
+        @stream.puts format('Ran on %<size>d node%<plural>s in %<elapsed>.2f seconds',
+                            size: results.size,
+                            plural: results.size == 1 ? '' : 's',
+                            elapsed: elapsed_time)
       end
 
       def print_table(results)
@@ -113,9 +115,9 @@ module Bolt
       # @param [Hash] A hash representing the task
       def print_task_info(task)
         # Building lots of strings...
-        pretty_params = ""
-        task_info = ""
-        usage = "bolt task run --nodes, -n <node-name> #{task['name']}"
+        pretty_params = +""
+        task_info = +""
+        usage = +"bolt task run --nodes, -n <node-name> #{task['name']}"
 
         if task['parameters']
           replace_data_type(task['parameters'])
@@ -143,21 +145,19 @@ module Bolt
       # @param [Hash] A hash representing the plan
       def print_plan_info(plan)
         # Building lots of strings...
-        pretty_params = ""
-        plan_info = ""
-        usage = "bolt plan run #{plan['name']}"
+        pretty_params = +""
+        plan_info = +""
+        usage = +"bolt plan run #{plan['name']}"
 
-        if plan['parameters']
-          plan['parameters'].each do |p|
-            name = p['name']
-            pretty_params << "- #{name}: #{p['type']}\n"
-            usage << if p.include?('default_value')
-                       # TODO: print the default value when available
-                       " [#{name}=<value>]"
-                     else
-                       " #{name}=<value>"
-                     end
-          end
+        plan['parameters']&.each do |p|
+          name = p['name']
+          pretty_params << "- #{name}: #{p['type']}\n"
+          usage << if p.include?('default_value')
+                     # TODO: print the default value when available
+                     " [#{name}=<value>]"
+                   else
+                     " #{name}=<value>"
+                   end
         end
 
         plan_info << "\n#{plan['name']}"
@@ -184,10 +184,10 @@ module Bolt
         end
       end
 
-      def fatal_error(e)
-        @stream.puts(colorize(:red, e.message))
-        if e.is_a? Bolt::RunFailure
-          @stream.puts ::JSON.pretty_generate(e.result_set)
+      def fatal_error(err)
+        @stream.puts(colorize(:red, err.message))
+        if err.is_a? Bolt::RunFailure
+          @stream.puts ::JSON.pretty_generate(err.result_set)
         end
       end
     end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'bolt_spec/errors'
 require 'bolt_spec/files'
@@ -33,8 +35,8 @@ foreach ($i in $args)
 }
 PS
 
-  def make_target(h: host, p: port, conf: config)
-    Bolt::Target.new("#{h}:#{p}").update_conf(conf)
+  def make_target(host_: host, port_: port, conf: config)
+    Bolt::Target.new("#{host_}:#{port_}").update_conf(conf)
   end
 
   let(:target) { make_target }
@@ -57,7 +59,7 @@ PS
         expect_node_error(Bolt::Node::ConnectError,
                           'CONNECT_ERROR',
                           /Failed to connect to/) do
-          winrm.with_connection(make_target(h: host, p: port)) {}
+          winrm.with_connection(make_target(host_: host, port_: port)) {}
         end
       end
     end
@@ -67,7 +69,7 @@ PS
       expect_node_error(Bolt::Node::ConnectError,
                         'CONNECT_ERROR',
                         /Failed to connect to/) do
-        winrm.with_connection(make_target(h: 'totally-not-there', conf: config)) {}
+        winrm.with_connection(make_target(host_: 'totally-not-there', conf: config)) {}
       end
       exec_time = Time.now - exec_time
       expect(exec_time).to be < 5
@@ -82,7 +84,7 @@ PS
           expect_node_error(Bolt::Node::ConnectError,
                             'CONNECT_ERROR',
                             /Timeout after \d+ seconds connecting to/) do
-            winrm.with_connection(make_target(h: host, p: port, conf: config)) {}
+            winrm.with_connection(make_target(host_: host, port_: port, conf: config)) {}
           end
         end
       end
@@ -131,7 +133,7 @@ PS
   end
 
   context "connecting over SSL", winrm: true do
-    let(:target) { make_target(p: ssl_port, conf: ssl_config) }
+    let(:target) { make_target(port_: ssl_port, conf: ssl_config) }
 
     it "executes a command on a host" do
       expect(winrm.run_command(target, command)['stdout']).to eq("#{user}\r\n")
@@ -349,8 +351,8 @@ SHELLWORDS
 
     it "can run a task remotely", winrm: true do
       contents = 'Write-Host "$env:PT_message_one ${env:PT_message two}"'
-      arguments = { :message_one => 'task is running',
-                    :"message two" => 'task has run' }
+      arguments = { message_one: 'task is running',
+                    "message two": 'task has run' }
       with_task_containing('task-test-winrm', contents, 'environment', '.ps1') do |task|
         expect(winrm.run_task(target, task, arguments).message)
           .to eq("task is running task has run\r\n")
@@ -368,8 +370,8 @@ SHELLWORDS
 
     it "ignores _run_as", winrm: true do
       contents = 'Write-Host "$env:PT_message_one ${env:PT_message two}"'
-      arguments = { :message_one => 'task is running',
-                    :"message two" => 'task has run' }
+      arguments = { message_one: 'task is running',
+                    "message two": 'task has run' }
       with_task_containing('task-test-winrm', contents, 'environment', '.ps1') do |task|
         expect(winrm.run_task(target, task, arguments, '_run_as' => 'root').message)
           .to eq("task is running task has run\r\n")

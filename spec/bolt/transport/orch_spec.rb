@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'bolt_spec/files'
 require 'bolt_spec/task'
@@ -283,7 +285,7 @@ describe Bolt::Transport::Orch, orchestrator: true do
 
     describe 'uploading files' do
       let(:source_path) { File.join(base_path, 'spec', 'fixtures', 'scripts', 'success.sh') }
-      let(:dest_path) { 'success.sh' } # to be prepended with a temp dir in the 'around(:each)' block
+      let(:dest_path) { +'success.sh' } # to be prepended with a temp dir in the 'around(:each)' block
       let(:params) {
         content = Base64.encode64(File.read(source_path))
         mode = File.stat(source_path).mode

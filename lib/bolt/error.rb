@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Bolt
   class Error < RuntimeError
     attr_reader :kind, :details, :issue_code, :error_code

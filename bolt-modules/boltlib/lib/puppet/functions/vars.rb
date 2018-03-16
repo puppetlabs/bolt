@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'bolt/error'
 
 # Returns a hash of the 'vars' (variables) assigned to a target through the

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'net/ssh'
 require 'bolt_spec/errors'
@@ -33,8 +35,8 @@ do
 done
 BASH
 
-  def make_target(h: hostname, p: port, conf: config)
-    Bolt::Target.new("#{h}:#{p}").update_conf(conf.transport_conf)
+  def make_target(host_: hostname, port_: port, conf: config)
+    Bolt::Target.new("#{host_}:#{port_}").update_conf(conf.transport_conf)
   end
 
   let(:target) { make_target }
@@ -94,7 +96,7 @@ BASH
       expect_node_error(Bolt::Node::ConnectError,
                         'CONNECT_ERROR',
                         /Failed to connect to/) do
-        ssh.with_connection(make_target(h: 'totally-not-there')) {}
+        ssh.with_connection(make_target(host_: 'totally-not-there')) {}
       end
       exec_time = Time.now - exec_time
       expect(exec_time).to be < 1
@@ -106,7 +108,7 @@ BASH
       expect_node_error(Bolt::Node::ConnectError,
                         'CONNECT_ERROR',
                         /Failed to connect to/) do
-        ssh.with_connection(make_target(h: hostname, p: 65535)) {}
+        ssh.with_connection(make_target(port_: 65535)) {}
       end
       exec_time = Time.now - exec_time
       expect(exec_time).to be < 1
@@ -131,7 +133,7 @@ BASH
 
         exec_time = Time.now
         expect {
-          ssh.with_connection(make_target(h: hostname, p: port, conf: timeout)) {}
+          ssh.with_connection(make_target(port_: port, conf: timeout)) {}
         }.to raise_error(Bolt::Node::ConnectError)
         expect(Time.now - exec_time).to be > 2
       end
@@ -139,14 +141,14 @@ BASH
   end
 
   context "when executing with private key" do
-    let(:config) { mk_config('host-key-check' => false, 'private-key' => key, user: user, port: port) }
+    let(:config) { mk_config('host-key-check' => false, 'private-key' => key, user: user, port_: port) }
 
     it "executes a command on a host", ssh: true do
       expect(ssh.run_command(target, command).value['stdout']).to eq("/home/#{user}\n")
     end
 
     it "can upload a file to a host", ssh: true do
-      target = make_target(conf: config)
+      target = make_target
 
       contents = "kljhdfg"
       remote_path = '/tmp/upload-test'
@@ -171,7 +173,7 @@ BASH
       key_data = File.open(key, 'r', &:read)
       mk_config('host-key-check' => false,
                 'private-key' => { 'key-data' => key_data },
-                user: user, port: port)
+                user: user, port_: port)
     end
 
     it "executes a command on a host", ssh: true do

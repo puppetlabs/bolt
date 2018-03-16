@@ -12,7 +12,7 @@ environment:
   BOLT_WINRM_PORT: 5985
   BOLT_WINRM_SSL_PORT: 5986
   matrix:
-    - RUBY_VERSION: 200
+    - RUBY_VERSION: 23
     - RUBY_VERSION: 24
 
 install:

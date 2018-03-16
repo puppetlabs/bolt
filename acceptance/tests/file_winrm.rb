@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 require 'bolt_command_helper'
-extend Acceptance::BoltCommandHelper
 
 test_name "C1005xx: \
            bolt file upload should copy local file to remote hosts via winrm" do
+  extend Acceptance::BoltCommandHelper
 
   winrm_nodes = select_hosts(roles: ['winrm'])
   skip_test('no applicable nodes to test on') if winrm_nodes.empty?

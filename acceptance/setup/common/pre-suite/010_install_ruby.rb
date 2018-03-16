@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 test_name "Install Ruby" do
   step "Ensure Ruby is installed on Bolt controller" do
     result = nil
@@ -13,18 +15,32 @@ PS
       # instrospected from the STDOUT of the installer.
       bolt.add_env_var('PATH', '/cygdrive/c/ProgramData/chocolatey/bin:PATH')
       on(bolt, powershell('choco install ruby -y'))
-      # HACK: to add ruby path to cygwin
-      bolt.add_env_var('PATH', '/cygdrive/c/tools/ruby24/bin:PATH')
+      on(bolt, powershell('choco list --lo ruby')) do |output|
+        version = /ruby (2\.[0-9])/.match(output.stdout)[1].delete('.')
+        bolt.add_env_var('PATH', "/cygdrive/c/tools/ruby#{version}/bin:PATH")
+      end
       result = on(bolt, powershell('ruby --version'))
     when /debian|ubuntu/
       # install system ruby packages
       install_package(bolt, 'ruby')
       install_package(bolt, 'ruby-dev')
+      # install dev tools
+      install_package(bolt, 'make')
+      install_package(bolt, 'gcc')
       result = on(bolt, 'ruby --version')
     when /el-|centos|fedora/
       # install system ruby packages
       install_package(bolt, 'ruby')
       install_package(bolt, 'ruby-devel')
+      # install dev tools
+      install_package(bolt, 'make')
+      install_package(bolt, 'gcc')
+      if bolt['platform'] =~ /fedora/
+        install_package(bolt, 'redhat-rpm-config')
+        install_package(bolt, 'rubygem-bigdecimal')
+        install_package(bolt, 'rubygem-json')
+        install_package(bolt, 'rubygem-rdoc')
+      end
       result = on(bolt, 'ruby --version')
     when /osx/
       # ruby dev tools should be already installed

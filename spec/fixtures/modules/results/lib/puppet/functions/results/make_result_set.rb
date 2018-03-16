@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Puppet::Functions.create_function(:'results::make_result_set') do
   dispatch :create do
     param 'Hash', :input

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'bolt/target'
 
@@ -65,8 +67,8 @@ describe Bolt::Target do
         '_'  => '%5F',
         '`'  => '%60'
       }
-      unencoded = ''
-      encoded = ''
+      unencoded = +''
+      encoded = +''
       table.each_pair do |k, v|
         unencoded.concat(k)
         encoded.concat(v)

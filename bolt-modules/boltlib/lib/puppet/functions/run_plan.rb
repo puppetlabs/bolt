@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'bolt/error'
 
 # Runs the `plan` referenced by its name passing giving arguments to it given as a hash of name to value mappings.
@@ -47,8 +49,7 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
       begin
         result = func.class.dispatcher.dispatchers[0].call_by_name_with_scope(scope, params, true)
       rescue Puppet::PreformattedError => err
-        if named_args['_catch_errors'] &&
-           err.respond_to?(:cause) && err.cause && err.cause.is_a?(Bolt::Error)
+        if named_args['_catch_errors'] && err.cause.is_a?(Bolt::Error)
           result = err.cause.to_puppet_error
         else
           raise err

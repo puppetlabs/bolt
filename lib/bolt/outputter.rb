@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Bolt
   class Outputter
     def self.for_format(format)
