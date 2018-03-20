@@ -12,6 +12,10 @@ module Bolt
       include(Puppet::Pops::Types::IteratorProducer)
     end
 
+    def self.from_asserted_hash(hash)
+      new(hash['results'])
+    end
+
     def iterator
       if Object.const_defined?(:Puppet) && Puppet.const_defined?(:Pops) &&
          self.class.included_modules.include?(Puppet::Pops::Types::Iterable)

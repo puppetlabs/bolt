@@ -28,6 +28,10 @@ module Bolt
       to_h.to_json(opts)
     end
 
+    def update_details(&block)
+      @details = yield(@details)
+    end
+
     def to_puppet_error
       Puppet::DataTypes::Error.from_asserted_hash(to_h)
     end
@@ -65,12 +69,8 @@ module Bolt
   end
 
   class PuppetError < Error
-    def self.convert_puppet_errors(result)
-      Bolt::Util.walk_vals(result) { |v| v.is_a?(Puppet::DataTypes::Error) ? from_error(v) : v }
-    end
-
-    def self.from_error(err)
-      new(err.msg, err.kind, err.details, err.issue_code)
+    def self.from_asserted_hash(error_hash)
+      new(error_hash['msg'], error_hash['kind'], error_hash['details'], error_hash['issue_code'])
     end
   end
 end

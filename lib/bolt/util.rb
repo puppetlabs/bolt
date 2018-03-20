@@ -74,6 +74,45 @@ module Bolt
         end
       end
 
+      # Depth first walk of pcore rich data to convert it into data and boltesque ruby types
+      def pcore_to_ruby(data)
+        if data.is_a? Hash
+          if data['__pcore_value__']
+            val = pcore_to_ruby(data['__pcore_value__'])
+          else
+            val = data.select {|k,v| !["__pcore_type__", "__pcore_value__"].include?(k)}
+            val = map_vals(val, &method(:pcore_to_ruby))
+          end
+          # TODO: this probably can be it's own method bolt_obj(pcore_type, init_val)
+          if data['__pcore_type__']
+            #require 'pry'; binding.pry
+            case data['__pcore_type__']
+            when "ResultSet"
+              Bolt::ResultSet.from_asserted_hash(val)
+            when "Result"
+              Bolt::Result.from_asserted_hash(val)
+            when "Target"
+              Bolt::Target.from_asserted_hash(val)
+            when "Error"
+              # we probably want a special error class for this
+              #Bolt::Error.new(val['msg'], val['kind'], val['details'], val['issue_code'])
+              Bolt::PuppetError.from_asserted_hash(val)
+            else
+              # TODO set up debug logger
+              puts "Unexpected Pcore type #{data['__pcore_type__']}"
+              val
+            end
+          else
+            val
+          end
+        elsif data.is_a? Array
+          data.map(&method(:pcore_to_ruby))
+        else
+          data
+        end
+      end
+
+
       # Performs a deep_clone, using an identical copy if the cloned structure contains multiple
       # references to the same object and prevents endless recursion.
       # Credit to Jan Molic via https://github.com/rubyworks/facets/blob/master/LICENSE.txt
