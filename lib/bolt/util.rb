@@ -39,6 +39,12 @@ module Bolt
         hash1.merge(hash2, &recursive_merge)
       end
 
+      def map_vals(hash)
+        hash.each_with_object({}) do |(k, v), acc|
+          acc[k] = yield(v)
+        end
+      end
+
       # Accepts a Data object and returns a copy with all hash keys
       # modifed by block. use &:to_s to stringify keys or :to_sym to symbolize them
       def walk_keys(data, &block)

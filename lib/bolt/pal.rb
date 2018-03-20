@@ -48,6 +48,10 @@ module Bolt
           _pcore_init_hash.to_json(opts)
         end
       end
+
+      unless Puppet.settings.global_defaults_initialized?
+        Puppet.initialize_settings
+      end
     end
 
     # Create a top-level alias for TargetSpec so that users don't have to
@@ -65,8 +69,7 @@ module Bolt
     # Runs a block in a PAL script compiler configured for Bolt.  Catches
     # exceptions thrown by the block and re-raises them ensuring they are
     # Bolt::Errors since the script compiler block will squash all exceptions.
-    def in_bolt_compiler(opts = [])
-      Puppet.initialize_settings(opts)
+    def in_bolt_compiler
       r = Puppet::Pal.in_tmp_environment('bolt', modulepath: full_modulepath(@config[:modulepath]), facts: {}) do |pal|
         pal.with_script_compiler do |compiler|
           add_target_spec(compiler)
@@ -108,8 +111,8 @@ module Bolt
 
     def in_plan_compiler(executor, inventory)
       with_bolt_executor(executor, inventory) do
-        with_puppet_settings do |opts|
-          in_bolt_compiler(opts) do |compiler|
+        with_puppet_settings do
+          in_bolt_compiler do |compiler|
             yield compiler
           end
         end
@@ -124,13 +127,16 @@ module Bolt
       end
     end
 
+    # TODO: PUP-8553 should replace this
     def with_puppet_settings
       Dir.mktmpdir('bolt') do |dir|
         cli = []
         Puppet::Settings::REQUIRED_APP_SETTINGS.each do |setting|
           cli << "--#{setting}" << dir
         end
-        yield cli
+        Puppet.settings.send(:clear_everything_for_tests)
+        Puppet.initialize_settings(cli)
+        yield
       end
     end
 
@@ -140,6 +146,37 @@ module Bolt
         tasks.map(&:name).sort.map do |task_name|
           task_sig = compiler.task_signature(task_name)
           [task_name, task_sig.task.description]
+        end
+      end
+    end
+
+    def parse_params(type, object_name, params)
+      in_bolt_compiler do |compiler|
+        if type == 'task'
+          param_spec = compiler.task_signature(object_name)&.task_hash&.dig('parameters')
+        elsif type == 'plan'
+          plan = compiler.plan_signature(object_name)
+          param_spec = plan_hash(object_name, plan) if plan
+        end
+        param_spec ||= {}
+
+        params.each_with_object({}) do |(name, str), acc|
+          type = param_spec.dig(name, 'type')
+          begin
+            parsed = JSON.parse(str, quirks_mode: true)
+            # The type may not exist if the module is remote on orch or if a task
+            # defines no parameters. Since we treat no parameters as Any we
+            # should parse everything in this case
+            acc[name] = if type && !type.instance?(parsed)
+                          str
+                        else
+                          parsed
+                        end
+          rescue JSON::ParserError
+            # This value may not be assignable in which case run_* will error
+            acc[name] = str
+          end
+          acc
         end
       end
     end
@@ -162,6 +199,20 @@ module Bolt
       end
     end
 
+    # This coverts a plan signature object into a format approximating
+    # the task_hash of a task_signature
+    def plan_hash(plan_name, plan)
+      elements = plan.params_type.elements || {}
+      parameters = elements.each_with_object({}) do |param, acc|
+        acc[param.name] = { 'type' => param.value_type }
+        acc[param.name]['default_value'] = nil if param.key_type.is_a?(Puppet::Pops::Types::POptionalType)
+      end
+      {
+        'name' => plan_name,
+        'parameters' => parameters
+      }
+    end
+
     def get_plan_info(plan_name)
       plan = in_bolt_compiler do |compiler|
         compiler.plan_signature(plan_name)
@@ -170,34 +221,18 @@ module Bolt
       if plan.nil?
         raise Bolt::CLIError, Bolt::Error.unknown_plan(plan_name)
       end
-
-      elements = plan.params_type.elements
-      {
-        'name' => plan_name,
-        'parameters' =>
-          unless elements.nil? || elements.empty?
-            elements.map { |e|
-              p = {
-                'name' => e.name,
-                'type' => e.value_type
-              }
-              # TODO: when the default value can be obtained use the actual value instead of nil
-              p['default_value'] = nil if e.key_type.is_a?(Puppet::Pops::Types::POptionalType)
-              p
-            }
-          end
-      }
+      plan_hash(plan_name, plan)
     end
 
-    def run_task(object, targets, params, executor, inventory, &eventblock)
+    def run_task(task_name, targets, params, executor, inventory, &eventblock)
       in_task_compiler(executor, inventory) do |compiler|
-        compiler.call_function('run_task', object, targets, params, &eventblock)
+        compiler.call_function('run_task', task_name, targets, params, &eventblock)
       end
     end
 
-    def run_plan(object, params, executor = nil, inventory = nil)
+    def run_plan(plan_name, params, executor = nil, inventory = nil)
       in_plan_compiler(executor, inventory) do |compiler|
-        compiler.call_function('run_plan', object, params)
+        compiler.call_function('run_plan', plan_name, params)
       end
     end
   end

@@ -37,6 +37,9 @@ Style/MultilineBlockChain:
 Style/DoubleNegation:
   Enabled: false
 
+Style/SafeNavigation:
+  Enabled: false
+
 # Disable nearly all Metrics checks. These seem better off left to judgement.
 
 Metrics/AbcSize:

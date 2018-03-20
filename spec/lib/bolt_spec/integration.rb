@@ -41,8 +41,7 @@ module BoltSpec
 
     def run_one_node(arguments)
       result = run_cli_json(arguments)
-      if result['_error'] ||
-         (result['items'] && result['items'][0] && result['items'][0]['status'] != 'success')
+      if result['_error'] || (result.dig('items', 0, 'status') != 'success')
         expect(result).to eq("Should have succeed on node" => true)
       end
       result['items'][0]['result']

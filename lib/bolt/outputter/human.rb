@@ -149,15 +149,9 @@ module Bolt
         plan_info = +""
         usage = +"bolt plan run #{plan['name']}"
 
-        plan['parameters']&.each do |p|
-          name = p['name']
+        plan['parameters']&.each do |name, p|
           pretty_params << "- #{name}: #{p['type']}\n"
-          usage << if p.include?('default_value')
-                     # TODO: print the default value when available
-                     " [#{name}=<value>]"
-                   else
-                     " #{name}=<value>"
-                   end
+          usage << (p.include?('default_value') ? " [#{name}=<value>]" : " #{name}=<value>")
         end
 
         plan_info << "\n#{plan['name']}"

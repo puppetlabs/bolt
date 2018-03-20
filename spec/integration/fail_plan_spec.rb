@@ -26,6 +26,7 @@ describe "When a plan fails" do
 
   it 'returns the error object' do
     result = run_cli_json(['plan', 'run', 'error::args'] + config_flags, rescue_exec: true)
+    # TODO: remove now that ruby 2.0 is dropped
     if error_support
       expect(result).to eq('msg' => 'oops',
                            'kind' => 'test/oops',
@@ -38,6 +39,7 @@ describe "When a plan fails" do
 
   it 'returns the error object' do
     result = run_cli_json(['plan', 'run', 'error::err'] + config_flags, rescue_exec: true)
+    # TODO: remove now that ruby 2.0 is dropped
     if error_support
       expect(result).to eq('msg' => 'oops',
                            'kind' => 'test/oops',

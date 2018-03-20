@@ -366,7 +366,9 @@ Available options are:
                 "Parameters must be specified through either the --params " \
                 "option or param=value pairs, not both"
         end
+        options[:params_parsed] = true
       else
+        options[:params_parsed] = false
         options[:task_options] = Hash[task_options.map { |a| a.split('=', 2) }]
       end
 
@@ -498,6 +500,10 @@ Available options are:
       end
 
       message = 'There may be processes left executing on some nodes.'
+
+      if options[:task_options] && !options[:params_parsed] && pal
+        options[:task_options] = pal.parse_params(options[:mode], options[:object], options[:task_options])
+      end
 
       if options[:mode] == 'plan'
         unless options[:nodes].empty?

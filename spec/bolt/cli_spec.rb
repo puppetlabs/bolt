@@ -492,6 +492,7 @@ bar
         cli = Bolt::CLI.new(%w[plan run my::plan kj=2hv iuhg=iube 2whf=lcv
                                --modulepath .])
         result = cli.parse
+        expect(result[:params_parsed]).to eq(false)
         expect(result[:task_options]).to eq('kj'   => '2hv',
                                             'iuhg' => 'iube',
                                             '2whf' => 'lcv')
@@ -502,6 +503,7 @@ bar
         cli = Bolt::CLI.new(['plan', 'run', 'my::plan', '--params', json_args,
                              '--modulepath', '.'])
         result = cli.parse
+        expect(result[:params_parsed]).to eq(true)
         expect(result[:task_options]).to eq('kj'   => '2hv',
                                             'iuhg' => 'iube',
                                             '2whf' => 'lcv')
@@ -905,21 +907,18 @@ bar
           json = JSON.parse(output.string)
           expect(json).to eq(
             "name" => "sample::optional_params_task",
-            "parameters" => [
-              {
-                "name" => "param_mandatory",
+            "parameters" => {
+              "param_mandatory" => {
                 "type" => "String"
               },
-              {
-                "name" => "param_optional",
+              "param_optional" => {
                 "type" => "Optional[String]"
               },
-              {
-                "name" => "param_with_default_value",
+              "param_with_default_value" => {
                 "type" => "String",
                 "default_value" => nil
               }
-            ]
+            }
           )
         end
       end
@@ -986,7 +985,8 @@ bar
             mode: 'task',
             action: 'run',
             object: task_name,
-            task_options: task_params
+            task_options: task_params,
+            params_parsed: true
           }
         }
         let(:input_method) { +'both' }
@@ -1114,8 +1114,8 @@ bar
 
           it "errors when unknown parameters are specified" do
             task_params.merge!(
-              'foo' => nil,
-              'bar' => nil
+              'foo' => 'one',
+              'bar' => 'two'
             )
 
             expect { cli.execute(options) }.to raise_error(
