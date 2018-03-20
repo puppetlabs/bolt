@@ -16,11 +16,11 @@ For the following exercises you should already have `bolt` installed and have a 
 
 # Writing your first task with metadata
 
-Writing metadata helps those that consume your tasks know how to provide input to the tasks that you write.  Metadata for a task is written in JSON and is expected to have the same name as your task with a `.json` extension. So if you write a task called `foo_bar.py` you should write a corresponding `foo_bar.json`.  Lets start by writing a simple task that formats the parameters a user gives it.
+Writing metadata helps those that consume your tasks know how to provide input to the tasks that you write.  Metadata for a task is written in JSON and is expected to have the same name as your task with a `.json` extension. So if you write a task called `foo_bar.py` you should write a corresponding `foo_bar.json`.  Let's start by writing a simple task that formats the parameters a user gives it.
 
 Save the following file to `modules/exercise8/tasks/great_metadata.py`:
 ```
-#! /usr/bin/env python
+#!/usr/bin/env python
 
 """
 This script prints the values and types passed to it via standard in.  It will
@@ -52,7 +52,7 @@ for key in data:
 print(json.dumps(result))
 ```
 
-Now lets write the accompanying metadata.  Well specify the parameters as types such as `"type": "Integer"`  which will help us validate the users input as an `Integer`.  Save the following file to `modules/exercise8/tasks/great_metadata.json`:
+Now let's write the accompanying metadata.  We'll specify the parameters as types such as `"type": "Integer"`  which will help us validate the users input as an `Integer`.  Save the following file to `modules/exercise8/tasks/great_metadata.json`:
 ```
 {
   "description": "An exercise in writing great metadata",
@@ -81,7 +81,7 @@ Now lets write the accompanying metadata.  Well specify the parameters as types 
 
 # Using your task with metadata
 
-Use the following command to show to test that your task is listed with its description.
+Use the following command to show that your task is listed with its description.
 
 ```
 $ bolt task show --modulepath ./modules
@@ -115,7 +115,7 @@ PARAMETERS:
 
 # Testing our task's metadata validation
 
-Bolt can use the types that you have specified in your metadata to validate parameters passed to your task.  Lets attempt to run your task with an incorrect value passed to the `action` parameter.  We will pass the params as a JSON string.
+Bolt can use the types that you have specified in your metadata to validate parameters passed to your task.  Let's attempt to run your task with an incorrect value passed to the `action` parameter.  We will pass the params as a JSON string.
 
 ```
 $ bolt task run exercise8::great_metadata --nodes $NODE --modulepath ./modules --params '{"name":"poppey","action":"spinach","recursive":true}'
@@ -123,7 +123,7 @@ Task exercise8::great_metadata:
  parameter 'action' expects a match for Enum['restart', 'start', 'stop'], got 'spinach'
 ```
 
-If we correct our mistake we can see the task working correctly
+If we correct our mistake we can see the task working correctly.
 ```
 $ bolt task run exercise8::great_metadata --nodes $NODE --modulepath ./modules --params '{"name":"poppey","action":"start","recursive":true}'
 
@@ -152,7 +152,7 @@ Ran on 1 node in 0.73 seconds
 
 # Making your task support noop
 
-Tasks can be written to support noop. Lets create a new task that supports the `--noop` feature.  First lets create the metadata for our new task. Save the following file to `modules/exercise8/tasks/file.json`:
+Tasks can be written to support noop. Let's create a new task that supports the `--noop` feature.  First let's create the metadata for our new task. Save the following file to `modules/exercise8/tasks/file.json`:
 ```
 {
   "description": "Write content to a file.",
@@ -229,7 +229,7 @@ exit(exitcode)
 
 ```
 
-Lets test out our new task with the `--noop` flag.
+Let's test out our new task with the `--noop` flag.
 ```
 $ bolt task run exercise8::file --nodes $NODE --modulepath ./modules content=Hello_World filename=/tmp/hello_world --noop
   {

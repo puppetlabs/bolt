@@ -24,10 +24,10 @@ It is also useful to have some familiarity with writing and running Plans with `
 
 In the previous exercise we ran tasks and commands within the context of a plan, but we didn't capture the return values or use those values in subsequent steps. The ability to use the output of a task as the input to another task allows for creating much more complex and powerful plans.
 
-First lets create a task. This will print a JSON structure with an `answer` key with a value of true or false. The important thing to note is the use of JSON to structure our return value. Save the following as `modules/exercise9/tasks/yesorno.py`:
+First let's create a task. This will print a JSON structure with an `answer` key with a value of true or false. The important thing to note is the use of JSON to structure our return value. Save the following as `modules/exercise9/tasks/yesorno.py`:
 
 ```python
-#! /usr/bin/env python
+#!/usr/bin/env python
 
 """
 This script returns a JSON string with a single key, answer which

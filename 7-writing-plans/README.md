@@ -120,7 +120,7 @@ Finished on node1:
 Ran on 1 node in 0.74 seconds
 ```
 
-Now lets write a plan that uses our task. Save the following as `modules/exercise7/plans/writeread.pp`:
+Now let's write a plan that uses our task. Save the following as `modules/exercise7/plans/writeread.pp`:
 
 ```puppet
 plan exercise7::writeread (
@@ -154,7 +154,7 @@ bolt plan run exercise7::writeread filename=hello message=world nodes=<nodes> --
 Note:
 
 * `message` is optional. If it's not passed it will use the default value from the plan.
-* When running multiple steps in a plan only the last step will generate output
+* When running multiple steps in a plan only the last step will generate output.
 
 Plans should be used whenever you want to run several commands together, often based on the output of previous commands and across multiple nodes. For instance removing a node from a load balancer before deploying the new version of the application, or clearing a cache after re-indexing a search engine.
 
