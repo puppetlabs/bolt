@@ -66,6 +66,7 @@ module Bolt
       @group_lookup = {}
       @target_vars = {}
       @target_facts = {}
+      @target_features = {}
     end
 
     def validate
@@ -103,6 +104,19 @@ module Bolt
 
     def facts(target)
       @target_facts[target.name]
+    end
+
+    def set_feature(target, feature, value = true)
+      @target_features[target.name] ||= Set.new
+      if value
+        @target_features[target.name] << feature
+      else
+        @target_features[target.name].delete(feature)
+      end
+    end
+
+    def features(target)
+      @target_features[target.name] || Set.new
     end
 
     #### PRIVATE ####
@@ -177,7 +191,11 @@ module Bolt
         # Expand a comma-separated list
         targets.split(/[[:space:],]+/).reject(&:empty?).map do |name|
           ts = resolve_name(name)
-          ts.map { |t| Bolt::Target.new(t) }
+          ts.map do |t|
+            target = Target.new(t)
+            target.inventory = self
+            target
+          end
         end
       end
     end
