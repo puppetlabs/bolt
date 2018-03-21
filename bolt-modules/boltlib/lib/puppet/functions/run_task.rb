@@ -61,9 +61,9 @@ Puppet::Functions.create_function(:run_task) do
     if !targets.empty? && targets.all? { |t| t.protocol == 'pcp' && t.options['local-validation'] == false }
       # create a fake task
       task = Puppet::Pops::Types::TypeFactory.task.from_hash(
-        'name'          => task_name,
-        'executable'    => '',
-        'supports_noop' => true
+        'name'            => task_name,
+        'implementations' => [{ 'name' => '', 'path' => '' }],
+        'supports_noop'   => true
       )
     else
       # TODO: use the compiler injection once PUP-8237 lands

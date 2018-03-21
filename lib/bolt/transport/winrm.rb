@@ -13,6 +13,8 @@ module Bolt
         %w[port user password connect-timeout ssl ssl-verify tmpdir cacert extensions]
       end
 
+      PROVIDED_FEATURES = ['powershell'].freeze
+
       def self.validate(options)
         ssl_flag = options['ssl']
         unless !!ssl_flag == ssl_flag
@@ -97,6 +99,9 @@ catch
       end
 
       def run_task(target, task, arguments, _options = {})
+        executable = target.select_impl(task, PROVIDED_FEATURES)
+        raise "No suitable implementation of #{task.name} for #{target.name}" unless executable
+
         input_method = task.input_method
         with_connection(target) do |conn|
           if STDIN_METHODS.include?(input_method)
@@ -113,7 +118,7 @@ catch
             end
           end
 
-          conn.with_remote_file(task.executable) do |remote_path|
+          conn.with_remote_file(executable) do |remote_path|
             output =
               if powershell_file?(remote_path) && stdin.nil?
                 # NOTE: cannot redirect STDIN to a .ps1 script inside of PowerShell

@@ -17,6 +17,8 @@ module Bolt
         %w[service-url cacert token-file task-environment local-validation]
       end
 
+      PROVIDED_FEATURES = ['puppet-agent'].freeze
+
       def self.validate(options)
         validation_flag = options['local-validation']
         unless !!validation_flag == validation_flag

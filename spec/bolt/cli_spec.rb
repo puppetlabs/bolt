@@ -797,7 +797,7 @@ bar
           }
           cli.execute(options)
           json = JSON.parse(output.string)
-          json.delete('executable')
+          json.delete('implementations')
           expect(json).to eq(
             "name" => "sample::params",
             "description" => "Task with parameters",
