@@ -12,6 +12,8 @@ module Bolt
         %w[port user password sudo-password private-key host-key-check connect-timeout tmpdir run-as]
       end
 
+      PROVIDED_FEATURES = ['shell'].freeze
+
       def self.validate(options)
         logger = Logging.logger[self]
 
@@ -108,6 +110,9 @@ module Bolt
       end
 
       def run_task(target, task, arguments, options = {})
+        executable = target.select_impl(task, PROVIDED_FEATURES)
+        raise "No suitable implementation of #{task.name} for #{target.name}" unless executable
+
         input_method = task.input_method
         with_connection(target) do |conn|
           conn.running_as(options['_run_as']) do
@@ -128,7 +133,7 @@ module Bolt
             end
 
             conn.with_remote_tempdir do |dir|
-              remote_task_path = conn.write_remote_executable(dir, task.executable)
+              remote_task_path = conn.write_remote_executable(dir, executable)
               if conn.run_as && stdin
                 wrapper = make_wrapper_stringio(remote_task_path, stdin)
                 remote_wrapper_path = conn.write_remote_executable(dir, wrapper, 'wrapper.sh')

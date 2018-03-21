@@ -45,6 +45,12 @@ module Bolt
     end
     private :parse
 
+    def select_impl(task, additional_features = [])
+      available_features = features + additional_features
+      suitable_impl = task.implementations.find { |impl| Set.new(impl['requirements']).subset?(available_features) }
+      return suitable_impl['path'] if suitable_impl
+    end
+
     def features
       if @inventory
         @inventory.features(self)
