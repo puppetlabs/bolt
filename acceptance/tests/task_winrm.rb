@@ -19,17 +19,11 @@ test_name "C100551: \
   end
 
   step "execute `bolt task run` via WinRM" do
-    user = ENV['WINRM_USER']
-    password = ENV['WINRM_PASSWORD']
-    nodes_csv = winrm_nodes.map { |host| "winrm://#{host.hostname}" }.join(',')
     bolt_command = "bolt task run test::hostname_win"
 
     flags = {
-      '--nodes'       => nodes_csv,
-      '--modulepath'  => "#{dir}/modules",
-      '-u'            => user,
-      '-p'            => password,
-      '--no-ssl'      => nil
+      '--nodes'      => 'winrm_nodes',
+      '--modulepath' => "#{dir}/modules",
     }
 
     result = bolt_command_on(bolt, bolt_command, flags)
