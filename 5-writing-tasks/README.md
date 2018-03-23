@@ -84,7 +84,7 @@ Note:
 
 # Write your first task in Python
 
-The above examples are obviously very simple. Lets implement something slightly more interesting and useful. We'll use Python for this example but remember Puppet Tasks can be implemented in any language which can be run on the target node. When using a more fully featured language like python tasks can return structured data by printing a single JSON object to stdout. This helps
+The above examples are obviously very simple. Lets implement something slightly more interesting and useful. We'll use Python for this example but remember Puppet Tasks can be implemented in any language which can be run on the target node. When using a more fully featured language like python tasks can return structured data by printing a single JSON object to stdout.
 
 Note that `bolt` assumes that the required runtime is already available on the target nodes. So for the following examples to work the target nodes should have Python 2 or 3 already installed. This task will also work on Windows system with Python 2 or 3 installed on them.
 
