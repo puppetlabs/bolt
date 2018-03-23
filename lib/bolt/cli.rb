@@ -116,20 +116,15 @@ Available options are:
         @options = options
 
         @nodes = define('-n', '--nodes NODES',
-                        'Node(s) to connect to in URI format or group name (Optional)',
-                        ' --nodes localhost,node_group,ssh://nix.com:2222,winrm://windows.puppet.com',
-                        # An empty line in a switch description causes the OptionParser#help
-                        # method to raise an exception. Specifying a line containing only a
-                        # newline is the closest one can get to the empty line without
-                        # triggering that exception.
-                        "\n",
-                        '* URI format is [protocol://]host[:port]',
-                        '* NODES can be a comma-separated list of URI format and/or group names',
-                        '* NODES can also be \'@<file>\' to read from a file or \'-\' to read from stdin',
-                        '* Windows nodes must specify protocol with winrm:// unless otherwise configured',
-                        "* protocol is `ssh` by default; may be #{TRANSPORTS.keys.join(', ')}",
-                        '* port defaults to `22` for SSH',
-                        '* port defaults to `5985` or `5986` for WinRM, based on the --[no-]ssl setting') do |nodes|
+                        'Identifies the nodes to target.',
+                        'Enter a comma-separated list of node URIs or group names.',
+                        "Or read a node list from an input file '@<file>' or stdin '-'.",
+                        'Example: --nodes localhost,node_group,ssh://nix.com:2222,winrm://windows.puppet.com',
+                        'URI format is [protocol://]host[:port]',
+                        "SSH is the default protocol; may be #{TRANSPORTS.keys.join(', ')}",
+                        'For Windows nodes, specify the winrm:// protocol if it has not be configured',
+                        'For SSH, port defaults to `22`',
+                        'For WinRM, port defaults to `5985` or `5986` based on the --[no-]ssl setting') do |nodes|
           @options[:nodes] << get_arg_input(nodes)
         end.extend(SwitchHider)
         @query = define('-q', '--query QUERY',
@@ -137,11 +132,11 @@ Available options are:
           @options[:query] = query
         end.extend(SwitchHider)
         define('-u', '--user USER',
-               'User to authenticate as (Optional)') do |user|
+               'User to authenticate as') do |user|
           @options[:user] = user
         end
         define('-p', '--password [PASSWORD]',
-               'Password to authenticate with (Optional).',
+               'Password to authenticate with.',
                'Omit the value to prompt for the password.') do |password|
           if password.nil?
             STDOUT.print "Please enter your password: "
@@ -152,25 +147,25 @@ Available options are:
           end
         end
         define('--private-key KEY',
-               'Private ssh key to authenticate with (Optional)') do |key|
+               'Private ssh key to authenticate with') do |key|
           @options[:'private-key'] = key
         end
         define('--tmpdir DIR',
-               'The directory to upload and execute temporary files on the target (Optional)') do |tmpdir|
+               'The directory to upload and execute temporary files on the target') do |tmpdir|
           @options[:tmpdir] = tmpdir
         end
         define('-c', '--concurrency CONCURRENCY', Integer,
                'Maximum number of simultaneous connections ' \
-               '(Optional, defaults to 100)') do |concurrency|
+               '(defaults to 100)') do |concurrency|
           @options[:concurrency] = concurrency
         end
         define('--connect-timeout TIMEOUT', Integer,
-               'Connection timeout (Optional)') do |timeout|
+               'Connection timeout (defaults vary)') do |timeout|
           @options[:'connect-timeout'] = timeout
         end
         define('--modulepath MODULES',
                'List of directories containing modules, ' \
-               "separated by #{File::PATH_SEPARATOR}") do |modulepath|
+               "separated by '#{File::PATH_SEPARATOR}'") do |modulepath|
           @options[:modulepath] = modulepath.split(File::PATH_SEPARATOR)
         end
         define('--params PARAMETERS',
