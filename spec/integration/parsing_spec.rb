@@ -30,6 +30,26 @@ describe "CLI parses input" do
                          "hash" => { "this" => "that" })
   end
 
+  it 'shows a plan with aliased type' do
+    result = run_cli_json(%w[plan show parsing] + config_flags)
+    target_spec_type = "TargetSpec = Boltlib::TargetSpec = Variant[String[1], Object[{name => 'Target', attributes =>"\
+    " {'uri' => String[1], 'options' => {type => Hash[String[1], Data], value => {}}}, functions => {'host' => "\
+    "Callable[[0, 0], String[1]], 'name' => Callable[[0, 0], String[1]], 'password' => Callable[[0, 0], "\
+    "Optional[String[1]]], 'port' => Callable[[0, 0], Optional[Integer]], 'protocol' => Callable[[0, 0], "\
+    "Optional[String[1]]], 'user' => Callable[[0, 0], Optional[String[1]]]}}], Array[Boltlib::TargetSpec]]"
+
+    expect(result).to eq(
+      "name" => "parsing",
+      "parameters" => {
+        "string" => { "type" => "String" },
+        "string_bool" => { "type" => "Variant[String, Boolean]" },
+        "nodes" => { "type" => target_spec_type },
+        "array" => { "type" => "Optional[Array]", "default_value" => nil },
+        "hash" => { "type" => "Optional[Hash]", "default_value" => nil }
+      }
+    )
+  end
+
   it 'fails with invalid plan params' do
     params = ['string=foo',
               'string_bool="true"',
