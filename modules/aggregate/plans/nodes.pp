@@ -16,11 +16,11 @@ plan aggregate::nodes(
   }
 
   if ($type_count == 0) {
-    fail_plan("Must specify a command, script, or task to run", 'canary/invalid-params')
+    fail_plan("Must specify a command, script, or task to run", 'aggregate/invalid-params')
   }
 
   if ($type_count > 1) {
-    fail_plan("Must specify only one command, script, or task to run", 'canary/invalid-params')
+    fail_plan("Must specify only one command, script, or task to run", 'aggregate/invalid-params')
   }
 
   $res = if ($task) {
