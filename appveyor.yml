@@ -45,3 +45,5 @@ test_script:
   - bundle exec rake spec
   - cd ../../modules/aggregate
   - bundle exec rake spec
+  - cd ../../modules/minifact
+  - bundle exec rake spec
