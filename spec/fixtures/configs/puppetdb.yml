@@ -1,0 +1,7 @@
+---
+puppetdb:
+  server_urls: ["https://localhost:8081"]
+  cacert: /path/to/cacert
+  cert: /path/to/cert
+  key: /path/to/key
+  token: ~/.puppetlabs/token

@@ -59,4 +59,24 @@ describe Bolt::PuppetDB::Client do
       expect { client.query_certnames('query') }.to raise_error(/Failed to query PuppetDB: something went wrong/)
     end
   end
+
+  describe "get facts for certnames" do
+    let(:response) { double('response', code: 200, body: '{}') }
+    let(:http_client) { double('http_client', post: response) }
+
+    before :each do
+      allow(client).to receive(:http_client).and_return(http_client)
+    end
+
+    it 'returns facts for certnames' do
+      body = %w[foo bar foo]
+      allow(response).to receive(:body).and_return("{}")
+
+      expect(client.facts_for_node(body)).to eq("foo" => {}, "bar" => {})
+    end
+
+    it 'returns an empty list if no certnames are given' do
+      expect(client.facts_for_node([])).to eq({})
+    end
+  end
 end
