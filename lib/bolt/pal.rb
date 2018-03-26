@@ -199,10 +199,11 @@ module Bolt
       end
     end
 
-    # This coverts a plan signature object into a format approximating
-    # the task_hash of a task_signature
+    # This converts a plan signature object into a format approximating the
+    # task_hash of a task_signature. Must be called from within bolt compiler
+    # to pickup type aliases used in the plan signature.
     def plan_hash(plan_name, plan)
-      elements = plan.params_type.elements || {}
+      elements = plan.params_type.elements || []
       parameters = elements.each_with_object({}) do |param, acc|
         acc[param.name] = { 'type' => param.value_type }
         acc[param.name]['default_value'] = nil if param.key_type.is_a?(Puppet::Pops::Types::POptionalType)
@@ -214,14 +215,15 @@ module Bolt
     end
 
     def get_plan_info(plan_name)
-      plan = in_bolt_compiler do |compiler|
-        compiler.plan_signature(plan_name)
+      plan_info = in_bolt_compiler do |compiler|
+        plan = compiler.plan_signature(plan_name)
+        plan_hash(plan_name, plan) if plan
       end
 
-      if plan.nil?
+      if plan_info.nil?
         raise Bolt::CLIError, Bolt::Error.unknown_plan(plan_name)
       end
-      plan_hash(plan_name, plan)
+      plan_info
     end
 
     def run_task(task_name, targets, params, executor, inventory, &eventblock)
