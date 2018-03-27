@@ -15,11 +15,10 @@ module BoltSpec
       opts = cli.parse
 
       if rescue_exec
-        err_kls = error_support ? Bolt::Error : StandardError
         begin
           cli.execute(opts)
         # rubocop:disable HandleExceptions
-        rescue err_kls
+        rescue Bolt::Error
         end
         # rubocop:enable HandleExceptions
       else
@@ -51,11 +50,6 @@ module BoltSpec
       result = run_cli_json(arguments)
       expect(result['_error'] || (result['items'] && result['items'][0] && result['items'][0]['status'] != 'success'))
       result['items'][0]['result']
-    end
-
-    def error_support
-      minor = RUBY_VERSION.split('.')[1].to_i
-      minor >= 1
     end
   end
 end

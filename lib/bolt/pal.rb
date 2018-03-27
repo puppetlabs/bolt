@@ -41,14 +41,6 @@ module Bolt
       # Now that puppet is loaded we can include puppet mixins in data types
       Bolt::ResultSet.include_iterable
 
-      # TODO: This is a hack for PUP-8441 remove it once that is fixed
-      require_relative '../../vendored/puppet/lib/puppet/datatypes/impl/error.rb'
-      Puppet::DataTypes::Error.class_eval do
-        def to_json(opts = nil)
-          _pcore_init_hash.to_json(opts)
-        end
-      end
-
       unless Puppet.settings.global_defaults_initialized?
         Puppet.initialize_settings
       end
@@ -99,7 +91,8 @@ module Bolt
         end
       end
 
-      if r.is_a? StandardError
+      # Plans may return PuppetError but nothing should be throwing them
+      if r.is_a?(StandardError) && !r.is_a?(Bolt::PuppetError)
         raise r
       end
       r
@@ -234,7 +227,8 @@ module Bolt
 
     def run_plan(plan_name, params, executor = nil, inventory = nil)
       in_plan_compiler(executor, inventory) do |compiler|
-        compiler.call_function('run_plan', plan_name, params)
+        r = compiler.call_function('run_plan', plan_name, params)
+        Bolt::PuppetError.convert_puppet_errors(r)
       end
     end
   end

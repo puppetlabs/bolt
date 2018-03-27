@@ -46,7 +46,7 @@ module Bolt
       end
 
       # Accepts a Data object and returns a copy with all hash keys
-      # modifed by block. use &:to_s to stringify keys or :to_sym to symbolize them
+      # modified by block. use &:to_s to stringify keys or &:to_sym to symbolize them
       def walk_keys(data, &block)
         if data.is_a? Hash
           data.each_with_object({}) do |(k, v), acc|
@@ -55,6 +55,20 @@ module Bolt
           end
         elsif data.is_a? Array
           data.map { |v| walk_keys(v, &block) }
+        else
+          data
+        end
+      end
+
+      # Accepts a Data object and returns a copy with all hash and array values
+      # Arrays and hashes including the initial object are modified before
+      # their descendants are.
+      def walk_vals(data, &block)
+        data = yield(data)
+        if data.is_a? Hash
+          map_vals(data) { |v| walk_vals(v, &block) }
+        elsif data.is_a? Array
+          data.map { |v| walk_vals(v, &block) }
         else
           data
         end
