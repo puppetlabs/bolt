@@ -137,6 +137,21 @@ SHELL
       end
     end
 
+    it "can run a task with non-string parameters" do
+      contents = <<SHELL
+#!/bin/sh
+echo ${PT_message} ${PT_number}
+cat
+SHELL
+      arguments = { message: 'Hello from task', number: 12 }
+      with_task_containing('tasks-test-both', contents, 'both') do |task|
+        expect(local.run_task(target, task, arguments).message).to eq(<<SHELL.strip)
+Hello from task 12
+{\"message\":\"Hello from task\",\"number\":12}
+SHELL
+      end
+    end
+
     it "can run a task with params containing quotes" do
       contents = <<SHELL
 #!/bin/sh
