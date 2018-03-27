@@ -32,8 +32,6 @@ module Bolt
             yield dir
           end
         end
-      rescue StandardError => e
-        raise Bolt::Node::FileError.new("Could not make tempdir: #{e.message}", 'TEMPDIR_ERROR')
       end
       private :in_tmpdir
 
