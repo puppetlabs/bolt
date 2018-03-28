@@ -137,6 +137,21 @@ SHELL
       end
     end
 
+    it "can run a task with non-string parameters" do
+      contents = <<SHELL
+#!/bin/sh
+echo ${PT_message} ${PT_number}
+cat
+SHELL
+      arguments = { message: 'Hello from task', number: 12 }
+      with_task_containing('tasks-test-both', contents, 'both') do |task|
+        expect(local.run_task(target, task, arguments).message).to eq(<<SHELL.strip)
+Hello from task 12
+{\"message\":\"Hello from task\",\"number\":12}
+SHELL
+      end
+    end
+
     it "can run a task with params containing quotes" do
       contents = <<SHELL
 #!/bin/sh
@@ -189,7 +204,7 @@ SHELL
       it 'errors when it tries to run a command' do
         expect {
           local.run_command(target, 'echo hello')
-        }.to raise_error(Bolt::Node::FileError, /no tmpdir/)
+        }.to raise_error(/no tmpdir/)
       end
 
       it 'errors when it tries to run a script' do
@@ -197,7 +212,7 @@ SHELL
         with_tempfile_containing('script test', contents) do |file|
           expect {
             local.run_script(target, file.path, []).error_hash['msg']
-          }.to raise_error(Bolt::Node::FileError, /no tmpdir/)
+          }.to raise_error(/no tmpdir/)
         end
       end
 
@@ -207,7 +222,7 @@ SHELL
         with_task_containing('tasks_test', contents, 'environment') do |task|
           expect {
             local.run_task(target, task, arguments)
-          }.to raise_error(Bolt::Node::FileError, /no tmpdir/)
+          }.to raise_error(/no tmpdir/)
         end
       end
     end
@@ -223,7 +238,7 @@ SHELL
       it "run_command errors when tmpdir doesn't exist" do
         expect {
           local.run_command(target2, 'echo hello')
-        }.to raise_error(Bolt::Node::FileError, /Could not make tempdir.*#{Regexp.escape(tmpdir)}/)
+        }.to raise_error(Errno::ENOENT, /No such file or directory.*#{Regexp.escape(tmpdir)}/)
       end
 
       it "run_script errors when tmpdir doesn't exist" do
@@ -231,7 +246,7 @@ SHELL
         with_tempfile_containing('script dir', contents) do |file|
           expect {
             local.run_script(target2, file.path, [])
-          }.to raise_error(Bolt::Node::FileError, /Could not make tempdir.*#{Regexp.escape(tmpdir)}/)
+          }.to raise_error(Errno::ENOENT, /No such file or directory.*#{Regexp.escape(tmpdir)}/)
         end
       end
 

@@ -9,7 +9,7 @@ module Bolt
       class Shell
         def execute(*command, options)
           if options[:env]
-            env = options[:env].each_with_object({}) { |(k, v), h| h["PT_#{k}"] = v }
+            env = options[:env].each_with_object({}) { |(k, v), h| h["PT_#{k}"] = v.to_s }
             command = [env] + command
           end
 
