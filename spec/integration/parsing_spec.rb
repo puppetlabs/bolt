@@ -57,7 +57,23 @@ describe "CLI parses input" do
               'array=13',
               'hash={"this": "that"}']
     result = run_cli_json(%w[plan run parsing] + params + config_flags, rescue_exec: true)
-    expect(result["msg"]).to eq("parsing: parameter 'array' expects a value of type Undef or Array, got Integer")
+    expect(result["msg"]).to eq("parsing: parameter 'array' expects a value of type Undef or Array, got String")
+  end
+
+  it 'parses plan parameters' do
+    params = ['string=false',
+              'string_bool=true',
+              '--nodes', 'foo,bar',
+              'array=[13]',
+              'hash={"this": "that"}']
+    result = run_cli_json(%w[plan run parsing] + params + config_flags, rescue_exec: true)
+    expect(result).to eq(
+      'array' => [13],
+      'hash' => { 'this' => 'that' },
+      'nodes' => %w[foo bar],
+      'string' => 'false',
+      'string_bool' => true
+    )
   end
 
   it 'parses task parameters', ssh: true do

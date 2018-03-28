@@ -153,7 +153,7 @@ module Bolt
     def parse_params(type, object_name, params)
       in_bolt_compiler do |compiler|
         if type == 'task'
-          param_spec = compiler.task_signature(object_name)&.task_hash&.dig('parameters')
+          param_spec = compiler.task_signature(object_name)&.task_hash
         elsif type == 'plan'
           plan = compiler.plan_signature(object_name)
           param_spec = plan_hash(object_name, plan) if plan
@@ -161,7 +161,7 @@ module Bolt
         param_spec ||= {}
 
         params.each_with_object({}) do |(name, str), acc|
-          type = param_spec.dig(name, 'type')
+          type = param_spec.dig('parameters', name, 'type')
           begin
             parsed = JSON.parse(str, quirks_mode: true)
             # The type may not exist if the module is remote on orch or if a task
