@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require 'bolt/puppetdb/config'
+require 'bolt/puppetdb'
 require 'json'
 require 'httpclient'
 require 'optparse'
