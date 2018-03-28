@@ -26,64 +26,39 @@ describe "When a plan fails" do
 
   it 'returns the error object' do
     result = run_cli_json(['plan', 'run', 'error::args'] + config_flags, rescue_exec: true)
-    # TODO: remove now that ruby 2.0 is dropped
-    if error_support
-      expect(result).to eq('msg' => 'oops',
-                           'kind' => 'test/oops',
-                           'details' => { 'some' => 'info' })
-    else
-      expect(result['msg']).to match(/oops/)
-      expect(result['kind']).to eq('bolt/cli-error')
-    end
+    expect(result).to eq('msg' => 'oops',
+                         'kind' => 'test/oops',
+                         'details' => { 'some' => 'info' })
   end
 
   it 'returns the error object' do
     result = run_cli_json(['plan', 'run', 'error::err'] + config_flags, rescue_exec: true)
-    # TODO: remove now that ruby 2.0 is dropped
-    if error_support
-      expect(result).to eq('msg' => 'oops',
-                           'kind' => 'test/oops',
-                           'details' => { 'some' => 'info' })
-    else
-      expect(result['msg']).to match(/oops/)
-      expect(result['kind']).to eq('bolt/cli-error')
-    end
+    expect(result).to eq('msg' => 'oops',
+                         'kind' => 'test/oops',
+                         'details' => { 'some' => 'info' })
   end
 
   it 'catches plan failures' do
-    if error_support
-      result = run_cli_json(['plan', 'run', 'error::catch_plan'] + config_flags)
-      expect(result).to eq('msg' => 'oops',
-                           'kind' => 'test/oops',
-                           'details' => { 'some' => 'info' })
-    else
-      result = run_cli_json(['plan', 'run', 'error::catch_plan'] + config_flags, rescue_exec: true)
-      expect(result['msg']).to match(/oops/)
-    end
+    result = run_cli_json(['plan', 'run', 'error::catch_plan'] + config_flags)
+    expect(result).to eq('msg' => 'oops',
+                         'kind' => 'test/oops',
+                         'details' => { 'some' => 'info' })
   end
 
   it 'catches run failures', ssh: true do
-    if error_support
-      result = run_cli_json(['plan', 'run', 'error::catch_plan_run', "target=#{target}"] + config_flags)
-      expect(result).to eq("kind" => "puppetlabs.tasks/task-error",
-                           "issue_code" => "TASK_ERROR",
-                           "msg" => "The task failed with exit code 1",
-                           "details" => { "exit_code" => 1 })
-    else
-      result = run_cli_json(['plan', 'run', 'error::catch_plan_run', "target=#{target}"] + config_flags,
-                            rescue_exec: true)
-      expect(result['msg']).to match(/error::fail/)
-    end
+    result = run_cli_json(['plan', 'run', 'error::catch_plan_run', "target=#{target}"] + config_flags)
+    expect(result).to eq("kind" => "puppetlabs.tasks/task-error",
+                         "issue_code" => "TASK_ERROR",
+                         "msg" => "The task failed with exit code 1",
+                         "details" => { "exit_code" => 1 })
   end
 
   it 'outputs nested errors' do
-    if error_support
-      result = run_cli_json(['plan', 'run', 'error::nested'] + config_flags)
-      expect(result).to eq('error' => [{
-                             'msg' => 'oops',
-                             'kind' => 'test/oops',
-                             'details' => { 'some' => 'info' }
-                           }])
-    end
+    result = run_cli_json(['plan', 'run', 'error::nested'] + config_flags)
+    expect(result).to eq('error' => [{
+                           'msg' => 'oops',
+                           'kind' => 'test/oops',
+                           'details' => { 'some' => 'info' }
+                         }])
   end
 end

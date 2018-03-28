@@ -63,4 +63,14 @@ module Bolt
       @error_code = 2
     end
   end
+
+  class PuppetError < Error
+    def self.convert_puppet_errors(result)
+      Bolt::Util.walk_vals(result) { |v| v.is_a?(Puppet::DataTypes::Error) ? from_error(v) : v }
+    end
+
+    def self.from_error(err)
+      new(err.msg, err.kind, err.details, err.issue_code)
+    end
+  end
 end
