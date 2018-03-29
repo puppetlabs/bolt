@@ -13,6 +13,8 @@ module Bolt
       # is safe and in practice only happen in tests
       self.class.load_puppet
       self.class.configure_logging(config[:log_level])
+      # This makes sure we don't accidentally create puppet dirs
+      with_puppet_settings { |_| nil }
 
       @config = config
     end
@@ -40,10 +42,6 @@ module Bolt
 
       # Now that puppet is loaded we can include puppet mixins in data types
       Bolt::ResultSet.include_iterable
-
-      unless Puppet.settings.global_defaults_initialized?
-        Puppet.initialize_settings
-      end
     end
 
     # Create a top-level alias for TargetSpec so that users don't have to
@@ -104,6 +102,9 @@ module Bolt
 
     def in_plan_compiler(executor, inventory)
       with_bolt_executor(executor, inventory) do
+        # TODO: remove this call and see if anything breaks when
+        # settings dirs don't actually exist. Plans shouldn't
+        # actually be using them.
         with_puppet_settings do
           in_bolt_compiler do |compiler|
             yield compiler
