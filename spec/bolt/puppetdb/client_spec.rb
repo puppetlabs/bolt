@@ -69,10 +69,11 @@ describe Bolt::PuppetDB::Client do
     end
 
     it 'returns facts for certnames' do
-      body = %w[foo bar foo]
-      allow(response).to receive(:body).and_return("{}")
+      request = %w[foo bar foo]
+      body = [{ 'certname' => 'foo', 'facts' => { 'a' => 1 } }, { 'certname' => 'bar', 'facts' => { 'b' => 2 } }]
+      allow(response).to receive(:body).and_return(body.to_json)
 
-      expect(client.facts_for_node(body)).to eq("foo" => {}, "bar" => {})
+      expect(client.facts_for_node(request)).to eq('foo' => { 'a' => 1 }, 'bar' => { 'b' => 2 })
     end
 
     it 'returns an empty list if no certnames are given' do
