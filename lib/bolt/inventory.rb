@@ -93,7 +93,7 @@ module Bolt
     end
 
     def vars(target)
-      @target_vars[target.name]
+      @target_vars[target.name] || {}
     end
 
     def add_facts(target, new_facts = {})
@@ -102,7 +102,7 @@ module Bolt
     end
 
     def facts(target)
-      @target_facts[target.name]
+      @target_facts[target.name] || {}
     end
 
     #### PRIVATE ####

@@ -86,33 +86,64 @@ describe 'running with an inventory file', reset_puppet_settings: true do
     end
 
     context 'with variables set' do
-      let(:var_plan) { ['plan', 'run', 'vars', "host=#{target}"] + config_flags }
-      let(:output) { "Vars for localhost: {daffy => duck, bugs => bunny}\n" }
+      let(:output) { "Vars for localhost: {daffy => duck, bugs => bunny}" }
+
+      def var_plan(name = 'vars')
+        ['plan', 'run', name, "host=#{target}"] + config_flags
+      end
+
       it 'sets a variable on the target' do
-        expect(run_cli_json(var_plan)[0]['result']['stdout']).to eq(output)
+        expect(run_cli_json(var_plan)).to eq(output)
       end
 
       it 'preserves variables between runs', :reset_puppet_settings do
         run_cli_json(run_command)
-        expect(run_cli_json(var_plan)[0]['result']['stdout']).to eq(output)
+        expect(run_cli_json(var_plan)).to eq(output)
+      end
+
+      context 'with target not in inventory' do
+        let(:inventory) { {} }
+
+        it 'does not error when facts are retrieved' do
+          expect(run_cli_json(var_plan('vars::emit'))).to eq("Vars for localhost: {}")
+        end
+
+        it 'does not error when facts are added' do
+          expect(run_cli_json(var_plan)).to eq("Vars for localhost: {bugs => bunny}")
+        end
       end
     end
 
     context 'with facts set' do
       # This also asserts the deep_merge works
-      let(:fact_plan) { ['plan', 'run', 'facts', "host=#{target}"] + config_flags }
       let(:output) {
         "Facts for localhost: {scooby => doo, cloud => {provider => AWS, " \
-        "foo => bar}, kernel => Linux}\n"
+        "foo => bar}, kernel => Linux}"
       }
 
+      def fact_plan(name = 'facts')
+        ['plan', 'run', name, "host=#{target}"] + config_flags
+      end
+
       it 'sets a facts hash on the target' do
-        expect(run_cli_json(fact_plan)[0]['result']['stdout']).to eq(output)
+        expect(run_cli_json(fact_plan)).to eq(output)
       end
 
       it 'preserves facts between runs', :reset_puppet_settings do
         run_cli_json(run_command)
-        expect(run_cli_json(fact_plan)[0]['result']['stdout']).to eq(output)
+        expect(run_cli_json(fact_plan)).to eq(output)
+      end
+
+      context 'with target not in inventory' do
+        let(:inventory) { {} }
+
+        it 'does not error when facts are retrieved' do
+          expect(run_cli_json(fact_plan('facts::emit'))).to eq("Facts for localhost: {}")
+        end
+
+        it 'does not error when facts are added' do
+          expect(run_cli_json(fact_plan)).to eq("Facts for localhost: {kernel => Linux, cloud => {provider => AWS}}")
+        end
       end
     end
   end
