@@ -11,11 +11,13 @@ module Bolt
   module Transport
     class Orch < Base
       CONF_FILE = File.expand_path('~/.puppetlabs/client-tools/orchestrator.conf')
-      BOLT_MOCK_TASK = Struct.new(:name, :executable).new('bolt', 'bolt/tasks/init').freeze
+      BOLT_MOCK_TASK = Struct.new(:name).new('bolt').freeze
 
       def self.options
         %w[service-url cacert token-file task-environment local-validation]
       end
+
+      PROVIDED_FEATURES = ['puppet-agent'].freeze
 
       def self.validate(options)
         validation_flag = options['local-validation']

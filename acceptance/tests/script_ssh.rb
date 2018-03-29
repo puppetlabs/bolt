@@ -19,17 +19,9 @@ test_name "C100548: \
   end
 
   step "execute `bolt script run` via SSH" do
-    user = ENV['SSH_USER']
-    password = ENV['SSH_PASSWORD']
-    nodes_csv = ssh_nodes.map(&:hostname).join(',')
     bolt_command = "bolt script run #{script}"
 
-    flags = {
-      '--nodes'              => nodes_csv,
-      '-u'                   => user,
-      '-p'                   => password,
-      '--no-host-key-check'  => nil
-    }
+    flags = { '--nodes' => 'ssh_nodes' }
 
     result = bolt_command_on(bolt, bolt_command, flags)
     ssh_nodes.each do |node|

@@ -6,6 +6,7 @@ require 'bolt/error'
 module Bolt
   class Target
     attr_reader :uri, :options
+    attr_writer :inventory
 
     # Satisfies the Puppet datatypes API
     def self.from_asserted_hash(hash)
@@ -43,6 +44,20 @@ module Bolt
       end
     end
     private :parse
+
+    def select_impl(task, additional_features = [])
+      available_features = features + additional_features
+      suitable_impl = task.implementations.find { |impl| Set.new(impl['requirements']).subset?(available_features) }
+      return suitable_impl['path'] if suitable_impl
+    end
+
+    def features
+      if @inventory
+        @inventory.features(self)
+      else
+        Set.new
+      end
+    end
 
     def eql?(other)
       self.class.equal?(other.class) && @uri == other.uri
