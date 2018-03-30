@@ -20,6 +20,9 @@ script:
 - pushd modules/aggregate
 - bundle exec rake spec
 - popd
+- pushd modules/minifact
+- bundle exec rake spec
+- popd
 notifications:
   email: false
   hipchat:

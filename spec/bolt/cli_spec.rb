@@ -848,7 +848,10 @@ bar
           }
           cli.execute(options)
           json = JSON.parse(output.string)
-          expect(json).to eq([['sample::ok', nil]])
+          expect(json).to eq([["minifact::bash", nil],
+                              ["minifact::powershell", nil],
+                              ["minifact::ruby", nil],
+                              ['sample::ok', nil]])
 
           expect(@puppet_logs.first.message).to match(/unexpected token.*params\.json/m)
         end
@@ -939,6 +942,9 @@ bar
           expect(json).to eq([["aggregate::count"],
                               ["aggregate::nodes"],
                               ["canary"],
+                              ["minifact"],
+                              ["minifact::info"],
+                              ["minifact::retrieve"],
                               ["puppetdb_fact"],
                               ["sample::ok"]])
 

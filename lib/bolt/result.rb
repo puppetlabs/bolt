@@ -68,6 +68,11 @@ module Bolt
       new(target, message: "Uploaded '#{source}' to '#{target.host}:#{destination}'")
     end
 
+    # Satisfies the Puppet datatypes API
+    def self.from_asserted_args(target, value)
+      new(target, value: value)
+    end
+
     def initialize(target, error: nil, message: nil, value: nil)
       @target = target
       @value = value || {}
