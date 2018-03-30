@@ -211,7 +211,12 @@ describe 'running with an inventory file', reset_puppet_settings: true do
       end
 
       context 'with localhost in inventory' do
-        let(:inventory) { { nodes: ['localhost'] } }
+        let(:inventory) do
+          # Ensure that we try to connect to a *closed* port, to avoid spurious "success"
+          port = TCPServer.open(0) { |socket| socket.addr[1] }
+          config = { transport: 'ssh', ssh: { port: port } }
+          { nodes: ['localhost'], config: config }
+        end
 
         it 'fails to connect' do
           result = run_failed_node(run_command)
