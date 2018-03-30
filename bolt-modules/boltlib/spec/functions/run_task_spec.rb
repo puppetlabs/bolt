@@ -86,6 +86,40 @@ describe 'run_task' do
       is_expected.to run.with_params('Test::Yes', []).and_return(Bolt::ResultSet.new([]))
     end
 
+    context 'with description' do
+      let(:message) { 'test message' }
+
+      it 'passes the description through if parameters are passed' do
+        executor.expects(:run_task).with([target], anything, {}, '_description' => message).returns(result_set)
+        inventory.expects(:get_targets).with(hostname).returns([target])
+
+        is_expected.to run.with_params('test::yes', hostname, message, {})
+      end
+
+      it 'passes the description through if no parameters are passed' do
+        executor.expects(:run_task).with([target], anything, {}, '_description' => message).returns(result_set)
+        inventory.expects(:get_targets).with(hostname).returns([target])
+
+        is_expected.to run.with_params('test::yes', hostname, message)
+      end
+    end
+
+    context 'without description' do
+      it 'ignores description if parameters are passed' do
+        executor.expects(:run_task).with([target], anything, {}, {}).returns(result_set)
+        inventory.expects(:get_targets).with(hostname).returns([target])
+
+        is_expected.to run.with_params('test::yes', hostname, {})
+      end
+
+      it 'ignores description if no parameters are passed' do
+        executor.expects(:run_task).with([target], anything, {}, {}).returns(result_set)
+        inventory.expects(:get_targets).with(hostname).returns([target])
+
+        is_expected.to run.with_params('test::yes', hostname)
+      end
+    end
+
     context 'with multiple destinations' do
       let(:result_set) { Bolt::ResultSet.new([result, result2]) }
 
