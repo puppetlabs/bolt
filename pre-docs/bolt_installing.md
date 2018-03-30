@@ -13,7 +13,7 @@ Server 12 and Ubuntu 14.04 and 16.04.
 
 Install Bolt and its dependencies on *nix platforms.
 
-1. To install the dependencies you need to use Bolt, run the command that
+1. To install the dependencies you need to install Bolt, run the command that
   corresponds to your operating system.
 
   -  For Fedora 25
@@ -63,9 +63,9 @@ Install Bolt and its dependencies on Windows systems.
   bolt --help
   ```
 
-## Install Bolt on Debian or Ubuntu
-Install Bolt from a package that contains both the software and its
-dependencies. Packaged versions of Bolt are available for Debian 8 and 9 and
+## Install Bolt from apt repositories on Debian or Ubuntu
+
+Packaged versions of Bolt are available for Debian 8 and 9 and
 Ubuntu 14.04 and 16.04.
 
 The Puppet repository for the APT package management system is
@@ -74,7 +74,8 @@ https://apt.puppet.com. Packages are named using the convention
 package for Puppet 5 Platform on 8 “Jessie” is puppet5-release-jessie.deb.
 
 > Note: These packages require you to download the Puppet 5 Platform and include
-> puppet-agent as a dependency.  Download and install the software and its
+> puppet-agent as a dependency. If you use an earlier puppet agent you'll have
+> to upgrade it.  Download and install the software and its
 > dependencies. Use the commands appropriate to your system.
 
 1. -  Debian 8
@@ -113,10 +114,9 @@ package for Puppet 5 Platform on 8 “Jessie” is puppet5-release-jessie.deb.
    ```
 
 
-## Install Bolt on RHEL or SLES
+## Install Bolt from yum reposities on RHEL or SLES
 
-Install Bolt from a package that contains both the software and its
-dependencies. Packaged versions of Bolt are available for Red Hat Enterprise
+Packaged versions of Bolt are available for Red Hat Enterprise
 Linux 6 and 7, SUSE Linux Enterprise Server 12.
 
 The Puppet repository for the YUM package management system is
@@ -126,7 +126,8 @@ the release package for Puppet 5 Platform on Linux 7 is
 puppet5-release-el-7.noarch.rpm.
 
 > Note: These packages require you to download the Puppet 5 Platform and include
-> puppet-agent as a dependency.  Download and install the software and its
+> puppet-agent as a dependency. If you use an earlier puppet agent you'll have
+> to upgrade it.  Download and install the software and its
 > dependencies. Use the commands appropriate to your system.
 
 1. -  Enterprise Linux 6

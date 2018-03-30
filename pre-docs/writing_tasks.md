@@ -8,7 +8,8 @@ metadata. This allows you to reuse and share them more easily.
 > and Bolt.
 
 You can write tasks in any programming language the target nodes
-will run, such as Bash, PowerShell, or Python. Place your task in the ./tasks
+will run, such as Bash, PowerShell, or Python. A task can even be a compiled binary that will run on the target.
+Place your task in the ./tasks
 directory of a module and add a metadata file to describe parameters and
 configure task behavior.
 
@@ -206,44 +207,35 @@ and the path to the task within the module.
 
 You can write tasks in any language that will run on the target nodes. Give
 task files the extension for the language they are written in (such as `.rb` for
-Ruby), and place them in your module's `./tasks` directory.
+Ruby), and place them in the top level of your module's `./tasks` directory.
 
 Task names are composed of two or more name segments, indicating:
 
 - The name of the module the task is located in.
-- The name of the task file, withouth the extension.
-- The path within the module, if the task is in a subdirectory of ./tasks.
+- The name of the task file, without the extension.
 
 For example, the `puppetlabs-mysql` module has the `sql` task in
-`./mysql/tasks/sql.rb`, so the task name is `mysql::sql`. A task defined in
-`./mymodule/tasks/service/start.rb` would be `mymodule::service::start`. This name
-is how you refer to the task when you run task commands.
+`./mysql/tasks/sql.rb`, so the task name is `mysql::sql`. This name
+is how you refer to the task when you run tasks.
 
 The task filename `init` is special: the task it defines is referenced using the
 module name only. For example, in the `puppetlabs-service` module, the task
-defined in `init.rb` is the `service` task. Use this kind of naming sparingly, if
-at all, as top named elements like this can clash with other constructs.
+defined in `init.rb` is the `service` task.
 
-Task names must be unique. If there are two tasks with the same name in a
+Task names must be unique. If there are two tasks with the same name but different file extensions in a
 module, the task runner won't load either of them.
-
-Task names must not have the same name as any Puppet data type, because when
-you run tasks with Puppet, they are loaded as unique data types. For a complete
-list of Puppet data types, see the data type documentation.
 
 Each task or plan name segment must begin with a lowercase letter and:
 
-- May include lowercase letters.
+- Must start with a lowercase letters.
 - May include digits.
 - May include underscores.
-- Must not use reserved words.
-- Must not use the reserved extensions .md or .json.
-- Must not have the same name as any Puppet data types.
 - Namespace segments must match the following regular expression \A[a-z][a-z0-9_]*\Z
+- The file extension must not use the reserved extensions .md or .json.
 
 ## Defining parameters in tasks
 
-Add parameters to your task as either environment variables or as a JSON hash
+Allow your task to accept parameters as either environment variables or as a JSON hash
 on standard input.
 
 Tasks can receive input as either environment variables, a JSON hash on
@@ -263,8 +255,8 @@ input and output for more information.
 To add parameters to your task as environment variables, pass the argument
 prefixed with the Puppet task prefix `PT_`.
 
-For example, to add a message parameter to your task, pass it in the task code
-as `PT_message`. When the user runs the task, they specify the value for the
+For example, to add a message parameter to your task, read it from the environment in task code
+as `PT_message`. When the user runs the task, they can specify the value for the
 parameter on the command line as `message=hello`, and the task runner submits
 the value hello to the `PT_message` variable.
 
@@ -276,9 +268,8 @@ echo your message is $PT_message
 ### Defining parameters in Windows
 
 For Windows tasks, you can pass parameters as environment variables, but it's
-usually more useful to write your task in PowerShell and use named arguments.
-To support PowerShell standard argument handling, set the `input_method` in your
-metadata to powershell.
+easier to write your task in PowerShell and use named arguments.
+By default tasks with a `.ps1` extension use  PowerShell standard argument handling.
 
 For example, this PowerShell task takes a process name as an argument and
 returns information about the process. If no parameter is passed by the user,
@@ -313,17 +304,17 @@ if ($Name -eq $null -or $Name -eq "") {
 ```
 
 To pass parameters in your task as environment variables (`PT_parameter`), you
-must set `input_method` in your task metadata to environment. To run Ruby tasks
+must set `input_method` in your task metadata to `environment`. To run Ruby tasks
 on Windows, the Puppet agent must be installed on the target nodes.
 
 ## Returning errors in tasks
 
 To return a detailed error message if your task fails, include an Error object
-with your task.
+in the tasks result.
 
 When a task exits non-zero, the task runner checks for an error key (`_error`).
-If one is not present, the task runner generates a generic error key and adds
-it to the output. If there is no text on `stdout` but text is present on `stderr`,
+If one is not present, the task runner generates a generic error and adds
+it to the result. If there is no text on `stdout` but text is present on `stderr`,
 the `stderr` text is included in the message.
 
 
@@ -335,6 +326,8 @@ the `stderr` text is included in the message.
 }
 ```
 
+An error object includes the following keys:
+
 - `msg`
   A human readable string that appears in the UI.
 - `kind`
@@ -342,7 +335,8 @@ the `stderr` text is included in the message.
 - `details`
   An object of structured data about the tasks.
 
-Specify Error parameters to provide details about the failure.
+Tasks can provide more details about the failure by including their own error
+object in the result at `_error`.
 
 ```
 #!/opt/puppetlabs/puppet/bin/ruby
@@ -416,11 +410,10 @@ end
 exit exitcode
 ```
 
-
 ### Returning structured output
 
-To return structured data from your task, include code in your task that prints
-a JSON object to stdout.
+To return structured data from your task, print only a single JSON object to
+`stdout` in your task.
 
 Structured output is useful if you want to use the output in another program,
 or if you want to use the result of the task in a Puppet task plan.
@@ -437,16 +430,16 @@ json.dump(result, sys.stdout)
 ## Converting scripts to tasks
 
 To convert an existing script to a task, you can either write a task that wraps
-the script or you can replace the logic in your script to check for environment
-variables instead of assigning arguments.
+the script or you can add logic in your script to check for parameters in environment
+variables.
 
 If the script is already installed on the target nodes, you can write a task
-that wraps the script. In the task, specify the script arguments as task
+that wraps the script. In the task, read the script arguments as task
 parameters and call the script, passing the parameters as the arguments.
 
 If the script isn't installed or you want to make it into a cohesive task that
 you can manage its version with code management tools, add code to your script
-to check for the environment variables, prefixed with `PT_`, and assign them
+to check for the environment variables, prefixed with `PT_`, and read them
 instead of arguments.
 
 Given a script that accepts positional arguments on the command line:
@@ -472,8 +465,6 @@ else
 fi
 ```
 
-> Note: You must have a WinRM HTTP listener to make DSC calls.
-
 ## Supporting no-op in tasks
 
 Tasks can support no-operation functionality, also known as no-op mode. This
@@ -488,7 +479,7 @@ metaparameter. No-op is supported only in Puppet Enterprise.
 
 If the user passes the `--noop` flag with their command, this parameter is set to
 `true`, and your task must not make changes. You must also set `supports_noop` to
-`true` in your task metadata.
+`true` in your task metadata or the task runner will refuse to run the task in noop mode.
 
 
 ### No-op metadata example
@@ -606,7 +597,7 @@ the metadata file, `sql.json`.
 To document and validate task parameters, add the parameters to the task's
 metadata as JSON object, parameters.
 
-If a task includes parameters in its metadata, it rejects any parameters input
+If a task includes parameters in its metadata, the task runner rejects any parameters input
 to the task which aren't defined in the metadata.
 
 In the parameter object, give each parameter a description and specify its

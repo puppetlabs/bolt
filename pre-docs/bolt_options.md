@@ -15,14 +15,14 @@ command from.
 You must specify the target nodes that you want to execute bolt commands on.
 
 For most bolt commands, specify the target nodes with the `--nodes` flag when you
-run the command, such as `--nodes mercury`. Only the `bolt run plan` command does
-not accept the `--nodes` flag. For plans, specify nodes as a list within the task
-plan itself or specify them as regular parameters, like `nodes=neptune`.
+run the command, such as `--nodes mercury`. For plans, the `--nodes` flag will
+be mapped to the `nodes` parameter if the plan exposes one.
 
-When targeting machines with the `--nodes` flag, you must specify the transport
-protocol. Specify the transport either in the node string for each host, such
-as `--nodes winrm://mywindowsnode.mydomain`, or set a default transport for the
-operation with the `--transport` option.
+When targeting machines with the `--nodes` flag, you may specify the transport
+either in the node url for each host, such as `--nodes
+winrm://mywindowsnode.mydomain`, or set a default transport for the operation
+with the `--transport` option. If you do not specify a transport it will
+default to `ssh`.
 
 To specify multiple nodes with the `--nodes` flag, use a comma-separated list of
 nodes, such as `--nodes neptune,saturn,mars`.
@@ -50,19 +50,19 @@ To pass nodes to Bolt in a file, pass the file name and relative location with
 the `--nodes` flag and an `@` symbol: `bolt command run --nodes @nodes.txt`
 
 To pass nodes on `stdin`, on the command line, use a command to generate a node
-list, and pipe the result to Bolt : `<COMMAND> | bolt command run --nodes` For
+list, and pipe the result to Bolt with `-` after `--nodes` : `<COMMAND> | bolt command run --nodes -` For
 example, if you have a node list in a text file, you might run `cat nodes.txt |
 bolt command run --nodes`
 
 
-### Specifying nodes in an inventory file
+### Specifying nodes from an inventory file
 
-To specify nodes in an inventory file, reference nodes by node name or the name
-a group of nodes.
+To specify nodes from an inventory file, reference nodes by node name, a glob
+matching names in the file or the name a group of nodes.
 
 For the inventory file example below, the command `--nodes
 elastic_search,web_app` matches all nodes in both groups, `elastic_search` and
-`web_app`. And `--nodes elasticsearch\*` references all the nodes that start with
+`web_app`. And `--nodes 'elasticsearch*'` references all the nodes that start with
 elasticsearch.
 
 
@@ -90,7 +90,8 @@ Pass the `--transport` option after the nodes list, such as `--nodes win1 --tran
 
 This sets the transport protocol as the default for this command. If you set
 this option when running a plan, it is treated as the default transport for the
-entire plan run.
+entire plan run. Any nodes passed with transports in their url or transports
+configured in inventory will not use this default.
 
 This is useful on Windows, so that you do not have to include the winrm
 transport for each node. To override the default transport, specify the
@@ -121,14 +122,14 @@ password does not appear in a process listing or on the console.
 ## Specifying the module path
 
 When executing tasks or plans, you must specify the `--modulepath` option as
-the directory containing the task module.
+the directory containing the task modules.
 
 Specify this option in the format `--modulepath </PATH/TO/MODULE>`. This path
 should be only the path the modules directory, such as `~/modules`. Do not
 specify the module name in this path, as the name is already specified as part
 of the task or plan name.
 
-To specify multiple module paths, separate the paths with with a semicolon
+To specify multiple module directories to search for modules, separate the paths with with a semicolon
 (`;`) on Windows or a colon (`:`) on all other platforms.
 
 
@@ -193,6 +194,7 @@ Displays a list of all the tasks on the modulepath. Will note whether a task sup
 bolt plan show
 ```
 - Lists the plans that are installed on the current module apth
+- Adding a specific plan name displays details and parameters for the plan.
 - The module path to the module containing the plan.
 
 ## Command options

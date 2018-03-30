@@ -27,15 +27,11 @@ For example, given a module called mymodule with a plan defined in
 in `./mymodule/plans/service/myplan.pp` would be `mymodule::service::myplan`. This
 name is how you refer to the plan when you run commands.
 
-Plan names must be unique. If there are two plans with the same name in a
-module, the task runner won't load either of them.
-
 The plan filename init is special: the plan it defines is referenced using the
 module name only. For example, in a module called `mymodule`, the plan defined in
-`init.pp` is the `mymodule` plan. Use this kind of naming sparingly, if at all, as
-top named elements like this can clash with other constructs.
+`init.pp` is the `mymodule` plan.
 
-Do not give plans the same names as constructs in the Puppet language. Although
+Avoid giving plans the same names as constructs in the Puppet language. Although
 plans do not share their namespace with other language constructs, giving plans
 these names makes your code difficult to read.
 
@@ -44,8 +40,7 @@ Each plan name segment must begin with a lowercase letter and:
 - May include lowercase letters.
 - May include digits.
 - May include underscores.
-- Must not use reserved words.
-- Must not use the reserved extensions .md or .json.
+- Must not be a reserved word.
 - Must not have the same name as any Puppet data types.
 
 Namespace segments must match the following regular expression
@@ -60,8 +55,10 @@ Specify each parameter in your plan with its data type. For example, you might
 want parameters to specify which nodes to run different parts of your plan on.
 
 The following example shows node parameters specified as data type
-`Variant[String[1], Array[String[1]]]`. For more information about these data
-types, see the common data types table in the related metadata type topic.
+`TargetSpec` this allows this parameter to be passed as a single url, comma
+seperated url lis, Target datatype or Array of either. For more information
+about these data types, see the common data types table in the related metadata
+type topic.
 
 This allows the user to pass, for each parameter, either a simple node name or
 a URI that describes the protocol to use, the hostname, username and password.
@@ -71,9 +68,9 @@ should be run on.
 
 ```
 plan mymodule::my_plan(
-  String[1]                             $load_balancer,
-  Variant[String[1], Array[String[1]]]  $frontends,
-  Variant[String[1], Array[String[1]]]  $backends,
+  String[1]   $load_balancer,
+  TargetSpec  $frontends,
+  TargetSpec  $backends,
 ) {
 
   # process frontends
@@ -83,9 +80,12 @@ plan mymodule::my_plan(
 }
 ```
 
-To execute this plan from the command line, pass the parameters as `parameter=value`:
+To execute this plan from the command line, pass the parameters as
+`parameter=value`. The Targetspec will accept either an array as json
+or a comma seperated string of target names.
+
 ```
-bolt plan run mymodule::myplan --modulepath ./PATH/TO/MODULES --params '{"load_balancer":"lb.myorg.com","frontends":["kermit.myorg.com","gonzo.myorg.com"],"backends":["waldorf.myorg.com","statler.myorg.com"]}'
+bolt plan run mymodule::myplan --modulepath ./PATH/TO/MODULES --params load_balancer=lb.myorg.com frontends='["kermit.myorg.com","gonzo.myorg.com"]' backends=waldorf.myorg.com,statler.myorg.com
 ```
 
 
@@ -105,11 +105,7 @@ commands.
 
 ### Calling basic plan functions
 
-Add basic functions to your plan by calling the function with its data type and
-arguments.
-
-Basic functions in plans share a similar structure. Call these functions with
-their data type and parameters.
+Basic functions in plans share a similar structure. Call these functions with their parameters.
 
 `run_script`
 Runs a script on one or more nodes.
@@ -169,19 +165,20 @@ plan vars(String $host) {
 Or set `vars` in the inventory file using the `vars` key at the group level.
 
 ```yaml
+---
 groups:
   - name: my_nodes
-	nodes:
-  	  - 'localhost'
-	vars:
-  	  operatingsystem: windows
-	config:
-  	  transport: ssh
+    nodes:
+      - localhost
+    vars:
+      operatingsystem: windows
+    config:
+      transport: ssh
 ```
 
 The `TargetSpec` parameter is an abstract specification of targets that can
 include the patterns allowed by `--nodes`, a single Target object, or an Array of
-Targets (as returned by `get_targets`). Implemented as a type alias that matches
+Targets and node patterns. Implemented as a type alias that matches
 String (which may describe targets), Target, and Arrays of these. This is the
 primary type to use when you want to accept a reference to one or more target
 nodes. To operate on individual nodes, resolve it to a list via `get_targets`.
@@ -254,10 +251,13 @@ plan mymodule::update_everything {
 Indicators that a plan has run successfully or failed.
 
 Any plan that completes execution without an error is considered successful.
-The `bolt` command exits 0 and any calling plans continue execution. When a plan
-is unsuccessful and you have reason to believe the caller should not continue
-as normal, it fails with the `fail_plan` function. This causes the bolt command
-to exit non-zero and prevents calling plans executing any further, unless
+The `bolt` command exits 0 and any calling plans continue execution. If any
+calls to `run_` functions fail without `_catch_errors` then the plan will hald
+execution and be considered a failure. Any calling plans will also halt until a
+`run_plan` call with `_catch_errors` is reached. If one isn't the `bolt`
+command will exit 2. When writing a plan if you have reason to believe it has
+failed you can fail the plan with the `fail_plan` function. This causes the
+bolt command to exit 2 and prevents calling plans executing any further, unless
 `run_plan` was called with `_catch_errors`.
 
 ### Failing plans
@@ -282,10 +282,10 @@ you may get an error.
 
 The `Error` data type includes:
 
-- message: The error message string.
-- kind: A string that defines the kind of error.
+- msg: The error message string.
+- kind: A string that defines the kind of error similar to an error class..
 - details: A hash with details about the error from a task or from information about the state of a plan when it fails, for example, exit_code or stack_trace.
-- issue_code: A string that is a code for the error message.
+- issue_code: A unique code for the message that can be used for translation.
 
 Use the `Error` data type in a case expression to match against different kind of
 errors. To recover from certain errors, while failing on or ignoring others,
@@ -333,9 +333,8 @@ You should be aware of some other Puppet behaviors in plans:
 - `--strict=error` is always on, so minor language issues generate errors. For
   example `{ a => 10, a => 20 }` is an error because there is a duplicate key
   in the hash.
-- Facts are for the machine where the script or plan is running, not for the
   nodes on which the tasks are executed.
-- Settings are for the machine where the script or plan is running.
+- Most Puppet settings are empty and not-configurable when using bolt.
 - Logs include "source location" (file, line) instead of resource type or name.
 
 
@@ -352,7 +351,7 @@ A `ResultSet` has the following methods:
 - `empty()`: Returns Boolean if the execution result set is empty.
 - `count()`: Returns an Integer count of nodes.
 - `first()`: The first Result object, useful to unwrap single results.
-- `find(target-name)`: Look up the Result for a specific target.
+- `find(String $target_name)`: Look up the Result for a specific target.
 - `error_set()`: A ResultSet containing only the results of failed nodes.
 - `ok_set()`: A ResultSet containing only the sucessful results.
 - `targets()`: An array of all the Target objects from every Result in the set.
@@ -368,7 +367,7 @@ A `Result` has the following methods:
 
 An instance of `ResultSet` is `Iterable` as if it were an `Array[Result]` so that
 iterative functions such as `each`, `map`, `reduce`, or `filter` work directly on the
-execution result.
+ResultSet returning each result.
 
 This example checks if a task ran correctly on all nodes. If it did not, the
 check fails:
