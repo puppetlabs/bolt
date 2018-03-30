@@ -93,7 +93,7 @@ describe 'run_script' do
         end
 
         it 'does not error with _catch_errors' do
-          executor.expects(:run_script).with([target, target2], full_path, [], {})
+          executor.expects(:run_script).with([target, target2], full_path, [], '_catch_errors' => true)
                   .returns(result_set)
           inventory.expects(:get_targets).with([hostname, hostname2]).returns([target, target2])
 

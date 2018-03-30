@@ -54,7 +54,7 @@ Puppet::Functions.create_function(:run_task) do
     # Ensure that given targets are all Target instances
     targets = inventory.get_targets(targets)
 
-    use_args = task_args.reject { |k, _| k.start_with?('_') }
+    options, use_args = task_args.partition { |k, _| k.start_with?('_') }.map(&:to_h)
 
     # Don't bother loading the local task definition if all targets use the 'pcp' transport
     # and the local-validation option is set to false for all of them
@@ -94,7 +94,6 @@ Puppet::Functions.create_function(:run_task) do
     if targets.empty?
       Bolt::ResultSet.new([])
     else
-      options = task_args.select { |k, _| k == '_run_as' }
       executor.run_task(targets, task, use_args, options, &block)
     end
   end
