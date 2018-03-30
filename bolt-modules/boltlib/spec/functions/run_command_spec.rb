@@ -81,7 +81,7 @@ describe 'run_command' do
         end
 
         it 'does not error with _catch_errors' do
-          executor.expects(:run_command).with([target, target2], command, {})
+          executor.expects(:run_command).with([target, target2], command, '_catch_errors' => true)
                   .returns(result_set)
           inventory.expects(:get_targets).with([hostname, hostname2]).returns([target, target2])
 

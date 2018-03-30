@@ -129,7 +129,10 @@ describe 'run_task' do
         it 'does not error with _catch_errors' do
           executable = File.join(tasks_root, 'meta.sh')
 
-          executor.expects(:run_task).with([target, target2], mock_task(executable, 'environment'), default_args, {})
+          executor.expects(:run_task).with([target, target2],
+                                           mock_task(executable, 'environment'),
+                                           default_args,
+                                           '_catch_errors' => true)
                   .returns(result_set)
           inventory.expects(:get_targets).with([hostname, hostname2]).returns([target, target2])
 

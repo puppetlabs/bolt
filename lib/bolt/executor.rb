@@ -98,6 +98,7 @@ module Bolt
     end
 
     def run_command(targets, command, options = {}, &callback)
+      @logger.notice(options['_description']) if options.key?('_description')
       @logger.info("Starting command run '#{command}' on #{targets.map(&:uri)}")
       notify = proc { |event| @notifier.notify(callback, event) if callback }
       options = { '_run_as' => run_as }.merge(options) if run_as
@@ -112,6 +113,7 @@ module Bolt
     end
 
     def run_script(targets, script, arguments, options = {}, &callback)
+      @logger.notice(options['_description']) if options.key?('_description')
       @logger.info("Starting script run #{script} on #{targets.map(&:uri)}")
       @logger.debug("Arguments: #{arguments}")
       notify = proc { |event| @notifier.notify(callback, event) if callback }
@@ -127,8 +129,8 @@ module Bolt
     end
 
     def run_task(targets, task, arguments, options = {}, &callback)
-      task_name = task.name
-      @logger.info("Starting task #{task_name} on #{targets.map(&:uri)}")
+      @logger.notice(options['_description']) if options.key?('_description')
+      @logger.info("Starting task #{task.name} on #{targets.map(&:uri)}")
       @logger.debug("Arguments: #{arguments} Input method: #{task.input_method}")
       notify = proc { |event| @notifier.notify(callback, event) if callback }
       options = { '_run_as' => run_as }.merge(options) if run_as
@@ -137,12 +139,13 @@ module Bolt
         transport.batch_task(batch, task, arguments, options, &notify)
       end
 
-      @logger.info(summary('task', task_name, results))
+      @logger.info(summary('task', task.name, results))
       @notifier.shutdown
       results
     end
 
     def file_upload(targets, source, destination, options = {}, &callback)
+      @logger.notice(options['_description']) if options.key?('_description')
       @logger.info("Starting file upload from #{source} to #{destination} on #{targets.map(&:uri)}")
       notify = proc { |event| @notifier.notify(callback, event) if callback }
       options = { '_run_as' => run_as }.merge(options) if run_as

@@ -1324,7 +1324,7 @@ bar
 
           expect(executor)
             .to receive(:run_task)
-            .with(targets, task_t, { 'message' => 'hi there' }, {})
+            .with(targets, task_t, { 'message' => 'hi there' }, kind_of(Hash))
             .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0)]))
 
           cli.execute(options)
@@ -1346,7 +1346,7 @@ bar
         it "formats results of a passing task" do
           expect(executor)
             .to receive(:run_task)
-            .with(targets, task_t, { 'message' => 'hi there' }, {})
+            .with(targets, task_t, { 'message' => 'hi there' }, kind_of(Hash))
             .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0)]))
 
           cli.execute(options)
@@ -1358,7 +1358,7 @@ bar
         it "raises errors from the executor" do
           expect(executor)
             .to receive(:run_task)
-            .with(targets, task_t, { 'message' => 'hi there' }, {})
+            .with(targets, task_t, { 'message' => 'hi there' }, kind_of(Hash))
             .and_raise("Could not connect to target")
 
           expect { cli.execute(options) }.to raise_error(/Could not connect to target/)
@@ -1367,7 +1367,7 @@ bar
         it "formats results of a failing task" do
           expect(executor)
             .to receive(:run_task)
-            .with(targets, task_t, { 'message' => 'hi there' }, {})
+            .with(targets, task_t, { 'message' => 'hi there' }, kind_of(Hash))
             .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'no', '', 1)]))
 
           cli.execute(options)
@@ -1402,7 +1402,7 @@ bar
         it "traps SIGINT", :signals_self do
           expect(executor)
             .to receive(:run_task)
-            .with(targets, task_t, { 'message' => 'hi there' }, {}) do
+            .with(targets, task_t, { 'message' => 'hi there' }, kind_of(Hash)) do
               Process.kill :INT, Process.pid
               sync_thread.join(1) # give ruby some time to handle the signal
               Bolt::ResultSet.new([])

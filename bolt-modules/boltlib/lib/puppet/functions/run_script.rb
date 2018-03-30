@@ -50,7 +50,7 @@ Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFuncti
     r = if targets.empty?
           Bolt::ResultSet.new([])
         else
-          executor.run_script(targets, found, options['arguments'] || [], options.select { |k, _| k == '_run_as' })
+          executor.run_script(targets, found, options['arguments'] || [], options.reject { |k, _| k == 'arguments' })
         end
 
     if !r.ok && !options['_catch_errors']
