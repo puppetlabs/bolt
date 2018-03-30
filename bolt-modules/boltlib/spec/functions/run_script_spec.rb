@@ -66,6 +66,40 @@ describe 'run_script' do
       is_expected.to run.with_params('test/uploads/hostname.sh', target, '_run_as' => 'root').and_return(result_set)
     end
 
+    context 'with description' do
+      let(:message) { 'test message' }
+
+      it 'passes the description through if parameters are passed' do
+        executor.expects(:run_script).with([target], full_path, [], '_description' => message).returns(result_set)
+        inventory.expects(:get_targets).with(target).returns([target])
+
+        is_expected.to run.with_params('test/uploads/hostname.sh', target, message, {})
+      end
+
+      it 'passes the description through if no parameters are passed' do
+        executor.expects(:run_script).with([target], full_path, [], '_description' => message).returns(result_set)
+        inventory.expects(:get_targets).with(target).returns([target])
+
+        is_expected.to run.with_params('test/uploads/hostname.sh', target, message)
+      end
+    end
+
+    context 'without description' do
+      it 'ignores description if parameters are passed' do
+        executor.expects(:run_script).with([target], full_path, [], {}).returns(result_set)
+        inventory.expects(:get_targets).with(target).returns([target])
+
+        is_expected.to run.with_params('test/uploads/hostname.sh', target, {})
+      end
+
+      it 'ignores description if no parameters are passed' do
+        executor.expects(:run_script).with([target], full_path, [], {}).returns(result_set)
+        inventory.expects(:get_targets).with(target).returns([target])
+
+        is_expected.to run.with_params('test/uploads/hostname.sh', target)
+      end
+    end
+
     context 'with multiple destinations' do
       let(:hostname2) { 'test.testing.com' }
       let(:target2) { Bolt::Target.new(hostname2) }

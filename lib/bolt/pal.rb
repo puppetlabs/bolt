@@ -222,7 +222,7 @@ module Bolt
 
     def run_task(task_name, targets, params, executor, inventory, &eventblock)
       in_task_compiler(executor, inventory) do |compiler|
-        compiler.call_function('run_task', task_name, targets, params, &eventblock)
+        compiler.call_function('run_task', task_name, targets, nil, params, &eventblock)
       end
     end
 

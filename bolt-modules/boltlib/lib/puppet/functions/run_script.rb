@@ -16,8 +16,23 @@ Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFuncti
     return_type 'ResultSet'
   end
 
+  dispatch :run_script_with_description do
+    scope_param
+    param 'String[1]', :script
+    param 'Boltlib::TargetSpec', :targets
+    param 'String', :description
+    optional_param 'Hash[String[1], Any]', :options
+    return_type 'ResultSet'
+  end
+
   def run_script(scope, script, targets, options = nil)
+    run_script_with_description(scope, script, targets, nil, options)
+  end
+
+  def run_script_with_description(scope, script, targets, description = nil, options = nil)
     options ||= {}
+    options = options.merge('_description' => description) if description
+
     unless Puppet[:tasks]
       raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
         Puppet::Pops::Issues::TASK_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, operation: 'run_script'
