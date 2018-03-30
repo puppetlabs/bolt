@@ -11,15 +11,16 @@ before_script:
 
 script:
 - bundle exec rake travisci rubocop
-- pushd bolt-modules/boltlib
-- bundle exec rake spec
-- popd
-- pushd modules/canary
-- bundle exec rake spec
-- popd
-- pushd modules/aggregate
-- bundle exec rake spec
-- popd
+- |
+  pushd bolt-modules/boltlib
+  bundle exec rake spec
+  popd
+- |
+  for i in $( ls modules ); do
+    pushd modules/$i
+    bundle exec rake spec
+    popd
+  done
 notifications:
   email: false
   hipchat:
