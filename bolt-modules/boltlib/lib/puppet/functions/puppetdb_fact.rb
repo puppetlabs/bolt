@@ -12,6 +12,7 @@ require 'bolt/error'
 Puppet::Functions.create_function(:puppetdb_fact) do
   dispatch :puppetdb_fact do
     param 'Array[String]', :targets
+    return_type 'Hash[String, Data]'
   end
 
   def puppetdb_fact(targets)
