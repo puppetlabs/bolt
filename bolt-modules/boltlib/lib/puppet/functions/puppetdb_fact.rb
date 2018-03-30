@@ -11,18 +11,28 @@ require 'bolt/error'
 #
 Puppet::Functions.create_function(:puppetdb_fact) do
   dispatch :puppetdb_fact do
-    param 'Array[String]', :targets
+    param 'Array[String]', :certnames
     return_type 'Hash[String, Data]'
   end
 
-  def puppetdb_fact(targets)
+  def puppetdb_fact(certnames)
     unless Puppet[:tasks]
       raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
         Puppet::Pops::Issues::TASK_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, operation: 'puppetdb_fact'
       )
     end
 
-    executor = Puppet.lookup(:bolt_executor) { nil }
-    executor.puppetdb_fact(targets)
+    puppetdb_client = Puppet.lookup(:bolt_pdb_client) { nil }
+    unless puppetdb_client && Puppet.features.bolt?
+      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
+        Puppet::Pops::Issues::TASK_MISSING_BOLT, action: _('query facts from puppetdb')
+      )
+    end
+
+    begin
+      puppetdb_client.facts_for_node(certnames)
+    rescue StandardError => e
+      raise Bolt::CLIError, "Could not retrieve targets from PuppetDB: #{e}"
+    end
   end
 end

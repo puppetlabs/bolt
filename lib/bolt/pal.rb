@@ -96,12 +96,12 @@ module Bolt
       r
     end
 
-    def with_bolt_executor(executor, inventory, &block)
-      Puppet.override({ bolt_executor: executor, bolt_inventory: inventory }, &block)
+    def with_bolt_executor(executor, inventory, pdb_client = nil, &block)
+      Puppet.override({ bolt_executor: executor, bolt_inventory: inventory, bolt_pdb_client: pdb_client }, &block)
     end
 
-    def in_plan_compiler(executor, inventory)
-      with_bolt_executor(executor, inventory) do
+    def in_plan_compiler(executor, inventory, pdb_client)
+      with_bolt_executor(executor, inventory, pdb_client) do
         # TODO: remove this call and see if anything breaks when
         # settings dirs don't actually exist. Plans shouldn't
         # actually be using them.
@@ -226,8 +226,8 @@ module Bolt
       end
     end
 
-    def run_plan(plan_name, params, executor = nil, inventory = nil)
-      in_plan_compiler(executor, inventory) do |compiler|
+    def run_plan(plan_name, params, executor = nil, inventory = nil, pdb_client = nil)
+      in_plan_compiler(executor, inventory, pdb_client) do |compiler|
         r = compiler.call_function('run_plan', plan_name, params)
         Bolt::PuppetError.convert_puppet_errors(r)
       end

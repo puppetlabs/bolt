@@ -16,13 +16,13 @@ describe 'puppetdb_fact' do
   }
 
   it 'returns facts from PuppetDB' do
-    executor.expects(:puppetdb_fact).with(facts.keys).returns(facts)
+    puppetdb_client.expects(:facts_for_node).with(facts.keys).returns(facts)
     result = run_plan('puppetdb_fact', 'nodes' => facts.keys)
     expect(result).to eq(facts)
   end
 
   it 'adds facts to Targets' do
-    executor.expects(:puppetdb_fact).with(facts.keys).returns(facts)
+    puppetdb_client.expects(:facts_for_node).with(facts.keys).returns(facts)
     run_plan('puppetdb_fact', 'nodes' => facts.keys)
     facts.each do |k, v|
       expect(inventory.facts(Bolt::Target.new(k))).to eq(v)
@@ -30,7 +30,7 @@ describe 'puppetdb_fact' do
   end
 
   it 'returns an empty hash for an empty list' do
-    executor.expects(:puppetdb_fact).with([]).returns({})
+    puppetdb_client.expects(:facts_for_node).with([]).returns({})
     result = run_plan('puppetdb_fact', 'nodes' => [])
     expect(result).to eq({})
   end

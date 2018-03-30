@@ -17,8 +17,8 @@ module BoltSpec
       conf
     end
 
-    def peval(code, pal, executor = nil, inventory = nil)
-      pal.in_plan_compiler(executor, inventory) do |c|
+    def peval(code, pal, executor = nil, inventory = nil, pdb_client = nil)
+      pal.in_plan_compiler(executor, inventory, pdb_client) do |c|
         c.evaluate_string(code)
       end
     end
