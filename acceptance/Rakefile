@@ -4,29 +4,31 @@ require 'rototiller'
 
 desc "Generate Beaker Host config"
 rototiller_task :host_config do |task|
-  task.add_env(name: 'BOLT_CONTROLLER', default: 'centos7-64')
-  task.add_env(name: 'BOLT_NODES',
-               default: 'ubuntu1604-64,osx1012-64,windows10ent-64')
-  ns = [ENV['BOLT_CONTROLLER'], ENV['BOLT_NODES']].join(',')
-  n  = ns.split(',')
-  n_new = []
-  n.each_with_index do |node, i|
-    roles = []
-    roles << 'bolt' if i.zero?
-    roles << if /win/ =~ node
-               'winrm'
-             else
-               'ssh'
-             end
-    node = node + roles.join(',') + '.{type=aio}'
-    n_new << node
+  unless ENV['BEAKER_HOSTS']
+    task.add_env(name: 'BOLT_CONTROLLER', default: 'centos7-64')
+    task.add_env(name: 'BOLT_NODES',
+                 default: 'ubuntu1604-64,osx1012-64,windows10ent-64')
+    ns = [ENV['BOLT_CONTROLLER'], ENV['BOLT_NODES']].join(',')
+    n  = ns.split(',')
+    n_new = []
+    n.each_with_index do |node, i|
+      roles = []
+      roles << 'bolt' if i.zero?
+      roles << if /win/ =~ node
+                 'winrm'
+               else
+                 'ssh'
+               end
+      node = node + roles.join(',') + '.{type=aio}'
+      n_new << node
+    end
+    nodes_final = n_new.join('-')
+    generate = "beaker-hostgenerator"
+    generate += " #{nodes_final}"
+    generate += " > hosts.yaml"
+    sh generate
+    sh "cat hosts.yaml"
   end
-  nodes_final = n_new.join('-')
-  generate = "beaker-hostgenerator"
-  generate += " #{nodes_final}"
-  generate += " > hosts.yaml"
-  sh generate
-  sh "cat hosts.yaml"
 end
 
 beaker_options = [
