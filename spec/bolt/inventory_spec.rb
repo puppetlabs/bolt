@@ -231,6 +231,12 @@ describe Bolt::Inventory do
         ts = targets(['ssh://a', 'winrm://b:5000', 'u:p@c'])
         expect(inventory.get_targets('ssh://a, winrm://b:5000, u:p@c')).to eq(ts)
       end
+
+      it 'should fail for unknown protocols' do
+        expect {
+          inventory.get_targets('z://foo')
+        }.to raise_error(Bolt::UnknownTransportError, %r{Unknown transport z found for z://foo})
+      end
     end
 
     context 'non-empty inventory' do
@@ -430,6 +436,19 @@ describe Bolt::Inventory do
 
         it 'fails validation' do
           expect { inventory.get_targets('node') }.to raise_error(Bolt::CLIError)
+        end
+      end
+
+      context 'transport' do
+        let(:data) {
+          {
+            'nodes' => ['node'],
+            'config' => { 'transport' => 'z' }
+          }
+        }
+
+        it 'fails validation' do
+          expect { inventory.get_targets('node') }.to raise_error(Bolt::UnknownTransportError)
         end
       end
     end

@@ -16,6 +16,13 @@ module Bolt
     local: Bolt::Transport::Local
   }.freeze
 
+  class UnknownTransportError < Bolt::Error
+    def initialize(transport, uri = nil)
+      msg = uri.nil? ? "Unknown transport #{transport}" : "Unknown transport #{transport} found for #{uri}"
+      super(msg, 'bolt/unknown-transport')
+    end
+  end
+
   Config = Struct.new(
     :concurrency,
     :format,
@@ -202,6 +209,10 @@ module Bolt
 
       unless %w[human json].include? self[:format]
         raise Bolt::CLIError, "Unsupported format: '#{self[:format]}'"
+      end
+
+      unless self[:transport].nil? || Bolt::TRANSPORTS.include?(self[:transport].to_sym)
+        raise UnknownTransportError, self[:transport]
       end
 
       TRANSPORTS.each do |transport, impl|
