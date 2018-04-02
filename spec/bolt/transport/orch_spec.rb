@@ -79,6 +79,16 @@ describe Bolt::Transport::Orch, orchestrator: true do
       body = orch.build_request(targets, mtask, params.merge('_noop' => true))
       expect(body[:scope]).to eq(nodes: %w[node1 node2])
     end
+
+    it "sets description if passed" do
+      body = orch.build_request(targets, mtask, params, 'test description')
+      expect(body[:description]).to eq('test description')
+    end
+
+    it "omits description if not passed" do
+      body = orch.build_request(targets, mtask, params, nil)
+      expect(body).not_to include(:description)
+    end
   end
 
   describe :process_run_results do
@@ -204,6 +214,12 @@ describe Bolt::Transport::Orch, orchestrator: true do
         expect(events).to include(type: :node_start, target: result.target)
         expect(events).to include(type: :node_result, result: result)
       end
+    end
+
+    it 'passes description through if supplied' do
+      expect(mock_client).to receive(:run_task).with(include(description: 'test message')).and_return(results)
+
+      orch.batch_task(targets, mtask, params, '_description' => 'test message')
     end
   end
 
