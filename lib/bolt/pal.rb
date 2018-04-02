@@ -2,6 +2,7 @@
 
 require 'bolt/executor'
 require 'bolt/error'
+require 'bolt/util'
 
 module Bolt
   class PAL
@@ -50,6 +51,12 @@ module Bolt
     # something has been, no pun intended, "bolted on".
     def add_target_spec(compiler)
       compiler.evaluate_string('type TargetSpec = Boltlib::TargetSpec')
+    end
+
+    def prime_types(compiler)
+      #result set references Result with references Target
+      compiler.evaluate_string('ResultSet')
+      compiler.evaluate_string('Error')
     end
 
     def full_modulepath(modulepath)
@@ -228,8 +235,44 @@ module Bolt
 
     def run_plan(plan_name, params, executor = nil, inventory = nil)
       in_plan_compiler(executor, inventory) do |compiler|
-        r = compiler.call_function('run_plan', plan_name, params)
-        Bolt::PuppetError.convert_puppet_errors(r)
+        result = compiler.call_function('run_plan', plan_name, params)
+        strip_pcore(result, compiler)
+      end
+    end
+
+    # Depth first walk of pcore rich data to convert it into data and bolt ruby objects
+    # We don't really need to do a depth first walk unless Bolt ruby objects can contain
+    # pcore types. They're currently limited to Data and each other.
+    def pcore_to_ruby(data)
+      if data.is_a? Hash
+        val = Bolt::Util.map_vals(val, &method(:pcore_to_ruby))
+        case data['__pcore_type__']
+        when "ResultSet"
+          Bolt::ResultSet.from_asserted_hash(val)
+        when "Result"
+          Bolt::Result.from_asserted_hash(val)
+        when "Target"
+          Bolt::Target.from_asserted_hash(val)
+        when "Error"
+          Bolt::PuppetError.from_asserted_hash(val)
+        else
+          val
+        end
+      elsif data.is_a? Array
+        data.map(&method(:pcore_to_ruby))
+      else
+        data
+      end
+    end
+
+    def strip_pcore(obj, compiler)
+      prime_types(compiler)
+      if obj.is_a? Bolt::Error
+        obj.update_details { |d| strip_pcore(d, compiler) }
+      else
+        puts "serializing #{obj}"
+        result = Puppet::Pops::Serialization::ToDataConverter.convert(obj, rich_data: true, symbol_to_string: true)
+        Bolt::Util::pcore_to_ruby(result)
       end
     end
   end

@@ -7,6 +7,15 @@ module Bolt
   class Result
     attr_reader :target, :value
 
+    def self.from_asserted_args(target, value)
+      new(target, value: value)
+    end
+
+    def self.from_asserted_hash(hash)
+      new(hash['target'], value: hash['value'])
+    end
+
+
     def self.from_exception(target, exception)
       @exception = exception
       if @exception.is_a?(Bolt::Error)
