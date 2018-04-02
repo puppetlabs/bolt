@@ -58,7 +58,7 @@ bolt command run --nodes`
 ### Specifying nodes from an inventory file
 
 To specify nodes from an inventory file, reference nodes by node name, a glob
-matching names in the file or the name a group of nodes.
+matching names in the file, or the name of a group of nodes.
 
 For the inventory file example below, the command `--nodes
 elastic_search,web_app` matches all nodes in both groups, `elastic_search` and
@@ -129,7 +129,7 @@ should be only the path the modules directory, such as `~/modules`. Do not
 specify the module name in this path, as the name is already specified as part
 of the task or plan name.
 
-To specify multiple module directories to search for modules, separate the paths with with a semicolon
+To specify multiple module directories to search for modules, separate the paths with a semicolon
 (`;`) on Windows or a colon (`:`) on all other platforms.
 
 
@@ -193,7 +193,7 @@ Displays a list of all the tasks on the modulepath. Will note whether a task sup
 ```
 bolt plan show
 ```
-- Lists the plans that are installed on the current module apth
+- Lists the plans that are installed on the current module path.
 - Adding a specific plan name displays details and parameters for the plan.
 - The module path to the module containing the plan.
 

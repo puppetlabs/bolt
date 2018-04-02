@@ -13,7 +13,7 @@ Server 12 and Ubuntu 14.04 and 16.04.
 
 Install Bolt and its dependencies on *nix platforms.
 
-1. To install the dependencies you need to install Bolt, run the command that
+1. To install dependencies required to install Bolt, run the command that
   corresponds to your operating system.
 
   -  For Fedora 25
@@ -75,7 +75,7 @@ package for Puppet 5 Platform on 8 “Jessie” is puppet5-release-jessie.deb.
 
 > Note: These packages require you to download the Puppet 5 Platform and include
 > puppet-agent as a dependency. If you use an earlier puppet agent you'll have
-> to upgrade it.  Download and install the software and its
+> to upgrade it. Download and install the software and its
 > dependencies. Use the commands appropriate to your system.
 
 1. -  Debian 8

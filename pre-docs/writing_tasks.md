@@ -209,7 +209,7 @@ You can write tasks in any language that will run on the target nodes. Give
 task files the extension for the language they are written in (such as `.rb` for
 Ruby), and place them in the top level of your module's `./tasks` directory.
 
-Task names are composed of two or more name segments, indicating:
+Task names are composed of one or two name segments, indicating:
 
 - The name of the module the task is located in.
 - The name of the task file, without the extension.
@@ -227,7 +227,7 @@ module, the task runner won't load either of them.
 
 Each task or plan name segment must begin with a lowercase letter and:
 
-- Must start with a lowercase letters.
+- Must start with a lowercase letter.
 - May include digits.
 - May include underscores.
 - Namespace segments must match the following regular expression \A[a-z][a-z0-9_]*\Z
@@ -310,7 +310,7 @@ on Windows, the Puppet agent must be installed on the target nodes.
 ## Returning errors in tasks
 
 To return a detailed error message if your task fails, include an Error object
-in the tasks result.
+in the task's result.
 
 When a task exits non-zero, the task runner checks for an error key (`_error`).
 If one is not present, the task runner generates a generic error and adds

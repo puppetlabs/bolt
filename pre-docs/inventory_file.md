@@ -9,7 +9,7 @@ The inventory file is a yaml file stored by default at
 `~/.puppetlabs/bolt/inventory.yaml`. At the top level it contains an array of
 nodes and groups. Each node can have a config, vals, and facts specific to that
 node. Each group can have an array of nodes and set default config, facts, and
-valss for the entire group
+vals for the entire group
 
 ## Inventory Config
 
@@ -50,14 +50,17 @@ nodes:
         user: me
 ```
 
+> Note: config values set at the top level of inventory will only apply to
+> targets included in that inventory file. Set config for unknown targets in
+> the bolt config file.
+
 ## Inventory facts and vals
 
 In addition to config values you can store information relating to `facts` and
 `vals` for nodes in the inventory. Facts represent observed information about
-the node including what can be collected by facter. `vals` contain arbitrary
+the node including what can be collected by Facter. `vals` contain arbitrary
 data that may be passed to run_* functions or used for logic in plans.
 
-```
 ```yaml
 groups:
   - name: centos_nodes
@@ -87,7 +90,7 @@ A group is a map that requires a name and can contain any of the following:
 - `vals` : Vals object.
 
 A group name must match the regular expression
-values /[a-zA-Z]\w+/. This is the same restriction used for environments.
+values `/[a-zA-Z]\w+/`. This is the same restriction used for environments.
 
 Groups
 An array of group objects.
@@ -159,10 +162,9 @@ Configure login and escalation for a specific node.
 nodes:
   - name: host1.example.com
     config:
-      transports:
-        ssh:
-          user: me
-          run-as: root
+      ssh:
+        user: me
+        run-as: root
 ```
 
 Generating inventory files

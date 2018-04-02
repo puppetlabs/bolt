@@ -17,15 +17,15 @@ API.
 
 To set up Bolt to use the orchestrator API you must do the following:
 
-- Install the Bolt module in a PE environment.
+- Install the bolt module in a PE environment.
 - Set PE RBAC permissions for Bolt tasks.
 - Adjust the orchestrator configuration files, as needed
 - View available tasks
 
 
-## Enable Bolt actions in the PE environment
+## Install the bolt module in a PE environment
 
-Bolt uses a task to execute commands, upload files, and run scripts over pcp. To install this this task
+Bolt uses a task to execute commands, upload files, and run scripts over Orchestrator. To install this task
 install Bolt source code as a module named 'bolt' in the Puppet code used in
 PE. Install the code in the same environment as the other tasks you want to
 run. Use the following Puppetfile line:
@@ -54,16 +54,6 @@ click Access control > User roles.
 
 ## Adjust the orchestrator configuration files
 
-By default Bolt uses the production environment in PE when running tasks. You
-can configure it to use a different environment via the task-environment config
-setting.
-
-```
-
-pcp:
-  task-environment: development
-```
-
 Set up the orchestrator API for Bolt in the same user-specified configuration
 file that is used for PE client tools:
 
@@ -76,6 +66,20 @@ file that is used for PE client tools:
 > file to your home directory.  Tip: You can also configure orchestrator in the
 > Bolt configuration file (~/.puppetlabs/bolt.yml) or the configuration section
 > of the inventory file (~/.puppetlabs/bolt/inventory.yaml).
+
+Bolt can be configured to connect to Orchestrator in the `pcp` section of the
+bolt config file as well. This configuration will not be shared with `puppet
+task`.
+
+By default Bolt uses the production environment in PE
+when running tasks. To use a different environment change the
+`task-environment` setting in bolt config.
+
+```
+---
+pcp:
+  task-environment: development
+```
 
 ## View available tasks
 

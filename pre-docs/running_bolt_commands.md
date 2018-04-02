@@ -31,7 +31,7 @@ bolt command run "echo 'hello world'"
 You can run commands on remote nodes with Bolt.
 
 Specify the command you want to run and which nodes to run it on. Specify nodes
-with node flag, `--nodes` or `-n`:
+with the node flag, `--nodes` or `-n`:
 
 ```
 bolt command run <COMMAND> --nodes <NODE>
@@ -46,8 +46,6 @@ If the command contains spaces or shell special characters, then you must single
 ```
 bolt command run 'echo $HOME' --nodes <NODE>
 ```
-
-
 
 ## Running scripts
 

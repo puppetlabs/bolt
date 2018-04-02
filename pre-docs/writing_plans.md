@@ -55,8 +55,8 @@ Specify each parameter in your plan with its data type. For example, you might
 want parameters to specify which nodes to run different parts of your plan on.
 
 The following example shows node parameters specified as data type
-`TargetSpec` this allows this parameter to be passed as a single url, comma
-seperated url lis, Target datatype or Array of either. For more information
+`TargetSpec`. This allows this parameter to be passed as a single url, comma
+seperated url list, Target data type, or Array of either. For more information
 about these data types, see the common data types table in the related metadata
 type topic.
 
@@ -68,9 +68,9 @@ should be run on.
 
 ```
 plan mymodule::my_plan(
-  String[1]   $load_balancer,
-  TargetSpec  $frontends,
-  TargetSpec  $backends,
+  String[1]  $load_balancer,
+  TargetSpec $frontends,
+  TargetSpec $backends,
 ) {
 
   # process frontends
@@ -252,7 +252,7 @@ Indicators that a plan has run successfully or failed.
 
 Any plan that completes execution without an error is considered successful.
 The `bolt` command exits 0 and any calling plans continue execution. If any
-calls to `run_` functions fail without `_catch_errors` then the plan will hald
+calls to `run_` functions fail without `_catch_errors` then the plan will halt
 execution and be considered a failure. Any calling plans will also halt until a
 `run_plan` call with `_catch_errors` is reached. If one isn't the `bolt`
 command will exit 2. When writing a plan if you have reason to believe it has
