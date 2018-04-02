@@ -16,6 +16,7 @@ require 'bolt/puppetdb'
 require 'bolt/pal'
 require 'bolt/target'
 require 'bolt/version'
+require 'bolt/util/on_access'
 
 module Bolt
   class CLIError < Bolt::Error
@@ -449,8 +450,10 @@ Available options are:
 
     def puppetdb_client
       return @puppetdb_client if @puppetdb_client
-      puppetdb_config = Bolt::PuppetDB::Config.new(nil, config.puppetdb)
-      @puppetdb_client = Bolt::PuppetDB::Client.from_config(puppetdb_config)
+      @puppetdb_client = Bolt::Util::OnAccess.new do
+        puppetdb_config = Bolt::PuppetDB::Config.new(nil, config.puppetdb)
+        Bolt::PuppetDB::Client.from_config(puppetdb_config)
+      end
     end
 
     def query_puppetdb_nodes(query)
@@ -511,7 +514,7 @@ Available options are:
           options[:task_options]['nodes'] = options[:nodes].join(',')
         end
         executor = Bolt::Executor.new(config, options[:noop], true)
-        result = pal.run_plan(options[:object], options[:task_options], executor, inventory)
+        result = pal.run_plan(options[:object], options[:task_options], executor, inventory, puppetdb_client)
         outputter.print_plan_result(result)
         # An exception would have been raised if the plan failed
         code = 0

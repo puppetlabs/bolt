@@ -106,11 +106,15 @@ module BoltSpec
       @inventory ||= Bolt::Inventory.new({})
     end
 
+    def puppetdb_client
+      @puppetdb_client ||= mock('puppetdb_client')
+    end
+
     # TODO: handle expected plan failures
     def run_plan(name, params)
       pal = Bolt::PAL.new(config)
       begin
-        result = pal.run_plan(name, params, executor, inventory)
+        result = pal.run_plan(name, params, executor, inventory, puppetdb_client)
       rescue Bolt::CLIError => e
         if executor.error_message
           raise executor.error_message

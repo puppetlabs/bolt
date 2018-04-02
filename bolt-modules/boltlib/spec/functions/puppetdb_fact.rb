@@ -5,25 +5,24 @@ require 'spec_helper'
 describe 'puppetdb_fact' do
   include PuppetlabsSpec::Fixtures
 
-  let(:executor) { mock('bolt_executor') }
-  let(:inventory) { mock('inventory') }
+  let(:pdb_client) { mock('pdb_client') }
 
   around(:each) do |example|
     Puppet[:tasks] = true
     Puppet.features.stubs(:bolt?).returns(true)
 
-    Puppet.override(bolt_executor: executor, bolt_inventory: inventory) do
+    Puppet.override(bolt_pdb_client: pdb_client) do
       example.run
     end
   end
 
   context 'it calls puppetdb_facts' do
-    let(:targets) { %w[a.com b.com] }
-    let(:pdb_facts) { { 'a.com' => {}, 'b.com' => {} } }
-    it 'with list of nodes' do
-      executor.expects(:puppetdb_facts).with(targets).returns(pdb_facts)
+    let(:facts) { { 'a.com' => {}, 'b.com' => {} } }
 
-      is_expected.to run.with_params(targets).and_return(pdb_facts)
+    it 'with list of nodes' do
+      pdb_client.expects(:facts_for_node).with(facts.keys).returns(facts)
+
+      is_expected.to run.with_params(facts.keys).and_return(facts)
     end
   end
 end
