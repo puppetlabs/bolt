@@ -53,7 +53,7 @@ groups of nodes on the commandline and from plans.
 `extensions`: List of file extensions that are accepted for scripts or tasks.
 Scripts with these file extensions rely on the target node's file type
 association to run. For example, if Python is installed on the system, a .py
-script should run with python.exe. They extensions .ps1, .rb, and .pp are
+script should run with python.exe. The extensions .ps1, .rb, and .pp are
 always allowed and run via hard-coded executables.
 
 

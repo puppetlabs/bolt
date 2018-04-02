@@ -26,6 +26,27 @@ bolt command run "echo 'hello world'"
 > port 5986, passing the `--ssl` switch is required to connect to the default WinRM
 > port 5985.
 
+## Running arbitrary commands
+
+You can run commands on remote nodes with Bolt.
+
+Specify the command you want to run and which nodes to run it on. Specify nodes
+with the node flag, `--nodes` or `-n`:
+
+```
+bolt command run <COMMAND> --nodes <NODE>
+```
+
+When executing on WinRM nodes, indicate the WinRM protocol in the nodes string:
+```
+bolt command run <COMMAND> --nodes winrm://<WINDOWS.NODE> --user <USERNAME> --password <PASSWORD>
+```
+
+If the command contains spaces or shell special characters, then you must single quote the command:
+```
+bolt command run 'echo $HOME' --nodes <NODE>
+```
+
 ## Running scripts
 
 You can execute scripts on remote machines with Bolt.
@@ -46,7 +67,7 @@ the path to the Bash interpreter:
 echo hello
 ```
 
-On *nix, Bolt ensures that the script is executable on the remote system before
+On *nix, Bolt adds execute permissions on the remote system before
 executing it. For remote Windows systems, Bolt supports the extensions `.ps1`,
 `.rb`, and `.pp`. To enable other file extensions, add them to your Bolt config, as
 follows:
@@ -75,28 +96,6 @@ characters, you must quote it. Argument values are passed literally and are not
 interpolated by the shell on the remote host, so if you `run bolt script run
 myscript.sh 'echo $HOME'`, then the script receives the argument `'echo $HOME'`,
 rather than any interpolated value.
-
-## Running arbitrary commands
-
-You can run commands on remote nodes with Bolt.
-
-Specify the command you want to run and which nodes to run it on. Specify nodes
-with node flag, `--nodes` or `-n`:
-
-```
-bolt command run <COMMAND> --nodes <NODE>
-```
-
-When executing on WinRM nodes, indicate the WinRM protocol in the nodes string:
-```
-bolt command run <COMMAND> --nodes winrm://<WINDOWS.NODE> --user <USERNAME> --password <PASSWORD>
-```
-
-If the command contains spaces or shell special characters, then you must single quote the command:
-```
-bolt command run 'echo $HOME' --nodes <NODE>
-```
-
 
 ## Uploading files
 You can use Bolt to copy files to remote nodes.
