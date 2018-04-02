@@ -83,6 +83,7 @@ try
 }
 catch
 {
+  Write-Error $_.Exception
   exit 1
 }
           PS
@@ -124,10 +125,10 @@ catch
 $private:taskArgs = Get-ContentAsJson (
   $utf8.GetString([System.Convert]::FromBase64String('#{Base64.encode64(JSON.dump(arguments))}'))
 )
-try { & "#{remote_path}" @taskArgs } catch { exit 1 }
+try { & "#{remote_path}" @taskArgs } catch { Write-Error $_.Exception; exit 1 }
               PS
                 else
-                  conn.execute(%(try { & "#{remote_path}" } catch { exit 1 }))
+                  conn.execute(%(try { & "#{remote_path}" } catch { Write-Error $_.Exception; exit 1 }))
                 end
               else
                 path, args = *process_from_extension(remote_path)
