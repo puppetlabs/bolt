@@ -650,7 +650,7 @@ bar
         it "executes the 'whoami' command" do
           expect(executor)
             .to receive(:run_command)
-            .with(targets, 'whoami')
+            .with(targets, 'whoami', kind_of(Hash))
             .and_return(Bolt::ResultSet.new([]))
 
           expect(cli.execute(options)).to eq(0)
@@ -660,14 +660,14 @@ bar
         it "returns 2 if any node fails" do
           expect(executor)
             .to receive(:run_command)
-            .with(targets, 'whoami')
+            .with(targets, 'whoami', kind_of(Hash))
             .and_return(fail_set)
 
           expect(cli.execute(options)).to eq(2)
         end
 
         it "traps SIGINT", :signals_self do
-          expect(executor).to receive(:run_command).with(targets, 'whoami') do
+          expect(executor).to receive(:run_command).with(targets, 'whoami', kind_of(Hash)) do
             Process.kill :INT, Process.pid
             sync_thread.join(1) # give ruby some time to handle the signal
             Bolt::ResultSet.new([])
@@ -697,7 +697,7 @@ bar
 
           expect(executor)
             .to receive(:run_script)
-            .with(targets, script, [])
+            .with(targets, script, [], kind_of(Hash))
             .and_return(Bolt::ResultSet.new([]))
 
           expect(cli.execute(options)).to eq(0)
@@ -734,7 +734,7 @@ bar
         it "returns 2 if any node fails" do
           stub_file(script)
           expect(executor).to receive(:run_script)
-            .with(targets, script, [])
+            .with(targets, script, [], kind_of(Hash))
             .and_return(fail_set)
 
           expect(cli.execute(options)).to eq(2)
@@ -743,7 +743,7 @@ bar
         it "traps SIGINT", :signals_self do
           stub_file(script)
 
-          expect(executor).to receive(:run_script).with(targets, script, []) do
+          expect(executor).to receive(:run_script).with(targets, script, [], kind_of(Hash)) do
             Process.kill :INT, Process.pid
             sync_thread.join(1) # give ruby some time to handle the signal
             Bolt::ResultSet.new([])
@@ -1432,7 +1432,7 @@ bar
 
           expect(executor)
             .to receive(:file_upload)
-            .with(targets, source, dest)
+            .with(targets, source, dest, kind_of(Hash))
             .and_return(Bolt::ResultSet.new([]))
 
           cli.execute(options)
@@ -1444,7 +1444,7 @@ bar
 
           expect(executor)
             .to receive(:file_upload)
-            .with(targets, source, dest)
+            .with(targets, source, dest, kind_of(Hash))
             .and_return(fail_set)
 
           expect(cli.execute(options)).to eq(2)

@@ -135,6 +135,10 @@ Available options are:
                'User to authenticate as') do |user|
           @options[:user] = user
         end
+        define('--description DESCRIPTION',
+               'Description to use for the job') do |description|
+          @options[:description] = description
+        end
         define('-p', '--password [PASSWORD]',
                'Password to authenticate with.',
                'Omit the value to prompt for the password.') do |password|
@@ -523,17 +527,19 @@ Available options are:
         outputter.print_head
 
         elapsed_time = Benchmark.realtime do
+          executor_opts = {}
+          executor_opts['_description'] = options[:description] if options.key?(:description)
           results =
             case options[:mode]
             when 'command'
-              executor.run_command(targets, options[:object]) do |event|
+              executor.run_command(targets, options[:object], executor_opts) do |event|
                 outputter.print_event(event)
               end
             when 'script'
               script = options[:object]
               validate_file('script', script)
               executor.run_script(
-                targets, script, options[:leftovers]
+                targets, script, options[:leftovers], executor_opts
               ) do |event|
                 outputter.print_event(event)
               end
@@ -542,7 +548,8 @@ Available options are:
                            targets,
                            options[:task_options],
                            executor,
-                           inventory) do |event|
+                           inventory,
+                           options[:description]) do |event|
                 outputter.print_event(event)
               end
             when 'file'
@@ -553,7 +560,7 @@ Available options are:
                 raise Bolt::CLIError, "A destination path must be specified"
               end
               validate_file('source file', src)
-              executor.file_upload(targets, src, dest) do |event|
+              executor.file_upload(targets, src, dest, executor_opts) do |event|
                 outputter.print_event(event)
               end
             end
