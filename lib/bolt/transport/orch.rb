@@ -38,14 +38,16 @@ module Bolt
         OrchestratorClient.new(client_opts, true)
       end
 
-      def build_request(targets, task, arguments)
-        { task: task.name,
-          environment: targets.first.options["task-environment"],
-          noop: arguments['_noop'],
-          params: arguments.reject { |k, _| k == '_noop' },
-          scope: {
-            nodes: targets.map(&:host)
-          } }
+      def build_request(targets, task, arguments, description = nil)
+        body = { task: task.name,
+                 environment: targets.first.options["task-environment"],
+                 noop: arguments['_noop'],
+                 params: arguments.reject { |k, _| k == '_noop' },
+                 scope: {
+                   nodes: targets.map(&:host)
+                 } }
+        body[:description] = description if description
+        body
       end
 
       def process_run_results(targets, results)
@@ -75,11 +77,15 @@ module Bolt
         end
       end
 
-      def batch_command(targets, command, _options = {}, &callback)
+      def batch_command(targets, command, options = {}, &callback)
+        params = {
+          action: 'command',
+          command: command
+        }
         results = run_task_job(targets,
                                BOLT_MOCK_TASK,
-                               action: 'command',
-                               command: command,
+                               params,
+                               options,
                                &callback)
         callback ||= proc {}
         results.map! { |result| unwrap_bolt_result(result.target, result) }
@@ -88,7 +94,7 @@ module Bolt
         end
       end
 
-      def batch_script(targets, script, arguments, _options = {}, &callback)
+      def batch_script(targets, script, arguments, options = {}, &callback)
         content = File.open(script, &:read)
         content = Base64.encode64(content)
         params = {
@@ -97,14 +103,14 @@ module Bolt
           arguments: arguments
         }
         callback ||= proc {}
-        results = run_task_job(targets, BOLT_MOCK_TASK, params, &callback)
+        results = run_task_job(targets, BOLT_MOCK_TASK, params, options, &callback)
         results.map! { |result| unwrap_bolt_result(result.target, result) }
         results.each do |result|
           callback.call(type: :node_result, result: result)
         end
       end
 
-      def batch_upload(targets, source, destination, _options = {}, &callback)
+      def batch_upload(targets, source, destination, options = {}, &callback)
         content = File.open(source, &:read)
         content = Base64.encode64(content)
         mode = File.stat(source).mode
@@ -115,7 +121,7 @@ module Bolt
           mode: mode
         }
         callback ||= proc {}
-        results = run_task_job(targets, BOLT_MOCK_TASK, params, &callback)
+        results = run_task_job(targets, BOLT_MOCK_TASK, params, options, &callback)
         results.map! do |result|
           if result.error_hash
             result
@@ -136,8 +142,8 @@ module Bolt
         end.values
       end
 
-      def run_task_job(targets, task, arguments)
-        body = build_request(targets, task, arguments)
+      def run_task_job(targets, task, arguments, options)
+        body = build_request(targets, task, arguments, options['_description'])
 
         targets.each do |target|
           yield(type: :node_start, target: target) if block_given?
@@ -158,9 +164,9 @@ module Bolt
         end
       end
 
-      def batch_task(targets, task, arguments, _options = {}, &callback)
+      def batch_task(targets, task, arguments, options = {}, &callback)
         callback ||= proc {}
-        results = run_task_job(targets, task, arguments, &callback)
+        results = run_task_job(targets, task, arguments, options, &callback)
         results.each do |result|
           callback.call(type: :node_result, result: result)
         end
