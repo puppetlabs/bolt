@@ -65,21 +65,13 @@ describe 'facts::retrieve' do
   context 'a local target' do
     let(:node) { 'local://' }
 
-    it 'omits the target if bash is absent' do
-      Puppet::Util.stubs(:which).with('bash').returns(nil)
-      err = { '_error' => { 'kind' => 'facts/unsupported', 'msg' => 'Target not supported by facts.' } }
-      expect(run_plan('facts::retrieve', 'nodes' => [node])).to eq(results(err))
-    end
-
     it 'retrieves facts' do
-      Puppet::Util.stubs(:which).with('bash').returns('path')
       expect_task('facts::bash').always_return(fact_output)
 
       expect(run_plan('facts::retrieve', 'nodes' => [node])).to eq(results(fact_output))
     end
 
     it 'omits failed targets' do
-      Puppet::Util.stubs(:which).with('bash').returns('path')
       expect_task('facts::bash').always_return(err_output)
 
       expect(run_plan('facts::retrieve', 'nodes' => [node])).to eq(results(err_output))

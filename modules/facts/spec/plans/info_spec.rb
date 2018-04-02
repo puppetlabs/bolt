@@ -57,20 +57,13 @@ describe 'facts::info' do
   context 'a local target' do
     let(:node) { 'local://' }
 
-    it 'omits the target if bash is absent' do
-      Puppet::Util.stubs(:which).with('bash').returns(nil)
-      expect(run_plan('facts::info', 'nodes' => [node])).to eq([])
-    end
-
     it 'contains OS information for target' do
-      Puppet::Util.stubs(:which).with('bash').returns('path')
       expect_task('facts::bash').always_return('os' => { 'name' => 'any', 'family' => 'any', 'release' => {} })
 
       expect(run_plan('facts::info', 'nodes' => [node])).to eq(["#{node}: any  (any)"])
     end
 
     it 'omits failed targets' do
-      Puppet::Util.stubs(:which).with('bash').returns('path')
       expect_task('facts::bash').always_return('_error' => { 'msg' => "Failed on #{node}" })
 
       expect(run_plan('facts::info', 'nodes' => [node])).to eq([])

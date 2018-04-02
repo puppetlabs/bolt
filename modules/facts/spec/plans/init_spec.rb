@@ -71,14 +71,7 @@ describe 'facts' do
   context 'a local target' do
     let(:node) { 'local://' }
 
-    it 'reports unsupported if bash is absent' do
-      Puppet::Util.stubs(:which).with('bash').returns(nil)
-      err = { '_error' => { 'kind' => 'facts/unsupported', 'msg' => 'Target not supported by facts.' } }
-      expect(run_plan('facts', 'nodes' => [node])).to eq(results(err))
-    end
-
     it 'adds facts to the Target' do
-      Puppet::Util.stubs(:which).with('bash').returns('path')
       expect_task('facts::bash').always_return(fact_output)
       inventory.expects(:add_facts).with(target, fact_output)
 
@@ -86,7 +79,6 @@ describe 'facts' do
     end
 
     it 'omits failed targets' do
-      Puppet::Util.stubs(:which).with('bash').returns('path')
       expect_task('facts::bash').always_return(err_output)
       inventory.expects(:add_facts).never
 
