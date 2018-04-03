@@ -23,24 +23,14 @@ PS
     when /debian|ubuntu/
       # install system ruby packages
       install_package(bolt, 'ruby')
-      install_package(bolt, 'ruby-dev')
-      # install dev tools
-      install_package(bolt, 'make')
-      install_package(bolt, 'gcc')
+      install_package(bolt, 'ruby-ffi')
       result = on(bolt, 'ruby --version')
     when /el-|centos|fedora/
       # install system ruby packages
       install_package(bolt, 'ruby')
-      install_package(bolt, 'ruby-devel')
-      # install dev tools
-      install_package(bolt, 'make')
-      install_package(bolt, 'gcc')
-      if bolt['platform'] =~ /fedora/
-        install_package(bolt, 'redhat-rpm-config')
-        install_package(bolt, 'rubygem-bigdecimal')
-        install_package(bolt, 'rubygem-json')
-        install_package(bolt, 'rubygem-rdoc')
-      end
+      install_package(bolt, 'rubygem-json')
+      install_package(bolt, 'rubygem-ffi')
+      install_package(bolt, 'rubygem-bigdecimal')
       result = on(bolt, 'ruby --version')
     when /osx/
       # ruby dev tools should be already installed

@@ -5,7 +5,7 @@ gem_version = ENV['BOLT_GEM'] || ""
 
 test_name "Install Bolt gem" do
   step "Install Bolt gem" do
-    install_command = "gem install bolt --source #{gem_source}"
+    install_command = "gem install bolt --source #{gem_source} --no-ri --no-rdoc"
     install_command += " -v '#{gem_version}'" unless gem_version.empty?
     case bolt['platform']
     when /windows/
