@@ -28,20 +28,21 @@ test_name "Install Bolt via git" do
     VERS
   end
   step "Build gem" do
+    build_command = "cd bolt; gem build bolt.gemspec"
     case bolt['platform']
     when /windows/
-      execute_powershell_script_on(bolt, 'cd bolt; gem build bolt.gemspec')
+      execute_powershell_script_on(bolt, build_command)
     else
-      on(bolt, "cd bolt && gem build bolt.gemspec")
+      on(bolt, build_command)
     end
   end
   step "Install custom gem" do
+    install_command = "cd bolt; gem install bolt-#{version}.gem --no-ri --no-rdoc"
     case bolt['platform']
     when /windows/
-      execute_powershell_script_on(bolt,
-                                   "cd bolt; gem install bolt-#{version}.gem")
+      execute_powershell_script_on(bolt, install_command)
     else
-      on(bolt, "cd bolt && gem install bolt-#{version}.gem")
+      on(bolt, install_command)
     end
   end
   step "Ensure install succeeded" do
