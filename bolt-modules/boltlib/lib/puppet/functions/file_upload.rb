@@ -19,8 +19,24 @@ Puppet::Functions.create_function(:file_upload, Puppet::Functions::InternalFunct
     return_type 'ResultSet'
   end
 
+  dispatch :file_upload_with_description do
+    scope_param
+    param 'String[1]', :source
+    param 'String[1]', :destination
+    param 'Boltlib::TargetSpec', :targets
+    param 'String', :description
+    optional_param 'Hash[String[1], Any]', :options
+    return_type 'ResultSet'
+  end
+
   def file_upload(scope, source, destination, targets, options = nil)
+    file_upload_with_description(scope, source, destination, targets, nil, options)
+  end
+
+  def file_upload_with_description(scope, source, destination, targets, description = nil, options = nil)
     options ||= {}
+    options = options.merge('_description' => description) if description
+
     unless Puppet[:tasks]
       raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
         Puppet::Pops::Issues::TASK_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, operation: 'file_upload'
@@ -48,7 +64,7 @@ Puppet::Functions.create_function(:file_upload, Puppet::Functions::InternalFunct
       call_function('debug', "Simulating file upload of '#{found}' - no targets given - no action taken")
       r = Bolt::ResultSet.new([])
     else
-      r = executor.file_upload(targets, found, destination, options.select { |k, _| k == '_run_as' })
+      r = executor.file_upload(targets, found, destination, options)
     end
 
     if !r.ok && !options['_catch_errors']

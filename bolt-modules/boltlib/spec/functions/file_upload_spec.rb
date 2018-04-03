@@ -63,6 +63,44 @@ describe 'file_upload' do
       is_expected.to run.with_params('test/uploads', destination, target, '_run_as' => 'soandso').and_return(result_set)
     end
 
+    context 'with description' do
+      let(:message) { 'test message' }
+
+      it 'passes the description through if parameters are passed' do
+        executor.expects(:file_upload)
+                .with([target], full_dir_path, destination, '_description' => message)
+                .returns(result_set)
+        inventory.stubs(:get_targets).with(target).returns([target])
+
+        is_expected.to run.with_params('test/uploads', destination, target, message, {}).and_return(result_set)
+      end
+
+      it 'passes the description through if no parameters are passed' do
+        executor.expects(:file_upload)
+                .with([target], full_dir_path, destination, '_description' => message)
+                .returns(result_set)
+        inventory.stubs(:get_targets).with(target).returns([target])
+
+        is_expected.to run.with_params('test/uploads', destination, target, message).and_return(result_set)
+      end
+    end
+
+    context 'without description' do
+      it 'ignores description if parameters are passed' do
+        executor.expects(:file_upload).with([target], full_dir_path, destination, {}).returns(result_set)
+        inventory.stubs(:get_targets).with(target).returns([target])
+
+        is_expected.to run.with_params('test/uploads', destination, target, {}).and_return(result_set)
+      end
+
+      it 'ignores description if no parameters are passed' do
+        executor.expects(:file_upload).with([target], full_dir_path, destination, {}).returns(result_set)
+        inventory.stubs(:get_targets).with(target).returns([target])
+
+        is_expected.to run.with_params('test/uploads', destination, target).and_return(result_set)
+      end
+    end
+
     context 'with multiple destinations' do
       let(:hostname2) { 'test.testing.com' }
       let(:target2) { Bolt::Target.new(hostname2) }
@@ -93,7 +131,7 @@ describe 'file_upload' do
         end
 
         it 'does not error with _catch_errors' do
-          executor.expects(:file_upload).with([target, target2], full_path, destination, {})
+          executor.expects(:file_upload).with([target, target2], full_path, destination, '_catch_errors' => true)
                   .returns(result_set)
           inventory.expects(:get_targets).with([hostname, hostname2]).returns([target, target2])
 

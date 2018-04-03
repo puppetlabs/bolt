@@ -48,6 +48,40 @@ describe 'run_command' do
       is_expected.to run.with_params(command, target, '_run_as' => 'root').and_return(result_set)
     end
 
+    context 'with description' do
+      let(:message) { 'test message' }
+
+      it 'passes the description through if parameters are passed' do
+        executor.expects(:run_command).with([target], command, '_description' => message).returns(result_set)
+        inventory.expects(:get_targets).with(target).returns([target])
+
+        is_expected.to run.with_params(command, target, message, {}).and_return(result_set)
+      end
+
+      it 'passes the description through if no parameters are passed' do
+        executor.expects(:run_command).with([target], command, '_description' => message).returns(result_set)
+        inventory.expects(:get_targets).with(target).returns([target])
+
+        is_expected.to run.with_params(command, target, message).and_return(result_set)
+      end
+    end
+
+    context 'without description' do
+      it 'ignores description if parameters are passed' do
+        executor.expects(:run_command).with([target], command, {}).returns(result_set)
+        inventory.expects(:get_targets).with(target).returns([target])
+
+        is_expected.to run.with_params(command, target, {}).and_return(result_set)
+      end
+
+      it 'ignores description if no parameters are passed' do
+        executor.expects(:run_command).with([target], command, {}).returns(result_set)
+        inventory.expects(:get_targets).with(target).returns([target])
+
+        is_expected.to run.with_params(command, target).and_return(result_set)
+      end
+    end
+
     context 'with multiple hosts' do
       let(:hostname2) { 'test.testing.com' }
       let(:target2) { Bolt::Target.new(hostname2) }
@@ -81,7 +115,7 @@ describe 'run_command' do
         end
 
         it 'does not error with _catch_errors' do
-          executor.expects(:run_command).with([target, target2], command, {})
+          executor.expects(:run_command).with([target, target2], command, '_catch_errors' => true)
                   .returns(result_set)
           inventory.expects(:get_targets).with([hostname, hostname2]).returns([target, target2])
 

@@ -43,11 +43,11 @@ module Bolt
       impl.value
     end
 
-    def summary(action, object, result)
+    def summary(description, result)
       fc = result.error_set.length
       npl = result.length == 1 ? '' : 's'
       fpl = fc == 1 ? '' : 's'
-      "Ran #{action} '#{object}' on #{result.length} node#{npl} with #{fc} failure#{fpl}"
+      "Finished: #{description} on #{result.length} node#{npl} with #{fc} failure#{fpl}"
     end
     private :summary
 
@@ -98,7 +98,9 @@ module Bolt
     end
 
     def run_command(targets, command, options = {}, &callback)
-      @logger.info("Starting command run '#{command}' on #{targets.map(&:uri)}")
+      description = options.fetch('_description', "command '#{command}'")
+      @logger.info("Starting: #{description} on #{targets.map(&:uri)}")
+      @logger.debug("Running command '#{command}' on #{targets.map(&:uri)}")
       notify = proc { |event| @notifier.notify(callback, event) if callback }
       options = { '_run_as' => run_as }.merge(options) if run_as
 
@@ -106,14 +108,16 @@ module Bolt
         transport.batch_command(batch, command, options, &notify)
       end
 
-      @logger.info(summary('command', command, results))
+      @logger.info(summary(description, results))
       @notifier.shutdown
       results
     end
 
     def run_script(targets, script, arguments, options = {}, &callback)
-      @logger.info("Starting script run #{script} on #{targets.map(&:uri)}")
-      @logger.debug("Arguments: #{arguments}")
+      description = options.fetch('_description', "script #{script}")
+      @logger.info("Starting: #{description} on #{targets.map(&:uri)}")
+      @logger.debug("Running script #{script} with '#{arguments}' on #{targets.map(&:uri)}")
+
       notify = proc { |event| @notifier.notify(callback, event) if callback }
       options = { '_run_as' => run_as }.merge(options) if run_as
 
@@ -121,15 +125,16 @@ module Bolt
         transport.batch_script(batch, script, arguments, options, &notify)
       end
 
-      @logger.info(summary('script', script, results))
+      @logger.info(summary(description, results))
       @notifier.shutdown
       results
     end
 
     def run_task(targets, task, arguments, options = {}, &callback)
-      task_name = task.name
-      @logger.info("Starting task #{task_name} on #{targets.map(&:uri)}")
-      @logger.debug("Arguments: #{arguments} Input method: #{task.input_method}")
+      description = options.fetch('_description', "task #{task.name}")
+      @logger.info("Starting: #{description} on #{targets.map(&:uri)}")
+      @logger.debug("Running task #{task.name} with '#{arguments}' via #{task.input_method} on #{targets.map(&:uri)}")
+
       notify = proc { |event| @notifier.notify(callback, event) if callback }
       options = { '_run_as' => run_as }.merge(options) if run_as
 
@@ -137,13 +142,14 @@ module Bolt
         transport.batch_task(batch, task, arguments, options, &notify)
       end
 
-      @logger.info(summary('task', task_name, results))
+      @logger.info(summary(description, results))
       @notifier.shutdown
       results
     end
 
     def file_upload(targets, source, destination, options = {}, &callback)
-      @logger.info("Starting file upload from #{source} to #{destination} on #{targets.map(&:uri)}")
+      description = options.fetch('_description', "file upload from #{source} to #{destination}")
+      @logger.info("Starting: #{description} on #{targets.map(&:uri)}")
       notify = proc { |event| @notifier.notify(callback, event) if callback }
       options = { '_run_as' => run_as }.merge(options) if run_as
 
@@ -151,7 +157,7 @@ module Bolt
         transport.batch_upload(batch, source, destination, options, &notify)
       end
 
-      @logger.info(summary('upload', source, results))
+      @logger.info(summary(description, results))
       @notifier.shutdown
       results
     end

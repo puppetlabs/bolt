@@ -17,8 +17,22 @@ Puppet::Functions.create_function(:run_command) do
     return_type 'ResultSet'
   end
 
+  dispatch :run_command_with_description do
+    param 'String[1]', :command
+    param 'Boltlib::TargetSpec', :targets
+    param 'String', :description
+    optional_param 'Hash[String[1], Any]', :options
+    return_type 'ResultSet'
+  end
+
   def run_command(command, targets, options = nil)
+    run_command_with_description(command, targets, nil, options)
+  end
+
+  def run_command_with_description(command, targets, description = nil, options = nil)
     options ||= {}
+    options = options.merge('_description' => description) if description
+
     unless Puppet[:tasks]
       raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
         Puppet::Pops::Issues::TASK_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, operation: 'run_command'
@@ -40,7 +54,7 @@ Puppet::Functions.create_function(:run_command) do
       call_function('debug', "Simulating run_command('#{command}') - no targets given - no action taken")
       r = Bolt::ResultSet.new([])
     else
-      r = executor.run_command(targets, command, options.select { |k, _| k == '_run_as' })
+      r = executor.run_command(targets, command, options)
     end
 
     if !r.ok && !options['_catch_errors']

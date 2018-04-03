@@ -10,6 +10,14 @@ require 'bolt/error'
 # * The returned value contains information about the result per target.
 #
 Puppet::Functions.create_function(:run_task) do
+  dispatch :run_task_with_description do
+    param 'String[1]', :task_name
+    param 'Boltlib::TargetSpec', :targets
+    param 'String', :description
+    optional_param 'Hash[String[1], Any]', :task_args
+    return_type 'ResultSet'
+  end
+
   dispatch :run_task do
     param 'String[1]', :task_name
     param 'Boltlib::TargetSpec', :targets
@@ -21,21 +29,26 @@ Puppet::Functions.create_function(:run_task) do
   dispatch :run_task_raw do
     param 'String[1]', :task_name
     param 'Boltlib::TargetSpec', :targets
+    param 'Optional[String]', :description
     optional_param 'Hash[String[1], Any]', :task_args
     # return_type 'ResultSet'
     block_param
   end
 
   def run_task(task_name, targets, task_args = nil)
+    run_task_with_description(task_name, targets, nil, task_args)
+  end
+
+  def run_task_with_description(task_name, targets, description, task_args = nil)
     task_args ||= {}
-    r = run_task_raw(task_name, targets, task_args)
+    r = run_task_raw(task_name, targets, description, task_args)
     if !r.ok && !task_args['_catch_errors']
       raise Bolt::RunFailure.new(r, 'run_task', task_name)
     end
     r
   end
 
-  def run_task_raw(task_name, targets, task_args = nil, &block)
+  def run_task_raw(task_name, targets, description = nil, task_args = nil, &block)
     task_args ||= {}
     unless Puppet[:tasks]
       raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
@@ -54,7 +67,9 @@ Puppet::Functions.create_function(:run_task) do
     # Ensure that given targets are all Target instances
     targets = inventory.get_targets(targets)
 
-    use_args = task_args.reject { |k, _| k.start_with?('_') }
+    options, use_args = task_args.partition { |k, _| k.start_with?('_') }.map(&:to_h)
+
+    options['_description'] = description if description
 
     # Don't bother loading the local task definition if all targets use the 'pcp' transport
     # and the local-validation option is set to false for all of them
@@ -94,7 +109,6 @@ Puppet::Functions.create_function(:run_task) do
     if targets.empty?
       Bolt::ResultSet.new([])
     else
-      options = task_args.select { |k, _| k == '_run_as' }
       executor.run_task(targets, task, use_args, options, &block)
     end
   end
