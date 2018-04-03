@@ -130,7 +130,7 @@ BOLT-342
 Wildcards available to target nodes in inventory files (0.16.2)
 You can use the * wild card to refer to nodes listed in an inventory file. For example,
 
-bolt task run minifact --nodes 'foo*.example.com'
+bolt task run facts --nodes 'foo*.example.com'
 Note that in most shells, the wildcard needs to be quoted or escaped to avoid shell expansion. 
 
 BOLT-330

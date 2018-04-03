@@ -138,6 +138,10 @@ module Bolt
       conf.update_from_inventory(data['config'])
       conf.validate
 
+      unless target.protocol.nil? || Bolt::TRANSPORTS.include?(target.protocol.to_sym)
+        raise Bolt::UnknownTransportError.new(target.protocol, target.uri)
+      end
+
       target.update_conf(conf.transport_conf)
     end
     private :update_target
