@@ -204,9 +204,6 @@ Available options are:
         end
 
         separator 'Run context:'
-        define('--tmpdir DIR', 'The directory to upload and execute temporary files on the target') do |tmpdir|
-          @options[:tmpdir] = tmpdir
-        end
         define('-c', '--concurrency CONCURRENCY', Integer,
                'Maximum number of simultaneous connections (default: 100)') do |concurrency|
           @options[:concurrency] = concurrency
@@ -237,6 +234,9 @@ Available options are:
         end
         define('--[no-]tty', 'Request a pseudo TTY on nodes that support it') do |tty|
           @options[:tty] = tty
+        end
+        define('--tmpdir DIR', 'The directory to upload and execute temporary files on the target') do |tmpdir|
+          @options[:tmpdir] = tmpdir
         end
 
         separator 'Display:'
