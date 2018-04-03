@@ -69,4 +69,30 @@ describe 'facts::info' do
       expect(run_plan('facts::info', 'nodes' => [node])).to eq([])
     end
   end
+
+  context 'ssh, winrm, and pcp targets' do
+    let(:nodes) { %w[ssh://host1 winrm://host2 pcp://host3] }
+
+    it 'contains OS information for target' do
+      [
+        ['facts::bash', { 'os' => { 'name' => 'unix', 'family' => 'unix', 'release' => {} } }],
+        ['facts::powershell', { 'os' => { 'name' => 'win', 'family' => 'win', 'release' => {} } }],
+        ['facts::ruby', { 'os' => { 'name' => 'any', 'family' => 'any', 'release' => {} } }]
+      ].zip(nodes).each do |(task, result), node|
+        expect_task(task).return_for_targets(node => result)
+      end
+
+      expect(run_plan('facts::info', 'nodes' => nodes)).to eq(
+        ["#{nodes[0]}: unix  (unix)", "#{nodes[1]}: win  (win)", "#{nodes[2]}: any  (any)"]
+      )
+    end
+
+    it 'omits failed targets' do
+      %w[facts::bash facts::powershell facts::ruby].zip(nodes).each do |fact, node|
+        expect_task(fact).return_for_targets(node => { '_error' => { 'msg' => "Failed on #{node}" } })
+      end
+
+      expect(run_plan('facts::info', 'nodes' => nodes)).to eq([])
+    end
+  end
 end
