@@ -29,11 +29,23 @@ module Bolt
 
   class CLI
     class BoltOptionParser < OptionParser
+      def self.examples(cmd, desc)
+        <<-EXAMP
+#{desc} a Windows host via WinRM, providing for the password
+    bolt #{cmd} -n winrm://winhost -u Administrator -p
+#{desc} the local machine, a Linux host via SSH, and hosts from a group specified in an inventory file
+    bolt #{cmd} -n localhost,nixhost,node_group
+#{desc} Windows hosts queried from PuppetDB via WinRM as a domain user, prompting for the password
+    bolt #{cmd} -q 'inventory[certname] { facts.os.family = "windows" }' --transport winrm -u 'domain\\Administrator' -p
+EXAMP
+      end
+
       BANNER = <<-HELP
 Usage: bolt <subcommand> <action> [options]
 
 Available subcommands:
     bolt command run <command>       Run a command remotely
+    bolt file upload <src> <dest>    Upload a local file
     bolt script run <script>         Upload a local script and run it remotely
     bolt task show                   Show list of available tasks
     bolt task show <task>            Show documentation for task
@@ -41,7 +53,8 @@ Available subcommands:
     bolt plan show                   Show list of available plans
     bolt plan show <plan>            Show details for plan
     bolt plan run <plan> [params]    Run a Puppet task plan
-    bolt file upload <src> <dest>    Upload a local file
+
+Run `bolt <subcommand> --help` to view specific examples.
 
 where [options] are:
       HELP
@@ -56,6 +69,7 @@ Available actions are:
 
 Parameters are of the form <parameter>=<value>.
 
+#{examples('task run facts', 'run facter on')}
 Available options are:
       HELP
 
@@ -65,6 +79,7 @@ Usage: bolt command <action> <command> [options]
 Available actions are:
     run                              Run a command remotely
 
+#{examples('command run hostname', 'run hostname on')}
 Available options are:
       HELP
 
@@ -74,6 +89,7 @@ Usage: bolt script <action> <script> [[arg1] ... [argN]] [options]
 Available actions are:
     run                              Upload a local script and run it remotely
 
+#{examples('script run my_script.ps1 some args', 'run a script on')}
 Available options are:
       HELP
 
@@ -87,6 +103,7 @@ Available actions are:
 
 Parameters are of the form <parameter>=<value>.
 
+#{examples('plan run canary command=hostname', 'run the canary plan on')}
 Available options are:
       HELP
 
@@ -96,6 +113,7 @@ Usage: bolt file <action> [options]
 Available actions are:
     upload <src> <dest>              Upload local file <src> to <dest> on each node
 
+#{examples('file upload /tmp/source /etc/profile.d/login.sh', 'upload a file to')}
 Available options are:
       HELP
 
@@ -120,7 +138,7 @@ Available options are:
                         'Identifies the nodes to target.',
                         'Enter a comma-separated list of node URIs or group names.',
                         "Or read a node list from an input file '@<file>' or stdin '-'.",
-                        'Example: --nodes localhost,node_group,ssh://nix.com:2222,winrm://windows.puppet.com',
+                        'Example: --nodes localhost,node_group,ssh://nix.com:23,winrm://windows.puppet.com',
                         'URI format is [protocol://]host[:port]',
                         "SSH is the default protocol; may be #{TRANSPORTS.keys.join(', ')}",
                         'For Windows nodes, specify the winrm:// protocol if it has not be configured',
@@ -128,17 +146,23 @@ Available options are:
                         'For WinRM, port defaults to `5985` or `5986` based on the --[no-]ssl setting') do |nodes|
           @options[:nodes] << get_arg_input(nodes)
         end.extend(SwitchHider)
-        @query = define('-q', '--query QUERY',
-                        'Query PuppetDB to determine the targets') do |query|
+        @query = define('-q', '--query QUERY', 'Query PuppetDB to determine the targets') do |query|
           @options[:query] = query
         end.extend(SwitchHider)
-        define('-u', '--user USER',
-               'User to authenticate as') do |user|
+        define('--noop', 'Execute a task that supports it in noop mode') do |_|
+          @options[:noop] = true
+        end
+        define('--params PARAMETERS',
+               "Parameters to a task or plan as json, a json file '@<file>', or on stdin '-'") do |params|
+          @options[:task_options] = parse_params(params)
+        end
+
+        separator 'Authentication:'
+        define('-u', '--user USER', 'User to authenticate as') do |user|
           @options[:user] = user
         end
         define('-p', '--password [PASSWORD]',
-               'Password to authenticate with.',
-               'Omit the value to prompt for the password.') do |password|
+               'Password to authenticate with. Omit the value to prompt for the password.') do |password|
           if password.nil?
             STDOUT.print "Please enter your password: "
             @options[:password] = STDIN.noecho(&:gets).chomp
@@ -147,59 +171,25 @@ Available options are:
             @options[:password] = password
           end
         end
-        define('--private-key KEY',
-               'Private ssh key to authenticate with') do |key|
+        define('--private-key KEY', 'Private ssh key to authenticate with') do |key|
           @options[:'private-key'] = key
         end
-        define('--tmpdir DIR',
-               'The directory to upload and execute temporary files on the target') do |tmpdir|
-          @options[:tmpdir] = tmpdir
-        end
-        define('-c', '--concurrency CONCURRENCY', Integer,
-               'Maximum number of simultaneous connections ' \
-               '(defaults to 100)') do |concurrency|
-          @options[:concurrency] = concurrency
-        end
-        define('--connect-timeout TIMEOUT', Integer,
-               'Connection timeout (defaults vary)') do |timeout|
-          @options[:'connect-timeout'] = timeout
-        end
-        define('--modulepath MODULES',
-               'List of directories containing modules, ' \
-               "separated by '#{File::PATH_SEPARATOR}'") do |modulepath|
-          @options[:modulepath] = modulepath.split(File::PATH_SEPARATOR)
-        end
-        define('--params PARAMETERS',
-               'Parameters to a task or plan') do |params|
-          @options[:task_options] = parse_params(params)
-        end
-
-        define('--format FORMAT',
-               'Output format to use: human or json') do |format|
-          @options[:format] = format
-        end
-        define('--[no-]host-key-check',
-               'Check host keys with SSH') do |host_key_check|
+        define('--[no-]host-key-check', 'Check host keys with SSH') do |host_key_check|
           @options[:'host-key-check'] = host_key_check
         end
-        define('--[no-]ssl',
-               'Use SSL with WinRM') do |ssl|
+        define('--[no-]ssl', 'Use SSL with WinRM') do |ssl|
           @options[:ssl] = ssl
         end
-        define('--[no-]ssl-verify',
-               'Verify remote host SSL certificate with WinRM') do |ssl_verify|
+        define('--[no-]ssl-verify', 'Verify remote host SSL certificate with WinRM') do |ssl_verify|
           @options[:'ssl-verify'] = ssl_verify
         end
-        define('--transport TRANSPORT', TRANSPORTS.keys.map(&:to_s),
-               "Specify a default transport: #{TRANSPORTS.keys.join(', ')}") do |t|
-          @options[:transport] = t
-        end
-        define('--run-as USER',
-               'User to run as using privilege escalation') do |user|
+
+        separator 'Escalation:'
+        define('--run-as USER', 'User to run as using privilege escalation') do |user|
           @options[:'run-as'] = user
         end
         define('--sudo-password [PASSWORD]',
-               'Password for privilege escalation') do |password|
+               'Password for privilege escalation. Omit the value to prompt for the password.') do |password|
           if password.nil?
             STDOUT.print "Please enter your privilege escalation password: "
             @options[:'sudo-password'] = STDIN.noecho(&:gets).chomp
@@ -208,35 +198,57 @@ Available options are:
             @options[:'sudo-password'] = password
           end
         end
-        define('--configfile CONFIG_PATH',
-               'Specify where to load the config file from') do |path|
+
+        separator 'Run context:'
+        define('--tmpdir DIR', 'The directory to upload and execute temporary files on the target') do |tmpdir|
+          @options[:tmpdir] = tmpdir
+        end
+        define('-c', '--concurrency CONCURRENCY', Integer,
+               'Maximum number of simultaneous connections (default: 100)') do |concurrency|
+          @options[:concurrency] = concurrency
+        end
+        define('--modulepath MODULES',
+               "List of directories containing modules, separated by '#{File::PATH_SEPARATOR}'") do |modulepath|
+          @options[:modulepath] = modulepath.split(File::PATH_SEPARATOR)
+        end
+        define('--configfile FILEPATH',
+               'Specify where to load config from (default: ~/.puppetlabs/bolt.yaml)') do |path|
           @options[:configfile] = path
         end
-        define('--inventoryfile INVENTORY_PATH',
-               'Specify where to load the inventory file from') do |path|
+        define('--inventoryfile FILEPATH',
+               'Specify where to load inventory from (default: ~/.puppetlabs/bolt/inventory.yaml)') do |path|
           if ENV.include?(Bolt::Inventory::ENVIRONMENT_VAR)
             raise Bolt::CLIError, "Cannot pass inventory file when #{Bolt::Inventory::ENVIRONMENT_VAR} is set"
           end
           @options[:inventoryfile] = path
         end
-        define_tail('--[no-]tty',
-                    'Request a pseudo TTY on nodes that support it') do |tty|
+
+        separator 'Transports:'
+        define('--transport TRANSPORT', TRANSPORTS.keys.map(&:to_s),
+               "Specify a default transport: #{TRANSPORTS.keys.join(', ')}") do |t|
+          @options[:transport] = t
+        end
+        define('--connect-timeout TIMEOUT', Integer, 'Connection timeout (defaults vary)') do |timeout|
+          @options[:'connect-timeout'] = timeout
+        end
+        define('--[no-]tty', 'Request a pseudo TTY on nodes that support it') do |tty|
           @options[:tty] = tty
         end
-        define_tail('--noop',
-                    'Execute a task that supports it in noop mode') do |_|
-          @options[:noop] = true
+
+        separator 'Display:'
+        define('--format FORMAT', 'Output format to use: human or json') do |format|
+          @options[:format] = format
         end
-        define_tail('-h', '--help', 'Display help') do |_|
+        define('-h', '--help', 'Display help') do |_|
           @options[:help] = true
         end
-        define_tail('--verbose', 'Display verbose logging') do |_|
+        define('--verbose', 'Display verbose logging') do |_|
           @options[:verbose] = true
         end
-        define_tail('--debug', 'Display debug logging') do |_|
+        define('--debug', 'Display debug logging') do |_|
           @options[:debug] = true
         end
-        define_tail('--version', 'Display the version') do |_|
+        define('--version', 'Display the version') do |_|
           puts Bolt::VERSION
           raise Bolt::CLIExit
         end
