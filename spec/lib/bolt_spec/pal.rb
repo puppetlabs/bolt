@@ -13,7 +13,6 @@ module BoltSpec
     def config
       conf = Bolt::Config.new
       conf[:modulepath] = modulepath
-      conf[:log_level] = :notice
       conf
     end
 

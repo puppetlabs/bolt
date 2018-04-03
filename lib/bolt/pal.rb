@@ -12,7 +12,7 @@ module Bolt
       # Nothing works without initialized this global state. Reinitializing
       # is safe and in practice only happen in tests
       self.class.load_puppet
-      self.class.configure_logging(config[:log_level])
+      self.class.configure_logging
       # This makes sure we don't accidentally create puppet dirs
       with_puppet_settings { |_| nil }
 
@@ -20,8 +20,7 @@ module Bolt
     end
 
     # Puppet logging is global so this is class method to avoid confusion
-    def self.configure_logging(log_level)
-      Puppet[:log_level] = log_level == :debug ? 'debug' : 'notice'
+    def self.configure_logging
       Puppet::Util::Log.newdestination(:console)
     end
 
