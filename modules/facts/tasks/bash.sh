@@ -29,13 +29,18 @@ if [ -z "${name}" ]; then
     fi
 fi
 
+if [ -z "${name}" ]; then
+    name=$(uname)
+    release=$(uname -r)
+fi
+
 case $name in
     RedHat|Fedora|CentOS|Scientific|SLC|Ascendos|CloudLinux)
         family=RedHat;;
     HuaweiOS|LinuxMint|Ubuntu|Debian)
         family=Debian;;
     *)
-        family=Other;;
+        family=$name;;
 esac
 
 # Print it all out
@@ -43,7 +48,7 @@ if [ -z "$name" ]; then
     cat <<JSON
 {
   "_error": {
-    "kind": "minfact/noname",
+    "kind": "facts/noname",
     "msg": "Could not determine OS name"
   }
 }
