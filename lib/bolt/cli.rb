@@ -152,6 +152,10 @@ Available options are:
         define('--noop', 'Execute a task that supports it in noop mode') do |_|
           @options[:noop] = true
         end
+        define('--description DESCRIPTION',
+               'Description to use for the job') do |description|
+          @options[:description] = description
+        end
         define('--params PARAMETERS',
                "Parameters to a task or plan as json, a json file '@<file>', or on stdin '-'") do |params|
           @options[:task_options] = parse_params(params)
@@ -160,10 +164,6 @@ Available options are:
         separator 'Authentication:'
         define('-u', '--user USER', 'User to authenticate as') do |user|
           @options[:user] = user
-        end
-        define('--description DESCRIPTION',
-               'Description to use for the job') do |description|
-          @options[:description] = description
         end
         define('-p', '--password [PASSWORD]',
                'Password to authenticate with. Omit the value to prompt for the password.') do |password|
