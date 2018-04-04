@@ -60,6 +60,12 @@ To use `rubocop`, perform the bundle install with no exclusions
     bundle install --path .bundle --with test
     bundle exec rake rubocop
 
+### Contributing to bundled modules
+
+Some module content is included with the Bolt gem for out-of-the-box use. Some of those modules are included in this repository and others are managed with the Puppetfile included in this repository. All the bundled modules are installed in the `modules` directory.
+
+To change external modules (to add a new module or bump the version), update the Puppetfile and then run `bundle exec r10k puppetfile install`.
+
 ## Testing
 
 Some tests require a Windows VMs or Linux containers. For Linux tests (recommended, if you're not sure) `docker-compose up -d --build` to bring these up with the `docker-compose.yaml` included with the `bolt` gem. For windows tests, execute `vagrant up` to bring these up with the provided Vagrantfile. Any tests that require this are tagged with `:winrm` or `:ssh` in rspec.
