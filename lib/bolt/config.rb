@@ -27,7 +27,6 @@ module Bolt
     :concurrency,
     :format,
     :inventoryfile,
-    :log_level,
     :log,
     :modulepath,
     :puppetdb,
