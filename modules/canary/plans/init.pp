@@ -48,5 +48,5 @@ plan canary(
     $restr = canary::skip($rest)
   }
 
-  canary::merge($canr, $restr)
+  return canary::merge($canr, $restr)
 }

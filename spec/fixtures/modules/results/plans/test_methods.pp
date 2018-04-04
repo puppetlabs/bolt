@@ -11,5 +11,5 @@ plan results::test_methods(
   # Test to_s works
   $str = "result ${result}"
   # return ok
-  $result.ok
+  return $result.ok
 }

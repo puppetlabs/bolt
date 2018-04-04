@@ -47,7 +47,12 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
       end
 
       begin
-        result = func.class.dispatcher.dispatchers[0].call_by_name_with_scope(scope, params, true)
+        func.class.dispatcher.dispatchers[0].call_by_name_with_scope(scope, params, true)
+        # If the plan returns using a return statement then we never get here.
+        # We only get here if the plan finishes without executing any return
+        # statement and since we don't want to leak any implicit return value
+        # from the plan we simply set the result to nil here.
+        result = nil
       rescue Puppet::PreformattedError => err
         if named_args['_catch_errors'] && err.cause.is_a?(Bolt::Error)
           result = err.cause.to_puppet_error

@@ -3,5 +3,5 @@ plan results::test_target(
 ) {
   $target = Target($node)
   $target2 = Target($target.uri, $target.options)
-  run_task('results', $target2)
+  return run_task('results', $target2)
 }

@@ -1,7 +1,7 @@
 plan test::id(
   String $target
 ) {
-  [
+  return [
     run_task(test::id, [$target]),
     run_task(test::id, [$target], '_run_as' => 'root'),
 
