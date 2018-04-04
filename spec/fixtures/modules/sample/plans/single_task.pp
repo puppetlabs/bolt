@@ -1,9 +1,11 @@
 # one line plan to show we can run a task by name
-plan sample::single_task(String $nodes) {
-  $node_array = split($nodes, ',')
-  run_task (
-    "sample::echo", $node_array,
-    message => "hi there",
-    '_catch_errors' => true,
-  )
+plan sample::single_task(
+  TargetSpec       $nodes,
+  Optional[String] $description = undef,
+) {
+  if $description {
+    run_task("sample::echo", $nodes, $description, message => "hi there", _catch_errors => true)
+  } else {
+    run_task("sample::echo", $nodes, message => "hi there", _catch_errors => true)
+  }
 }
