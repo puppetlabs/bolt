@@ -81,7 +81,6 @@ groups:
 ```
 
 
-
 ### Setting a default transport
 
 To set a default transport protocol, pass it with the command with the `--transport` option.
@@ -201,28 +200,41 @@ bolt plan show
 
 Options are optional unless marked as required.
 
-- `--nodes, -n`	 Required when running. Nodes to connect to.
-
-  To connect with WinRM, include the protocol as winrm://<HOSTNAME>.
-
-  For an IPv6 address without a port number, encase it brackets [fe80::34eb:ff1:b584:d7c0].
-
-  For IPv6 addresses including a port use one of the following formats:  fe80::34eb:ff1:b584:d7c0:22  or  [fe80::34eb:ff1:b584:d7c0]:22.
-
-- `--user, -u`	User to authenticate as.
-- `--password, -p`	Password to authenticate with. Pass this flag without any value to securely prompt for the password.
-- `--modulepath`	Required for tasks and plans. The path to the module containing
-  the task. Separate multiple paths with a semicolon (`;`) on Windows or a colon
-  (`:`) on all other platforms.
-- `--help, -h`	Displays help for the bolt command.
-- `--version`	Displays the Bolt version.
-- `--params`	Parameters, passed as a JSON object on the command line, or as a JSON parameter file, prefaced with @ like @params.json
-- `--[no-]tty`	Applicable to SSH transport only. Some commands, such as sudo, may require a pseudo TTY to execute. If so, specify --tty
-- `--check-host-keys`	Do not require verification of new hosts in the known_hosts file.
-
-  check-host-keys and no-check-host-keys are options for the SSH transport.
-
-` `--ssl`	Do not require verification of new hosts in the known_hosts file.
-  ssl and no-sll are options for WinRM.
-
-- `--transport`	Specifies the default transport for this command. To override, specify the transport for a given node, such as ssh://linuxnode.
+| Options | Description |
+| --- | --- |
+| `--nodes, -n` | Required when running. Nodes to connect to.<br><br>To connect with WinRM, include the protocol as winrm://<HOSTNAME>.<br><br>For an IPv6 address without a port number, encase it brackets [fe80::34eb:ff1:b584:d7c0].<br><br>For IPv6 addresses including a port use one of the following formats:  fe80::34eb:ff1:b584:d7c0:22  or  [fe80::34eb:ff1:b584:d7c0]:22. |
+| `--query, -q` | Query PuppetDB to determine the targets. |
+| `--noop` | Execute a task that supports it in noop mode. |
+| `--description` | Add a description to the run. Used in logging and submitted to Orchestrator with the pcp transport. |
+| `--params` | Parameters, passed as a JSON object on the command line, or as a JSON parameter file, prefaced with @ like @params.json |
+||
+| Authentication |
+| `--user, -u` | User to authenticate as. |
+| `--password, -p` | Password to authenticate with. Pass this flag without any value to securely prompt for the password. |
+| `--private-key` | Private ssh key to authenticate with |
+| `--[no-]host-key-check` | Do not require verification of new hosts in the known_hosts file.<br><br>`host-key-check` and `no-host-key-check` are options for the SSH transport. |
+| `--[no-]ssl` | Do not require verification of new hosts in the known_hosts file.<br><br>`ssl` and `no-ssl` are options for WinRM. |
+| `--[no-]ssl-verify` | Do not verify remote host SSL certificate with WinRM<br><br>`ssl-verify` and `no-ssl-verify` are options for WinRM. |
+||
+| Escalation |
+| `--run-as` | User to run as using privilege escalation |
+| `--sudo-password` | Password for privilege escalation. Omit the value to prompt for the password. |
+||
+| Run context |
+| `--concurrency, -c` | Maximum number of simultaneous connections (default: 100) |
+| `--modulepath` | Required for tasks and plans. The path to the module containing the task. Separate multiple paths with a semicolon (`;`) on Windows or a colon (`:`) on all other platforms. |
+| `--configfile` | Specify where to load config from (default: ~/.puppetlabs/bolt.yaml) |
+| `--inventoryfile` | Specify where to load inventory from (default: ~/.puppetlabs/bolt/inventory.yaml) |
+||
+| Transports |
+| `--transport` | Specifies the default transport for this command. To override, specify the transport for a given node, such as ssh://linuxnode. |
+| `--connect-timeout` | Connection timeout (defaults vary) |
+| `--[no-]tty` | Applicable to SSH transport only. Some commands, such as sudo, may require a pseudo TTY to execute. If so, specify --tty |
+| `--tmpdir` | The directory to upload and execute temporary files on the target |
+||
+| Display |
+| `--format` | Output format to use: human or json |
+| `--help, -h` | Displays help for the bolt command. |
+| `--verbose` | Display verbose logging |
+| `--debug` | Display debug logging |
+| `--version` | Displays the Bolt version. |
