@@ -31,6 +31,7 @@ PS
       install_package(bolt, 'rubygem-json')
       install_package(bolt, 'rubygem-ffi')
       install_package(bolt, 'rubygem-bigdecimal')
+      install_package(bolt, 'rubygem-io-console')
       result = on(bolt, 'ruby --version')
     when /osx/
       # ruby dev tools should be already installed
