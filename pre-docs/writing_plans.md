@@ -109,15 +109,15 @@ Basic functions in plans share a similar structure. Call these functions with th
 
 `run_script`
 Runs a script on one or more nodes.
-`$fileref`, `$nodes`, `**$options`
+`$fileref`, `$nodes`, `$description`, `$options`
 
 `file_upload`
 Uploads a file to a specified location on one or more nodes.
-`$source`, `$destination`, `$nodes`, `$options`
+`$source`, `$destination`, `$nodes`, `$description`, `$options`
 
 `run_command`
 Runs a command on one or more nodes.
-`$cmd`, `$nodes`, `$options`
+`$cmd`, `$nodes`, `$description`, `$options`
 
 `get_targets`
 Parses common ways of referring to targets and returns an Array of Target objects.
@@ -129,17 +129,21 @@ NAME>/<FILE>` reference, which will search for `<FILE>` relative to a module's
 files directory. For example, the reference `mysql/mysqltuner.pl` searches for
 the file `<MODULES DIRECTORY>/mysql/files/mysqltuner.pl`.
 
+The `$options` parameter is used for options that modify how Bolt executes the function. For `run_script`, arguments to the script can be passed as an array of strings under an `arguments` key in `$options`.
+
 Note that all the `$nodes` arguments support the patterns supported by `--nodes`
 (except for shell expansion).
+
+The `$description` parameter is always optional. It can be used to provide a description of the intent behind running the function that will be included in logging. The `pcp` transport in particular passes this on to Orchestrator when running tasks.
 
 For example, to have your plan run the script located in
 `./mymodule/files/my_script.sh` on a set of nodes, as follows. Note that these
 functions will raise an exception and stop further execution of the plan if
 they fail on any node. To prevent this and handle the error, pass the
-`_catch_errrors => true` option to the command.
+`_catch_errors => true` option to the command.
 
 ```
-run_script("mymodule/my_script.sh", $nodes, 'catch_errors'=> true)
+run_script("mymodule/my_script.sh", $nodes, '_catch_errors'=> true)
 ```
 
 ### Target objects
@@ -189,9 +193,8 @@ nodes. To operate on individual nodes, resolve it to a list via `get_targets`.
 When you need to run multiple tasks, or you need some tasks to depend on
 others, you can call the tasks from a task plan.
 
-To run a task from your plan, call the `run_task` function, specifying the task
-to run, any task parameters, and the nodes on which to run the task. Specify
-the full task name, as `<MODULE>::<TASK>`.
+To run a task from your plan, call the `run_task` function, specifying `$task_name`, `$nodes`, `$description`, `$parameters`. Specify
+the full task name, as `<MODULE>::<TASK>`. Parameters are supplied as a hash of parameter name to value, and can also include anything that would be passed in `$options` for other functions.
 
 For example, the following plan runs several tasks, each on a different set of
 nodes. Note that `run_task` raises an exception and stops further execution of
