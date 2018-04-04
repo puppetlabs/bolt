@@ -112,7 +112,8 @@ Runs a script on one or more nodes.
 `$fileref`, `$nodes`, `$description`, `$options`
 
 `file_upload`
-Uploads a file to a specified location on one or more nodes.
+Uploads a file to a specified location on one or more nodes. Note that most transports are not
+optimized for file copying, so this is best limited to small files.
 `$source`, `$destination`, `$nodes`, `$description`, `$options`
 
 `run_command`
