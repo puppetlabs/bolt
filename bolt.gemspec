@@ -22,7 +22,8 @@ Gem::Specification.new do |spec|
                        Dir['bolt-modules/boltlib/lib/**/*.rb'] +
                        Dir['bolt-modules/boltlib/types/**/*.pp'] +
                        Dir['modules/*/lib/**/*.rb'] +
-                       Dir['modules/*/plans/**/*.pp']
+                       Dir['modules/*/plans/**/*.pp'] +
+                       Dir['modules/*/tasks/**/*']
   spec.bindir        = "exe"
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]

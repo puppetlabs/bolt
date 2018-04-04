@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'bolt_spec/conn'
-require 'bolt_spec/files'
 require 'bolt_spec/config'
 require 'bolt_spec/conn'
+require 'bolt_spec/files'
 require 'bolt_spec/integration'
 require 'bolt/cli'
 
