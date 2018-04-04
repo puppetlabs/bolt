@@ -1,3 +1,3 @@
 plan test::whoami(String $target) {
-  run_command('whoami', $target)
+  return run_command('whoami', $target)
 }
