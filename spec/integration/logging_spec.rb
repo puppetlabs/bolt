@@ -50,6 +50,13 @@ describe "when logging executor activity", ssh: true do
     expect(result[0]['result']['_output'].strip).to match(/hi there/)
   end
 
+  it 'logs description when included' do
+    result = run_cli_json(%W[plan run #{echo_plan} description=somemessage] + config_flags)
+    expect(@log_output.readline).to match(/Starting: somemessage on/)
+    expect(@log_output.readline).to match(/Finished: somemessage on/)
+    expect(result[0]['result']['_output'].strip).to match(/hi there/)
+  end
+
   context 'with verbose logging' do
     let(:log_level) { :info }
 
