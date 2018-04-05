@@ -21,7 +21,7 @@ plan facts::retrieve(TargetSpec $nodes) {
 
   # Return a single result set composed of results from the result sets
   # returned by the individual task runs.
-  ResultSet(
+  return ResultSet(
     $task_targets.map |$task, $targets| {
       run_task($task, $targets, '_catch_errors' => true)
     }.reduce([]) |$results, $result_set| {

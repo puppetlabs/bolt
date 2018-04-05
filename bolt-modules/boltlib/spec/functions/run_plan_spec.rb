@@ -24,7 +24,7 @@ describe 'run_plan' do
         result = Puppet::Pal.in_tmp_environment('pal_env', modulepath: env.modulepath) do |pal|
           pal.with_script_compiler do |compiler|
             compiler.evaluate_string(<<-CODE)
-            plan run_me() { "worked1" }
+            plan run_me() { return "worked1" }
             run_plan('run_me')
             CODE
           end
@@ -66,6 +66,10 @@ describe 'run_plan' do
         is_expected.to run.with_params('test::run_me_int', 'x' => 'should not work')
                           .and_raise_error(/expects an Integer value/)
       end
+    end
+
+    it 'returns undef for plans without explicit return' do
+      is_expected.to run.with_params('test::no_return').and_return(nil)
     end
   end
 end

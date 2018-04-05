@@ -5,7 +5,7 @@
 # The $nodes parameter is a list of the nodes for which to print the OS
 # information.
 plan facts::info(TargetSpec $nodes) {
-  run_plan(facts::retrieve, nodes => $nodes).reduce([]) |$info, $r| {
+  return run_plan(facts::retrieve, nodes => $nodes).reduce([]) |$info, $r| {
     if ($r.ok) {
       $info + "${r.target.name}: ${r[os][name]} ${r[os][release][full]} (${r[os][family]})"
     } else {
