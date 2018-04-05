@@ -223,203 +223,196 @@ describe Bolt::Transport::Orch, orchestrator: true do
     end
   end
 
-  context 'using the bolt task wrapper' do
-    before(:each) do
-      bolt_task = File.expand_path(File.join(base_path, 'tasks', 'init.rb'))
-      allow(mock_client).to(receive(:run_task) do |body|
-        Open3.popen3("ruby #{bolt_task};") do |stdin, stdout, stderr, wt|
-          stdin.write(params.to_json)
-          stdin.close
-          output = stdout.read
-          err = stderr.read
-          exit_code = wt.value.exitstatus
-          expect(err).to be_empty
-          expect(exit_code).to eq(0)
+  describe :batch_command do
+    let(:command) { 'anything' }
+    let(:body) {
+      {
+        task: 'bolt_shim::command',
+        params: { command: command }
+      }
+    }
 
-          body[:scope][:nodes].map do |node|
-            { 'name' => node, 'state' => 'finished', 'result' => JSON.parse(output) }
-          end
-        end
-      end)
+    let(:results) {
+      [{ 'name' => 'node1', 'state' => 'finished', 'result' => { 'stdout' => 'hello', 'exit_code' => 0 } },
+       { 'name' => 'node2', 'state' => 'finished', 'result' => { 'stdout' => 'goodbye', 'exit_code' => 0 } }]
+    }
+
+    before(:each) do
+      expect(mock_client).to receive(:run_task).with(include(body)).and_return(results)
     end
 
-    describe :batch_command do
-      let(:options) { {} }
-      let(:params) {
-        {
-          action: 'command',
-          command: command,
-          options: options
-        }
-      }
-      let(:command) { 'echo hi!; echo bye >&2' }
+    it 'returns a success' do
+      results = orch.batch_command(targets, command)
+      expect(results[0]).to be_success
+      expect(results[1]).to be_success
+      expect(results[0]['stdout']).to eq('hello')
+      expect(results[1]['stdout']).to eq('goodbye')
+    end
 
-      it 'returns a success' do
-        results = orch.batch_command(targets, command)
-        expect(results[0]).to be_success
-        expect(results[1]).to be_success
-        expect(results[0]['stdout']).to eq("hi!\n")
-        expect(results[0]['stderr']).to eq("bye\n")
+    it 'emits events for each target' do
+      events = []
+      results = orch.batch_command(targets, command) do |event|
+        events << event
       end
 
-      it 'emits events for each target' do
-        events = []
-        results = orch.batch_command(targets, command) do |event|
-          events << event
-        end
+      results.each do |result|
+        expect(events).to include(type: :node_start, target: result.target)
+        expect(events).to include(type: :node_result, result: result)
+      end
+    end
 
-        results.each do |result|
-          expect(events).to include(type: :node_start, target: result.target)
-          expect(events).to include(type: :node_result, result: result)
-        end
+    it 'ignores _run_as' do
+      results = orch.batch_command(targets, command, '_run_as' => 'root')
+      expect(results[0]).to be_success
+      expect(results[1]).to be_success
+    end
+
+    context 'when it fails' do
+      let(:results) {
+        [{ 'name' => 'node1', 'state' => 'finished', 'result' => { 'stderr' => 'bye', 'exit_code' => 23 } },
+         { 'name' => 'node2', 'state' => 'finished', 'result' => { 'stdout' => 'hi', 'exit_code' => 1 } }]
+      }
+
+      it 'returns a failure with stdout, stderr and exit_code' do
+        results = orch.batch_command(targets, command)
+
+        expect(results[0]).not_to be_success
+        expect(results[0]['exit_code']).to eq(23)
+        expect(results[0]['stderr']).to eq('bye')
+
+        expect(results[1]).not_to be_success
+        expect(results[1]['exit_code']).to eq(1)
+        expect(results[1]['stdout']).to eq('hi')
+      end
+    end
+  end
+
+  describe :batch_upload do
+    let(:source_path) { File.join(base_path, 'spec', 'fixtures', 'scripts', 'success.sh') }
+    let(:dest_path) { +'success.sh' } # to be prepended with a temp dir in the 'around(:each)' block
+    let(:body) {
+      content = Base64.encode64(File.read(source_path))
+      mode = File.stat(source_path).mode
+
+      {
+        task: 'bolt_shim::upload',
+        params: { path: dest_path, content: content, mode: mode }
+      }
+    }
+
+    def upload_message(node)
+      { '_output' => "Uploaded '#{source_path}' to '#{node}:#{dest_path}'" }
+    end
+
+    let(:results) {
+      [{ 'name' => 'node1', 'state' => 'finished', 'result' => upload_message('node1') },
+       { 'name' => 'node2', 'state' => 'finished', 'result' => upload_message('node2') }]
+    }
+
+    before(:each) do
+      expect(mock_client).to receive(:run_task).with(include(body)).and_return(results)
+    end
+
+    it 'should write the file' do
+      results = orch.batch_upload(targets, source_path, dest_path)
+      expect(results[0]).to be_success
+      expect(results[1]).to be_success
+      expect(results[0].message).to match(/Uploaded '#{source_path}' to '#{targets[0].host}:#{dest_path}/)
+      expect(results[1].message).to match(/Uploaded '#{source_path}' to '#{targets[1].host}:#{dest_path}/)
+    end
+
+    it 'emits events for each target' do
+      events = []
+      results = orch.batch_upload(targets, source_path, dest_path) do |event|
+        events << event
+      end
+
+      results.each do |result|
+        expect(events).to include(type: :node_start, target: result.target)
+        expect(events).to include(type: :node_result, result: result)
+      end
+    end
+  end
+
+  describe :batch_script do
+    let(:args) { ['with spaces', 'nospaces', 'echo $HOME; cat /etc/passwd'] }
+    let(:script_path) { File.join(base_path, 'spec', 'fixtures', 'scripts', 'success.sh') }
+
+    let(:body) {
+      content = Base64.encode64(File.read(script_path))
+
+      {
+        task: 'bolt_shim::script',
+        params: { content: content, arguments: args }
+      }
+    }
+
+    let(:results) {
+      [{ 'name' => 'node1', 'state' => 'finished', 'result' => { '_output' => '', 'exit_code' => 0 } },
+       { 'name' => 'node2', 'state' => 'finished', 'result' => { '_output' => '', 'exit_code' => 0 } }]
+    }
+
+    before(:each) do
+      expect(mock_client).to receive(:run_task).with(include(body)).and_return(results)
+    end
+
+    it 'returns a success' do
+      results = orch.batch_script(targets, script_path, args)
+      expect(results[0]).to be_success
+      expect(results[1]).to be_success
+    end
+
+    it 'emits events for each target' do
+      events = []
+      results = orch.batch_script(targets, script_path, args) do |event|
+        events << event
+      end
+
+      results.each do |result|
+        expect(events).to include(type: :node_start, target: result.target)
+        expect(events).to include(type: :node_result, result: result)
+      end
+    end
+
+    context "when the script succeeds" do
+      let(:results) {
+        [{ 'name' => 'node1', 'state' => 'finished', 'result' => { 'stdout' => 'hello', 'exit_code' => 0 } },
+         { 'name' => 'node2', 'state' => 'finished', 'result' => { 'stderr' => 'there', 'exit_code' => 0 } }]
+      }
+
+      it 'captures stdout' do
+        results = orch.batch_script(targets, script_path, args)
+        expect(results[0]['stdout']).to eq('hello')
+      end
+
+      it 'captures stderr' do
+        results = orch.batch_script(targets, script_path, args)
+        expect(results[1]['stderr']).to eq('there')
       end
 
       it 'ignores _run_as' do
-        results = orch.batch_command(targets, command, '_run_as' => 'root')
+        results = orch.batch_script(targets, script_path, args, '_run_as' => 'root')
         expect(results[0]).to be_success
         expect(results[1]).to be_success
       end
-
-      context 'when it fails' do
-        let(:command) { 'echo hi!; echo bye >&2; exit 23' }
-
-        it 'returns a failure with stdout, stderr and exit_code' do
-          results = orch.batch_command(targets, command)
-
-          expect(results[0]).not_to be_success
-          expect(results[0]['exit_code']).to eq(23)
-          expect(results[0]['stdout']).to eq("hi!\n")
-          expect(results[0]).not_to be_success
-
-          expect(results[1]['exit_code']).to eq(23)
-          expect(results[1]['stdout']).to eq("hi!\n")
-          expect(results[1]['stderr']).to eq("bye\n")
-          expect(results[1]['stderr']).to eq("bye\n")
-        end
-      end
     end
 
-    describe 'uploading files' do
-      let(:source_path) { File.join(base_path, 'spec', 'fixtures', 'scripts', 'success.sh') }
-      let(:dest_path) { +'success.sh' } # to be prepended with a temp dir in the 'around(:each)' block
-      let(:params) {
-        content = Base64.encode64(File.read(source_path))
-        mode = File.stat(source_path).mode
-
-        {
-          action: 'upload',
-          path: dest_path,
-          content: content,
-          mode: mode
-        }
+    context "when the script fails" do
+      let(:results) {
+        [{ 'name' => 'node1', 'state' => 'finished', 'result' => { 'stdout' => 'hello', 'exit_code' => 34 } },
+         { 'name' => 'node2', 'state' => 'finished', 'result' => { 'stderr' => 'there', 'exit_code' => 1 } }]
       }
 
-      around(:each) do |example|
-        Dir.mktmpdir(nil, '/tmp') do |dir|
-          dest_path.replace(File.join(dir, dest_path)) # prepend the temp dir to the dest_path
-
-          example.run
-        end
-      end
-
-      describe :batch_upload do
-        it 'should write the file' do
-          results = orch.batch_upload(targets, source_path, dest_path)
-          expect(results[0]).to be_success
-          expect(results[1]).to be_success
-          expect(results[0].message).to match(/Uploaded '#{source_path}' to '#{targets[0].host}:#{dest_path}/)
-          expect(results[1].message).to match(/Uploaded '#{source_path}' to '#{targets[1].host}:#{dest_path}/)
-        end
-
-        it 'emits events for each target' do
-          events = []
-          results = orch.batch_upload(targets, source_path, dest_path) do |event|
-            events << event
-          end
-
-          results.each do |result|
-            expect(events).to include(type: :node_start, target: result.target)
-            expect(events).to include(type: :node_result, result: result)
-          end
-        end
-      end
-    end
-
-    describe :batch_script do
-      let(:args) { ['with spaces', 'nospaces', 'echo $HOME; cat /etc/passwd'] }
-      let(:script_path) { File.join(base_path, 'spec', 'fixtures', 'scripts', 'success.sh') }
-      let(:params) {
-        content = Base64.encode64(File.read(script_path))
-
-        {
-          action: 'script',
-          content: content,
-          arguments: args
-        }
-      }
-
-      it 'returns a success' do
+      it 'returns a failure with stdout, stderr and exit_code' do
         results = orch.batch_script(targets, script_path, args)
-        expect(results[0]).to be_success
-        expect(results[1]).to be_success
-      end
 
-      it 'emits events for each target' do
-        events = []
-        results = orch.batch_script(targets, script_path, args) do |event|
-          events << event
-        end
+        expect(results[0]).not_to be_success
+        expect(results[0]['exit_code']).to eq(34)
+        expect(results[0]['stdout']).to eq('hello')
 
-        results.each do |result|
-          expect(events).to include(type: :node_start, target: result.target)
-          expect(events).to include(type: :node_result, result: result)
-        end
-      end
-
-      context "when the script succeeds" do
-        let(:script_path) { File.join(base_path, 'spec', 'fixtures', 'scripts', 'success.sh') }
-
-        it 'captures stdout' do
-          results = orch.batch_script(targets, script_path, args)
-          expect(
-            results[0]['stdout']
-          ).to eq(<<-OUT)
-arg: with spaces
-arg: nospaces
-arg: echo $HOME; cat /etc/passwd
-standard out
-          OUT
-        end
-
-        it 'captures stderr' do
-          results = orch.batch_script(targets, script_path, args)
-          expect(results[0]['stderr']).to eq("standard error\n")
-          expect(results[1]['stderr']).to eq("standard error\n")
-        end
-
-        it 'ignores _run_as' do
-          results = orch.batch_script(targets, script_path, args, '_run_as' => 'root')
-          expect(results[0]).to be_success
-          expect(results[1]).to be_success
-        end
-      end
-
-      context "when the script fails" do
-        let(:script_path) { File.join(base_path, 'spec', 'fixtures', 'scripts', 'failure.sh') }
-
-        it 'returns a failure with stdout, stderr and exit_code' do
-          results = orch.batch_script(targets, script_path, args)
-
-          expect(results[0]).not_to be_success
-          expect(results[0]['exit_code']).to eq(34)
-          expect(results[0]['stdout']).to eq("standard out\n")
-          expect(results[0]['stderr']).to eq("standard error\n")
-
-          expect(results[1]).not_to be_success
-          expect(results[1]['exit_code']).to eq(34)
-          expect(results[1]['stdout']).to eq("standard out\n")
-          expect(results[1]['stderr']).to eq("standard error\n")
-        end
+        expect(results[1]).not_to be_success
+        expect(results[1]['exit_code']).to eq(1)
+        expect(results[1]['stderr']).to eq('there')
       end
     end
   end

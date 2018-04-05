@@ -11,7 +11,9 @@ module Bolt
   module Transport
     class Orch < Base
       CONF_FILE = File.expand_path('~/.puppetlabs/client-tools/orchestrator.conf')
-      BOLT_MOCK_TASK = Struct.new(:name, :executable).new('bolt', 'bolt/tasks/init').freeze
+      BOLT_COMMAND_TASK = Struct.new(:name).new('bolt_shim::command').freeze
+      BOLT_SCRIPT_TASK = Struct.new(:name).new('bolt_shim::script').freeze
+      BOLT_UPLOAD_TASK = Struct.new(:name).new('bolt_shim::upload').freeze
 
       def self.options
         %w[service-url cacert token-file task-environment local-validation]
@@ -79,11 +81,10 @@ module Bolt
 
       def batch_command(targets, command, options = {}, &callback)
         params = {
-          action: 'command',
           command: command
         }
         results = run_task_job(targets,
-                               BOLT_MOCK_TASK,
+                               BOLT_COMMAND_TASK,
                                params,
                                options,
                                &callback)
@@ -98,12 +99,11 @@ module Bolt
         content = File.open(script, &:read)
         content = Base64.encode64(content)
         params = {
-          action: 'script',
           content: content,
           arguments: arguments
         }
         callback ||= proc {}
-        results = run_task_job(targets, BOLT_MOCK_TASK, params, options, &callback)
+        results = run_task_job(targets, BOLT_SCRIPT_TASK, params, options, &callback)
         results.map! { |result| unwrap_bolt_result(result.target, result) }
         results.each do |result|
           callback.call(type: :node_result, result: result)
@@ -115,13 +115,12 @@ module Bolt
         content = Base64.encode64(content)
         mode = File.stat(source).mode
         params = {
-          action: 'upload',
           path: destination,
           content: content,
           mode: mode
         }
         callback ||= proc {}
-        results = run_task_job(targets, BOLT_MOCK_TASK, params, options, &callback)
+        results = run_task_job(targets, BOLT_UPLOAD_TASK, params, options, &callback)
         results.map! do |result|
           if result.error_hash
             result
