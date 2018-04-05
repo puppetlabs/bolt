@@ -5,8 +5,11 @@ if (Get-Command facter -ErrorAction SilentlyContinue) {
     facter --json
 }
 else {
+    # The number 2 in the condition below is the value of
+    # the [System.PlatformID]::Win32NT constant. We don't
+    # use the constant here as it doesn't work on Windows
+    # Server Core.
     if ([System.Environment]::OSVersion.Platform -gt 2) {
-        # [System.PlatformID]::Win32NT
         @'
 {
   "_error": {
