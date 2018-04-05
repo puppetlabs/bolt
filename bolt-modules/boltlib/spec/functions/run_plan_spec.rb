@@ -68,6 +68,10 @@ describe 'run_plan' do
       end
     end
 
+    it 'fails when a plan returns an unexpected result' do
+      is_expected.to run.with_params('test::bad_return').and_raise_error(/invalid result/)
+    end
+
     it 'returns undef for plans without explicit return' do
       is_expected.to run.with_params('test::no_return').and_return(nil)
     end

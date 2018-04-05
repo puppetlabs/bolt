@@ -73,4 +73,13 @@ module Bolt
       new(err.msg, err.kind, err.details, err.issue_code)
     end
   end
+
+  class InvalidPlanResult < Error
+    def initialize(plan_name, result_str)
+      super("Plan #{plan_name} returned an invalid result: #{result_str}",
+            'bolt/invalid-plan-result',
+            { 'plan_name' => plan_name,
+              'result_string' => result_str })
+    end
+  end
 end

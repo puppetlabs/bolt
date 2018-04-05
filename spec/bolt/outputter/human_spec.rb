@@ -227,6 +227,11 @@ PARAMETERS:
     expect(output.string.strip).to eq("\"#{result}\"")
   end
 
+  it "prints a message when a plan returns undef" do
+    outputter.print_plan_result(nil)
+    expect(output.string.strip).to eq("Plan completed successfully with no result")
+  end
+
   it "handles fatal errors" do
     outputter.fatal_error(Bolt::CLIError.new("oops"))
     expect(output.string).to eq("oops\n")
