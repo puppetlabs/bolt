@@ -175,4 +175,4 @@ If Ruby is already included in your operating system, verify that it is version 
 
 Now that you have Bolt installed you can move on to:
 
-[Setting up test nodes](../2-acquiring-nodes)
+[Setting up test nodes](../02-acquiring-nodes)

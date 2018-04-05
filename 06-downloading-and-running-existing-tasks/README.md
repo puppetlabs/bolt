@@ -16,10 +16,10 @@ In this exercise you will explore existing tasks, including several tasks that t
 # Prerequisites
 Complete the following before you start this lesson:
 
-1. [Installing Bolt](../1-installing-bolt)
-1. [Setting up test nodes](../2-acquiring-nodes)
-1. [Running Commands](../3-running-commands)
-1. [Running Scripts](../4-running-scripts)
+1. [Installing Bolt](../01-installing-bolt)
+1. [Setting up test nodes](../02-acquiring-nodes)
+1. [Running Commands](../03-running-commands)
+1. [Running Scripts](../04-running-scripts)
 
 
 # Clone the control repo and configure Bolt's modulepath
@@ -169,4 +169,4 @@ These exercises introduce you to Puppet tasks. You'll find lots more tips, trick
 
 Now that you know how to download and run third party tasks with Bolt you can move on to:
 
-[Writing Plans](../7-writing-plans)
+[Writing Plans](../07-writing-plans)

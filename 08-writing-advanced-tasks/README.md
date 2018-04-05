@@ -9,9 +9,9 @@ In this exercise you will write a task with metadata.
 # Prerequisites
 Complete the following before you start this lesson:
 
-1. [Installing Bolt](../1-installing-bolt)
-1. [Acquiring nodes](../2-acquiring-nodes)
-1. [Writing tasks](../5-writing-tasks)
+1. [Installing Bolt](../01-installing-bolt)
+1. [Acquiring nodes](../02-acquiring-nodes)
+1. [Writing tasks](../05-writing-tasks)
 
 # About task metadata
 Task metadata files describe task parameters, validate input, and control how tasks are executed.  Adding metadata to your tasks helps others use them.  You write metadata for a task in JSON and save it with the same name as your task. For example, if you write a task called `great_metadata.py` its corresponding metadata file is named `great_metadata.json`.  
@@ -271,4 +271,4 @@ You can write tasks that support no-operation mode (noop). You use noop to see w
 
 Now that you know how to write task metadata and include the `--noop` flag you can move on to:
 
-1. [Writing advanced Plans](../9-writing-advanced-plans)
+1. [Writing advanced Plans](../09-writing-advanced-plans)

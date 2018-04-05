@@ -1,0 +1,18 @@
+---
+groups:
+  - name: lb
+    nodes:
+      - "0.0.0.0:32771"
+  - name: db
+    nodes:
+      - "0.0.0.0:32770"
+  - name: app
+    nodes:
+      - "0.0.0.0:32768"
+      - "0.0.0.0:32769"
+config:
+  ssh:
+    host-key-check: false
+    # These are credentials for docker.
+    password: root
+    user: root

@@ -12,9 +12,9 @@ In this exercise you will run existing scripts against remote nodes using Bolt.
 # Prerequisites
 Complete the following before you start this lesson:
 
-1. [Installing Bolt](../1-installing-bolt)
-1. [Setting up test nodes](../2-acquiring-nodes)
-1. [Running Commands](../3-running-commands)
+1. [Installing Bolt](../01-installing-bolt)
+1. [Setting up test nodes](../02-acquiring-nodes)
+1. [Running Commands](../03-running-commands)
 
 # Test Linux nodes for ShellShock
 Run the [bashcheck](https://github.com/hannob/bashcheck) script to check on ShellShock and related vulnerabilities.
@@ -89,4 +89,4 @@ Create a simple PowerShell script to test connectivity to a known website.
 
 Now that you know how to use Bolt to run existing scripts you can move on to:
 
-[Writing Tasks](../5-writing-tasks)
+[Writing Tasks](../05-writing-tasks)

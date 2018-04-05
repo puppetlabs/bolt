@@ -122,4 +122,4 @@ Using Docker we can quickly launch a number of ephemeral SSH servers. To make th
 
 Now that you have set up test nodes to use with Bolt you can move on to:
 
-[Running Commands](../3-running-commands)
+[Running Commands](../03-running-commands)
