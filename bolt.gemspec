@@ -42,7 +42,7 @@ Gem::Specification.new do |spec|
 
   # Dependencies of our vendored puppet, etc
   spec.add_dependency "CFPropertyList", "~> 2.2"
-  spec.add_dependency "gettext-setup", "< 1", ">= 0.10"
+  spec.add_dependency "fast_gettext", "~> 1.1.2"
   spec.add_dependency "locale", "~> 2.1"
   spec.add_dependency "minitar", "~> 0.6"
   spec.add_dependency "win32-dir", "= 0.4.9"
