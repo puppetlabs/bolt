@@ -10,6 +10,7 @@ gem "puppetlabs_spec_helper", git: 'https://github.com/puppetlabs/puppetlabs_spe
 group(:test) do
   gem "beaker-hostgenerator"
   gem "gettext-setup", '~> 0.28', require: false
+  gem "mocha", '~> 1.4.0'
   gem "rubocop", '~> 0.50', require: false
 end
 

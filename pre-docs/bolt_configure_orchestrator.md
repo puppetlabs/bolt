@@ -17,40 +17,33 @@ API.
 
 To set up Bolt to use the orchestrator API you must do the following:
 
-- Install the bolt module in a PE environment.
-- Set PE RBAC permissions for Bolt tasks.
+- Install the bolt_shim module in a PE environment.
+- Set PE RBAC permissions for all tasks.
 - Adjust the orchestrator configuration files, as needed
 - View available tasks
 
-
 ## Install the bolt module in a PE environment
 
-Bolt uses a task to execute commands, upload files, and run scripts over Orchestrator. To install this task
-install Bolt source code as a module named 'bolt' in the Puppet code used in
-PE. Install the code in the same environment as the other tasks you want to
-run. Use the following Puppetfile line:
+Bolt uses a task to execute commands, upload files, and run scripts over
+Orchestrator. To install this task install the `puppetlabs-bolt_shim` module
+from the Forge. Install the code in the same environment as the other tasks you
+want to run. Use the following Puppetfile line:
 
 ```
-mod 'bolt', git: 'git@github.com:puppetlabs/bolt.git', ref: '<version of bolt>'.
-
+mod 'puppetlabs-bolt_shim', '0.1.1'
 ```
 
-## Assign PE RBAC permissions for Bolt tasks
+## Assign PE RBAC permissions for all tasks
 
 Warning: By granting users access to Bolt tasks, you give them permission to
 run arbitrary commands and upload files as a super-user.  In the PE console,
 click Access control > User roles.
 
-#. Make sure the bolt task is installed in the `production` environment on the
-   master.
 #. From the list of user roles, click the one you want to have Bolt task
    permissions.
 #. On the Permissions tab, in the Type box, select Tasks.
-#. For Permission, select Run tasks, and then select `bolt` from the Object list.
+#. For Permission, select Run tasks, and then select `All` from the Object list.
 #. Click Add permission, and then commit the change.
-#. You may uninstall the `bolt` module from the production environment if you
-   only want to use it in other environments after granting permissions.
-
 
 ## Adjust the orchestrator configuration files
 
