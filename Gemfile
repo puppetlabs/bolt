@@ -14,6 +14,10 @@ group(:test) do
   gem "rubocop", '~> 0.50', require: false
 end
 
+group(:development) do
+  gem "r10k", "~> 2.6"
+end
+
 local_gemfile = File.join(__dir__, 'Gemfile.local')
 if File.exist? local_gemfile
   eval_gemfile local_gemfile
