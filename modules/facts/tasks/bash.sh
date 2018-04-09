@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Delegate to facter if available
-command -v facter > /dev/null 2>&1 && exec facter --json
+command -v facter > /dev/null 2>&1 && exec facter -p --json
 
 minor () {
     minor="${*#*.}"
