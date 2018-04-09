@@ -13,14 +13,20 @@ script:
 - bundle exec rake travisci rubocop
 - |
   pushd bolt-modules/boltlib
-  bundle exec rake spec
+  if ! bundle exec rake spec; then
+    exit 1
+  fi
   popd
 - |
+  status=0
   for i in $( ls modules ); do
     pushd modules/$i
-    bundle exec rake spec
+    if ! bundle exec rake spec; then
+      status=1
+    fi
     popd
   done
+  exit $status
 notifications:
   email: false
   hipchat:
