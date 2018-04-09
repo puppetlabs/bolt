@@ -47,7 +47,17 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
       end
 
       begin
-        result = func.class.dispatcher.dispatchers[0].call_by_name_with_scope(scope, params, true)
+        # If the plan does not throw :return by calling the return function it's result is
+        # undef/nil
+        result = catch(:return) do
+          func.class.dispatcher.dispatchers[0].call_by_name_with_scope(scope, params, true)
+          nil
+        end&.value
+        # Validate the result is a PlanResult
+        unless Puppet::Pops::Types::TypeParser.singleton.parse('Boltlib::PlanResult').instance?(result)
+          raise Bolt::InvalidPlanResult.new(plan_name, result.to_s)
+        end
+        result
       rescue Puppet::PreformattedError => err
         if named_args['_catch_errors'] && err.cause.is_a?(Bolt::Error)
           result = err.cause.to_puppet_error

@@ -1,1 +1,1 @@
-plan test::run_me() { "worked2" }
+plan test::run_me() { return "worked2" }

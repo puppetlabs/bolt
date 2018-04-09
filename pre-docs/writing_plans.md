@@ -1,9 +1,9 @@
 
 # Writing plans
 
-Plans allow you to run more than one task with a single command, or compute
-values for the input to a task, or make decisions based on the result of
-running a task.
+Plans allow you to run more than one task with a single command, compute values
+for the input to a task, process the results of tasks, or make decisions based
+  on the result of running a task.
 
 Write plans in the Puppet language, giving them a .pp extension, and place them
 in the module's `/plans` directory.
@@ -86,6 +86,45 @@ or a comma seperated string of target names.
 
 ```
 bolt plan run mymodule::myplan --modulepath ./PATH/TO/MODULES --params load_balancer=lb.myorg.com frontends='["kermit.myorg.com","gonzo.myorg.com"]' backends=waldorf.myorg.com,statler.myorg.com
+```
+
+## Returning results from plans
+
+> Plans can optionally return a result that can be used from other plans or
+> saved externally.
+
+Plans, unlike functions, are primarily run for side effects but they can
+optionally return a result. To return a result from a plan use the `return`
+function. Any plan that does not call the `return` function will return
+`undef`.
+
+```puppet
+plan return_result(
+  $nodes
+) {
+  return run_task('mytask', $nodes)
+}
+```
+
+The result of a plan must match the `PlanResult` type alias. This roughly
+includes JSON types as well as the Plan lanuguage types which have well defined
+json representations in Bolt.
+
+- `Undef`
+- `String`
+- `Numeric`
+- `Boolean`
+- `Target`
+- `Result`
+- `ResultSet`
+- `Error`
+- `Array` with only `PlanResult`
+- `Hash` with `String` keys and `PlanResult` values
+
+or
+
+```
+Variant[Data, String, Numeric, Boolean, Error, Result, ResultSet, Target, Array[Boltlib::PlanResult], Hash[String, Boltlib::PlanResult]]
 ```
 
 

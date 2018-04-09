@@ -43,12 +43,13 @@ module Bolt
       Bolt::ResultSet.include_iterable
     end
 
-    # Create a top-level alias for TargetSpec so that users don't have to
+    # Create a top-level alias for TargetSpec and PlanResult so that users don't have to
     # namespace it with Boltlib, which is just an implementation detail. This
-    # allows TargetSpec to feel like a built-in type in bolt, rather than
+    # allows them to feel like a built-in type in bolt, rather than
     # something has been, no pun intended, "bolted on".
-    def add_target_spec(compiler)
+    def alias_types(compiler)
       compiler.evaluate_string('type TargetSpec = Boltlib::TargetSpec')
+      compiler.evaluate_string('type PlanResult = Boltlib::PlanResult')
     end
 
     def full_modulepath(modulepath)
@@ -61,7 +62,7 @@ module Bolt
     def in_bolt_compiler
       r = Puppet::Pal.in_tmp_environment('bolt', modulepath: full_modulepath(@config[:modulepath]), facts: {}) do |pal|
         pal.with_script_compiler do |compiler|
-          add_target_spec(compiler)
+          alias_types(compiler)
           begin
             yield compiler
           rescue Puppet::PreformattedError => err

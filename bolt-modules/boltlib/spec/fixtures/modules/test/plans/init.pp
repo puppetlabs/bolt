@@ -1,1 +1,1 @@
-plan test() { "worked4" }
+plan test() { return "worked4" }

@@ -163,8 +163,10 @@ module Bolt
 
       # @param [Hash] A hash representing the plan result
       def print_plan_result(result)
-        # If the object has a json representation display it
-        if result.respond_to?(:to_json)
+        if result.nil?
+          @stream.puts("Plan completed successfully with no result")
+        # Otherwise if object has a json representation display it
+        elsif result.respond_to?(:to_json)
           # Guard against to_json methods that don't accept options
           # and don't print empty results on multiple lines
           if result.method(:to_json).arity == 0 ||
