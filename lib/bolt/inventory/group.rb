@@ -52,7 +52,6 @@ module Bolt
         if node_names.include?(@name)
           raise ValidationError.new("Group #{@name} conflicts with node of the same name", @name)
         end
-        raise ValidationError.new("Group #{@name} is too deeply nested", @name) if depth > 1
 
         check_deprecated_config('Group', @name, @config)
 
@@ -129,7 +128,7 @@ module Bolt
           # Shallow merge instead of deep merge so that vars with a hash value
           # are assigned a new hash, rather than merging the existing value
           # with the value meant to replace it
-          'vars'   => data2['vars'].merge(data1['vars']),
+          'vars'   => data1['vars'].merge(data2['vars']),
           'facts'  => Bolt::Util.deep_merge(data1['facts'], data2['facts']),
           'groups' => data2['groups'] + data1['groups']
         }

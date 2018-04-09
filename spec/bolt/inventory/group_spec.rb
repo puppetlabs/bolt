@@ -421,4 +421,132 @@ describe Bolt::Inventory::Group do
       expect { group.validate }.to raise_error(Bolt::Inventory::ValidationError, /conflicts with node/)
     end
   end
+
+  context 'with nested groups' do
+    context 'when one group contains a child group' do
+      let(:data) do
+        {
+          'name' => 'root',
+          'groups' => [{
+            'name' => 'parent',
+            'groups' => [{
+              'name' => 'child',
+              'nodes' => [{ 'name' => 'node1' }],
+              'vars' => { 'foo' => 'bar' }
+            }],
+            'vars' => { 'foo' => 'qux', 'a' => 'b' }
+          }]
+        }
+      end
+
+      before :each do
+        group.validate
+      end
+
+      it 'returns the node as a member of the parent group' do
+        expect(group.node_names).to include('node1')
+      end
+
+      it 'overrides parent group data with child group data' do
+        expect(group.data_for('node1')['vars']).to eq('foo' => 'bar', 'a' => 'b')
+      end
+
+      it 'returns the whole ancestry as the list of groups for the node' do
+        expect(group.data_for('node1')['groups']).to eq(%w[child parent root])
+      end
+    end
+
+    context 'when one group contains two child groups' do
+      let(:data) do
+        {
+          'name' => 'root',
+          'groups' => [{
+            'name' => 'parent',
+            'groups' => [{
+              'name' => 'child1',
+              'nodes' => [{ 'name' => 'node1' }],
+              'vars' => { 'foo' => 'bar' }
+            }, {
+              'name' => 'child2',
+              'nodes' => [{ 'name' => 'node2' }],
+              'vars' => { 'foo' => 'baz' }
+            }],
+            'vars' => { 'foo' => 'qux', 'a' => 'b' }
+          }]
+        }
+      end
+
+      before :each do
+        group.validate
+      end
+
+      it 'returns all child nodes as members of the parent group' do
+        expect(group.node_names.to_a.sort).to eq(%w[node1 node2])
+      end
+
+      it 'overrides parent group data with child group data' do
+        expect(group.data_for('node1')['vars']).to eq('foo' => 'bar', 'a' => 'b')
+        expect(group.data_for('node2')['vars']).to eq('foo' => 'baz', 'a' => 'b')
+      end
+
+      it 'returns the whole ancestry as the list of groups for the node' do
+        expect(group.data_for('node1')['groups']).to eq(%w[child1 parent root])
+        expect(group.data_for('node2')['groups']).to eq(%w[child2 parent root])
+      end
+    end
+  end
+
+  context 'when a group is duplicated in two parent groups' do
+    let(:data) do
+      {
+        'name' => 'root',
+        'groups' => [{
+          'name' => 'parent',
+          'groups' => [{
+            'name' => 'child1',
+            'nodes' => [{ 'name' => 'node1' }],
+            'vars' => { 'foo' => 'bar' }
+          }, {
+            'name' => 'child1',
+            'nodes' => [{ 'name' => 'node2' }],
+            'vars' => { 'foo' => 'baz' }
+          }],
+          'vars' => { 'foo' => 'qux', 'a' => 'b' }
+        }]
+      }
+    end
+
+    it 'fails because the group is duplicated' do
+      expect { group.validate }.to raise_error(Bolt::Inventory::ValidationError, /Tried to redefine group/)
+    end
+  end
+
+  context 'when a node is contained at multiple levels of the group hierarchy' do
+    let(:data) do
+      {
+        'name' => 'root',
+        'groups' => [{
+          'name' => 'parent1',
+          'nodes' => [{ 'name' => 'node1' }],
+          'vars' => { 'foo' => 'bar' }
+        }, {
+          'name' => 'parent2',
+          'groups' => [{
+            'name' => 'child1',
+            'nodes' => [{ 'name' => 'node1' }],
+            'vars' => { 'foo' => 'baz', 'a' => 'b' }
+          }]
+        }]
+      }
+    end
+
+    before :each do
+      group.validate
+    end
+
+    it 'uses values from the first branch encountered, picking the most specific subgroup' do
+      expect(group.data_for('node1')['groups']).to eq(%w[parent1 child1 parent2 root])
+      expect(group.data_for('node1')['vars']).to eq('foo' => 'bar', 'a' => 'b')
+    end
+  end
 end
