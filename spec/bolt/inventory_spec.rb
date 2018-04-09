@@ -63,6 +63,12 @@ describe Bolt::Inventory do
               } },
             'node7', 'ssh://node8'
           ],
+          'groups' => [
+            { 'name' => 'group3',
+              'nodes' => [
+                'node9'
+              ] }
+          ],
           'config' => {
             'ssh' => {
               'host-key-check' => false,
@@ -137,14 +143,14 @@ describe Bolt::Inventory do
       inventory = Bolt::Inventory.new(data)
       inventory.collect_groups
       targets = inventory.get_targets('all')
-      expect(targets.size).to eq(8)
+      expect(targets.size).to eq(9)
     end
 
     it 'finds nodes in a subgroup' do
       inventory = Bolt::Inventory.new(data)
       inventory.collect_groups
       targets = inventory.get_targets('group2')
-      expect(targets).to eq(targets(%w[node6 node7 ssh://node8]))
+      expect(targets).to eq(targets(%w[node6 node7 ssh://node8 node9]))
     end
   end
 
@@ -259,7 +265,7 @@ describe Bolt::Inventory do
 
       it 'should match wildcard selectors' do
         targets = inventory.get_targets('node*')
-        expect(targets).to eq(targets(%w[node1 node2 node3 node4 node5 node6 node7]))
+        expect(targets).to eq(targets(%w[node1 node2 node3 node4 node5 node6 node7 node9]))
       end
 
       it 'should fail if wildcard selector matches nothing' do
