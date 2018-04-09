@@ -5,7 +5,7 @@ source ENV['GEM_SOURCE'] || 'https://rubygems.org'
 gemspec
 
 # Required to pick up plan specs in the rake spec task
-gem "puppetlabs_spec_helper", git: 'https://github.com/puppetlabs/puppetlabs_spec_helper.git', ref: 'master'
+gem "puppetlabs_spec_helper", git: 'https://github.com/puppetlabs/puppetlabs_spec_helper.git', ref: '96a633ebf1a1e88062bf726d4271a3251baf082e'
 
 group(:test) do
   gem "beaker-hostgenerator"
