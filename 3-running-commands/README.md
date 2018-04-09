@@ -56,22 +56,29 @@ Finished on node2:
      21:20:14 up 13 min,  0 users,  load average: 0.00, 0.01, 0.05$
 ```
 
-For the duration of these exercises, it may help to set a variable with the list of nodes for future use. Later examples will refer to this variable. For example if using the provided Vagrant configuration, set the following:
+For the duration of these exercises, it may help to create an [inventory file] to refer to a group of nodes. Later examples will refer to the default group `all`. See the [inventory file] docs for how to setup other named groups.
 
-```
-NODE=node1,node2,node3
-```
+For example if using the provided Vagrant configuration, save the following to `~/.puppetlabs/bolt/inventory.yaml`:
 
-On Windows, you can do the same thing with Powershell:
-
-```powershell
-$NODE="node1,node2,node3"
+```yaml
+nodes: [node1, node2, node3]
 ```
 
 If you're accessing nodes using a username and password rather than keys you can pass those on the command line like so:
 
 ```
-bolt command run <command> --nodes $NODE --user <user> --password <password>
+bolt command run <command> --nodes all --user <user> --password <password>
+```
+
+or include that configuration in the [inventory file]:
+
+```yaml
+nodes: [node1, node2, node3]
+config:
+  transports:
+    ssh:
+      user: $user
+      password: $password
 ```
 
 `bolt` has a number of other flags. Run the following command to list all of them:
@@ -132,3 +139,5 @@ bolt command run <command> --no-ssl --nodes winrm://<node>,winrm://<node> --user
 Now that you know how to run adhoc commands with `bolt` you can move on to:
 
 1. [Running Scripts](../4-running-scripts)
+
+[inventory file]: https://puppet.com/docs/bolt/0.x/inventory_file.html
