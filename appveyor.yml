@@ -42,4 +42,15 @@ test_script:
   - cd bolt-modules/boltlib
   - bundle exec rake spec
   - cd ../..
-  - ps: Get-ChildItem modules -Directory | ForEach-Object { cd $_.FullName; bundle exec rake spec }
+  - ps: |
+      $test_fail = 0
+      Get-ChildItem modules -Directory | ForEach-Object {
+        cd $_.FullName;
+        $test_output = bundle exec rake spec
+        $r = $LASTEXITCODE
+        Write-Output $test_output
+        if($r) {
+          $test_fail = $r
+        }
+      }
+      if($test_fail) { throw "module tests failed" }
