@@ -1329,6 +1329,8 @@ bar
             .with(targets, task_t, { 'message' => 'hi there' }, kind_of(Hash))
             .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0)]))
 
+          expect(executor).to receive(:start_plan)
+
           cli.execute(options)
           expect(JSON.parse(output.string)).to eq(
             [{ 'node' => 'foo', 'status' => 'success', 'result' => { '_output' => 'yes' } }]
@@ -1351,6 +1353,8 @@ bar
             .with(targets, task_t, { 'message' => 'hi there' }, kind_of(Hash))
             .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0)]))
 
+          expect(executor).to receive(:start_plan)
+
           cli.execute(options)
           expect(JSON.parse(output.string)).to eq(
             [{ 'node' => 'foo', 'status' => 'success', 'result' => { '_output' => 'yes' } }]
@@ -1363,7 +1367,10 @@ bar
             .with(targets, task_t, { 'message' => 'hi there' }, kind_of(Hash))
             .and_raise("Could not connect to target")
 
-          expect { cli.execute(options) }.to raise_error(/Could not connect to target/)
+          expect(executor).to receive(:start_plan)
+
+          expect(cli.execute(options)).to eq(1)
+          expect(JSON.parse(output.string)['msg']).to match(/Could not connect to target/)
         end
 
         it "formats results of a failing task" do
@@ -1371,6 +1378,8 @@ bar
             .to receive(:run_task)
             .with(targets, task_t, { 'message' => 'hi there' }, kind_of(Hash))
             .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'no', '', 1)]))
+
+          expect(executor).to receive(:start_plan)
 
           cli.execute(options)
           expect(JSON.parse(output.string)).to eq(
@@ -1395,10 +1404,10 @@ bar
         it "errors for non-existent plans" do
           plan_name.replace 'sample::dne'
 
-          expect { cli.execute(options) }.to raise_error(
-            Bolt::CLIError, /Could not find a plan named "sample::dne"/
-          )
-          expect(JSON.parse(output.string)).to be
+          expect(executor).to receive(:start_plan)
+
+          expect(cli.execute(options)).to eq(1)
+          expect(JSON.parse(output.string)['msg']).to match(/Could not find a plan named "sample::dne"/)
         end
 
         it "traps SIGINT", :signals_self do
@@ -1409,6 +1418,8 @@ bar
               sync_thread.join(1) # give ruby some time to handle the signal
               Bolt::ResultSet.new([])
             end
+
+          expect(executor).to receive(:start_plan)
 
           expect(cli).to receive(:exit!) do
             sync_thread.kill

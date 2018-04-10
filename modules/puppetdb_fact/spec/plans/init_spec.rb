@@ -18,7 +18,7 @@ describe 'puppetdb_fact' do
   it 'returns facts from PuppetDB' do
     puppetdb_client.expects(:facts_for_node).with(facts.keys).returns(facts)
     result = run_plan('puppetdb_fact', 'nodes' => facts.keys)
-    expect(result).to eq(facts)
+    expect(result).to eq(Bolt::PlanResult.new(facts, 'success'))
   end
 
   it 'adds facts to Targets' do
@@ -32,6 +32,6 @@ describe 'puppetdb_fact' do
   it 'returns an empty hash for an empty list' do
     puppetdb_client.expects(:facts_for_node).with([]).returns({})
     result = run_plan('puppetdb_fact', 'nodes' => [])
-    expect(result).to eq({})
+    expect(result).to eq(Bolt::PlanResult.new({}, 'success'))
   end
 end

@@ -27,13 +27,13 @@ describe 'facts::retrieve' do
     it 'retrieves facts' do
       expect_task('facts::bash').always_return(fact_output)
 
-      expect(run_plan('facts::retrieve', 'nodes' => [node])).to eq(results(fact_output))
+      expect(run_plan('facts::retrieve', 'nodes' => [node]).value).to eq(results(fact_output))
     end
 
     it 'omits failed targets' do
       expect_task('facts::bash').always_return(err_output)
 
-      expect(run_plan('facts', 'nodes' => [node])).to eq(results(err_output))
+      expect(run_plan('facts', 'nodes' => [node]).value).to eq(results(err_output))
     end
   end
 
@@ -43,13 +43,13 @@ describe 'facts::retrieve' do
     it 'retrieves facts' do
       expect_task('facts::powershell').always_return(fact_output)
 
-      expect(run_plan('facts::retrieve', 'nodes' => [node])).to eq(results(fact_output))
+      expect(run_plan('facts::retrieve', 'nodes' => [node]).value).to eq(results(fact_output))
     end
 
     it 'omits failed targets' do
       expect_task('facts::powershell').always_return(err_output)
 
-      expect(run_plan('facts', 'nodes' => [node])).to eq(results(err_output))
+      expect(run_plan('facts', 'nodes' => [node]).value).to eq(results(err_output))
     end
   end
 
@@ -59,13 +59,13 @@ describe 'facts::retrieve' do
     it 'retrieves facts' do
       expect_task('facts::ruby').always_return(fact_output)
 
-      expect(run_plan('facts::retrieve', 'nodes' => [node])).to eq(results(fact_output))
+      expect(run_plan('facts::retrieve', 'nodes' => [node]).value).to eq(results(fact_output))
     end
 
     it 'omits failed targets' do
       expect_task('facts::ruby').always_return(err_output)
 
-      expect(run_plan('facts', 'nodes' => [node])).to eq(results(err_output))
+      expect(run_plan('facts', 'nodes' => [node]).value).to eq(results(err_output))
     end
   end
 
@@ -75,13 +75,13 @@ describe 'facts::retrieve' do
     it 'retrieves facts' do
       expect_task('facts::bash').always_return(fact_output)
 
-      expect(run_plan('facts::retrieve', 'nodes' => [node])).to eq(results(fact_output))
+      expect(run_plan('facts::retrieve', 'nodes' => [node]).value).to eq(results(fact_output))
     end
 
     it 'omits failed targets' do
       expect_task('facts::bash').always_return(err_output)
 
-      expect(run_plan('facts::retrieve', 'nodes' => [node])).to eq(results(err_output))
+      expect(run_plan('facts::retrieve', 'nodes' => [node]).value).to eq(results(err_output))
     end
   end
 
@@ -96,7 +96,7 @@ describe 'facts::retrieve' do
       result_set = Bolt::ResultSet.new(
         nodes.map { |node| Bolt::Result.new(Bolt::Target.new(node), value: fact_output(node)) }
       )
-      expect(run_plan('facts::retrieve', 'nodes' => nodes)).to eq(result_set)
+      expect(run_plan('facts::retrieve', 'nodes' => nodes).value).to eq(result_set)
     end
 
     it 'omits failed targets' do
@@ -107,7 +107,7 @@ describe 'facts::retrieve' do
       result_set = Bolt::ResultSet.new(
         nodes.map { |node| Bolt::Result.new(Bolt::Target.new(node), value: err_output(node)) }
       )
-      expect(run_plan('facts::retrieve', 'nodes' => nodes)).to eq(result_set)
+      expect(run_plan('facts::retrieve', 'nodes' => nodes).value).to eq(result_set)
     end
   end
 end

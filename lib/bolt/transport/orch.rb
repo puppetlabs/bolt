@@ -5,6 +5,7 @@ require 'concurrent'
 require 'json'
 require 'orchestrator_client'
 require 'bolt/transport/base'
+require 'bolt/transport/orch/connection'
 require 'bolt/result'
 
 module Bolt
@@ -14,6 +15,8 @@ module Bolt
       BOLT_COMMAND_TASK = Struct.new(:name).new('bolt_shim::command').freeze
       BOLT_SCRIPT_TASK = Struct.new(:name).new('bolt_shim::script').freeze
       BOLT_UPLOAD_TASK = Struct.new(:name).new('bolt_shim::upload').freeze
+
+      attr_writer :plan_context
 
       def self.options
         %w[service-url cacert token-file task-environment local-validation]
@@ -26,30 +29,31 @@ module Bolt
         end
       end
 
-      def create_client(opts)
-        client_keys = %i[service-url token-file cacert]
-        client_opts = opts.reduce({}) do |acc, (k, v)|
-          if client_keys.include?(k)
-            acc.merge(k.to_s => v)
-          else
-            acc
-          end
-        end
-        logger.debug("Creating orchestrator client for #{client_opts}")
-
-        OrchestratorClient.new(client_opts, true)
+      def initialize(*args)
+        @connections = {}
+        super
       end
 
-      def build_request(targets, task, arguments, description = nil)
-        body = { task: task.name,
-                 environment: targets.first.options["task-environment"],
-                 noop: arguments['_noop'],
-                 params: arguments.reject { |k, _| k == '_noop' },
-                 scope: {
-                   nodes: targets.map(&:host)
-                 } }
-        body[:description] = description if description
-        body
+      def finish_plan(result)
+        if result.is_a? Bolt::PlanResult
+          @connections.each_value do |conn|
+            begin
+              conn.finish_plan(result)
+            rescue StandardError => e
+              @logger.error("Failed to finish plan on #{conn.key}: #{e.message}")
+            end
+          end
+        end
+      end
+
+      # It's safe to create connections here for now because the
+      # batches/threads are per connection.
+      def get_connection(conn_opts)
+        key = Connection.get_key(conn_opts)
+        unless (conn = @connections[key])
+          conn = @connections[key] = Connection.new(conn_opts, @plan_context, logger)
+        end
+        conn
       end
 
       def process_run_results(targets, results)
@@ -134,22 +138,16 @@ module Bolt
       end
 
       def batches(targets)
-        targets.group_by do |target|
-          [target.options['task-environment'],
-           target.options['service-url'],
-           target.options['token-file']]
-        end.values
+        targets.group_by { |target| Connection.get_key(target.options) }.values
       end
 
       def run_task_job(targets, task, arguments, options)
-        body = build_request(targets, task, arguments, options['_description'])
-
         targets.each do |target|
           yield(type: :node_start, target: target) if block_given?
         end
 
         begin
-          results = create_client(targets.first.options).run_task(body)
+          results = get_connection(targets.first.options).run_task(targets, task, arguments, options)
 
           process_run_results(targets, results)
         rescue OrchestratorClient::ApiError => e

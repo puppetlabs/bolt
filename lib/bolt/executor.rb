@@ -16,10 +16,10 @@ module Bolt
     attr_reader :noop, :transports
     attr_accessor :run_as
 
-    def initialize(config = Bolt::Config.new, noop = nil, plan_logging = false)
+    def initialize(config = Bolt::Config.new, noop = nil)
       @config = config
       @logger = Logging.logger[self]
-      @plan_logging = plan_logging
+      @plan_logging = false
 
       @transports = Bolt::TRANSPORTS.each_with_object({}) do |(key, val), coll|
         coll[key.to_s] = Concurrent::Delay.new { val.new }
@@ -34,6 +34,7 @@ module Bolt
 
     def transport(transport)
       impl = @transports[transport || 'ssh']
+      raise(Bolt::UnknownTransportError, transport) unless impl
       # If there was an error creating the transport, ensure it gets thrown
       impl.no_error!
       impl.value
@@ -183,6 +184,25 @@ module Bolt
         @notifier.shutdown
         results
       end
+    end
+
+    # Plan context doesn't make sense for most transports but it is tightly
+    # coupled with the orchestrator transport since the transport behaves
+    # differently when a plan is running. In order to limit how much this
+    # pollutes the transport API we only handle the orchestrator transport here.
+    # Since we callt this function without resolving targets this will result
+    # in the orchestrator transport always being initialized during plan runs.
+    # For now that's ok.
+    #
+    # In the future if other transports need this or if we want a plan stack
+    # we'll need to refactor.
+    def start_plan(plan_context)
+      transport('pcp').plan_context = plan_context
+      @plan_logging = true
+    end
+
+    def finish_plan(plan_result)
+      transport('pcp').finish_plan(plan_result)
     end
   end
 end
