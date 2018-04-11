@@ -66,6 +66,7 @@ beaker_options = [
     } },
   { name: '--keyfile',
     add_argument: {
+      name: '~/.ssh/id_rsa-acceptance',
       add_env: {
         name: 'BEAKER_KEYFILE',
         message: 'The private SSH key beaker will use to connect to SUTs'
