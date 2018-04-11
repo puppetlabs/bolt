@@ -60,19 +60,20 @@ directory of your `bolt` git clone.
 The following environment variables are used in conjunction with the
 rake tasks:
 
-### Required
-
-**SSH_PASSWORD** (No default): Value to be used by the tests as the
-password for the `SSH_USER` for connecting to all hosts over SSH.
-
-
-**WINRM_PASSWORD** (No default): Value to be used by the tests as the
-passord for the `WINRM_USER` for connecting to all hosts over WinRM.
-
 ### Optional
 
 **BEAKER_KEYFILE** (Default `~/.ssh/id_rsa-acceptance`): The path to
 the file Beaker should use as the ssh key.
+
+**SSH_PASSWORD** (Default `bolt_secret_password`): Value to be used by the tests
+as the password for the `SSH_USER` for connecting to all hosts over SSH. Setup
+will update passwords on targets to match this value after connecting via
+`BEAKER_KEYFILE`.
+
+**WINRM_PASSWORD** (Default `bolt_secret_password`): Value to be used by the
+tests as the passord for the `WINRM_USER` for connecting to all hosts over WinRM.
+Setup will update passwords on targets to match this value after connecting via
+`BEAKER_KEYFILE`.
 
 **BOLT_CONTOLLER** (Default `centos7-64bolt`): Operating system and
 architecture to be used for the node running `bolt`. This value should be one
