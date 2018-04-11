@@ -99,6 +99,8 @@ will default to `root`.
 tests as the user for connecting to all hosts using the `winrm` role.
 This user must already be present on the system.
 
+**RUBY_URL** (Default `https://artifactory.delivery.puppetlabs.net/artifactory/generic__buildsources/buildsources/ruby-2.4.4.tar.gz`): The url to download and install ruby from.
+
 ### For Gem Testing
 
 **GEM_VERSION** (Default `> 0.1.0`): When testing via gem install,

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'install_ruby'
+
 test_name "Install Ruby" do
   step "Ensure Ruby is installed on Bolt controller" do
     result = nil
@@ -22,16 +24,13 @@ PS
       result = on(bolt, powershell('ruby --version'))
     when /debian|ubuntu/
       # install system ruby packages
-      install_package(bolt, 'ruby')
-      install_package(bolt, 'ruby-ffi')
+      install_package(bolt, "zlib1g zlib1g-dev openssl libssl-dev")
+      install_ruby_from_source(bolt)
       result = on(bolt, 'ruby --version')
     when /el-|centos|fedora/
       # install system ruby packages
-      install_package(bolt, 'ruby')
-      install_package(bolt, 'rubygem-json')
-      install_package(bolt, 'rubygem-ffi')
-      install_package(bolt, 'rubygem-bigdecimal')
-      install_package(bolt, 'rubygem-io-console')
+      install_package(bolt, "zlib zlib-devel openssl-devel libssl-devel")
+      install_ruby_from_source(bolt)
       result = on(bolt, 'ruby --version')
     when /osx/
       # ruby dev tools should be already installed
