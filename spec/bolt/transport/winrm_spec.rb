@@ -15,6 +15,8 @@ describe Bolt::Transport::WinRM do
 
   def mk_config(conf)
     stringified = conf.each_with_object({}) { |(k, v), coll| coll[k.to_s] = v }
+    # The default of 10 seconds seems to be too short to always succeed in AppVeyor.
+    stringified['connect-timeout'] ||= 20
     Bolt::Config.new(transport: 'winrm', transports: { winrm: stringified })
   end
 
