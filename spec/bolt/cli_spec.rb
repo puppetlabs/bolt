@@ -18,8 +18,7 @@ describe "Bolt::CLI" do
     allow_any_instance_of(Bolt::CLI).to receive(:outputter).and_return(outputter)
     allow_any_instance_of(Bolt::CLI).to receive(:warn)
 
-    # This will turn on logging to the console by default... not ideal for tests
-    allow(Bolt::PAL).to receive(:configure_logging)
+    Logging.logger[:root].level = :info
   end
 
   def stub_file(path)
@@ -853,7 +852,8 @@ bar
                               ["facts::ruby", nil],
                               ['sample::ok', nil]])
 
-          expect(@puppet_logs.first.message).to match(/unexpected token.*params\.json/m)
+          output = @log_output.readlines.join
+          expect(output).to match(/unexpected token.*params\.json/m)
         end
       end
 
@@ -948,7 +948,7 @@ bar
                               ["puppetdb_fact"],
                               ["sample::ok"]])
 
-          expect(@puppet_logs.first.message).to match(/^Syntax error at.*single_task.pp/m)
+          expect(@log_output.readlines.join).to match(/Syntax error at.*single_task.pp/m)
         end
 
         it "plan run displays an error" do
