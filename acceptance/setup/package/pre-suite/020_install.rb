@@ -23,13 +23,13 @@ test_name 'Install Bolt package' do
     end
 
     base_url, build_details = fetch_build_details(sha_yaml_url)
-    artifact_url, _ = host_urls(bolt, build_details, base_url)
+    artifact_url, = host_urls(bolt, build_details, base_url)
 
     case bolt['platform']
       # TODO: BKR-1109 requests a supported way to install packages on Windows and OSX
-    when %r{windows}
+    when /windows/
       generic_install_msi_on(bolt, artifact_url)
-    when %r{osx}
+    when /osx/
       on bolt, "curl -O #{artifact_url}"
       bolt.install_package('bolt*')
     else
