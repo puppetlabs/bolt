@@ -12,7 +12,7 @@ module Bolt
       # Nothing works without initialized this global state. Reinitializing
       # is safe and in practice only happen in tests
       self.class.load_puppet
-      self.class.configure_logging
+
       # This makes sure we don't accidentally create puppet dirs
       with_puppet_settings { |_| nil }
 
@@ -21,7 +21,10 @@ module Bolt
 
     # Puppet logging is global so this is class method to avoid confusion
     def self.configure_logging
-      Puppet::Util::Log.newdestination(:console)
+      Puppet::Util::Log.newdestination(Logging.logger['Puppet'])
+      # Defer all log level decisions to the Logging library by telling Puppet
+      # to log everything
+      Puppet.settings[:log_level] = 'debug'
     end
 
     def self.load_puppet
@@ -38,6 +41,8 @@ module Bolt
       rescue LoadError
         raise Bolt::CLIError, "Puppet must be installed to execute tasks"
       end
+
+      require 'bolt/pal/logging'
 
       # Now that puppet is loaded we can include puppet mixins in data types
       Bolt::ResultSet.include_iterable
@@ -130,6 +135,7 @@ module Bolt
         end
         Puppet.settings.send(:clear_everything_for_tests)
         Puppet.initialize_settings(cli)
+        self.class.configure_logging
         yield
       end
     end
