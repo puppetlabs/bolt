@@ -66,11 +66,18 @@ beaker_options = [
     } },
   { name: '--keyfile',
     add_argument: {
+      name: '~/.ssh/id_rsa-acceptance',
       add_env: {
         name: 'BEAKER_KEYFILE',
         message: 'The private SSH key beaker will use to connect to SUTs'
       }
     } }
+]
+beaker_env = [
+  { name: 'SSH_USER',       default: 'root' },
+  { name: 'SSH_PASSWORD',   default: 'bolt_secret_password' },
+  { name: 'WINRM_USER',     default: 'Administrator' },
+  { name: 'WINRM_PASSWORD', default: 'bolt_secret_password' }
 ]
 namespace :test do
   desc "Run bolt acceptance tests against a published gem"
@@ -80,12 +87,9 @@ namespace :test do
       name: '--options',
       add_argument: { name: 'config/gem/options.rb' }
     }
+    beaker_env.each { |env| task.add_env(env) }
     task.add_env(name: 'GEM_VERSION', default: '> 0.1.0')
     task.add_env(name: 'GEM_SOURCE',  default: 'https://rubygems.org')
-    task.add_env(name: 'SSH_USER',    default: 'root')
-    task.add_env(name: 'SSH_PASSWORD')
-    task.add_env(name: 'WINRM_USER', default: 'Administrator')
-    task.add_env(name: 'WINRM_PASSWORD')
     task.add_command do |cmd|
       cmd.name = 'beaker'
       cmd.add_option(*beaker_options)
@@ -99,14 +103,11 @@ namespace :test do
       name: '--options',
       add_argument: { name: 'config/git/options.rb' }
     }
+    beaker_env.each { |env| task.add_env(env) }
     task.add_env(name: 'GIT_SERVER', default: 'https://github.com')
     task.add_env(name: 'GIT_FORK',   default: 'puppetlabs/bolt.git')
     task.add_env(name: 'GIT_BRANCH', default: 'master')
     task.add_env(name: 'GIT_SHA',    default: '')
-    task.add_env(name: 'SSH_USER',   default: 'root')
-    task.add_env(name: 'SSH_PASSWORD')
-    task.add_env(name: 'WINRM_USER', default: 'Administrator')
-    task.add_env(name: 'WINRM_PASSWORD')
     task.add_command do |cmd|
       cmd.name = 'beaker'
       cmd.add_option(*beaker_options)
@@ -120,10 +121,7 @@ namespace :test do
       name: '--options',
       add_argument: { name: 'config/package/options.rb' }
     }
-    task.add_env(name: 'SSH_USER', default: 'root')
-    task.add_env(name: 'SSH_PASSWORD')
-    task.add_env(name: 'WINRM_USER', default: 'Administrator')
-    task.add_env(name: 'WINRM_PASSWORD')
+    beaker_env.each { |env| task.add_env(env) }
     task.add_env(name: 'SHA')
     task.add_command do |cmd|
       cmd.name = 'beaker'
