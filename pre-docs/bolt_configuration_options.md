@@ -29,6 +29,7 @@ directories seperated by the OS specific file path seperator.
 `inventoryfile`: The path to a structured data inventory file used to refer to
 groups of nodes on the commandline and from plans.
 
+`color`: Whether to use colored output when printing messages to the console.
 
 ## SSH transport configuration options
 

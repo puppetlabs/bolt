@@ -25,20 +25,20 @@ module Bolt
           fatal: %i[white on_red]
         }
       )
-
-      root_logger = Logging.logger[:root]
-      root_logger.add_appenders Logging.appenders.stderr(
-        'console',
-        layout: console_layout,
-        level: default_level
-      )
-      # We set the root logger's level so that it logs everything but we do
-      # limit what's actually logged in every appender individually.
-      root_logger.level = :all
     end
 
     def self.configure(config)
       root_logger = Logging.logger[:root]
+
+      root_logger.add_appenders Logging.appenders.stderr(
+        'console',
+        layout: console_layout(config[:color]),
+        level: default_level
+      )
+
+      # We set the root logger's level so that it logs everything but we do
+      # limit what's actually logged in every appender individually.
+      root_logger.level = :all
 
       config[:log].each_pair do |name, params|
         appender = Logging.appenders[name]
@@ -66,10 +66,11 @@ module Bolt
       end
     end
 
-    def self.console_layout
+    def self.console_layout(color)
+      color_scheme = :bolt if color
       Logging.layouts.pattern(
         pattern: '%m\n',
-        color_scheme: :bolt
+        color_scheme: color_scheme
       )
     end
 

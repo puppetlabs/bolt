@@ -30,6 +30,7 @@ module Bolt
     :log,
     :modulepath,
     :puppetdb,
+    :color,
     :transport,
     :transports
   ) do
@@ -39,7 +40,8 @@ module Bolt
       transport: 'ssh',
       format: 'human',
       modulepath: [],
-      puppetdb: {}
+      puppetdb: {},
+      color: true
     }.freeze
 
     TRANSPORT_OPTIONS = %i[password run-as sudo-password extensions
@@ -129,8 +131,8 @@ module Bolt
         self[:modulepath] = data['modulepath'].split(File::PATH_SEPARATOR)
       end
 
-      %w[inventoryfile concurrency format puppetdb].each do |key|
-        if data[key]
+      %w[inventoryfile concurrency format puppetdb color].each do |key|
+        if data.key?(key)
           self[key.to_sym] = data[key]
         end
       end
@@ -150,8 +152,8 @@ module Bolt
     end
 
     def update_from_cli(options)
-      %i[concurrency transport format modulepath inventoryfile].each do |key|
-        self[key] = options[key] if options[key]
+      %i[concurrency transport format modulepath inventoryfile color].each do |key|
+        self[key] = options[key] if options.key?(key)
       end
 
       if options[:debug]

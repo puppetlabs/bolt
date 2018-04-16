@@ -18,6 +18,9 @@ describe "Bolt::CLI" do
     allow_any_instance_of(Bolt::CLI).to receive(:outputter).and_return(outputter)
     allow_any_instance_of(Bolt::CLI).to receive(:warn)
 
+    # Don't allow tests to override the captured log config
+    allow(Bolt::Logger).to receive(:configure)
+
     Logging.logger[:root].level = :info
   end
 
@@ -344,12 +347,11 @@ bar
     end
 
     describe "console log level" do
-      let(:console_log) { Logging.appenders['console'] }
-      after(:each) { console_log.level = :notice }
       it "is not sensitive to ordering of debug and verbose" do
+        expect(Bolt::Logger).to receive(:configure).with(have_attributes(log: { 'console' => { level: :debug } }))
+
         cli = Bolt::CLI.new(%w[command run --nodes foo --debug --verbose])
         cli.parse
-        expect(console_log.level).to eq(Logging.level_num(:debug))
       end
     end
 

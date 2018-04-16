@@ -39,36 +39,6 @@ describe Bolt::Logger do
         %w[debug info notice warn error fatal any].each_with_object({}) { |l, h| h[l] = h.count }
       )
     end
-
-    it 'creates the console appender with the expected properties' do
-      expect(Logging.appenders['console']).to be_nil
-
-      Bolt::Logger.initialize_logging
-
-      console_appender = Logging.appenders['console']
-
-      expect(console_appender).not_to be_nil
-      expect(console_appender.class).to eq(Logging::Appenders::Stderr)
-      expect(console_appender.level).to eq(Logging.level_num(:notice))
-    end
-
-    it 'adds the console appender to the root logger' do
-      # this initializes logging, se we need to reset it again
-      expect(Logging.logger[:root].appenders).to be_empty
-      Logging.reset
-
-      Bolt::Logger.initialize_logging
-
-      console_appender = Logging.appenders['console']
-
-      expect(Logging.logger[:root].appenders).to eq([console_appender])
-    end
-
-    it 'sets the root logger level to :all' do
-      Bolt::Logger.initialize_logging
-
-      expect(Logging.logger[:root].level).to eq(Logging.level_num(:all))
-    end
   end
 
   describe '::configure' do
@@ -90,12 +60,41 @@ describe Bolt::Logger do
       Bolt::Logger.initialize_logging
     end
 
-    it 'sets the level of the console appender' do
-      config[:log] = { 'console' => { level: :foo } }
+    it 'sets the root logger level to :all' do
+      Bolt::Logger.configure(Bolt::Config.new)
 
-      expect(Logging.appenders['console']).to receive(:level=).with(:foo)
+      expect(Logging.logger[:root].level).to eq(Logging.level_num(:all))
+    end
+
+    it 'creates the console appender with the expected properties' do
+      expect(Logging.appenders['console']).to be_nil
+
+      Bolt::Logger.configure(Bolt::Config.new)
+
+      console_appender = Logging.appenders['console']
+
+      expect(Logging.logger[:root].appenders).to eq([console_appender])
+
+      expect(console_appender).not_to be_nil
+      expect(console_appender.class).to eq(Logging::Appenders::Stderr)
+      expect(console_appender.level).to eq(Logging.level_num(:notice))
+      expect(console_appender.layout.color_scheme).to eq(Logging::ColorScheme['bolt'])
+    end
+
+    it 'overrides the level of the console appender if specified' do
+      config[:log] = { 'console' => { level: :warn } }
 
       Bolt::Logger.configure(config)
+
+      expect(Logging.appenders['console'].level).to eq(Logging.level_num(:warn))
+    end
+
+    it 'disables color if specified' do
+      Bolt::Logger.configure(Bolt::Config.new(color: false))
+
+      console_appender = Logging.appenders['console']
+
+      expect(console_appender.layout.color_scheme).to be_nil
     end
 
     it 'creates all the additional appenders with expected properties' do
@@ -119,7 +118,7 @@ describe Bolt::Logger do
     end
 
     it 'adds all the additional appenders to the root logger' do
-      appenders = [Logging.appenders['console']]
+      appenders = []
 
       expect(Logging.appenders)
         .to receive(:file).exactly(config[:log].count - 1) do |*args|
@@ -129,6 +128,7 @@ describe Bolt::Logger do
         end
 
       Bolt::Logger.configure(config)
+      appenders.unshift(Logging.appenders['console'])
 
       expect(Logging.logger[:root].appenders).to eq(appenders)
     end

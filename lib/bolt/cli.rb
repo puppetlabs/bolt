@@ -243,6 +243,9 @@ Available options are:
         define('--format FORMAT', 'Output format to use: human or json') do |format|
           @options[:format] = format
         end
+        define('--[no-]color', 'Whether to show output in color') do |color|
+          @options[:color] = color
+        end
         define('-h', '--help', 'Display help') do |_|
           @options[:help] = true
         end
