@@ -16,10 +16,20 @@ module Bolt
 
       Logging.init :debug, :info, :notice, :warn, :error, :fatal, :any
 
+      Logging.color_scheme(
+        'bolt',
+        lines: {
+          notice: :green,
+          warn: :yellow,
+          error: :red,
+          fatal: %i[white on_red]
+        }
+      )
+
       root_logger = Logging.logger[:root]
       root_logger.add_appenders Logging.appenders.stderr(
         'console',
-        layout: default_layout,
+        layout: console_layout,
         level: default_level
       )
       # We set the root logger's level so that it logs everything but we do
@@ -56,8 +66,15 @@ module Bolt
       end
     end
 
+    def self.console_layout
+      Logging.layouts.pattern(
+        pattern: '%m\n',
+        color_scheme: :bolt
+      )
+    end
+
     def self.default_layout
-      @default_layout ||= Logging.layouts.pattern(
+      Logging.layouts.pattern(
         pattern: '%d %-6l %c: %m\n',
         date_pattern: '%Y-%m-%dT%H:%M:%S.%6N'
       )
