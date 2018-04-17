@@ -39,14 +39,6 @@ module Bolt
       impl.value
     end
 
-    def summary(description, result)
-      fc = result.error_set.length
-      npl = result.length == 1 ? '' : 's'
-      fpl = fc == 1 ? '' : 's'
-      "Finished: #{description} on #{result.length} node#{npl} with #{fc} failure#{fpl}"
-    end
-    private :summary
-
     # Execute the given block on a list of nodes in parallel, one thread per "batch".
     #
     # This is the main driver of execution on a list of targets. It first
@@ -93,9 +85,27 @@ module Bolt
       ResultSet.new(promises.map(&:value))
     end
 
-    # When running a plan, info messages like starting a task are promoted to notice.
-    def log_action(msg)
-      @plan_logging ? @logger.notice(msg) : @logger.info(msg)
+    def log_action(description, targets)
+      # When running a plan, info messages like starting a task are promoted to notice.
+      log_method = @plan_logging ? :notice : :info
+      target_str = if targets.length > 5
+                     "#{targets.count} targets"
+                   else
+                     targets.map(&:uri).join(', ')
+                   end
+
+      @logger.send(log_method, "Starting: #{description} on #{target_str}")
+
+      start_time = Time.now
+      results = yield
+      duration = Time.now - start_time
+
+      failures = results.error_set.length
+      plural = failures == 1 ? '' : 's'
+
+      @logger.send(log_method, "Finished: #{description} with #{failures} failure#{plural} in #{duration.round(2)} sec")
+
+      results
     end
     private :log_action
 
@@ -109,72 +119,70 @@ module Bolt
 
     def run_command(targets, command, options = {}, &callback)
       description = options.fetch('_description', "command '#{command}'")
-      log_action("Starting: #{description} on #{targets.map(&:uri)}")
-      notify = proc { |event| @notifier.notify(callback, event) if callback }
-      options = { '_run_as' => run_as }.merge(options) if run_as
+      log_action(description, targets) do
+        notify = proc { |event| @notifier.notify(callback, event) if callback }
+        options = { '_run_as' => run_as }.merge(options) if run_as
 
-      results = batch_execute(targets) do |transport, batch|
-        with_node_logging("Running command '#{command}'", batch) do
-          transport.batch_command(batch, command, options, &notify)
+        results = batch_execute(targets) do |transport, batch|
+          with_node_logging("Running command '#{command}'", batch) do
+            transport.batch_command(batch, command, options, &notify)
+          end
         end
-      end
 
-      log_action(summary(description, results))
-      @notifier.shutdown
-      results
+        @notifier.shutdown
+        results
+      end
     end
 
     def run_script(targets, script, arguments, options = {}, &callback)
       description = options.fetch('_description', "script #{script}")
-      log_action("Starting: #{description} on #{targets.map(&:uri)}")
+      log_action(description, targets) do
+        notify = proc { |event| @notifier.notify(callback, event) if callback }
+        options = { '_run_as' => run_as }.merge(options) if run_as
 
-      notify = proc { |event| @notifier.notify(callback, event) if callback }
-      options = { '_run_as' => run_as }.merge(options) if run_as
-
-      results = batch_execute(targets) do |transport, batch|
-        with_node_logging("Running script #{script} with '#{arguments}'", batch) do
-          transport.batch_script(batch, script, arguments, options, &notify)
+        results = batch_execute(targets) do |transport, batch|
+          with_node_logging("Running script #{script} with '#{arguments}'", batch) do
+            transport.batch_script(batch, script, arguments, options, &notify)
+          end
         end
-      end
 
-      log_action(summary(description, results))
-      @notifier.shutdown
-      results
+        @notifier.shutdown
+        results
+      end
     end
 
     def run_task(targets, task, arguments, options = {}, &callback)
       description = options.fetch('_description', "task #{task.name}")
-      log_action("Starting: #{description} on #{targets.map(&:uri)}")
+      log_action(description, targets) do
+        notify = proc { |event| @notifier.notify(callback, event) if callback }
+        options = { '_run_as' => run_as }.merge(options) if run_as
 
-      notify = proc { |event| @notifier.notify(callback, event) if callback }
-      options = { '_run_as' => run_as }.merge(options) if run_as
-
-      results = batch_execute(targets) do |transport, batch|
-        with_node_logging("Running task #{task.name} with '#{arguments}' via #{task.input_method}", batch) do
-          transport.batch_task(batch, task, arguments, options, &notify)
+        results = batch_execute(targets) do |transport, batch|
+          with_node_logging("Running task #{task.name} with '#{arguments}' via #{task.input_method}", batch) do
+            transport.batch_task(batch, task, arguments, options, &notify)
+          end
         end
-      end
 
-      log_action(summary(description, results))
-      @notifier.shutdown
-      results
+        @notifier.shutdown
+        results
+      end
     end
 
     def file_upload(targets, source, destination, options = {}, &callback)
       description = options.fetch('_description', "file upload from #{source} to #{destination}")
-      log_action("Starting: #{description} on #{targets.map(&:uri)}")
-      notify = proc { |event| @notifier.notify(callback, event) if callback }
-      options = { '_run_as' => run_as }.merge(options) if run_as
+      log_action(description, targets) do
+        notify = proc { |event| @notifier.notify(callback, event) if callback }
+        options = { '_run_as' => run_as }.merge(options) if run_as
 
-      results = batch_execute(targets) do |transport, batch|
-        with_node_logging("Uploading file #{source} to #{destination}", batch) do
-          transport.batch_upload(batch, source, destination, options, &notify)
+        results = batch_execute(targets) do |transport, batch|
+          with_node_logging("Uploading file #{source} to #{destination}", batch) do
+            transport.batch_upload(batch, source, destination, options, &notify)
+          end
         end
-      end
 
-      log_action(summary(description, results))
-      @notifier.shutdown
-      results
+        @notifier.shutdown
+        results
+      end
     end
   end
 end
