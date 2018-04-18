@@ -234,6 +234,7 @@ Options are optional unless marked as required.
 ||
 | Display |
 | `--format` | Output format to use: human or json |
+| `--[no-]color` | Whether to show output in color |
 | `--help, -h` | Displays help for the bolt command. |
 | `--verbose` | Display verbose logging |
 | `--debug` | Display debug logging |

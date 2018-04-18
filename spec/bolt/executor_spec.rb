@@ -375,7 +375,7 @@ describe "Bolt::Executor" do
       executor.run_command(targets, command)
 
       expect(@log_output.readline).to match(/NOTICE.*Starting: command '.*' on .*/)
-      expect(@log_output.readline).to match(/NOTICE.*Finished: command '.*' on 2 nodes with 0 failures/)
+      expect(@log_output.readline).to match(/NOTICE.*Finished: command '.*' with 0 failures/)
     end
 
     it "logs scripts" do
@@ -389,7 +389,7 @@ describe "Bolt::Executor" do
       executor.run_script(targets, script, [])
 
       expect(@log_output.readline).to match(/NOTICE.*Starting: script .* on .*/)
-      expect(@log_output.readline).to match(/NOTICE.*Finished: script .* on 2 nodes with 0 failures/)
+      expect(@log_output.readline).to match(/NOTICE.*Finished: script .* with 0 failures/)
     end
 
     it "logs tasks" do
@@ -403,7 +403,7 @@ describe "Bolt::Executor" do
       executor.run_task(targets, mock_task(task), task_arguments)
 
       expect(@log_output.readline).to match(/NOTICE.*Starting: task service::restart on .*/)
-      expect(@log_output.readline).to match(/NOTICE.*Finished: task service::restart on 2 nodes with 0 failures/)
+      expect(@log_output.readline).to match(/NOTICE.*Finished: task service::restart with 0 failures/)
     end
 
     it "logs uploads" do
@@ -417,7 +417,7 @@ describe "Bolt::Executor" do
       executor.file_upload(targets, script, dest)
 
       expect(@log_output.readline).to match(/NOTICE.*Starting: file upload from .* to .* on .*/)
-      expect(@log_output.readline).to match(/NOTICE.*Finished: file upload from .* to .* on 2 nodes with 0 failures/)
+      expect(@log_output.readline).to match(/NOTICE.*Finished: file upload from .* to .* with 0 failures/)
     end
   end
 end

@@ -11,6 +11,7 @@ module BoltSpec
       output =  StringIO.new
       outputter = Bolt::Outputter::JSON.new(output)
       allow(cli).to receive(:outputter).and_return(outputter)
+      allow(Bolt::Logger).to receive(:configure)
 
       opts = cli.parse
 

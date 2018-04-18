@@ -46,7 +46,7 @@ describe "when logging executor activity", ssh: true do
   it 'logs with a plan that includes a description' do
     result = run_cli_json(%W[plan run #{echo_plan} description=somemessage] + config_flags)
     expect(@log_output.readline).to match(/Starting: somemessage on/)
-    expect(@log_output.readline).to match(/Finished: somemessage on/)
+    expect(@log_output.readline).to match(/Finished: somemessage/)
     expect(result[0]['result']['_output'].strip).to match(/hi there/)
   end
 
