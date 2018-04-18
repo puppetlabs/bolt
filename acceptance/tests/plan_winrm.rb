@@ -110,11 +110,11 @@ plan test::winrm_retry_plan($nodes) {
 
     result = bolt_command_on(bolt, bolt_command, flags)
 
-    assert_match(/Bolt::Executor: Starting: task/, result.output,
+    assert_match(/Starting: task test::hostname/, result.output,
                  "The starting task message was not in the output")
-    assert_match(/Bolt::Executor: Finished: task/, result.output,
+    assert_match(/Finished: task test::hostname/, result.output,
                  "The ran task message was not in the output")
-    assert_match(/on #{winrm_nodes.length} node[s]? with 1 failure/, result.output,
+    assert_match(/with 1 failure/, result.output,
                  "Node failure was not logged correctly")
   end
 end
