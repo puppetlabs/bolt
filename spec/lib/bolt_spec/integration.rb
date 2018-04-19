@@ -9,7 +9,7 @@ module BoltSpec
       allow(cli.config).to receive(:default_paths).and_return([File.join('.', 'path', 'does not exist')])
       allow(Bolt::Inventory).to receive(:default_paths).and_return([File.join('.', 'path', 'does not exist')])
       output =  StringIO.new
-      outputter = Bolt::Outputter::JSON.new(output)
+      outputter = Bolt::Outputter::JSON.new(false, output)
       allow(cli).to receive(:outputter).and_return(outputter)
       allow(Bolt::Logger).to receive(:configure)
 

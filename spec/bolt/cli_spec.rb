@@ -13,7 +13,7 @@ describe "Bolt::CLI" do
   let(:target) { Bolt::Target.new('foo') }
 
   before(:each) do
-    outputter = Bolt::Outputter::Human.new(StringIO.new)
+    outputter = Bolt::Outputter::Human.new(false, StringIO.new)
 
     allow_any_instance_of(Bolt::CLI).to receive(:outputter).and_return(outputter)
     allow_any_instance_of(Bolt::CLI).to receive(:warn)
@@ -615,7 +615,7 @@ bar
       before :each do
         allow(Bolt::Executor).to receive(:new).and_return(executor)
 
-        outputter = Bolt::Outputter::JSON.new(output)
+        outputter = Bolt::Outputter::JSON.new(false, output)
 
         allow(cli).to receive(:outputter).and_return(outputter)
       end
@@ -1496,7 +1496,7 @@ bar
       before :each do
         expect(Bolt::Executor).to receive(:new).with(config, true).and_return(executor)
 
-        outputter = Bolt::Outputter::JSON.new(output)
+        outputter = Bolt::Outputter::JSON.new(false, output)
 
         allow(cli).to receive(:outputter).and_return(outputter)
       end

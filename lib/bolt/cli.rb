@@ -617,7 +617,7 @@ Available options are:
     end
 
     def outputter
-      @outputter ||= Bolt::Outputter.for_format(config[:format])
+      @outputter ||= Bolt::Outputter.for_format(config[:format], config[:color])
     end
   end
 end

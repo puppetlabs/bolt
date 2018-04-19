@@ -11,7 +11,7 @@ module Bolt
       def print_head; end
 
       def colorize(color, string)
-        if @stream.isatty
+        if @color && @stream.isatty
           "\033[#{COLORS[color]}m#{string}\033[0m"
         else
           string
