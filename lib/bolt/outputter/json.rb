@@ -3,11 +3,11 @@
 module Bolt
   class Outputter
     class JSON < Bolt::Outputter
-      def initialize(stream = $stdout)
+      def initialize(color, stream = $stdout)
         @items_open = false
         @object_open = false
         @preceding_item = false
-        super(stream)
+        super(color, stream)
       end
 
       def print_head
