@@ -82,8 +82,8 @@ Capture the results of your plan runs in a log file.
 ```
 log:
   console:
-    level: :info
+    level: info
   ~/.bolt/debug.log:
-    level: :debug
+    level: debug
     append: false
 ```
