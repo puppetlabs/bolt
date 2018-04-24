@@ -13,3 +13,4 @@ mod 'canary', local: true
 mod 'facts', local: true
 mod 'aggregate', local: true
 mod 'puppetdb_fact', local: true
+mod 'apply', local: true
