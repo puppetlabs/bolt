@@ -91,7 +91,11 @@ namespace :test do
     task.add_env(name: 'GEM_VERSION', default: '> 0.1.0')
     task.add_env(name: 'GEM_SOURCE',  default: 'https://rubygems.org')
     task.add_command do |cmd|
-      cmd.name = 'beaker'
+      # without 'bundle exec' testing in jenkins fails
+      # with 'beaker not found'. We do not know why so
+      # for now use bundle exec to keep things working
+      #             - Sean P. McDonald 4/24/18
+      cmd.name = 'bundle exec beaker'
       cmd.add_option(*beaker_options)
     end
   end
@@ -109,7 +113,11 @@ namespace :test do
     task.add_env(name: 'GIT_BRANCH', default: 'master')
     task.add_env(name: 'GIT_SHA',    default: '')
     task.add_command do |cmd|
-      cmd.name = 'beaker'
+      # without 'bundle exec' testing in jenkins fails
+      # with 'beaker not found'. We do not know why so
+      # for now use bundle exec to keep things working
+      #             - Sean P. McDonald 4/24/18
+      cmd.name = 'bundle exec beaker'
       cmd.add_option(*beaker_options)
     end
   end
@@ -124,7 +132,11 @@ namespace :test do
     beaker_env.each { |env| task.add_env(env) }
     task.add_env(name: 'SHA')
     task.add_command do |cmd|
-      cmd.name = 'beaker'
+      # without 'bundle exec' testing in jenkins fails
+      # with 'beaker not found'. We do not know why so
+      # for now use bundle exec to keep things working
+      #             - Sean P. McDonald 4/24/18
+      cmd.name = 'bundle exec beaker'
       cmd.add_option(*beaker_options)
     end
   end
