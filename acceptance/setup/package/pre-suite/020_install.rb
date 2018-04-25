@@ -18,22 +18,6 @@ test_name 'Install Bolt package' do
   else
     dev_builds_url = ENV['DEV_BUILDS_URL'] || 'http://builds.delivery.puppetlabs.net'
     sha_yaml_url = "#{dev_builds_url}/bolt/#{ENV['SHA']}/artifacts/#{ENV['SHA']}.yaml"
-    unless link_exists?(sha_yaml_url)
-      fail_test("<SHA>.yaml URL '#{sha_yaml_url}' does not exist.")
-    end
-
-    base_url, build_details = fetch_build_details(sha_yaml_url)
-    artifact_url, = host_urls(bolt, build_details, base_url)
-
-    case bolt['platform']
-      # TODO: BKR-1109 requests a supported way to install packages on Windows and OSX
-    when /windows/
-      generic_install_msi_on(bolt, artifact_url)
-    when /osx/
-      on bolt, "curl -O #{artifact_url}"
-      bolt.install_package('bolt*')
-    else
-      bolt.install_package(artifact_url)
-    end
+    install_from_build_data_url('bolt', sha_yaml_url, bolt)
   end
 end
