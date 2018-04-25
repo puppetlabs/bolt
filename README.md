@@ -22,3 +22,6 @@ These step through the basic functionality of Puppet Tasks and focus on simple c
 1. [Writing Plans](7-writing-plans)
 1. [Writing advanced Plans](8-writing-advanced-plans)
 
+## Self-Paced Training
+
+Learn to run tasks everywhere you need them, when you need them. Our [free, online self-paced training](https://learn.puppet.com/course/puppet-orchestration-bolt-and-tasks) gets you up and running with the open-source task runner Bolt and Puppet Tasks for Puppet Enterprise.
