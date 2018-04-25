@@ -46,6 +46,7 @@ test_script:
       $test_fail = 0
       Get-ChildItem modules -Directory | ForEach-Object {
         cd $_.FullName;
+        bundle install
         $test_output = bundle exec rake spec
         $r = $LASTEXITCODE
         Write-Output $test_output
