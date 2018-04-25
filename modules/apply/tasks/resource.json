@@ -1,0 +1,18 @@
+{
+  "description": "Apply a single Puppet resource",
+  "input_method": "stdin",
+  "parameters": {
+    "type": {
+      "description": "The type of resource to apply",
+      "type": "String[1]"
+    },
+    "title": {
+      "description": "The title of the resource to apply",
+      "type": "String[1]"
+    },
+    "parameters": {
+      "description": "A map of parameter names and values to apply",
+      "type": "Hash[String[1], Data]"
+    }
+  }
+}

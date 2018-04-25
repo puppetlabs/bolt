@@ -849,10 +849,10 @@ bar
           }
           cli.execute(options)
           json = JSON.parse(output.string)
-          expect(json).to eq([["facts::bash", nil],
-                              ["facts::powershell", nil],
-                              ["facts::ruby", nil],
-                              ['sample::ok', nil]])
+          expect(json).to include(["facts::bash", nil],
+                                  ["facts::powershell", nil],
+                                  ["facts::ruby", nil],
+                                  ['sample::ok', nil])
 
           output = @log_output.readlines.join
           expect(output).to match(/unexpected token.*params\.json/m)

@@ -21,6 +21,7 @@ script:
   status=0
   for i in $( ls modules ); do
     pushd modules/$i
+    bundle install
     if ! bundle exec rake spec; then
       status=1
     fi
