@@ -2,6 +2,7 @@
 
 require 'bolt/executor'
 require 'bolt/error'
+require 'bolt/plan_result'
 
 module Bolt
   class PAL
@@ -235,8 +236,10 @@ module Bolt
     def run_plan(plan_name, params, executor = nil, inventory = nil, pdb_client = nil)
       in_plan_compiler(executor, inventory, pdb_client) do |compiler|
         r = compiler.call_function('run_plan', plan_name, params)
-        Bolt::PuppetError.convert_puppet_errors(r)
+        Bolt::PlanResult.from_pcore(r, 'success')
       end
+    rescue Bolt::Error => e
+      Bolt::PlanResult.new(e, 'failure')
     end
   end
 end

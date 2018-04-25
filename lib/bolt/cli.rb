@@ -532,11 +532,20 @@ Available options are:
           end
           options[:task_options]['nodes'] = options[:nodes].join(',')
         end
-        executor = Bolt::Executor.new(config, options[:noop], true)
+        params = options[:noop] ? options[:task_options].merge("_noop" => true) : options[:task_options]
+        plan_context = { plan_name: options[:object],
+                         params: params }
+        plan_context[:description] = options[:description] if options[:description]
+
+        executor = Bolt::Executor.new(config, options[:noop])
+        executor.start_plan(plan_context)
         result = pal.run_plan(options[:object], options[:task_options], executor, inventory, puppetdb_client)
+
+        # If a non-bolt exeception bubbles up the plan won't get finished
+        # TODO: finish the plan once ORCH-2224
+        # executor.finish_plan(result)
         outputter.print_plan_result(result)
-        # An exception would have been raised if the plan failed
-        code = 0
+        code = result.ok? ? 0 : 1
       else
         executor = Bolt::Executor.new(config, options[:noop])
         targets = options[:targets]

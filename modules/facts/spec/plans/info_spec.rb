@@ -12,13 +12,13 @@ describe 'facts::info' do
     it 'contains OS information for target' do
       expect_task('facts::bash').always_return('os' => { 'name' => 'unix', 'family' => 'unix', 'release' => {} })
 
-      expect(run_plan('facts::info', 'nodes' => [node])).to eq(["#{node}: unix  (unix)"])
+      expect(run_plan('facts::info', 'nodes' => [node]).value).to eq(["#{node}: unix  (unix)"])
     end
 
     it 'omits failed targets' do
       expect_task('facts::bash').always_return('_error' => { 'msg' => "Failed on #{node}" })
 
-      expect(run_plan('facts::info', 'nodes' => [node])).to eq([])
+      expect(run_plan('facts::info', 'nodes' => [node]).value).to eq([])
     end
   end
 
@@ -28,13 +28,13 @@ describe 'facts::info' do
     it 'contains OS information for target' do
       expect_task('facts::powershell').always_return('os' => { 'name' => 'win', 'family' => 'win', 'release' => {} })
 
-      expect(run_plan('facts::info', 'nodes' => [node])).to eq(["#{node}: win  (win)"])
+      expect(run_plan('facts::info', 'nodes' => [node]).value).to eq(["#{node}: win  (win)"])
     end
 
     it 'omits failed targets' do
       expect_task('facts::powershell').always_return('_error' => { 'msg' => "Failed on #{node}" })
 
-      expect(run_plan('facts::info', 'nodes' => [node])).to eq([])
+      expect(run_plan('facts::info', 'nodes' => [node]).value).to eq([])
     end
   end
 
@@ -44,13 +44,13 @@ describe 'facts::info' do
     it 'contains OS information for target' do
       expect_task('facts::ruby').always_return('os' => { 'name' => 'any', 'family' => 'any', 'release' => {} })
 
-      expect(run_plan('facts::info', 'nodes' => [node])).to eq(["#{node}: any  (any)"])
+      expect(run_plan('facts::info', 'nodes' => [node]).value).to eq(["#{node}: any  (any)"])
     end
 
     it 'omits failed targets' do
       expect_task('facts::ruby').always_return('_error' => { 'msg' => "Failed on #{node}" })
 
-      expect(run_plan('facts::info', 'nodes' => [node])).to eq([])
+      expect(run_plan('facts::info', 'nodes' => [node]).value).to eq([])
     end
   end
 
@@ -60,13 +60,13 @@ describe 'facts::info' do
     it 'contains OS information for target' do
       expect_task('facts::bash').always_return('os' => { 'name' => 'any', 'family' => 'any', 'release' => {} })
 
-      expect(run_plan('facts::info', 'nodes' => [node])).to eq(["#{node}: any  (any)"])
+      expect(run_plan('facts::info', 'nodes' => [node]).value).to eq(["#{node}: any  (any)"])
     end
 
     it 'omits failed targets' do
       expect_task('facts::bash').always_return('_error' => { 'msg' => "Failed on #{node}" })
 
-      expect(run_plan('facts::info', 'nodes' => [node])).to eq([])
+      expect(run_plan('facts::info', 'nodes' => [node]).value).to eq([])
     end
   end
 
@@ -82,7 +82,7 @@ describe 'facts::info' do
         expect_task(task).return_for_targets(node => result)
       end
 
-      expect(run_plan('facts::info', 'nodes' => nodes)).to eq(
+      expect(run_plan('facts::info', 'nodes' => nodes).value).to eq(
         ["#{nodes[0]}: unix  (unix)", "#{nodes[1]}: win  (win)", "#{nodes[2]}: any  (any)"]
       )
     end
@@ -92,7 +92,7 @@ describe 'facts::info' do
         expect_task(fact).return_for_targets(node => { '_error' => { 'msg' => "Failed on #{node}" } })
       end
 
-      expect(run_plan('facts::info', 'nodes' => nodes)).to eq([])
+      expect(run_plan('facts::info', 'nodes' => nodes).value).to eq([])
     end
   end
 end

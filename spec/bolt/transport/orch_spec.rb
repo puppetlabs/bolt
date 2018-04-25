@@ -23,11 +23,7 @@ describe Bolt::Transport::Orch, orchestrator: true do
 
   let(:mock_client) { instance_double("OrchestratorClient", run_task: results) }
 
-  let(:orch) do
-    orch = Bolt::Transport::Orch.new
-    allow(orch).to receive(:create_client).and_return(mock_client)
-    orch
-  end
+  let(:orch) { Bolt::Transport::Orch.new }
 
   let(:results) do
     [{ 'name' => 'localhost', 'state' => result_state, 'result' => result }]
@@ -41,52 +37,58 @@ describe Bolt::Transport::Orch, orchestrator: true do
 
   let(:base_path) { File.expand_path(File.join(File.dirname(__FILE__), '..', '..', '..')) }
 
+  before(:each) do
+    allow(OrchestratorClient).to receive(:new).and_return(mock_client)
+  end
+
   describe :build_request do
+    let(:conn) { Bolt::Transport::Orch::Connection.new(targets.first.options, nil, orch.logger) }
+
     it "gets the task name from the task" do
-      body = orch.build_request(targets, mtask, {})
+      body = conn.build_request(targets, mtask, {})
       expect(body[:task]).to eq('foo')
     end
 
     it "sets environment" do
       targets.first.options['task-environment'] = 'development'
-      body = orch.build_request(targets, mtask, {})
+      body = conn.build_request(targets, mtask, {})
       expect(body[:environment]).to eq('development')
     end
 
     it "omits noop if unspecified" do
-      body = orch.build_request(targets, mtask, {})
+      body = conn.build_request(targets, mtask, {})
       expect(body[:noop]).to be_nil
     end
 
     it "sets noop to true if specified noop" do
-      body = orch.build_request(targets, mtask, '_noop' => true)
+      body = conn.build_request(targets, mtask, '_noop' => true)
       expect(body[:noop]).to eq(true)
     end
 
     it "sets the parameters" do
       params = { 'foo' => 1, 'bar' => 'baz' }
-      body = orch.build_request(targets, mtask, params)
+      body = conn.build_request(targets, mtask, params)
       expect(body[:params]).to eq(params)
     end
 
     it "doesn't pass noop as a parameter" do
       params = { 'foo' => 1, 'bar' => 'baz' }
-      body = orch.build_request(targets, mtask, params.merge('_noop' => true))
+      body = conn.build_request(targets, mtask, params.merge('_noop' => true))
       expect(body[:params]).to eq(params)
     end
 
     it "sets the scope to the list of hosts" do
-      body = orch.build_request(targets, mtask, params.merge('_noop' => true))
+      body = conn.build_request(targets, mtask, params.merge('_noop' => true))
       expect(body[:scope]).to eq(nodes: %w[node1 node2])
     end
 
     it "sets description if passed" do
-      body = orch.build_request(targets, mtask, params, 'test description')
+      body = conn.build_request(targets, mtask, params, 'test description')
       expect(body[:description]).to eq('test description')
     end
 
     it "omits description if not passed" do
-      body = orch.build_request(targets, mtask, params, nil)
+      body = conn.build_request(targets, mtask, params, nil)
       expect(body).not_to include(:description)
     end
   end
@@ -194,6 +196,44 @@ describe Bolt::Transport::Orch, orchestrator: true do
 
     it "executes a task on a host" do
       allow(mock_client).to receive(:run_task).and_return(results)
+
+      node_results = orch.batch_task(targets, mtask, params)
+      expect(node_results[0].value).to eq('_output' => 'hello')
+      expect(node_results[1].value).to eq('_output' => 'goodbye')
+      expect(node_results[0]).to be_success
+      expect(node_results[1]).to be_success
+    end
+
+    it 'uses plan_task when a plan is running' do
+      plan_context = { plan_name: "foo", params: {} }
+      orch.plan_context = plan_context
+
+      mock_command_api = instance_double("OrchestratorClient::Client")
+      expect(mock_client).to receive(:command).and_return(mock_command_api)
+      expect(mock_command_api).to receive(:plan_start).with(plan_context).and_return("name" => "22")
+
+      expect(mock_client).to receive(:run_task).with(hash_including(plan_job: "22")).and_return(results)
+
+      node_results = orch.batch_task(targets, mtask, params)
+      expect(node_results[0].value).to eq('_output' => 'hello')
+      expect(node_results[1].value).to eq('_output' => 'goodbye')
+      expect(node_results[0]).to be_success
+      expect(node_results[1]).to be_success
+    end
+
+    it 'uses task when the plan cannot be started' do
+      plan_context = { plan_name: "foo", params: {} }
+      orch.plan_context = plan_context
+
+      mock_command_api = instance_double("OrchestratorClient::Client")
+      expect(mock_client).to receive(:command).and_return(mock_command_api)
+      expect(mock_command_api).to receive(:plan_start).with(plan_context).and_raise(
+        OrchestratorClient::ApiError.new({}, "404")
+      )
+
+      expect(mock_client).to receive(:run_task).with(satisfy do |opts|
+        !opts.include?(:plan_job)
+      end).and_return(results)
 
       node_results = orch.batch_task(targets, mtask, params)
       expect(node_results[0].value).to eq('_output' => 'hello')

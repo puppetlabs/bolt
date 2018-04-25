@@ -354,8 +354,9 @@ describe "Bolt::Executor" do
   end
 
   context "When running a plan" do
-    let(:executor) { Bolt::Executor.new(config, nil, true) }
+    let(:executor) { Bolt::Executor.new(config, nil) }
     let(:nodes_string) { results.map(&:first).map(&:uri) }
+    let(:plan_context) { { name: 'foo' } }
 
     before :all do
       @log_output.level = :notice
@@ -372,6 +373,7 @@ describe "Bolt::Executor" do
           .and_return(result)
       end
 
+      executor.start_plan(plan_context)
       executor.run_command(targets, command)
 
       expect(@log_output.readline).to match(/NOTICE.*Starting: command '.*' on .*/)
@@ -386,6 +388,7 @@ describe "Bolt::Executor" do
           .and_return(result)
       end
 
+      executor.start_plan(plan_context)
       executor.run_script(targets, script, [])
 
       expect(@log_output.readline).to match(/NOTICE.*Starting: script .* on .*/)
@@ -400,6 +403,7 @@ describe "Bolt::Executor" do
           .and_return(result)
       end
 
+      executor.start_plan(plan_context)
       executor.run_task(targets, mock_task(task), task_arguments)
 
       expect(@log_output.readline).to match(/NOTICE.*Starting: task service::restart on .*/)
@@ -414,6 +418,7 @@ describe "Bolt::Executor" do
           .and_return(result)
       end
 
+      executor.start_plan(plan_context)
       executor.file_upload(targets, script, dest)
 
       expect(@log_output.readline).to match(/NOTICE.*Starting: file upload from .* to .* on .*/)
