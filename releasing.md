@@ -8,8 +8,14 @@ Create jira tickets for both the Bolt team and RE team for release. We use an in
 
 1. Clone [Winston](https://github.com/puppetlabs/winston) and `cd` into the directory 
 1. Run `bundle install` 
+1. If you've already cloned Winston, then **update from puppetlabs/winston#master**. There's been some activity around Winston lately so make sure your local version is up to date!
 1. Ask in the "release-new" hipchat room who should be the RE lead for this release 
-1. Determine who should be the Bolt lead for this release, as well as Docs lead. 1. In the Winston directory run ``` bundle exec rake bolt bolt_release_tickets JIRA_USER= BOLT_LEAD= DOCS_LEAD= RE_LEAD= BOLT_VERSION=0.19.0 DATE=2018-04-12 ``` With updated version, date, and jira users. Note that the values for all of the leads and for the jira user are in the form of the jira username, which is typically lower-case `firstname.lastname`. 
+1. Determine who should be the Bolt lead for this release, as well as Docs lead. 
+1. In the Winston directory run 
+  ``` 
+  bundle exec rake bolt_release_tickets JIRA_USER=first.last BOLT_LEAD=first.last DOCS_LEAD=first.last RE_LEAD=first.last BOLT_VERSION=0.19.0 DATE=2018-04-12
+  ``` 
+  With updated version, date, and jira users. Note that the values for all of the leads and for the jira user are in the form of the jira username, which is typically lower-case `firstname.lastname`. 
 
 ## The Day Of Release 
 
