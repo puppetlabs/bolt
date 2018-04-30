@@ -188,7 +188,9 @@ module Bolt
 
           command_str = command.is_a?(String) ? command : Shellwords.shelljoin(command)
           if use_sudo
-            sudo_str = Shellwords.shelljoin(["sudo", "-S", "-u", run_as, "-p", sudo_prompt])
+            sudo_flags = ["sudo", "-S", "-u", run_as, "-p", sudo_prompt]
+            sudo_flags += ["-E"] if options[:environment]
+            sudo_str = Shellwords.shelljoin(sudo_flags)
             command_str = "#{sudo_str} #{command_str}"
           end
 

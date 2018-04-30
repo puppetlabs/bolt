@@ -423,6 +423,15 @@ SHELL
       end
     end
 
+    it "can run a task passing input with environment vars", ssh: true do
+      contents = "#!/bin/sh\necho -n ${PT_message_one} then ${PT_message_two}"
+      arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
+      with_task_containing('tasks_test', contents, 'environment') do |task|
+        expect(ssh.run_task(target, task, arguments).message)
+          .to eq('Hello from task then Goodbye')
+      end
+    end
+
     it "can upload a file as root", ssh: true do
       contents = "upload file test as root content"
       dest = '/tmp/root-file-upload-test'
