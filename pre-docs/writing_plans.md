@@ -186,48 +186,6 @@ they fail on any node. To prevent this and handle the error, pass the
 run_script("mymodule/my_script.sh", $nodes, '_catch_errors'=> true)
 ```
 
-### Target objects
-
-The Target object represents a node and its specific connection options. You
-can get a printable representation via the name function, as well as access
-components of the target: `protocol`, `host`, `port`, `user`, `password`. You can also
-assign variables (`set_var`) to a target and get a list of existing variables the
-target has (`target.vars`).
-
-Set vars in a plan using `$target.set_var`.
-
-
-```
-plan vars(String $host) {
-	$target = get_targets($host)[0]
-	$target.set_var('operatingsystem', 'windows')
-	$targetvars = $target.vars
-	run_command("echo 'Vars for ${host}: ${$targetvars}'", $host)
-}
-```
-
-Or set `vars` in the inventory file using the `vars` key at the group level.
-
-```yaml
----
-groups:
-  - name: my_nodes
-    nodes:
-      - localhost
-    vars:
-      operatingsystem: windows
-    config:
-      transport: ssh
-```
-
-The `TargetSpec` parameter is an abstract specification of targets that can
-include the patterns allowed by `--nodes`, a single Target object, or an Array of
-Targets and node patterns. Implemented as a type alias that matches
-String (which may describe targets), Target, and Arrays of these. This is the
-primary type to use when you want to accept a reference to one or more target
-nodes. To operate on individual nodes, resolve it to a list via `get_targets`.
-
-
 ## Running tasks from plans
 
 When you need to run multiple tasks, or you need some tasks to depend on
@@ -433,5 +391,86 @@ $r.each |$result| {
   } else {
    notice("${node} returned a value: ${result.value}")
   }
+}
+```
+
+## Target objects
+
+The Target object represents a node and its specific connection options. The
+state of a target is stored in the inventory for the duration of a plan allowing
+you to collect facts or set vars for a target and retrieve them later.
+You can get a printable representation via the name function, as well as access
+components of the target: `protocol`, `host`, `port`, `user`, `password`.
+
+### `TargetSpec`
+
+The execution function take a parameter with the type alias TargetSpec. This
+alias accepts the pattern strings allowed by `--nodes`, a single Target object,
+or an Array of Targets and node patterns. Plans that accept a set of targets as
+a parameter should generally use this type to interact cleanly with the CLI and
+other plans. To operate on individual nodes, resolve it to a list via
+`get_targets`. For example to loop over each node in a plan accept a
+`TargetSpec` argument but call `get_targets` on it before looping.
+
+```puppet
+plan loop(TargetSpec $nodes) {
+  get_targets($nodes).each |$target| {
+    run_task('my_task', $target)
+  }
+}
+```
+
+If your plan accepts a single `TargetSpec` parameter you can call that
+parameter `nodes` so that it can be specified with the `--nodes` flag from the
+cli.
+
+### Variables and Facts on Targets
+
+When bolt runs it loads transport config values, variables, and facts from
+the inventory.  These can be accessed with the `$target.facts()` and
+`$target.vars()` functions. During the course of a plan you can update the
+facts or vars for any target. In general Facts are observed about the state of
+a node while `vars` are more general information. Facts will usually come from
+running `facter` or another fact collection application on the target or be
+looked up from a fact store like Puppetdb. `vars` are computed externally or
+assigned directly.
+
+
+Set vars in a plan using `$target.set_var`.
+
+```
+plan vars(String $host) {
+	$target = get_targets($host)[0]
+	$target.set_var('newly_provisioned', true)
+	$targetvars = $target.vars
+	run_command("echo 'Vars for ${host}: ${$targetvars}'", $host)
+}
+```
+
+Or set `vars` in the inventory file using the `vars` key at the group level.
+
+```yaml
+---
+groups:
+  - name: my_nodes
+    nodes:
+      - localhost
+    vars:
+      operatingsystem: windows
+    config:
+      transport: ssh
+```
+
+Collect facts with the `fact` plan and filter nodes based on them.
+
+```puppet
+plan run_with_facts(TargetSpec $nodes) {
+  # This will collect facts on nodes and update the inventory
+  run_plan(facts, $nodes)
+
+  $centos_nodes = get_nodes($nodes).filter |$n| { n.facts['operatingsystem'] == 'centos' }
+  $ubuntu_nodes = get_nodes($nodes).filter |$n| { n.facts['operatingsystem'] == 'ubuntu' }
+  run_task(centos_task, $centos_nodes)
+  run_task(ubuntu_task, $ubuntu_nodes)
 }
 ```
