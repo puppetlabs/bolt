@@ -14,7 +14,7 @@ require 'bolt/puppetdb'
 module Bolt
   class Executor
     attr_reader :noop, :transports
-    attr_accessor :run_as
+    attr_accessor :run_as, :plan_logging
 
     def initialize(config = Bolt::Config.new, noop = nil)
       @config = config

@@ -474,3 +474,52 @@ plan run_with_facts(TargetSpec $nodes) {
   run_task(ubuntu_task, $ubuntu_nodes)
 }
 ```
+
+## Plan Logging
+
+### Puppet log functions
+
+To generate log messages from a plan use the puppet log function corresponding
+to the level you want to log at. `error`, `warn`, `notice`, `info`, or `debug`.
+The default log level for bolt is `notice` but can be set to `info` with the
+`--verbose` flag or `debug` with the `--debug` flag.
+
+### Default Action Logging
+
+Bolt logs actions that a plan takes on targets through the `file_upload`,
+`run_command`, `run_script` or `run_task` functions. By default it will log a
+`notice` level message when an action starts and another when it completes. If
+you pass a description to the function that will be used in place of the
+generic log message.
+
+```
+run_task(my_task, $targets, "Better description", param1 => "val")
+```
+
+If your plan contains many small actions you may want to suppress these messages
+and use explicit calls to the puppet log functions instead. This can be
+accomplished by wrapping actions in a `without_default_logging` block which
+will cause the action messages to be logged at `info` level instead of
+`notice`. For example to loop over a series of nodes without logging each action.
+
+```puppet
+plan deploy( TargetSpec $nodes) {
+  without_default_logging() || {
+    get_targets($nodes).each |$node| {
+      run_task(deploy, $node)
+    }
+  }
+}
+```
+
+To avoid complications with parser ambiguity always call
+`without_default_logging` with `()` and empty block args `||`.
+
+```puppet
+without_default_logging() || { run_command('echo hi', $nodes) }
+```
+not
+
+```puppet
+without_default_logging { run_command('echo hi', $nodes) }
+```
