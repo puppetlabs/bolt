@@ -2,7 +2,7 @@
 
 # Delegate to facter if available
 if (Get-Command facter -ErrorAction SilentlyContinue) {
-    facter --json
+    facter -p --json
 }
 else {
     # The number 2 in the condition below is the value of
