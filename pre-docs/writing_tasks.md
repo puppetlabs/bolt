@@ -669,3 +669,4 @@ Type	Description
 - `Array[String]`	Matches an array of strings.
 - `Hash`	Matches a JSON object.
 - `Variant[Integer, Pattern[/\A\d+\Z/]]`	Matches an integer or a String of an integer
+- `Boolean` Accepts boolean values.
