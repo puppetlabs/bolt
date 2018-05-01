@@ -410,6 +410,9 @@ end
 exit exitcode
 ```
 
+If your task accepts input on stdin it should specify `"input_method": "stdin"`
+in its metadata.json or it may not work with sudo for some users.
+
 ### Returning structured output
 
 To return structured data from your task, print only a single JSON object to
