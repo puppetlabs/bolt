@@ -78,6 +78,7 @@ modes that will be passed to a shell command, instead of
 
 ```
 String $mode = 'file'
+```
 
 use
 
