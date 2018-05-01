@@ -1,134 +1,125 @@
-# Acquiring nodes for use with Bolt
+# Setting up test nodes to use with Bolt
 
 > **Difficulty**: Basic
 
 > **Time**: Approximately 5 minutes
 
-In this exercise you will create nodes with which you can experiment with `bolt`. We have provided multiple options below as examples, feel free to pick one.
+In this exercise you will create nodes that you can use to experiment with Bolt. You can also use existing nodes in your system if you prefer. 
 
 - [Existing nodes](#existing-nodes)
 - [Using Vagrant](#using-vagrant)
 - [Using Docker](#using-docker)
 
 # Prerequisites
+To use an attached configuration file to set up test nodes, you must have one of the following installed on your machine: 
 
-If you're using [Vagrant](https://www.vagrantup.com/) or [Docker](https://www.docker.com/) you will need those installed on your local machine. For Docker we recommend [Docker for Mac](https://www.docker.com/docker-mac) or [Docker for Windows](https://www.docker.com/docker-windows) for people on those platforms.
+- [Vagrant](https://www.vagrantup.com/) 
+- [Docker for Mac](https://www.docker.com/docker-mac) 
+- [Docker for Windows](https://www.docker.com/docker-windows) 
 
 # Existing nodes
 
-If you already have, or can easily launch, a few Linux or Windows nodes then you're all set. These nodes would need to be accessible via SSH or WinRM but that's it. If you can already access them via an SSH or WinRM client then `bolt` should be able to access them too.
+If you already have, or can easily launch, a few Linux or Windows nodes then you're all set. These nodes must be accessible via SSH or WinRM; if you can  access them via an SSH or WinRM client then Bolt can, too.
 
 # Using Vagrant
+**Note:** These instructions assume that you are familiar with Vagrant and have a suitable hypervisor configured.
 
-Save the following as `Vagrantfile`, or use the file accompanying this exercise.
+The attached Vagrantfile configures three CentOS 7 nodes and a Windows (Nano Server) node.
 
-```ruby
-$nodes_count = 3
 
-if ENV['NODES'].to_i > 0 && ENV['NODES']
-  $nodes_count = ENV['NODES'].to_i
-end
 
-Vagrant.configure('2') do |config|
-  config.vm.box = 'centos/7'
-  config.ssh.forward_agent = true
-  config.vm.network "private_network", type: "dhcp"
+1. Save the following code as `Vagrantfile` or download the `Vagrantfile` attached to this exercise. To configure a different number of nodes, change the `NODES` environment variable.
 
-  (1..$nodes_count).each do |i|
-    config.vm.define "node#{i}"
-  end
 
-  config.vm.define :windows do |windows|
-    windows.vm.box = "mwrock/WindowsNano"
-    windows.vm.guest = :windows
-    windows.vm.communicator = "winrm"
-  end
-end
-```
+    ```ruby
+    nodes_count = 3
+    ```
+    The result:
+    ```        
+    if ENV['NODES'].to_i > 0 && ENV['NODES']
+      $nodes_count = ENV['NODES'].to_i
+    end
+    
+    Vagrant.configure('2') do |config|
+      config.vm.box = 'centos/7'
+      config.ssh.forward_agent = true
+      config.vm.network "private_network", type: "dhcp"
+    
+      (1..$nodes_count).each do |i|
+        config.vm.define "node#{i}"
+      end
+    
+      config.vm.define :windows do |windows|
+        windows.vm.box = "mwrock/WindowsNano"
+        windows.vm.guest = :windows
+        windows.vm.communicator = "winrm"
+      end
+    end
+    ```
+2. From the command line, ensure you’re in the directory where you stored the Vagrantfile file and enter `vagrant up`.
 
-This will by default launch three CentOS 7 nodes and a Windows (Nano Server) node. Run the following command. We are assuming you have some familiarity with Vagrant and have a suitable hypervisor configured.
+3. Generate the SSH configuration so Bolt knows how to authenticate with the SSH daemon. The following command will output the required details.
 
-```
-vagrant up
-```
+    ```
+    vagrant ssh-config
+    ```
+    
+    You can save that so it will be automatically picked up by most SSH clients, including Bolt. This uses the ability to specify hosts along with their connection details in a [configuration file](https://linux.die.net/man/5/ssh_config).
+    
+    ```
+    mkdir ~/.ssh
+    vagrant ssh-config | sed /StrictHostKeyChecking/d | sed /UserKnownHostsFile/d >> ~/.ssh/config
+    ```
+    
+    By saving this SSH configuration file, you can use the node name, rather than the IP address. When passing nodes to Bolt in the following exercises with Linux you will use `--nodes node1,node2`.
 
-It can be configured to a different number of nodes by setting the `NODES` environment variable.
+4. Make sure you can SSH into all of your nodes. If you've used the vagrant nodes before you may have to remove entries from `~/.ssh/known_hosts`.
 
-You can generate the SSH configuration so `bolt` knows how to authenticate with the SSH daemon. The following command will output the required details.
-
-```
-vagrant ssh-config
-```
-
-Note that if you've created more than one SSH server as above, this should be:
-
-You can save that so it will be automatically picked up by most SSH clients, including `bolt`. This uses the ability to specify hosts along with there connection details in a [configuration file](https://linux.die.net/man/5/ssh_config).
-
-```
-mkdir ~/.ssh
-vagrant ssh-config | sed /StrictHostKeyChecking/d | sed /UserKnownHostsFile/d >> ~/.ssh/config
-```
-
-When passing nodes to `bolt` in the following exercises with Linux you will use `--nodes node1,node2`. The reason you can use the node name, rather than the IP address, is the above SSH configuration file.
-
-Make sure you can ssh into all of your nodes. If you've used the vagrant nodes before you may have to remove entries from `~/.ssh/known_hosts`.
-
-```
-ssh node1
-ssh node2
-ssh node3
-```
+    ```
+    ssh node1
+    ssh node2
+    ssh node3
+    ```
 
 
 # Using Docker
+Using Docker we can quickly launch a number of ephemeral SSH servers. To make that even easier we'll use Docker Compose. 
 
-Using Docker we can quickly launch a number of ephemeral SSH servers. To make that even easier we'll use Docker Compose. Save the following as `docker-compose.yml` or use the file accompanying this lab.
+1. Save the following code as `docker-compose.yml` or download the `docker-compose.yml` file attached to this exercise.
 
-```yaml
-version: '3'
-services:
-  ssh:
-    image: rastasheep/ubuntu-sshd
-    ports:
-      - 22
-```
+    ```yaml
+    version: '3'
+    services:
+      ssh:
+        image: rastasheep/ubuntu-sshd
+        ports:
+          - 22
+    ```
 
-Run the following command to launch a single SSH server in the background.
+2. Launch a single SSH server in the background: `docker-compose up --detach`. To launch more SSH servers, run:  `docker-compose up --scale ssh=3 --detach`.
 
-```
-docker-compose up -d
-```
+3. View a list of running containers: `docker-compose ps`. The result should be similar to:  
+    ```
+            Name                 Command        State           Ports
+    -------------------------------------------------------------------------
+    2acquiringnodes_ssh_1   /usr/sbin/sshd -D   Up      0.0.0.0:32768->22/tcp
+    2acquiringnodes_ssh_2   /usr/sbin/sshd -D   Up      0.0.0.0:32769->22/tcp
+    ```
+    
+    Note the `Ports` column. We are forwarding a local port to the SSH server running in the container. Using the example above, you can SSH to `127.0.0.1:32768`.
+    
+4. If you have a local SSH client, test the connection. Change the port to one you get from running the `docker-compose ps` command. The image sets the username and password to `root`. 
+    
+    ```
+    ssh root@127.0.0.1 -p 32768
+    ```
 
-If you'd like to launch more SSH servers then use the `--scale` flag like so:
+5. Make sure you can log into all the nodes before moving on. You may have to remove some entries from `~/.ssh/known_hosts` 
 
-```
-docker-compose up --scale ssh=3 -d
-```
-
-You can see the running containers using `ps`:
-
-```
-docker-compose ps
-        Name                 Command        State           Ports
--------------------------------------------------------------------------
-2acquiringnodes_ssh_1   /usr/sbin/sshd -D   Up      0.0.0.0:32768->22/tcp
-2acquiringnodes_ssh_2   /usr/sbin/sshd -D   Up      0.0.0.0:32769->22/tcp
-```
-
-Note the `Ports` column. We are forwarding a local port to the SSH server running in the container. So you should be able to SSH to `127.0.0.1:32768` (in the example above).
-
-The image sets the username to `root` and the password to `root`. Test the connection out if you have a local SSH client like so, changing the port to one you get from running the `docker-compose ps` command above.
-
-```
-ssh root@127.0.0.1 -p 32768
-```
-
-Make sure you can log into all the nodes before moving on. You may have to remove some entries from `~/.ssh/known_hosts`
-
-When passing nodes to `bolt` in the next section you will use `--nodes 127.0.0.1:32768,127.0.0.1:32769`, replacing the ports with those you see when you run the `docker-compose ps` command shown above.
+    When passing nodes to Bolt in the next section you will use `--nodes 127.0.0.1:32768,127.0.0.1:32769`, replacing the ports with those you see when you run the `docker-compose ps` command.
 
 # Next steps
 
-Now that you have nodes with which to experiment with `bolt` you can move on to:
+Now that you have set up test nodes to use with Bolt you can move on to:
 
-1. [Running Commands](../3-running-commands)
+[Running Commands](../3-running-commands)

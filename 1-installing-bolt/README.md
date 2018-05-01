@@ -4,72 +4,175 @@
 
 > **Time**: Approximately 10 minutes
 
-In this exercise you will install `bolt` so you can get started with Puppet Tasks. Just pick one of the following guides for your chosen operating system.
+In this exercise you will install Bolt so you can get started with Puppet Tasks. Follow the instructions for your operating system.
 
 - [Installing Bolt on Windows](#installing-bolt-on-windows)
-- [Installing Bolt on macOS](#installing-bolt-on-macos)
-- [Installing Bolt on Linux](#installing-bolt-on-linux)
+- [Installing Bolt on macOS](#install-bolt-on-mac-os-x)
+- [Installing Bolt on Debian or Ubuntu](#install-bolt-from-apt-repositories-on-debian-or-ubuntu)
+- [Installing Bolt on RHEL or SLES](#install-bolt-from-yum-repositories-on-rhel-or-sles)
+- [Installing Bolt as a gem](#install-bolt-as-a-gem)
 
 # Prerequisites
 
-This lesson covers everything you need to install `bolt` on your own machine. Just select the guide below for your operating system.
+This lesson covers everything you need to install Bolt on your machine. Just select the guide below for your operating system.
 
-# Installing Bolt on Windows
+## Install Bolt on Windows
 
-`bolt` is packaged as a Ruby gem, so you will need a Ruby environment installed on your machine. [Chocolatey](https://chocolatey.org/) is an excellent way to get Ruby installed and setup. If you don't have Chocolatey installed then you can follow the [Chocolatey installation instructions](https://chocolatey.org/install). With `choco` installed run the following in an Administrator PowerShell prompt.
+1.  Download the Bolt installer package from [https://downloads.puppet.com/windows/puppet5/bolt-x64-latest.msi.](https://downloads.puppet.com/windows/puppet5/bolt-x64-latest.msi)
+2.  Double-click the MSI file and run the installation.
+3.  Run a Bolt command to verify it has installed correctly.  
 
-```powershell
-choco install ruby
-refreshenv
-gem install bolt
-```
-
-You can check everything has been installed correctly by running `bolt --help`.
-
-# Installing Bolt on macOS
-
-`bolt` is packaged as a Ruby gem, so you will need a Ruby environment installed. It also makes use of gems with native dependencies so you'll need a compiler toolchain. If you don't already have Xcode or similar installed you can do so with the following.
-
-```
-xcode-select --install
-```
-
-macOS comes with Ruby already installed so you should be able to install `bolt` using the built-in `gem` tool:
-
-```
-gem install bolt
-```
-
-You can check everything has been installed correctly by running `bolt --help`.
+    ```
+    bolt --help
+    ```
 
 
-# Installing Bolt on Linux
+## Install Bolt on Mac OS X
 
-`bolt` is packaged as a Ruby gem, so you will need a Ruby environment installed. It also makes use of gems with native dependencies so you'll need a compiler toolchain. The commands to install these dependencies vary based on which flavor of Linux you are running.
+1.  Download the Bolt installer package for your macOS version. 
 
-## CentOS 7/RHEL 7
+    **Tip:** To find the macOS version number on your Mac, go to the Apple \(\) menu in the corner of your screen and choose **About This Mac**.
 
-```
-yum install -y make gcc ruby-devel
-gem install bolt
-```
+    -   10.11 \(El Capitan\) [https://downloads.puppet.com/mac/puppet5/10.11/x86\_64/bolt-latest.dmg](https://downloads.puppet.com/mac/puppet5/10.11/x86_64/bolt-latest.dmg)
+    -   10.12 \(Sierra\) [https://downloads.puppet.com/mac/puppet5/10.12/x86\_64/bolt-latest.dmg](https://downloads.puppet.com/mac/puppet5/10.12/x86_64/bolt-latest.dmg)
+    -   10.13 \(High Sierra\) [https://downloads.puppet.com/mac/puppet5/10.13/x86\_64/bolt-latest.dmg](https://downloads.puppet.com/mac/puppet5/10.13/x86_64/bolt-latest.dmg)
+2.  Double-click the `bolt-latest.dmg` file to mount it and then double-click the `bolt-[version]-installer.pkg` to run the installation.
+3.  Run a Bolt command to verify it has installed correctly.  
 
-## Fedora 25
+    ```
+    bolt --help
+    ```
 
-```
-dnf install -y make gcc redhat-rpm-config ruby-devel rubygem-rdoc
-gem install bolt
-```
 
-## Debian 9/Ubuntu 16.04
+## Install Bolt from apt repositories on Debian or Ubuntu
 
-```
-apt-get install -y make gcc ruby-dev
-gem install bolt
-```
+Packaged versions of Bolt are available for Debian 8 and 9 and Ubuntu 14.04 and 16.04.
+
+The Puppet repository for the APT package management system is [https://apt.puppet.com](https://apt.puppet.com). Packages are named using the convention `<PLATFORM_VERSION>-release-<VERSION CODE NAME>.deb`. For example, the release package for Puppet 5 Platform on  8 “Jessie” is `puppet5-release-jessie.deb`.
+
+**Note:** These packages include the Puppet 5 Platform. To install only the Bolt package you can install the packages directly as well.
+
+1.  Download and install the software and its dependencies. Use the commands appropriate to your system.
+    -   Debian 8
+
+        ```
+        wget https://apt.puppet.com/puppet5-release-jessie.deb
+        sudo dpkg -i puppet5-release-jessie.deb
+        sudo apt-get update 
+        sudo apt-get install bolt
+        
+        ```
+
+    -   Debian 9
+
+        ```
+        wget https://apt.puppet.com/puppet5-release-stretch.deb
+        sudo dpkg -i puppet5-release-stretch.deb
+        sudo apt-get update 
+        sudo apt-get install bolt
+        ```
+
+    -   Ubuntu 14.04
+
+        ```
+        wget https://apt.puppet.com/puppet5-release-trusty.deb
+        sudo dpkg -i puppet5-release-trusty.deb
+        sudo apt-get update 
+        sudo apt-get install bolt
+        ```
+
+    -   Ubuntu 16.04
+
+        ```
+        wget https://apt.puppet.com/puppet5-release-xenial.deb
+        sudo dpkg -i puppet5-release-xenial.deb
+        sudo apt-get update 
+        sudo apt-get install bolt
+        ```
+
+2.  Run a Bolt command to verify it has installed correctly. 
+
+    ```
+    bolt --help
+    ```
+
+
+## Install Bolt from yum repositories on RHEL or SLES
+
+Packaged versions of Bolt are available for Red Hat Enterprise Linux 6 and 7, SUSE Linux Enterprise Server 12.
+
+The Puppet repository for the YUM package management system is [http://yum.puppet.com/puppet5/](http://yum.puppet.com/puppet5/) Packages are named using the convention `<PLATFORM_NAME>-release-<OS ABBREVIATION>-<OS VERSION>.noarch.rpm`. For example, the release package for Puppet 5 Platform on Linux 7 is `puppet5-release-el-7.noarch.rpm`.
+
+**Note:** These packages include the Puppet 5 Platform. To install only the Bolt package you can install the packages directly as well.
+
+1.  Download and install the software and its dependencies. Use the commands appropriate to your system.
+    -   Enterprise Linux 6
+
+        ```
+        sudo rpm -Uvh https://yum.puppet.com/puppet5/puppet5-release-el-6.noarch.rpm
+        sudo yum install bolt				
+        ```
+
+    -   Enterprise Linux 7
+
+        ```
+        sudo rpm -Uvh https://yum.puppet.com/puppet5/puppet5-release-el-7.noarch.rpm
+        sudo yum install bolt
+        ```
+
+    -   SUSE Linux Enterprise Server 12
+
+        ```
+        sudo rpm -Uvh https://yum.puppet.com/puppet5/puppet5-release-sles-12.noarch.rpm
+        sudo yum install bolt
+        ```
+
+2.  Run a Bolt command  to verify it has installed correctly.  
+
+    ```
+    bolt --help
+    ```
+
+
+## Install Bolt as a gem
+
+Install Ruby 2.3 or above and Bolt.
+
+If Ruby is already included in your operating system, verify that it is version 2.3 or above. Run the command `ruby --version`.
+
+1.  To install the dependencies required to install Bolt, run the command that corresponds to your operating system.
+    -   For Fedora 27
+
+        ```
+        dnf install -y ruby rubygem-json rubygem-ffi rubygem-bigdecimal rubygem-io-console
+        ```
+
+    -   For Debian 9 or Ubuntu 16.04
+
+        ```
+        apt-get install -y ruby ruby-ffi
+        ```
+
+    -   For Mac OS X 10.13 \(High Sierra\)
+
+        ```
+        xcode-select --install
+        
+        ```
+
+    -   For Windows, you can download Ruby from [https://rubyinstaller.org/](https://rubyinstaller.org/) or the Chocolatey Windows package manager. Run subsequent commands in a Windows PowerShell session.
+2.  To install Bolt, run `gem install bolt`
+3.  Run a Bolt command to verify it has installed correctly.  
+
+    ```
+    bolt --help
+    ```
+
+
+
 
 # Next steps
 
-Now that you have `bolt` installed you can move on to:
+Now that you have Bolt installed you can move on to:
 
-1. [Acquiring nodes](../2-acquiring-nodes)
+[Setting up test nodes](../2-acquiring-nodes)

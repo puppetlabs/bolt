@@ -2,11 +2,11 @@
 
 ## Introduction
 
-This repository contains a step-by-step introduction to [Bolt](https://github.com/puppetlabs/bolt) and to the Puppet Tasks ecosystem. It's designed to be followed in order, with each exercise introducing the basic concepts. If you complete all of the exercises you should be well on your way to understanding how you can use `bolt` and Puppet Tasks to help manage your infrastructure.  
+This repository contains a step-by-step introduction to [Bolt](https://github.com/puppetlabs/bolt) and to the Puppet Tasks ecosystem. It's designed to be followed in order, with each exercise introducing the basic concepts. If you complete all of the exercises you should be well on your way to understanding how you can use Bolt and Puppet Tasks to help manage your infrastructure.  
 
 ## Prerequisites
 
-These exercises will help you get `bolt` installed and make sure you have a few nodes to target with tasks and commands. 
+These exercises will help you get Bolt installed and make sure you have a few nodes to target with tasks and commands. 
 
 1. [Installing Bolt](1-installing-bolt)
 1. [Acquiring nodes](2-acquiring-nodes)

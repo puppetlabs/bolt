@@ -4,140 +4,128 @@
 
 > **Time**: Approximately 5 minutes
 
-At the most basic level `bolt` can be used to run arbitrary commands on a set of remote hosts. Let's see that in practice before we move on to more useful higher-level features. In particular we'll look at:
+You can use Bolt to run arbitrary commands on a set of remote hosts. Let's see that in practice before we move on to more advanced features. Choose the exercise based on the operating system of your test nodes.
 
 - [Running shell commands on Linux nodes](#running-shell-commands-on-linux-nodes)
 - [Running PowerShell commands on Windows nodes](#running-powershell-commands-on-windows-nodes)
 
-Feel free to just run one of these exercises depending on your operating system environment.
-
 # Prerequisites
-
-For the following exercises you should already have `bolt` installed and have a few nodes (either Windows or Linux) available to run commands against. The following guides will help:
+Complete the following before you start this lesson:
 
 1. [Installing Bolt](../1-installing-bolt)
-1. [Acquiring nodes](../2-acquiring-nodes)
+1. [Setting up test nodes](../2-acquiring-nodes)
 
 # Running shell commands on Linux nodes
 
-`bolt` by default uses SSH for transport, and will reuse your existing SSH configuration for authentication. If you can SSH to a node then `bolt` should just work. That normally means just providing configuration in `~/.ssh/config`. Running a command against a remote node is done with the following:
+Bolt by default uses SSH for transport. If you can connect to systems remotely, you can use Bolt to run shell commands. It reuses your existing SSH configuration for authentication, which is typically provided in `~/.ssh/config`.  
 
+To run a command against a remote Linux node, use the following command syntax:
 ```
 bolt command run <command> --nodes <nodes>
 ```
 
-Let's run the `uptime` command. Replace `node1` in the following with the address of one of your own nodes.
-
+To run a command against a remote node using a username and password rather than keys use the following syntax:
 ```
-$ bolt command run uptime --nodes node1
-Started on node1...
-Finished on node1:
-  STDOUT:
-    21:19:23 up 13 min,  0 users,  load average: 0.08, 0.03, 0.04
+bolt command run <command> --nodes <nodes> --user <user> --password <password>
 ```
 
-If you receive an error reading `Host key verification failed` you should make sure the correct host keys are in your `known_hosts` file or pass `--no-host-key-check` to future bolt commands. Bolt will not honor `StrictHostKeyChecking` in your ssh config.
+1. Run the `uptime` command to view how long the system has been running. If you are using existing nodes on your system, replace `node1` with the address for your node.
 
-`bolt` can also run commands against multiple nodes by passing a comma-separated list. Replace `node1,node2,node3` in the following with two or more of your own nodes. If you get an error about `Host key verification` run the rest of the examples with the `--no-host-key-check` flag to disable host key verification.
+    ```
+    bolt command run uptime --nodes node1
+    ```
+    The result:
+    ```
+    Started on node1...
+    Finished on node1:
+      STDOUT:
+        21:19:23 up 13 min,  0 users,  load average: 0.08, 0.03, 0.04
+    ```
+    
+    **Tip:** If you receive the error `Host key verification failed` make sure the correct host keys are in your `known_hosts` file or pass `--no-host-key-check` to future Bolt commands. Bolt will not honor `StrictHostKeyChecking` in your SSH configuration.
 
-```
-$ bolt command run uptime --nodes node1,node2,node3
-Started on node1...
-Started on node2...
-Started on node3...
-Finished on node1:
-  STDOUT:
-     21:20:13 up 13 min,  0 users,  load average: 0.20, 0.06, 0.05
-Finished on node3:
-  STDOUT:
-     21:20:14 up 12 min,  0 users,  load average: 0.00, 0.01, 0.02
-Finished on node2:
-  STDOUT:
-     21:20:14 up 13 min,  0 users,  load average: 0.00, 0.01, 0.05$
-```
+2. Run the 'uptime' command on multiple nodes by passing a comma-separated list. If you are using existing nodes on your system, replace `node1,node2,node3` with addresses for your nodes. If you get an error about `Host key verification` run the rest of the examples with the `--no-host-key-check` flag to disable host key verification.
 
-For the duration of these exercises, it may help to create an [inventory file] to refer to a group of nodes. Later examples will refer to the default group `all`. See the [inventory file] docs for how to setup other named groups.
+    ```
+    bolt command run uptime --nodes node1,node2,node3
+    ```
+    The result:
+    ```
+    Started on node1...
+    Started on node2...
+    Started on node3...
+    Finished on node1:
+      STDOUT:
+         21:20:13 up 13 min,  0 users,  load average: 0.20, 0.06, 0.05
+    Finished on node3:
+      STDOUT:
+         21:20:14 up 12 min,  0 users,  load average: 0.00, 0.01, 0.02
+    Finished on node2:
+      STDOUT:
+         21:20:14 up 13 min,  0 users,  load average: 0.00, 0.01, 0.05$
+    ```
 
-For example if using the provided Vagrant configuration, save the following to `~/.puppetlabs/bolt/inventory.yaml`:
+3. Create an inventory file to store information about your nodes and refer to them as a group.  Later exercises will refer to the default group `all`. For more information on how to set up other named groups, see the 
+    [Inventory File docs](https://puppet.com/docs/bolt/0.x/inventory_file.html).
 
-```yaml
-nodes: [node1, node2, node3]
-```
+    For example, if you are using the provided Vagrant configuration file, save the following to `~/.puppetlabs/bolt/inventory.yaml`:
+    
+    ```yaml
+    nodes: [node1, node2, node3]
+    ```
 
-If you're accessing nodes using a username and password rather than keys you can pass those on the command line like so:
-
-```
-bolt command run <command> --nodes all --user <user> --password <password>
-```
-
-or include that configuration in the [inventory file]:
-
-```yaml
-nodes: [node1, node2, node3]
-config:
-  transports:
-    ssh:
-      user: $user
-      password: $password
-```
-
-`bolt` has a number of other flags. Run the following command to list all of them:
-
-```
-bolt --help
-```
-
+    If you're accessing nodes using a username and password rather than keys, save the following to `~/.puppetlabs/bolt/inventory.yaml`:
+    
+    ```yaml
+    nodes: [node1, node2, node3]
+    config:
+      transports:
+        ssh:
+          user: $user
+          password: $password
+    ```
 
 # Running PowerShell commands on Windows nodes
 
-`bolt` can communicate over WinRM and execute PowerShell commands when running Windows nodes. The command will look like the following:
+Bolt can communicate over WinRM and execute PowerShell commands when running Windows nodes. To run a command against a remote Windows node, use the following command syntax:
 
 ```
 bolt command run <command> --nodes winrm://<node> --user <user> --password <password>
 ```
 
-Note the `winrm://` prefix for the node address. Also note the `--username` and `--password` flags for passing authentication information. Unless you have SSL setup for WinRM communication, you will also need to supply the `--no-ssl` flag.
+Note the `winrm://` prefix for the node address. Also note the `--username` and `--password` flags for passing authentication information. In addition, unless you have set up SSL for WinRM communication, you must supply the `--no-ssl` flag. Otherwise running a Bolt command will result in an `unknown protocol` error.
 
-If you get an error about `unknown protocol`, you may not have SSL setup for WinRM communication and should run the rest of the examples with the `--no-ssl` flag.
-
-You can see all of the available flags by running:
-
-```
-bolt --help
-```
-
-For the duration of these exercises, it may help to set a variable with the list of nodes for future use. Later examples will refer to this variable. Username and password can be incorporated into the node address as well. For example if using the provided Vagrant configuration, set the following:
-
-```
-WINNODE=winrm://vagrant:vagrant@localhost:55985
-```
-
-On Windows, you can do the same thing with Powershell:
-
-```powershell
-$WINNODE="winrm://vagrant:vagrant@localhost:55985"
-```
-
-If you're trying `bolt` out using Windows run the following command. This should list all of the processes running on the remote machine.
-
-```
-bolt command run "gps | select ProcessName" --nodes $WINNODE
-```
-
-The above example accesses a single node. You can also provide a comma-separated list of nodes like so:
-
-```
-bolt command run <command> --nodes winrm://<node>,winrm://<node> --user <user> --password <password>
-```
-
-By default `bolt` will use ssl when executing over WinRM.  If you would like to use http use the `--no-ssl` flag.
 ```
 bolt command run <command> --no-ssl --nodes winrm://<node>,winrm://<node> --user <user> --password <password>
 ```
+
+1. Set a variable with the list of nodes.  Later exercises will refer to this variable. You can incorporate the username and password into the node address. For example, if you are using the provided Vagrant configuration file, set the following:
+
+    ```
+    WINNODE=winrm://vagrant:vagrant@localhost:55985
+    ```
+    
+    On Windows, you can do the same thing with Powershell:
+    
+    ```powershell
+    $WINNODE="winrm://vagrant:vagrant@localhost:55985"
+    ```
+
+2.  Run the following command to list all of the processes running on a remote machine.
+
+    ```
+    bolt command run "gps | select ProcessName" --nodes $WINNODE
+    ```
+
+    Use following syntax to list all of the processes running on multiple remote machines.
+
+    ```
+    bolt command run <command> --nodes winrm://<node>,winrm://<node> --user <user> --password <password>
+    ```
+
+
 # Next steps
 
-Now that you know how to run adhoc commands with `bolt` you can move on to:
+Now that you know how to use Bolt to run adhoc commands you can move on to:
 
-1. [Running Scripts](../4-running-scripts)
-
-[inventory file]: https://puppet.com/docs/bolt/0.x/inventory_file.html
+[Running Scripts](../4-running-scripts)
