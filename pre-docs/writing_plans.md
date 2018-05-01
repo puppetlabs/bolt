@@ -466,10 +466,10 @@ Collect facts with the `fact` plan and filter nodes based on them.
 ```puppet
 plan run_with_facts(TargetSpec $nodes) {
   # This will collect facts on nodes and update the inventory
-  run_plan(facts, $nodes)
+  run_plan(facts, nodes => $nodes)
 
-  $centos_nodes = get_nodes($nodes).filter |$n| { n.facts['operatingsystem'] == 'centos' }
-  $ubuntu_nodes = get_nodes($nodes).filter |$n| { n.facts['operatingsystem'] == 'ubuntu' }
+  $centos_nodes = get_targets($nodes).filter |$n| { $n.facts['os']['name'] == 'CentOS' }
+  $ubuntu_nodes = get_targets($nodes).filter |$n| { $n.facts['os']['name' == 'Ubuntu' }
   run_task(centos_task, $centos_nodes)
   run_task(ubuntu_task, $ubuntu_nodes)
 }
