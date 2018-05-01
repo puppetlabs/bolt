@@ -14,6 +14,7 @@ describe "when logging executor activity", ssh: true do
   let(:modulepath) { File.join(__dir__, '../fixtures/modules') }
   let(:stdin_task) { "sample::stdin" }
   let(:echo_plan) { "sample::single_task" }
+  let(:without_default_plan) { "logging::without_default" }
   let(:uri) { conn_uri('ssh') }
   let(:user) { conn_info('ssh')[:user] }
   let(:password) { conn_info('ssh')[:password] }
@@ -50,6 +51,20 @@ describe "when logging executor activity", ssh: true do
     expect(result[0]['result']['_output'].strip).to match(/hi there/)
   end
 
+  it 'logs extra with a plan' do
+    result = run_cli_json(%W[plan run #{echo_plan}] + config_flags)
+    expect(@log_output.readline).to match(/Starting: task sample::echo/)
+    expect(@log_output.readline).to match(/Finished: task sample::echo/)
+    expect(result[0]['result']['_output'].strip).to match(/hi there/)
+  end
+
+  it 'does not log extra without_default_logging in a plan' do
+    run_cli_json(%W[plan run #{without_default_plan}] + config_flags)
+    logs = @log_output.read
+    expect(logs).not_to match(/Starting: task logging::echo/)
+    expect(logs).not_to match(/Finished: task logging::echo/)
+  end
+
   context 'with verbose logging' do
     let(:log_level) { :info }
 
@@ -79,5 +94,14 @@ describe "when logging executor activity", ssh: true do
       expect(@log_output.readline).to match(/Finished: task sample::echo/)
       expect(result[0]['result']['_output'].strip).to match(/hi there/)
     end
+
+    it 'logs extra without_default in a plan' do
+      run_cli_json(%W[plan run #{without_default_plan}] + config_flags)
+      expect(@log_output.readline).to match(/Starting: task logging::echo/)
+      expect(@log_output.readline).to match(/Running task logging::echo with/)
+      expect(@log_output.readline).to match(/hi there/)
+      expect(@log_output.readline).to match(/Finished: task logging::echo/)
+    end
+
   end
 end
