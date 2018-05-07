@@ -102,6 +102,5 @@ describe "when logging executor activity", ssh: true do
       expect(@log_output.readline).to match(/hi there/)
       expect(@log_output.readline).to match(/Finished: task logging::echo/)
     end
-
   end
 end
