@@ -10,13 +10,18 @@ before_script:
 - docker-compose build && docker-compose up -d
 
 script:
-- bundle exec rake travisci rubocop
+- bundle exec rake travisci
+- bundle exec rubocop
 - |
+  status=0
   pushd bolt-modules/boltlib
   if ! bundle exec rake spec; then
-    exit 1
+    status=1
   fi
   popd
+  if [ $status -eq 1 ]; then
+    false
+  fi
 - |
   status=0
   for i in $( ls modules ); do
@@ -26,7 +31,10 @@ script:
     fi
     popd
   done
-  exit $status
+  # fail this step if there were any failures
+  if [ $status -eq 1 ]; then
+    false
+  fi
 notifications:
   email: false
   hipchat:
