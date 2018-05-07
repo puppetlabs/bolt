@@ -461,12 +461,41 @@ groups:
       transport: ssh
 ```
 
-Collect facts with the `fact` plan and filter nodes based on them.
+#### Collect facts from the targets
+
+The `facts` plan will connect to the target and discover facts through a few methods.
+
+- On `ssh` targets it will run a simple bash script.
+- On `winrm` targets it will run a simple powershell script.
+- On `pcp` or targets where it discovered the puppet agent it present it will run facter.
+
+It then stores these facts on the targets in the inventory for later use.
+This example collects facts with the `facts` plan and then uses those facts
+to decide which task to run on the targets.
 
 ```puppet
 plan run_with_facts(TargetSpec $nodes) {
   # This will collect facts on nodes and update the inventory
   run_plan(facts, nodes => $nodes)
+
+  $centos_nodes = get_targets($nodes).filter |$n| { $n.facts['os']['name'] == 'CentOS' }
+  $ubuntu_nodes = get_targets($nodes).filter |$n| { $n.facts['os']['name' == 'Ubuntu' }
+  run_task(centos_task, $centos_nodes)
+  run_task(ubuntu_task, $ubuntu_nodes)
+}
+```
+
+#### Collect facts from puppetdb
+
+When targets are running a puppet agent and sending facts to puppetdb the
+`puppetdb_fact` plan can be used to collect facts for them.  This example
+collects facts with the `puppetdb_fact` plan and then uses those facts to
+decide which task to run on the targets. You'll have to (configure the puppetdb client)[bolt_configure_puppetdb.md] before running it.
+
+```puppet
+plan run_with_facts(TargetSpec $nodes) {
+  # This will collect facts on nodes and update the inventory
+  run_plan(puppetdb_fact, nodes => $nodes)
 
   $centos_nodes = get_targets($nodes).filter |$n| { $n.facts['os']['name'] == 'CentOS' }
   $ubuntu_nodes = get_targets($nodes).filter |$n| { $n.facts['os']['name' == 'Ubuntu' }
@@ -522,4 +551,23 @@ not
 
 ```puppet
 without_default_logging { run_command('echo hi', $nodes) }
+```
+
+## `puppetdb_query`
+
+TODO where should this go?
+
+You can use the `puppetdb_query` function in plans to make direct queries to
+puppetdb. For example you can discover nodes from puppetdb and then run tasks
+on them. You'll have to (configure the puppetdb client)[bolt_configure_puppetdb.md] before running it.
+
+```puppet
+plan pdb_discover {
+  $result = puppetdb_query("inventory[certname] { app_role == 'web_server' })
+  # extract the certnames into an array
+  $names = $result.map |$r| { $r["certname"] }
+  # wrap in url. You can skip this if the default transport is pcp
+  $nodes = $names.map |$n| { "pcp://${n}" }
+  run_task('my_task', $nodes)
+}
 ```
