@@ -131,7 +131,7 @@ module Bolt
         self[:modulepath] = data['modulepath'].split(File::PATH_SEPARATOR)
       end
 
-      %w[inventoryfile concurrency format puppetdb color].each do |key|
+      %w[inventoryfile concurrency format puppetdb color transport].each do |key|
         if data.key?(key)
           self[key.to_sym] = data[key]
         end
