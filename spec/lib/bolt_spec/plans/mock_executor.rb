@@ -64,12 +64,22 @@ module BoltSpec
         true
       end
 
-      def call(targets, _task, _arguments, _options)
+      def call(targets, task, arguments, options)
         @calls += 1
-        Bolt::ResultSet.new(targets.map do |target|
-          val = @data[target.name] || @data[:default]
-          Bolt::Result.new(target, value: val)
-        end)
+        if @return_block
+          # Merge arguments and options into params to match puppet function signature.
+          result_set = @return_block.call(targets: targets, task: task, params: arguments.merge(options))
+          unless result_set.is_a?(Bolt::ResultSet)
+            raise "Return block for #{task} did not return a Bolt::ResultSet"
+          end
+          result_set
+        else
+          results = targets.map do |target|
+            val = @data[target.name] || @data[:default]
+            Bolt::Result.new(target, value: val)
+          end
+          Bolt::ResultSet.new(results)
+        end
       end
 
       def assert_called(taskname)
@@ -136,12 +146,20 @@ module BoltSpec
         self
       end
 
+      def return(&block)
+        raise "Cannot set return values and return block." if @data_set
+        @return_block = block
+        self
+      end
+
       # Set different result values for each target
       def return_for_targets(data)
         data.each do |target, result|
           raise "Mocked results must be hashes: #{target}: #{result}" unless result.is_a? Hash
         end
+        raise "Cannot set return values and return block." if @return_block
         @data = data
+        @data_set = true
         self
       end
 
