@@ -17,7 +17,7 @@ test_name 'Install Bolt package' do
     end
   else
     dev_builds_url = ENV['DEV_BUILDS_URL'] || 'http://builds.delivery.puppetlabs.net'
-    sha_yaml_url = "#{dev_builds_url}/bolt/#{ENV['SHA']}/artifacts/#{ENV['SHA']}.yaml"
+    sha_yaml_url = "#{dev_builds_url}/puppet-bolt/#{ENV['SHA']}/artifacts/#{ENV['SHA']}.yaml"
     install_from_build_data_url('puppet-bolt', sha_yaml_url, bolt)
   end
 end
