@@ -589,6 +589,16 @@ bar
           cli.parse
         }.to raise_error(Bolt::CLIError, /Invalid plan/)
       end
+
+      it "accepts targets resulting from --query from puppetdb" do
+        cli = Bolt::CLI.new(%w[plan run foo --query nodes{}])
+        allow(cli).to receive(:query_puppetdb_nodes).and_return(%w[foo bar])
+
+        targets = [Bolt::Target.new('foo'), Bolt::Target.new('bar')]
+
+        result = cli.parse
+        expect(result[:targets]).to eq(targets)
+      end
     end
 
     describe "execute" do

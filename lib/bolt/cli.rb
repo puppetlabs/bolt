@@ -392,7 +392,7 @@ Available options are:
       validate(options)
 
       # After validation, initialize inventory and targets. Errors here are better to catch early.
-      unless options[:action] == 'show' || options[:mode] == 'plan'
+      unless options[:action] == 'show'
         if options[:query]
           nodes = query_puppetdb_nodes(options[:query])
           options[:targets] = inventory.get_targets(nodes)
