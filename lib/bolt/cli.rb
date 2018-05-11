@@ -394,8 +394,12 @@ Available options are:
       # After validation, initialize inventory and targets. Errors here are better to catch early.
       unless options[:action] == 'show'
         if options[:query]
+          if options[:nodes].any?
+            raise Bolt::CLIError, "Only one of '--nodes' or '--query' may be specified"
+          end
           nodes = query_puppetdb_nodes(options[:query])
           options[:targets] = inventory.get_targets(nodes)
+          options[:nodes] = nodes if options[:mode] == 'plan'
         else
           options[:targets] = inventory.get_targets(options[:nodes])
         end
@@ -532,6 +536,7 @@ Available options are:
           end
           options[:task_options]['nodes'] = options[:nodes].join(',')
         end
+
         params = options[:noop] ? options[:task_options].merge("_noop" => true) : options[:task_options]
         plan_context = { plan_name: options[:object],
                          params: params }
