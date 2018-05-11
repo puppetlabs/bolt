@@ -1,12 +1,11 @@
-FROM rastasheep/ubuntu-sshd
-
+# Travis not using 18.04 yet
+FROM rastasheep/ubuntu-sshd:16.04
+RUN apt-get update && apt-get -y install sudo tree && apt-get -y install locales
 RUN locale-gen en_US.UTF-8
 
 ENV LC_ALL="en_US.UTF-8"
 ENV LANG="en_US.UTF-8"
 ENV LANGUAGE="en_US.UTF-8"
-
-RUN apt-get update && apt-get -y install sudo tree
 
 # Add bolt user
 RUN useradd bolt && echo "bolt:bolt" | chpasswd && adduser bolt sudo
