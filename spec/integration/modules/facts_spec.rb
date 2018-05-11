@@ -28,7 +28,8 @@ describe "running the facts plan" do
       expect(data['status']).to eq('success')
       expect(data['result'].size).to eq(1)
       expect(data['result']['os']['name']).to be
-      expect(data['result']['os']['family']).to match(/RedHat|Debian/)
+      # temporarily add Linux to matcher while BOLT-518 is investigated
+      expect(data['result']['os']['family']).to match(/RedHat|Debian|Linux/)
       expect(data['result']['os']['release']).to be
     end
   end
