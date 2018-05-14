@@ -140,7 +140,7 @@ module Bolt
               dir.chown(conn.run_as)
 
               execute_options[:sudoable] = true if conn.run_as
-              output = conn.execute(command, **execute_options)
+              output = conn.execute(command, execute_options)
             end
             Bolt::Result.for_task(target, output.stdout.string,
                                   output.stderr.string,

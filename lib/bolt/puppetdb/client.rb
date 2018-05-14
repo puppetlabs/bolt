@@ -42,7 +42,7 @@ module Bolt
           fields = results.first&.keys
           raise Bolt::PuppetDBError, "Query results did not contain a 'certname' field: got #{fields.join(', ')}"
         end
-        results&.map { |result| result['certname'] }.uniq
+        results&.map { |result| result['certname'] }&.uniq
       end
 
       # This method expects an array of certnames to get facts for

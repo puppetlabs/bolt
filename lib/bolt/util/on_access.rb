@@ -10,7 +10,8 @@ module Bolt
 
       # If a method is called and we haven't constructed the object,
       # construct it. Then pass the call to the object.
-      # rubocop:disable Style/MethodMissing
+      # rubocop:disable Style/MethodMissingSuper
+      # rubocop:disable Style/MissingRespondToMissing
       def method_missing(method, *args, &block)
         if @obj.nil?
           @obj = @constructor.call
@@ -18,7 +19,8 @@ module Bolt
 
         @obj.send(method, *args, &block)
       end
-      # rubocop:enable Style/MethodMissing
+      # rubocop:enable Style/MethodMissingSuper
+      # rubocop:enable Style/MissingRespondToMissing
     end
   end
 end
