@@ -96,7 +96,7 @@ describe Bolt::Config do
       expect(File).not_to receive(:exist?).with(default_path)
       expect(File).not_to receive(:exist?).with(alt_path)
       expect(File).to receive(:open).with(expanded_path, 'r:UTF-8').and_raise(Errno::ENOENT)
-      expect { config.load_file(path) }.to raise_error(Bolt::CLIError)
+      expect { config.load_file(path) }.to raise_error(Bolt::FileError)
     end
   end
 
@@ -138,7 +138,7 @@ describe Bolt::Config do
           ssh: { 'connect-timeout' => '42s' }
         }
       )
-      expect { config.validate }.to raise_error(Bolt::CLIError)
+      expect { config.validate }.to raise_error(Bolt::ValidationError)
     end
 
     it "accepts a boolean for host-key-check" do
@@ -160,7 +160,7 @@ describe Bolt::Config do
       }
       expect {
         Bolt::Config.new(config).validate
-      }.to raise_error(Bolt::CLIError)
+      }.to raise_error(Bolt::ValidationError)
     end
 
     it "accepts a private-key hash" do
@@ -182,7 +182,7 @@ describe Bolt::Config do
       }
       expect {
         Bolt::Config.new(config).validate
-      }.to raise_error(Bolt::CLIError)
+      }.to raise_error(Bolt::ValidationError)
     end
 
     it "accepts a boolean for ssl" do
@@ -204,7 +204,7 @@ describe Bolt::Config do
       }
       expect {
         Bolt::Config.new(config).validate
-      }.to raise_error(Bolt::CLIError)
+      }.to raise_error(Bolt::ValidationError)
     end
 
     it "accepts a boolean for ssl-verify" do
@@ -226,7 +226,7 @@ describe Bolt::Config do
       }
       expect {
         Bolt::Config.new(config).validate
-      }.to raise_error(Bolt::CLIError)
+      }.to raise_error(Bolt::ValidationError)
     end
 
     it "accepts a boolean for local-validation" do
@@ -248,7 +248,7 @@ describe Bolt::Config do
       }
       expect {
         Bolt::Config.new(config).validate
-      }.to raise_error(Bolt::CLIError)
+      }.to raise_error(Bolt::ValidationError)
     end
   end
 end

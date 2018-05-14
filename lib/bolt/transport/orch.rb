@@ -25,7 +25,7 @@ module Bolt
       def self.validate(options)
         validation_flag = options['local-validation']
         unless !!validation_flag == validation_flag
-          raise Bolt::CLIError, 'local-validation option must be a Boolean true or false'
+          raise Bolt::ValidationError, 'local-validation option must be a Boolean true or false'
         end
       end
 

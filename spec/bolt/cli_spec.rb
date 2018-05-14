@@ -268,7 +268,7 @@ bar
         allow(cli).to receive(:puppetdb_client).and_return(puppetdb)
 
         expect { cli.parse }
-          .to raise_error(Bolt::CLIError, /Could not retrieve targets from PuppetDB.*failed to puppetdb the nodes/)
+          .to raise_error(Bolt::PuppetDBError, /failed to puppetdb the nodes/)
       end
 
       it "fails if both --nodes and --query are specified" do
@@ -544,7 +544,7 @@ bar
                                  --modulepath .])
           expect {
             cli.parse
-          }.to raise_error(Bolt::CLIError, /No such file/)
+          }.to raise_error(Bolt::FileError, /No such file/)
         end
       end
 
@@ -727,7 +727,7 @@ bar
           stub_non_existent_file(script)
 
           expect { cli.execute(options) }.to raise_error(
-            Bolt::CLIError, /The script '#{script}' does not exist/
+            Bolt::FileError, /The script '#{script}' does not exist/
           )
           expect(JSON.parse(output.string)).to be
         end
@@ -736,7 +736,7 @@ bar
           stub_unreadable_file(script)
 
           expect { cli.execute(options) }.to raise_error(
-            Bolt::CLIError, /The script '#{script}' is unreadable/
+            Bolt::FileError, /The script '#{script}' is unreadable/
           )
           expect(JSON.parse(output.string)).to be
         end
@@ -745,7 +745,7 @@ bar
           stub_directory(script)
 
           expect { cli.execute(options) }.to raise_error(
-            Bolt::CLIError, /The script '#{script}' is not a file/
+            Bolt::FileError, /The script '#{script}' is not a file/
           )
           expect(JSON.parse(output.string)).to be
         end
@@ -891,7 +891,7 @@ bar
           expect {
             cli.execute(options)
           }.to raise_error(
-            Bolt::CLIError,
+            Bolt::Error,
             'Could not find a task named "abcdefg". For a list of available tasks, run "bolt task show"'
           )
         end
@@ -1000,7 +1000,7 @@ bar
           expect {
             cli.execute(options)
           }.to raise_error(
-            Bolt::CLIError,
+            Bolt::Error,
             'Could not find a plan named "abcdefg". For a list of available plans, run "bolt plan show"'
           )
         end
@@ -1050,7 +1050,7 @@ bar
           task_name.replace 'dne::task1'
 
           expect { cli.execute(options) }.to raise_error(
-            Bolt::CLIError, /Could not find a task named "dne::task1"/
+            Bolt::PAL::PALError, /Could not find a task named "dne::task1"/
           )
           expect(JSON.parse(output.string)).to be
         end
@@ -1059,7 +1059,7 @@ bar
           task_name.replace 'sample::dne'
 
           expect { cli.execute(options) }.to raise_error(
-            Bolt::CLIError, /Could not find a task named "sample::dne"/
+            Bolt::PAL::PALError, /Could not find a task named "sample::dne"/
           )
           expect(JSON.parse(output.string)).to be
         end
@@ -1149,7 +1149,7 @@ bar
             )
 
             expect { cli.execute(options) }.to raise_error(
-              Bolt::CLIError,
+              Bolt::PAL::PALError,
               /Task sample::params:\n(?x:
                )\s*has no parameter named 'foo'\n(?x:
                )\s*has no parameter named 'bar'/
@@ -1161,7 +1161,7 @@ bar
             task_params['mandatory_string'] = 'str'
 
             expect { cli.execute(options) }.to raise_error(
-              Bolt::CLIError,
+              Bolt::PAL::PALError,
               /Task sample::params:\n(?x:
                )\s*expects a value for parameter 'mandatory_integer'\n(?x:
                )\s*expects a value for parameter 'mandatory_boolean'/
@@ -1179,7 +1179,7 @@ bar
             )
 
             expect { cli.execute(options) }.to raise_error(
-              Bolt::CLIError,
+              Bolt::PAL::PALError,
               /Task sample::params:\n(?x:
                )\s*parameter 'mandatory_boolean' expects a Boolean value, got String\n(?x:
                )\s*parameter 'optional_string' expects a value of type Undef or String,(?x:
@@ -1198,7 +1198,7 @@ bar
             )
 
             expect { cli.execute(options) }.to raise_error(
-              Bolt::CLIError,
+              Bolt::PAL::PALError,
               /Task sample::params:\n(?x:
                )\s*parameter 'mandatory_string' expects a String\[1, 10\] value, got String\n(?x:
                )\s*parameter 'optional_integer' expects a value of type Undef or Integer\[-5, 5\],(?x:
@@ -1243,14 +1243,14 @@ bar
               task_name.replace 'unknown::task'
 
               expect { cli.execute(options) }.to raise_error(
-                Bolt::CLIError, /Could not find a task named "unknown::task"/
+                Bolt::PAL::PALError, /Could not find a task named "unknown::task"/
               )
               expect(JSON.parse(output.string)).to be
             end
 
             it "errors as usual if invalid (according to the local task definition) parameters are specified" do
               expect { cli.execute(options) }.to raise_error(
-                Bolt::CLIError,
+                Bolt::PAL::PALError,
                 /Task sample::params:\n(?x:
                  )\s*has no parameter named 'foo'\n(?x:
                  )\s*has no parameter named 'bar'/
@@ -1274,14 +1274,14 @@ bar
                 task_name.replace 'unknown::task'
 
                 expect { cli.execute(options) }.to raise_error(
-                  Bolt::CLIError, /Could not find a task named "unknown::task"/
+                  Bolt::PAL::PALError, /Could not find a task named "unknown::task"/
                 )
                 expect(JSON.parse(output.string)).to be
               end
 
               it "errors as usual if invalid (according to the local task definition) parameters are specified" do
                 expect { cli.execute(options) }.to raise_error(
-                  Bolt::CLIError,
+                  Bolt::PAL::PALError,
                   /Task sample::params:\n(?x:
                    )\s*has no parameter named 'foo'\n(?x:
                    )\s*has no parameter named 'bar'/
@@ -1491,7 +1491,7 @@ bar
           stub_non_existent_file(source)
 
           expect { cli.execute(options) }.to raise_error(
-            Bolt::CLIError, /The source file '#{source}' does not exist/
+            Bolt::FileError, /The source file '#{source}' does not exist/
           )
           expect(JSON.parse(output.string)).to be
         end
@@ -1500,7 +1500,7 @@ bar
           stub_unreadable_file(source)
 
           expect { cli.execute(options) }.to raise_error(
-            Bolt::CLIError, /The source file '#{source}' is unreadable/
+            Bolt::FileError, /The source file '#{source}' is unreadable/
           )
           expect(JSON.parse(output.string)).to be
         end
@@ -1509,7 +1509,7 @@ bar
           stub_directory(source)
 
           expect { cli.execute(options) }.to raise_error(
-            Bolt::CLIError, /The source file '#{source}' is not a file/
+            Bolt::FileError, /The source file '#{source}' is not a file/
           )
           expect(JSON.parse(output.string)).to be
         end
@@ -1762,7 +1762,7 @@ bar
       cli = Bolt::CLI.new(%W[command run --configfile #{File.join(configdir, 'invalid.yml')} --nodes foo])
       expect {
         cli.parse
-      }.to raise_error(Bolt::CLIError, /Could not parse/)
+      }.to raise_error(Bolt::FileError, /Could not parse/)
     end
   end
 

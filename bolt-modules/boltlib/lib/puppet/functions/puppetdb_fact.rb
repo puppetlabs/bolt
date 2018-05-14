@@ -29,10 +29,6 @@ Puppet::Functions.create_function(:puppetdb_fact) do
       )
     end
 
-    begin
-      puppetdb_client.facts_for_node(certnames)
-    rescue StandardError => e
-      raise Bolt::CLIError, "Could not retrieve targets from PuppetDB: #{e}"
-    end
+    puppetdb_client.facts_for_node(certnames)
   end
 end

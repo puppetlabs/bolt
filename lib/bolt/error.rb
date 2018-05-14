@@ -64,6 +64,7 @@ module Bolt
     end
   end
 
+  # This class is used to treat a Puppet Error datatype as a ruby error outside PAL
   class PuppetError < Error
     def self.from_error(err)
       new(err.msg, err.kind, err.details, err.issue_code)
@@ -76,6 +77,18 @@ module Bolt
             'bolt/invalid-plan-result',
             { 'plan_name' => plan_name,
               'result_string' => result_str })
+    end
+  end
+
+  class ValidationError < Bolt::Error
+    def initialize(msg)
+      super(msg, 'bolt.transport/validation-error')
+    end
+  end
+
+  class FileError < Bolt::Error
+    def initialize(msg, path)
+      super(msg, 'bolt/file-error', { "path" => path })
     end
   end
 end

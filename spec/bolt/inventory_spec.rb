@@ -402,7 +402,7 @@ describe Bolt::Inventory do
         }
 
         it 'fails validation' do
-          expect { inventory.get_targets('node') }.to raise_error(Bolt::CLIError)
+          expect { inventory.get_targets('node') }.to raise_error(Bolt::ValidationError)
         end
       end
 
@@ -415,7 +415,7 @@ describe Bolt::Inventory do
         }
 
         it 'fails validation' do
-          expect { inventory.get_targets('node') }.to raise_error(Bolt::CLIError)
+          expect { inventory.get_targets('node') }.to raise_error(Bolt::ValidationError)
         end
       end
 
@@ -428,7 +428,7 @@ describe Bolt::Inventory do
         }
 
         it 'fails validation' do
-          expect { inventory.get_targets('node') }.to raise_error(Bolt::CLIError)
+          expect { inventory.get_targets('node') }.to raise_error(Bolt::ValidationError)
         end
       end
 
@@ -441,7 +441,7 @@ describe Bolt::Inventory do
         }
 
         it 'fails validation' do
-          expect { inventory.get_targets('node') }.to raise_error(Bolt::CLIError)
+          expect { inventory.get_targets('node') }.to raise_error(Bolt::ValidationError)
         end
       end
 

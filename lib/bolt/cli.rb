@@ -307,7 +307,7 @@ Available options are:
       def read_arg_file(file)
         File.read(file)
       rescue StandardError => err
-        raise Bolt::CLIError, "Error attempting to read #{file}: #{err}"
+        raise Bolt::FileError.new("Error attempting to read #{file}: #{err}", file)
       end
     end
 
@@ -481,8 +481,6 @@ Available options are:
 
     def query_puppetdb_nodes(query)
       puppetdb_client.query_certnames(query)
-    rescue StandardError => e
-      raise Bolt::CLIError, "Could not retrieve targets from PuppetDB: #{e}"
     end
 
     def execute(options)
@@ -618,12 +616,12 @@ Available options are:
       stat = file_stat(path)
 
       if !stat.readable?
-        raise Bolt::CLIError, "The #{type} '#{path}' is unreadable"
+        raise Bolt::FileError.new("The #{type} '#{path}' is unreadable", path)
       elsif !stat.file?
-        raise Bolt::CLIError, "The #{type} '#{path}' is not a file"
+        raise Bolt::FileError.new("The #{type} '#{path}' is not a file", path)
       end
     rescue Errno::ENOENT
-      raise Bolt::CLIError, "The #{type} '#{path}' does not exist"
+      raise Bolt::FileError.new("The #{type} '#{path}' does not exist", path)
     end
 
     def file_stat(path)
