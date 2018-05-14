@@ -592,12 +592,20 @@ bar
 
       it "accepts targets resulting from --query from puppetdb" do
         cli = Bolt::CLI.new(%w[plan run foo --query nodes{}])
-        allow(cli).to receive(:query_puppetdb_nodes).and_return(%w[foo bar])
-
+        allow(cli).to receive(:query_puppetdb_nodes).once.and_return(%w[foo bar])
         targets = [Bolt::Target.new('foo'), Bolt::Target.new('bar')]
-
         result = cli.parse
+        cli.validate(result)
+        cli.execute(result)
         expect(result[:targets]).to eq(targets)
+        expect(result[:nodes]).to eq(%w[foo bar])
+      end
+
+      it "fails when --nodes AND --query provided" do
+        expect {
+          cli = Bolt::CLI.new(%w[plan run foo --query nodes{} --nodes bar])
+          cli.parse
+        }.to raise_error(Bolt::CLIError, /'--nodes' or '--query'/)
       end
     end
 
