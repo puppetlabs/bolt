@@ -13,9 +13,9 @@ In this exercise you will further explore Puppet Plans:
 # Prerequisites
 Complete the following before you start this lesson:
 
-1. [Installing Bolt](../1-installing-bolt)
-1. [Setting up test nodes](../2-acquiring-nodes)
-1. [Writing plans](../7-writing-plans)
+1. [Installing Bolt](../01-installing-bolt)
+1. [Setting up test nodes](../02-acquiring-nodes)
+1. [Writing plans](../07-writing-plans)
 
 # Write a plan which uses input and output
 

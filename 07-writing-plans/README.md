@@ -12,9 +12,9 @@ In this exercise you will discover Puppet Plans and how to run them with Bolt.
 # Prerequisites
 Complete the following before you start this lesson:
 
-1. [Installing Bolt](../1-installing-bolt)
-1. [Setting up test nodes](../2-acquiring-nodes)
-1. [Running Commands](../3-running-commands)
+1. [Installing Bolt](../01-installing-bolt)
+1. [Setting up test nodes](../02-acquiring-nodes)
+1. [Running Commands](../03-running-commands)
 
 # About Plans 
 
@@ -100,7 +100,7 @@ Create a task and then create a plan that uses the task.
     2018-02-16T15:36:32.932869 INFO   Bolt::Executor: Starting task exercise7::write on ["node1"]
     2018-02-16T15:36:32.932892 DEBUG  Bolt::Executor: Arguments: {"filename"=>"hello", "message"=>"world"} Input method: both
     2018-02-16T15:36:33.178433 DEBUG  Bolt::Transport::SSH: Authentication method 'gssapi-with-mic' is not available
-    2018-02-16T15:36:33.179532 DEBUG  Bolt::Transport::SSH: Running task run 'Task({'name' => 'exercise7::write', 'executable' => '/Users/username/puppetlabs/tasks-hands-on-lab/7-writing-plans/modules/exercise7/tasks/write.sh'})' on node1
+    2018-02-16T15:36:33.179532 DEBUG  Bolt::Transport::SSH: Running task run 'Task({'name' => 'exercise7::write', 'executable' => '/Users/username/puppetlabs/tasks-hands-on-lab/07-writing-plans/modules/exercise7/tasks/write.sh'})' on node1
     Started on node1...
     2018-02-16T15:36:33.216451 DEBUG  node1: Opened session
     2018-02-16T15:36:33.216604 DEBUG  node1: Executing: mktemp -d

@@ -8,19 +8,19 @@ This repository contains a step-by-step introduction to [Bolt](https://github.co
 
 These exercises will help you get Bolt installed and make sure you have a few nodes to target with tasks and commands. 
 
-1. [Installing Bolt](1-installing-bolt)
-1. [Acquiring nodes](2-acquiring-nodes)
+1. [Installing Bolt](01-installing-bolt)
+1. [Acquiring nodes](02-acquiring-nodes)
 
 ## Exercises
 
 These step through the basic functionality of Puppet Tasks and focus on simple commands you can copy and paste.
 
-1. [Running Commands](3-running-commands)
-1. [Running Scripts](4-running-scripts)
-1. [Writing Tasks](5-writing-tasks)
-1. [Downloading and running existing Tasks](6-downloading-and-running-existing-tasks)
-1. [Writing Plans](7-writing-plans)
-1. [Writing advanced Plans](8-writing-advanced-plans)
+1. [Running Commands](03-running-commands)
+1. [Running Scripts](04-running-scripts)
+1. [Writing Tasks](05-writing-tasks)
+1. [Downloading and running existing Tasks](06-downloading-and-running-existing-tasks)
+1. [Writing Plans](07-writing-plans)
+1. [Writing advanced Plans](08-writing-advanced-plans)
 
 ## Self-Paced Training
 

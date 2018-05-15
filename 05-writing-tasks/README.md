@@ -14,10 +14,10 @@ In this exercise you will write your first Puppet Tasks for use with Bolt.
 # Prerequisites
 Complete the following before you start this lesson:
 
-1. [Installing Bolt](../1-installing-bolt)
-1. [Setting up test nodes](../2-acquiring-nodes)
-1. [Running Commands](../3-running-commands)
-1. [Running Scripts](../4-running-scripts)
+1. [Installing Bolt](../01-installing-bolt)
+1. [Setting up test nodes](../02-acquiring-nodes)
+1. [Running Commands](../03-running-commands)
+1. [Running Scripts](../04-running-scripts)
 
 
 # How do tasks work?
@@ -130,4 +130,4 @@ Note that Bolt assumes that the required runtime is already available on the tar
 
 Now that you know how to write tasks you can move on to:
 
-[Downloading and running existing tasks](../6-downloading-and-running-existing-tasks)
+[Downloading and running existing tasks](../06-downloading-and-running-existing-tasks)
