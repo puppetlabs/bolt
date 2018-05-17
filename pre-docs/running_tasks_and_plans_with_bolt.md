@@ -29,12 +29,9 @@ Manager. For more details, see the installing modules documentation.
 Before running tasks or plans in your environment, you can inspect them to
 determine their effect using noop mode, or using the Bolt show commands.
 
-### Run in noop mode
+### Run in no-operation mode
 
-Some tasks can run as noop, so you can run them without making changes to your
-target node. This way, you ensure the tasks perform as designed. To run a task
-in noop mode with Bolt, use the `--noop` flag. If a task doesn't support running
-in noop mode, you'll get an error. `bolt task run package name=vim
+You can run some tasks in no-operation mode (`--noop`) to view changes  without taking any action on your target node. This way, you ensure the tasks perform as designed. Add the `--noop` flag to your `bolt task run` command. If a task doesn't support no-operation mode, you'll get an  error. `bolt task run package name=vim
 action=install --noop -n example.com`
 
 ### Show a task list
@@ -49,7 +46,7 @@ bolt task show
 ### Show documentation for a task
 
 To see parameters and other details for a task, including whether a task
-supports `--noop`, use the `show <TASK NAME>` command.
+supports no-operation mode`--noop`, use the `show <TASK NAME>` command.
 
 ```
 bolt task show <TASK NAME>
@@ -66,7 +63,7 @@ bolt plan show
 ### Show documentation for a plan
 
 To see parameters and other details for a plan, including whether a plan
-supports `--noop`, use the `show <PLAN NAME>` command.
+supports the no-operation mode `--noop`, use the `show <PLAN NAME>` command.
 
 ```
 bolt plan show <TASK NAME>
