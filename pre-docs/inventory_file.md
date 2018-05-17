@@ -11,7 +11,8 @@ nodes and groups. Each node can have a config, vals, and facts specific to that
 node. Each group can have an array of nodes, an array of child groups, and can
 set default config, facts, and vals for the entire group.
 
-## Inventory Config
+**Note:** config values set at the top level of inventory will only apply to targets included in that inventory file. Set config for unknown targets in the bolt config file.
+
 
 You can only set transport configuration in the inventory file. This means
 using a top level transport value to assign a transport to the target and all
@@ -51,17 +52,16 @@ groups:
       transport: winrm
       winrm:
         port: 5382
+```
+
 # Override a user for a specific node.
+```
 nodes:
   - name: linux1.example.com
     config:
       ssh:
         user: me
 ```
-
-> Note: config values set at the top level of inventory will only apply to
-> targets included in that inventory file. Set config for unknown targets in
-> the bolt config file.
 
 ## Inventory facts and vals
 
@@ -174,6 +174,7 @@ Configure login and escalation for a specific node.
 nodes:
   - name: host1.example.com
     config:
+      transports:
       ssh:
         user: me
         run-as: root
