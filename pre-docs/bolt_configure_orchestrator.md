@@ -36,7 +36,9 @@ mod 'puppetlabs-bolt_shim', '0.1.1'
 ## Assign PE RBAC permissions for all tasks
 
 Warning: By granting users access to Bolt tasks, you give them permission to
-run arbitrary commands and upload files as a super-user.  In the PE console,
+run arbitrary commands and upload files as a super-user.
+
+1.  In the PE console,
 click Access control > User roles.
 
 #. From the list of user roles, click the one you want to have Bolt task

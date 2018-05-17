@@ -203,10 +203,12 @@ Options are optional unless marked as required.
 | Options | Description |
 | --- | --- |
 | `--nodes, -n` | Required when running. Nodes to connect to.<br><br>To connect with WinRM, include the protocol as winrm://<HOSTNAME>.<br><br>For an IPv6 address without a port number, encase it brackets [fe80::34eb:ff1:b584:d7c0].<br><br>For IPv6 addresses including a port use one of the following formats:  fe80::34eb:ff1:b584:d7c0:22  or  [fe80::34eb:ff1:b584:d7c0]:22. |
-| `--query, -q` | Query PuppetDB to determine the targets. |
-| `--noop` | Execute a task that supports it in noop mode. |
-| `--description` | Add a description to the run. Used in logging and submitted to Orchestrator with the pcp transport. |
-| `--params` | Parameters, passed as a JSON object on the command line, or as a JSON parameter file, prefaced with @ like @params.json |
+| `--query` `, -q` |Query PuppetDB to determine the targets.|
+| `--noop` |Execute a task that supports it in no-operation mode.|
+| `--description` |Add a description to the run. Used in logging and submitted to Orchestrator with the pcp transport.|
+| `--params` |Parameters, passed as a JSON object on the command line, or as a JSON parameter file, prefaced with `@` like `@params.json`. For Windows PowerShell,  add single quotation marks to define the file: `'@params.json'`
+
+|
 ||
 | Authentication |
 | `--user, -u` | User to authenticate as. |
