@@ -38,6 +38,13 @@ if [ -z "${name}" ]; then
         name=$(grep "^NAME" /usr/lib/os-release | cut -d'=' -f2 | sed "s/\"//g")
         release=$(grep "^VERSION_ID" /usr/lib/os-release | cut -d'=' -f2 | sed "s/\"//g")
     fi
+    if [ -n "${name}" ]; then
+        if echo "${name}" | egrep -iq "(.*red)(.*hat)"; then
+            name="RedHat"
+        elif echo "${name}" | egrep -iq "debian"; then
+            name="Debian"
+        fi
+    fi
 fi
 
 if [ -z "${name}" ]; then
