@@ -45,7 +45,7 @@ module Bolt
         begin
           data = YAML.safe_load(ENV[ENVIRONMENT_VAR])
         rescue Psych::Exception
-          raise Bolt::CLIError, "Could not parse inventory from $#{ENVIRONMENT_VAR}"
+          raise Bolt::Error.new("Could not parse inventory from $#{ENVIRONMENT_VAR}", 'bolt/parse-error')
         end
       else
         data = Bolt::Util.read_config_file(config[:inventoryfile], default_paths, 'inventory')

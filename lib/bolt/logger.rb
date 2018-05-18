@@ -56,7 +56,7 @@ module Bolt
               level: default_level
             )
           rescue ArgumentError => e
-            raise Bolt::CLIError, "Failed to open log #{name}: #{e.message}"
+            raise Bolt::Error.new("Failed to open log #{name}: #{e.message}", 'bolt/log-error')
           end
 
           root_logger.add_appenders appender

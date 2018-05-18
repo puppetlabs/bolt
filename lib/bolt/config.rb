@@ -200,16 +200,16 @@ module Bolt
     def validate
       self[:log].each_pair do |name, params|
         if params.key?(:level) && !Bolt::Logger.valid_level?(params[:level])
-          raise Bolt::CLIError,
+          raise Bolt::ValidationError,
                 "level of log #{name} must be one of: #{Bolt::Logger.levels.join(', ')}; received #{params[:level]}"
         end
         if params.key?(:append) && params[:append] != true && params[:append] != false
-          raise Bolt::CLIError, "append flag of log #{name} must be a Boolean, received #{params[:append]}"
+          raise Bolt::ValidationError, "append flag of log #{name} must be a Boolean, received #{params[:append]}"
         end
       end
 
       unless %w[human json].include? self[:format]
-        raise Bolt::CLIError, "Unsupported format: '#{self[:format]}'"
+        raise Bolt::ValidationError, "Unsupported format: '#{self[:format]}'"
       end
 
       unless self[:transport].nil? || Bolt::TRANSPORTS.include?(self[:transport].to_sym)

@@ -9,6 +9,31 @@ module Bolt
     BOLTLIB_PATH = File.join(__FILE__, '../../../bolt-modules')
     MODULES_PATH = File.join(__FILE__, '../../../modules')
 
+    # PALError is used to convert errors from executing puppet code into
+    # Bolt::Errors
+    class PALError < Bolt::Error
+      # Puppet sometimes rescues exceptions notes the location and reraises.
+      # Return the original error.
+      def self.from_preformatted_error(err)
+        if err.cause&.is_a? Bolt::Error
+          err.cause
+        else
+          from_error(err.cause || err)
+        end
+      end
+
+      # Generate a Bolt::Pal::PALError for non-bolt errors
+      def self.from_error(err)
+        e = new(err.message)
+        e.set_backtrace(err.backtrace)
+        e
+      end
+
+      def initialize(msg)
+        super(msg, 'bolt/pal-error')
+      end
+    end
+
     def initialize(config)
       # Nothing works without initialized this global state. Reinitializing
       # is safe and in practice only happen in tests
@@ -40,7 +65,7 @@ module Bolt
       begin
         require_relative '../../vendored/require_vendored'
       rescue LoadError
-        raise Bolt::CLIError, "Puppet must be installed to execute tasks"
+        raise Bolt::Error.new("Puppet must be installed to execute tasks", "bolt/puppet-missing")
       end
 
       require 'bolt/pal/logging'
@@ -72,25 +97,9 @@ module Bolt
           begin
             yield compiler
           rescue Puppet::PreformattedError => err
-            # Puppet sometimes rescues exceptions notes the location and reraises.
-            # Return the original error.
-            if err.cause
-              if err.cause.is_a? Bolt::Error
-                err.cause
-              else
-                e = Bolt::CLIError.new(err.cause.message)
-                e.set_backtrace(err.cause.backtrace)
-                e
-              end
-            else
-              e = Bolt::CLIError.new(err.message)
-              e.set_backtrace(err.backtrace)
-              e
-            end
+            PALError.from_preformatted_error(err)
           rescue StandardError => err
-            e = Bolt::CLIError.new(err.message)
-            e.set_backtrace(err.backtrace)
-            e
+            PALError.from_preformatted_error(err)
           end
         end
       end
@@ -188,7 +197,7 @@ module Bolt
       end
 
       if task.nil?
-        raise Bolt::CLIError, Bolt::Error.unknown_task(task_name)
+        raise Bolt::Error.new(Bolt::Error.unknown_task(task_name), 'bolt/unknown-task')
       end
 
       task.task_hash
@@ -222,7 +231,7 @@ module Bolt
       end
 
       if plan_info.nil?
-        raise Bolt::CLIError, Bolt::Error.unknown_plan(plan_name)
+        raise Bolt::Error.new(Bolt::Error.unknown_plan(plan_name), 'bolt/unknown-plan')
       end
       plan_info
     end
