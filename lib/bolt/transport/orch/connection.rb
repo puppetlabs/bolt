@@ -23,11 +23,11 @@ module Bolt
           client_opts = client_keys.each_with_object({}) do |k, acc|
             acc[k] = opts[k] if opts.include?(k)
           end
+          client_opts['User-Agent'] = "Bolt/#{VERSION}"
           logger.debug("Creating orchestrator client for #{client_opts}")
 
           @client = OrchestratorClient.new(client_opts, true)
           @plan_job = start_plan(plan_context)
-
           @environment = opts["task-environment"]
         end
 
