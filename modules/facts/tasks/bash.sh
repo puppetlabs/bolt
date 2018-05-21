@@ -29,6 +29,24 @@ if [ -z "${name}" ]; then
     fi
 fi
 
+# if lsb not available try os-release
+if [ -z "${name}" ]; then
+    if [ -e /etc/os-release ]; then
+        name=$(grep "^NAME" /etc/os-release | cut -d'=' -f2 | sed "s/\"//g")
+        release=$(grep "^VERSION_ID" /etc/os-release | cut -d'=' -f2 | sed "s/\"//g")
+    elif [-e /usr/lib/os-release ]; then
+        name=$(grep "^NAME" /usr/lib/os-release | cut -d'=' -f2 | sed "s/\"//g")
+        release=$(grep "^VERSION_ID" /usr/lib/os-release | cut -d'=' -f2 | sed "s/\"//g")
+    fi
+    if [ -n "${name}" ]; then
+        if echo "${name}" | egrep -iq "(.*red)(.*hat)"; then
+            name="RedHat"
+        elif echo "${name}" | egrep -iq "debian"; then
+            name="Debian"
+        fi
+    fi
+fi
+
 if [ -z "${name}" ]; then
     name=$(uname)
     release=$(uname -r)
