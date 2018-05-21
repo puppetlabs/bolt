@@ -27,7 +27,7 @@ module Bolt
 
       @noop = noop
       @run_as = nil
-      @pool = Concurrent::CachedThreadPool.new(max_threads: @config[:concurrency])
+      @pool = Concurrent::ThreadPoolExecutor.new(max_threads: @config[:concurrency])
       @logger.debug { "Started with #{@config[:concurrency]} max thread(s)" }
       @notifier = Bolt::Notifier.new
     end

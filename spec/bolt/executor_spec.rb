@@ -342,6 +342,44 @@ describe "Bolt::Executor" do
     end
   end
 
+  context "with concurrency 2" do
+    let(:targets) {
+      [Bolt::Target.new('node1'), Bolt::Target.new('node2'), Bolt::Target.new('node3')]
+    }
+
+    let(:config) { Bolt::Config.new(concurrency: 2) }
+
+    it "batch_execute only creates 2 threads" do
+      state = targets.each_with_object({}) do |target, acc|
+        acc[target] = { promise: Concurrent::Promise.new { Bolt::Result.for_command(target, "foo", "bar", 0) },
+                        running: false }
+      end
+
+      # calling promise.value will block the thread from completing
+      t = Thread.new {
+        executor.batch_execute(targets) do |_transport, batch|
+          target = batch[0]
+          state[target][:running] = true
+          result = state[target][:promise].value
+          state[target][:running] = false
+          result
+        end
+      }
+      # without pausing here running seems to evaluate to 0
+      sleep(0.1)
+
+      running = state.reduce(0) do |acc, (_k, v)|
+        acc += 1 if v[:running]
+        acc
+      end
+
+      expect(running).to eq(2)
+      # execute all the promises to release the threads
+      state.keys.each { |k| state[k][:promise].execute }
+      t.join
+    end
+  end
+
   it "returns an exception result if the connect raises an unhandled error" do
     node_results.each_key do |_target|
       expect(ssh).to receive(:with_connection).and_raise("reset")
