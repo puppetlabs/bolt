@@ -3,6 +3,7 @@
 require 'spec_helper'
 require 'bolt/outputter'
 require 'bolt/cli'
+require 'bolt/plan_result'
 
 describe "Bolt::Outputter::Human" do
   let(:output) { StringIO.new }
@@ -195,8 +196,8 @@ PARAMETERS:
   end
 
   it "prints empty results from a plan" do
-    outputter.print_plan_result([])
-    expect(output.string).to eq("[]\n")
+    outputter.print_plan_result(Bolt::PlanResult.new([], 'success'))
+    expect(output.string).to eq("[\n\n]\n")
   end
 
   it "formats unwrapped ExecutionResult from a plan" do
@@ -209,7 +210,7 @@ PARAMETERS:
                         'partial_result' => { 'stdout' => 'no', 'stderr' => '', 'exit_code' => 2 },
                         'details' => { 'exit_code' => 2 } } } }
     ]
-    outputter.print_plan_result(result)
+    outputter.print_plan_result(Bolt::PlanResult.new(result, 'failure'))
 
     result_hash = JSON.parse(output.string)
     expect(result_hash).to eq(result)
@@ -217,18 +218,18 @@ PARAMETERS:
 
   it "formats hash results from a plan" do
     result = { 'some' => 'data' }
-    outputter.print_plan_result(result)
+    outputter.print_plan_result(Bolt::PlanResult.new(result, 'success'))
     expect(JSON.parse(output.string)).to eq(result)
   end
 
   it "prints simple output from a plan" do
     result = "some data"
-    outputter.print_plan_result(result)
+    outputter.print_plan_result(Bolt::PlanResult.new(result, 'success'))
     expect(output.string.strip).to eq("\"#{result}\"")
   end
 
   it "prints a message when a plan returns undef" do
-    outputter.print_plan_result(nil)
+    outputter.print_plan_result(Bolt::PlanResult.new(nil, 'success'))
     expect(output.string.strip).to eq("Plan completed successfully with no result")
   end
 
