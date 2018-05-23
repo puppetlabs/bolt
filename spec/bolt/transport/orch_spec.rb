@@ -41,6 +41,18 @@ describe Bolt::Transport::Orch, orchestrator: true do
     allow(OrchestratorClient).to receive(:new).and_return(mock_client)
   end
 
+  describe "when orchestrator_client-ruby is used" do
+    it "bolt sets User-Agent header option to Bolt/${version}" do
+      config = {
+        'service-url' => 'foo',
+        'cacert' => 'bar'
+      }
+      allow(OrchestratorClient).to receive(:new).and_call_original
+      c = Bolt::Transport::Orch::Connection.new(config, nil, orch.logger)
+      expect(c.instance_variable_get(:@client).config.config["User-Agent"]).to eq("Bolt/#{Bolt::VERSION}")
+    end
+  end
+
   describe :build_request do
     let(:conn) { Bolt::Transport::Orch::Connection.new(targets.first.options, nil, orch.logger) }
 
