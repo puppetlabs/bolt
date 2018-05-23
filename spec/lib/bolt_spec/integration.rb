@@ -2,14 +2,14 @@
 
 module BoltSpec
   module Integration
-    def run_cli(arguments, rescue_exec: false)
+    def run_cli(arguments, rescue_exec: false, outputter: Bolt::Outputter::JSON)
       cli = Bolt::CLI.new(arguments)
 
       # prevent tests from reading users config
       allow(cli.config).to receive(:default_paths).and_return([File.join('.', 'path', 'does not exist')])
       allow(Bolt::Inventory).to receive(:default_paths).and_return([File.join('.', 'path', 'does not exist')])
       output =  StringIO.new
-      outputter = Bolt::Outputter::JSON.new(false, output)
+      outputter = outputter.new(false, output)
       allow(cli).to receive(:outputter).and_return(outputter)
       allow(Bolt::Logger).to receive(:configure)
 
