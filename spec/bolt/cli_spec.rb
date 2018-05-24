@@ -1020,7 +1020,7 @@ bar
             params_parsed: true
           }
         }
-        let(:input_method) { +'both' }
+        let(:input_method) { nil }
         let(:task_path) { +'modules/sample/tasks/echo.sh$' }
         let(:task_t) { task_type(task_name, Regexp.new(task_path), input_method) }
 
@@ -1033,7 +1033,6 @@ bar
             .to receive(:run_task)
             .with(targets, task_t, task_params, {})
             .and_return(Bolt::ResultSet.new([]))
-
           expect(cli.execute(options)).to eq(0)
           expect(JSON.parse(output.string)).to be
         end
@@ -1089,32 +1088,33 @@ bar
           expect(JSON.parse(output.string)).to be
         end
 
-        it "runs a task passing input on stdin" do
-          task_name.replace 'sample::stdin'
-          task_path.replace 'modules/sample/tasks/stdin.sh$'
-          input_method.replace 'stdin'
+        context "input_method stdin" do
+          let(:input_method) { 'stdin' }
+          it "runs a task passing input on stdin" do
+            task_name.replace 'sample::stdin'
+            task_path.replace 'modules/sample/tasks/stdin.sh$'
 
-          expect(executor)
-            .to receive(:run_task)
-            .with(targets, task_t, task_params, {})
-            .and_return(Bolt::ResultSet.new([]))
+            expect(executor)
+              .to receive(:run_task)
+              .with(targets, task_t, task_params, {})
+              .and_return(Bolt::ResultSet.new([]))
 
-          cli.execute(options)
-          expect(JSON.parse(output.string)).to be
-        end
+            cli.execute(options)
+            expect(JSON.parse(output.string)).to be
+          end
 
-        it "runs a powershell task passing input on stdin" do
-          task_name.replace 'sample::winstdin'
-          task_path.replace 'modules/sample/tasks/winstdin.ps1$'
-          input_method.replace 'stdin'
+          it "runs a powershell task passing input on stdin" do
+            task_name.replace 'sample::winstdin'
+            task_path.replace 'modules/sample/tasks/winstdin.ps1$'
 
-          expect(executor)
-            .to receive(:run_task)
-            .with(targets, task_t, task_params, {})
-            .and_return(Bolt::ResultSet.new([]))
+            expect(executor)
+              .to receive(:run_task)
+              .with(targets, task_t, task_params, {})
+              .and_return(Bolt::ResultSet.new([]))
 
-          cli.execute(options)
-          expect(JSON.parse(output.string)).to be
+            cli.execute(options)
+            expect(JSON.parse(output.string)).to be
+          end
         end
 
         it "traps SIGINT", :signals_self do
@@ -1293,7 +1293,7 @@ bar
 
             context "when all targets use the PCP transport" do
               let(:target) { Bolt::Target.new('pcp://foo') }
-              let(:task_t) { task_type(task_name, /\A\z/, 'both') }
+              let(:task_t) { task_type(task_name, /\A\z/, nil) }
 
               it "runs the task even when it is not installed locally" do
                 task_name.replace 'unknown::task'
@@ -1333,7 +1333,7 @@ bar
             task_options: plan_params
           }
         }
-        let(:task_t) { task_type('sample::echo', %r{modules/sample/tasks/echo.sh$}, 'both') }
+        let(:task_t) { task_type('sample::echo', %r{modules/sample/tasks/echo.sh$}, nil) }
 
         before :each do
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
@@ -1544,7 +1544,7 @@ bar
             noop: true
           }
         }
-        let(:task_t) { task_type(task_name, %r{modules/sample/tasks/noop.sh$}, 'both') }
+        let(:task_t) { task_type(task_name, %r{modules/sample/tasks/noop.sh$}, nil) }
 
         before :each do
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]

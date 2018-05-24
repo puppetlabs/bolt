@@ -43,7 +43,7 @@ describe 'run_task' do
     it 'when running a task without metadata the input method is "both"' do
       executable = File.join(tasks_root, 'echo.sh')
 
-      executor.expects(:run_task).with([target], mock_task(executable, 'both'), default_args, {}).returns(result_set)
+      executor.expects(:run_task).with([target], mock_task(executable, nil), default_args, {}).returns(result_set)
       inventory.expects(:get_targets).with(hostname).returns([target])
 
       is_expected.to run.with_params('Test::Echo', hostname, default_args).and_return(result_set)
@@ -74,7 +74,7 @@ describe 'run_task' do
     it 'when called without without args hash (for a task where this is allowed)' do
       executable = File.join(tasks_root, 'yes.sh')
 
-      executor.expects(:run_task).with([target], mock_task(executable, 'both'), {}, {}).returns(result_set)
+      executor.expects(:run_task).with([target], mock_task(executable, nil), {}, {}).returns(result_set)
       inventory.expects(:get_targets).with(hostname).returns([target])
 
       is_expected.to run.with_params('test::yes', hostname).and_return(result_set)
@@ -190,7 +190,7 @@ describe 'run_task' do
       it 'finds task named after the module' do
         executable = File.join(tasks_root, 'init.sh')
 
-        executor.expects(:run_task).with([target], mock_task(executable, 'both'), {}, {}).returns(result_set)
+        executor.expects(:run_task).with([target], mock_task(executable, nil), {}, {}).returns(result_set)
         inventory.expects(:get_targets).with(hostname).returns([target])
 
         is_expected.to run.with_params('test', hostname).and_return(result_set)
