@@ -107,6 +107,11 @@ module Bolt
           return cl
         end
       end
+
+      # Returns true if windows false if not.
+      def windows?
+        !!File::ALT_SEPARATOR
+      end
     end
   end
 end

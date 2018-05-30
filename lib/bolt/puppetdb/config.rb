@@ -1,30 +1,35 @@
 # frozen_string_literal: true
 
 require 'json'
+require 'bolt/util'
 
 module Bolt
   module PuppetDB
     class Config
       DEFAULT_TOKEN = File.expand_path('~/.puppetlabs/token')
-      DEFAULT_CONFIG = File.expand_path('~/.puppetlabs/client-tools/puppetdb.conf')
+      DEFAULT_CONFIG = { user: File.expand_path('~/.puppetlabs/client-tools/puppetdb.conf'),
+                         global: '/etc/puppetlabs/client-tools/puppetdb.conf',
+                         win_global: 'C:/ProgramData/PuppetLabs/client-tools/puppetdb.conf' }.freeze
 
       def initialize(config_file, options)
         @settings = load_config(config_file)
         @settings.merge!(options)
-
         expand_paths
         validate
       end
 
       def load_config(filename)
+        global_path = Bolt::Util.windows? ? DEFAULT_CONFIG[:win_global] : DEFAULT_CONFIG[:global]
         if filename
           if File.exist?(filename)
             config = JSON.parse(File.read(filename))
           else
             raise Bolt::PuppetDBError, "config file #{filename} does not exist"
           end
-        elsif File.exist?(DEFAULT_CONFIG)
-          config = JSON.parse(File.read(DEFAULT_CONFIG))
+        elsif File.exist?(DEFAULT_CONFIG[:user])
+          config = JSON.parse(File.read(DEFAULT_CONFIG[:user]))
+        elsif File.exist?(global_path)
+          config = JSON.parse(File.read(global_path))
         else
           config = {}
         end

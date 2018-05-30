@@ -4,6 +4,7 @@ require 'logging'
 require 'shellwords'
 require 'bolt/node/errors'
 require 'bolt/node/output'
+require 'bolt/util'
 
 module Bolt
   module Transport
@@ -59,7 +60,7 @@ module Bolt
           @logger = Logging.logger[@target.host]
         end
 
-        if !!File::ALT_SEPARATOR
+        if Bolt::Util.windows?
           require 'ffi'
           module Win
             extend FFI::Library
@@ -102,7 +103,7 @@ module Bolt
               @logger.debug { "Disabling use_agent in net-ssh: ssh-agent is not available" }
               options[:use_agent] = false
             end
-          elsif !!File::ALT_SEPARATOR
+          elsif Bolt::Util.windows?
             pageant_wide = 'Pageant'.encode('UTF-16LE')
             if Win.FindWindow(pageant_wide, pageant_wide).to_i == 0
               @logger.debug { "Disabling use_agent in net-ssh: pageant process not running" }

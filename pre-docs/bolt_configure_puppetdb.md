@@ -59,6 +59,8 @@ puppetdb:
   cert: /etc/puppetlabs/puppet/ssl/certs/my-host.example.com.pem
   key: /etc/puppetlabs/puppet/ssl/private_keys/my-host.example.com.pem
 ```
+If Puppet Enterprise is installed and puppetdb is not defined in a configfile bolt will default to use puppetdb config defined in either`$HOME/.puppetlabs/client-tools/puppetdb.conf` or `/etc/puppetlabs/client-tools/puppetdb.conf` (`C:\ProgramData\PuppetLabs\client-tools\puppetdb.conf` if windows OS).
+> **Note**: Bolt **will not** merge config files into a conf.d format the way that pe-client-tools will.
 
 To use PE RBAC auth
 ```yaml
