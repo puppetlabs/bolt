@@ -185,6 +185,28 @@ describe Bolt::Config do
       }.to raise_error(Bolt::ValidationError)
     end
 
+    it "does accepts an array for run-as-command" do
+      config = {
+        transports: {
+          ssh: { 'run-as-command' => ['sudo -n'] }
+        }
+      }
+      expect {
+        Bolt::Config.new(config).validate
+      }.not_to raise_error
+    end
+
+    it "does not accept a non-array for run-as-command" do
+      config = {
+        transports: {
+          ssh: { 'run-as-command' => 'sudo -n' }
+        }
+      }
+      expect {
+        Bolt::Config.new(config).validate
+      }.to raise_error(Bolt::ValidationError)
+    end
+
     it "accepts a boolean for ssl" do
       config = {
         transports: {

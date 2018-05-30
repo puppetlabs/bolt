@@ -184,14 +184,20 @@ module Bolt
         def execute(command, sudoable: false, **options)
           result_output = Bolt::Node::Output.new
           run_as = options[:run_as] || self.run_as
-          use_sudo = sudoable && run_as && @user != run_as
+          escalate = sudoable && run_as && @user != run_as
+          use_sudo = escalate && @target.options['run-as-command'].nil?
 
           command_str = command.is_a?(String) ? command : Shellwords.shelljoin(command)
-          if use_sudo
-            sudo_flags = ["sudo", "-S", "-u", run_as, "-p", sudo_prompt]
-            sudo_flags += ["-E"] if options[:environment]
-            sudo_str = Shellwords.shelljoin(sudo_flags)
-            command_str = "#{sudo_str} #{command_str}"
+          if escalate
+            if use_sudo
+              sudo_flags = ["sudo", "-S", "-u", run_as, "-p", sudo_prompt]
+              sudo_flags += ["-E"] if options[:environment]
+              sudo_str = Shellwords.shelljoin(sudo_flags)
+              command_str = "#{sudo_str} #{command_str}"
+            else
+              run_as_str = Shellwords.shelljoin(@target.options['run-as-command'] + [run_as])
+              command_str = "#{run_as_str} #{command_str}"
+            end
           end
 
           # Including the environment declarations in the shelljoin will escape
