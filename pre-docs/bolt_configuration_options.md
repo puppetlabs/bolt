@@ -41,11 +41,23 @@ groups of nodes on the commandline and from plans.
 
 `tmpdir`: The directory to upload and execute temporary files on the target.
 
+`port`: Connection port. Default is `22`.
+
+`user`: Login user. Default is `root`.
+
+`password`: Login password.
+
+`run-as`: A different user to run commands as after login.
+
+`sudo-password`: Password to use when changing users via `run-as`.
+
 
 ## WinRM transport configuration options
 `connect-timeout`: How long Bolt should wait when establishing connections.
 
-`ssl`: When true, Bolt will use normal http connections for winrm. The default is true.
+`ssl`: When true, Bolt will use normal http connections for winrm. Default is true.
+
+`ssl-verify`: When true, verifies the targets certificate matches the `cacert`. Default is true.
 
 `tmpdir`: The directory to upload and execute temporary files on the target.
 
@@ -57,6 +69,12 @@ association to run. For example, if Python is installed on the system, a .py
 script should run with python.exe. The extensions .ps1, .rb, and .pp are
 always allowed and run via hard-coded executables.
 
+`port`: Connection port. Default is `5986`, or 5985 if `ssl: false`.
+
+`user`: Login user. Required.
+
+`password`: Login password. Required.
+
 
 ## PCP transport configuration options
 
@@ -67,6 +85,13 @@ always allowed and run via hard-coded executables.
 `token-file`: The path to the token file.
 
 `task-environment`: The environment orchestrator should load task code from.
+
+`local-validation`: When true, requires a local copy of any tasks being run. Default is false.
+
+
+## Local transport configuration options
+
+`tmpdir`: The directory to copy and execute temporary files.
 
 
 ## Log file configuration options
