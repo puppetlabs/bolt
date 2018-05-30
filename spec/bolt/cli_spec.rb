@@ -867,7 +867,8 @@ bar
           }
           cli.execute(options)
           json = JSON.parse(output.string)
-          expect(json).to eq([["facts::bash", nil],
+          expect(json).to eq([["facts", "Gather system facts"],
+                              ["facts::bash", nil],
                               ["facts::powershell", nil],
                               ["facts::ruby", nil],
                               ['sample::ok', nil]])

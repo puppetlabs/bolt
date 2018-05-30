@@ -25,13 +25,13 @@ describe 'facts::retrieve' do
     let(:node) { 'ssh://host' }
 
     it 'retrieves facts' do
-      expect_task('facts::bash').always_return(fact_output)
+      expect_task('facts').always_return(fact_output)
 
       expect(run_plan('facts::retrieve', 'nodes' => [node]).value).to eq(results(fact_output))
     end
 
     it 'omits failed targets' do
-      expect_task('facts::bash').always_return(err_output)
+      expect_task('facts').always_return(err_output)
 
       expect(run_plan('facts', 'nodes' => [node]).value).to eq(results(err_output))
     end
@@ -41,13 +41,13 @@ describe 'facts::retrieve' do
     let(:node) { 'winrm://host' }
 
     it 'retrieves facts' do
-      expect_task('facts::powershell').always_return(fact_output)
+      expect_task('facts').always_return(fact_output)
 
       expect(run_plan('facts::retrieve', 'nodes' => [node]).value).to eq(results(fact_output))
     end
 
     it 'omits failed targets' do
-      expect_task('facts::powershell').always_return(err_output)
+      expect_task('facts').always_return(err_output)
 
       expect(run_plan('facts', 'nodes' => [node]).value).to eq(results(err_output))
     end
@@ -57,13 +57,13 @@ describe 'facts::retrieve' do
     let(:node) { 'pcp://host' }
 
     it 'retrieves facts' do
-      expect_task('facts::ruby').always_return(fact_output)
+      expect_task('facts').always_return(fact_output)
 
       expect(run_plan('facts::retrieve', 'nodes' => [node]).value).to eq(results(fact_output))
     end
 
     it 'omits failed targets' do
-      expect_task('facts::ruby').always_return(err_output)
+      expect_task('facts').always_return(err_output)
 
       expect(run_plan('facts', 'nodes' => [node]).value).to eq(results(err_output))
     end
@@ -73,13 +73,13 @@ describe 'facts::retrieve' do
     let(:node) { 'local://' }
 
     it 'retrieves facts' do
-      expect_task('facts::bash').always_return(fact_output)
+      expect_task('facts').always_return(fact_output)
 
       expect(run_plan('facts::retrieve', 'nodes' => [node]).value).to eq(results(fact_output))
     end
 
     it 'omits failed targets' do
-      expect_task('facts::bash').always_return(err_output)
+      expect_task('facts').always_return(err_output)
 
       expect(run_plan('facts::retrieve', 'nodes' => [node]).value).to eq(results(err_output))
     end
@@ -89,9 +89,8 @@ describe 'facts::retrieve' do
     let(:nodes) { %w[ssh://host1 winrm://host2 pcp://host3] }
 
     it 'contains OS information for target' do
-      %w[facts::bash facts::powershell facts::ruby].zip(nodes).each do |task, node|
-        expect_task(task).return_for_targets(node => fact_output(node))
-      end
+      target_results = nodes.each_with_object({}) { |node, h| h[node] = fact_output(node) }
+      expect_task('facts').return_for_targets(target_results)
 
       result_set = Bolt::ResultSet.new(
         nodes.map { |node| Bolt::Result.new(Bolt::Target.new(node), value: fact_output(node)) }
@@ -100,9 +99,8 @@ describe 'facts::retrieve' do
     end
 
     it 'omits failed targets' do
-      %w[facts::bash facts::powershell facts::ruby].zip(nodes).each do |task, node|
-        expect_task(task).return_for_targets(node => err_output(node))
-      end
+      target_results = nodes.each_with_object({}) { |node, h| h[node] = err_output(node) }
+      expect_task('facts').return_for_targets(target_results)
 
       result_set = Bolt::ResultSet.new(
         nodes.map { |node| Bolt::Result.new(Bolt::Target.new(node), value: err_output(node)) }
