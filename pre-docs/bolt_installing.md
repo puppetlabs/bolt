@@ -10,6 +10,10 @@ Download from https://downloads.puppet.com/windows/puppet5/puppet-bolt-x64-lates
 
 ## Install Bolt on Mac OS X
 
+### Install with Brew
+`brew cask install puppetlabs/puppet/puppet-bolt`
+
+### Install Directly
 Go to  > About This Mac to determine which version you're running.
 
 Download and install using the following links:
