@@ -28,11 +28,7 @@ test_name "build bolt inventory file" do
     ]
   }
 
-  bolt_confdir = if bolt.platform =~ /win/
-                   '/cygdrive/c/Users/Administrator/.puppetlabs/bolt'
-                 else
-                   "#{on(bolt, 'echo $HOME').stdout.chomp}/.puppetlabs/bolt"
-                 end
+  bolt_confdir = "#{on(bolt, 'echo $HOME').stdout.chomp}/.puppetlabs/bolt"
 
   on bolt, "mkdir -p #{bolt_confdir}"
   create_remote_file(bolt, "#{bolt_confdir}/inventory.yaml", inventory.to_yaml)
