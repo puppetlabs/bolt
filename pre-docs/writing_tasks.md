@@ -223,9 +223,6 @@ The task filename `init` is special: the task it defines is referenced using the
 module name only. For example, in the `puppetlabs-service` module, the task
 defined in `init.rb` is the `service` task.
 
-Task names must be unique. If there are two tasks with the same name but different file extensions in a
-module, the task runner won't load either of them.
-
 Each task or plan name segment must begin with a lowercase letter and:
 
 - Must start with a lowercase letter.
@@ -233,6 +230,51 @@ Each task or plan name segment must begin with a lowercase letter and:
 - May include underscores.
 - Namespace segments must match the following regular expression \A[a-z][a-z0-9_]*\Z
 - The file extension must not use the reserved extensions .md or .json.
+
+### Tasks with a single implementation
+
+A task can consist of a single executable with or without a corresponding metadata file. For
+instance, `./mysql/tasks/sql.rb` and `./mysql/tasks/sql.json`. In this case, no
+other `./mysql/tasks/sql.*` files can exist.
+
+### Tasks with multiple implementations
+
+A task can also have multiple implementation, with metadata that explains when
+to use each implementation. For instance, consider a module with the following
+files:
+
+```
+- tasks
+  - sql.sh
+  - sql.ps1
+  - sql.json
+```
+
+This task has two executables (`sql.sh` and `sql.ps1`) with a metadata file. The metadata file contains an `implementations` section:
+
+```json
+{
+  "implementations": [
+    {"name": "sql.sh", "requirements": ["shell"]},
+    {"name": "sql.ps1", "requirements": ["powershell"]}
+  ]
+}
+```
+
+Each implementations has a `name` and a list of `requirements`. The
+requirements are the set of *features* which must be available on the target in
+order for that implementation to be used. In this case, the `sql.sh`
+implementation requires the `shell` feature, and the `sql.ps1` implementations
+requires the `powershell` feature.
+
+The set of features available on the target is determined by the task runner.
+The task runner will choose the *first* implementation whose requirements are
+satisfied.
+
+The following features are defined by default:
+* `puppet-agent`: present if the target has the puppet agent package installed
+* `shell`: present if the target has a posix shell
+* `powershell`: present if the target has powershell
 
 ## Defining parameters in tasks
 

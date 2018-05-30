@@ -13,6 +13,8 @@ module Bolt
         %w[tmpdir]
       end
 
+      PROVIDED_FEATURES = ['shell'].freeze
+
       def self.validate(_options); end
 
       def initialize
@@ -78,11 +80,14 @@ module Bolt
       end
 
       def run_task(target, task, arguments, _options = {})
+        executable = target.select_impl(task, PROVIDED_FEATURES)
+        raise "No suitable implementation of #{task.name} for #{target.name}" unless executable
+
         input_method = task.input_method
         stdin = STDIN_METHODS.include?(input_method) ? JSON.dump(arguments) : nil
         env = ENVIRONMENT_METHODS.include?(input_method) ? arguments : nil
 
-        with_tmpscript(task.executable, target.options['tmpdir']) do |script|
+        with_tmpscript(executable, target.options['tmpdir']) do |script|
           logger.debug("Running '#{script}' with #{arguments}")
 
           output = @conn.execute(script, stdin: stdin, env: env)

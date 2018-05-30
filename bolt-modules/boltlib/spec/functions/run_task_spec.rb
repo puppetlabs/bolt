@@ -24,7 +24,8 @@ describe 'run_task' do
   end
 
   def mock_task(executable, input_method)
-    responds_with(:executable, executable) & responds_with(:input_method, input_method)
+    implementations = [{ 'name' => File.basename(executable), 'path' => executable, 'requirements' => [] }]
+    responds_with(:implementations, implementations) & responds_with(:input_method, input_method)
   end
 
   context 'it calls bolt executor run_task' do
