@@ -45,6 +45,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "fast_gettext", "~> 1.1.2"
   spec.add_dependency "locale", "~> 2.1"
   spec.add_dependency "minitar", "~> 0.6"
+  spec.add_dependency "semantic_puppet", "~> 1.0.2"
   spec.add_dependency "win32-dir", "= 0.4.9"
   spec.add_dependency "win32-process", "= 0.7.5"
   spec.add_dependency "win32-security", "= 0.2.5"
