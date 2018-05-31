@@ -472,6 +472,7 @@ describe Bolt::Inventory do
           'connect-timeout' => transport.size,
           'tmpdir' => '/' + transport,
           'run-as' => 'root',
+          'tty' => true,
           'sudo-password' => 'nothing',
           'extensions' => '.py',
           'service-url' => 'https://master',
@@ -519,7 +520,7 @@ describe Bolt::Inventory do
         expect(target.port).to eq('12345ssh')
         expect(target.options).to eq(
           'connect-timeout' => 3,
-          'tty' => false,
+          'tty' => true,
           'host-key-check' => false,
           'private-key' => "anything",
           'tmpdir' => "/ssh",
