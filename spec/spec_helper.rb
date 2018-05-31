@@ -41,6 +41,11 @@ RSpec.configure do |config|
     mocks.verify_partial_doubles = true
   end
 
+  config.before :each do
+    # Disable analytics while running tests
+    ENV['BOLT_DISABLE_ANALYTICS'] = 'true'
+  end
+
   # This will be default in future rspec, leave it on
   config.shared_context_metadata_behavior = :apply_to_host_groups
 

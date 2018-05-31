@@ -6,6 +6,7 @@ require 'json'
 require 'io/console'
 require 'logging'
 require 'optparse'
+require 'bolt/analytics'
 require 'bolt/config'
 require 'bolt/error'
 require 'bolt/executor'
@@ -493,6 +494,15 @@ Available options are:
         exit!
       end
 
+      @analytics = Bolt::Analytics.build_client
+
+      screen = "#{options[:mode]}_#{options[:action]}"
+      # submit a different screen for `bolt task show` and `bolt task show foo`
+      if options[:action] == 'show' && options[:object]
+        screen += '_object'
+      end
+      @analytics.screen_view(screen)
+
       if options[:mode] == 'plan' || options[:mode] == 'task'
         pal = Bolt::PAL.new(config)
       end
@@ -606,6 +616,7 @@ Available options are:
     ensure
       # restore original signal handler
       Signal.trap :INT, handler if handler
+      @analytics&.finish
     end
 
     def validate_file(type, path)
