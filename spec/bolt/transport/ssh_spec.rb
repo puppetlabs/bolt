@@ -519,4 +519,16 @@ SHELL
       end
     end
   end
+
+  context "using a custom run-as-command" do
+    let(:config) {
+      mk_config('host-key-check' => false, 'sudo-password' => password, 'run-as' => 'root',
+                user: user, password: password,
+                'run-as-command' => ["sudo", "-nSEu"])
+    }
+
+    it "can fails to execute with sudo -n", ssh: true do
+      expect(ssh.run_command(target, 'whoami')['stderr']).to match("sudo: a password is required")
+    end
+  end
 end

@@ -39,7 +39,10 @@ groups of nodes on the commandline and from plans.
 
 `connect-timeout`: How long Bolt should wait when establishing connections.
 
-`tmpdir`: The directory to upload and execute temporary files on the target.
+`run-as-command`: The command to escalate permissions. The user to escalate to
+and command will be appended to this command. This command must not require an
+interactive password prompt and the `sudo-password` option is ignored when
+`run-as-command` is specified. The runas command must be specified as an array.
 
 `port`: Connection port. Default is `22`.
 
@@ -51,6 +54,7 @@ groups of nodes on the commandline and from plans.
 
 `sudo-password`: Password to use when changing users via `run-as`.
 
+`tmpdir`: The directory to upload and execute temporary files on the target.
 
 ## WinRM transport configuration options
 `connect-timeout`: How long Bolt should wait when establishing connections.
