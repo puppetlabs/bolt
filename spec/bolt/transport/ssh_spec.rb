@@ -439,6 +439,7 @@ SHELL
         expect(ssh.upload(target, file.path, dest).message).to match(/Uploaded/)
         expect(ssh.run_command(target, "cat #{dest}")['stdout']).to eq(contents)
         expect(ssh.run_command(target, "stat -c %U #{dest}")['stdout'].chomp).to eq('root')
+        expect(ssh.run_command(target, "stat -c %G #{dest}")['stdout'].chomp).to eq('root')
       end
 
       ssh.run_command(target, "rm #{dest}", sudoable: true, run_as: 'root')
@@ -486,6 +487,7 @@ SHELL
           expect(ssh.upload(target, file.path, dest, '_run_as' => 'root').message).to match(/Uploaded/)
           expect(ssh.run_command(target, "cat #{dest}", '_run_as' => 'root')['stdout']).to eq(contents)
           expect(ssh.run_command(target, "stat -c %U #{dest}", '_run_as' => 'root')['stdout'].chomp).to eq('root')
+          expect(ssh.run_command(target, "stat -c %G #{dest}", '_run_as' => 'root')['stdout'].chomp).to eq('root')
         end
 
         ssh.run_command(target, "rm #{dest}", sudoable: true, run_as: 'root')
