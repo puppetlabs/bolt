@@ -104,6 +104,7 @@ catch
         raise "No suitable implementation of #{task.name} for #{target.name}" unless executable
 
         input_method = task.input_method
+        input_method ||= powershell_file?(executable) ? 'powershell' : 'both'
         with_connection(target) do |conn|
           if STDIN_METHODS.include?(input_method)
             stdin = JSON.dump(arguments)

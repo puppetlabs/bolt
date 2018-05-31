@@ -20,12 +20,12 @@ module BoltSpec
       end
     end
 
-    def mock_task(name, executable = name, input_method = 'both')
+    def mock_task(name, executable = name, input_method = nil)
       impls = [{ 'name' => executable, 'path' => executable }]
       double('task', name: name, implementations: impls, input_method: input_method)
     end
 
-    def task_type(name, executable = nil, input_method = 'both')
+    def task_type(name, executable = nil, input_method = nil)
       TaskTypeMatcher.new(name, executable || name, input_method)
     end
 

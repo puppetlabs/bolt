@@ -118,7 +118,7 @@ module Bolt
         executable = target.select_impl(task, PROVIDED_FEATURES)
         raise "No suitable implementation of #{task.name} for #{target.name}" unless executable
 
-        input_method = task.input_method
+        input_method = task.input_method ? task.input_method : "both"
         with_connection(target) do |conn|
           conn.running_as(options['_run_as']) do
             stdin, output = nil
