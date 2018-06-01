@@ -6,6 +6,12 @@ as well as macOS and Windows.
 
 ## Install Bolt on Windows
 
+### Install with Chocolatey
+
+`choco install puppet-bolt`
+
+### Install directly
+
 Install Bolt on Windows systems via an MSI installer package.
 
 1.   Download the Bolt installer package from [https://downloads.puppet.com/windows/puppet5/puppet-bolt-x64-latest.msi](https://downloads.puppet.com/windows/puppet5/puppet-bolt-x64-latest.msi).
@@ -17,6 +23,12 @@ Install Bolt on Windows systems via an MSI installer package.
     ```
 
 ## Install Bolt on Mac OS X
+
+### Install with Brew
+
+`brew cask install puppetlabs/puppet/puppet-bolt`
+
+### Install directly
 
 Install Bolt on Mac OS X systems.
 
