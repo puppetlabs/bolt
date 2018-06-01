@@ -4,6 +4,9 @@
 Packaged versions of Bolt are available for many modern Linux distributions,
 as well as macOS and Windows.
 
+> Note: Bolt automatically collects data about how it's being used. [Learn more
+> about what is collected and how to opt-out.](bolt_analytics.md)
+
 ## Install Bolt on Windows
 
 ### Install with Chocolatey
