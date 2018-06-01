@@ -25,7 +25,14 @@ module Bolt
             return if owner.nil? || owner == @owner
 
             @owner = owner
-            result = @node.execute(['chown', '-R', "#{@owner}:", @path], sudoable: true, run_as: 'root')
+            result = @node.execute(['id', '-g', @owner])
+            if result.exit_code != 0
+              message = "Could not identify group of user #{@owner}: #{result.stderr.string}"
+              raise Bolt::Node::FileError.new(message, 'ID_ERROR')
+            end
+            group = result.stdout.string.chomp
+
+            result = @node.execute(['chown', '-R', "#{@owner}:#{group}", @path], sudoable: true, run_as: 'root')
             if result.exit_code != 0
               message = "Could not change owner of '#{@path}' to #{@owner}: #{result.stderr.string}"
               raise Bolt::Node::FileError.new(message, 'CHOWN_ERROR')
