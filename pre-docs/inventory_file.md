@@ -174,7 +174,6 @@ Configure login and escalation for a specific node.
 nodes:
   - name: host1.example.com
     config:
-      transports:
       ssh:
         user: me
         run-as: root
