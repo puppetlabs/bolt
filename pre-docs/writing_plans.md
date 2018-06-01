@@ -90,8 +90,7 @@ bolt plan run mymodule::myplan --modulepath ./PATH/TO/MODULES --params load_bala
 
 ## Returning results from plans
 
-> Plans can optionally return a result that can be used from other plans or
-> saved externally.
+Use plans to return results that you can use in other plans or save for use outside of Bolt.
 
 Plans, unlike functions, are primarily run for side effects but they can
 optionally return a result. To return a result from a plan use the `return`
@@ -186,7 +185,25 @@ they fail on any node. To prevent this and handle the error, pass the
 run_script("mymodule/my_script.sh", $nodes, '_catch_errors'=> true)
 ```
 
-## Running tasks from plans
+### Returning errors in plans
+
+To return an error if your plan fails, include an `Error` object in your plan.
+
+Specify `Error` parameters to provide details about the failure.
+
+For example, if called with `run_plan('mymodule::myplan')`, this would return an error to the caller.
+
+```
+plan mymodule::myplan {
+  Error(
+    message    => "Sorry, this plan does not work yet.",
+    kind       => 'mymodule/error',
+    issue_code => 'NOT_IMPLEMENTED'
+    )
+  }
+```
+
+### Running tasks from plans
 
 When you need to run multiple tasks, or you need some tasks to depend on
 others, you can call the tasks from a task plan.

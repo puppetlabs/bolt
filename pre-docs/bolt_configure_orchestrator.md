@@ -36,14 +36,13 @@ mod 'puppetlabs-bolt_shim', '0.1.1'
 ## Assign PE RBAC permissions for all tasks
 
 Warning: By granting users access to Bolt tasks, you give them permission to
-run arbitrary commands and upload files as a super-user.  In the PE console,
-click Access control > User roles.
+run arbitrary commands and upload files as a super-user.
 
-#. From the list of user roles, click the one you want to have Bolt task
-   permissions.
-#. On the Permissions tab, in the Type box, select Tasks.
-#. For Permission, select Run tasks, and then select `All` from the Object list.
-#. Click Add permission, and then commit the change.
+1. In the PE console, click Access control > User roles.
+2. From the list of user roles, click the one you want to have Bolt task    permissions.
+3. On the Permissions tab, in the Type box, select Tasks.
+4. For Permission, select Run tasks, and then select `All` from the Object list.
+5. Click Add permission, and then commit the change.
 
 ## Adjust the orchestrator configuration files
 
