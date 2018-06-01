@@ -206,7 +206,7 @@ Options are optional unless marked as required.
 | `--query` `, -q` |Query PuppetDB to determine the targets.|
 | `--noop` |Execute a task that supports it in no-operation mode.|
 | `--description` |Add a description to the run. Used in logging and submitted to Orchestrator with the pcp transport.|
-| `--params` |Parameters, passed as a JSON object on the command line, or as a JSON parameter file, prefaced with `@` like `@params.json`. For Windows PowerShell,  add single quotation marks to define the file: `'@params.json'`
+| `--params` |Parameters, passed as a JSON object on the command line, or as a JSON parameter file, prefaced with `@` like `@params.json`. For Windows PowerShell, add single quotation marks to define the file: `'@params.json'`
 
 |
 ||
