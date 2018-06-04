@@ -167,6 +167,8 @@ module Bolt
               channel.wait
               return true
             else
+              # Cancel the sudo prompt to prevent later commands getting stuck
+              channel.close
               raise Bolt::Node::EscalateError.new(
                 "Sudo password for user #{@user} was not provided for #{target.uri}",
                 'NO_PASSWORD'
