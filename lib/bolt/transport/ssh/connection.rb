@@ -271,12 +271,10 @@ module Bolt
         end
 
         def make_tempdir
-          if target.options['tmpdir']
-            tmppath = "#{target.options['tmpdir']}/#{SecureRandom.uuid}"
-            command = ['mkdir', '-m', 700, tmppath]
-          else
-            command = ['mktemp', '-d']
-          end
+          tmpdir = target.options.fetch('tmpdir', '/tmp')
+          tmppath = "#{tmpdir}/#{SecureRandom.uuid}"
+          command = ['mkdir', '-m', 700, tmppath]
+
           result = execute(command)
           if result.exit_code != 0
             raise Bolt::Node::FileError.new("Could not make tempdir: #{result.stderr.string}", 'TEMPDIR_ERROR')
