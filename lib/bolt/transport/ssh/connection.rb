@@ -239,14 +239,14 @@ module Bolt
                 unless use_sudo && handled_sudo(channel, data)
                   result_output.stdout << data
                 end
-                @logger.debug { "stdout: #{data}" }
+                @logger.debug { "stdout: #{data.strip}" }
               end
 
               channel.on_extended_data do |_, _, data|
                 unless use_sudo && handled_sudo(channel, data)
                   result_output.stderr << data
                 end
-                @logger.debug { "stderr: #{data}" }
+                @logger.debug { "stderr: #{data.strip}" }
               end
 
               channel.on_request("exit-status") do |_, data|
