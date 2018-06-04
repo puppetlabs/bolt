@@ -267,6 +267,9 @@ module Bolt
             @logger.info { "Command failed with exit code #{result_output.exit_code}" }
           end
           result_output
+        rescue StandardError
+          @logger.debug { "Command aborted" }
+          raise
         end
 
         def write_remote_file(source, destination)
