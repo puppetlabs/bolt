@@ -11,6 +11,11 @@ require_relative '../vendored/require_vendored'
 
 $LOAD_PATH.unshift File.join(__dir__, 'lib')
 
+# Ensure tasks are enabled when rspec-puppet sets up an environment
+# so we get task loaders.
+Puppet[:tasks] = true
+require 'puppetlabs_spec_helper/module_spec_helper'
+
 RSpec.shared_context 'reset puppet settings' do
   after :each do
     # reset puppet settings so that they can be initialized again
