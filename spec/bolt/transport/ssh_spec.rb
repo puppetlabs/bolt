@@ -22,6 +22,8 @@ describe Bolt::Transport::SSH do
   let(:hostname) { ENV['BOLT_SSH_HOST'] || "localhost" }
   let(:user) { ENV['BOLT_SSH_USER'] || "bolt" }
   let(:password) { ENV['BOLT_SSH_PASSWORD'] || "bolt" }
+  let(:bash_user) { 'test' }
+  let(:bash_password) { 'test' }
   let(:port) { ENV['BOLT_SSH_PORT'] || 20022 }
   let(:key) { ENV['BOLT_SSH_KEY'] || Dir["spec/fixtures/keys/id_rsa"][0] }
   let(:command) { "pwd" }
@@ -503,9 +505,8 @@ SHELL
       it "returns a failed result", ssh: true do
         expect {
           ssh.run_command(target, 'whoami')
-             .to raise_error(Bolt::Node::EscalateError,
-                             "Sudo password for user #{user} not recognized on #{hostname}:#{port}")
-        }
+        }.to raise_error(Bolt::Node::EscalateError,
+                         "Sudo password for user #{user} not recognized on #{hostname}:#{port}")
       end
     end
 
@@ -515,9 +516,24 @@ SHELL
       it "returns a failed result", ssh: true do
         expect {
           ssh.run_command(target, 'whoami')
-             .to raise_error(Bolt::Node::EscalateError,
-                             "Sudo password for user #{user} was not provided for #{hostname}:#{port}")
-        }
+        }.to raise_error(Bolt::Node::EscalateError,
+                         "Sudo password for user #{user} was not provided for #{hostname}:#{port}")
+      end
+    end
+
+    context "as bash user with no password" do
+      let(:config) {
+        mk_config('host-key-check' => false, 'run-as' => 'root', user: bash_user, password: bash_password)
+      }
+
+      it "returns a failed result when a temporary directory is created", ssh: true do
+        contents = "#!/bin/sh\nwhoami"
+        with_tempfile_containing('script test', contents) do |file|
+          expect {
+            ssh.run_script(target, file.path, [])
+          }.to raise_error(Bolt::Node::EscalateError,
+                           "Sudo password for user #{bash_user} was not provided for #{hostname}:#{port}")
+        end
       end
     end
   end
