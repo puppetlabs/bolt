@@ -24,19 +24,22 @@ module Bolt
           def chown(owner)
             return if owner.nil? || owner == @owner
 
-            @owner = owner
-            result = @node.execute(['id', '-g', @owner])
+            result = @node.execute(['id', '-g', owner])
             if result.exit_code != 0
-              message = "Could not identify group of user #{@owner}: #{result.stderr.string}"
+              message = "Could not identify group of user #{owner}: #{result.stderr.string}"
               raise Bolt::Node::FileError.new(message, 'ID_ERROR')
             end
             group = result.stdout.string.chomp
 
-            result = @node.execute(['chown', '-R', "#{@owner}:#{group}", @path], sudoable: true, run_as: 'root')
+            # Chown can only be run by root.
+            result = @node.execute(['chown', '-R', "#{owner}:#{group}", @path], sudoable: true, run_as: 'root')
             if result.exit_code != 0
-              message = "Could not change owner of '#{@path}' to #{@owner}: #{result.stderr.string}"
+              message = "Could not change owner of '#{@path}' to #{owner}: #{result.stderr.string}"
               raise Bolt::Node::FileError.new(message, 'CHOWN_ERROR')
             end
+
+            # File ownership successfully changed, record the new owner.
+            @owner = owner
           end
 
           def delete
