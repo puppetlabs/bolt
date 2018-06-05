@@ -7,6 +7,7 @@ Bolt automatically collects data about how you use it.
 * Version of Bolt
 * The Bolt command executed (eg. `bolt task run`, `bolt plan show`), excluding arguments
 * User locale
+* Operating system and version
 
 This data is associated with a random, non-identifiable user UUID.
 

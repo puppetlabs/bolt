@@ -54,8 +54,13 @@ describe Bolt::Analytics::Client do
       cid: uuid,
       tid: 'UA-120367942-1',
       ul: Locale.current.to_rfc,
-      aip: true
+      aip: true,
+      cd1: 'CentOS 7'
     }
+  end
+
+  before :each do
+    allow_any_instance_of(described_class).to receive(:compute_os).and_return(double('os_future', value: 'CentOS 7'))
   end
 
   subject { described_class.new(uuid) }

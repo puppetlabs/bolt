@@ -8,6 +8,7 @@ require 'logging'
 require 'rspec/logging_helper'
 # Make sure puppet is required for the 'reset puppet settings' context
 require_relative '../vendored/require_vendored'
+require 'puppet_pal'
 
 $LOAD_PATH.unshift File.join(__dir__, 'lib')
 

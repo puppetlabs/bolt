@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative '../../../vendored/require_vendored.rb'
+require 'puppet_pal'
 
 # Add bolt spec helpers
 bolt_dir = Gem::Specification.find_by_name('bolt').gem_dir
