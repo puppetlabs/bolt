@@ -1,5 +1,0 @@
----
-fixtures:
-  symlinks:
-    facts: "#{source_dir}"
-    boltlib: "#{File.absolute_path(File.join(source_dir, '..', '..', 'bolt-modules', 'boltlib'))}"

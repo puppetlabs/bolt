@@ -1,4 +1,0 @@
-# frozen_string_literal: true
-
-require_relative '../../vendored/require_vendored.rb'
-require 'puppetlabs_spec_helper/rake_tasks'
