@@ -57,6 +57,7 @@ module Bolt
         @http = HTTPClient.new
         @user_id = user_id
         @executor = Concurrent.global_io_executor
+        @os = compute_os
       end
 
       def screen_view(screen)
@@ -109,8 +110,19 @@ module Bolt
           # Anonymize IPs
           aip: true,
           # User locale
-          ul: Locale.current.to_rfc
+          ul: Locale.current.to_rfc,
+          # Custom Dimension 1 (Operating System)
+          cd1: @os.value
         }
+      end
+
+      def compute_os
+        Concurrent::Future.execute(executor: @executor) do
+          require_relative '../../vendored/require_vendored'
+          require 'facter'
+          os = Facter.value('os')
+          "#{os['name']} #{os.dig('release', 'major')}"
+        end
       end
 
       # If the user is running a very fast command, there may not be time for
