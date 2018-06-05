@@ -63,7 +63,8 @@ If you're targeting Windows nodes then you might prefer to implement the task in
 1. Save the following file as `modules/exercise5/tasks/print.ps1`
 
     ```powershell
-    Write-Output "$env:computername received the message: $env:PT_message"
+    param ($message)
+    Write-Output "$env:computername received the message: $message"
     ```
 
 2. Run the exercise5 task. 
@@ -71,12 +72,23 @@ If you're targeting Windows nodes then you might prefer to implement the task in
     ```
     bolt task run exercise5::print message="hello powershell" --nodes $WINNODE --modulepath ./modules
     ```
+    ```
+    The result:
+    Started on localhost...
+    Finished on localhost:
+      Nano received the message: hello powershell
+      {
+      }
+    Successful on 1 node: winrm://vagrant:vagrant@localhost:55985
+    Ran on 1 node in 3.87 seconds
+    ```
 
     **Note:**
     
     * The name of the file on disk (minus any file extension) translates to the name of the task when run via Bolt, in this case `print`.
     * The name of the module (directory) is also used to find the relevant task, in this case `exercise5`.
     * As with the Bash example above, name parameters so that they're more easily understood by users of the task.
+    * By default tasks with a `.ps1` extention executed over WinRM use PowerShell standard agrument handling rather than being supplied as prefixed environment variables or via `stdin`. 
 
 # Write your first task in Python
 
