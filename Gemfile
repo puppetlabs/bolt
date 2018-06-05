@@ -2,6 +2,9 @@
 
 source ENV['GEM_SOURCE'] || 'https://rubygems.org'
 
+# Disable analytics when running in development
+ENV['BOLT_DISABLE_ANALYTICS'] = 'true'
+
 gemspec
 
 # Required to pick up plan specs in the rake spec task

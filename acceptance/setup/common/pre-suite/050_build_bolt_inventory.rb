@@ -32,4 +32,6 @@ test_name "build bolt inventory file" do
 
   on bolt, "mkdir -p #{bolt_confdir}"
   create_remote_file(bolt, "#{bolt_confdir}/inventory.yaml", inventory.to_yaml)
+
+  create_remote_file(bolt, "#{bolt_confdir}/analytics.yaml", { 'disabled' => true }.to_yaml)
 end
