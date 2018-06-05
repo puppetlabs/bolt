@@ -21,7 +21,7 @@ Write a simple task that formats the parameters a user gives it.
 
 1. Save the following file to `modules/exercise8/tasks/great_metadata.py`:
 
-    ```
+    ```python
     #!/usr/bin/env python
     
     """
@@ -56,7 +56,7 @@ Write a simple task that formats the parameters a user gives it.
 
 2. Write the accompanying metadata and save the file to `modules/exercise8/tasks/great_metadata.json`. Specify the parameters as types such as `"type": "Integer"`  which help validate user input as an `Integer`.  
 
-    ```
+    ```json
     {
       "description": "An exercise in writing great metadata",
       "input_method": "stdin",
@@ -106,19 +106,20 @@ Write a simple task that formats the parameters a user gives it.
     The result:
     ```    
     exercise8::great_metadata - An exercise in writing great metadata
-    
+
     USAGE:
-    bolt task run --nodes, -n <node-name> exercise8::great_metadata name=<value> [user=<value>] password=<value> action=<value>
-    
+    bolt task run --nodes, -n <node-name> exercise8::great_metadata name=<value> recursive=<value> action=<value> [timeout=<value>] [--noop]
+
     PARAMETERS:
     - name: String
         The description for the 'name' parameter
     - recursive: Boolean
-        The description for the 'password' parameter
+        The description for the 'recursive' parameter
     - action: Enum['restart', 'start', 'stop']
         The description for the 'action' parameter
     - timeout: Optional[Integer]
         The description for the 'timeout' parameter
+
     ```
 
 # Testing your task's metadata validation
@@ -138,12 +139,14 @@ Bolt can use the types that you have specified in your metadata to validate para
 
 2. Correct the value for the action parameter and run the task again.
     ```
-    bolt task run exercise8::great_metadata --nodes all --modulepath ./modules --params '{"name":"poppey","action":"start","recursive":true}'
+    bolt task run exercise8::great_metadata --nodes node1 --modulepath ./modules --params '{"name":"poppey","action":"start","recursive":true}'
     ```
     The result:
     ```     
+    Started on node1...
+    Finished on node1:
       {
-        "message": "Congratulations on writing your metadata!  Here are the keys and the values that you passed to this task.",
+        "message": "\nCongratulations on writing your metadata!  Here are\nthe keys and the values that you passed to this task.\n",
         "parameters": [
           {
             "type": "unicode",
@@ -162,7 +165,8 @@ Bolt can use the types that you have specified in your metadata to validate para
           }
         ]
       }
-    Ran on 1 node in 0.73 seconds
+    Successful on 1 node: node1
+    Ran on 1 node in 0.98 seconds
     ```
 
 # Creating a task that supports no-operation mode (noop)
@@ -171,7 +175,7 @@ You can write tasks that support no-operation mode (noop). You use noop to see w
 
 1. Create the metadata for the new task and save it to `modules/exercise8/tasks/file.json`:
 
-    ```
+    ```json
     {
       "description": "Write content to a file.",
       "supports_noop": true,
@@ -190,7 +194,7 @@ You can write tasks that support no-operation mode (noop). You use noop to see w
 
 2. Save the following file to `modules/exercise8/tasks/file.py`. This task uses input from stdin. When a user passes the `--noop` flag, the JSON object from stdin will contain the `_noop` key with a value of True.  
 
-    ```
+    ```python
     #!/usr/bin/env python
     
     """
@@ -249,23 +253,33 @@ You can write tasks that support no-operation mode (noop). You use noop to see w
 
 3. Test the task with the `--noop` flag.
     ```
-    bolt task run exercise8::file --nodes all --modulepath ./modules content=Hello_World filename=/tmp/hello_world --noop
+    bolt task run exercise8::file --nodes node1 --modulepath ./modules content=Hello_World filename=/tmp/hello_world --noop
+    ```
+    The result:
+    ```
+    Started on node1...
+    Finished on node1:
       {
         "_noop": true,
         "success": true
       }
-    Ran on 1 node in 0.64 seconds
+    Successful on 1 node: node1
+    Ran on 1 node in 0.96 seconds
     ```
     
 4. Run the task again without `--noop` and see the task create the file successfully.
     ```
-    bolt task run exercise8::file --nodes all --modulepath ./modules content=Hello_World filename=/tmp/hello_world
+    bolt task run exercise8::file --nodes node1 --modulepath ./modules content=Hello_World filename=/tmp/hello_world
     ```
     The result:
-    ```       {
+    ``` 
+    Started on node1...
+    Finished on node1:
+      {
         "success": true
       }
-    Ran on 1 node in 0.63 second
+    Successful on 1 node: node1
+    Ran on 1 node in 0.98 seconds
     ```
 # Next steps
 

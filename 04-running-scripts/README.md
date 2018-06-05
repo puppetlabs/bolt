@@ -31,7 +31,7 @@ Run the [bashcheck](https://github.com/hannob/bashcheck) script to check on Shel
 2. Run the script using the command `bolt script run <script-name> <script options>`. This uploads the script to the nodes you have specified. 
 
     ```
-    bolt script run bashcheck --nodes all
+    bolt script run bashcheck --nodes node1
     ```
     The result:
     ```    
@@ -40,7 +40,7 @@ Run the [bashcheck](https://github.com/hannob/bashcheck) script to check on Shel
       STDOUT:
         Testing /usr/bin/bash ...
         Bash version 4.2.46(2)-release
-    
+        
         Variable function parser pre/suffixed [(), redhat], bugs not exploitable
         Not vulnerable to CVE-2014-6271 (original shellshock)
         Not vulnerable to CVE-2014-7169 (taviso bug)
@@ -48,7 +48,8 @@ Run the [bashcheck](https://github.com/hannob/bashcheck) script to check on Shel
         Test for CVE-2014-7187 not reliable without address sanitizer
         Not vulnerable to CVE-2014-6277 (lcamtuf bug #1)
         Not vulnerable to CVE-2014-6278 (lcamtuf bug #2)
-    Ran on 1 node in 0.41 seconds
+    Successful on 1 node: node1
+    Ran on 1 node in 0.89 seconds
     ```
 
 
@@ -74,15 +75,16 @@ Create a simple PowerShell script to test connectivity to a known website.
     Started on localhost...
     Finished on localhost:
       STDOUT:
-    
-        Source        Destination     IPV4Address      IPV6Address                              Bytes    Time(ms)
-        ------        -----------     -----------      -----------                              -----    --------
-        Nano          example.com                                                               256      5
-        Nano          example.com                                                               256      5
-        Nano          example.com                                                               256      6
-    
-    
-    Ran on 1 node in 12.37 seconds
+        
+        Source        Destination     IPV4Address      IPV6Address                              Bytes    Time(ms) 
+        ------        -----------     -----------      -----------                              -----    -------- 
+        Nano          example.com                                                               256      4        
+        Nano          example.com                                                               256      4        
+        Nano          example.com                                                               256      5        
+        
+        
+    Successful on 1 node: winrm://vagrant:vagrant@localhost:55985
+    Ran on 1 node in 8.55 seconds
     ```
 
 # Next steps

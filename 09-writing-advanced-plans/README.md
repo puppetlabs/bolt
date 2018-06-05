@@ -49,7 +49,7 @@ In the previous exercise you ran tasks and commands within the context of a plan
     plan exercise9::yesorno (TargetSpec $nodes) {
       $results = run_task('exercise9::yesorno', $nodes)
       $subset = $results.filter |$result| { $result[answer] == true }.map |$result| { $result.target }
-      run_command("uptime", $subset)
+      return run_command("uptime", $subset)
     }
     ```
     
@@ -67,27 +67,32 @@ In the previous exercise you ran tasks and commands within the context of a plan
     bolt plan run exercise9::yesorno nodes=all --modulepath ./modules
     ```
     The result:
-    ```bash
+    ```
+    Starting: task exercise9::yesorno on node1, node2, node3
+    Finished: task exercise9::yesorno with 0 failures in 0.95 sec
+    Starting: command 'uptime' on node2, node3
+    Finished: command 'uptime' with 0 failures in 0.43 sec
     [
       {
-        "node": "node1",
+        "node": "node2",
         "status": "success",
         "result": {
-          "stdout": " 23:41:49 up 8 min,  0 users,  load average: 0.00, 0.03, 0.04\n",
+          "stdout": " 20:02:39 up  4:18,  0 users,  load average: 0.03, 0.02, 0.05\n",
           "stderr": "",
           "exit_code": 0
         }
       },
       {
-        "node": "node2",
+        "node": "node3",
         "status": "success",
         "result": {
-          "stdout": " 23:41:49 up 7 min,  0 users,  load average: 0.32, 0.08, 0.05\n",
+          "stdout": " 20:02:39 up  4:18,  0 users,  load average: 0.00, 0.01, 0.05\n",
           "stderr": "",
           "exit_code": 0
         }
       }
     ]
+
     ```
     **Note:** Running the plan multiple times results in different output. As the return value of the task is random, the command runs on a different subset of nodes each time.
 
@@ -100,7 +105,7 @@ Bolt supports a powerful extension mechanism via Puppet functions. These are fun
     ```puppet
     plan exercise9::count_volumes (TargetSpec $nodes) {
       $result = run_command('df', $nodes)
-      $result.map |$r| {
+      return $result.map |$r| {
         $line_count = $r['stdout'].split("\n").length - 1
         "${$r.target.name} has ${$line_count} volumes"
       }
@@ -120,8 +125,8 @@ Bolt supports a powerful extension mechanism via Puppet functions. These are fun
     ```
     The result:
     ```bash
-    2018-02-22T15:33:21.666706 INFO   Bolt::Executor: Starting command run 'df -h' on ["node1", "node2", "node3"]
-    2018-02-22T15:33:21.980383 INFO   Bolt::Executor: Ran command 'df -h' on 3 nodes with 0 failures
+    Starting: command 'df' on node1, node2, node3
+    Finished: command 'df' with 0 failures in 0.5 sec
     [
       "node1 has 7 volumes",
       "node2 has 7 volumes",
@@ -156,7 +161,7 @@ Bolt supports a powerful extension mechanism via Puppet functions. These are fun
         $arr + $volumes
       }
     
-      $volumes.unique
+      return $volumes.unique
     }
     ```
 7. Run the plan. 
@@ -165,9 +170,9 @@ Bolt supports a powerful extension mechanism via Puppet functions. These are fun
     bolt plan run exercise9::unique_volumes nodes=all --modulepath ./modules
     ```
     The result:
-    ```bash
-    2018-02-22T15:48:51.992621 INFO   Bolt::Executor: Starting command run 'df' on ["node1", "node2", "node3"]
-    2018-02-22T15:48:52.305331 INFO   Bolt::Executor: Ran command 'df' on 3 nodes with 0 failures
+    ```
+    Starting: command 'df' on node1, node2, node3
+    Finished: command 'df' with 0 failures in 0.53 sec
     [
       "/",
       "/dev",
@@ -205,9 +210,18 @@ By default, any task or command that fails causes a plan to abort immediately. Y
     bolt plan run exercise9::error nodes=all --modulepath ./modules
     ```
     The result:
-    ```bash
-    Plan aborted: run_command 'false' failed on 3 nodes
-    [...]
+    ```
+    Starting: command 'false' on node1, node2, node3
+    Finished: command 'false' with 3 failures in 0.53 sec
+    {
+      "kind": "bolt/run-failure",
+      "msg": "Plan aborted: run_command 'false' failed on 3 nodes",
+      "details": {
+        "action": "run_command",
+        "object": "false",
+        "result_set": [...]
+      }
+    }
     ```
 
     Because the plan stopped executing immediately after the `run_command()` failed, no message was returned.
@@ -231,21 +245,20 @@ By default, any task or command that fails causes a plan to abort immediately. Y
     bolt plan run exercise9::catch_error nodes=all --modulepath ./modules
     ```
     The result:
-    ```bash
-    Notice: Scope(<module>/exercise9/plans/catch_error.pp, 7): The command failed
+    ```
+    Starting: command 'false' on node1, node2, node3
+    Finished: command 'false' with 3 failures in 0.47 sec
+    The command failed
+    Plan completed successfully with no result
+
     ```
 
 **Tip:** You can pass the  `_catch_errors` to `run_command`, `run_task`, `run_script`, and `file_upload`.
 
 # Next steps
+Now that you have learned about writing advanced plans you can deploy an app with bolt! 
 
-Congratulations, you now have a basic understanding of Bolt and Puppet Tasks. Here are a few ideas for what to do next:
+[Deploying and Application](../10-deploying-an-application)
 
-* Explore content on the [Puppet Tasks Playground](https://github.com/puppetlabs/tasks-playground)
-* Get reusable tasks and plans from the [Task Modules Repo](https://github.com/puppetlabs/task-modules)
-* Search Puppet Forge for [tasks](https://forge.puppet.com/modules?with_tasks=yes)
-* Start writing tasks for one of your existing Puppet modules
-* Head over to the [Puppet Slack](https://slack.puppet.com/) and talk to the Bolt developers and other users
-* Try out the [Puppet Development Kit](https://puppet.com/download-puppet-development-kit) [(docs)](https://docs.puppet.com/pdk/latest/index.html) which has a few features to make authoring tasks even easier
 
 [puppetlabs-stdlib]: https://github.com/puppetlabs/puppetlabs-stdlib

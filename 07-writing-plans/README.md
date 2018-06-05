@@ -31,25 +31,25 @@ Create a simple plan that runs a command on a list of nodes.
 
     ```puppet
     plan exercise7::command (TargetSpec $nodes) {
-      run_command("uptime", $nodes)
+      return run_command("uptime", $nodes)
     }
     ```
 
 2. Run the plan:
 
     ```
-    bolt plan run exercise7::command nodes=all --modulepath ./modules
+    bolt plan run exercise7::command nodes=node1 --modulepath ./modules
     ```
     The result:
     ```    
-    2018-02-16T15:35:47.843668 INFO   Bolt::Executor: Starting command run 'uptime' on ["node1"]
-    2018-02-16T15:35:48.154690 INFO   Bolt::Executor: Ran command 'uptime' on 1 node with 0 failures
+    Starting: command 'uptime' on node1
+    Finished: command 'uptime' with 0 failures in 0.43 sec
     [
       {
         "node": "node1",
         "status": "success",
         "result": {
-          "stdout": " 23:35:48 up 2 min,  0 users,  load average: 0.10, 0.09, 0.04\n",
+          "stdout": " 18:46:27 up  3:03,  0 users,  load average: 0.06, 0.04, 0.05\n",
           "stderr": "",
           "exit_code": 0
         }
@@ -88,39 +88,41 @@ Create a task and then create a plan that uses the task.
 2. Run the task directly with the following command:
 
     ```
-    bolt task run exercise7::write filename=hello message=world --nodes=all --modulepath ./modules --debug
+    bolt task run exercise7::write filename=hello message=world --nodes=node1 --modulepath ./modules --debug
     ```
     
     **Note:** In this case the task doesn't output anything to stdout. It can be useful to trace the running of the task, and for that the `--debug` flag is useful. Here is the output when run with debug:
     
     ```
-    2018-02-16T15:36:31.643418 DEBUG  Bolt::Inventory: Did not find node1 in inventory
-    2018-02-16T15:36:32.713360 DEBUG  Bolt::Executor: Started with 100 max thread(s)
-    2018-02-16T15:36:32.932771 DEBUG  Bolt::Inventory: Did not find node1 in inventory
-    2018-02-16T15:36:32.932869 INFO   Bolt::Executor: Starting task exercise7::write on ["node1"]
-    2018-02-16T15:36:32.932892 DEBUG  Bolt::Executor: Arguments: {"filename"=>"hello", "message"=>"world"} Input method: both
-    2018-02-16T15:36:33.178433 DEBUG  Bolt::Transport::SSH: Authentication method 'gssapi-with-mic' is not available
-    2018-02-16T15:36:33.179532 DEBUG  Bolt::Transport::SSH: Running task run 'Task({'name' => 'exercise7::write', 'executable' => '/Users/username/puppetlabs/tasks-hands-on-lab/07-writing-plans/modules/exercise7/tasks/write.sh'})' on node1
+    Did not find config for node1 in inventory
+    Started with 100 max thread(s)
+    ModuleLoader: module 'boltlib' has unknown dependencies - it will have all other modules visible
+    Did not find config for node1 in inventory
+    Starting: task exercise7::write on node1
+    Authentication method 'gssapi-with-mic' is not available
+    Running task exercise7::write with '{"filename"=>"hello", "message"=>"world"}' via  on ["node1"]
     Started on node1...
-    2018-02-16T15:36:33.216451 DEBUG  node1: Opened session
-    2018-02-16T15:36:33.216604 DEBUG  node1: Executing: mktemp -d
-    2018-02-16T15:36:33.395440 DEBUG  node1: stdout: /tmp/tmp.I7ZTz4OmfY
-    
-    2018-02-16T15:36:33.395746 DEBUG  node1: Command returned successfully
-    2018-02-16T15:36:33.411634 DEBUG  node1: Executing: chmod u+x '/tmp/tmp.I7ZTz4OmfY/write.sh'
-    2018-02-16T15:36:33.423831 DEBUG  node1: Command returned successfully
-    2018-02-16T15:36:33.424137 DEBUG  node1: Executing: PT_filename='hello' PT_message='world' '/tmp/tmp.I7ZTz4OmfY/write.sh'
-    2018-02-16T15:36:33.436180 DEBUG  node1: Command returned successfully
-    2018-02-16T15:36:33.436226 DEBUG  node1: Executing: rm -rf '/tmp/tmp.I7ZTz4OmfY'
-    2018-02-16T15:36:33.447658 DEBUG  node1: Command returned successfully
-    2018-02-16T15:36:33.447850 DEBUG  node1: Closed session
-    2018-02-16T15:36:33.447918 DEBUG  Bolt::Transport::SSH: Result on node1: {"_output":""}
+    Running task run 'Task({'name' => 'exercise7::write', 'implementations' => [{'name' => 'write.sh', 'path' => '/Users/username/puppetlabs/tasks-hands-on-lab/07-writing-plans/modules/exercise7/tasks/write.sh', 'requirements' => []}], 'input_method' => undef})' on node1
+    Opened session
+    Executing: mktemp -d
+    stdout: /tmp/tmp.mJo9THENdL
+
+    Command returned successfully
+    Executing: chmod u\+x /tmp/tmp.mJo9THENdL/write.sh
+    Command returned successfully
+    Executing: PT_filename=hello PT_message=world /tmp/tmp.mJo9THENdL/write.sh
+    Command returned successfully
+    Executing: rm -rf /tmp/tmp.mJo9THENdL
+    Command returned successfully
+    Closed session
     Finished on node1:
-    
+     {"node":"node1","status":"success","result":{"_output":""}}
+
       {
       }
-    2018-02-16T15:36:33.448381 INFO   Bolt::Executor: Ran task 'exercise7::write' on 1 node with 0 failures
-    Ran on 1 node in 0.74 seconds
+    Finished: task exercise7::write with 0 failures in 0.89 sec
+    Successful on 1 node: node1
+    Ran on 1 node in 0.97 seconds
     ```
 3. Write a plan that uses the task you created. Save the following as `modules/exercise7/plans/writeread.pp`:
 
@@ -149,7 +151,25 @@ Create a task and then create a plan that uses the task.
 4. Run the plan using the following command:
     
     ```
-    bolt plan run exercise7::writeread filename=hello message=world nodes=<nodes> --modulepath ./modules
+    bolt plan run exercise7::writeread filename=hello message=world nodes=node1 --modulepath ./modules
+    ```
+    ```
+    The result:
+    Starting: task exercise7::write on node1
+    Finished: task exercise7::write with 0 failures in 0.86 sec
+    Starting: command 'cat /tmp/hello' on node1
+    Finished: command 'cat /tmp/hello' with 0 failures in 0.38 sec
+    [
+      {
+        "node": "node1",
+        "status": "success",
+        "result": {
+          "stdout": "world\n",
+          "stderr": "",
+          "exit_code": 0
+        }
+      }
+    ]
     ```
 
     **Note:**
@@ -162,4 +182,4 @@ Create a task and then create a plan that uses the task.
 
 Now that you know how to create and run basic plans with Bolt you can move on to:
 
-[Writing advanced Tasks](../8-writing-advanced-tasks)
+[Writing advanced Tasks](../08-writing-advanced-tasks)

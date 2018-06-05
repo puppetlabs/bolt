@@ -43,14 +43,17 @@ This exercise uses `sh`, but you can use Perl, Python, Lua, or JavaScript or any
 2. Run the exercise5 task. Note the `message` argument. This will be expanded to the `PT_message` environment variable expected by our task. By naming parameters explicitly it's easier for others to use your tasks.
 
     ```
-    bolt task run exercise5 message=hello --nodes all --modulepath ./modules
+    bolt task run exercise5 message=hello --nodes node1 --modulepath ./modules
     ```
     The result:
     ```
     Started on node1...
     Finished on node1:
       localhost.localdomain received the message: hello
-    Ran on 1 node in 0.43 seconds
+      {
+      }
+    Successful on 1 node: node1
+    Ran on 1 node in 0.99 seconds
     ```
 
 3. Run the Bolt command with a different value for `message` and see how the output changes.
@@ -127,15 +130,16 @@ Note that Bolt assumes that the required runtime is already available on the tar
     ```
     The result:
     ```
-        Started on node1...
+    Started on node1...
     Finished on node1:
-      google.com is available at 216.58.204.14 on localhost.localdomain
+      google.com is available at 172.217.3.206 on localhost.localdomain
       {
         "host": "google.com",
         "hostname": "localhost.localdomain",
-        "ipaddr": "216.58.204.14"
+        "ipaddr": "172.217.3.206"
       }
-    Ran on 1 node in 0.41 seconds
+    Successful on 1 node: node1
+    Ran on 1 node in 0.97 seconds
     ```
 
 # Next steps
