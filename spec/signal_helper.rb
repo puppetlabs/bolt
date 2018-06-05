@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'bolt/util'
+
 RSpec.shared_context 'synchronization thread' do
   let(:sync_thread) { Thread.new { Thread.stop } }
 
@@ -33,5 +35,5 @@ RSpec.configure do |config|
   # enabled by specifying `--tag ~~signals_self` on the rspec command
   # line. Note the double tilde.
   config.filter_run_excluding :signals_self \
-    if Gem.win_platform? && !config.exclusion_filter[:'~signals_self']
+    if Bolt::Util.windows? && !config.exclusion_filter[:'~signals_self']
 end

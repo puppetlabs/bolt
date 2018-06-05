@@ -37,7 +37,8 @@ module Bolt
           end
           opts.on('--config CONFIG',
                   "The puppetdb.conf file to read configuration from",
-                  "Default: #{Bolt::PuppetDB::Config::DEFAULT_CONFIG} if present") do |file|
+                  "Defaults: #{Bolt::PuppetDB::Config::DEFAULT_CONFIG[:user]} or",
+                  "#{Bolt::PuppetDB::Config::DEFAULT_CONFIG[:global]} if present") do |file|
             @config_file = File.expand_path(file)
           end
           opts.on('--output FILE', '-o FILE',

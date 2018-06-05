@@ -5,6 +5,7 @@ require 'fileutils'
 require 'tmpdir'
 require 'bolt/transport/base'
 require 'bolt/result'
+require 'bolt/util'
 
 module Bolt
   module Transport
@@ -20,7 +21,7 @@ module Bolt
       def initialize
         super
 
-        if Gem.win_platform?
+        if Bolt::Util.windows?
           raise NotImplementedError, "The local transport is not yet implemented on Windows"
         else
           @conn = Shell.new

@@ -26,10 +26,11 @@ is stored at:
 
 Windows `%USERPROFILE%\.puppetlabs\client-tools\puppetdb.conf`
 
-> Note: If you use a global configuration file stored at
-> /etc/puppetlabs/client-tools/puppetdb.conf, copy the file to your home
-> directory.  The configuration file is shared with the puppet-query tool. For
-> details on the format of the file see the PuppetDB documentation.
+> Note: The presedence used to load puppetdb config is
+> 1. configfile (optionally specified with --configfile)
+> 2. $HOME/.puppetlabs/client-tools/puppetdb.conf
+> 3. /etc/puppetlabs/client-tools/puppetdb.conf (windows: C:\ProgramData\PuppetLabs\client-tools\puppetdb.conf)
+
 
 `bolt-inventory-pdb` requires the following file settings:
 

@@ -3,6 +3,7 @@
 require 'bolt/executor'
 require 'bolt/error'
 require 'bolt/plan_result'
+require 'bolt/util'
 
 module Bolt
   class PAL
@@ -54,7 +55,7 @@ module Bolt
     end
 
     def self.load_puppet
-      if Gem.win_platform?
+      if Bolt::Util.windows?
         # Windows 'fix' for openssl behaving strangely. Prevents very slow operation
         # of random_bytes later when establishing winrm connections from a Windows host.
         # See https://github.com/rails/rails/issues/25805 for background.
