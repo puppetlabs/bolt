@@ -1349,6 +1349,7 @@ bar
             .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0)]))
 
           expect(executor).to receive(:start_plan)
+          expect(executor).to receive(:finish_plan)
 
           cli.execute(options)
           expect(JSON.parse(output.string)).to eq(
@@ -1373,6 +1374,7 @@ bar
             .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0)]))
 
           expect(executor).to receive(:start_plan)
+          expect(executor).to receive(:finish_plan)
 
           cli.execute(options)
           expect(JSON.parse(output.string)).to eq(
@@ -1387,6 +1389,7 @@ bar
             .and_raise("Could not connect to target")
 
           expect(executor).to receive(:start_plan)
+          expect(executor).to receive(:finish_plan)
 
           expect(cli.execute(options)).to eq(1)
           expect(JSON.parse(output.string)['msg']).to match(/Could not connect to target/)
@@ -1399,6 +1402,7 @@ bar
             .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'no', '', 1)]))
 
           expect(executor).to receive(:start_plan)
+          expect(executor).to receive(:finish_plan)
 
           cli.execute(options)
           expect(JSON.parse(output.string)).to eq(
@@ -1424,6 +1428,7 @@ bar
           plan_name.replace 'sample::dne'
 
           expect(executor).to receive(:start_plan)
+          expect(executor).to receive(:finish_plan)
 
           expect(cli.execute(options)).to eq(1)
           expect(JSON.parse(output.string)['msg']).to match(/Could not find a plan named "sample::dne"/)
@@ -1439,6 +1444,7 @@ bar
             end
 
           expect(executor).to receive(:start_plan)
+          expect(executor).to receive(:finish_plan)
 
           expect(cli).to receive(:exit!) do
             sync_thread.kill
