@@ -14,7 +14,7 @@ Puppet::DataTypes.create_type('Target') do
       protocol => Callable[[], Optional[String[1]]],
       user => Callable[[], Optional[String[1]]],
     }
-    PUPPET
+  PUPPET
 
   load_file('bolt/target')
 
