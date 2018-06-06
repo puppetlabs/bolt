@@ -31,5 +31,5 @@ plan aggregate::nodes(
     run_script($script, $nodes, $params)
   }
 
-  aggregate::nodes($res)
+  return aggregate::nodes($res)
 }

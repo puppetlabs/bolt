@@ -8,10 +8,11 @@ information for nodes or node groups.
 The inventory file is a yaml file stored by default at
 `~/.puppetlabs/bolt/inventory.yaml`. At the top level it contains an array of
 nodes and groups. Each node can have a config, vals, and facts specific to that
-node. Each group can have an array of nodes and set default config, facts, and
-vals for the entire group
+node. Each group can have an array of nodes, an array of child groups, and can
+set default config, facts, and vals for the entire group.
 
-## Inventory Config
+**Note:** config values set at the top level of inventory will only apply to targets included in that inventory file. Set config for unknown targets in the bolt config file.
+
 
 You can only set transport configuration in the inventory file. This means
 using a top level transport value to assign a transport to the target and all
@@ -19,16 +20,25 @@ values in the transports sections. You can set config on nodes or groups in the
 inventory file. Bolt performs a depth first search of nodes, followed by a
 search of groups, and uses the first value it finds. Nested hashes are merged.
 
-In this inventory file example, three nodes are configured to use ssh transport
-and three other nodes to use WinRM transport.
+This inventory file example defines two top-level groups: `ssh_nodes` and
+`win_nodes`. The `ssh_nodes` group contains two other groups: `linux_nodes` and
+`macos_nodes`. Six nodes are configured to use ssh transport and three other
+nodes to use WinRM transport.
 
 ```yaml
 groups:
   - name: ssh_nodes
-    nodes:
-      - ssh1.example.com
-      - ssh2.example.com
-      - ssh3.example.com
+    groups:
+      - name: linux_nodes
+        nodes:
+          - linux1.example.com
+          - linux2.example.com
+          - linux3.example.com
+      - name: macos_nodes
+        nodes:
+          - macos1.example.com
+          - macos2.example.com
+          - macos2.example.com
     config:
       transport: ssh
       ssh:
@@ -42,17 +52,16 @@ groups:
       transport: winrm
       winrm:
         port: 5382
+```
+
 # Override a user for a specific node.
+```
 nodes:
-  - name: ssh1.example.com
+  - name: linux1.example.com
     config:
       ssh:
         user: me
 ```
-
-> Note: config values set at the top level of inventory will only apply to
-> targets included in that inventory file. Set config for unknown targets in
-> the bolt config file.
 
 ## Inventory facts and vals
 
@@ -85,12 +94,15 @@ A config is a map that contains transport specific configuration options.
 Group
 A group is a map that requires a name and can contain any of the following:
 - `nodes` : Nodes object
+- `groups` : Groups object.
 - `config` : Config object.
 - `facts` : Facts object.
 - `vals` : Vals object.
 
 A group name must match the regular expression
 values `/[a-zA-Z]\w+/`. This is the same restriction used for environments.
+
+A group may contain other groups. Any nodes in the nested groups will also be in the parent group. The configuration of nested groups will override the parent group.
 
 Groups
 An array of group objects.
@@ -110,8 +122,8 @@ name: "host1.example.com"
 ```
 ```
 name: "host1.example.com"
-  config:
-    transport: "ssh"
+config:
+  transport: "ssh"
 ```
 
 Node Name

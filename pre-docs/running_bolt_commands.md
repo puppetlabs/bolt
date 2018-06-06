@@ -108,3 +108,6 @@ the format `bolt file upload <SOURCE> <DESTINATION>`. Specify the nodes with the
 ```
 bolt file upload my_file.txt /tmp/remote_file.txt --nodes node1,node2
 ```
+
+Note that most transports are not optimized for file copying, so this is best
+limited to small files.

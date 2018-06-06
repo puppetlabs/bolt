@@ -36,19 +36,13 @@ module Bolt
       def query_certnames(query)
         return [] unless query
 
-        body = JSON.generate(query: query)
+        results = make_query(query)
 
-        response = http_client.post("#{@uri}/pdb/query/v4", body: body, header: headers)
-        if response.code != 200
-          raise Bolt::PuppetDBError, "Failed to query PuppetDB: #{response.body}"
-        else
-          results = JSON.parse(response.body)
-          if results&.first && !results.first&.key?('certname')
-            fields = results.first&.keys
-            raise Bolt::PuppetDBError, "Query results did not contain a 'certname' field: got #{fields.join(', ')}"
-          end
-          results&.map { |result| result['certname'] }.uniq
+        if results&.first && !results.first&.key?('certname')
+          fields = results.first&.keys
+          raise Bolt::PuppetDBError, "Query results did not contain a 'certname' field: got #{fields.join(', ')}"
         end
+        results&.map { |result| result['certname'] }&.uniq
       end
 
       # This method expects an array of certnames to get facts for
@@ -58,24 +52,37 @@ module Bolt
         certnames.uniq!
         name_query = certnames.map { |c| ["=", "certname", c] }
         name_query.insert(0, "or")
-        body = JSON.generate(query: name_query)
+        result = make_query(name_query, 'inventory')
 
-        response = http_client.post("#{@uri}/pdb/query/v4/inventory", body: body, header: headers)
+        result&.each_with_object({}) do |node, coll|
+          coll[node['certname']] = node['facts']
+        end
+      end
+
+      def make_query(query, path = nil)
+        body = JSON.generate(query: query)
+        url = "#{@uri}/pdb/query/v4"
+        url += "/#{path}" if path
+
+        begin
+          response = http_client.post(url, body: body, header: headers)
+        rescue StandardError => err
+          raise Bolt::PuppetDBError, "Failed to query PuppetDB: #{err}"
+        end
         if response.code != 200
           raise Bolt::PuppetDBError, "Failed to query PuppetDB: #{response.body}"
-        else
-          parsed = JSON.parse(response.body)
         end
-
-        parsed&.each_with_object({}) do |node, coll|
-          coll[node['certname']] = node['facts']
+        begin
+          JSON.parse(response.body)
+        rescue JSON::ParserError
+          raise Bolt::PuppetDBError, "Unable to parse response as JSON: #{response.body}"
         end
       end
 
       def http_client
         return @http if @http
         @http = HTTPClient.new
-        @http.ssl_config.set_client_cert_file(@cert, @key)
+        @http.ssl_config.set_client_cert_file(@cert, @key) if @cert
         @http.ssl_config.add_trust_ca(@cacert)
 
         @http

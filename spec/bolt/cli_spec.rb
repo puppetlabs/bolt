@@ -13,13 +13,15 @@ describe "Bolt::CLI" do
   let(:target) { Bolt::Target.new('foo') }
 
   before(:each) do
-    outputter = Bolt::Outputter::Human.new(StringIO.new)
+    outputter = Bolt::Outputter::Human.new(false, StringIO.new)
 
     allow_any_instance_of(Bolt::CLI).to receive(:outputter).and_return(outputter)
     allow_any_instance_of(Bolt::CLI).to receive(:warn)
 
-    # This will turn on logging to the console by default... not ideal for tests
-    allow(Bolt::PAL).to receive(:configure_logging)
+    # Don't allow tests to override the captured log config
+    allow(Bolt::Logger).to receive(:configure)
+
+    Logging.logger[:root].level = :info
   end
 
   def stub_file(path)
@@ -266,7 +268,7 @@ bar
         allow(cli).to receive(:puppetdb_client).and_return(puppetdb)
 
         expect { cli.parse }
-          .to raise_error(Bolt::CLIError, /Could not retrieve targets from PuppetDB.*failed to puppetdb the nodes/)
+          .to raise_error(Bolt::PuppetDBError, /failed to puppetdb the nodes/)
       end
 
       it "fails if both --nodes and --query are specified" do
@@ -345,12 +347,11 @@ bar
     end
 
     describe "console log level" do
-      let(:console_log) { Logging.appenders['console'] }
-      after(:each) { console_log.level = :notice }
       it "is not sensitive to ordering of debug and verbose" do
+        expect(Bolt::Logger).to receive(:configure).with(have_attributes(log: { 'console' => { level: :debug } }))
+
         cli = Bolt::CLI.new(%w[command run --nodes foo --debug --verbose])
         cli.parse
-        expect(console_log.level).to eq(Logging.level_num(:debug))
       end
     end
 
@@ -543,7 +544,7 @@ bar
                                  --modulepath .])
           expect {
             cli.parse
-          }.to raise_error(Bolt::CLIError, /No such file/)
+          }.to raise_error(Bolt::FileError, /No such file/)
         end
       end
 
@@ -588,6 +589,24 @@ bar
           cli.parse
         }.to raise_error(Bolt::CLIError, /Invalid plan/)
       end
+
+      it "accepts targets resulting from --query from puppetdb" do
+        cli = Bolt::CLI.new(%w[plan run foo --query nodes{}])
+        allow(cli).to receive(:query_puppetdb_nodes).once.and_return(%w[foo bar])
+        targets = [Bolt::Target.new('foo'), Bolt::Target.new('bar')]
+        result = cli.parse
+        cli.validate(result)
+        cli.execute(result)
+        expect(result[:targets]).to eq(targets)
+        expect(result[:nodes]).to eq(%w[foo bar])
+      end
+
+      it "fails when --nodes AND --query provided" do
+        expect {
+          cli = Bolt::CLI.new(%w[plan run foo --query nodes{} --nodes bar])
+          cli.parse
+        }.to raise_error(Bolt::CLIError, /'--nodes' or '--query'/)
+      end
     end
 
     describe "execute" do
@@ -614,7 +633,7 @@ bar
       before :each do
         allow(Bolt::Executor).to receive(:new).and_return(executor)
 
-        outputter = Bolt::Outputter::JSON.new(output)
+        outputter = Bolt::Outputter::JSON.new(false, output)
 
         allow(cli).to receive(:outputter).and_return(outputter)
       end
@@ -708,7 +727,7 @@ bar
           stub_non_existent_file(script)
 
           expect { cli.execute(options) }.to raise_error(
-            Bolt::CLIError, /The script '#{script}' does not exist/
+            Bolt::FileError, /The script '#{script}' does not exist/
           )
           expect(JSON.parse(output.string)).to be
         end
@@ -717,7 +736,7 @@ bar
           stub_unreadable_file(script)
 
           expect { cli.execute(options) }.to raise_error(
-            Bolt::CLIError, /The script '#{script}' is unreadable/
+            Bolt::FileError, /The script '#{script}' is unreadable/
           )
           expect(JSON.parse(output.string)).to be
         end
@@ -726,7 +745,7 @@ bar
           stub_directory(script)
 
           expect { cli.execute(options) }.to raise_error(
-            Bolt::CLIError, /The script '#{script}' is not a file/
+            Bolt::FileError, /The script '#{script}' is not a file/
           )
           expect(JSON.parse(output.string)).to be
         end
@@ -797,7 +816,7 @@ bar
           }
           cli.execute(options)
           json = JSON.parse(output.string)
-          json.delete('executable')
+          json.delete('implementations')
           expect(json).to eq(
             "name" => "sample::params",
             "description" => "Task with parameters",
@@ -848,12 +867,14 @@ bar
           }
           cli.execute(options)
           json = JSON.parse(output.string)
-          expect(json).to eq([["facts::bash", nil],
+          expect(json).to eq([["facts", "Gather system facts"],
+                              ["facts::bash", nil],
                               ["facts::powershell", nil],
                               ["facts::ruby", nil],
                               ['sample::ok', nil]])
 
-          expect(@puppet_logs.first.message).to match(/unexpected token.*params\.json/m)
+          output = @log_output.readlines.join
+          expect(output).to match(/unexpected token.*params\.json/m)
         end
       end
 
@@ -871,7 +892,7 @@ bar
           expect {
             cli.execute(options)
           }.to raise_error(
-            Bolt::CLIError,
+            Bolt::Error,
             'Could not find a task named "abcdefg". For a list of available tasks, run "bolt task show"'
           )
         end
@@ -948,7 +969,7 @@ bar
                               ["puppetdb_fact"],
                               ["sample::ok"]])
 
-          expect(@puppet_logs.first.message).to match(/^Syntax error at.*single_task.pp/m)
+          expect(@log_output.readlines.join).to match(/Syntax error at.*single_task.pp/m)
         end
 
         it "plan run displays an error" do
@@ -980,7 +1001,7 @@ bar
           expect {
             cli.execute(options)
           }.to raise_error(
-            Bolt::CLIError,
+            Bolt::Error,
             'Could not find a plan named "abcdefg". For a list of available plans, run "bolt plan show"'
           )
         end
@@ -999,7 +1020,7 @@ bar
             params_parsed: true
           }
         }
-        let(:input_method) { +'both' }
+        let(:input_method) { nil }
         let(:task_path) { +'modules/sample/tasks/echo.sh$' }
         let(:task_t) { task_type(task_name, Regexp.new(task_path), input_method) }
 
@@ -1012,7 +1033,6 @@ bar
             .to receive(:run_task)
             .with(targets, task_t, task_params, {})
             .and_return(Bolt::ResultSet.new([]))
-
           expect(cli.execute(options)).to eq(0)
           expect(JSON.parse(output.string)).to be
         end
@@ -1030,7 +1050,7 @@ bar
           task_name.replace 'dne::task1'
 
           expect { cli.execute(options) }.to raise_error(
-            Bolt::CLIError, /Could not find a task named "dne::task1"/
+            Bolt::PAL::PALError, /Could not find a task named "dne::task1"/
           )
           expect(JSON.parse(output.string)).to be
         end
@@ -1039,7 +1059,7 @@ bar
           task_name.replace 'sample::dne'
 
           expect { cli.execute(options) }.to raise_error(
-            Bolt::CLIError, /Could not find a task named "sample::dne"/
+            Bolt::PAL::PALError, /Could not find a task named "sample::dne"/
           )
           expect(JSON.parse(output.string)).to be
         end
@@ -1068,32 +1088,33 @@ bar
           expect(JSON.parse(output.string)).to be
         end
 
-        it "runs a task passing input on stdin" do
-          task_name.replace 'sample::stdin'
-          task_path.replace 'modules/sample/tasks/stdin.sh$'
-          input_method.replace 'stdin'
+        context "input_method stdin" do
+          let(:input_method) { 'stdin' }
+          it "runs a task passing input on stdin" do
+            task_name.replace 'sample::stdin'
+            task_path.replace 'modules/sample/tasks/stdin.sh$'
 
-          expect(executor)
-            .to receive(:run_task)
-            .with(targets, task_t, task_params, {})
-            .and_return(Bolt::ResultSet.new([]))
+            expect(executor)
+              .to receive(:run_task)
+              .with(targets, task_t, task_params, {})
+              .and_return(Bolt::ResultSet.new([]))
 
-          cli.execute(options)
-          expect(JSON.parse(output.string)).to be
-        end
+            cli.execute(options)
+            expect(JSON.parse(output.string)).to be
+          end
 
-        it "runs a powershell task passing input on stdin" do
-          task_name.replace 'sample::winstdin'
-          task_path.replace 'modules/sample/tasks/winstdin.ps1$'
-          input_method.replace 'stdin'
+          it "runs a powershell task passing input on stdin" do
+            task_name.replace 'sample::winstdin'
+            task_path.replace 'modules/sample/tasks/winstdin.ps1$'
 
-          expect(executor)
-            .to receive(:run_task)
-            .with(targets, task_t, task_params, {})
-            .and_return(Bolt::ResultSet.new([]))
+            expect(executor)
+              .to receive(:run_task)
+              .with(targets, task_t, task_params, {})
+              .and_return(Bolt::ResultSet.new([]))
 
-          cli.execute(options)
-          expect(JSON.parse(output.string)).to be
+            cli.execute(options)
+            expect(JSON.parse(output.string)).to be
+          end
         end
 
         it "traps SIGINT", :signals_self do
@@ -1129,7 +1150,7 @@ bar
             )
 
             expect { cli.execute(options) }.to raise_error(
-              Bolt::CLIError,
+              Bolt::PAL::PALError,
               /Task sample::params:\n(?x:
                )\s*has no parameter named 'foo'\n(?x:
                )\s*has no parameter named 'bar'/
@@ -1141,7 +1162,7 @@ bar
             task_params['mandatory_string'] = 'str'
 
             expect { cli.execute(options) }.to raise_error(
-              Bolt::CLIError,
+              Bolt::PAL::PALError,
               /Task sample::params:\n(?x:
                )\s*expects a value for parameter 'mandatory_integer'\n(?x:
                )\s*expects a value for parameter 'mandatory_boolean'/
@@ -1159,7 +1180,7 @@ bar
             )
 
             expect { cli.execute(options) }.to raise_error(
-              Bolt::CLIError,
+              Bolt::PAL::PALError,
               /Task sample::params:\n(?x:
                )\s*parameter 'mandatory_boolean' expects a Boolean value, got String\n(?x:
                )\s*parameter 'optional_string' expects a value of type Undef or String,(?x:
@@ -1178,7 +1199,7 @@ bar
             )
 
             expect { cli.execute(options) }.to raise_error(
-              Bolt::CLIError,
+              Bolt::PAL::PALError,
               /Task sample::params:\n(?x:
                )\s*parameter 'mandatory_string' expects a String\[1, 10\] value, got String\n(?x:
                )\s*parameter 'optional_integer' expects a value of type Undef or Integer\[-5, 5\],(?x:
@@ -1223,14 +1244,14 @@ bar
               task_name.replace 'unknown::task'
 
               expect { cli.execute(options) }.to raise_error(
-                Bolt::CLIError, /Could not find a task named "unknown::task"/
+                Bolt::PAL::PALError, /Could not find a task named "unknown::task"/
               )
               expect(JSON.parse(output.string)).to be
             end
 
             it "errors as usual if invalid (according to the local task definition) parameters are specified" do
               expect { cli.execute(options) }.to raise_error(
-                Bolt::CLIError,
+                Bolt::PAL::PALError,
                 /Task sample::params:\n(?x:
                  )\s*has no parameter named 'foo'\n(?x:
                  )\s*has no parameter named 'bar'/
@@ -1254,14 +1275,14 @@ bar
                 task_name.replace 'unknown::task'
 
                 expect { cli.execute(options) }.to raise_error(
-                  Bolt::CLIError, /Could not find a task named "unknown::task"/
+                  Bolt::PAL::PALError, /Could not find a task named "unknown::task"/
                 )
                 expect(JSON.parse(output.string)).to be
               end
 
               it "errors as usual if invalid (according to the local task definition) parameters are specified" do
                 expect { cli.execute(options) }.to raise_error(
-                  Bolt::CLIError,
+                  Bolt::PAL::PALError,
                   /Task sample::params:\n(?x:
                    )\s*has no parameter named 'foo'\n(?x:
                    )\s*has no parameter named 'bar'/
@@ -1272,7 +1293,7 @@ bar
 
             context "when all targets use the PCP transport" do
               let(:target) { Bolt::Target.new('pcp://foo') }
-              let(:task_t) { task_type(task_name, /\A\z/, 'both') }
+              let(:task_t) { task_type(task_name, /\A\z/, nil) }
 
               it "runs the task even when it is not installed locally" do
                 task_name.replace 'unknown::task'
@@ -1312,7 +1333,7 @@ bar
             task_options: plan_params
           }
         }
-        let(:task_t) { task_type('sample::echo', %r{modules/sample/tasks/echo.sh$}, 'both') }
+        let(:task_t) { task_type('sample::echo', %r{modules/sample/tasks/echo.sh$}, nil) }
 
         before :each do
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
@@ -1326,6 +1347,8 @@ bar
             .to receive(:run_task)
             .with(targets, task_t, { 'message' => 'hi there' }, kind_of(Hash))
             .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0)]))
+
+          expect(executor).to receive(:start_plan)
 
           cli.execute(options)
           expect(JSON.parse(output.string)).to eq(
@@ -1349,6 +1372,8 @@ bar
             .with(targets, task_t, { 'message' => 'hi there' }, kind_of(Hash))
             .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0)]))
 
+          expect(executor).to receive(:start_plan)
+
           cli.execute(options)
           expect(JSON.parse(output.string)).to eq(
             [{ 'node' => 'foo', 'status' => 'success', 'result' => { '_output' => 'yes' } }]
@@ -1361,7 +1386,10 @@ bar
             .with(targets, task_t, { 'message' => 'hi there' }, kind_of(Hash))
             .and_raise("Could not connect to target")
 
-          expect { cli.execute(options) }.to raise_error(/Could not connect to target/)
+          expect(executor).to receive(:start_plan)
+
+          expect(cli.execute(options)).to eq(1)
+          expect(JSON.parse(output.string)['msg']).to match(/Could not connect to target/)
         end
 
         it "formats results of a failing task" do
@@ -1369,6 +1397,8 @@ bar
             .to receive(:run_task)
             .with(targets, task_t, { 'message' => 'hi there' }, kind_of(Hash))
             .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'no', '', 1)]))
+
+          expect(executor).to receive(:start_plan)
 
           cli.execute(options)
           expect(JSON.parse(output.string)).to eq(
@@ -1393,10 +1423,10 @@ bar
         it "errors for non-existent plans" do
           plan_name.replace 'sample::dne'
 
-          expect { cli.execute(options) }.to raise_error(
-            Bolt::CLIError, /Could not find a plan named "sample::dne"/
-          )
-          expect(JSON.parse(output.string)).to be
+          expect(executor).to receive(:start_plan)
+
+          expect(cli.execute(options)).to eq(1)
+          expect(JSON.parse(output.string)['msg']).to match(/Could not find a plan named "sample::dne"/)
         end
 
         it "traps SIGINT", :signals_self do
@@ -1407,6 +1437,8 @@ bar
               sync_thread.join(1) # give ruby some time to handle the signal
               Bolt::ResultSet.new([])
             end
+
+          expect(executor).to receive(:start_plan)
 
           expect(cli).to receive(:exit!) do
             sync_thread.kill
@@ -1460,7 +1492,7 @@ bar
           stub_non_existent_file(source)
 
           expect { cli.execute(options) }.to raise_error(
-            Bolt::CLIError, /The source file '#{source}' does not exist/
+            Bolt::FileError, /The source file '#{source}' does not exist/
           )
           expect(JSON.parse(output.string)).to be
         end
@@ -1469,7 +1501,7 @@ bar
           stub_unreadable_file(source)
 
           expect { cli.execute(options) }.to raise_error(
-            Bolt::CLIError, /The source file '#{source}' is unreadable/
+            Bolt::FileError, /The source file '#{source}' is unreadable/
           )
           expect(JSON.parse(output.string)).to be
         end
@@ -1478,7 +1510,7 @@ bar
           stub_directory(source)
 
           expect { cli.execute(options) }.to raise_error(
-            Bolt::CLIError, /The source file '#{source}' is not a file/
+            Bolt::FileError, /The source file '#{source}' is not a file/
           )
           expect(JSON.parse(output.string)).to be
         end
@@ -1494,7 +1526,7 @@ bar
       before :each do
         expect(Bolt::Executor).to receive(:new).with(config, true).and_return(executor)
 
-        outputter = Bolt::Outputter::JSON.new(output)
+        outputter = Bolt::Outputter::JSON.new(false, output)
 
         allow(cli).to receive(:outputter).and_return(outputter)
       end
@@ -1512,7 +1544,7 @@ bar
             noop: true
           }
         }
-        let(:task_t) { task_type(task_name, %r{modules/sample/tasks/noop.sh$}, 'both') }
+        let(:task_t) { task_type(task_name, %r{modules/sample/tasks/noop.sh$}, nil) }
 
         before :each do
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
@@ -1731,7 +1763,7 @@ bar
       cli = Bolt::CLI.new(%W[command run --configfile #{File.join(configdir, 'invalid.yml')} --nodes foo])
       expect {
         cli.parse
-      }.to raise_error(Bolt::CLIError, /Could not parse/)
+      }.to raise_error(Bolt::FileError, /Could not parse/)
     end
   end
 

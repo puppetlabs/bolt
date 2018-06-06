@@ -12,5 +12,5 @@ plan facts(TargetSpec $nodes) {
     }
   }
 
-  $result_set
+  return $result_set
 }

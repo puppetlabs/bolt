@@ -4,6 +4,7 @@ require 'logging'
 require 'shellwords'
 require 'bolt/node/errors'
 require 'bolt/node/output'
+require 'bolt/util'
 
 module Bolt
   module Transport
@@ -24,12 +25,22 @@ module Bolt
           def chown(owner)
             return if owner.nil? || owner == @owner
 
-            @owner = owner
-            result = @node.execute(['chown', '-R', "#{@owner}:", @path], sudoable: true, run_as: 'root')
+            result = @node.execute(['id', '-g', owner])
             if result.exit_code != 0
-              message = "Could not change owner of '#{@path}' to #{@owner}: #{result.stderr.string}"
+              message = "Could not identify group of user #{owner}: #{result.stderr.string}"
+              raise Bolt::Node::FileError.new(message, 'ID_ERROR')
+            end
+            group = result.stdout.string.chomp
+
+            # Chown can only be run by root.
+            result = @node.execute(['chown', '-R', "#{owner}:#{group}", @path], sudoable: true, run_as: 'root')
+            if result.exit_code != 0
+              message = "Could not change owner of '#{@path}' to #{owner}: #{result.stderr.string}"
               raise Bolt::Node::FileError.new(message, 'CHOWN_ERROR')
             end
+
+            # File ownership successfully changed, record the new owner.
+            @owner = owner
           end
 
           def delete
@@ -52,7 +63,7 @@ module Bolt
           @logger = Logging.logger[@target.host]
         end
 
-        if !!File::ALT_SEPARATOR
+        if Bolt::Util.windows?
           require 'ffi'
           module Win
             extend FFI::Library
@@ -95,7 +106,7 @@ module Bolt
               @logger.debug { "Disabling use_agent in net-ssh: ssh-agent is not available" }
               options[:use_agent] = false
             end
-          elsif !!File::ALT_SEPARATOR
+          elsif Bolt::Util.windows?
             pageant_wide = 'Pageant'.encode('UTF-16LE')
             if Win.FindWindow(pageant_wide, pageant_wide).to_i == 0
               @logger.debug { "Disabling use_agent in net-ssh: pageant process not running" }
@@ -160,6 +171,8 @@ module Bolt
               channel.wait
               return true
             else
+              # Cancel the sudo prompt to prevent later commands getting stuck
+              channel.close
               raise Bolt::Node::EscalateError.new(
                 "Sudo password for user #{@user} was not provided for #{target.uri}",
                 'NO_PASSWORD'
@@ -184,12 +197,20 @@ module Bolt
         def execute(command, sudoable: false, **options)
           result_output = Bolt::Node::Output.new
           run_as = options[:run_as] || self.run_as
-          use_sudo = sudoable && run_as && @user != run_as
+          escalate = sudoable && run_as && @user != run_as
+          use_sudo = escalate && @target.options['run-as-command'].nil?
 
           command_str = command.is_a?(String) ? command : Shellwords.shelljoin(command)
-          if use_sudo
-            sudo_str = Shellwords.shelljoin(["sudo", "-S", "-u", run_as, "-p", sudo_prompt])
-            command_str = "#{sudo_str} #{command_str}"
+          if escalate
+            if use_sudo
+              sudo_flags = ["sudo", "-S", "-u", run_as, "-p", sudo_prompt]
+              sudo_flags += ["-E"] if options[:environment]
+              sudo_str = Shellwords.shelljoin(sudo_flags)
+              command_str = "#{sudo_str} #{command_str}"
+            else
+              run_as_str = Shellwords.shelljoin(@target.options['run-as-command'] + [run_as])
+              command_str = "#{run_as_str} #{command_str}"
+            end
           end
 
           # Including the environment declarations in the shelljoin will escape
@@ -219,14 +240,14 @@ module Bolt
                 unless use_sudo && handled_sudo(channel, data)
                   result_output.stdout << data
                 end
-                @logger.debug { "stdout: #{data}" }
+                @logger.debug { "stdout: #{data.strip}" }
               end
 
               channel.on_extended_data do |_, _, data|
                 unless use_sudo && handled_sudo(channel, data)
                   result_output.stderr << data
                 end
-                @logger.debug { "stderr: #{data}" }
+                @logger.debug { "stderr: #{data.strip}" }
               end
 
               channel.on_request("exit-status") do |_, data|
@@ -247,6 +268,9 @@ module Bolt
             @logger.info { "Command failed with exit code #{result_output.exit_code}" }
           end
           result_output
+        rescue StandardError
+          @logger.debug { "Command aborted" }
+          raise
         end
 
         def write_remote_file(source, destination)
@@ -256,12 +280,10 @@ module Bolt
         end
 
         def make_tempdir
-          if target.options['tmpdir']
-            tmppath = "#{target.options['tmpdir']}/#{SecureRandom.uuid}"
-            command = ['mkdir', '-m', 700, tmppath]
-          else
-            command = ['mktemp', '-d']
-          end
+          tmpdir = target.options.fetch('tmpdir', '/tmp')
+          tmppath = "#{tmpdir}/#{SecureRandom.uuid}"
+          command = ['mkdir', '-m', 700, tmppath]
+
           result = execute(command)
           if result.exit_code != 0
             raise Bolt::Node::FileError.new("Could not make tempdir: #{result.stderr.string}", 'TEMPDIR_ERROR')

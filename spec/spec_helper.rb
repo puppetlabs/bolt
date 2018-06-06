@@ -8,6 +8,7 @@ require 'logging'
 require 'rspec/logging_helper'
 # Make sure puppet is required for the 'reset puppet settings' context
 require_relative '../vendored/require_vendored'
+require 'puppet_pal'
 
 $LOAD_PATH.unshift File.join(__dir__, 'lib')
 
@@ -42,13 +43,8 @@ RSpec.configure do |config|
   end
 
   config.before :each do
-    @puppet_logs = []
-    Puppet::Util::Log.newdestination(Puppet::Test::LogCollector.new(@puppet_logs))
-  end
-
-  config.after :each do
-    @puppet_logs.clear
-    Puppet::Util::Log.close_all
+    # Disable analytics while running tests
+    ENV['BOLT_DISABLE_ANALYTICS'] = 'true'
   end
 
   # This will be default in future rspec, leave it on

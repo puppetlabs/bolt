@@ -403,6 +403,9 @@ PS
             @logger.info { "Command failed with exit code #{output.exitcode}" }
           end
           result_output
+        rescue StandardError
+          @logger.debug { "Command aborted" }
+          raise
         end
 
         # 10 minutes in seconds

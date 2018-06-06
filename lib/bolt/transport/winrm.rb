@@ -13,21 +13,23 @@ module Bolt
         %w[port user password connect-timeout ssl ssl-verify tmpdir cacert extensions]
       end
 
+      PROVIDED_FEATURES = ['powershell'].freeze
+
       def self.validate(options)
         ssl_flag = options['ssl']
         unless !!ssl_flag == ssl_flag
-          raise Bolt::CLIError, 'ssl option must be a Boolean true or false'
+          raise Bolt::ValidationError, 'ssl option must be a Boolean true or false'
         end
 
         ssl_verify_flag = options['ssl-verify']
         unless !!ssl_verify_flag == ssl_verify_flag
-          raise Bolt::CLIError, 'ssl-verify option must be a Boolean true or false'
+          raise Bolt::ValidationError, 'ssl-verify option must be a Boolean true or false'
         end
 
         timeout_value = options['connect-timeout']
         unless timeout_value.is_a?(Integer) || timeout_value.nil?
           error_msg = "connect-timeout value must be an Integer, received #{timeout_value}:#{timeout_value.class}"
-          raise Bolt::CLIError, error_msg
+          raise Bolt::ValidationError, error_msg
         end
       end
 
@@ -98,7 +100,11 @@ catch
       end
 
       def run_task(target, task, arguments, _options = {})
+        executable = target.select_impl(task, PROVIDED_FEATURES)
+        raise "No suitable implementation of #{task.name} for #{target.name}" unless executable
+
         input_method = task.input_method
+        input_method ||= powershell_file?(executable) ? 'powershell' : 'both'
         with_connection(target) do |conn|
           if STDIN_METHODS.include?(input_method)
             stdin = JSON.dump(arguments)
@@ -114,7 +120,7 @@ catch
             end
           end
 
-          conn.with_remote_file(task.executable) do |remote_path|
+          conn.with_remote_file(executable) do |remote_path|
             output =
               if powershell_file?(remote_path) && stdin.nil?
                 # NOTE: cannot redirect STDIN to a .ps1 script inside of PowerShell

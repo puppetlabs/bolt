@@ -110,20 +110,16 @@ module BoltSpec
       @puppetdb_client ||= mock('puppetdb_client')
     end
 
-    # TODO: handle expected plan failures
     def run_plan(name, params)
       pal = Bolt::PAL.new(config)
-      begin
-        result = pal.run_plan(name, params, executor, inventory, puppetdb_client)
-      rescue Bolt::CLIError => e
-        if executor.error_message
-          raise executor.error_message
-        else
-          raise e
-        end
+      result = pal.run_plan(name, params, executor, inventory, puppetdb_client)
+
+      if executor.error_message
+        raise executor.error_message
       end
 
       executor.assert_call_expectations
+
       result
     end
 

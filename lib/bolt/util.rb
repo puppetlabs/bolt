@@ -20,12 +20,12 @@ module Bolt
         File.open(path, "r:UTF-8") { |f| YAML.safe_load(f.read) }
       rescue Errno::ENOENT
         if path_passed
-          raise Bolt::CLIError, "Could not read #{file_name} file: #{path}"
+          raise Bolt::FileError.new("Could not read #{file_name} file: #{path}", path)
         end
       rescue Psych::Exception
-        raise Bolt::CLIError, "Could not parse #{file_name} file: #{path}"
+        raise Bolt::FileError.new("Could not parse #{file_name} file: #{path}", path)
       rescue IOError, SystemCallError
-        raise Bolt::CLIError, "Could not read #{file_name} file: #{path}"
+        raise Bolt::FileError.new("Could not read #{file_name} file: #{path}", path)
       end
 
       def deep_merge(hash1, hash2)
@@ -106,6 +106,11 @@ module Bolt
 
           return cl
         end
+      end
+
+      # Returns true if windows false if not.
+      def windows?
+        !!File::ALT_SEPARATOR
       end
     end
   end

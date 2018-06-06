@@ -6,6 +6,7 @@ require 'json'
 require 'io/console'
 require 'logging'
 require 'optparse'
+require 'bolt/analytics'
 require 'bolt/config'
 require 'bolt/error'
 require 'bolt/executor'
@@ -152,6 +153,10 @@ Available options are:
         define('--noop', 'Execute a task that supports it in noop mode') do |_|
           @options[:noop] = true
         end
+        define('--description DESCRIPTION',
+               'Description to use for the job') do |description|
+          @options[:description] = description
+        end
         define('--params PARAMETERS',
                "Parameters to a task or plan as json, a json file '@<file>', or on stdin '-'") do |params|
           @options[:task_options] = parse_params(params)
@@ -160,10 +165,6 @@ Available options are:
         separator 'Authentication:'
         define('-u', '--user USER', 'User to authenticate as') do |user|
           @options[:user] = user
-        end
-        define('--description DESCRIPTION',
-               'Description to use for the job') do |description|
-          @options[:description] = description
         end
         define('-p', '--password [PASSWORD]',
                'Password to authenticate with. Omit the value to prompt for the password.') do |password|
@@ -243,6 +244,9 @@ Available options are:
         define('--format FORMAT', 'Output format to use: human or json') do |format|
           @options[:format] = format
         end
+        define('--[no-]color', 'Whether to show output in color') do |color|
+          @options[:color] = color
+        end
         define('-h', '--help', 'Display help') do |_|
           @options[:help] = true
         end
@@ -304,7 +308,7 @@ Available options are:
       def read_arg_file(file)
         File.read(file)
       rescue StandardError => err
-        raise Bolt::CLIError, "Error attempting to read #{file}: #{err}"
+        raise Bolt::FileError.new("Error attempting to read #{file}: #{err}", file)
       end
     end
 
@@ -389,10 +393,14 @@ Available options are:
       validate(options)
 
       # After validation, initialize inventory and targets. Errors here are better to catch early.
-      unless options[:action] == 'show' || options[:mode] == 'plan'
+      unless options[:action] == 'show'
         if options[:query]
+          if options[:nodes].any?
+            raise Bolt::CLIError, "Only one of '--nodes' or '--query' may be specified"
+          end
           nodes = query_puppetdb_nodes(options[:query])
           options[:targets] = inventory.get_targets(nodes)
+          options[:nodes] = nodes if options[:mode] == 'plan'
         else
           options[:targets] = inventory.get_targets(options[:nodes])
         end
@@ -474,8 +482,6 @@ Available options are:
 
     def query_puppetdb_nodes(query)
       puppetdb_client.query_certnames(query)
-    rescue StandardError => e
-      raise Bolt::CLIError, "Could not retrieve targets from PuppetDB: #{e}"
     end
 
     def execute(options)
@@ -487,6 +493,15 @@ Available options are:
         )
         exit!
       end
+
+      @analytics = Bolt::Analytics.build_client
+
+      screen = "#{options[:mode]}_#{options[:action]}"
+      # submit a different screen for `bolt task show` and `bolt task show foo`
+      if options[:action] == 'show' && options[:object]
+        screen += '_object'
+      end
+      @analytics.screen_view(screen)
 
       if options[:mode] == 'plan' || options[:mode] == 'task'
         pal = Bolt::PAL.new(config)
@@ -529,11 +544,21 @@ Available options are:
           end
           options[:task_options]['nodes'] = options[:nodes].join(',')
         end
-        executor = Bolt::Executor.new(config, options[:noop], true)
+
+        params = options[:noop] ? options[:task_options].merge("_noop" => true) : options[:task_options]
+        plan_context = { plan_name: options[:object],
+                         params: params }
+        plan_context[:description] = options[:description] if options[:description]
+
+        executor = Bolt::Executor.new(config, options[:noop])
+        executor.start_plan(plan_context)
         result = pal.run_plan(options[:object], options[:task_options], executor, inventory, puppetdb_client)
+
+        # If a non-bolt exeception bubbles up the plan won't get finished
+        # TODO: finish the plan once ORCH-2224
+        # executor.finish_plan(result)
         outputter.print_plan_result(result)
-        # An exception would have been raised if the plan failed
-        code = 0
+        code = result.ok? ? 0 : 1
       else
         executor = Bolt::Executor.new(config, options[:noop])
         targets = options[:targets]
@@ -591,6 +616,7 @@ Available options are:
     ensure
       # restore original signal handler
       Signal.trap :INT, handler if handler
+      @analytics&.finish
     end
 
     def validate_file(type, path)
@@ -601,12 +627,12 @@ Available options are:
       stat = file_stat(path)
 
       if !stat.readable?
-        raise Bolt::CLIError, "The #{type} '#{path}' is unreadable"
+        raise Bolt::FileError.new("The #{type} '#{path}' is unreadable", path)
       elsif !stat.file?
-        raise Bolt::CLIError, "The #{type} '#{path}' is not a file"
+        raise Bolt::FileError.new("The #{type} '#{path}' is not a file", path)
       end
     rescue Errno::ENOENT
-      raise Bolt::CLIError, "The #{type} '#{path}' does not exist"
+      raise Bolt::FileError.new("The #{type} '#{path}' does not exist", path)
     end
 
     def file_stat(path)
@@ -614,7 +640,7 @@ Available options are:
     end
 
     def outputter
-      @outputter ||= Bolt::Outputter.for_format(config[:format])
+      @outputter ||= Bolt::Outputter.for_format(config[:format], config[:color])
     end
   end
 end

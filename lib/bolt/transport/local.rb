@@ -5,6 +5,7 @@ require 'fileutils'
 require 'tmpdir'
 require 'bolt/transport/base'
 require 'bolt/result'
+require 'bolt/util'
 
 module Bolt
   module Transport
@@ -13,12 +14,14 @@ module Bolt
         %w[tmpdir]
       end
 
+      PROVIDED_FEATURES = ['shell'].freeze
+
       def self.validate(_options); end
 
       def initialize
         super
 
-        if Gem.win_platform?
+        if Bolt::Util.windows?
           raise NotImplementedError, "The local transport is not yet implemented on Windows"
         else
           @conn = Shell.new
@@ -78,11 +81,14 @@ module Bolt
       end
 
       def run_task(target, task, arguments, _options = {})
-        input_method = task.input_method
+        executable = target.select_impl(task, PROVIDED_FEATURES)
+        raise "No suitable implementation of #{task.name} for #{target.name}" unless executable
+
+        input_method = task.input_method ? task.input_method : "both"
         stdin = STDIN_METHODS.include?(input_method) ? JSON.dump(arguments) : nil
         env = ENVIRONMENT_METHODS.include?(input_method) ? arguments : nil
 
-        with_tmpscript(task.executable, target.options['tmpdir']) do |script|
+        with_tmpscript(executable, target.options['tmpdir']) do |script|
           logger.debug("Running '#{script}' with #{arguments}")
 
           output = @conn.execute(script, stdin: stdin, env: env)

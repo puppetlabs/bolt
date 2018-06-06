@@ -15,6 +15,8 @@ describe Bolt::Transport::WinRM do
 
   def mk_config(conf)
     stringified = conf.each_with_object({}) { |(k, v), coll| coll[k.to_s] = v }
+    # The default of 10 seconds seems to be too short to always succeed in AppVeyor.
+    stringified['connect-timeout'] ||= 20
     Bolt::Config.new(transport: 'winrm', transports: { winrm: stringified })
   end
 
@@ -483,20 +485,28 @@ PS
       end
     end
 
-    it "can run a task passing input on stdin and environment", winrm: true do
+    it "can run a task passing input on environment", winrm: true do
       contents = <<PS
 Write-Host "$env:PT_message_one $env:PT_message_two"
-$line = [Console]::In.ReadLine()
-Write-Host $line
 PS
       arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-      with_task_containing('tasks-test-both-winrm', contents, 'both', '.ps1') do |task|
+      with_task_containing('tasks-test-both-winrm', contents, 'environment', '.ps1') do |task|
         expect(
           winrm.run_task(target, task, arguments).message
-        ).to eq([
-          "Hello from task Goodbye\r\n",
-          "{\"message_one\":\"Hello from task\",\"message_two\":\"Goodbye\"}\r\n"
-        ].join(''))
+        ).to eq("Hello from task Goodbye\r\n")
+      end
+    end
+
+    it "defaults to powershell input method when executing .ps1", winrm: true do
+      contents = <<PS
+param ($message_one, $message_two)
+Write-Host "$message_one $message_two"
+PS
+      arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
+      with_task_containing('tasks-test-both-winrm', contents, nil, '.ps1') do |task|
+        expect(
+          winrm.run_task(target, task, arguments).message
+        ).to eq("Hello from task Goodbye\r\n")
       end
     end
 

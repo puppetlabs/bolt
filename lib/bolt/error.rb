@@ -64,13 +64,31 @@ module Bolt
     end
   end
 
+  # This class is used to treat a Puppet Error datatype as a ruby error outside PAL
   class PuppetError < Error
-    def self.convert_puppet_errors(result)
-      Bolt::Util.walk_vals(result) { |v| v.is_a?(Puppet::DataTypes::Error) ? from_error(v) : v }
-    end
-
     def self.from_error(err)
       new(err.msg, err.kind, err.details, err.issue_code)
+    end
+  end
+
+  class InvalidPlanResult < Error
+    def initialize(plan_name, result_str)
+      super("Plan #{plan_name} returned an invalid result: #{result_str}",
+            'bolt/invalid-plan-result',
+            { 'plan_name' => plan_name,
+              'result_string' => result_str })
+    end
+  end
+
+  class ValidationError < Bolt::Error
+    def initialize(msg)
+      super(msg, 'bolt.transport/validation-error')
+    end
+  end
+
+  class FileError < Bolt::Error
+    def initialize(msg, path)
+      super(msg, 'bolt/file-error', { "path" => path })
     end
   end
 end

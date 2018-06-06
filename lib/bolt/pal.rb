@@ -2,17 +2,44 @@
 
 require 'bolt/executor'
 require 'bolt/error'
+require 'bolt/plan_result'
+require 'bolt/util'
 
 module Bolt
   class PAL
     BOLTLIB_PATH = File.join(__FILE__, '../../../bolt-modules')
     MODULES_PATH = File.join(__FILE__, '../../../modules')
 
+    # PALError is used to convert errors from executing puppet code into
+    # Bolt::Errors
+    class PALError < Bolt::Error
+      # Puppet sometimes rescues exceptions notes the location and reraises.
+      # Return the original error.
+      def self.from_preformatted_error(err)
+        if err.cause&.is_a? Bolt::Error
+          err.cause
+        else
+          from_error(err.cause || err)
+        end
+      end
+
+      # Generate a Bolt::Pal::PALError for non-bolt errors
+      def self.from_error(err)
+        e = new(err.message)
+        e.set_backtrace(err.backtrace)
+        e
+      end
+
+      def initialize(msg)
+        super(msg, 'bolt/pal-error')
+      end
+    end
+
     def initialize(config)
       # Nothing works without initialized this global state. Reinitializing
       # is safe and in practice only happen in tests
       self.class.load_puppet
-      self.class.configure_logging(config[:log_level])
+
       # This makes sure we don't accidentally create puppet dirs
       with_puppet_settings { |_| nil }
 
@@ -20,13 +47,15 @@ module Bolt
     end
 
     # Puppet logging is global so this is class method to avoid confusion
-    def self.configure_logging(log_level)
-      Puppet[:log_level] = log_level == :debug ? 'debug' : 'notice'
-      Puppet::Util::Log.newdestination(:console)
+    def self.configure_logging
+      Puppet::Util::Log.newdestination(Logging.logger['Puppet'])
+      # Defer all log level decisions to the Logging library by telling Puppet
+      # to log everything
+      Puppet.settings[:log_level] = 'debug'
     end
 
     def self.load_puppet
-      if Gem.win_platform?
+      if Bolt::Util.windows?
         # Windows 'fix' for openssl behaving strangely. Prevents very slow operation
         # of random_bytes later when establishing winrm connections from a Windows host.
         # See https://github.com/rails/rails/issues/25805 for background.
@@ -36,20 +65,24 @@ module Bolt
 
       begin
         require_relative '../../vendored/require_vendored'
+        require 'puppet_pal'
       rescue LoadError
-        raise Bolt::CLIError, "Puppet must be installed to execute tasks"
+        raise Bolt::Error.new("Puppet must be installed to execute tasks", "bolt/puppet-missing")
       end
+
+      require 'bolt/pal/logging'
 
       # Now that puppet is loaded we can include puppet mixins in data types
       Bolt::ResultSet.include_iterable
     end
 
-    # Create a top-level alias for TargetSpec so that users don't have to
+    # Create a top-level alias for TargetSpec and PlanResult so that users don't have to
     # namespace it with Boltlib, which is just an implementation detail. This
-    # allows TargetSpec to feel like a built-in type in bolt, rather than
+    # allows them to feel like a built-in type in bolt, rather than
     # something has been, no pun intended, "bolted on".
-    def add_target_spec(compiler)
+    def alias_types(compiler)
       compiler.evaluate_string('type TargetSpec = Boltlib::TargetSpec')
+      compiler.evaluate_string('type PlanResult = Boltlib::PlanResult')
     end
 
     def full_modulepath(modulepath)
@@ -62,29 +95,13 @@ module Bolt
     def in_bolt_compiler
       r = Puppet::Pal.in_tmp_environment('bolt', modulepath: full_modulepath(@config[:modulepath]), facts: {}) do |pal|
         pal.with_script_compiler do |compiler|
-          add_target_spec(compiler)
+          alias_types(compiler)
           begin
             yield compiler
           rescue Puppet::PreformattedError => err
-            # Puppet sometimes rescues exceptions notes the location and reraises.
-            # Return the original error.
-            if err.cause
-              if err.cause.is_a? Bolt::Error
-                err.cause
-              else
-                e = Bolt::CLIError.new(err.cause.message)
-                e.set_backtrace(err.cause.backtrace)
-                e
-              end
-            else
-              e = Bolt::CLIError.new(err.message)
-              e.set_backtrace(err.backtrace)
-              e
-            end
+            PALError.from_preformatted_error(err)
           rescue StandardError => err
-            e = Bolt::CLIError.new(err.message)
-            e.set_backtrace(err.backtrace)
-            e
+            PALError.from_preformatted_error(err)
           end
         end
       end
@@ -130,6 +147,7 @@ module Bolt
         end
         Puppet.settings.send(:clear_everything_for_tests)
         Puppet.initialize_settings(cli)
+        self.class.configure_logging
         yield
       end
     end
@@ -181,7 +199,7 @@ module Bolt
       end
 
       if task.nil?
-        raise Bolt::CLIError, Bolt::Error.unknown_task(task_name)
+        raise Bolt::Error.new(Bolt::Error.unknown_task(task_name), 'bolt/unknown-task')
       end
 
       task.task_hash
@@ -215,7 +233,7 @@ module Bolt
       end
 
       if plan_info.nil?
-        raise Bolt::CLIError, Bolt::Error.unknown_plan(plan_name)
+        raise Bolt::Error.new(Bolt::Error.unknown_plan(plan_name), 'bolt/unknown-plan')
       end
       plan_info
     end
@@ -229,8 +247,10 @@ module Bolt
     def run_plan(plan_name, params, executor = nil, inventory = nil, pdb_client = nil)
       in_plan_compiler(executor, inventory, pdb_client) do |compiler|
         r = compiler.call_function('run_plan', plan_name, params)
-        Bolt::PuppetError.convert_puppet_errors(r)
+        Bolt::PlanResult.from_pcore(r, 'success')
       end
+    rescue Bolt::Error => e
+      Bolt::PlanResult.new(e, 'failure')
     end
   end
 end

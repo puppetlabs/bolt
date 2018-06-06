@@ -28,16 +28,22 @@ plan canary(
   $catch_params = $params + { '_catch_errors' => true }
 
   if ($task) {
+    $action = 'run_task'
+    $object = $task
     $canr = run_task($task, $canaries, $catch_params)
     if ($canr.ok) {
       $restr = run_task($task, $rest, $catch_params)
     }
   } elsif ($command) {
+    $action = 'run_command'
+    $object = $command
     $canr = run_command($command, $canaries, $catch_params)
     if ($canr.ok) {
       $restr = run_command($command, $rest, $catch_params)
     }
   } elsif ($script) {
+    $action = 'run_script'
+    $object = $script
     $canr = run_script($script, $canaries, $catch_params)
     if ($canr.ok) {
       $restr = run_script($script, $rest, $catch_params)
@@ -48,5 +54,20 @@ plan canary(
     $restr = canary::skip($rest)
   }
 
-  canary::merge($canr, $restr)
+  $merged_result = canary::merge($canr, $restr)
+
+  unless ($merged_result.ok) {
+    if ($canr.ok) {
+      $message = "Plan failed for ${merged_result.error_set.count} targets."
+    }
+    else {
+      $message = "Plan aborted. ${canr.error_set.count} canary target failures. ${restr.count} targets skipped."
+    }
+    $details = {'action' => $action,
+                'object' => $object,
+                'result_set' => $merged_result}
+    fail_plan($message, 'bolt/run-failure', $details)
+  }
+
+  return $merged_result
 }

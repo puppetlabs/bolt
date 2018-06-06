@@ -22,6 +22,8 @@ describe Bolt::Transport::SSH do
   let(:hostname) { ENV['BOLT_SSH_HOST'] || "localhost" }
   let(:user) { ENV['BOLT_SSH_USER'] || "bolt" }
   let(:password) { ENV['BOLT_SSH_PASSWORD'] || "bolt" }
+  let(:bash_user) { 'test' }
+  let(:bash_password) { 'test' }
   let(:port) { ENV['BOLT_SSH_PORT'] || 20022 }
   let(:key) { ENV['BOLT_SSH_KEY'] || Dir["spec/fixtures/keys/id_rsa"][0] }
   let(:command) { "pwd" }
@@ -423,6 +425,15 @@ SHELL
       end
     end
 
+    it "can run a task passing input with environment vars", ssh: true do
+      contents = "#!/bin/sh\necho -n ${PT_message_one} then ${PT_message_two}"
+      arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
+      with_task_containing('tasks_test', contents, 'environment') do |task|
+        expect(ssh.run_task(target, task, arguments).message)
+          .to eq('Hello from task then Goodbye')
+      end
+    end
+
     it "can upload a file as root", ssh: true do
       contents = "upload file test as root content"
       dest = '/tmp/root-file-upload-test'
@@ -430,6 +441,7 @@ SHELL
         expect(ssh.upload(target, file.path, dest).message).to match(/Uploaded/)
         expect(ssh.run_command(target, "cat #{dest}")['stdout']).to eq(contents)
         expect(ssh.run_command(target, "stat -c %U #{dest}")['stdout'].chomp).to eq('root')
+        expect(ssh.run_command(target, "stat -c %G #{dest}")['stdout'].chomp).to eq('root')
       end
 
       ssh.run_command(target, "rm #{dest}", sudoable: true, run_as: 'root')
@@ -477,6 +489,7 @@ SHELL
           expect(ssh.upload(target, file.path, dest, '_run_as' => 'root').message).to match(/Uploaded/)
           expect(ssh.run_command(target, "cat #{dest}", '_run_as' => 'root')['stdout']).to eq(contents)
           expect(ssh.run_command(target, "stat -c %U #{dest}", '_run_as' => 'root')['stdout'].chomp).to eq('root')
+          expect(ssh.run_command(target, "stat -c %G #{dest}", '_run_as' => 'root')['stdout'].chomp).to eq('root')
         end
 
         ssh.run_command(target, "rm #{dest}", sudoable: true, run_as: 'root')
@@ -492,9 +505,8 @@ SHELL
       it "returns a failed result", ssh: true do
         expect {
           ssh.run_command(target, 'whoami')
-             .to raise_error(Bolt::Node::EscalateError,
-                             "Sudo password for user #{user} not recognized on #{hostname}:#{port}")
-        }
+        }.to raise_error(Bolt::Node::EscalateError,
+                         "Sudo password for user #{user} not recognized on #{hostname}:#{port}")
       end
     end
 
@@ -504,10 +516,37 @@ SHELL
       it "returns a failed result", ssh: true do
         expect {
           ssh.run_command(target, 'whoami')
-             .to raise_error(Bolt::Node::EscalateError,
-                             "Sudo password for user #{user} was not provided for #{hostname}:#{port}")
-        }
+        }.to raise_error(Bolt::Node::EscalateError,
+                         "Sudo password for user #{user} was not provided for #{hostname}:#{port}")
       end
+    end
+
+    context "as bash user with no password" do
+      let(:config) {
+        mk_config('host-key-check' => false, 'run-as' => 'root', user: bash_user, password: bash_password)
+      }
+
+      it "returns a failed result when a temporary directory is created", ssh: true do
+        contents = "#!/bin/sh\nwhoami"
+        with_tempfile_containing('script test', contents) do |file|
+          expect {
+            ssh.run_script(target, file.path, [])
+          }.to raise_error(Bolt::Node::EscalateError,
+                           "Sudo password for user #{bash_user} was not provided for #{hostname}:#{port}")
+        end
+      end
+    end
+  end
+
+  context "using a custom run-as-command" do
+    let(:config) {
+      mk_config('host-key-check' => false, 'sudo-password' => password, 'run-as' => 'root',
+                user: user, password: password,
+                'run-as-command' => ["sudo", "-nSEu"])
+    }
+
+    it "can fails to execute with sudo -n", ssh: true do
+      expect(ssh.run_command(target, 'whoami')['stderr']).to match("sudo: a password is required")
     end
   end
 end

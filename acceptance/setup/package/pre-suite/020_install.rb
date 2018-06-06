@@ -1,9 +1,23 @@
 # frozen_string_literal: true
 
-step 'Install Bolt package' do
-  bolt_sha = ENV['SHA']
+# Inspired by https://github.com/puppetlabs/pdk/blob/master/package-testing/pre/000_install_package.rb
+# Uses helpers from beaker-puppet to fetch build defaults
 
-  install_puppetlabs_dev_repo(bolt, 'bolt', bolt_sha, 'repo-configs')
-  bolt.install_package('bolt')
-  add_puppet_paths_on(bolt)
+test_name 'Install Bolt package' do
+  if ENV['LOCAL_PKG']
+    pkg = File.basename(ENV['LOCAL_PKG'])
+    step "Install local package #{pkg}" do
+      scp_to(bolt, ENV['LOCAL_PKG'], pkg)
+      # TODO: add Windows::Pkg::install_local_package
+      if bolt['platform'] =~ /windows/
+        generic_install_msi_on(bolt, pkg)
+      else
+        bolt.install_local_package(pkg)
+      end
+    end
+  else
+    dev_builds_url = ENV['DEV_BUILDS_URL'] || 'http://builds.delivery.puppetlabs.net'
+    sha_yaml_url = "#{dev_builds_url}/puppet-bolt/#{ENV['SHA']}/artifacts/#{ENV['SHA']}.yaml"
+    install_from_build_data_url('puppet-bolt', sha_yaml_url, bolt)
+  end
 end

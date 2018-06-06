@@ -47,7 +47,7 @@ describe "when runnning over the winrm transport", winrm: true do
 
     it 'passes noop to a task that supports noop', :reset_puppet_settings do
       result = run_one_node(%w[task run sample::ps_noop message=somemessage --noop] + config_flags)
-      expect(result['_output'].strip).to eq("somemessage with noop true")
+      expect(result['_output'].strip).to eq("somemessage with noop True")
     end
 
     it 'does not pass noop to a task by default', :reset_puppet_settings do

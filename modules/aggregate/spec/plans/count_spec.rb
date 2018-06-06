@@ -9,7 +9,7 @@ describe 'aggregate::count' do
   it 'counts the same value' do
     expect_task('test_task').always_return('key1' => 'val', 'key2' => 'val')
     result = run_plan('aggregate::count', 'nodes' => "foo,bar", "task" => "test_task")
-    expect(result).to eq('key1' => { 'val' => 2 }, 'key2' => { 'val' => 2 })
+    expect(result.value).to eq('key1' => { 'val' => 2 }, 'key2' => { 'val' => 2 })
   end
 
   it 'passes params' do
@@ -18,6 +18,6 @@ describe 'aggregate::count' do
     result = run_plan('aggregate::count', 'nodes' => "foo",
                                           "task" => "test_task",
                                           'params' => params)
-    expect(result).to eq({})
+    expect(result.value).to eq({})
   end
 end

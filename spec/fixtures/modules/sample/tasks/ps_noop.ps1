@@ -1,1 +1,2 @@
-echo "$env:PT_message with noop $env:PT__noop"
+param ($message, $_noop)
+echo "$message with noop $_noop"

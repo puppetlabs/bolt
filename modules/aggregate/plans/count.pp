@@ -31,5 +31,5 @@ plan aggregate::count(
     run_script($script, $nodes, $params)
   }
 
-  aggregate::count($res)
+  return aggregate::count($res)
 }

@@ -15,4 +15,4 @@ def facter_executable
 end
 
 # Delegate to facter
-exec(facter_executable, '--json')
+exec(facter_executable, '-p', '--json')

@@ -9,8 +9,10 @@ module Bolt
   module Transport
     class SSH < Base
       def self.options
-        %w[port user password sudo-password private-key host-key-check connect-timeout tmpdir run-as]
+        %w[port user password sudo-password private-key host-key-check connect-timeout tmpdir run-as tty run-as-command]
       end
+
+      PROVIDED_FEATURES = ['shell'].freeze
 
       def self.validate(options)
         logger = Logging.logger[self]
@@ -22,12 +24,12 @@ module Bolt
 
         host_key = options['host-key-check']
         unless !!host_key == host_key
-          raise Bolt::CLIError, 'host-key-check option must be a Boolean true or false'
+          raise Bolt::ValidationError, 'host-key-check option must be a Boolean true or false'
         end
 
         if (key_opt = options['private-key'])
           unless key_opt.instance_of?(String) || (key_opt.instance_of?(Hash) && key_opt.include?('key-data'))
-            raise Bolt::CLIError,
+            raise Bolt::ValidationError,
                   "private-key option must be the path to a private key file or a hash containing the 'key-data'"
           end
         end
@@ -35,7 +37,12 @@ module Bolt
         timeout_value = options['connect-timeout']
         unless timeout_value.is_a?(Integer) || timeout_value.nil?
           error_msg = "connect-timeout value must be an Integer, received #{timeout_value}:#{timeout_value.class}"
-          raise Bolt::CLIError, error_msg
+          raise Bolt::ValidationError, error_msg
+        end
+
+        run_as_cmd = options['run-as-command']
+        if run_as_cmd && (!run_as_cmd.is_a?(Array) || run_as_cmd.any? { |n| !n.is_a?(String) })
+          raise Bolt::ValidationError, "run-as-command must be an Array of Strings, received #{run_as_cmd}"
         end
       end
 
@@ -108,7 +115,10 @@ module Bolt
       end
 
       def run_task(target, task, arguments, options = {})
-        input_method = task.input_method
+        executable = target.select_impl(task, PROVIDED_FEATURES)
+        raise "No suitable implementation of #{task.name} for #{target.name}" unless executable
+
+        input_method = task.input_method ? task.input_method : "both"
         with_connection(target) do |conn|
           conn.running_as(options['_run_as']) do
             stdin, output = nil
@@ -128,7 +138,7 @@ module Bolt
             end
 
             conn.with_remote_tempdir do |dir|
-              remote_task_path = conn.write_remote_executable(dir, task.executable)
+              remote_task_path = conn.write_remote_executable(dir, executable)
               if conn.run_as && stdin
                 wrapper = make_wrapper_stringio(remote_task_path, stdin)
                 remote_wrapper_path = conn.write_remote_executable(dir, wrapper, 'wrapper.sh')
@@ -140,7 +150,7 @@ module Bolt
               dir.chown(conn.run_as)
 
               execute_options[:sudoable] = true if conn.run_as
-              output = conn.execute(command, **execute_options)
+              output = conn.execute(command, execute_options)
             end
             Bolt::Result.for_task(target, output.stdout.string,
                                   output.stderr.string,

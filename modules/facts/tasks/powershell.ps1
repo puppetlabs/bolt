@@ -2,18 +2,24 @@
 
 # Delegate to facter if available
 if (Get-Command facter -ErrorAction SilentlyContinue) {
-    facter --json
-} else {
-    if ([System.Environment]::OSVersion.Platform -gt 2) { # [System.PlatformID]::Win32NT
-@'
+    facter -p --json
+}
+else {
+    # The number 2 in the condition below is the value of
+    # the [System.PlatformID]::Win32NT constant. We don't
+    # use the constant here as it doesn't work on Windows
+    # Server Core.
+    if ([System.Environment]::OSVersion.Platform -gt 2) {
+        @'
 {
   "_error": {
-    "kind": "minfact/noname",
+    "kind": "facts/noname",
     "msg": "Could not determine OS name"
   }
 }
 '@
-    } else {
+    }
+    else {
         $release = [System.Environment]::OSVersion.Version.ToString() -replace '\.[^.]*\z'
         $version = $release -replace '\.[^.]*\z'
 
@@ -21,23 +27,20 @@ if (Get-Command facter -ErrorAction SilentlyContinue) {
         $os = Get-CimInstance Win32_OperatingSystem -ErrorAction SilentlyContinue
         $consumerrel = $os.ProductType -eq '1'
 
-        if ($version -eq '10.0') {
-            $release = if ($consumerrel) { '10' } else { '2016' }
-        } elseif ($version -eq '6.3') {
-            $release = if ($consumerrel) { '8.1' } else { '2012 R2' }
-        } elseif ($version -eq '6.2') {
-            $release = if ($consumerrel) { '8' } else { '2012' }
-        } elseif ($version -eq '6.1') {
-            $release = if ($consumerrel) { '7' } else { '2008 R2' }
-        } elseif ($version -eq '6.0') {
-            $release = if ($consumerrel) { 'Vista' } else { '2008' }
-        } elseif ($version -eq '5.2') {
-            $release = if ($consumerrel) { 'XP' } else {
-                if ($os.OtherTypeDescription -eq 'R2') { '2003 R2' } else { '2003' }
+        $release = switch($version){
+            '10.0'{ if ($consumerrel) { '10' } else { '2016' } }
+            '6.3' { if ($consumerrel) { '8.1' } else { '2012 R2' } }
+            '6.2' { if ($consumerrel) { '8' } else { '2012' } }
+            '6.1' { if ($consumerrel) { '7' } else { '2008 R2' } }
+            '6.0' { if ($consumerrel) { 'Vista' } else { '2008' } }
+            '5.2' { 
+                if ($consumerrel) { 'XP' } else {
+                    if ($os.OtherTypeDescription -eq 'R2') { '2003 R2' } else { '2003' }
+                }
             }
         }
 
-@"
+        @"
 {
   "os": {
     "name": "windows",

@@ -11,7 +11,7 @@ module Bolt
       def print_head; end
 
       def colorize(color, string)
-        if @stream.isatty
+        if @color && @stream.isatty
           "\033[#{COLORS[color]}m#{string}\033[0m"
         else
           string
@@ -161,20 +161,12 @@ module Bolt
         @stream.puts(plan_info)
       end
 
-      # @param [Hash] A hash representing the plan result
-      def print_plan_result(result)
-        # If the object has a json representation display it
-        if result.respond_to?(:to_json)
-          # Guard against to_json methods that don't accept options
-          # and don't print empty results on multiple lines
-          if result.method(:to_json).arity == 0 ||
-             (result.respond_to?(:empty?) && result.empty?)
-            @stream.puts(result.to_json)
-          else
-            @stream.puts(::JSON.pretty_generate(result, quirks_mode: true))
-          end
+      # @param [Bolt::PlanResult] A PlanResult object
+      def print_plan_result(plan_result)
+        if plan_result.value.nil?
+          @stream.puts("Plan completed successfully with no result")
         else
-          @stream.puts result.to_s
+          @stream.puts(::JSON.pretty_generate(plan_result, quirks_mode: true))
         end
       end
 

@@ -1,9 +1,9 @@
 
 # Writing plans
 
-Plans allow you to run more than one task with a single command, or compute
-values for the input to a task, or make decisions based on the result of
-running a task.
+Plans allow you to run more than one task with a single command, compute values
+for the input to a task, process the results of tasks, or make decisions based
+  on the result of running a task.
 
 Write plans in the Puppet language, giving them a .pp extension, and place them
 in the module's `/plans` directory.
@@ -88,6 +88,44 @@ or a comma seperated string of target names.
 bolt plan run mymodule::myplan --modulepath ./PATH/TO/MODULES --params load_balancer=lb.myorg.com frontends='["kermit.myorg.com","gonzo.myorg.com"]' backends=waldorf.myorg.com,statler.myorg.com
 ```
 
+## Returning results from plans
+
+Use plans to return results that you can use in other plans or save for use outside of Bolt.
+
+Plans, unlike functions, are primarily run for side effects but they can
+optionally return a result. To return a result from a plan use the `return`
+function. Any plan that does not call the `return` function will return
+`undef`.
+
+```puppet
+plan return_result(
+  $nodes
+) {
+  return run_task('mytask', $nodes)
+}
+```
+
+The result of a plan must match the `PlanResult` type alias. This roughly
+includes JSON types as well as the Plan lanuguage types which have well defined
+json representations in Bolt.
+
+- `Undef`
+- `String`
+- `Numeric`
+- `Boolean`
+- `Target`
+- `Result`
+- `ResultSet`
+- `Error`
+- `Array` with only `PlanResult`
+- `Hash` with `String` keys and `PlanResult` values
+
+or
+
+```
+Variant[Data, String, Numeric, Boolean, Error, Result, ResultSet, Target, Array[Boltlib::PlanResult], Hash[String, Boltlib::PlanResult]]
+```
+
 
 ## Plan execution functions
 Your plan can execute multiple functions on remote systems.
@@ -109,15 +147,16 @@ Basic functions in plans share a similar structure. Call these functions with th
 
 `run_script`
 Runs a script on one or more nodes.
-`$fileref`, `$nodes`, `**$options`
+`$fileref`, `$nodes`, `$description`, `$options`
 
 `file_upload`
-Uploads a file to a specified location on one or more nodes.
-`$source`, `$destination`, `$nodes`, `$options`
+Uploads a file to a specified location on one or more nodes. Note that most transports are not
+optimized for file copying, so this is best limited to small files.
+`$source`, `$destination`, `$nodes`, `$description`, `$options`
 
 `run_command`
 Runs a command on one or more nodes.
-`$cmd`, `$nodes`, `$options`
+`$cmd`, `$nodes`, `$description`, `$options`
 
 `get_targets`
 Parses common ways of referring to targets and returns an Array of Target objects.
@@ -129,69 +168,48 @@ NAME>/<FILE>` reference, which will search for `<FILE>` relative to a module's
 files directory. For example, the reference `mysql/mysqltuner.pl` searches for
 the file `<MODULES DIRECTORY>/mysql/files/mysqltuner.pl`.
 
+The `$options` parameter is used for options that modify how Bolt executes the function. For `run_script`, arguments to the script can be passed as an array of strings under an `arguments` key in `$options`.
+
 Note that all the `$nodes` arguments support the patterns supported by `--nodes`
 (except for shell expansion).
+
+The `$description` parameter is always optional. It can be used to provide a description of the intent behind running the function that will be included in logging. The `pcp` transport in particular passes this on to Orchestrator when running tasks.
 
 For example, to have your plan run the script located in
 `./mymodule/files/my_script.sh` on a set of nodes, as follows. Note that these
 functions will raise an exception and stop further execution of the plan if
 they fail on any node. To prevent this and handle the error, pass the
-`_catch_errrors => true` option to the command.
+`_catch_errors => true` option to the command.
 
 ```
-run_script("mymodule/my_script.sh", $nodes, 'catch_errors'=> true)
+run_script("mymodule/my_script.sh", $nodes, '_catch_errors'=> true)
 ```
 
-### Target objects
+### Returning errors in plans
 
-The Target object represents a node and its specific connection options. You
-can get a printable representation via the name function, as well as access
-components of the target: `protocol`, `host`, `port`, `user`, `password`. You can also
-assign variables (`set_var`) to a target and get a list of existing variables the
-target has (`target.vars`).
+To return an error if your plan fails, include an `Error` object in your plan.
 
-Set vars in a plan using `$target.set_var`.
+Specify `Error` parameters to provide details about the failure.
 
+For example, if called with `run_plan('mymodule::myplan')`, this would return an error to the caller.
 
 ```
-plan vars(String $host) {
-	$target = get_targets($host)[0]
-	$target.set_var('operatingsystem', 'windows')
-	$targetvars = $target.vars
-	run_command("echo 'Vars for ${host}: ${$targetvars}'", $host)
-}
+plan mymodule::myplan {
+  Error(
+    message    => "Sorry, this plan does not work yet.",
+    kind       => 'mymodule/error',
+    issue_code => 'NOT_IMPLEMENTED'
+    )
+  }
 ```
 
-Or set `vars` in the inventory file using the `vars` key at the group level.
-
-```yaml
----
-groups:
-  - name: my_nodes
-    nodes:
-      - localhost
-    vars:
-      operatingsystem: windows
-    config:
-      transport: ssh
-```
-
-The `TargetSpec` parameter is an abstract specification of targets that can
-include the patterns allowed by `--nodes`, a single Target object, or an Array of
-Targets and node patterns. Implemented as a type alias that matches
-String (which may describe targets), Target, and Arrays of these. This is the
-primary type to use when you want to accept a reference to one or more target
-nodes. To operate on individual nodes, resolve it to a list via `get_targets`.
-
-
-## Running tasks from plans
+### Running tasks from plans
 
 When you need to run multiple tasks, or you need some tasks to depend on
 others, you can call the tasks from a task plan.
 
-To run a task from your plan, call the `run_task` function, specifying the task
-to run, any task parameters, and the nodes on which to run the task. Specify
-the full task name, as `<MODULE>::<TASK>`.
+To run a task from your plan, call the `run_task` function, specifying `$task_name`, `$nodes`, `$description`, `$parameters`. Specify
+the full task name, as `<MODULE>::<TASK>`. Parameters are supplied as a hash of parameter name to value, and can also include anything that would be passed in `$options` for other functions.
 
 For example, the following plan runs several tasks, each on a different set of
 nodes. Note that `run_task` raises an exception and stops further execution of
@@ -390,5 +408,183 @@ $r.each |$result| {
   } else {
    notice("${node} returned a value: ${result.value}")
   }
+}
+```
+
+## Target objects
+
+The Target object represents a node and its specific connection options. The
+state of a target is stored in the inventory for the duration of a plan allowing
+you to collect facts or set vars for a target and retrieve them later.
+You can get a printable representation via the name function, as well as access
+components of the target: `protocol`, `host`, `port`, `user`, `password`.
+
+### `TargetSpec`
+
+The execution function take a parameter with the type alias TargetSpec. This
+alias accepts the pattern strings allowed by `--nodes`, a single Target object,
+or an Array of Targets and node patterns. Plans that accept a set of targets as
+a parameter should generally use this type to interact cleanly with the CLI and
+other plans. To operate on individual nodes, resolve it to a list via
+`get_targets`. For example to loop over each node in a plan accept a
+`TargetSpec` argument but call `get_targets` on it before looping.
+
+```puppet
+plan loop(TargetSpec $nodes) {
+  get_targets($nodes).each |$target| {
+    run_task('my_task', $target)
+  }
+}
+```
+
+If your plan accepts a single `TargetSpec` parameter you can call that
+parameter `nodes` so that it can be specified with the `--nodes` flag from the
+cli.
+
+### Variables and Facts on Targets
+
+When bolt runs it loads transport config values, variables, and facts from
+the inventory.  These can be accessed with the `$target.facts()` and
+`$target.vars()` functions. During the course of a plan you can update the
+facts or vars for any target. In general Facts are observed about the state of
+a node while `vars` are more general information. Facts will usually come from
+running `facter` or another fact collection application on the target or be
+looked up from a fact store like Puppetdb. `vars` are computed externally or
+assigned directly.
+
+
+Set vars in a plan using `$target.set_var`.
+
+```
+plan vars(String $host) {
+	$target = get_targets($host)[0]
+	$target.set_var('newly_provisioned', true)
+	$targetvars = $target.vars
+	run_command("echo 'Vars for ${host}: ${$targetvars}'", $host)
+}
+```
+
+Or set `vars` in the inventory file using the `vars` key at the group level.
+
+```yaml
+---
+groups:
+  - name: my_nodes
+    nodes:
+      - localhost
+    vars:
+      operatingsystem: windows
+    config:
+      transport: ssh
+```
+
+#### Collect facts from the targets
+
+The `facts` plan will connect to the target and discover facts through a few methods.
+
+- On `ssh` targets it will run a simple bash script.
+- On `winrm` targets it will run a simple powershell script.
+- On `pcp` or targets where it discovered the puppet agent it present it will run facter.
+
+It then stores these facts on the targets in the inventory for later use.
+This example collects facts with the `facts` plan and then uses those facts
+to decide which task to run on the targets.
+
+```puppet
+plan run_with_facts(TargetSpec $nodes) {
+  # This will collect facts on nodes and update the inventory
+  run_plan(facts, nodes => $nodes)
+
+  $centos_nodes = get_targets($nodes).filter |$n| { $n.facts['os']['name'] == 'CentOS' }
+  $ubuntu_nodes = get_targets($nodes).filter |$n| { $n.facts['os']['name' == 'Ubuntu' }
+  run_task(centos_task, $centos_nodes)
+  run_task(ubuntu_task, $ubuntu_nodes)
+}
+```
+
+#### Collect facts from puppetdb
+
+When targets are running a puppet agent and sending facts to puppetdb the
+`puppetdb_fact` plan can be used to collect facts for them.  This example
+collects facts with the `puppetdb_fact` plan and then uses those facts to
+decide which task to run on the targets. You'll have to (configure the puppetdb client)[bolt_configure_puppetdb.md] before running it.
+
+```puppet
+plan run_with_facts(TargetSpec $nodes) {
+  # This will collect facts on nodes and update the inventory
+  run_plan(puppetdb_fact, nodes => $nodes)
+
+  $centos_nodes = get_targets($nodes).filter |$n| { $n.facts['os']['name'] == 'CentOS' }
+  $ubuntu_nodes = get_targets($nodes).filter |$n| { $n.facts['os']['name' == 'Ubuntu' }
+  run_task(centos_task, $centos_nodes)
+  run_task(ubuntu_task, $ubuntu_nodes)
+}
+```
+
+## Plan Logging
+
+### Puppet log functions
+
+To generate log messages from a plan use the puppet log function corresponding
+to the level you want to log at. `error`, `warn`, `notice`, `info`, or `debug`.
+The default log level for bolt is `notice` but can be set to `info` with the
+`--verbose` flag or `debug` with the `--debug` flag.
+
+### Default Action Logging
+
+Bolt logs actions that a plan takes on targets through the `file_upload`,
+`run_command`, `run_script` or `run_task` functions. By default it will log a
+`notice` level message when an action starts and another when it completes. If
+you pass a description to the function that will be used in place of the
+generic log message.
+
+```
+run_task(my_task, $targets, "Better description", param1 => "val")
+```
+
+If your plan contains many small actions you may want to suppress these messages
+and use explicit calls to the puppet log functions instead. This can be
+accomplished by wrapping actions in a `without_default_logging` block which
+will cause the action messages to be logged at `info` level instead of
+`notice`. For example to loop over a series of nodes without logging each action.
+
+```puppet
+plan deploy( TargetSpec $nodes) {
+  without_default_logging() || {
+    get_targets($nodes).each |$node| {
+      run_task(deploy, $node)
+    }
+  }
+}
+```
+
+To avoid complications with parser ambiguity always call
+`without_default_logging` with `()` and empty block args `||`.
+
+```puppet
+without_default_logging() || { run_command('echo hi', $nodes) }
+```
+not
+
+```puppet
+without_default_logging { run_command('echo hi', $nodes) }
+```
+
+## `puppetdb_query`
+
+TODO where should this go?
+
+You can use the `puppetdb_query` function in plans to make direct queries to
+puppetdb. For example you can discover nodes from puppetdb and then run tasks
+on them. You'll have to (configure the puppetdb client)[bolt_configure_puppetdb.md] before running it.
+
+```puppet
+plan pdb_discover {
+  $result = puppetdb_query("inventory[certname] { app_role == 'web_server' })
+  # extract the certnames into an array
+  $names = $result.map |$r| { $r["certname"] }
+  # wrap in url. You can skip this if the default transport is pcp
+  $nodes = $names.map |$n| { "pcp://${n}" }
+  run_task('my_task', $nodes)
 }
 ```

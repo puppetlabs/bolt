@@ -11,9 +11,6 @@ test_name "C100553: \
   skip_test('no applicable nodes to test on') if ssh_nodes.empty?
 
   first_node = ssh_nodes[0].hostname.split('.')[0]
-  user = ENV['SSH_USER']
-  password = ENV['SSH_PASSWORD']
-  nodes_csv = ssh_nodes.map(&:hostname).join(',')
 
   dir = bolt.tmpdir('C100553')
 
@@ -44,13 +41,10 @@ plan test::ssh_retry_plan($nodes) {
   end
 
   step "execute `bolt plan run` via SSH with json output" do
-    bolt_command = "bolt plan run test::ssh_retry_plan nodes=#{nodes_csv}"
+    bolt_command = "bolt plan run test::ssh_retry_plan nodes=ssh_nodes"
     flags = {
-      '-u'                     => user,
-      '--modulepath'           => "#{dir}/modules",
-      '-p'                     => password,
-      '--format'               => 'json',
-      '--no-host-key-check'    => nil
+      '--modulepath' => "#{dir}/modules",
+      '--format'     => 'json'
     }
 
     result = bolt_command_on(bolt, bolt_command, flags)
@@ -92,21 +86,18 @@ plan test::ssh_retry_plan($nodes) {
   end
 
   step "execute `bolt plan run` via SSH with verbose, human readable output" do
-    bolt_command = "bolt plan run test::ssh_retry_plan nodes=#{nodes_csv}"
+    bolt_command = "bolt plan run test::ssh_retry_plan nodes=ssh_nodes"
     flags = {
-      '-u'                     => user,
-      '--modulepath'           => "#{dir}/modules",
-      '-p'                     => password,
-      '--no-host-key-check'    => nil,
-      '--verbose'              => nil
+      '--modulepath' => "#{dir}/modules",
+      '--verbose'    => nil
     }
 
     result = bolt_command_on(bolt, bolt_command, flags)
-    assert_match(/Bolt::Executor: Starting: task/, result.output,
+    assert_match(/Starting: task test::hostname_nix/, result.output,
                  "The starting task message was not in the output")
-    assert_match(/Bolt::Executor: Finished: task/, result.output,
+    assert_match(/Finished: task test::hostname_nix/, result.output,
                  "The ran task message was not in the output")
-    assert_match(/on #{ssh_nodes.length} node[s]? with 1 failure/, result.output,
+    assert_match(/with 1 failure/, result.output,
                  "Task run failure was not logged correctly")
   end
 end

@@ -39,33 +39,44 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
     # The perspective of the environment is wanted here (for now) to not have to
     # require modules to have dependencies defined in meta data.
     loader = loaders.private_environment_loader
-    if loader && (func = loader.load(:plan, plan_name))
-      # TODO: Add profiling around this
-      if (run_as = named_args['_run_as'])
-        old_run_as = executor.run_as
-        executor.run_as = run_as
-      end
 
-      begin
-        result = func.class.dispatcher.dispatchers[0].call_by_name_with_scope(scope, params, true)
-      rescue Puppet::PreformattedError => err
-        if named_args['_catch_errors'] && err.cause.is_a?(Bolt::Error)
-          result = err.cause.to_puppet_error
-        else
-          raise err
-        end
-      ensure
-        if run_as
-          executor.run_as = old_run_as
-        end
-      end
-
-      return result
+    # TODO: Why would we not have a private_environment_loader?
+    unless loader && (func = loader.load(:plan, plan_name))
+      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
+        Puppet::Pops::Issues.issue(:UNKNOWN_PLAN) { Bolt::Error.unknown_plan(plan_name) }
+      )
     end
 
-    # Could not find plan
-    raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
-      Puppet::Pops::Issues.issue(:UNKNOWN_PLAN) { Bolt::Error.unknown_plan(plan_name) }
-    )
+    # TODO: Add profiling around this
+    if (run_as = named_args['_run_as'])
+      old_run_as = executor.run_as
+      executor.run_as = run_as
+    end
+    result = nil
+    begin
+      # If the plan does not throw :return by calling the return function it's result is
+      # undef/nil
+      result = catch(:return) do
+        func.class.dispatcher.dispatchers[0].call_by_name_with_scope(scope, params, true)
+        nil
+      end&.value
+      # Validate the result is a PlanResult
+      unless Puppet::Pops::Types::TypeParser.singleton.parse('Boltlib::PlanResult').instance?(result)
+        raise Bolt::InvalidPlanResult.new(plan_name, result.to_s)
+      end
+      result
+    rescue Puppet::PreformattedError => err
+      if named_args['_catch_errors'] && err.cause.is_a?(Bolt::Error)
+        result = err.cause.to_puppet_error
+      else
+        raise err
+      end
+    ensure
+      if run_as
+        executor.run_as = old_run_as
+      end
+    end
+
+    result
   end
 end
