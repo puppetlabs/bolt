@@ -42,7 +42,7 @@ module Bolt
             begin
               conn.finish_plan(result)
             rescue StandardError => e
-              @logger.error("Failed to finish plan on #{conn.key}: #{e.message}")
+              @logger.debug("Failed to finish plan on #{conn.key}: #{e.message}")
             end
           end
         end
