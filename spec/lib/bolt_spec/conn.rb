@@ -32,7 +32,7 @@ module BoltSpec
     def conn_uri(transport, include_password: false, override_port: nil)
       conn = conn_info(transport)
       passwd = include_password ? ":#{conn[:password]}" : ''
-      port = override_port ? override_port : conn[:port]
+      port = override_port || conn[:port]
       "#{conn[:protocol]}://#{conn[:user]}#{passwd}@#{conn[:host]}:#{port}"
     end
   end
