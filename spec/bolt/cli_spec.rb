@@ -1524,7 +1524,7 @@ bar
       let(:output) { StringIO.new }
 
       before :each do
-        expect(Bolt::Executor).to receive(:new).with(config, true).and_return(executor)
+        expect(Bolt::Executor).to receive(:new).with(config, anything, true).and_return(executor)
 
         outputter = Bolt::Outputter::JSON.new(false, output)
 
