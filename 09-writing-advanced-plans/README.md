@@ -49,7 +49,7 @@ In the previous exercise you ran tasks and commands within the context of a plan
     plan exercise9::yesorno (TargetSpec $nodes) {
       $results = run_task('exercise9::yesorno', $nodes)
       $subset = $results.filter |$result| { $result[answer] == true }.map |$result| { $result.target }
-      return run_command("uptime", $subset)
+      run_command("uptime", $subset)
     }
     ```
     
@@ -69,30 +69,10 @@ In the previous exercise you ran tasks and commands within the context of a plan
     The result:
     ```
     Starting: task exercise9::yesorno on node1, node2, node3
-    Finished: task exercise9::yesorno with 0 failures in 0.95 sec
+    Finished: task exercise9::yesorno with 0 failures in 0.97 sec
     Starting: command 'uptime' on node2, node3
-    Finished: command 'uptime' with 0 failures in 0.43 sec
-    [
-      {
-        "node": "node2",
-        "status": "success",
-        "result": {
-          "stdout": " 20:02:39 up  4:18,  0 users,  load average: 0.03, 0.02, 0.05\n",
-          "stderr": "",
-          "exit_code": 0
-        }
-      },
-      {
-        "node": "node3",
-        "status": "success",
-        "result": {
-          "stdout": " 20:02:39 up  4:18,  0 users,  load average: 0.00, 0.01, 0.05\n",
-          "stderr": "",
-          "exit_code": 0
-        }
-      }
-    ]
-
+    Finished: command 'uptime' with 0 failures in 0.39 sec
+    Plan completed successfully with no result
     ```
     **Note:** Running the plan multiple times results in different output. As the return value of the task is random, the command runs on a different subset of nodes each time.
 
@@ -124,7 +104,7 @@ Bolt supports a powerful extension mechanism via Puppet functions. These are fun
     bolt plan run exercise9::count_volumes nodes=all --modulepath ./modules
     ```
     The result:
-    ```bash
+    ```
     Starting: command 'df' on node1, node2, node3
     Finished: command 'df' with 0 failures in 0.5 sec
     [
@@ -250,7 +230,6 @@ By default, any task or command that fails causes a plan to abort immediately. Y
     Finished: command 'false' with 3 failures in 0.47 sec
     The command failed
     Plan completed successfully with no result
-
     ```
 
 **Tip:** You can pass the  `_catch_errors` to `run_command`, `run_task`, `run_script`, and `file_upload`.

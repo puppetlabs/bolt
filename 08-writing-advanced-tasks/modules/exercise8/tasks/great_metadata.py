@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#!/usr/bin/env python
 
 """
 This script prints the values and types passed to it via standard in.  It will

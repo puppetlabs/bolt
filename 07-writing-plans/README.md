@@ -31,7 +31,7 @@ Create a simple plan that runs a command on a list of nodes.
 
     ```puppet
     plan exercise7::command (TargetSpec $nodes) {
-      return run_command("uptime", $nodes)
+      run_command("uptime", $nodes)
     }
     ```
 
@@ -43,18 +43,9 @@ Create a simple plan that runs a command on a list of nodes.
     The result:
     ```    
     Starting: command 'uptime' on node1
-    Finished: command 'uptime' with 0 failures in 0.43 sec
-    [
-      {
-        "node": "node1",
-        "status": "success",
-        "result": {
-          "stdout": " 18:46:27 up  3:03,  0 users,  load average: 0.06, 0.04, 0.05\n",
-          "stderr": "",
-          "exit_code": 0
-        }
-      }
-    ]
+    Finished: command 'uptime' with 0 failures in 0.45 sec
+    Plan completed successfully with no result
+
     ```
 
     **Note:**
@@ -153,23 +144,13 @@ Create a task and then create a plan that uses the task.
     ```
     bolt plan run exercise7::writeread filename=hello message=world nodes=node1 --modulepath ./modules
     ```
-    ```
     The result:
+    ```
     Starting: task exercise7::write on node1
-    Finished: task exercise7::write with 0 failures in 0.86 sec
+    Finished: task exercise7::write with 0 failures in 0.88 sec
     Starting: command 'cat /tmp/hello' on node1
-    Finished: command 'cat /tmp/hello' with 0 failures in 0.38 sec
-    [
-      {
-        "node": "node1",
-        "status": "success",
-        "result": {
-          "stdout": "world\n",
-          "stderr": "",
-          "exit_code": 0
-        }
-      }
-    ]
+    Finished: command 'cat /tmp/hello' with 0 failures in 0.41 sec
+    Plan completed successfully with no result
     ```
 
     **Note:**

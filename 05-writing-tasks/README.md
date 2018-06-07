@@ -91,7 +91,7 @@ If you're targeting Windows nodes then you might prefer to implement the task in
     * The name of the file on disk (minus any file extension) translates to the name of the task when run via Bolt, in this case `print`.
     * The name of the module (directory) is also used to find the relevant task, in this case `exercise5`.
     * As with the Bash example above, name parameters so that they're more easily understood by users of the task.
-    * By default tasks with a `.ps1` extention executed over WinRM use PowerShell standard agrument handling rather than being supplied as prefixed environment variables or via `stdin`. 
+    * By default tasks with a `.ps1` extension executed over WinRM use PowerShell standard agrument handling rather than being supplied as prefixed environment variables or via `stdin`. 
 
 # Write your first task in Python
 

@@ -9,5 +9,5 @@ plan exercise7::writeread (
     filename => $filename,
     message  => $message,
   )
-  return run_command("cat /tmp/${filename}", $nodes)
+  run_command("cat /tmp/${filename}", $nodes)
 }

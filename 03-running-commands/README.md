@@ -38,10 +38,11 @@ bolt command run <command> --nodes <nodes> --user <user> --password <password>
     ```
     Started on node1...
     Finished on node1:
-        STDOUT:
-         00:20:55 up 19 min,  0 users,  load average: 0.00, 0.01, 0.03
+      STDOUT:
+         22:42:18 up 16 min,  0 users,  load average: 0.00, 0.01, 0.03
     Successful on 1 node: node1
-    Ran on 1 node in 0.43 seconds
+    Ran on 1 node in 0.42 seconds
+
     ```
 
     **Tip:** If you receive the error `Host key verification failed` make sure the correct host keys are in your `known_hosts` file or pass `--no-host-key-check` to future Bolt commands. Bolt will not honor `StrictHostKeyChecking` in your SSH configuration.
@@ -58,16 +59,15 @@ bolt command run <command> --nodes <nodes> --user <user> --password <password>
     Started on node3...
     Finished on node2:
       STDOUT:
-         00:21:53 up 19 min,  0 users,  load average: 0.00, 0.01, 0.03
-    Finished on node3:
-      STDOUT:
-         00:21:53 up 18 min,  0 users,  load average: 0.02, 0.04, 0.04
+         22:42:55 up 16 min,  0 users,  load average: 0.00, 0.01, 0.02
     Finished on node1:
       STDOUT:
-         00:21:53 up 19 min,  0 users,  load average: 0.00, 0.01, 0.03
+         22:42:55 up 17 min,  0 users,  load average: 0.00, 0.01, 0.03
+    Finished on node3:
+      STDOUT:
+         22:42:55 up 16 min,  0 users,  load average: 0.00, 0.01, 0.04
     Successful on 3 nodes: node1,node2,node3
-    Ran on 3 nodes in 0.50 seconds
-
+    Ran on 3 nodes in 0.48 seconds
     ```
 
 3. Create an inventory file to store information about your nodes and refer to them as a group.  Later exercises will refer to the default group `all`. For more information on how to set up other named groups, see the
