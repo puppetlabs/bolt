@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#!/usr/bin/env python
 
 """
 This script prints the values and types passed to it via standard in.  It will
@@ -10,6 +10,8 @@ import json
 import sys
 
 def make_serializable(object):
+  if sys.version_info[0] > 2:
+    return object
   if isinstance(object, unicode):
     return object.encode('utf-8')
   else:
@@ -31,3 +33,4 @@ for key in data:
     result['parameters'].append(param)
 
 print(json.dumps(result))
+

@@ -41,6 +41,8 @@ If you set up nodes in Vagrant in lesson `02-acquiring-nodes/`, run:
 ```
 NODES=4 vagrant up
 ```
+> Note: Vagrantfile looks for environment variable `NODES` for number of centos nodes to provision.
+> Set environmnet variable based on your shell, for example bash shell: `export NODES=4`. 
 
 ### Provision extra nodes on Docker
 If you set up nodes in Docker in lesson `02-acquiring-nodes`, run:
@@ -55,7 +57,6 @@ When you have four nodes, update your SSH config to include them all.
 Set up an inventory file to more easily map the nodes to their role in the application. 
 
 1. Assign one node to the load balancer (lb) group, one to the database (db) group and the other two to the application (app) group.
-
     ```yaml
     ---
     groups:
@@ -75,6 +76,24 @@ Set up an inventory file to more easily map the nodes to their role in the appli
         # These are credentials for Docker. Manage Vagrant with SSH config.
         password: root
         user: root
+    ```
+    **Note**: inventory.yaml for nodes provisioned with vagrant
+    ```
+    ---
+    groups:
+      - name: lb
+        nodes:
+          - node1
+      - name: db
+        nodes:
+          - node2
+      - name: app
+        nodes:
+          - node3
+          - node4
+    config:
+      ssh:
+        host-key-check: false
     ```
 
 2. Make sure your inventory is configured correctly and you can connect to all nodes. Run:
@@ -281,13 +300,40 @@ plan my_app::deploy(
 ```
 
 
-Run this plan with the follow command. It will randomly fail 10% of the
+Run this plan with the following command. It will randomly fail 10% of the
 time when the simulated load is high.
 
 ```bash
 bolt plan run my_app::deploy version=1.0.2 app_servers=app db_server=db lb_server=lb --inventoryfile ./inventory.yaml --modulepath=./modules
 ```
+The result (when simulated load is below threshold)
+```
+Starting: Check load before starting deploy on node1
+Finished: Check load before starting deploy with 0 failures in 0.89 sec
+Starting: Install 1.0.2 of the application on node3, node4, node2
+Finished: Install 1.0.2 of the application with 0 failures in 0.89 sec
+Starting: task my_app::migrate on node2
+Finished: task my_app::migrate with 0 failures in 0.85 sec
+Deploying to node3, currently ok with 4 open connections.
+Deploy complete on Target('node3', {"connect-timeout"=>10, "tty"=>false, "host-key-check"=>false}).
+Deploying to node4, currently ok with 10 open connections.
+Deploy complete on Target('node4', {"connect-timeout"=>10, "tty"=>false, "host-key-check"=>false}).
+Starting: Clean up old versions on node2, node3, node4
+Finished: Clean up old versions with 0 failures in 0.88 sec
+Plan completed successfully with no result
+```
+The result (when simulated load is above threshold)
+```
+Starting: Check load before starting deploy on node1
+Finished: Check load before starting deploy with 0 failures in 0.89 sec
+{
+  "kind": "bolt/plan-failure",
+  "msg": "The appplication has too many open connections: 10",
+  "details": {
+  }
+}
 
+```
 ### Parameters
 
 ```puppet

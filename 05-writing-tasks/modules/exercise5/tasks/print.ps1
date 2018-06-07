@@ -1,1 +1,2 @@
-Write-Output "$env:computername received the message: $env:PT_message"
+param ($message)
+Write-Output "$env:computername received the message: $message"

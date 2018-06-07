@@ -133,7 +133,7 @@ Committing modules directly to the control repo is useful while you develop new 
 2.  Using parameters for the package task, check on the status of the bash package:
 
     ```
-    bolt task run package action=status name=bash --nodes all
+    bolt task run package action=status name=bash --nodes node1
     ```
     The result:
     ```    
@@ -141,9 +141,10 @@ Committing modules directly to the control repo is useful while you develop new 
     Finished on node1:
       {
         "status": "up to date",
-        "version": "4.2.46-29.el7_4"
+        "version": "4.2.46-30.el7"
       }
-    Ran on 1 node in 3.81 seconds
+    Successful on 1 node: node1
+    Ran on 1 node in 3.84 seconds
     ```
 3.  Using parameters for the package task, install the vim package across all your nodes:
 
@@ -153,12 +154,25 @@ Committing modules directly to the control repo is useful while you develop new 
     The result:
     ```
     Started on node1...
+    Started on node3...
+    Started on node2...
     Finished on node1:
       {
         "status": "present",
-        "version": "2:7.4.160-2.el7"
+        "version": "2:7.4.160-4.el7"
       }
-    Ran on 1 node in 15.26 seconds
+    Finished on node3:
+      {
+        "status": "installed",
+        "version": "2:7.4.160-4.el7"
+      }
+    Finished on node2:
+      {
+        "status": "installed",
+        "version": "2:7.4.160-4.el7"
+      }
+    Successful on 3 nodes: node1,node2,node3
+    Ran on 3 nodes in 10.03 seconds
     ```
 
 # More tips, tricks and ideas on the Tasks Playground

@@ -8,5 +8,5 @@ plan exercise9::unique_volumes (TargetSpec $nodes) {
     $arr + $volumes
   }
 
-  $volumes.unique
+  return $volumes.unique
 }
