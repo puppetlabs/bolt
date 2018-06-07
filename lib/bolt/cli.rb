@@ -550,7 +550,7 @@ Available options are:
                          params: params }
         plan_context[:description] = options[:description] if options[:description]
 
-        executor = Bolt::Executor.new(config, options[:noop])
+        executor = Bolt::Executor.new(config, @analytics, options[:noop])
         executor.start_plan(plan_context)
         result = pal.run_plan(options[:object], options[:task_options], executor, inventory, puppetdb_client)
 
@@ -559,7 +559,7 @@ Available options are:
         outputter.print_plan_result(result)
         code = result.ok? ? 0 : 1
       else
-        executor = Bolt::Executor.new(config, options[:noop])
+        executor = Bolt::Executor.new(config, @analytics, options[:noop])
         targets = options[:targets]
 
         results = nil

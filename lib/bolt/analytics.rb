@@ -71,7 +71,7 @@ module Bolt
         submit(base_params.merge(screen_view_params))
       end
 
-      def event(category, action)
+      def event(category, action, label = nil, value = nil)
         event_params = {
           # Type
           t: 'event',
@@ -80,6 +80,11 @@ module Bolt
           # Event Action
           ea: action
         }
+
+        # Event Label
+        event_params[:el] = label if label
+        # Event Value
+        event_params[:ev] = value if value
 
         submit(base_params.merge(event_params))
       end
@@ -145,7 +150,7 @@ module Bolt
         @logger.debug "Skipping submission of '#{screen}' screenview because analytics is disabled"
       end
 
-      def event(category, action)
+      def event(category, action, _label = nil, _value = nil)
         @logger.debug "Skipping submission of '#{category} #{action}' event because analytics is disabled"
       end
 

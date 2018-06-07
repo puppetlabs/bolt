@@ -83,6 +83,22 @@ describe Bolt::Analytics::Client do
 
       subject.event('run', 'task')
     end
+
+    it 'sends the event label if supplied' do
+      params = base_params.merge(t: 'event', ec: 'run', ea: 'task', el: 'happy')
+
+      expect(subject).to receive(:submit).with params
+
+      subject.event('run', 'task', 'happy')
+    end
+
+    it 'sends the event metric if supplied' do
+      params = base_params.merge(t: 'event', ec: 'run', ea: 'task', ev: 12)
+
+      expect(subject).to receive(:submit).with params
+
+      subject.event('run', 'task', nil, 12)
+    end
   end
 end
 
@@ -96,6 +112,14 @@ describe Bolt::Analytics::NoopClient do
   describe "#event" do
     it 'succeeds' do
       subject.event('run', 'task')
+    end
+
+    it 'succeeds with a label' do
+      subject.event('run', 'task', 'happy')
+    end
+
+    it 'succeeds with a metric' do
+      subject.event('run', 'task', nil, 12)
     end
   end
 end
