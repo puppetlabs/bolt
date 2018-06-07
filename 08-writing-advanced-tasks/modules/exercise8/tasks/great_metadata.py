@@ -10,6 +10,8 @@ import json
 import sys
 
 def make_serializable(object):
+  if sys.version_info[0] > 2:
+    return object
   if isinstance(object, unicode):
     return object.encode('utf-8')
   else:
@@ -31,3 +33,4 @@ for key in data:
     result['parameters'].append(param)
 
 print(json.dumps(result))
+

@@ -1,6 +1,6 @@
 version: '3'
 services:
   ssh:
-    build: .
+    image: rastasheep/ubuntu-sshd
     ports:
       - 22

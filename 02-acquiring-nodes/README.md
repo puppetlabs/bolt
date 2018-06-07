@@ -91,12 +91,17 @@ Using Docker we can quickly launch a number of ephemeral SSH servers. To make th
     version: '3'
     services:
       ssh:
-        image: rastasheep/ubuntu-sshd
+        build: .
         ports:
           - 22
     ```
+2. Save the following code as `Dockerfile` or download the `Dockerfile` attached to this exercise.
+    ```
+    FROM rastasheep/ubuntu-sshd:16.04
+    RUN ln -s /usr/bin/python3 /usr/bin/python
+    ```
 
-2. Launch a single SSH server in the background: `docker-compose up --detach`. To launch more SSH servers, run:  `docker-compose up --scale ssh=3 --detach`.
+2. Launch a single SSH server in the background: `docker-compose up -d`. To launch more SSH servers, run:  `docker-compose up --scale ssh=3 -d`.
 
 3. View a list of running containers: `docker-compose ps`. The result should be similar to:  
     ```
