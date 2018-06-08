@@ -2,14 +2,15 @@
 
 require 'bolt/error'
 
-# Returns a hash of certname to facts objects for each matched Target.  This
-# functions accepts an array of certnames and returns a hash of target
-# certnames and their corresponding facts hash.
+# Collects facts based on a list of certnames.
 #
 # * If a node is not found in PuppetDB, it's included in the returned hash with empty facts hash.
 # * Otherwise the node is included in the hash with a value that is a hash of it's facts.
-#
 Puppet::Functions.create_function(:puppetdb_fact) do
+  # @param certnames Array of certnames.
+  # @return A hash of certname to facts hash for each matched Target.
+  # @example Get facts for nodes
+  #   puppetdb_fact(['app.example.com', 'db.example.com'])
   dispatch :puppetdb_fact do
     param 'Array[String]', :certnames
     return_type 'Hash[String, Data]'

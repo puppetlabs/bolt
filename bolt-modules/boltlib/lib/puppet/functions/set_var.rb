@@ -3,14 +3,13 @@
 require 'bolt/error'
 
 # Sets a variable { key => value } for a target.
-#
-# This function takes 3 parameters:
-# * A Target object to set the variable for
-# * The key for the variable (String)
-# * The value of the variable (Data)
-#
-# Returns undef.
 Puppet::Functions.create_function(:set_var) do
+  # @param target The Target object to set the variable for. See {get_targets}.
+  # @param key The key for the variable.
+  # @param value The value of the variable.
+  # @return [Undef]
+  # @example Set a variable on a target
+  #   $target.set_var('ephemeral', true)
   dispatch :set_var do
     param 'Target', :target
     param 'String', :key

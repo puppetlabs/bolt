@@ -3,13 +3,19 @@
 require 'bolt/error'
 
 # Uploads the given file or directory to the given set of targets and returns the result from each upload.
-#
-# * This function does nothing if the list of targets is empty.
-# * It is possible to run on the target 'localhost'
-# * A target is a String with a targets's hostname or a Target.
-# * The returned value contains information about the result per target.
-#
+# This function does nothing if the list of targets is empty.
 Puppet::Functions.create_function(:file_upload, Puppet::Functions::InternalFunction) do
+  # Upload a file.
+  # @param source A source path, either an absolute path or a modulename/filename selector for a file in
+  #               <moduleroot>/files.
+  # @param destination An absolute path on the target(s).
+  # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
+  # @param options Additional options: '_catch_errors', '_run_as'.
+  # @return A list of results, one entry per target.
+  # @example Upload a local file to Linux targets and change owner to 'root'
+  #   file_upload('/var/tmp/payload.tgz', '/tmp/payload.tgz', $targets, '_run_as' => 'root')
+  # @example Upload a module file to a Windows target
+  #   file_upload('postgres/default.conf', 'C:/ProgramData/postgres/default.conf', $target)
   dispatch :file_upload do
     scope_param
     param 'String[1]', :source
@@ -19,6 +25,16 @@ Puppet::Functions.create_function(:file_upload, Puppet::Functions::InternalFunct
     return_type 'ResultSet'
   end
 
+  # Upload a file, logging the provided description.
+  # @param source A source path, either an absolute path or a modulename/filename selector for a file in
+  #               <moduleroot>/files.
+  # @param destination An absolute path on the target(s).
+  # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
+  # @param description A description to be output when calling this function.
+  # @param options Additional options: '_catch_errors', '_run_as'.
+  # @return A list of results, one entry per target.
+  # @example Upload a file
+  #   file_upload('/var/tmp/payload.tgz', '/tmp/payload.tgz', $targets, 'Uploading payload to unpack')
   dispatch :file_upload_with_description do
     scope_param
     param 'String[1]', :source
