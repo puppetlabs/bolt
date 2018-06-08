@@ -29,6 +29,18 @@ before_test:
       gem -v
       bundle -v
       type Gemfile.lock
+      $CACertFile = Join-Path -Path $ENV:AppData -ChildPath 'RubyCACert.pem'
+
+      If (-Not (Test-Path -Path $CACertFile)) {  
+        "Downloading CA Cert bundle.."
+          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+            Invoke-WebRequest -Uri 'https://curl.haxx.se/ca/cacert.pem' -UseBasicParsing -OutFile $CACertFile | Out-Null
+          }
+
+          "Setting CA Certificate store set to $CACertFile.."
+      $ENV:SSL_CERT_FILE = $CACertFile
+      [System.Environment]::SetEnvironmentVariable('SSL_CERT_FILE',$CACertFile, [System.EnvironmentVariableTarget]::Machine)
+      bundle exec r10k puppetfile install
       Add-Type -AssemblyName System.Web
       $ENV:BOLT_WINRM_PASSWORD = "&aA4" + [System.Web.Security.Membership]::GeneratePassword(10, 3)
       ($user = New-LocalUser -Name $ENV:BOLT_WINRM_USER -Password (ConvertTo-SecureString -String $ENV:BOLT_WINRM_PASSWORD -Force -AsPlainText)) | Format-List
@@ -44,7 +56,8 @@ test_script:
   - cd ../..
   - ps: |
       $test_fail = 0
-      Get-ChildItem modules -Directory | ForEach-Object {
+      $mods = ("canary", "aggregate", "puppetdb_fact")
+      Get-ChildItem modules -Directory -Include $mods | foreach {
         cd $_.FullName;
         $test_output = bundle exec rake spec
         $r = $LASTEXITCODE

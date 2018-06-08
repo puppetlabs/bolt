@@ -867,12 +867,18 @@ bar
           }
           cli.execute(options)
           json = JSON.parse(output.string)
-          expect(json).to eq([["facts", "Gather system facts"],
-                              ["facts::bash", nil],
-                              ["facts::powershell", nil],
-                              ["facts::ruby", nil],
-                              ['sample::ok', nil]])
-
+          expect(json).to eq([["apply::resource", "Apply a single Puppet resource"],
+                              ["facts", "Gather system facts"],
+                              ["facts::bash", "Gather system facts using bash"],
+                              ["facts::powershell", "Gather system facts using powershell"],
+                              ["facts::ruby", "Gather system facts using ruby and facter"],
+                              ["package", "Manage and inspect the state of packages"],
+                              ["puppet_conf", "Inspect puppet agent configuration settings"],
+                              ["sample::ok", nil],
+                              ["service", "Manage and inspect the state of services"],
+                              ["service::linux", "Manage the state of services (without a puppet agent)"],
+                              ["service::windows",
+                               "Manage the state of Windows services (without a puppet agent)"]])
           output = @log_output.readlines.join
           expect(output).to match(/unexpected token.*params\.json/m)
         end

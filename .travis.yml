@@ -7,6 +7,7 @@ rvm:
 before_script:
 - eval `ssh-agent`
 - cat Gemfile.lock
+- bundle exec r10k puppetfile install
 - docker-compose build && docker-compose up -d
 
 script:
@@ -24,7 +25,7 @@ script:
   fi
 - |
   status=0
-  for i in $( ls modules ); do
+  for i in 'canary' 'aggregate' 'puppetdb_fact'; do
     pushd modules/$i
     if ! bundle exec rake spec; then
       status=1
