@@ -5,11 +5,13 @@ require 'bolt/error'
 # Returns a hash of the 'vars' (variables) assigned to a target through the
 # inventory file or `set_var` function.
 #
-# Accepts no parameters.
-#
 # Plan authors can call this function on a target to get the variable hash
 # for that target.
 Puppet::Functions.create_function(:vars) do
+  # @param target The Target object to get variables from. See {get_targets}.
+  # @return A hash of the 'vars' (variables) assigned to a target.
+  # @example Get vars for a target
+  #   $target.vars
   dispatch :vars do
     param 'Target', :target
     return_type 'Hash[String, Data]'

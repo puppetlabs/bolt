@@ -3,13 +3,30 @@
 require 'bolt/error'
 
 # Runs a given instance of a `Task` on the given set of targets and returns the result from each.
-#
-# * This function does nothing if the list of targets is empty.
-# * It is possible to run on the target 'localhost'
-# * A target is a String with a targets's hostname or a Target.
-# * The returned value contains information about the result per target.
-#
+# This function does nothing if the list of targets is empty.
 Puppet::Functions.create_function(:run_task) do
+  # Run a task.
+  # @param task_name The task to run.
+  # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
+  # @param task_args Arguments to the plan. Can also include additional options: '_catch_errors', '_run_as'.
+  # @return A list of results, one entry per target.
+  # @example Run a task as root
+  #   run_task('facts', $targets, '_run_as' => 'root')
+  dispatch :run_task do
+    param 'String[1]', :task_name
+    param 'Boltlib::TargetSpec', :targets
+    optional_param 'Hash[String[1], Any]', :task_args
+    return_type 'ResultSet'
+  end
+
+  # Run a task, logging the provided description.
+  # @param task_name The task to run.
+  # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
+  # @param description A description to be output when calling this function.
+  # @param task_args Arguments to the plan. Can also include additional options: '_catch_errors', '_run_as'.
+  # @return A list of results, one entry per target.
+  # @example Run a task
+  #   run_task('facts', $targets, 'Gather OS facts')
   dispatch :run_task_with_description do
     param 'String[1]', :task_name
     param 'Boltlib::TargetSpec', :targets
@@ -18,21 +35,20 @@ Puppet::Functions.create_function(:run_task) do
     return_type 'ResultSet'
   end
 
-  dispatch :run_task do
-    param 'String[1]', :task_name
-    param 'Boltlib::TargetSpec', :targets
-    optional_param 'Hash[String[1], Any]', :task_args
-    return_type 'ResultSet'
-  end
-
-  # this is used from 'bolt task run'
+  # Run a task, calling the block as each node starts and finishes execution. This is used from 'bolt task run'
+  # @param task_name The task to run.
+  # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
+  # @param description A description to be output when calling this function.
+  # @param task_args Arguments to the plan. Can also include additional options: '_catch_errors', '_run_as'.
+  # @param block A block that's invoked as actions are started and finished on each node.
+  # @return A list of results, one entry per target.
   dispatch :run_task_raw do
     param 'String[1]', :task_name
     param 'Boltlib::TargetSpec', :targets
     param 'Optional[String]', :description
     optional_param 'Hash[String[1], Any]', :task_args
-    # return_type 'ResultSet'
-    block_param
+    block_param 'Callable[Struct[{type => Enum[node_start, node_result], target => Target}], 1, 1]', :block
+    return_type 'ResultSet'
   end
 
   def run_task(task_name, targets, task_args = nil)

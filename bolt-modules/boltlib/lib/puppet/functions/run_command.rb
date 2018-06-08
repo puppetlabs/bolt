@@ -3,13 +3,15 @@
 require 'bolt/error'
 
 # Runs a command on the given set of targets and returns the result from each command execution.
-#
-# * This function does nothing if the list of targets is empty.
-# * It is possible to run on the target 'localhost'
-# * A target is a String with a targets's hostname or a Target.
-# * The returned value contains information about the result per target.
-#
+# This function does nothing if the list of targets is empty.
 Puppet::Functions.create_function(:run_command) do
+  # Run a command.
+  # @param command A command to run on target.
+  # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
+  # @param options Additional options: '_catch_errors', '_run_as'.
+  # @return A list of results, one entry per target.
+  # @example Run a command on targets
+  #   run_command('hostname', $targets, '_catch_errors' => true)
   dispatch :run_command do
     param 'String[1]', :command
     param 'Boltlib::TargetSpec', :targets
@@ -17,6 +19,14 @@ Puppet::Functions.create_function(:run_command) do
     return_type 'ResultSet'
   end
 
+  # Run a command, logging the provided description.
+  # @param command A command to run on target.
+  # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
+  # @param description A description to be output when calling this function.
+  # @param options Additional options: '_catch_errors', '_run_as'.
+  # @return A list of results, one entry per target.
+  # @example Run a command on targets
+  #   run_command('hostname', $targets, '_catch_errors' => true)
   dispatch :run_command_with_description do
     param 'String[1]', :command
     param 'Boltlib::TargetSpec', :targets

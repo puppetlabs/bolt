@@ -18,10 +18,10 @@ describe 'add_facts' do
     end
   end
 
-  it 'should set a variable on a target' do
+  it 'should set a fact on a target' do
     data = { 'a' => 'b', 'c' => 'd' }
-    inventory.expects(:add_facts).with(target, data).returns(nil)
-    is_expected.to run.with_params(target, data).and_return(nil)
+    inventory.expects(:add_facts).with(target, data).returns(data)
+    is_expected.to run.with_params(target, data).and_return(data)
   end
 
   it 'errors when passed invalid data types' do

@@ -3,20 +3,19 @@
 require 'bolt/error'
 
 # Parses common ways of referring to targets and returns an array of Targets.
-#
-# Accepts input consisting of
-# - a group
-# - a target URI
-# - an array of groups and/or target URIs
-# - a string that consists of a comma-separated list of groups and/or target URIs
-#
-# Examples of the above would be
-# - 'group1'
-# - 'host1,group1,winrm://host2:54321'
-# - ['host1', 'group1', 'winrm://host2:54321']
-#
-# Returns an array of unique Targets resolved from any target URIs and groups.
 Puppet::Functions.create_function(:get_targets) do
+  # @param names A pattern or array of patterns identifying a set of targets.
+  # @return A list of unique Targets resolved from any target URIs and groups.
+  # @example Resolve a group
+  #   get_targets('group1')
+  # @example Resolve a target URI
+  #   get_targets('winrm://host2:54321')
+  # @example Resolve array of groups and/or target URIs
+  #   get_targets(['host1', 'group1', 'winrm://host2:54321'])
+  # @example Resolve string consisting of a comma-separated list of groups and/or target URIs
+  #   get_targets('host1,group1,winrm://host2:54321')
+  # @example Run on localhost
+  #   get_targets('localhost')
   dispatch :get_targets do
     param 'Boltlib::TargetSpec', :names
     return_type 'Array[Target]'

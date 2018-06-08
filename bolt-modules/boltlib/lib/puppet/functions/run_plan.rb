@@ -2,17 +2,13 @@
 
 require 'bolt/error'
 
-# Runs the `plan` referenced by its name passing giving arguments to it given as a hash of name to value mappings.
-# A plan is autoloaded from under <root>/plans if not already defined.
-#
-# @example defining and running a plan
-#   plan myplan($x) {
-#     # do things with tasks
-#     notice "plan done with param x = ${x}"
-#   }
-#   run_plan('myplan', { x => 'testing' })
-#
+# Runs the `plan` referenced by its name. A plan is autoloaded from <moduleroot>/plans.
 Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction) do
+  # @param plan_name The plan to run.
+  # @param named_args Arguments to the plan. Can also include additional options: '_catch_errors', '_run_as'.
+  # @return [PlanResult] The result of running the plan. Undef if plan does not explicitly return results.
+  # @example Run a plan
+  #   run_plan('canary', 'command' => 'false', 'nodes' => $targets, '_catch_errors' => true)
   dispatch :run_plan do
     scope_param
     param 'String', :plan_name

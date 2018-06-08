@@ -3,8 +3,11 @@
 require 'bolt/error'
 
 # Returns the facts hash for a target.
-# This functions takes one parameter, the target to get facts for
 Puppet::Functions.create_function(:facts) do
+  # @param target A target.
+  # @return The target's facts.
+  # @example Getting facts
+  #   facts($target)
   dispatch :facts do
     param 'Target', :target
     return_type 'Hash[String, Data]'
