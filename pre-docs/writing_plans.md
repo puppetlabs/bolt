@@ -132,58 +132,12 @@ Your plan can execute multiple functions on remote systems.
 
 Your plan can include functions to run commands, scripts, tasks, and other
 plans on remote nodes. These execution functions correspond to task runner
-commands.
-
-- `run_command`: Runs a command on one or more nodes.
-- `run_script`: Runs a script (a non-task executable) on one or more nodes.
-- `run_task`: Runs a task on one or more nodes.
-- `run_plan`: Runs a plan on one or more nodes.
-- `file_upload`: Uploads a file to one or more nodes.
-
-
-### Calling basic plan functions
-
-Basic functions in plans share a similar structure. Call these functions with their parameters.
-
-`run_script`
-Runs a script on one or more nodes.
-`$fileref`, `$nodes`, `$description`, `$options`
-
-`file_upload`
-Uploads a file to a specified location on one or more nodes. Note that most transports are not
-optimized for file copying, so this is best limited to small files.
-`$source`, `$destination`, `$nodes`, `$description`, `$options`
-
-`run_command`
-Runs a command on one or more nodes.
-`$cmd`, `$nodes`, `$description`, `$options`
-
-`get_targets`
-Parses common ways of referring to targets and returns an Array of Target objects.
-`TargetSpec $targetspec`
-
-For the functions `run_script` and `file_upload`, the `$fileref` and `$source`
-parameters accept either an absolute path or a module relative path, `<MODULE
-NAME>/<FILE>` reference, which will search for `<FILE>` relative to a module's
-files directory. For example, the reference `mysql/mysqltuner.pl` searches for
-the file `<MODULES DIRECTORY>/mysql/files/mysqltuner.pl`.
-
-The `$options` parameter is used for options that modify how Bolt executes the function. For `run_script`, arguments to the script can be passed as an array of strings under an `arguments` key in `$options`.
+commands. For a complete list of functions that can be run from plans see the
+[plan function reference
+documentation](????).
 
 Note that all the `$nodes` arguments support the patterns supported by `--nodes`
 (except for shell expansion).
-
-The `$description` parameter is always optional. It can be used to provide a description of the intent behind running the function that will be included in logging. The `pcp` transport in particular passes this on to Orchestrator when running tasks.
-
-For example, to have your plan run the script located in
-`./mymodule/files/my_script.sh` on a set of nodes, as follows. Note that these
-functions will raise an exception and stop further execution of the plan if
-they fail on any node. To prevent this and handle the error, pass the
-`_catch_errors => true` option to the command.
-
-```
-run_script("mymodule/my_script.sh", $nodes, '_catch_errors'=> true)
-```
 
 ### Returning errors in plans
 
@@ -205,64 +159,15 @@ plan mymodule::myplan {
 
 ### Running tasks from plans
 
-When you need to run multiple tasks, or you need some tasks to depend on
-others, you can call the tasks from a task plan.
-
-To run a task from your plan, call the `run_task` function, specifying `$task_name`, `$nodes`, `$description`, `$parameters`. Specify
-the full task name, as `<MODULE>::<TASK>`. Parameters are supplied as a hash of parameter name to value, and can also include anything that would be passed in `$options` for other functions.
-
-For example, the following plan runs several tasks, each on a different set of
-nodes. Note that `run_task` raises an exception and stops further execution of
-the plan if it fails on any node. To prevent this and handle the error, pass
-the `_catch_errrors => true` option to the command.
-
-```puppet
-# If this task errors, the plan will continue to execute.
-run_task('mymodule::lb_remove', $load_balancer, nodes => $frontends, '_catch_errors' => true)
-# If the following task errors on any nodes, the plan will stop executing.
-run_task('mymodule::update_frontend_app', $frontends, version => '1.2.3')
-run_task('mymodule::lb_add', $load_balancer, nodes => $frontends)
-```
+See the [reference
+docs](????)
+for details and examples of running the `run_task` function.
 
 ### Running plans in a plan
 
-Use your plan to run another plan. Write reusable chunks of plan logic and run
-them directly with the bolt command or from another plan.
-
-Use the function `run_plan` to run a plan from within another plan. This function
-accepts the name of the plan to run and a hash of arguments and options to the
-plan.
-
-This example plan, `mymodule::update_everything`, runs the plan `mymodule::myplan`,
-and passes the necessary parameter values to it.
-
-```puppet
-plan mymodule::update_everything {
-  run_plan('mymodule::myplan',
-    load_balancer => 'lb.myorg.com',
-    frontends => ['kermit.myorg.com', 'gonzo.myorg.com'],
-    backends => ['waldorf.myorg.com', 'statler.myorg.com' ])
-}
-```
-
-If `mymodule::myplan` fails `mymodule::update_everything` will stop executing at
-that point. To catch the error in myplan and handle it, pass the option
-`_catch_errors => true` to `run_plan`. This will return an error if it fails.
-
-```puppet
-plan mymodule::update_everything {
-  $r = run_plan('mymodule::myplan',
-    _catch_errors => true,
-    load_balancer => 'lb.myorg.com',
-    frontends => ['kermit.myorg.com', 'gonzo.myorg.com'],
-    backends => ['waldorf.myorg.com', 'statler.myorg.com' ])
-  if($r =~ Error) {
-    notice("myplan failed: ${r.message}")
-  } else {
-    notice("myplan succeeded")
-  }
-}
-```
+See the [reference
+docs](????)
+for details and examples of running the `run_plan` function.
 
 ## Success and failure in plans
 
@@ -279,6 +184,10 @@ bolt command to exit 2 and prevents calling plans executing any further, unless
 `run_plan` was called with `_catch_errors`.
 
 ### Failing plans
+
+See the [reference
+docs](????)
+for details and examples of running the `fail_plan` function.
 
 If `file_upload`, `run_command`, `run_script`, or `run_task` are called without the
 `_catch_errors` option and they fail on any nodes, the plan itself will fail. To
