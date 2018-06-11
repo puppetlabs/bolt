@@ -78,6 +78,14 @@ module Bolt
       @group_lookup = @groups.collect_groups
     end
 
+    def group_names
+      @group_lookup.keys
+    end
+
+    def node_names
+      @groups.node_names
+    end
+
     def get_targets(targets)
       targets = expand_targets(targets)
       targets = if targets.is_a? Array

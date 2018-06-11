@@ -501,7 +501,9 @@ Available options are:
       if options[:action] == 'show' && options[:object]
         screen += '_object'
       end
-      @analytics.screen_view(screen)
+      @analytics.screen_view(screen,
+                             inventory_nodes: inventory.node_names.count,
+                             inventory_groups: inventory.group_names.count)
 
       if options[:mode] == 'plan' || options[:mode] == 'task'
         pal = Bolt::PAL.new(config)

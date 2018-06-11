@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'bolt/util'
 require 'bolt/version'
 require 'httpclient'
 require 'json'
@@ -13,6 +14,11 @@ module Bolt
     APPLICATION_NAME = 'bolt'
     TRACKING_ID = 'UA-120367942-1'
     TRACKING_URL = 'https://google-analytics.com/collect'
+    CUSTOM_DIMENSIONS = {
+      operating_system: :cd1,
+      inventory_nodes: :cd2,
+      inventory_groups: :cd3
+    }.freeze
 
     def self.build_client
       logger = Logging.logger[self]
@@ -60,13 +66,17 @@ module Bolt
         @os = compute_os
       end
 
-      def screen_view(screen)
+      def screen_view(screen, **kwargs)
+        custom_dimensions = Bolt::Util.walk_keys(kwargs) do |k|
+          CUSTOM_DIMENSIONS[k] || raise("Unknown analytics key '#{k}'")
+        end
+
         screen_view_params = {
           # Type
           t: 'screenview',
           # Screen Name
           cd: screen
-        }
+        }.merge(custom_dimensions)
 
         submit(base_params.merge(screen_view_params))
       end
@@ -146,7 +156,7 @@ module Bolt
         @logger = Logging.logger[self]
       end
 
-      def screen_view(screen)
+      def screen_view(screen, **_kwargs)
         @logger.debug "Skipping submission of '#{screen}' screenview because analytics is disabled"
       end
 

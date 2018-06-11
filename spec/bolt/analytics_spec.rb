@@ -73,6 +73,18 @@ describe Bolt::Analytics::Client do
 
       subject.screen_view('job_run')
     end
+
+    it 'sets custom dimensions correctly' do
+      params = base_params.merge(t: 'screenview', cd: 'job_run', cd2: 12, cd3: 17)
+
+      expect(subject).to receive(:submit).with params
+
+      subject.screen_view('job_run', inventory_nodes: 12, inventory_groups: 17)
+    end
+
+    it 'raises an error if an unknown custom dimension is specified' do
+      expect { subject.screen_view('job_run', random_field: 'foo') }.to raise_error(/Unknown analytics key/)
+    end
   end
 
   describe "#event" do
