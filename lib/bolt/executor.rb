@@ -170,6 +170,7 @@ module Bolt
       log_action(description, targets) do
         notify = proc { |event| @notifier.notify(callback, event) if callback }
         options = { '_run_as' => run_as }.merge(options) if run_as
+        arguments['_task'] = task.name
 
         results = batch_execute(targets) do |transport, batch|
           with_node_logging("Running task #{task.name} with '#{arguments}' via #{task.input_method}", batch) do
