@@ -16,7 +16,6 @@
 .yardoc/
 /_yardoc/
 /doc/
-/bolt-modules/boltlib/doc/
 /rdoc/
 
 ## Environment normalization:

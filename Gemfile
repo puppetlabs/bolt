@@ -20,6 +20,7 @@ group(:test) do
 end
 
 group(:development) do
+  gem "puppet-strings", "~> 2.0"
   gem "r10k", "~> 2.6"
 end
 

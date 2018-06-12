@@ -4,6 +4,10 @@ require "bundler/gem_tasks"
 require "rspec/core/rake_task"
 require "rubocop/rake_task"
 
+require_relative 'vendored/require_vendored'
+require "puppet-strings/tasks/generate"
+require "fileutils"
+
 desc "Run all RSpec tests"
 RSpec::Core::RakeTask.new(:spec)
 
@@ -31,6 +35,20 @@ task test: %w[spec rubocop]
 
 task :default do
   system "rake --tasks"
+end
+
+namespace :docs do
+  desc "Generate markdown docs for Bolt's core Puppet functions"
+  task :md do
+    Rake::Task['strings:generate'].invoke(nil, nil, nil, nil, nil, 'true', 'bolt-modules/boltlib')
+  end
+
+  desc "Generate a JSON file containing docs for Bolt's core Puppet functions"
+  task :json do
+    FileUtils.mkdir_p 'doc'
+    puts 'Docs for the boltlib module will be saved to doc/boltlib.json'
+    Rake::Task['strings:generate'].invoke(nil, nil, nil, nil, 'pre-docs/boltlib.json', nil, 'bolt-modules/boltlib')
+  end
 end
 
 namespace :integration do
