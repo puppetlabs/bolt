@@ -1,22 +1,21 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'bolt/executor'
 require 'bolt/result'
 require 'bolt/result_set'
 require 'bolt/target'
 
 describe 'run_task' do
   include PuppetlabsSpec::Fixtures
-  let(:executor) {
-    mock('Bolt::Executor').tap do |executor|
-      executor.stubs(:noop).returns(false)
-    end
-  }
+  let(:executor) { Bolt::Executor.new }
   let(:inventory) { mock('Bolt::Inventory') }
 
   around(:each) do |example|
     Puppet[:tasks] = true
     Puppet.features.stubs(:bolt?).returns(true)
+
+    executor.stubs(:noop).returns(false)
 
     Puppet.override(bolt_executor: executor, bolt_inventory: inventory) do
       example.run
@@ -85,6 +84,29 @@ describe 'run_task' do
       inventory.expects(:get_targets).with([]).returns([])
 
       is_expected.to run.with_params('Test::Yes', []).and_return(Bolt::ResultSet.new([]))
+    end
+
+    it 'reports the call to analytics' do
+      executor.expects(:report_function_call).with('run_task')
+      executable = File.join(tasks_root, 'echo.sh')
+
+      executor.expects(:run_task).with([target], mock_task(executable, nil), default_args, {}).returns(result_set)
+      inventory.expects(:get_targets).with(hostname).returns([target])
+
+      is_expected.to run.with_params('Test::Echo', hostname, default_args).and_return(result_set)
+    end
+
+    it 'skips reporting the call to analytics if called internally from Bolt' do
+      executor.expects(:report_function_call).with('run_task').never
+      executable = File.join(tasks_root, 'echo.sh')
+
+      executor.expects(:run_task)
+              .with([target], mock_task(executable, nil), default_args, kind_of(Hash))
+              .returns(result_set)
+      inventory.expects(:get_targets).with(hostname).returns([target])
+
+      is_expected.to run.with_params('Test::Echo', hostname, default_args.merge('_bolt_api_call' => true))
+                        .and_return(result_set)
     end
 
     context 'with description' do

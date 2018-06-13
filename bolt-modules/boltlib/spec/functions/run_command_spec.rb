@@ -1,12 +1,13 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'bolt/executor'
 require 'bolt/result'
 require 'bolt/result_set'
 require 'bolt/target'
 
 describe 'run_command' do
-  let(:executor) { mock('bolt_executor') }
+  let(:executor) { Bolt::Executor.new }
   let(:inventory) { mock('inventory') }
   let(:tasks_enabled) { true }
 
@@ -46,6 +47,14 @@ describe 'run_command' do
       inventory.expects(:get_targets).with(target).returns([target])
 
       is_expected.to run.with_params(command, target, '_run_as' => 'root').and_return(result_set)
+    end
+
+    it 'reports the call to analytics' do
+      executor.expects(:report_function_call).with('run_command')
+      executor.expects(:run_command).with([target], command, {}).returns(result_set)
+      inventory.expects(:get_targets).with(hostname).returns([target])
+
+      is_expected.to run.with_params(command, hostname).and_return(result_set)
     end
 
     context 'with description' do

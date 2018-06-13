@@ -123,6 +123,10 @@ module Bolt
       @reported_transports.add(name)
     end
 
+    def report_function_call(function)
+      @analytics&.event('Plan', 'call_function', function)
+    end
+
     def with_node_logging(description, batch)
       @logger.info("#{description} on #{batch.map(&:uri)}")
       result = yield

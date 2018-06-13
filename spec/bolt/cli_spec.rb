@@ -1037,7 +1037,7 @@ bar
         it "runs a task given a name" do
           expect(executor)
             .to receive(:run_task)
-            .with(targets, task_t, task_params, {})
+            .with(targets, task_t, task_params, '_bolt_api_call' => true)
             .and_return(Bolt::ResultSet.new([]))
           expect(cli.execute(options)).to eq(0)
           expect(JSON.parse(output.string)).to be
@@ -1046,7 +1046,7 @@ bar
         it "returns 2 if any node fails" do
           expect(executor)
             .to receive(:run_task)
-            .with(targets, task_t, task_params, {})
+            .with(targets, task_t, task_params, '_bolt_api_call' => true)
             .and_return(fail_set)
 
           expect(cli.execute(options)).to eq(2)
@@ -1075,7 +1075,7 @@ bar
 
           expect(executor)
             .to receive(:run_task)
-            .with(targets, task_t, {}, {})
+            .with(targets, task_t, {}, '_bolt_api_call' => true)
             .and_raise("Could not connect to target")
 
           expect { cli.execute(options) }.to raise_error(/Could not connect to target/)
@@ -1087,7 +1087,7 @@ bar
 
           expect(executor)
             .to receive(:run_task)
-            .with(targets, task_t, task_params, {})
+            .with(targets, task_t, task_params, '_bolt_api_call' => true)
             .and_return(Bolt::ResultSet.new([]))
 
           cli.execute(options)
@@ -1102,7 +1102,7 @@ bar
 
             expect(executor)
               .to receive(:run_task)
-              .with(targets, task_t, task_params, {})
+              .with(targets, task_t, task_params, '_bolt_api_call' => true)
               .and_return(Bolt::ResultSet.new([]))
 
             cli.execute(options)
@@ -1115,7 +1115,7 @@ bar
 
             expect(executor)
               .to receive(:run_task)
-              .with(targets, task_t, task_params, {})
+              .with(targets, task_t, task_params, '_bolt_api_call' => true)
               .and_return(Bolt::ResultSet.new([]))
 
             cli.execute(options)
@@ -1126,7 +1126,7 @@ bar
         it "traps SIGINT", :signals_self do
           expect(executor)
             .to receive(:run_task)
-            .with(targets, task_t, task_params, {}) do
+            .with(targets, task_t, task_params, '_bolt_api_call' => true) do
               Process.kill :INT, Process.pid
               sync_thread.join(1) # give ruby some time to handle the signal
               Bolt::ResultSet.new([])
@@ -1217,7 +1217,7 @@ bar
           it "runs the task when the specified parameters are successfully validated" do
             expect(executor)
               .to receive(:run_task)
-              .with(targets, task_t, task_params, {})
+              .with(targets, task_t, task_params, '_bolt_api_call' => true)
               .and_return(Bolt::ResultSet.new([]))
             task_params.merge!(
               'mandatory_string'  => ' ',
@@ -1306,7 +1306,7 @@ bar
 
                 expect(executor)
                   .to receive(:run_task)
-                  .with(targets, task_t, task_params, {})
+                  .with(targets, task_t, task_params, '_bolt_api_call' => true)
                   .and_return(Bolt::ResultSet.new([]))
 
                 cli.execute(options)
@@ -1316,7 +1316,7 @@ bar
               it "runs the task even when invalid (according to the local task definition) parameters are specified" do
                 expect(executor)
                   .to receive(:run_task)
-                  .with(targets, task_t, task_params, {})
+                  .with(targets, task_t, task_params, '_bolt_api_call' => true)
                   .and_return(Bolt::ResultSet.new([]))
 
                 cli.execute(options)
@@ -1342,6 +1342,7 @@ bar
         let(:task_t) { task_type('sample::echo', %r{modules/sample/tasks/echo.sh$}, nil) }
 
         before :each do
+          allow(executor).to receive(:report_function_call)
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
         end
 
@@ -1565,7 +1566,7 @@ bar
         it "runs a task that supports noop" do
           expect(executor)
             .to receive(:run_task)
-            .with(targets, task_t, task_params.merge('_noop' => true), {})
+            .with(targets, task_t, task_params.merge('_noop' => true), '_bolt_api_call' => true)
             .and_return(Bolt::ResultSet.new([]))
 
           cli.execute(options)

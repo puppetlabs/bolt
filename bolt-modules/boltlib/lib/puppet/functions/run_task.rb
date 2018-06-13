@@ -80,6 +80,12 @@ Puppet::Functions.create_function(:run_task) do
       )
     end
 
+    # Bolt calls this function internally to trigger tasks from the CLI. We
+    # don't want to count those invocations.
+    unless task_args['_bolt_api_call']
+      executor.report_function_call('run_task')
+    end
+
     # Ensure that given targets are all Target instances
     targets = inventory.get_targets(targets)
 

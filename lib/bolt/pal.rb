@@ -240,13 +240,14 @@ module Bolt
 
     def run_task(task_name, targets, params, executor, inventory, description = nil, &eventblock)
       in_task_compiler(executor, inventory) do |compiler|
+        params = params.merge('_bolt_api_call' => true)
         compiler.call_function('run_task', task_name, targets, description, params, &eventblock)
       end
     end
 
     def run_plan(plan_name, params, executor = nil, inventory = nil, pdb_client = nil)
       in_plan_compiler(executor, inventory, pdb_client) do |compiler|
-        r = compiler.call_function('run_plan', plan_name, params)
+        r = compiler.call_function('run_plan', plan_name, params.merge('_bolt_api_call' => true))
         Bolt::PlanResult.from_pcore(r, 'success')
       end
     rescue Bolt::Error => e

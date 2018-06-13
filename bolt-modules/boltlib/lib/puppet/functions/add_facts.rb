@@ -30,6 +30,9 @@ Puppet::Functions.create_function(:add_facts) do
       )
     end
 
+    executor = Puppet.lookup(:bolt_executor) { nil }
+    executor&.report_function_call('add_facts')
+
     inventory.add_facts(target, facts)
   end
 end

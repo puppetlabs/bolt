@@ -67,6 +67,8 @@ Puppet::Functions.create_function(:file_upload, Puppet::Functions::InternalFunct
       )
     end
 
+    executor.report_function_call('file_upload')
+
     found = Puppet::Parser::Files.find_file(source, scope.compiler.environment)
     unless found && Puppet::FileSystem.exist?(found)
       raise Puppet::ParseErrorWithIssue.from_issue_and_stack(

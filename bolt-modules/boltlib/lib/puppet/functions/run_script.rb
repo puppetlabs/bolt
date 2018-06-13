@@ -63,6 +63,8 @@ Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFuncti
       )
     end
 
+    executor.report_function_call('run_script')
+
     found = Puppet::Parser::Files.find_file(script, scope.compiler.environment)
     unless found && Puppet::FileSystem.exist?(found)
       raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
