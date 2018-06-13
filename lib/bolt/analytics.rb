@@ -17,7 +17,8 @@ module Bolt
     CUSTOM_DIMENSIONS = {
       operating_system: :cd1,
       inventory_nodes: :cd2,
-      inventory_groups: :cd3
+      inventory_groups: :cd3,
+      target_nodes: :cd4
     }.freeze
 
     def self.build_client

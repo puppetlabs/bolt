@@ -501,7 +501,9 @@ Available options are:
       if options[:action] == 'show' && options[:object]
         screen += '_object'
       end
+
       @analytics.screen_view(screen,
+                             target_nodes: options.fetch(:targets, []).count,
                              inventory_nodes: inventory.node_names.count,
                              inventory_groups: inventory.group_names.count)
 
