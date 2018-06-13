@@ -35,6 +35,9 @@ Puppet::Functions.create_function(:set_feature) do
       )
     end
 
+    executor = Puppet.lookup(:bolt_executor) { nil }
+    executor&.report_function_call('set_feature')
+
     inventory.set_feature(target, feature, value)
 
     target

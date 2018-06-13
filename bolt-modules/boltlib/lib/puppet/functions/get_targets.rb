@@ -36,6 +36,9 @@ Puppet::Functions.create_function(:get_targets) do
       )
     end
 
+    executor = Puppet.lookup(:bolt_executor) { nil }
+    executor&.report_function_call('get_targets')
+
     inventory.get_targets(names)
   end
 end

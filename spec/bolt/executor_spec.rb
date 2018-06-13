@@ -408,6 +408,14 @@ describe "Bolt::Executor" do
       executor.batch_execute(targets) {}
       executor.batch_execute(targets) {}
     end
+
+    context "#report_function_call" do
+      it 'reports an event for the given function' do
+        expect(analytics).to receive(:event).with('Plan', 'call_function', 'add_facts')
+
+        executor.report_function_call('add_facts')
+      end
+    end
   end
 
   context "When running a plan" do

@@ -32,6 +32,9 @@ Puppet::Functions.create_function(:fail_plan) do
   end
 
   def from_args(msg, kind = nil, details = nil, issue_code = nil)
+    executor = Puppet.lookup(:bolt_executor) { nil }
+    executor&.report_function_call('fail_plan')
+
     raise Bolt::PlanFailure.new(msg, kind || 'bolt/plan-failure', details, issue_code)
   end
 

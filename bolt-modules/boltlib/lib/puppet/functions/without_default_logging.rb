@@ -19,6 +19,8 @@ Puppet::Functions.create_function(:without_default_logging) do
 
   def without_default_logging
     executor = Puppet.lookup(:bolt_executor) { nil }
+    executor.report_function_call('without_default_logging')
+
     old_log = executor.plan_logging
     executor.plan_logging = false
     begin

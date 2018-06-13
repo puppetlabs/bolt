@@ -30,6 +30,9 @@ Puppet::Functions.create_function(:puppetdb_fact) do
       )
     end
 
+    executor = Puppet.lookup(:bolt_executor) { nil }
+    executor&.report_function_call('puppetdb_fact')
+
     puppetdb_client.facts_for_node(certnames)
   end
 end

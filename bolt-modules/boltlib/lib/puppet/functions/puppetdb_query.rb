@@ -22,6 +22,9 @@ Puppet::Functions.create_function(:puppetdb_query) do
       )
     end
 
+    executor = Puppet.lookup(:bolt_executor) { nil }
+    executor&.report_function_call('puppetdb_query')
+
     puppetdb_client.make_query(query)
   end
 end

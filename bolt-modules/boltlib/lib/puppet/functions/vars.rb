@@ -32,6 +32,9 @@ Puppet::Functions.create_function(:vars) do
       )
     end
 
+    executor = Puppet.lookup(:bolt_executor) { nil }
+    executor&.report_function_call('vars')
+
     inventory.vars(target)
   end
 end

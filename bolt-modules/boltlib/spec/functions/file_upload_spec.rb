@@ -1,13 +1,14 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'bolt/executor'
 require 'bolt/result'
 require 'bolt/result_set'
 require 'bolt/target'
 
 describe 'file_upload' do
   include PuppetlabsSpec::Fixtures
-  let(:executor) { mock('bolt_executor') }
+  let(:executor) { Bolt::Executor.new }
   let(:inventory) { mock('inventory') }
   let(:tasks_enabled) { true }
 
@@ -61,6 +62,14 @@ describe 'file_upload' do
       inventory.stubs(:get_targets).with(target).returns([target])
 
       is_expected.to run.with_params('test/uploads', destination, target, '_run_as' => 'soandso').and_return(result_set)
+    end
+
+    it 'reports the call to analytics' do
+      executor.expects(:file_upload).with([target], full_path, destination, {}).returns(result_set)
+      inventory.stubs(:get_targets).with(hostname).returns([target])
+      executor.expects(:report_function_call).with('file_upload')
+
+      is_expected.to run.with_params('test/uploads/index.html', destination, hostname).and_return(result_set)
     end
 
     context 'with description' do

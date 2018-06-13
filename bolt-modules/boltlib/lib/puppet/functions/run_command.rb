@@ -57,6 +57,8 @@ Puppet::Functions.create_function(:run_command) do
       )
     end
 
+    executor.report_function_call('run_command')
+
     # Ensure that given targets are all Target instances
     targets = inventory.get_targets(targets)
 

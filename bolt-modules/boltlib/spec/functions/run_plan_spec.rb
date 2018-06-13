@@ -2,10 +2,11 @@
 
 require 'spec_helper'
 require 'puppet_pal'
+require 'bolt/executor'
 
 describe 'run_plan' do
   include PuppetlabsSpec::Fixtures
-  let(:executor) { mock('bolt_executor') }
+  let(:executor) { Bolt::Executor.new }
 
   around(:each) do |example|
     Puppet[:tasks] = true
@@ -47,6 +48,16 @@ describe 'run_plan' do
 
         is_expected.to run.with_params('test::run_me', '_run_as' => 'bar').and_return('worked2')
       end
+    end
+
+    it 'reports the call to analytics' do
+      executor.expects(:report_function_call).with('run_plan')
+      is_expected.to run.with_params('test::run_me').and_return('worked2')
+    end
+
+    it 'skips reporting the call to analytics if called internally from Bolt' do
+      executor.expects(:report_function_call).never
+      is_expected.to run.with_params('test::run_me', '_bolt_api_call' => true).and_return('worked2')
     end
 
     context 'using the name of the module' do
