@@ -83,13 +83,15 @@ describe "CLI parses input" do
     ]
     result = run_one_node(['task', 'run', 'parsing', '--nodes', target] + params + config_flags)
     expect(result).to eq("string_bool" => "true",
-                         "array" => [1, 2, 3])
+                         "array" => [1, 2, 3],
+                         "_task" => "parsing")
   end
 
   it 'validates task parameters', ssh: true do
     params = [
       'string_bool="true"',
-      'array="123"'
+      'array="123"',
+      '_task="parsing"'
     ]
     result = run_cli_json(['task', 'run', 'parsing', '--nodes', target] + params + config_flags, rescue_exec: true)
     expect(result['_error']['msg']).to eq("Task parsing:\n parameter 'array' expects an Array value, got String")

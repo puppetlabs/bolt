@@ -276,6 +276,57 @@ The following features are defined by default:
 * `shell`: present if the target has a posix shell
 * `powershell`: present if the target has powershell
 
+### Sharing executables
+
+Multiple task implementations can refer to the same executable file. Executables can access the `_task` metaparam, which contains the task name.
+
+For example, the following creates 2 tasks `service::stop` and `service::start`, which can live in the executable but appear as 2 separate tasks.
+
+`myservice/tasks/init.rb`
+```ruby
+#!/usr/bin/env ruby
+require 'json'
+
+params = JSON.parse(STDIN.read)
+action = params['action'] || params['_task']
+if ['start',  'stop'].include?(action)
+  `systemctl #{params['_task']} #{params['service']}`
+end
+```
+
+`myservice/tasks/start.json`
+```
+{
+  "description": "Start a service",
+  "parameters": {
+    "service": {
+      "type": "String",
+      "description": "The service to start"
+    }
+  },
+  "implementations": [
+    {"name": "init.rb"}
+  ]
+}
+```
+
+`myservice/tasks/stop.json`
+```
+{
+  "description": "Stop a service",
+  "parameters": {
+    "service": {
+      "type": "String",
+      "description": "The service to stop"
+    }
+  },
+  "implementations": [
+    {"name": "init.rb"}
+  ]
+}
+```
+
+
 ## Defining parameters in tasks
 
 Allow your task to accept parameters as either environment variables or as a JSON hash
