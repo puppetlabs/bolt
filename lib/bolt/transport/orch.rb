@@ -87,7 +87,7 @@ module Bolt
 
       def batch_command(targets, command, options = {}, &callback)
         params = {
-          command: command
+          'command' => command
         }
         results = run_task_job(targets,
                                BOLT_COMMAND_TASK,
@@ -105,8 +105,8 @@ module Bolt
         content = File.open(script, &:read)
         content = Base64.encode64(content)
         params = {
-          content: content,
-          arguments: arguments
+          'content' => content,
+          'arguments' => arguments
         }
         callback ||= proc {}
         results = run_task_job(targets, BOLT_SCRIPT_TASK, params, options, &callback)
@@ -121,9 +121,9 @@ module Bolt
         content = Base64.encode64(content)
         mode = File.stat(source).mode
         params = {
-          path: destination,
-          content: content,
-          mode: mode
+          'path' => destination,
+          'content' => content,
+          'mode' => mode
         }
         callback ||= proc {}
         results = run_task_job(targets, BOLT_UPLOAD_TASK, params, options, &callback)

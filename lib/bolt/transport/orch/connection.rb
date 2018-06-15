@@ -62,7 +62,7 @@ module Bolt
           body = { task: task.name,
                    environment: @environment,
                    noop: arguments['_noop'],
-                   params: arguments.reject { |k, _| k == '_noop' },
+                   params: arguments.reject { |k, _| k.start_with?('_') },
                    scope: {
                      nodes: targets.map(&:host)
                    } }
