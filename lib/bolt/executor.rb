@@ -5,6 +5,8 @@ require 'English'
 require 'json'
 require 'concurrent'
 require 'logging'
+require 'set'
+require 'bolt/analytics'
 require 'bolt/result'
 require 'bolt/config'
 require 'bolt/notifier'
@@ -16,14 +18,18 @@ module Bolt
     attr_reader :noop, :transports
     attr_accessor :run_as, :plan_logging
 
-    def initialize(config = Bolt::Config.new, noop = nil)
+    def initialize(config = Bolt::Config.new, analytics = Bolt::Analytics::NoopClient.new, noop = nil)
       @config = config
+      @analytics = analytics
       @logger = Logging.logger[self]
       @plan_logging = false
 
       @transports = Bolt::TRANSPORTS.each_with_object({}) do |(key, val), coll|
-        coll[key.to_s] = Concurrent::Delay.new { val.new }
+        coll[key.to_s] = Concurrent::Delay.new do
+          val.new
+        end
       end
+      @reported_transports = Set.new
 
       @noop = noop
       @run_as = nil
@@ -50,6 +56,7 @@ module Bolt
     def batch_execute(targets)
       promises = targets.group_by(&:protocol).flat_map do |protocol, protocol_targets|
         transport = transport(protocol)
+        report_transport(transport, protocol_targets.count)
         transport.batches(protocol_targets).flat_map do |batch|
           batch_promises = Array(batch).each_with_object({}) do |target, h|
             h[target] = Concurrent::Promise.new(executor: :immediate)
@@ -110,6 +117,16 @@ module Bolt
     end
     private :log_action
 
+    def report_transport(transport, count)
+      name = transport.class.name.split('::').last.downcase
+      @analytics&.event('Transport', 'initialize', name, count) unless @reported_transports.include?(name)
+      @reported_transports.add(name)
+    end
+
+    def report_function_call(function)
+      @analytics&.event('Plan', 'call_function', function)
+    end
+
     def with_node_logging(description, batch)
       @logger.info("#{description} on #{batch.map(&:uri)}")
       result = yield
@@ -157,6 +174,7 @@ module Bolt
       log_action(description, targets) do
         notify = proc { |event| @notifier.notify(callback, event) if callback }
         options = { '_run_as' => run_as }.merge(options) if run_as
+        arguments['_task'] = task.name
 
         results = batch_execute(targets) do |transport, batch|
           with_node_logging("Running task #{task.name} with '#{arguments}' via #{task.input_method}", batch) do

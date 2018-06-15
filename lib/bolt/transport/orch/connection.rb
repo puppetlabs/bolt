@@ -28,6 +28,7 @@ module Bolt
 
           @client = OrchestratorClient.new(client_opts, true)
           @plan_job = start_plan(plan_context)
+          logger.debug("Started plan #{@plan_job}")
           @environment = opts["task-environment"]
         end
 

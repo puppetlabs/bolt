@@ -84,7 +84,7 @@ module Bolt
         executable = target.select_impl(task, PROVIDED_FEATURES)
         raise "No suitable implementation of #{task.name} for #{target.name}" unless executable
 
-        input_method = task.input_method ? task.input_method : "both"
+        input_method = task.input_method || "both"
         stdin = STDIN_METHODS.include?(input_method) ? JSON.dump(arguments) : nil
         env = ENVIRONMENT_METHODS.include?(input_method) ? arguments : nil
 

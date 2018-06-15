@@ -1,15 +1,17 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'bolt/executor'
 require 'bolt/target'
 
 describe 'get_targets' do
+  let(:executor) { Bolt::Executor.new }
   let(:inventory) { mock('inventory') }
   let(:tasks_enabled) { true }
 
   around(:each) do |example|
     Puppet[:tasks] = tasks_enabled
-    Puppet.override(bolt_inventory: inventory) do
+    Puppet.override(bolt_executor: executor, bolt_inventory: inventory) do
       example.run
     end
   end
@@ -53,6 +55,13 @@ describe 'get_targets' do
 
     it 'errors on unknown types' do
       is_expected.to run.with_params(mock('anything')).and_raise_error(ArgumentError)
+    end
+
+    it 'reports the call to analytics' do
+      inventory.expects(:get_targets).with(hostname).returns([target])
+      executor.expects(:report_function_call).with('get_targets')
+
+      is_expected.to run.with_params(hostname).and_return([target])
     end
   end
 

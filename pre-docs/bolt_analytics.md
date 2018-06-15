@@ -8,6 +8,9 @@ Bolt automatically collects data about how you use it.
 * The Bolt command executed (eg. `bolt task run`, `bolt plan show`), excluding arguments
 * User locale
 * Operating system and version
+* Which transports (SSH, WinRM, PCP) are used and with how many targets
+* The number of nodes and groups defined in the Bolt inventory file
+* The number of nodes targeted with a Bolt command
 
 This data is associated with a random, non-identifiable user UUID.
 

@@ -208,6 +208,8 @@ module BoltSpec
       def stub_task(task_name)
         @task_doubles[task_name] ||= TaskDouble.new
       end
+
+      def report_function_call(_function); end
     end
   end
 end

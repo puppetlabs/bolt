@@ -501,7 +501,11 @@ Available options are:
       if options[:action] == 'show' && options[:object]
         screen += '_object'
       end
-      @analytics.screen_view(screen)
+
+      @analytics.screen_view(screen,
+                             target_nodes: options.fetch(:targets, []).count,
+                             inventory_nodes: inventory.node_names.count,
+                             inventory_groups: inventory.group_names.count)
 
       if options[:mode] == 'plan' || options[:mode] == 'task'
         pal = Bolt::PAL.new(config)
@@ -550,17 +554,16 @@ Available options are:
                          params: params }
         plan_context[:description] = options[:description] if options[:description]
 
-        executor = Bolt::Executor.new(config, options[:noop])
+        executor = Bolt::Executor.new(config, @analytics, options[:noop])
         executor.start_plan(plan_context)
         result = pal.run_plan(options[:object], options[:task_options], executor, inventory, puppetdb_client)
 
         # If a non-bolt exeception bubbles up the plan won't get finished
-        # TODO: finish the plan once ORCH-2224
-        # executor.finish_plan(result)
+        executor.finish_plan(result)
         outputter.print_plan_result(result)
         code = result.ok? ? 0 : 1
       else
-        executor = Bolt::Executor.new(config, options[:noop])
+        executor = Bolt::Executor.new(config, @analytics, options[:noop])
         targets = options[:targets]
 
         results = nil

@@ -867,12 +867,18 @@ bar
           }
           cli.execute(options)
           json = JSON.parse(output.string)
-          expect(json).to eq([["facts", "Gather system facts"],
-                              ["facts::bash", nil],
-                              ["facts::powershell", nil],
-                              ["facts::ruby", nil],
-                              ['sample::ok', nil]])
-
+          expect(json).to eq([["apply::resource", "Apply a single Puppet resource"],
+                              ["facts", "Gather system facts"],
+                              ["facts::bash", "Gather system facts using bash"],
+                              ["facts::powershell", "Gather system facts using powershell"],
+                              ["facts::ruby", "Gather system facts using ruby and facter"],
+                              ["package", "Manage and inspect the state of packages"],
+                              ["puppet_conf", "Inspect puppet agent configuration settings"],
+                              ["sample::ok", nil],
+                              ["service", "Manage and inspect the state of services"],
+                              ["service::linux", "Manage the state of services (without a puppet agent)"],
+                              ["service::windows",
+                               "Manage the state of Windows services (without a puppet agent)"]])
           output = @log_output.readlines.join
           expect(output).to match(/unexpected token.*params\.json/m)
         end
@@ -1031,7 +1037,7 @@ bar
         it "runs a task given a name" do
           expect(executor)
             .to receive(:run_task)
-            .with(targets, task_t, task_params, {})
+            .with(targets, task_t, task_params, '_bolt_api_call' => true)
             .and_return(Bolt::ResultSet.new([]))
           expect(cli.execute(options)).to eq(0)
           expect(JSON.parse(output.string)).to be
@@ -1040,7 +1046,7 @@ bar
         it "returns 2 if any node fails" do
           expect(executor)
             .to receive(:run_task)
-            .with(targets, task_t, task_params, {})
+            .with(targets, task_t, task_params, '_bolt_api_call' => true)
             .and_return(fail_set)
 
           expect(cli.execute(options)).to eq(2)
@@ -1069,7 +1075,7 @@ bar
 
           expect(executor)
             .to receive(:run_task)
-            .with(targets, task_t, {}, {})
+            .with(targets, task_t, {}, '_bolt_api_call' => true)
             .and_raise("Could not connect to target")
 
           expect { cli.execute(options) }.to raise_error(/Could not connect to target/)
@@ -1081,7 +1087,7 @@ bar
 
           expect(executor)
             .to receive(:run_task)
-            .with(targets, task_t, task_params, {})
+            .with(targets, task_t, task_params, '_bolt_api_call' => true)
             .and_return(Bolt::ResultSet.new([]))
 
           cli.execute(options)
@@ -1096,7 +1102,7 @@ bar
 
             expect(executor)
               .to receive(:run_task)
-              .with(targets, task_t, task_params, {})
+              .with(targets, task_t, task_params, '_bolt_api_call' => true)
               .and_return(Bolt::ResultSet.new([]))
 
             cli.execute(options)
@@ -1109,7 +1115,7 @@ bar
 
             expect(executor)
               .to receive(:run_task)
-              .with(targets, task_t, task_params, {})
+              .with(targets, task_t, task_params, '_bolt_api_call' => true)
               .and_return(Bolt::ResultSet.new([]))
 
             cli.execute(options)
@@ -1120,7 +1126,7 @@ bar
         it "traps SIGINT", :signals_self do
           expect(executor)
             .to receive(:run_task)
-            .with(targets, task_t, task_params, {}) do
+            .with(targets, task_t, task_params, '_bolt_api_call' => true) do
               Process.kill :INT, Process.pid
               sync_thread.join(1) # give ruby some time to handle the signal
               Bolt::ResultSet.new([])
@@ -1211,7 +1217,7 @@ bar
           it "runs the task when the specified parameters are successfully validated" do
             expect(executor)
               .to receive(:run_task)
-              .with(targets, task_t, task_params, {})
+              .with(targets, task_t, task_params, '_bolt_api_call' => true)
               .and_return(Bolt::ResultSet.new([]))
             task_params.merge!(
               'mandatory_string'  => ' ',
@@ -1300,7 +1306,7 @@ bar
 
                 expect(executor)
                   .to receive(:run_task)
-                  .with(targets, task_t, task_params, {})
+                  .with(targets, task_t, task_params, '_bolt_api_call' => true)
                   .and_return(Bolt::ResultSet.new([]))
 
                 cli.execute(options)
@@ -1310,7 +1316,7 @@ bar
               it "runs the task even when invalid (according to the local task definition) parameters are specified" do
                 expect(executor)
                   .to receive(:run_task)
-                  .with(targets, task_t, task_params, {})
+                  .with(targets, task_t, task_params, '_bolt_api_call' => true)
                   .and_return(Bolt::ResultSet.new([]))
 
                 cli.execute(options)
@@ -1336,6 +1342,7 @@ bar
         let(:task_t) { task_type('sample::echo', %r{modules/sample/tasks/echo.sh$}, nil) }
 
         before :each do
+          allow(executor).to receive(:report_function_call)
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
         end
 
@@ -1349,6 +1356,7 @@ bar
             .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0)]))
 
           expect(executor).to receive(:start_plan)
+          expect(executor).to receive(:finish_plan)
 
           cli.execute(options)
           expect(JSON.parse(output.string)).to eq(
@@ -1373,6 +1381,7 @@ bar
             .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0)]))
 
           expect(executor).to receive(:start_plan)
+          expect(executor).to receive(:finish_plan)
 
           cli.execute(options)
           expect(JSON.parse(output.string)).to eq(
@@ -1387,6 +1396,7 @@ bar
             .and_raise("Could not connect to target")
 
           expect(executor).to receive(:start_plan)
+          expect(executor).to receive(:finish_plan)
 
           expect(cli.execute(options)).to eq(1)
           expect(JSON.parse(output.string)['msg']).to match(/Could not connect to target/)
@@ -1399,6 +1409,7 @@ bar
             .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'no', '', 1)]))
 
           expect(executor).to receive(:start_plan)
+          expect(executor).to receive(:finish_plan)
 
           cli.execute(options)
           expect(JSON.parse(output.string)).to eq(
@@ -1424,6 +1435,7 @@ bar
           plan_name.replace 'sample::dne'
 
           expect(executor).to receive(:start_plan)
+          expect(executor).to receive(:finish_plan)
 
           expect(cli.execute(options)).to eq(1)
           expect(JSON.parse(output.string)['msg']).to match(/Could not find a plan named "sample::dne"/)
@@ -1439,6 +1451,7 @@ bar
             end
 
           expect(executor).to receive(:start_plan)
+          expect(executor).to receive(:finish_plan)
 
           expect(cli).to receive(:exit!) do
             sync_thread.kill
@@ -1524,7 +1537,7 @@ bar
       let(:output) { StringIO.new }
 
       before :each do
-        expect(Bolt::Executor).to receive(:new).with(config, true).and_return(executor)
+        expect(Bolt::Executor).to receive(:new).with(config, anything, true).and_return(executor)
 
         outputter = Bolt::Outputter::JSON.new(false, output)
 
@@ -1553,7 +1566,7 @@ bar
         it "runs a task that supports noop" do
           expect(executor)
             .to receive(:run_task)
-            .with(targets, task_t, task_params.merge('_noop' => true), {})
+            .with(targets, task_t, task_params.merge('_noop' => true), '_bolt_api_call' => true)
             .and_return(Bolt::ResultSet.new([]))
 
           cli.execute(options)

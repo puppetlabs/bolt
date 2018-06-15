@@ -8,7 +8,8 @@ describe "Bolt::Executor" do
   include BoltSpec::Task
 
   let(:config) { Bolt::Config.new(concurrency: 1) }
-  let(:executor) { Bolt::Executor.new(config) }
+  let(:analytics) { Bolt::Analytics::NoopClient.new }
+  let(:executor) { Bolt::Executor.new(config, analytics) }
   let(:command) { "hostname" }
   let(:script) { '/path/to/script.sh' }
   let(:dest) { '/tmp/upload' }
@@ -388,6 +389,32 @@ describe "Bolt::Executor" do
     results = executor.run_command(targets, command)
     results.each do |result|
       expect(result.error_hash['kind']).to eq('puppetlabs.tasks/exception-error')
+    end
+  end
+
+  context 'reporting analytics data' do
+    let(:targets) {
+      [Bolt::Target.new('ssh://node1'),
+       Bolt::Target.new('ssh://node2'),
+       Bolt::Target.new('winrm://node3'),
+       Bolt::Target.new('pcp://node4')]
+    }
+
+    it 'reports one event for each transport used' do
+      expect(analytics).to receive(:event).with('Transport', 'initialize', 'ssh', 2).once
+      expect(analytics).to receive(:event).with('Transport', 'initialize', 'winrm', 1).once
+      expect(analytics).to receive(:event).with('Transport', 'initialize', 'orch', 1).once
+
+      executor.batch_execute(targets) {}
+      executor.batch_execute(targets) {}
+    end
+
+    context "#report_function_call" do
+      it 'reports an event for the given function' do
+        expect(analytics).to receive(:event).with('Plan', 'call_function', 'add_facts')
+
+        executor.report_function_call('add_facts')
+      end
     end
   end
 

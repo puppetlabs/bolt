@@ -112,7 +112,7 @@ module Bolt
         )
       end
 
-      # @param [Hash] A hash representing the task
+      # @param [Hash] task A hash representing the task
       def print_task_info(task)
         # Building lots of strings...
         pretty_params = +""
@@ -142,7 +142,7 @@ module Bolt
         @stream.puts(task_info)
       end
 
-      # @param [Hash] A hash representing the plan
+      # @param [Hash] plan A hash representing the plan
       def print_plan_info(plan)
         # Building lots of strings...
         pretty_params = +""
@@ -161,7 +161,7 @@ module Bolt
         @stream.puts(plan_info)
       end
 
-      # @param [Bolt::PlanResult] A PlanResult object
+      # @param [Bolt::PlanResult] plan_result A PlanResult object
       def print_plan_result(plan_result)
         if plan_result.value.nil?
           @stream.puts("Plan completed successfully with no result")

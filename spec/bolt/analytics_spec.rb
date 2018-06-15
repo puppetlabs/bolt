@@ -73,6 +73,18 @@ describe Bolt::Analytics::Client do
 
       subject.screen_view('job_run')
     end
+
+    it 'sets custom dimensions correctly' do
+      params = base_params.merge(t: 'screenview', cd: 'job_run', cd2: 12, cd3: 17)
+
+      expect(subject).to receive(:submit).with params
+
+      subject.screen_view('job_run', inventory_nodes: 12, inventory_groups: 17)
+    end
+
+    it 'raises an error if an unknown custom dimension is specified' do
+      expect { subject.screen_view('job_run', random_field: 'foo') }.to raise_error(/Unknown analytics key/)
+    end
   end
 
   describe "#event" do
@@ -82,6 +94,22 @@ describe Bolt::Analytics::Client do
       expect(subject).to receive(:submit).with params
 
       subject.event('run', 'task')
+    end
+
+    it 'sends the event label if supplied' do
+      params = base_params.merge(t: 'event', ec: 'run', ea: 'task', el: 'happy')
+
+      expect(subject).to receive(:submit).with params
+
+      subject.event('run', 'task', 'happy')
+    end
+
+    it 'sends the event metric if supplied' do
+      params = base_params.merge(t: 'event', ec: 'run', ea: 'task', ev: 12)
+
+      expect(subject).to receive(:submit).with params
+
+      subject.event('run', 'task', nil, 12)
     end
   end
 end
@@ -96,6 +124,14 @@ describe Bolt::Analytics::NoopClient do
   describe "#event" do
     it 'succeeds' do
       subject.event('run', 'task')
+    end
+
+    it 'succeeds with a label' do
+      subject.event('run', 'task', 'happy')
+    end
+
+    it 'succeeds with a metric' do
+      subject.event('run', 'task', nil, 12)
     end
   end
 end

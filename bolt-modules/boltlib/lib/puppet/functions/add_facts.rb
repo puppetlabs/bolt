@@ -2,12 +2,17 @@
 
 require 'bolt/error'
 
-# Deep merges a hash of facts with the existing facts has on a target.
-
+# Deep merges a hash of facts with the existing facts on a target.
 Puppet::Functions.create_function(:add_facts) do
+  # @param target A target.
+  # @param facts A hash of fact names to values that my include structured facts.
+  # @return The target's new facts.
+  # @example Adding facts to a target
+  #   add_facts($target, { 'os' => { 'family' => 'windows', 'name' => 'windows' } })
   dispatch :add_facts do
     param 'Target', :target
     param 'Hash', :facts
+    return_type 'Hash[String, Data]'
   end
 
   def add_facts(target, facts)
@@ -24,6 +29,9 @@ Puppet::Functions.create_function(:add_facts) do
         Puppet::Pops::Issues::TASK_MISSING_BOLT, action: _('add facts')
       )
     end
+
+    executor = Puppet.lookup(:bolt_executor) { nil }
+    executor&.report_function_call('add_facts')
 
     inventory.add_facts(target, facts)
   end
