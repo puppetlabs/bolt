@@ -73,8 +73,7 @@ module Bolt
         raise Bolt::CLIExit
       end
 
-      config.load_file(options[:configfile])
-      config.update_from_cli(options)
+      config.update(options)
       config.validate
       Bolt::Logger.configure(config)
 

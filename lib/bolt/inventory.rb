@@ -36,10 +36,6 @@ module Bolt
       end
     end
 
-    def self.default_paths
-      [File.expand_path(File.join('~', '.puppetlabs', 'bolt', 'inventory.yaml'))]
-    end
-
     def self.from_config(config)
       if ENV.include?(ENVIRONMENT_VAR)
         begin
@@ -48,7 +44,7 @@ module Bolt
           raise Bolt::Error.new("Could not parse inventory from $#{ENVIRONMENT_VAR}", 'bolt/parse-error')
         end
       else
-        data = Bolt::Util.read_config_file(config[:inventoryfile], default_paths, 'inventory')
+        data = Bolt::Util.read_config_file(config[:inventoryfile], [config.default_inventory], 'inventory')
       end
 
       inventory = new(data, config)

@@ -192,7 +192,7 @@ Available options are:
         @options[:configfile] = path
       end
       define('--configfile FILEPATH',
-             'Specify where to load config from (default: ~/.puppetlabs/bolt.yaml)') do |path|
+             'Specify where to load config from (default: ~/.puppetlabs/bolt/bolt.yaml)') do |path|
         @options[:configfile] = path
       end
       define('--inventoryfile FILEPATH',

@@ -225,8 +225,8 @@ Options are optional unless marked as required.
 | Run context |
 | `--concurrency, -c` | Maximum number of simultaneous connections (default: 100) |
 | `--modulepath` | Required for tasks and plans. The path to the module containing the task. Separate multiple paths with a semicolon (`;`) on Windows or a colon (`:`) on all other platforms. |
-| `--configfile` | Specify where to load config from (default: ~/.puppetlabs/bolt.yaml) |
-| `--inventoryfile` | Specify where to load inventory from (default: ~/.puppetlabs/bolt/inventory.yaml) |
+| `--configfile` | Specify where to load config from (default: `bolt.yaml` inside the `Boltdir`) |
+| `--inventoryfile` | Specify where to load inventory from (default: `inventory.yaml` inside the `Boltdir`) |
 ||
 | Transports |
 | `--transport` | Specifies the default transport for this command. To override, specify the transport for a given node, such as ssh://linuxnode. |
