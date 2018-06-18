@@ -109,7 +109,7 @@ c1   d
 cinnamon_roll - A delicious sweet bun
 
 USAGE:
-bolt task run --nodes, -n <node-name> cinnamon_roll icing=<value>
+bolt task run --nodes <node-name> cinnamon_roll icing=<value>
 
 PARAMETERS:
 - icing: Cream cheese
@@ -139,7 +139,7 @@ PARAMETERS:
 sticky_bun - A delicious sweet bun with nuts
 
 USAGE:
-bolt task run --nodes, -n <node-name> sticky_bun glaze=<value> pecans=<value>
+bolt task run --nodes <node-name> sticky_bun glaze=<value> pecans=<value>
 
 PARAMETERS:
 - glaze: Sticky

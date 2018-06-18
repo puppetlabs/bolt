@@ -117,7 +117,7 @@ module Bolt
         # Building lots of strings...
         pretty_params = +""
         task_info = +""
-        usage = +"bolt task run --nodes, -n <node-name> #{task['name']}"
+        usage = +"bolt task run --nodes <node-name> #{task['name']}"
 
         if task['parameters']
           replace_data_type(task['parameters'])
