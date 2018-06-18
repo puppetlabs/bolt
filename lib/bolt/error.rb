@@ -41,6 +41,12 @@ module Bolt
     end
   end
 
+  class CLIError < Bolt::Error
+    def initialize(msg)
+      super(msg, "bolt/cli-error")
+    end
+  end
+
   class RunFailure < Error
     attr_reader :result_set
 

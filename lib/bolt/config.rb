@@ -68,9 +68,13 @@ module Bolt
       local: {}
     }.freeze
 
+    BOLTDIR_NAME = 'Boltdir'
+
     def initialize(**kwargs)
       super()
       @logger = Logging.logger[self]
+      @pwd = kwargs.delete(:pwd)
+
       DEFAULTS.merge(kwargs).each { |k, v| self[k] = v }
 
       # add an entry for the default console logger
@@ -97,11 +101,6 @@ module Bolt
 
     def deep_clone
       Bolt::Util.deep_clone(self)
-    end
-
-    def default_paths
-      root_path = File.expand_path(File.join('~', '.puppetlabs'))
-      [File.join(root_path, 'bolt.yaml'), File.join(root_path, 'bolt.yml')]
     end
 
     def normalize_log(target)
@@ -146,9 +145,55 @@ module Bolt
     end
     private :update_from_file
 
-    def load_file(path)
-      data = Bolt::Util.read_config_file(path, default_paths, 'config')
-      update_from_file(data) if data
+    def find_boltdir(dir)
+      path = dir
+      boltdir = nil
+      while boltdir.nil? && path && path != File.dirname(path)
+        maybe_boltdir = File.join(path, BOLTDIR_NAME)
+        boltdir = maybe_boltdir if File.directory?(maybe_boltdir)
+        path = File.dirname(path)
+      end
+      boltdir
+    end
+
+    def pwd
+      @pwd ||= Dir.pwd
+    end
+
+    def boltdir
+      @boltdir ||= find_boltdir(pwd) || default_boltdir
+    end
+
+    def default_boltdir
+      File.expand_path(File.join('~', '.puppetlabs', 'bolt'))
+    end
+
+    def default_modulepath
+      [File.join(boltdir, "modules")]
+    end
+
+    # TODO: This is deprecated in 0.21.0 and can be removed in release 0.22.0.
+    def legacy_conf
+      return @legacy_conf if defined?(@legacy_conf)
+      root_path = File.expand_path(File.join('~', '.puppetlabs'))
+      legacy_paths = [File.join(root_path, 'bolt.yaml'), File.join(root_path, 'bolt.yml')]
+      @legacy_conf = legacy_paths.find { |path| File.exist?(path) }
+      @legacy_conf ||= legacy_paths[0]
+      if @legacy_conf
+        correct_path = File.join(default_boltdir, 'bolt.yaml')
+        msg = "Found configfile at deprecated location #{@legacy_conf}. Global config should be in #{correct_path}"
+        @logger.warn(msg)
+      end
+      @legacy_conf
+    end
+
+    def default_config
+      path = File.join(boltdir, 'bolt.yaml')
+      File.exist?(path) ? path : legacy_conf
+    end
+
+    def default_inventory
+      File.join(boltdir, 'inventory.yaml')
     end
 
     def update_from_cli(options)
@@ -182,6 +227,26 @@ module Bolt
       if options.key?(:'host-key-check') # this defaults to true so we need to check the presence of the key
         self[:transports][:ssh]['host-key-check'] = options[:'host-key-check']
       end
+    end
+
+    # Defaults that do not vary based on boltdir should not be included here.
+    #
+    # Defaults which are treated differently from specified values like
+    # 'inventoryfile' cannot be included here or they will not be handled correctly.
+    def update_from_defaults
+      self[:modulepath] = default_modulepath
+    end
+
+    # The order in which config is processed is important
+    def update(options)
+      update_from_defaults
+      load_file(options[:configfile])
+      update_from_cli(options)
+    end
+
+    def load_file(path)
+      data = Bolt::Util.read_config_file(path, [default_config], 'config')
+      update_from_file(data) if data
     end
 
     def update_from_inventory(data)

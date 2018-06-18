@@ -4,7 +4,11 @@ require 'spec_helper'
 require 'bolt/config'
 
 describe Bolt::Config do
-  let(:config) { Bolt::Config.new }
+  let(:config) do
+    conf = Bolt::Config.new
+    allow(conf).to receive(:boltdir).and_return(File.join(Dir.tmpdir, rand(1000).to_s))
+    conf
+  end
 
   describe "when initializing" do
     it "accepts keyword values" do
@@ -62,39 +66,42 @@ describe Bolt::Config do
   end
 
   describe "load_file" do
+    let(:boltdir_path) { File.expand_path(File.join(config.boltdir, 'bolt.yaml')) }
     let(:default_path) { File.expand_path(File.join('~', '.puppetlabs', 'bolt.yaml')) }
     let(:alt_path) { File.expand_path(File.join('~', '.puppetlabs', 'bolt.yml')) }
 
+    before(:each) do
+      expect(File).to receive(:exist?).with(boltdir_path).and_return(false)
+    end
+
     it "loads from a default file" do
-      expect(File).to receive(:exist?).with(default_path).and_return(true)
-      expect(File).to receive(:exist?).with(alt_path).and_return(false)
+      expect(File).to receive(:exist?).with(default_path).twice.and_return(true)
       expect(File).to receive(:open).with(default_path, 'r:UTF-8').and_raise(Errno::ENOENT)
       config.load_file(nil)
     end
 
     it "falls back to the old default file" do
       expect(File).to receive(:exist?).with(default_path).and_return(false)
-      expect(File).to receive(:exist?).with(alt_path).and_return(true)
+      expect(File).to receive(:exist?).with(alt_path).twice.and_return(true)
       expect(File).to receive(:open).with(alt_path, 'r:UTF-8').and_raise(Errno::ENOENT)
       config.load_file(nil)
     end
 
-    it "warns if both defaults exist, and uses the new default" do
-      expect(File).to receive(:exist?).with(default_path).and_return(true)
-      expect(File).to receive(:exist?).with(alt_path).and_return(true)
+    it "warns if the default exists, and uses the new default" do
+      expect(File).to receive(:exist?).with(default_path).twice.and_return(true)
       expect(File).to receive(:open).with(default_path, 'r:UTF-8').and_raise(Errno::ENOENT)
 
       config.load_file(nil)
 
-      expect(@log_output.readline).to match(/WARN.*Found configs at #{default_path}, #{alt_path}, using the first/)
+      expect(@log_output.readline).to match(/WARN.*Found configfile at deprecated location #{default_path}/)
     end
 
     it "loads from the specified file" do
       path = 'does not exist'
       expanded_path = File.expand_path(path)
 
-      expect(File).not_to receive(:exist?).with(default_path)
-      expect(File).not_to receive(:exist?).with(alt_path)
+      allow(File).to receive(:exist?).with(default_path)
+      allow(File).to receive(:exist?).with(alt_path)
       expect(File).to receive(:open).with(expanded_path, 'r:UTF-8').and_raise(Errno::ENOENT)
       expect { config.load_file(path) }.to raise_error(Bolt::FileError)
     end
@@ -271,6 +278,52 @@ describe Bolt::Config do
       expect {
         Bolt::Config.new(config).validate
       }.to raise_error(Bolt::ValidationError)
+    end
+  end
+
+  describe 'boltdir' do
+    let(:pwd) { File.dirname(boltdir_path) }
+    let(:config) { Bolt::Config.new(pwd: pwd) }
+    let(:boltdir_path) { File.join(@tmpdir, "foo", "Boltdir") }
+
+    around(:each) do |example|
+      Dir.mktmpdir do |tmpdir|
+        @tmpdir = tmpdir
+        FileUtils.mkdir_p(boltdir_path)
+        example.run
+      end
+    end
+
+    it 'find the boltdir next to itself' do
+      expect(config.boltdir).to eq(boltdir_path)
+    end
+
+    context 'when inside the boltdir' do
+      let(:pwd) { boltdir_path }
+      it 'find the boltdir next to itself' do
+        expect(config.boltdir).to eq(boltdir_path)
+      end
+    end
+
+    context 'when inside an inside a niece' do
+      let(:pwd) { File.join(@tmpdir, 'foo', 'bar') }
+
+      it 'find the boltdir from an existant dir' do
+        FileUtils.mkdir_p(pwd)
+        expect(config.boltdir).to eq(boltdir_path)
+      end
+
+      it 'find the boltdir from a non-existant dir' do
+        expect(config.boltdir).to eq(boltdir_path)
+      end
+    end
+
+    context 'when in a grandparent' do
+      let(:pwd) { @tmpdir }
+      it 'does not find the boltdir' do
+        # Don't assert nil to be robust against a boltdir above tmp
+        expect(config.boltdir).not_to eq(boltdir_path)
+      end
     end
   end
 end

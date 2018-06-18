@@ -5,13 +5,15 @@ In Bolt, you can use an inventory file to store information about your nodes.
 For example, you can organize your nodes into groups or set up connection
 information for nodes or node groups.
 
-The inventory file is a yaml file stored by default at
-`~/.puppetlabs/bolt/inventory.yaml`. At the top level it contains an array of
-nodes and groups. Each node can have a config, vals, and facts specific to that
-node. Each group can have an array of nodes, an array of child groups, and can
-set default config, facts, and vals for the entire group.
+The inventory file is a yaml file stored by default at `inventory.yaml` inside
+the `Boltdir`. At the top level it contains an array of nodes and groups. Each
+node can have a config, vals, and facts specific to that node. Each group can
+have an array of nodes, an array of child groups, and can set default config,
+facts, and vals for the entire group.
 
-**Note:** config values set at the top level of inventory will only apply to targets included in that inventory file. Set config for unknown targets in the bolt config file.
+**Note:** config values set at the top level of inventory will only apply to
+targets included in that inventory file. Set config for unknown targets in the
+bolt config file.
 
 
 You can only set transport configuration in the inventory file. This means

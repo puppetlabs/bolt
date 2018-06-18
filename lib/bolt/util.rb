@@ -2,7 +2,6 @@
 
 module Bolt
   module Util
-    # CODEREVIEW I hate mixing in random modules
     class << self
       def read_config_file(path, default_paths = nil, file_name = 'file')
         logger = Logging.logger[self]
@@ -17,10 +16,16 @@ module Bolt
         end
 
         path = File.expand_path(path)
-        File.open(path, "r:UTF-8") { |f| YAML.safe_load(f.read) }
+        content = File.open(path, "r:UTF-8") { |f| YAML.safe_load(f.read) }
+        logger.debug("Loaded #{file_name} from #{path}")
+        content
       rescue Errno::ENOENT
+        msg = "Could not read #{file_name} file: #{path}"
         if path_passed
-          raise Bolt::FileError.new("Could not read #{file_name} file: #{path}", path)
+          raise Bolt::FileError.new(msg, path)
+        else
+          logger.debug(msg)
+          nil
         end
       rescue Psych::Exception
         raise Bolt::FileError.new("Could not parse #{file_name} file: #{path}", path)
