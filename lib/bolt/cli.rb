@@ -210,6 +210,7 @@ module Bolt
       end
 
       @analytics.screen_view(screen,
+                             output_format: config[:format],
                              target_nodes: options.fetch(:targets, []).count,
                              inventory_nodes: inventory.node_names.count,
                              inventory_groups: inventory.group_names.count)
