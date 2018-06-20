@@ -150,6 +150,7 @@ module Bolt
       # been instantiated
       set_vars_from_hash(target.name, data['vars']) unless @target_vars[target.name]
       set_facts(target.name, data['facts']) unless @target_facts[target.name]
+      data['features']&.each { |feature| set_feature(target, feature) } unless @target_features[target.name]
 
       # Use Config object to ensure config section is treated consistently with config file
       conf = @config.deep_clone

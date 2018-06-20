@@ -41,6 +41,7 @@ describe Bolt::Inventory::Group do
       expect(group.node_data('node1')).to eq('config' => {},
                                              'vars' => {},
                                              'facts' => {},
+                                             'features' => [],
                                              'groups' => [])
     end
 
@@ -432,9 +433,11 @@ describe Bolt::Inventory::Group do
             'groups' => [{
               'name' => 'child',
               'nodes' => [{ 'name' => 'node1' }],
-              'vars' => { 'foo' => 'bar' }
+              'vars' => { 'foo' => 'bar' },
+              'features' => ['a']
             }],
-            'vars' => { 'foo' => 'qux', 'a' => 'b' }
+            'vars' => { 'foo' => 'qux', 'a' => 'b' },
+            'features' => ['b']
           }]
         }
       end
@@ -449,6 +452,10 @@ describe Bolt::Inventory::Group do
 
       it 'overrides parent group data with child group data' do
         expect(group.data_for('node1')['vars']).to eq('foo' => 'bar', 'a' => 'b')
+      end
+
+      it 'combines parent group features with child group features' do
+        expect(group.data_for('node1')['features']).to match_array(%w[a b])
       end
 
       it 'returns the whole ancestry as the list of groups for the node' do
@@ -528,13 +535,15 @@ describe Bolt::Inventory::Group do
         'groups' => [{
           'name' => 'parent1',
           'nodes' => [{ 'name' => 'node1' }],
-          'vars' => { 'foo' => 'bar' }
+          'vars' => { 'foo' => 'bar' },
+          'features' => ['a']
         }, {
           'name' => 'parent2',
           'groups' => [{
             'name' => 'child1',
             'nodes' => [{ 'name' => 'node1' }],
-            'vars' => { 'foo' => 'baz', 'a' => 'b' }
+            'vars' => { 'foo' => 'baz', 'a' => 'b' },
+            'features' => ['b']
           }]
         }]
       }
@@ -547,6 +556,7 @@ describe Bolt::Inventory::Group do
     it 'uses values from the first branch encountered, picking the most specific subgroup' do
       expect(group.data_for('node1')['groups']).to eq(%w[parent1 child1 parent2 root])
       expect(group.data_for('node1')['vars']).to eq('foo' => 'bar', 'a' => 'b')
+      expect(group.data_for('node1')['features']).to match_array(%w[a b])
     end
   end
 end
