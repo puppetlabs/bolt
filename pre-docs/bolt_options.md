@@ -52,7 +52,7 @@ the `--nodes` flag and an `@` symbol: `bolt command run --nodes @nodes.txt`
 To pass nodes on `stdin`, on the command line, use a command to generate a node
 list, and pipe the result to Bolt with `-` after `--nodes` : `<COMMAND> | bolt command run --nodes -` For
 example, if you have a node list in a text file, you might run `cat nodes.txt |
-bolt command run --nodes`
+bolt command run --nodes -`
 
 
 ### Specifying nodes from an inventory file
@@ -96,6 +96,8 @@ This is useful on Windows, so that you do not have to include the winrm
 transport for each node. To override the default transport, specify the
 protocol on a per-host basis, such as `bolt command run facter --nodes
 win1,ssh://linux --transport winrm`
+
+If `localhost` is passed to `--nodes` when invoking Bolt on a non-windows OS the `local` transport is used automatically. This behaviour can be avoided by prepending the target with the desired transport (ex: `ssh://localhost`).
 
 
 ## Specifying connection credentials
