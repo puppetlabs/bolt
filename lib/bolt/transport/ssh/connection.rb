@@ -303,8 +303,15 @@ module Bolt
 
         def write_remote_executable(dir, file, filename = nil)
           filename ||= File.basename(file)
-          remote_path = "#{dir}/#{filename}"
+          remote_path = File.join(dir.to_s, filename)
           write_remote_file(file, remote_path)
+          make_executable(remote_path)
+          remote_path
+        end
+
+        def write_executable_from_content(dest, content, filename)
+          remote_path = File.join(dest.to_s, filename)
+          @session.scp.upload!(StringIO.new(content), remote_path)
           make_executable(remote_path)
           remote_path
         end
