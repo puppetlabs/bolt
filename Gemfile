@@ -6,6 +6,8 @@ source ENV['GEM_SOURCE'] || 'https://rubygems.org'
 ENV['BOLT_DISABLE_ANALYTICS'] = 'true'
 
 gemspec
+gem "puma"
+gem "sinatra"
 
 # Required to pick up plan specs in the rake spec task
 gem "puppetlabs_spec_helper",

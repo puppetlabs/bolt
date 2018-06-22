@@ -2,10 +2,9 @@
 
 require 'json'
 require 'open3'
+require 'bolt/task'
 
 module Bolt
-  Task = Struct.new(:name, :implementations, :input_method)
-
   class Applicator
     def initialize(inventory, executor)
       @inventory = inventory
@@ -46,7 +45,9 @@ module Bolt
 
         path = File.join(libexec, 'apply_catalog.rb')
         impl = { 'name' => 'apply_catalog.rb', 'path' => path, 'requirements' => [], 'supports_noop' => true }
-        task = Task.new('apply_catalog', [impl], 'stdin')
+        task = Bolt::Task.new(name: 'apply_catalog',
+                              implementations: [impl],
+                              input_method: 'stdin')
         params['catalog'] = catalog
         @executor.run_task([target], task, params, '_description' => 'apply catalog')
       end

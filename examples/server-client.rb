@@ -1,0 +1,55 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'net/http'
+require 'bolt'
+require 'json'
+
+puts "Starting bolt service..."
+pid = Process.spawn('bolt-server')
+sleep(2)
+
+# Send HTTP requests
+@uri = URI.parse("http://localhost:4567/ssh/run_task")
+@http = Net::HTTP.new(@uri.host, @uri.port)
+
+@header = { 'Content-Type': 'text/json' }
+
+def make_request(req_body)
+  json = JSON.generate(req_body)
+  request = Net::HTTP::Post.new(@uri.request_uri, @header)
+  request.body = json
+  response = @http.request(request)
+  puts "Responded with #{response.body}\n\n"
+  if response.body['result']['_error']
+    puts response.body['result']['_error']['details']['stack_trace']
+  end
+end
+
+# First request
+body = { 'task' => {},
+         'target' => {},
+         'parameters' => {} }
+body['task']['name'] = "echo"
+body['task']['metadata'] = {
+  "description": "Echo a message",
+  "parameters": { "message" => "Hello world!" }
+}
+# This is just so the file isn't overtaken with base64 file content
+file = File.open(File.join(File.dirname(__FILE__), "encoded-file"))
+body['task']['file_content'] = file.read
+body['target']['hostname'] = 'localhost'
+body['target']['user'] = ENV['BOLT_USER']
+body['target']['password'] = ENV['BOLT_PW']
+body['target']['options'] =  { "host-key-check" => "false",
+                               "insecure" => "true" }
+make_request(body)
+
+# Second request
+body['task']['name'] = 'service'
+body['parameters'] = { 'action' => 'status',
+                       'name' => 'postgresql' }
+make_request(body)
+
+puts "Stopping bolt service..."
+Process.kill("HUP", pid)
