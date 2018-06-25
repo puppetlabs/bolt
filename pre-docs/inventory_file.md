@@ -7,9 +7,9 @@ information for nodes or node groups.
 
 The inventory file is a yaml file stored by default at `inventory.yaml` inside
 the `Boltdir`. At the top level it contains an array of nodes and groups. Each
-node can have a config, vals, and facts specific to that node. Each group can
+node can have a config, vars, and facts specific to that node. Each group can
 have an array of nodes, an array of child groups, and can set default config,
-facts, and vals for the entire group.
+facts, and vars for the entire group.
 
 **Note:** config values set at the top level of inventory will only apply to
 targets included in that inventory file. Set config for unknown targets in the
@@ -65,11 +65,11 @@ nodes:
         user: me
 ```
 
-## Inventory facts and vals
+## Inventory facts and vars
 
 In addition to config values you can store information relating to `facts` and
-`vals` for nodes in the inventory. Facts represent observed information about
-the node including what can be collected by Facter. `vals` contain arbitrary
+`vars` for nodes in the inventory. Facts represent observed information about
+the node including what can be collected by Facter. `vars` contain arbitrary
 data that may be passed to run_* functions or used for logic in plans.
 
 ```yaml
@@ -82,7 +82,7 @@ groups:
     facts:
       operatingsystem: CentOS
   - name: production_nodes
-    vals:
+    vars:
       environment: production
 ```
 
@@ -99,7 +99,7 @@ A group is a map that requires a name and can contain any of the following:
 - `groups` : Groups object.
 - `config` : Config object.
 - `facts` : Facts object.
-- `vals` : Vals object.
+- `vars` : Vars object.
 
 A group name must match the regular expression
 values `/[a-zA-Z]\w+/`. This is the same restriction used for environments.
@@ -134,7 +134,7 @@ The URI used to create the node.
 Nodes
 An array of node objects.
 
-Vals
+Vars
 A map of value names and values. Values may include arrays or nested maps.
 
 ## File Format
