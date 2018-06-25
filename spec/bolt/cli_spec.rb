@@ -868,6 +868,7 @@ bar
           cli.execute(options)
           json = JSON.parse(output.string)
           expect(json).to eq([["apply::resource", "Apply a single Puppet resource"],
+                              ["boltlib::apply_catalog", "Apply a complete Puppet catalog"],
                               ["facts", "Gather system facts"],
                               ["facts::bash", "Gather system facts using bash"],
                               ["facts::powershell", "Gather system facts using powershell"],

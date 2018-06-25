@@ -1,0 +1,10 @@
+{
+  "description": "Apply a complete Puppet catalog",
+  "input_method": "stdin",
+  "parameters": {
+    "catalog": {
+      "description": "The catalog to apply",
+      "type": "Hash[String, Data]"
+    }
+  }
+}
