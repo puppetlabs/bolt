@@ -2,8 +2,10 @@
 
 require 'bolt/error'
 
-# Sets a particular feature to present on a target. Features are used to determine what implementation
-# of a task should be run. Currently supported features are
+# Sets a particular feature to present on a target.
+#
+# Features are used to determine what implementation of a task should be run.
+# Currently supported features are
 # - powershell
 # - shell
 # - puppet-agent

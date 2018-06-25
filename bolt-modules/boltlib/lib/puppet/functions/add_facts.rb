@@ -5,7 +5,7 @@ require 'bolt/error'
 # Deep merges a hash of facts with the existing facts on a target.
 Puppet::Functions.create_function(:add_facts) do
   # @param target A target.
-  # @param facts A hash of fact names to values that my include structured facts.
+  # @param facts A hash of fact names to values that may include structured facts.
   # @return The target's new facts.
   # @example Adding facts to a target
   #   add_facts($target, { 'os' => { 'family' => 'windows', 'name' => 'windows' } })
