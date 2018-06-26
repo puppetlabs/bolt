@@ -206,6 +206,12 @@ describe 'running with an inventory file', reset_puppet_settings: true do
         expect(run_one_node(run_command)).to be
       end
 
+      it 'does not set transport local on to windows' do
+        allow(Bolt::Util).to receive(:windows?).and_return(true)
+        result = run_failed_node(run_command)
+        expect(result['_error']['kind']).to eq('puppetlabs.tasks/connect-error')
+      end
+
       it 'connects to run a plan' do
         expect(run_cli_json(run_plan)[0]['status']).to eq('success')
       end

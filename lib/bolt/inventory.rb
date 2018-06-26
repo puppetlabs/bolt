@@ -138,7 +138,9 @@ module Bolt
 
       unless data
         data = {}
-        data['config'] = { 'transport' => 'local' } if target.name == 'localhost'
+        unless Bolt::Util.windows?
+          data['config'] = { 'transport' => 'local' } if target.name == 'localhost'
+        end
       end
 
       unless data['config']
