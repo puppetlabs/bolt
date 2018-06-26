@@ -1,21 +1,13 @@
 # Bolt Functions
 
-<% for func in @functions -%>
-* [`<%= func['name'] %>`](#<%= func['name'] %>): <%= func['text'].lines.first.chomp %>
-<% end -%>
-
 <% for func in @functions %>
 ## <%= func['name'] %>
 
 <%= func['text'] %>
 
 <% for sig in func['signatures'] %>
-<% if func['signatures'].count > 1 -%>
-----
-
-<% end -%>
 <% if sig['text'] != func['text'] -%>
-<%= sig['text'] %>
+### <%= sig['text'] %>
 
 <% end -%>
 ```
