@@ -234,6 +234,9 @@ Available options are:
       define('--debug', 'Display debug logging') do |_|
         @options[:debug] = true
       end
+      define('--trace', 'Display error stack traces') do |_|
+        @options[:trace] = true
+      end
       define('--version', 'Display the version') do |_|
         puts Bolt::VERSION
         raise Bolt::CLIExit

@@ -351,7 +351,7 @@ module Bolt
     end
 
     def outputter
-      @outputter ||= Bolt::Outputter.for_format(config[:format], config[:color])
+      @outputter ||= Bolt::Outputter.for_format(config[:format], config[:color], config[:trace])
     end
   end
 end

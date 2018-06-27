@@ -2,19 +2,20 @@
 
 module Bolt
   class Outputter
-    def self.for_format(format, color)
+    def self.for_format(format, color, trace)
       case format
       when 'human'
-        Bolt::Outputter::Human.new(color)
+        Bolt::Outputter::Human.new(color, trace)
       when 'json'
-        Bolt::Outputter::JSON.new(color)
+        Bolt::Outputter::JSON.new(color, trace)
       when nil
         raise "Cannot use outputter before parsing."
       end
     end
 
-    def initialize(color, stream = $stdout)
+    def initialize(color, trace, stream = $stdout)
       @color = color
+      @trace = trace
       @stream = stream
     end
 
