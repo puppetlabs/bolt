@@ -26,6 +26,7 @@ module Bolt
   Config = Struct.new(
     :concurrency,
     :format,
+    :trace,
     :inventoryfile,
     :log,
     :modulepath,
@@ -197,7 +198,7 @@ module Bolt
     end
 
     def update_from_cli(options)
-      %i[concurrency transport format modulepath inventoryfile color].each do |key|
+      %i[concurrency transport format trace modulepath inventoryfile color].each do |key|
         self[key] = options[key] if options.key?(key)
       end
 

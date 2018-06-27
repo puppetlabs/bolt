@@ -9,7 +9,7 @@ module BoltSpec
       allow(cli.config).to receive(:default_config).and_return(File.join('.', 'path', 'does not exist'))
       allow(cli.config).to receive(:default_inventory).and_return(File.join('.', 'path', 'does not exist'))
       output =  StringIO.new
-      outputter = outputter.new(false, output)
+      outputter = outputter.new(false, false, output)
       allow(cli).to receive(:outputter).and_return(outputter)
       allow(Bolt::Logger).to receive(:configure)
 

@@ -175,6 +175,12 @@ module Bolt
         if err.is_a? Bolt::RunFailure
           @stream.puts ::JSON.pretty_generate(err.result_set)
         end
+
+        if @trace && err.backtrace
+          err.backtrace.each do |line|
+            @stream.puts(colorize(:red, "\t#{line}"))
+          end
+        end
       end
     end
 
