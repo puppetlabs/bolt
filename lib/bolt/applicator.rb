@@ -37,11 +37,14 @@ module Bolt
           }
         }
 
-        out, err, stat = Open3.capture3('bolt_catalog', 'compile', stdin_data: catalog_input.to_json)
+        libexec = File.join(Gem::Specification.find_by_name('bolt').gem_dir, 'libexec')
+
+        bolt_catalog_exe = File.join(libexec, 'bolt_catalog')
+        out, err, stat = Open3.capture3(bolt_catalog_exe, 'compile', stdin_data: catalog_input.to_json)
         raise ApplyError.new(target.to_s, err) unless stat.success?
         catalog = JSON.parse(out)
 
-        path = File.join(__dir__, 'applicator', 'apply_catalog.rb')
+        path = File.join(libexec, 'apply_catalog.rb')
         impl = { 'name' => 'apply_catalog.rb', 'path' => path, 'requirements' => [], 'supports_noop' => true }
         task = Task.new('apply_catalog', [impl], 'stdin')
         params['catalog'] = catalog
