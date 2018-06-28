@@ -17,14 +17,8 @@ Puppet::Functions.create_function(:puppetdb_fact) do
   end
 
   def puppetdb_fact(certnames)
-    unless Puppet[:tasks]
-      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
-        Puppet::Pops::Issues::TASK_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, operation: 'puppetdb_fact'
-      )
-    end
-
     puppetdb_client = Puppet.lookup(:bolt_pdb_client) { nil }
-    unless puppetdb_client && Puppet.features.bolt?
+    unless puppetdb_client
       raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
         Puppet::Pops::Issues::TASK_MISSING_BOLT, action: _('query facts from puppetdb')
       )
