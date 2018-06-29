@@ -4,6 +4,7 @@ require 'bolt/executor'
 require 'bolt/error'
 require 'bolt/plan_result'
 require 'bolt/util'
+require 'bolt/applicator'
 
 module Bolt
   class PAL
@@ -114,7 +115,13 @@ module Bolt
     end
 
     def with_bolt_executor(executor, inventory, pdb_client = nil, &block)
-      Puppet.override({ bolt_executor: executor, bolt_inventory: inventory, bolt_pdb_client: pdb_client }, &block)
+      opts = {
+        bolt_executor: executor,
+        bolt_inventory: inventory,
+        bolt_pdb_client: pdb_client,
+        apply_executor: Applicator.new(inventory, executor)
+      }
+      Puppet.override(opts, &block)
     end
 
     def in_plan_compiler(executor, inventory, pdb_client)
