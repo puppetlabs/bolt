@@ -3,6 +3,7 @@
 require 'yaml'
 require 'logging'
 require 'concurrent'
+require 'pathname'
 require 'bolt/cli'
 require 'bolt/transport/ssh'
 require 'bolt/transport/winrm'
@@ -151,14 +152,10 @@ module Bolt
     private :update_from_file
 
     def find_boltdir(dir)
-      path = dir
-      boltdir = nil
-      while boltdir.nil? && path && path != File.dirname(path)
-        maybe_boltdir = File.join(path, BOLTDIR_NAME)
-        boltdir = maybe_boltdir if File.directory?(maybe_boltdir)
-        path = File.dirname(path)
+      Pathname.new(dir).ascend do |path|
+        boltdir = path + BOLTDIR_NAME
+        break boltdir.to_s if boltdir.directory?
       end
-      boltdir
     end
 
     def pwd
