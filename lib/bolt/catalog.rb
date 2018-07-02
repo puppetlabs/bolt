@@ -53,12 +53,6 @@ end
 
 module Bolt
   class Catalog
-    def in_env
-      Puppet::Pal.in_tmp_environment('bolt_apply', modulepath: ['~/bolt/modules/'], facts: @scope['facts']) do |pal|
-        yield pal
-      end
-    end
-
     def with_puppet_settings
       Dir.mktmpdir('bolt') do |dir|
         cli = []
