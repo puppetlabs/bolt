@@ -34,7 +34,12 @@ module Bolt
       }
 
       bolt_catalog_exe = File.join(libexec, 'bolt_catalog')
-      out, err, stat = Open3.capture3(bolt_catalog_exe, 'compile', stdin_data: catalog_input.to_json)
+
+      old_path = ENV['PATH']
+      ENV['PATH'] = "#{RbConfig::CONFIG['bindir']}:#{old_path}"
+      out, err, stat = Open3.capture3('ruby', bolt_catalog_exe, 'compile', stdin_data: catalog_input.to_json)
+      ENV['PATH'] = old_path
+
       raise ApplyError.new(target.to_s, err) unless stat.success?
       JSON.parse(out)
     end
