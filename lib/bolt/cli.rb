@@ -215,26 +215,18 @@ module Bolt
                              inventory_nodes: inventory.node_names.count,
                              inventory_groups: inventory.group_names.count)
 
-      if options[:mode] == 'plan' || options[:mode] == 'task'
-        pal = Bolt::PAL.new(config)
-      end
-
       if options[:action] == 'show'
         if options[:mode] == 'task'
           if options[:object]
-            outputter.print_task_info(pal.get_task_info(options[:object]))
+            show_task(options[:object])
           else
-            outputter.print_table(pal.list_tasks)
-            outputter.print_message("\nUse `bolt task show <task-name>` to view "\
-                                    "details and parameters for a specific task.")
+            list_tasks
           end
         elsif options[:mode] == 'plan'
           if options[:object]
-            outputter.print_plan_info(pal.get_plan_info(options[:object]))
+            show_plan(options[:object])
           else
-            outputter.print_table(pal.list_plans)
-            outputter.print_message("\nUse `bolt plan show <plan-name>` to view "\
-                                    "details and parameters for a specific plan.")
+            list_plans
           end
         end
         return 0
@@ -242,34 +234,12 @@ module Bolt
 
       message = 'There may be processes left executing on some nodes.'
 
-      if options[:task_options] && !options[:params_parsed] && pal
+      if %w[task plan].include?(options[:mode]) && options[:task_options] && !options[:params_parsed] && pal
         options[:task_options] = pal.parse_params(options[:mode], options[:object], options[:task_options])
       end
 
       if options[:mode] == 'plan'
-        unless options[:nodes].empty?
-          if options[:task_options]['nodes']
-            raise Bolt::CLIError,
-                  "A plan's 'nodes' parameter may be specified using the --nodes option, but in that " \
-                  "case it must not be specified as a separate nodes=<value> parameter nor included " \
-                  "in the JSON data passed in the --params option"
-          end
-          options[:task_options]['nodes'] = options[:nodes].join(',')
-        end
-
-        params = options[:noop] ? options[:task_options].merge("_noop" => true) : options[:task_options]
-        plan_context = { plan_name: options[:object],
-                         params: params }
-        plan_context[:description] = options[:description] if options[:description]
-
-        executor = Bolt::Executor.new(config, @analytics, options[:noop], bundled_content: bundled_content)
-        executor.start_plan(plan_context)
-        result = pal.run_plan(options[:object], options[:task_options], executor, inventory, puppetdb_client)
-
-        # If a non-bolt exeception bubbles up the plan won't get finished
-        executor.finish_plan(result)
-        outputter.print_plan_result(result)
-        code = result.ok? ? 0 : 1
+        code = run_plan(options[:object], options[:task_options], options[:nodes], options)
       else
         executor = Bolt::Executor.new(config, @analytics, options[:noop], bundled_content: bundled_content)
         targets = options[:targets]
@@ -328,6 +298,56 @@ module Bolt
       # restore original signal handler
       Signal.trap :INT, handler if handler
       @analytics&.finish
+    end
+
+    def show_task(task_name)
+      outputter.print_task_info(pal.get_task_info(task_name))
+    end
+
+    def list_tasks
+      outputter.print_table(pal.list_tasks)
+      outputter.print_message("\nUse `bolt task show <task-name>` to view "\
+                              "details and parameters for a specific task.")
+    end
+
+    def show_plan(plan_name)
+      outputter.print_plan_info(pal.get_plan_info(plan_name))
+    end
+
+    def list_plans
+      outputter.print_table(pal.list_plans)
+      outputter.print_message("\nUse `bolt plan show <plan-name>` to view "\
+                              "details and parameters for a specific plan.")
+    end
+
+    def run_plan(plan_name, plan_arguments, nodes, options)
+      unless nodes.empty?
+        if plan_arguments['nodes']
+          raise Bolt::CLIError,
+                "A plan's 'nodes' parameter may be specified using the --nodes option, but in that " \
+                "case it must not be specified as a separate nodes=<value> parameter nor included " \
+                "in the JSON data passed in the --params option"
+        end
+        plan_arguments['nodes'] = nodes.join(',')
+      end
+
+      params = options[:noop] ? plan_arguments.merge('_noop' => true) : plan_arguments
+      plan_context = { plan_name: plan_name,
+                       params: params }
+      plan_context[:description] = options[:description] if options[:description]
+
+      executor = Bolt::Executor.new(config, @analytics, options[:noop], bundled_content: bundled_content)
+      executor.start_plan(plan_context)
+      result = pal.run_plan(plan_name, plan_arguments, executor, inventory, puppetdb_client)
+
+      # If a non-bolt exeception bubbles up the plan won't get finished
+      executor.finish_plan(result)
+      outputter.print_plan_result(result)
+      result.ok? ? 0 : 1
+    end
+
+    def pal
+      @pal ||= Bolt::PAL.new(config)
     end
 
     def validate_file(type, path)
