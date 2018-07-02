@@ -13,6 +13,7 @@ describe "when runnning over the winrm transport", winrm: true do
   let(:modulepath) { File.join(__dir__, '../fixtures/modules') }
   let(:whoami) { "echo $env:UserName" }
   let(:stdin_task) { "sample::winstdin" }
+  let(:param_task) { "sample::winparams" }
   let(:uri) { conn_uri('winrm') }
   let(:password) { conn_info('winrm')[:password] }
   let(:user) { conn_info('winrm')[:user] }
@@ -37,6 +38,19 @@ describe "when runnning over the winrm transport", winrm: true do
     it 'runs a task', :reset_puppet_settings do
       result = run_one_node(%W[task run #{stdin_task} message=somemessage] + config_flags)
       expect(result['_output'].strip).to match(/STDIN: {"messa/)
+    end
+
+    it 'runs a task with parameters', :reset_puppet_settings do
+      result = run_one_node(%w[task run sample::winparams message=somemessage] + config_flags)
+      expect(result['_output'].strip).to match(/Message: somemessage/)
+    end
+
+    it 'runs a task with complex parameters', :reset_puppet_settings do
+      complex_input_file = File.join(__dir__, '../fixtures/complex_params/input.json')
+      expected = File.open(File.join(__dir__, '../fixtures/complex_params/output'), 'rb', &:read)
+
+      result = run_one_node(%W[task run sample::complex_params --params @#{complex_input_file}] + config_flags)
+      expect(result['_output']).to eq(expected)
     end
 
     it 'reports errors when task fails', :reset_puppet_settings do

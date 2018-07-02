@@ -401,22 +401,18 @@ Height: $Height ($(if ($Height -ne $null) { $Height.GetType().Name } else { 'nul
       end
     end
 
-    it "fails when the powershell input method is used to pass unexpected parameters to a task", winrm: true do
+    it "ignores unexpected parameters when the powershell input method is used", winrm: true do
       contents = <<-PS
         param (
           [Parameter()]
           [String]$foo
         )
 
-        $bar = $env:PT_bar
-        Write-Host `
-          "foo: $foo ($(if ($foo -ne $null) { $foo.GetType().Name } else { 'null' }))," `
-          "bar: $bar ($(if ($bar -ne $null) { $bar.GetType().Name } else { 'null' }))"
+        Write-Host "foo=$foo"
       PS
-      arguments = { bar: 30 } # note that the script doesn't recognize the 'bar' parameter
+      arguments = { foo: 30 } # note that the script doesn't recognize the 'bar' parameter
       with_task_containing('task-params-test-winrm', contents, 'powershell', '.ps1') do |task|
-        expect(winrm.run_task(target, task, arguments).error_hash)
-          .to_not be_nil
+        expect(winrm.run_task(target, task, arguments).message).to eq("foo=30\r\n")
       end
     end
 

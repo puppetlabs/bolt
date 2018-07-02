@@ -9,18 +9,23 @@ describe "Passes the _task metaparameter" do
   include BoltSpec::Conn
 
   let(:modulepath) { File.join(__dir__, '../fixtures/modules') }
-  let(:config_flags) {
-    %W[--format json
-       --modulepath #{modulepath}
-       --no-host-key-check ]
-  }
-  let(:uri) { conn_uri('ssh') }
-  let(:password) { conn_info('ssh')[:password] }
-  let(:target) { conn_uri('ssh', include_password: true) }
+  let(:config_flags) { %W[--format json --nodes #{target} --modulepath #{modulepath}] }
 
-  it 'prints the _task metaparameter in a task' do
-    params = ['--nodes', uri, '--password', password]
-    result = run_cli_json(%w[task run task_param] + params + config_flags)
-    expect(result['items'][0]['result']['_output']).to eq("Running task task_param\n")
+  describe 'over ssh', ssh: true do
+    let(:target) { conn_uri('ssh', include_password: true) }
+
+    it 'prints the _task metaparameter in a task' do
+      result = run_cli_json(%w[task run task_param --no-host-key-check] + config_flags)
+      expect(result['items'][0]['result']['_output']).to eq("Running task task_param\n")
+    end
+  end
+
+  describe 'over winrm', winrm: true do
+    let(:target) { conn_uri('winrm', include_password: true) }
+
+    it 'prints the _task metaparameter in a task' do
+      result = run_cli_json(%w[task run task_param::win --no-ssl] + config_flags)
+      expect(result['items'][0]['result']['_output']).to eq("Running task task_param::win\r\n")
+    end
   end
 end

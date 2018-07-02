@@ -128,9 +128,12 @@ catch
                 # fortunately, using PS with stdin input_method should never happen
                 if input_method == 'powershell'
                   conn.execute(<<-PS)
-$private:taskArgs = Get-ContentAsJson (
+$private:tempArgs = Get-ContentAsJson (
   $utf8.GetString([System.Convert]::FromBase64String('#{Base64.encode64(JSON.dump(arguments))}'))
 )
+$allowedArgs = (Get-Command "#{remote_path}").Parameters.Keys
+$private:taskArgs = @{}
+$private:tempArgs.Keys | ? { $allowedArgs -contains $_ } | % { $private:taskArgs[$_] = $private:tempArgs[$_] }
 try { & "#{remote_path}" @taskArgs } catch { Write-Error $_.Exception; exit 1 }
               PS
                 else

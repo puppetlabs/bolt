@@ -1,0 +1,47 @@
+Defined with arguments:
+* ArgArray of type array
+* ArgArrayOfHashes of type hashtable[]
+* ArgBool of type bool
+* ArgFileInfo of type System.IO.FileInfo
+* ArgFloat of type float
+* ArgGuid of type guid
+* ArgHashtable of type hashtable
+* ArgInt32 of type int
+* ArgRegex of type regex
+* ArgString of type string
+* ArgSwitch of type switch
+* ArgTimeSpan of type timespan
+
+Received arguments:
+* ArgArray (System.Object[]):
+0
+foo
+True
+key: value
+* ArgArrayOfHashes (hashtable[]):
+name: puppet
+version_requirement: >= 3.7.0 < 6.0.0
+name: pe
+version_requirement: >= 5.0.0
+* ArgBool (bool):
+False
+* ArgFileInfo (System.IO.FileInfo):
+/Users/foo/source/puppet/Gemfile
+* ArgFloat (float):
+42.42
+* ArgGuid (guid):
+74be6039-e777-45fe-aa56-3d356443e096
+* ArgHashtable (hashtable):
+key: value
+key2: 2
+key3: True
+* ArgInt32 (int):
+5
+* ArgRegex (regex):
+^http:\/\/
+* ArgString (string):
+hello all
+* ArgSwitch (switch):
+True
+* ArgTimeSpan (timespan):
+12:34:56
