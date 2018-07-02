@@ -35,6 +35,9 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
       executor.report_function_call('run_plan')
     end
 
+    # Report bundled content, this should capture plans run from both CLI and Plans
+    executor.report_bundled_content('Plan', plan_name)
+
     params = named_args.reject { |k, _| k.start_with?('_') }
 
     loaders = closure_scope.compiler.loaders

@@ -1031,6 +1031,7 @@ bar
         let(:task_t) { task_type(task_name, Regexp.new(task_path), input_method) }
 
         before :each do
+          allow(executor).to receive(:report_bundled_content)
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
         end
 
@@ -1343,6 +1344,7 @@ bar
 
         before :each do
           allow(executor).to receive(:report_function_call)
+          allow(executor).to receive(:report_bundled_content)
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
         end
 
@@ -1560,6 +1562,7 @@ bar
         let(:task_t) { task_type(task_name, %r{modules/sample/tasks/noop.sh$}, nil) }
 
         before :each do
+          allow(executor).to receive(:report_bundled_content)
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
         end
 
