@@ -114,10 +114,16 @@ module Bolt
         end
       end
 
-      def run_task(target, task, arguments, options = {})
-        executable = target.select_impl(task, PROVIDED_FEATURES)
-        raise "No suitable implementation of #{task.name} for #{target.name}" unless executable
+      def from_api?(task)
+        if task.respond_to? :file_content
+          unless task.file_content.nil?
+            return true
+          end
+        end
+        false
+      end
 
+      def run_task(target, task, arguments, options = {})
         input_method = task.input_method || "both"
         with_connection(target) do |conn|
           conn.running_as(options['_run_as']) do
@@ -138,7 +144,15 @@ module Bolt
             end
 
             conn.with_remote_tempdir do |dir|
-              remote_task_path = conn.write_remote_executable(dir, executable)
+              if from_api?(task)
+                filename = task.name.split("::").last
+                remote_task_path = conn.write_executable_from_content(dir, task.file_content, filename)
+              else
+                executable = target.select_impl(task, PROVIDED_FEATURES)
+                raise "No suitable implementation of #{task.name} for #{target.name}" unless executable
+
+                remote_task_path = conn.write_remote_executable(dir, executable)
+              end
               if conn.run_as && stdin
                 wrapper = make_wrapper_stringio(remote_task_path, stdin)
                 remote_wrapper_path = conn.write_remote_executable(dir, wrapper, 'wrapper.sh')
