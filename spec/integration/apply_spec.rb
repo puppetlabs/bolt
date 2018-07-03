@@ -20,14 +20,6 @@ describe "Passes parsed AST to the apply_catalog task" do
     }
   end
 
-  def read_ast(str)
-    Bolt::Catalog.new.with_puppet_settings do
-      # rubocop:disable Security/Eval
-      Puppet::Pops::Serialization::FromDataConverter.convert(eval(str))
-      # rubocop:enable Security/Eval
-    end
-  end
-
   describe 'over ssh', ssh: true do
     let(:uri) { conn_uri('ssh') }
     let(:password) { conn_info('ssh')[:password] }
@@ -35,13 +27,16 @@ describe "Passes parsed AST to the apply_catalog task" do
 
     it 'echos the catalog ast' do
       result = run_cli_json(%w[plan run basic --no-host-key-check] + config_flags)
-      expect(result[0]['result']['_output']).to be
-      expect(result[0]['result']['_output']).to match(%r{File.*/root/test/})
-      expect(result[0]['result']['_output']).to match(/hi there I'm Debian/)
-
-      ast = read_ast(result[0]['result']['_output'])
+      ast = result[0]['result']
+      expect(ast).to be
       expect(ast['catalog_uuid']).to be
       expect(ast['resources'].count).to eq(5)
+
+      resources = ast['resources'].group_by { |r| r['type'] }
+      expect(resources['File'].count).to eq(2)
+      files = resources['File'].select { |f| f['title'] == '/root/test/hello.txt' }
+      expect(files.count).to eq(1)
+      expect(files[0]['parameters']['content']).to match(/hi there I'm Debian/)
     end
   end
 
@@ -52,13 +47,16 @@ describe "Passes parsed AST to the apply_catalog task" do
 
     it 'echos the catalog ast' do
       result = run_cli_json(%w[plan run basic --no-ssl --no-ssl-verify] + config_flags)
-      expect(result[0]['result']['_output']).to be
-      expect(result[0]['result']['_output']).to match(%r{File.*/root/test/})
-      expect(result[0]['result']['_output']).to match(/hi there I'm windows/)
-
-      ast = read_ast(result[0]['result']['_output'])
+      ast = result[0]['result']
+      expect(ast).to be
       expect(ast['catalog_uuid']).to be
       expect(ast['resources'].count).to eq(5)
+
+      resources = ast['resources'].group_by { |r| r['type'] }
+      expect(resources['File'].count).to eq(2)
+      files = resources['File'].select { |f| f['title'] == '/root/test/hello.txt' }
+      expect(files.count).to eq(1)
+      expect(files[0]['parameters']['content']).to match(/hi there I'm windows/)
     end
   end
 end
