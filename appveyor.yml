@@ -31,7 +31,7 @@ before_test:
       type Gemfile.lock
       $CACertFile = Join-Path -Path $ENV:AppData -ChildPath 'RubyCACert.pem'
 
-      If (-Not (Test-Path -Path $CACertFile)) {  
+      If (-Not (Test-Path -Path $CACertFile)) {
         "Downloading CA Cert bundle.."
           [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
             Invoke-WebRequest -Uri 'https://curl.haxx.se/ca/cacert.pem' -UseBasicParsing -OutFile $CACertFile | Out-Null
