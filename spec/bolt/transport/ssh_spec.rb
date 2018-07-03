@@ -289,6 +289,15 @@ SHELLWORDS
       end
     end
 
+    it "serializes hashes as json in environment input", ssh: true do
+      contents = "#!/bin/sh\nprintenv PT_message"
+      arguments = { message: { key: 'val' } }
+      with_task_containing('tasks_test_hash', contents, 'environment') do |task|
+        expect(ssh.run_task(target, task, arguments).value)
+          .to eq('key' => 'val')
+      end
+    end
+
     it "can run a task passing input on stdin and environment", ssh: true do
       contents = <<SHELL
 #!/bin/sh

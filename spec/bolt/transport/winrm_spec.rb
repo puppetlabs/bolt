@@ -493,6 +493,16 @@ PS
       end
     end
 
+    it "serializes hashes as json in environment input", winrm: true do
+      contents = "echo $env:PT_message"
+      arguments = { message: { key: 'val' } }
+      with_task_containing('tasks_test_hash', contents, 'environment', '.ps1') do |task|
+        expect(
+          winrm.run_task(target, task, arguments).value
+        ).to eq('key' => 'val')
+      end
+    end
+
     it "defaults to powershell input method when executing .ps1", winrm: true do
       contents = <<PS
 param ($message_one, $message_two)

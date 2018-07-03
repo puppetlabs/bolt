@@ -1,3 +1,3 @@
 #!/bin/sh
 
-echo $PT_catalog
+printenv PT_catalog
