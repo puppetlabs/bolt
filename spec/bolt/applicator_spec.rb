@@ -9,7 +9,8 @@ describe Bolt::Applicator do
   let(:target) { Bolt::Target.new(uri) }
   let(:inventory) { Bolt::Inventory.new(nil) }
   let(:executor) { Bolt::Executor.new }
-  let(:applicator) { Bolt::Applicator.new(inventory, executor, :mod, :pdb, nil, 2) }
+  let(:pdb_client) { Bolt::PuppetDB::Client.new(URI.parse('https://localhost:8081'), '/path/to/ca', token: 'token') }
+  let(:applicator) { Bolt::Applicator.new(inventory, executor, :mod, pdb_client, nil, 2) }
 
   it 'instantiates' do
     expect(applicator).to be
@@ -19,7 +20,13 @@ describe Bolt::Applicator do
     input = {
       code_ast: :ast,
       modulepath: :mod,
-      pdb_config: :pdb,
+      pdb_config: {
+        uri: 'https://localhost:8081',
+        cacert: '/path/to/ca',
+        token: 'token',
+        cert: nil,
+        key: nil
+      },
       hiera_config: nil,
       target: {
         name: uri,

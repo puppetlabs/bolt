@@ -8,11 +8,11 @@ module Bolt
   Task = Struct.new(:name, :implementations, :input_method)
 
   class Applicator
-    def initialize(inventory, executor, modulepath, pdb_config, hiera_config, max_compiles)
+    def initialize(inventory, executor, modulepath, pdb_client, hiera_config, max_compiles)
       @inventory = inventory
       @executor = executor
       @modulepath = modulepath
-      @pdb_config = pdb_config
+      @pdb_client = pdb_client
       @hiera_config = hiera_config ? validate_hiera_config(hiera_config) : nil
 
       @pool = Concurrent::ThreadPoolExecutor.new(max_threads: max_compiles)
@@ -36,7 +36,7 @@ module Bolt
       catalog_input = {
         code_ast: ast,
         modulepath: @modulepath,
-        pdb_config: @pdb_config,
+        pdb_config: @pdb_client&.config,
         hiera_config: @hiera_config,
         target: {
           name: target.host,

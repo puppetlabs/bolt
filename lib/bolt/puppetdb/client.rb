@@ -33,6 +33,16 @@ module Bolt
         @key = key
       end
 
+      def config
+        {
+          uri: @uri,
+          cacert: @cacert,
+          token: @token,
+          cert: @cert,
+          key: @key
+        }
+      end
+
       def query_certnames(query)
         return [] unless query
 

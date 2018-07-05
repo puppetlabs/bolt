@@ -15,7 +15,7 @@ describe 'ResultSet DataType' do
   before(:all) { Bolt::PAL.load_puppet }
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
 
-  let(:pal) { Bolt::PAL.new(config) }
+  let(:pal) { Bolt::PAL.new(modulepath, nil) }
   let(:result_code) do
     <<-PUPPET
 $result_set = results::make_result_set( {

@@ -75,7 +75,7 @@ module Bolt
 
       config.update(options)
       config.validate
-      Bolt::Logger.configure(config)
+      Bolt::Logger.configure(config[:log], config[:color])
 
       # This section handles parsing non-flag options which are
       # subcommand specific rather then part of the config
@@ -241,7 +241,10 @@ module Bolt
       if options[:subcommand] == 'plan'
         code = run_plan(options[:object], options[:task_options], options[:nodes], options)
       else
-        executor = Bolt::Executor.new(config, @analytics, options[:noop], bundled_content: bundled_content)
+        executor = Bolt::Executor.new(config[:concurrency],
+                                      @analytics,
+                                      options[:noop],
+                                      bundled_content: bundled_content)
         targets = options[:targets]
 
         results = nil
@@ -336,7 +339,7 @@ module Bolt
                        params: params }
       plan_context[:description] = options[:description] if options[:description]
 
-      executor = Bolt::Executor.new(config, @analytics, options[:noop], bundled_content: bundled_content)
+      executor = Bolt::Executor.new(config[:concurrency], @analytics, options[:noop], bundled_content: bundled_content)
       executor.start_plan(plan_context)
       result = pal.run_plan(plan_name, plan_arguments, executor, inventory, puppetdb_client)
 
@@ -347,7 +350,7 @@ module Bolt
     end
 
     def pal
-      @pal ||= Bolt::PAL.new(config)
+      @pal ||= Bolt::PAL.new(config.modulepath, config[:'hiera-config'], config[:'compile-concurrency'])
     end
 
     def validate_file(type, path)
@@ -375,7 +378,7 @@ module Bolt
     end
 
     def bundled_content
-      default_content = Bolt::PAL.new(Bolt::Config.new)
+      default_content = Bolt::PAL.new([], nil)
       plans = default_content.list_plans.each_with_object([]) do |iter, col|
         col << iter&.first
       end

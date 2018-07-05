@@ -369,7 +369,7 @@ bar
 
     describe "console log level" do
       it "is not sensitive to ordering of debug and verbose" do
-        expect(Bolt::Logger).to receive(:configure).with(have_attributes(log: { 'console' => { level: :debug } }))
+        expect(Bolt::Logger).to receive(:configure).with({ 'console' => { level: :debug } }, true)
 
         cli = Bolt::CLI.new(%w[command run --nodes foo --debug --verbose])
         cli.parse
@@ -1562,7 +1562,7 @@ bar
 
       before :each do
         allow(cli).to receive(:bundled_content).and_return(bundled_content)
-        expect(Bolt::Executor).to receive(:new).with(config,
+        expect(Bolt::Executor).to receive(:new).with(config[:concurrency],
                                                      anything,
                                                      true,
                                                      bundled_content: bundled_content).and_return(executor)

@@ -98,8 +98,9 @@ module Bolt
       target = request['target']
 
       pdb_client = Bolt::Util::OnAccess.new do
-        pdb_config = Bolt::PuppetDB::Config.new(nil, request['pdb_config'])
-        Bolt::PuppetDB::Client.from_config(pdb_config)
+        uri = URI.parse(request['pdb_config']['uri'])
+        cacert, token, cert, key = request['pdb_config'].values_at(:cacert, :token, :cert, :key)
+        Bolt::PuppetDB::Client.new(uri, cacert, token: token, cert: cert, key: key)
       end
 
       with_puppet_settings(request['hiera_config']) do
