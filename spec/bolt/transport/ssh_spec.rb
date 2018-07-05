@@ -14,9 +14,11 @@ describe Bolt::Transport::SSH do
   include BoltSpec::Files
   include BoltSpec::Task
 
+  let(:boltdir) { Bolt::Boltdir.new('.') }
+
   def mk_config(conf)
     conf = Bolt::Util.walk_keys(conf, &:to_s)
-    Bolt::Config.new(transports: { ssh: conf })
+    Bolt::Config.new(boltdir, 'ssh' => conf)
   end
 
   let(:hostname) { ENV['BOLT_SSH_HOST'] || "localhost" }

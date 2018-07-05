@@ -193,7 +193,7 @@ Available options are:
       end
       define('--boltdir FILEPATH',
              'Specify what Boltdir to load config from (default: autodiscovered from current working dir)') do |path|
-        @options[:configfile] = path
+        @options[:boltdir] = path
       end
       define('--configfile FILEPATH',
              'Specify where to load config from (default: ~/.puppetlabs/bolt/bolt.yaml)') do |path|

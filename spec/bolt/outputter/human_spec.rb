@@ -8,7 +8,6 @@ require 'bolt/plan_result'
 describe "Bolt::Outputter::Human" do
   let(:output) { StringIO.new }
   let(:outputter) { Bolt::Outputter::Human.new(false, false, output) }
-  let(:config) { Bolt::Config.new }
   let(:target) { Bolt::Target.new('node1') }
   let(:target2) { Bolt::Target.new('node2') }
   let(:results) {

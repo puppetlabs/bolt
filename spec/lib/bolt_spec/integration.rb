@@ -6,8 +6,8 @@ module BoltSpec
       cli = Bolt::CLI.new(arguments)
 
       # prevent tests from reading users config
-      allow(cli.config).to receive(:default_config).and_return(File.join('.', 'path', 'does not exist'))
-      allow(cli.config).to receive(:default_inventory).and_return(File.join('.', 'path', 'does not exist'))
+      allow(Bolt::Config).to receive(:legacy_conf).and_return(File.join('.', 'path', 'does not exist'))
+      allow(Bolt::Boltdir).to receive(:find_boltdir).and_return(Bolt::Boltdir.new(Dir.mktmpdir))
       puppetdb_client = Bolt::PuppetDB::Client.new(URI.parse('https://puppetdb.example.com'), '/path/to/cacert')
       allow(cli).to receive(:puppetdb_client).and_return(puppetdb_client)
       output =  StringIO.new

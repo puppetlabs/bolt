@@ -34,8 +34,8 @@ module Bolt
     def initialize(argv)
       Bolt::Logger.initialize_logging
       @logger = Logging.logger[self]
-      @config = Bolt::Config.new
       @argv = argv
+      @config = Bolt::Config.default
       @options = {
         nodes: []
       }
@@ -73,10 +73,6 @@ module Bolt
         raise Bolt::CLIExit
       end
 
-      config.update(options)
-      config.validate
-      Bolt::Logger.configure(config[:log], config[:color])
-
       # This section handles parsing non-flag options which are
       # subcommand specific rather then part of the config
       options[:action] = remaining.shift
@@ -98,6 +94,19 @@ module Bolt
       options[:leftovers] = remaining
 
       validate(options)
+
+      @config = if options[:configfile]
+                  Bolt::Config.from_file(options[:configfile], options)
+                else
+                  boltdir = if options[:boltdir]
+                              Bolt::Boltdir.new(options[:boltdir])
+                            else
+                              Bolt::Boltdir.find_boltdir(Dir.pwd)
+                            end
+                  Bolt::Config.from_boltdir(boltdir, options)
+                end
+
+      Bolt::Logger.configure(config.log, config.color)
 
       # After validation, initialize inventory and targets. Errors here are better to catch early.
       unless options[:action] == 'show'
@@ -163,6 +172,10 @@ module Bolt
         end
       end
 
+      if options[:boltdir] && options[:configfile]
+        raise Bolt::CLIError, "Only one of '--boltdir' or '--configfile' may be specified"
+      end
+
       if options[:noop] && (options[:subcommand] != 'task' || options[:action] != 'run')
         raise Bolt::CLIError,
               "Option '--noop' may only be specified when running a task"
@@ -210,7 +223,7 @@ module Bolt
       end
 
       @analytics.screen_view(screen,
-                             output_format: config[:format],
+                             output_format: config.format,
                              target_nodes: options.fetch(:targets, []).count,
                              inventory_nodes: inventory.node_names.count,
                              inventory_groups: inventory.group_names.count)
@@ -241,10 +254,7 @@ module Bolt
       if options[:subcommand] == 'plan'
         code = run_plan(options[:object], options[:task_options], options[:nodes], options)
       else
-        executor = Bolt::Executor.new(config[:concurrency],
-                                      @analytics,
-                                      options[:noop],
-                                      bundled_content: bundled_content)
+        executor = Bolt::Executor.new(config.concurrency, @analytics, options[:noop], bundled_content: bundled_content)
         targets = options[:targets]
 
         results = nil
@@ -339,7 +349,7 @@ module Bolt
                        params: params }
       plan_context[:description] = options[:description] if options[:description]
 
-      executor = Bolt::Executor.new(config[:concurrency], @analytics, options[:noop], bundled_content: bundled_content)
+      executor = Bolt::Executor.new(config.concurrency, @analytics, options[:noop], bundled_content: bundled_content)
       executor.start_plan(plan_context)
       result = pal.run_plan(plan_name, plan_arguments, executor, inventory, puppetdb_client)
 
@@ -350,7 +360,7 @@ module Bolt
     end
 
     def pal
-      @pal ||= Bolt::PAL.new(config.modulepath, config[:'hiera-config'], config[:'compile-concurrency'])
+      @pal ||= Bolt::PAL.new(config.modulepath, config.hiera_config, config.compile_concurrency)
     end
 
     def validate_file(type, path)
@@ -374,7 +384,7 @@ module Bolt
     end
 
     def outputter
-      @outputter ||= Bolt::Outputter.for_format(config[:format], config[:color], config[:trace])
+      @outputter ||= Bolt::Outputter.for_format(config.format, config.color, config.trace)
     end
 
     def bundled_content

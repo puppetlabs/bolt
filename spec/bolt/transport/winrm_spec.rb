@@ -13,11 +13,13 @@ describe Bolt::Transport::WinRM do
   include BoltSpec::Files
   include BoltSpec::Task
 
+  let(:boltdir) { Bolt::Boltdir.new('.') }
+
   def mk_config(conf)
     stringified = conf.each_with_object({}) { |(k, v), coll| coll[k.to_s] = v }
     # The default of 10 seconds seems to be too short to always succeed in AppVeyor.
     stringified['connect-timeout'] ||= 20
-    Bolt::Config.new(transport: 'winrm', transports: { winrm: stringified })
+    Bolt::Config.new(boltdir, 'transport' => 'winrm', 'winrm' => stringified)
   end
 
   let(:host) { ENV['BOLT_WINRM_HOST'] || 'localhost' }
@@ -38,7 +40,7 @@ foreach ($i in $args)
 PS
 
   def make_target(host_: host, port_: port, conf: config)
-    Bolt::Target.new("#{host_}:#{port_}").update_conf(conf)
+    Bolt::Target.new("#{host_}:#{port_}").update_conf(conf.transport_conf)
   end
 
   let(:target) { make_target }
@@ -80,7 +82,7 @@ PS
     it "adheres to the specified timeout" do
       TCPServer.open(0) do |socket|
         port = socket.addr[1]
-        config[:transports][:winrm]['connect-timeout'] = 2
+        config.transports[:winrm]['connect-timeout'] = 2
 
         Timeout.timeout(3) do
           expect_node_error(Bolt::Node::ConnectError,
