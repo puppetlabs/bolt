@@ -36,19 +36,25 @@ body['task']['metadata'] = {
   "parameters": { "message" => "Hello world!" }
 }
 # This is just so the file isn't overtaken with base64 file content
-file = File.open(File.join(File.dirname(__FILE__), "encoded-file"))
+file = File.open(File.join(File.dirname(__FILE__), "echo-task"))
 body['task']['file_content'] = file.read
 body['target']['hostname'] = 'localhost'
 body['target']['user'] = ENV['BOLT_USER']
 body['target']['password'] = ENV['BOLT_PW']
 body['target']['options'] =  { "host-key-check" => "false",
                                "insecure" => "true" }
+body['parameters'] = { "message" => "Hello!" }
 make_request(body)
 
 # Second request
-body['task']['name'] = 'service'
-body['parameters'] = { 'action' => 'status',
-                       'name' => 'postgresql' }
+file = File.open(File.join(File.dirname(__FILE__), "package-task"))
+body['task']['file_content'] = file.read
+body['task']['name'] = 'package::status'
+# This is a little gross but works
+body['parameters'] = { 'name' => 'cowsay',
+                       'action' => "status",
+                       'version' => "",
+                       'provider' => 'apt' }
 make_request(body)
 
 puts "Stopping bolt service..."
