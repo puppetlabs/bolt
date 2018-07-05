@@ -146,7 +146,9 @@ module Bolt
             conn.with_remote_tempdir do |dir|
               if from_api?(task)
                 filename = task.name.split("::").last
-                remote_task_path = conn.write_executable_from_content(dir, task.file_content, filename)
+                remote_task_path = conn.write_executable_from_content(dir,
+                                                                      Base64.decode64(task.file_content),
+                                                                      filename)
               else
                 executable = target.select_impl(task, PROVIDED_FEATURES)
                 raise "No suitable implementation of #{task.name} for #{target.name}" unless executable
