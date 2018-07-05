@@ -489,7 +489,7 @@ bar
 
     it "distinguishes subcommands" do
       cli = Bolt::CLI.new(%w[script run --nodes foo])
-      expect(cli.parse).to include(mode: 'script')
+      expect(cli.parse).to include(subcommand: 'script')
     end
 
     describe "file" do
@@ -681,7 +681,7 @@ bar
         let(:options) {
           {
             targets: targets,
-            mode: 'command',
+            subcommand: 'command',
             action: 'run',
             object: 'whoami'
           }
@@ -728,7 +728,7 @@ bar
       context "when running a script" do
         let(:script) { 'bar.sh' }
         let(:options) {
-          { targets: targets, mode: 'script', action: 'run', object: script,
+          { targets: targets, subcommand: 'script', action: 'run', object: script,
             leftovers: [] }
         }
 
@@ -808,7 +808,7 @@ bar
 
         it "lists tasks with description" do
           options = {
-            mode: 'task',
+            subcommand: 'task',
             action: 'show'
           }
           cli.execute(options)
@@ -831,7 +831,7 @@ bar
         it "shows an individual task data" do
           task_name = 'sample::params'
           options = {
-            mode: 'task',
+            subcommand: 'task',
             action: 'show',
             object: task_name
           }
@@ -883,7 +883,7 @@ bar
 
         it "task show prints a warning but shows other valid tasks" do
           options = {
-            mode: 'task',
+            subcommand: 'task',
             action: 'show'
           }
           cli.execute(options)
@@ -912,7 +912,7 @@ bar
 
         it "task show displays an error" do
           options = {
-            mode: 'task',
+            subcommand: 'task',
             action: 'show',
             object: 'abcdefg'
           }
@@ -932,7 +932,7 @@ bar
 
         it "lists plans" do
           options = {
-            mode: 'plan',
+            subcommand: 'plan',
             action: 'show'
           }
           cli.execute(options)
@@ -950,7 +950,7 @@ bar
         it "shows an individual plan data" do
           plan_name = 'sample::optional_params_task'
           options = {
-            mode: 'plan',
+            subcommand: 'plan',
             action: 'show',
             object: plan_name
           }
@@ -981,7 +981,7 @@ bar
 
         it "plan show prints a warning but shows other valid plans" do
           options = {
-            mode: 'plan',
+            subcommand: 'plan',
             action: 'show'
           }
 
@@ -1005,7 +1005,7 @@ bar
 
           options = {
             nodes: [],
-            mode: 'plan',
+            subcommand: 'plan',
             action: 'run',
             object: plan_name,
             task_options: plan_params
@@ -1021,7 +1021,7 @@ bar
 
         it "plan show displays an error" do
           options = {
-            mode: 'plan',
+            subcommand: 'plan',
             action: 'show',
             object: 'abcdefg'
           }
@@ -1040,7 +1040,7 @@ bar
         let(:options) {
           {
             targets: targets,
-            mode: 'task',
+            subcommand: 'task',
             action: 'run',
             object: task_name,
             task_options: task_params,
@@ -1355,7 +1355,7 @@ bar
         let(:options) {
           {
             nodes: [],
-            mode: 'plan',
+            subcommand: 'plan',
             action: 'run',
             object: plan_name,
             task_options: plan_params
@@ -1494,7 +1494,7 @@ bar
         let(:options) {
           {
             targets: targets,
-            mode: 'file',
+            subcommand: 'file',
             action: 'upload',
             object: source,
             leftovers: [dest]
@@ -1577,7 +1577,7 @@ bar
         let(:options) {
           {
             targets: targets,
-            mode: 'task',
+            subcommand: 'task',
             action: 'run',
             object: task_name,
             task_options: task_params,

@@ -48,15 +48,15 @@ module Bolt
     private :inventory
 
     def help?(parser, remaining)
-      # Set the mode
-      options[:mode] = remaining.shift
+      # Set the subcommand
+      options[:subcommand] = remaining.shift
 
-      if options[:mode] == 'help'
+      if options[:subcommand] == 'help'
         options[:help] = true
-        options[:mode] = remaining.shift
+        options[:subcommand] = remaining.shift
       end
 
-      # Update the parser for the new mode
+      # Update the parser for the new subcommand
       parser.update
 
       options[:help]
@@ -78,7 +78,7 @@ module Bolt
       Bolt::Logger.configure(config)
 
       # This section handles parsing non-flag options which are
-      # mode specific rather then part of the config
+      # subcommand specific rather then part of the config
       options[:action] = remaining.shift
       options[:object] = remaining.shift
 
@@ -107,7 +107,7 @@ module Bolt
           end
           nodes = query_puppetdb_nodes(options[:query])
           options[:targets] = inventory.get_targets(nodes)
-          options[:nodes] = nodes if options[:mode] == 'plan'
+          options[:nodes] = nodes if options[:subcommand] == 'plan'
         else
           options[:targets] = inventory.get_targets(options[:nodes])
         end
@@ -120,42 +120,42 @@ module Bolt
     end
 
     def validate(options)
-      unless COMMANDS.include?(options[:mode])
+      unless COMMANDS.include?(options[:subcommand])
         raise Bolt::CLIError,
-              "Expected subcommand '#{options[:mode]}' to be one of " \
+              "Expected subcommand '#{options[:subcommand]}' to be one of " \
               "#{COMMANDS.keys.join(', ')}"
       end
 
       if options[:action].nil?
         raise Bolt::CLIError,
-              "Expected an action of the form 'bolt #{options[:mode]} <action>'"
+              "Expected an action of the form 'bolt #{options[:subcommand]} <action>'"
       end
 
-      actions = COMMANDS[options[:mode]]
+      actions = COMMANDS[options[:subcommand]]
       unless actions.include?(options[:action])
         raise Bolt::CLIError,
               "Expected action '#{options[:action]}' to be one of " \
               "#{actions.join(', ')}"
       end
 
-      if options[:mode] != 'file' && options[:mode] != 'script' &&
+      if options[:subcommand] != 'file' && options[:subcommand] != 'script' &&
          !options[:leftovers].empty?
         raise Bolt::CLIError,
               "Unknown argument(s) #{options[:leftovers].join(', ')}"
       end
 
-      if %w[task plan].include?(options[:mode]) && options[:action] == 'run'
+      if %w[task plan].include?(options[:subcommand]) && options[:action] == 'run'
         if options[:object].nil?
-          raise Bolt::CLIError, "Must specify a #{options[:mode]} to run"
+          raise Bolt::CLIError, "Must specify a #{options[:subcommand]} to run"
         end
         # This may mean that we parsed a parameter as the object
         unless options[:object] =~ /\A([a-z][a-z0-9_]*)?(::[a-z][a-z0-9_]*)*\Z/
           raise Bolt::CLIError,
-                "Invalid #{options[:mode]} '#{options[:object]}'"
+                "Invalid #{options[:subcommand]} '#{options[:object]}'"
         end
       end
 
-      if options[:mode] != 'plan' && options[:action] != 'show'
+      if options[:subcommand] != 'plan' && options[:action] != 'show'
         if options[:nodes].empty? && options[:query].nil?
           raise Bolt::CLIError, "Targets must be specified with '--nodes' or '--query'"
         elsif options[:nodes].any? && options[:query]
@@ -163,7 +163,7 @@ module Bolt
         end
       end
 
-      if options[:noop] && (options[:mode] != 'task' || options[:action] != 'run')
+      if options[:noop] && (options[:subcommand] != 'task' || options[:action] != 'run')
         raise Bolt::CLIError,
               "Option '--noop' may only be specified when running a task"
       end
@@ -203,7 +203,7 @@ module Bolt
 
       @analytics = Bolt::Analytics.build_client
 
-      screen = "#{options[:mode]}_#{options[:action]}"
+      screen = "#{options[:subcommand]}_#{options[:action]}"
       # submit a different screen for `bolt task show` and `bolt task show foo`
       if options[:action] == 'show' && options[:object]
         screen += '_object'
@@ -216,13 +216,13 @@ module Bolt
                              inventory_groups: inventory.group_names.count)
 
       if options[:action] == 'show'
-        if options[:mode] == 'task'
+        if options[:subcommand] == 'task'
           if options[:object]
             show_task(options[:object])
           else
             list_tasks
           end
-        elsif options[:mode] == 'plan'
+        elsif options[:subcommand] == 'plan'
           if options[:object]
             show_plan(options[:object])
           else
@@ -234,11 +234,11 @@ module Bolt
 
       message = 'There may be processes left executing on some nodes.'
 
-      if %w[task plan].include?(options[:mode]) && options[:task_options] && !options[:params_parsed] && pal
-        options[:task_options] = pal.parse_params(options[:mode], options[:object], options[:task_options])
+      if %w[task plan].include?(options[:subcommand]) && options[:task_options] && !options[:params_parsed] && pal
+        options[:task_options] = pal.parse_params(options[:subcommand], options[:object], options[:task_options])
       end
 
-      if options[:mode] == 'plan'
+      if options[:subcommand] == 'plan'
         code = run_plan(options[:object], options[:task_options], options[:nodes], options)
       else
         executor = Bolt::Executor.new(config, @analytics, options[:noop], bundled_content: bundled_content)
@@ -251,7 +251,7 @@ module Bolt
           executor_opts = {}
           executor_opts['_description'] = options[:description] if options.key?(:description)
           results =
-            case options[:mode]
+            case options[:subcommand]
             when 'command'
               executor.run_command(targets, options[:object], executor_opts) do |event|
                 outputter.print_event(event)
