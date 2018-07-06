@@ -47,10 +47,12 @@ Gem::Specification.new do |spec|
   spec.add_dependency "locale", "~> 2.1"
   spec.add_dependency "minitar", "~> 0.6"
   spec.add_dependency "semantic_puppet", "~> 1.0.2"
-  spec.add_dependency "win32-dir", "= 0.4.9"
-  spec.add_dependency "win32-process", "= 0.7.5"
-  spec.add_dependency "win32-security", "= 0.2.5"
-  spec.add_dependency "win32-service", "= 0.8.8"
+  if Gem.win_platform?
+    spec.add_dependency "win32-dir", "= 0.4.9"
+    spec.add_dependency "win32-process", "= 0.7.5"
+    spec.add_dependency "win32-security", "= 0.2.5"
+    spec.add_dependency "win32-service", "= 0.8.8"
+  end
 
   # there is a bug in puppetlabs_spec_helper for modules without fixtures
   spec.add_development_dependency "bundler", "~> 1.14"
