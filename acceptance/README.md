@@ -288,11 +288,15 @@ Example of running test suite using gem install using an existing hosts file:
     ```
     bundle exec beaker provision
     ```
-1. Run tests with specified environment variables
+1. Run pre-suite and tests with specified environment variables
     ```
     SSH_USER=root           \
     SSH_PASSWORD='S3@ret3'       \
     WINRM_USER=Administator      \
     WINRM_PASSWORD='S3@ret3'      \
     bundle exec beaker exec -t ./tests
+    ```
+1. Re-run tests
+    ```
+    bundle exec beaker exec ./tests
     ```

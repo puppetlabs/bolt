@@ -1,22 +1,27 @@
 # frozen_string_literal: true
 
+require 'bolt_setup_helper'
+
 test_name "build bolt inventory file" do
+  extend Acceptance::BoltSetupHelper
+
   ssh_nodes = select_hosts(roles: ['ssh'])
   winrm_nodes = select_hosts(roles: ['winrm'])
 
   ssh_config = {
     'transport' => 'ssh',
     'ssh' => {
-      'user' => ENV['SSH_USER'],
-      'password' => ENV['SSH_PASSWORD'],
+      'user' => ssh_user,
+      'password' => ssh_password,
       'host-key-check' => false
     }
   }
+
   winrm_config = {
     'transport' => 'winrm',
     'winrm' => {
-      'user' => ENV['WINRM_USER'],
-      'password' => ENV['WINRM_PASSWORD'],
+      'user' => winrm_user,
+      'password' => winrm_password,
       'ssl' => false
     }
   }
