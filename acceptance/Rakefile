@@ -1,6 +1,11 @@
 # frozen_string_literal: true
 
 require 'rototiller'
+require_relative 'lib/acceptance/bolt_setup_helper'
+
+# rubocop:disable Style/MixinUsage
+extend Acceptance::BoltSetupHelper
+# rubocop:enable Style/MixinUsage
 
 desc "Generate Beaker Host config"
 rototiller_task :host_config do |task|
@@ -74,10 +79,10 @@ beaker_options = [
     } }
 ]
 beaker_env = [
-  { name: 'SSH_USER',       default: 'root' },
-  { name: 'SSH_PASSWORD',   default: 'bolt_secret_password' },
-  { name: 'WINRM_USER',     default: 'Administrator' },
-  { name: 'WINRM_PASSWORD', default: 'bolt_secret_password' }
+  { name: 'SSH_USER',       default: ssh_user },
+  { name: 'SSH_PASSWORD',   default: ssh_password },
+  { name: 'WINRM_USER',     default: winrm_user },
+  { name: 'WINRM_PASSWORD', default: winrm_password }
 ]
 namespace :test do
   desc "Run bolt acceptance tests against a published gem"
@@ -88,8 +93,8 @@ namespace :test do
       add_argument: { name: 'config/gem/options.rb' }
     }
     beaker_env.each { |env| task.add_env(env) }
-    task.add_env(name: 'GEM_VERSION', default: '> 0.1.0')
-    task.add_env(name: 'GEM_SOURCE',  default: 'https://rubygems.org')
+    task.add_env(name: 'GEM_VERSION', default: gem_version)
+    task.add_env(name: 'GEM_SOURCE',  default: gem_source)
     task.add_command do |cmd|
       # without 'bundle exec' testing in jenkins fails
       # with 'beaker not found'. We do not know why so
@@ -108,10 +113,10 @@ namespace :test do
       add_argument: { name: 'config/git/options.rb' }
     }
     beaker_env.each { |env| task.add_env(env) }
-    task.add_env(name: 'GIT_SERVER', default: 'https://github.com')
-    task.add_env(name: 'GIT_FORK',   default: 'puppetlabs/bolt.git')
-    task.add_env(name: 'GIT_BRANCH', default: 'master')
-    task.add_env(name: 'GIT_SHA',    default: '')
+    task.add_env(name: 'GIT_SERVER', default: git_server)
+    task.add_env(name: 'GIT_FORK',   default: git_fork)
+    task.add_env(name: 'GIT_BRANCH', default: git_branch)
+    task.add_env(name: 'GIT_SHA',    default: git_sha)
     task.add_command do |cmd|
       # without 'bundle exec' testing in jenkins fails
       # with 'beaker not found'. We do not know why so
