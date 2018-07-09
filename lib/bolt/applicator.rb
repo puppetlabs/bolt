@@ -23,13 +23,16 @@ module Bolt
     end
 
     def compile(target, ast, plan_vars)
+      trusted = Puppet::Context::TrustedInformation.new('local', target.host, {})
+
       catalog_input = {
         code_ast: ast,
         modulepath: [],
         target: {
           name: target.host,
           facts: @inventory.facts(target),
-          variables: @inventory.vars(target).merge(plan_vars)
+          variables: @inventory.vars(target).merge(plan_vars),
+          trusted: trusted.to_h
         }
       }
 
