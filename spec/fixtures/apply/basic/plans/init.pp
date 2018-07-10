@@ -7,9 +7,11 @@ plan basic(TargetSpec $nodes) {
   return apply($nodes) {
     file { '/root/test/':
       ensure => directory,
-    } -> file { "/root/test/hello.txt":
-      ensure => file,
+    } -> file { '/root/test/hello.txt':
+      ensure  => file,
       content => "hi there I'm ${$facts['os']['family']}\n",
     }
+  }.map |$r| {
+    $r['resources']
   }
 }

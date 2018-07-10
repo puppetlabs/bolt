@@ -30,12 +30,10 @@ describe "Passes parsed AST to the apply_catalog task" do
 
     it 'echos the catalog ast' do
       result = run_cli_json(%w[plan run basic] + config_flags)
-      ast = result[0]['result']
-      expect(ast).to be
-      expect(ast['catalog_uuid']).to be
-      expect(ast['resources'].count).to eq(5)
+      ast = result[0]
+      expect(ast.count).to eq(5)
 
-      resources = ast['resources'].group_by { |r| r['type'] }
+      resources = ast.group_by { |r| r['type'] }
       expect(resources['File'].count).to eq(2)
       files = resources['File'].select { |f| f['title'] == '/root/test/hello.txt' }
       expect(files.count).to eq(1)
@@ -118,12 +116,10 @@ describe "Passes parsed AST to the apply_catalog task" do
 
     it 'echos the catalog ast' do
       result = run_cli_json(%w[plan run basic] + config_flags)
-      ast = result[0]['result']
-      expect(ast).to be
-      expect(ast['catalog_uuid']).to be
-      expect(ast['resources'].count).to eq(5)
+      ast = result[0]
+      expect(ast.count).to eq(5)
 
-      resources = ast['resources'].group_by { |r| r['type'] }
+      resources = ast.group_by { |r| r['type'] }
       expect(resources['File'].count).to eq(2)
       files = resources['File'].select { |f| f['title'] == '/root/test/hello.txt' }
       expect(files.count).to eq(1)

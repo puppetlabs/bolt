@@ -13,6 +13,7 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
     scope_param
     param 'String', :plan_name
     optional_param 'Hash', :named_args
+    return_type 'Boltlib::PlanResult'
   end
 
   def run_plan(scope, plan_name, named_args = {})
