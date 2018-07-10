@@ -50,15 +50,14 @@ module Bolt
       impl.value
     end
 
-    # Execute the given block on a list of nodes in parallel, one thread per "batch".
+    # Starts executing the given block on a list of nodes in parallel, one thread per "batch".
     #
     # This is the main driver of execution on a list of targets. It first
     # groups targets by transport, then divides each group into batches as
-    # defined by the transport. Each batch, along with the corresponding
-    # transport, is yielded to the block in turn and the results all collected
-    # into a single ResultSet.
-    def batch_execute(targets)
-      promises = targets.group_by(&:protocol).flat_map do |protocol, protocol_targets|
+    # defined by the transport. Yields each batch, along with the corresponding
+    # transport, to the block in turn and returns an array of result promises.
+    def queue_execute(targets)
+      targets.group_by(&:protocol).flat_map do |protocol, protocol_targets|
         transport = transport(protocol)
         report_transport(transport, protocol_targets.count)
         transport.batches(protocol_targets).flat_map do |batch|
@@ -94,7 +93,23 @@ module Bolt
           batch_promises.values
         end
       end
+    end
+
+    # Create a ResultSet from the results of all promises.
+    def await_results(promises)
       ResultSet.new(promises.map(&:value))
+    end
+
+    # Execute the given block on a list of nodes in parallel, one thread per "batch".
+    #
+    # This is the main driver of execution on a list of targets. It first
+    # groups targets by transport, then divides each group into batches as
+    # defined by the transport. Each batch, along with the corresponding
+    # transport, is yielded to the block in turn and the results all collected
+    # into a single ResultSet.
+    def batch_execute(targets, &block)
+      promises = queue_execute(targets, &block)
+      await_results(promises)
     end
 
     def log_action(description, targets)
@@ -119,7 +134,6 @@ module Bolt
 
       results
     end
-    private :log_action
 
     def report_transport(transport, count)
       name = transport.class.name.split('::').last.downcase
@@ -143,7 +157,6 @@ module Bolt
       @logger.info(result.to_json)
       result
     end
-    private :with_node_logging
 
     def run_command(targets, command, options = {}, &callback)
       description = options.fetch('_description', "command '#{command}'")

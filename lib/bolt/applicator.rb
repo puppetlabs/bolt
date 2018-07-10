@@ -20,9 +20,11 @@ module Bolt
     end
 
     def catalog_apply_task
-      path = File.join(libexec, 'apply_catalog.rb')
-      impl = { 'name' => 'apply_catalog.rb', 'path' => path, 'requirements' => [], 'supports_noop' => true }
-      Task.new('apply_catalog', [impl], 'stdin')
+      @catalog_apply_task ||= begin
+        path = File.join(libexec, 'apply_catalog.rb')
+        impl = { 'name' => 'apply_catalog.rb', 'path' => path, 'requirements' => [], 'supports_noop' => true }
+        Task.new('apply_catalog', [impl], 'stdin')
+      end
     end
 
     def compile(target, ast, plan_vars)
@@ -80,11 +82,21 @@ module Bolt
 
       targets = @inventory.get_targets(args[0])
       ast = Puppet::Pops::Serialization::ToDataConverter.convert(apply_body, rich_data: true, symbol_to_string: true)
-      results = targets.map do |target|
-        params['catalog'] = compile(target, ast, plan_vars)
-        @executor.run_task([target], catalog_apply_task, params, '_description' => 'apply catalog')
+      notify = proc { |_| nil }
+
+      @executor.log_action('apply catalog', targets) do
+        promises = targets.flat_map do |target|
+          @executor.queue_execute([target]) do |transport, batch|
+            @executor.with_node_logging("Applying manifest block", batch) do
+              arguments = params.clone
+              arguments['catalog'] = compile(target, ast, plan_vars)
+              transport.batch_task(batch, catalog_apply_task, arguments, {}, &notify)
+            end
+          end
+        end
+
+        @executor.await_results(promises)
       end
-      ResultSet.new results.reduce([]) { |result, result_set| result + result_set.results }
     end
   end
 end
