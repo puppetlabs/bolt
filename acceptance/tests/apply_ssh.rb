@@ -22,7 +22,7 @@ test_name "bolt plan run with should apply manifest block on remote hosts via ss
 
   bolt_command = "bolt plan run example_apply filepath=#{filepath} nodes=ssh_nodes"
   flags = {
-    '--modulepath' => "$HOME/.puppetlabs/bolt/modules:#{dir}/modules",
+    '--modulepath' => modulepath(File.join(dir, 'modules')),
     '--format'     => 'json'
   }
 
