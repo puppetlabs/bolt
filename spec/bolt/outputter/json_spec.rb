@@ -96,6 +96,14 @@ describe "Bolt::Outputter::JSON" do
     expect(output.string.strip).to eq('"' + result + '"')
   end
 
+  it "prints the result of installing a Puppetfile" do
+    outputter.print_puppetfile_result(true, '/path/to/Puppetfile', '/path/to/modules')
+    parsed = JSON.parse(output.string)
+    expect(parsed['success']).to eq(true)
+    expect(parsed['puppetfile']).to eq('/path/to/Puppetfile')
+    expect(parsed['moduledir']).to eq('/path/to/modules')
+  end
+
   it "handles fatal errors" do
     outputter.print_head
     outputter.print_result(Bolt::Result.new(target1, value: { 'msg' => "ok" }))

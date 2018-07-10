@@ -6,6 +6,7 @@ require 'json'
 require 'io/console'
 require 'logging'
 require 'optparse'
+require 'r10k/action/puppetfile/install'
 require 'bolt/analytics'
 require 'bolt/bolt_option_parser'
 require 'bolt/config'
@@ -22,11 +23,12 @@ require 'bolt/version'
 module Bolt
   class CLIExit < StandardError; end
   class CLI
-    COMMANDS = { 'command' => %w[run],
-                 'script'  => %w[run],
-                 'task'    => %w[show run],
-                 'plan'    => %w[show run],
-                 'file'    => %w[upload] }.freeze
+    COMMANDS = { 'command'    => %w[run],
+                 'script'     => %w[run],
+                 'task'       => %w[show run],
+                 'plan'       => %w[show run],
+                 'file'       => %w[upload],
+                 'puppetfile' => %w[install] }.freeze
 
     attr_reader :config, :options
 
@@ -108,7 +110,7 @@ module Bolt
       Bolt::Logger.configure(config.log, config.color)
 
       # After validation, initialize inventory and targets. Errors here are better to catch early.
-      unless options[:action] == 'show'
+      unless options[:subcommand] == 'puppetfile' || options[:action] == 'show'
         if options[:query]
           if options[:nodes].any?
             raise Bolt::CLIError, "Only one of '--nodes' or '--query' may be specified"
@@ -163,7 +165,7 @@ module Bolt
         end
       end
 
-      if options[:subcommand] != 'plan' && options[:action] != 'show'
+      if !%w[plan puppetfile].include?(options[:subcommand]) && options[:action] != 'show'
         if options[:nodes].empty? && options[:query].nil?
           raise Bolt::CLIError, "Targets must be specified with '--nodes' or '--query'"
         elsif options[:nodes].any? && options[:query]
@@ -250,6 +252,8 @@ module Bolt
 
       if options[:subcommand] == 'plan'
         code = run_plan(options[:object], options[:task_options], options[:nodes], options)
+      elsif options[:subcommand] == 'puppetfile'
+        code = install_puppetfile(@config.puppetfile, @config.modulepath)
       else
         executor = Bolt::Executor.new(config.concurrency, @analytics, options[:noop], bundled_content: bundled_content)
         targets = options[:targets]
@@ -354,6 +358,30 @@ module Bolt
       executor.finish_plan(result)
       outputter.print_plan_result(result)
       result.ok? ? 0 : 1
+    end
+
+    def install_puppetfile(puppetfile, modulepath)
+      if puppetfile.exist?
+        moduledir = modulepath.first.to_s
+        r10k_config = {
+          root: puppetfile.dirname.to_s,
+          puppetfile: puppetfile.to_s,
+          moduledir: moduledir
+        }
+        install_action = R10K::Action::Puppetfile::Install.new(r10k_config, nil)
+
+        # Override the r10k logger with our own logger
+        install_action.instance_variable_set(:@logger, Logging.logger[install_action])
+
+        ok = install_action.call
+        outputter.print_puppetfile_result(ok, puppetfile, moduledir)
+
+        ok ? 0 : 1
+      else
+        raise Bolt::FileError.new("Could not find a Puppetfile at #{puppetfile}", puppetfile)
+      end
+    rescue R10K::Error => e
+      raise PuppetfileError, e
     end
 
     def pal

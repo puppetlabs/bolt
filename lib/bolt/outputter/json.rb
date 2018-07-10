@@ -57,6 +57,12 @@ module Bolt
         @stream.puts result.to_json
       end
 
+      def print_puppetfile_result(success, puppetfile, moduledir)
+        @stream.puts({ "success": success,
+                       "puppetfile": puppetfile,
+                       "moduledir": moduledir }.to_json)
+      end
+
       def fatal_error(err)
         @stream.puts "],\n" if @items_open
         @stream.puts '"_error": ' if @object_open

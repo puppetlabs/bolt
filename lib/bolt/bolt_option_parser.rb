@@ -28,6 +28,7 @@ Available subcommands:
   bolt plan show                   Show list of available plans
   bolt plan show <plan>            Show details for plan
   bolt plan run <plan> [params]    Run a Puppet task plan
+  bolt puppetfile install          Install modules from a Puppetfile into a Boltdir
 
 Run `bolt <subcommand> --help` to view specific examples.
 
@@ -89,6 +90,18 @@ Available actions are:
   upload <src> <dest>              Upload local file <src> to <dest> on each node
 
 #{examples('file upload /tmp/source /etc/profile.d/login.sh', 'upload a file to')}
+Available options are:
+    HELP
+
+    PUPPETFILE_HELP = <<-HELP
+Usage: bolt puppetfile <action> [options]
+
+Available actions are:
+  install                          Install modules from a Puppetfile into a Boltdir
+
+Install modules into the local Boltdir
+  bolt puppetfile install
+
 Available options are:
     HELP
 
@@ -267,6 +280,8 @@ Available options are:
                       TASK_HELP
                     when 'file'
                       FILE_HELP
+                    when 'puppetfile'
+                      PUPPETFILE_HELP
                     else
                       BANNER
                     end

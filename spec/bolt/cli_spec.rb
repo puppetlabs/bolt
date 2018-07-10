@@ -1650,6 +1650,77 @@ bar
         end
       end
     end
+
+    describe "installing a Puppetfile" do
+      let(:options) {
+        {
+          subcommand: 'puppetfile',
+          action: 'run'
+        }
+      }
+      let(:output) { StringIO.new }
+      let(:puppetfile) { Pathname.new('path/to/puppetfile') }
+      let(:modulepath) { [Pathname.new('path/to/modules')] }
+      let(:action_stub) { double('r10k_action_puppetfile_install') }
+      let(:cli) { Bolt::CLI.new({}) }
+
+      before :each do
+        allow(cli).to receive(:outputter).and_return(Bolt::Outputter::JSON.new(false, false, output))
+        allow(puppetfile).to receive(:exist?).and_return(true)
+
+        # Ensure we never actually install modules.
+        allow(R10K::Action::Puppetfile::Install).to receive(:new).and_return(action_stub)
+      end
+
+      it 'fails if the Puppetfile does not exist' do
+        allow(puppetfile).to receive(:exist?).and_return(false)
+
+        expect do
+          cli.install_puppetfile(puppetfile, modulepath)
+        end.to raise_error(Bolt::FileError, /Could not find a Puppetfile/)
+      end
+
+      it 'installs to the first directory of the modulepath' do
+        expect(R10K::Action::Puppetfile::Install).to receive(:new)
+          .with({ root: puppetfile.dirname.to_s, puppetfile: puppetfile.to_s, moduledir: modulepath.first.to_s }, nil)
+
+        allow(action_stub).to receive(:call).and_return(true)
+
+        cli.install_puppetfile(puppetfile, modulepath)
+      end
+
+      it 'returns 0 and prints a result if successful' do
+        allow(action_stub).to receive(:call).and_return(true)
+
+        expect(cli.install_puppetfile(puppetfile, modulepath)).to eq(0)
+
+        result = JSON.parse(output.string)
+        expect(result['success']).to eq(true)
+        expect(result['puppetfile']).to eq(puppetfile.to_s)
+        expect(result['moduledir']).to eq(modulepath.first.to_s)
+      end
+
+      it 'returns 1 and prints a result if unsuccessful' do
+        allow(action_stub).to receive(:call).and_return(false)
+
+        expect(cli.install_puppetfile(puppetfile, modulepath)).to eq(1)
+
+        result = JSON.parse(output.string)
+        expect(result['success']).to eq(false)
+        expect(result['puppetfile']).to eq(puppetfile.to_s)
+        expect(result['moduledir']).to eq(modulepath.first.to_s)
+      end
+
+      it 'propagates any r10k errors' do
+        allow(action_stub).to receive(:call).and_raise(R10K::Error.new('everything is terrible'))
+
+        expect do
+          cli.install_puppetfile(puppetfile, modulepath)
+        end.to raise_error(Bolt::PuppetfileError, /everything is terrible/)
+
+        expect(output.string).to be_empty
+      end
+    end
   end
 
   describe 'configfile' do

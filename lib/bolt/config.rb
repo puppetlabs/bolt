@@ -230,6 +230,10 @@ module Bolt
       @hiera_config || @boltdir.hiera_config
     end
 
+    def puppetfile
+      @boltdir.puppetfile
+    end
+
     def modulepath
       @modulepath || @boltdir.modulepath
     end
