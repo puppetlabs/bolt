@@ -3,11 +3,8 @@
 ### Bash autocompletion for bolt
 ### include this file in your .bash_profile or .bashrc to use completion
 ### "source bolt_bash_completion.sh"
-<<<<<<< HEAD
 ###
 ### Marc Schoechlin ms-github@256bit.org
-=======
->>>>>>> d69aaca586ea952a62ac99e01839abb081d2e50d
 
 _bolt()
 {
@@ -39,13 +36,9 @@ _bolt()
          next=""
       ;;
       --nodes|-n)
-<<<<<<< HEAD
          # TODO: add automatic lookup here, ideally bolt should have a lookup function suitable for this 
          # to provide completions from the ~/.puppetlabs/bolt/inventory.yaml file
          next=""
-=======
-         next="$all_hosts"
->>>>>>> d69aaca586ea952a62ac99e01839abb081d2e50d
       ;;
       --query|-q|--description|--params|--user|-u|-p|--password|--private-key|--run-as|--sudo-password|--concurrency|-c|--modulepath|--boltdir|--configfile|--inventoryfile|--transport|--connect-timeout|--tmpdir|--format)
          next=""
