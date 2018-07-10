@@ -76,8 +76,9 @@ describe "Passes parsed AST to the apply_catalog task" do
 
     it 'errors calling run_task' do
       result = run_cli_json(%w[plan run basic::disabled] + config_flags)
-      expect(result['kind']).to eq('bolt/apply-error')
-      expect(result['msg']).to match(/The task operation 'run_task' is not available when compiling a catalog/)
+      error = result[0]['result']['_error']
+      expect(error['kind']).to eq('bolt/apply-error')
+      expect(error['msg']).to match(/The task operation 'run_task' is not available when compiling a catalog/)
     end
 
     context 'with puppetdb stubbed' do
@@ -94,16 +95,18 @@ describe "Passes parsed AST to the apply_catalog task" do
       it 'calls puppetdb_query' do
         with_tempfile_containing('conf', YAML.dump(config)) do |conf|
           result = run_cli_json(%W[plan run basic::pdb_query --configfile #{conf.path}] + config_flags)
-          expect(result['kind']).to eq('bolt/apply-error')
-          expect(result['msg']).to match(/Failed to query PuppetDB: /)
+          error = result[0]['result']['_error']
+          expect(error['kind']).to eq('bolt/apply-error')
+          expect(error['msg']).to match(/Failed to query PuppetDB: /)
         end
       end
 
       it 'calls puppetdb_fact' do
         with_tempfile_containing('conf', YAML.dump(config)) do |conf|
           result = run_cli_json(%W[plan run basic::pdb_fact --configfile #{conf.path}] + config_flags)
-          expect(result['kind']).to eq('bolt/apply-error')
-          expect(result['msg']).to match(/Failed to query PuppetDB: /)
+          error = result[0]['result']['_error']
+          expect(error['kind']).to eq('bolt/apply-error')
+          expect(error['msg']).to match(/Failed to query PuppetDB: /)
         end
       end
     end

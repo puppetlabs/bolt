@@ -2,17 +2,21 @@
 
 require 'json'
 require 'open3'
+require 'concurrent'
 
 module Bolt
   Task = Struct.new(:name, :implementations, :input_method)
 
   class Applicator
-    def initialize(inventory, executor, modulepath, pdb_config, hiera_config)
+    def initialize(inventory, executor, modulepath, pdb_config, hiera_config, max_compiles = nil)
       @inventory = inventory
       @executor = executor
       @modulepath = modulepath
       @pdb_config = pdb_config
       @hiera_config = hiera_config ? validate_hiera_config(hiera_config) : nil
+
+      max_threads = max_compiles || Concurrent.processor_count
+      @pool = Concurrent::ThreadPoolExecutor.new(max_threads: max_threads)
     end
 
     private def libexec
@@ -85,17 +89,26 @@ module Bolt
       notify = proc { |_| nil }
 
       @executor.log_action('apply catalog', targets) do
-        promises = targets.flat_map do |target|
+        futures = targets.map do |target|
+          Concurrent::Future.execute(executor: @pool) do
+            @executor.with_node_logging("Compiling manifest block", [target]) do
+              compile(target, ast, plan_vars)
+            end
+          end
+        end
+
+        result_promises = targets.zip(futures).flat_map do |target, future|
           @executor.queue_execute([target]) do |transport, batch|
             @executor.with_node_logging("Applying manifest block", batch) do
               arguments = params.clone
-              arguments['catalog'] = compile(target, ast, plan_vars)
+              arguments['catalog'] = future.value
+              raise future.reason if future.rejected?
               transport.batch_task(batch, catalog_apply_task, arguments, {}, &notify)
             end
           end
         end
 
-        @executor.await_results(promises)
+        @executor.await_results(result_promises)
       end
     end
   end
