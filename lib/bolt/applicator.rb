@@ -36,7 +36,7 @@ module Bolt
       bolt_catalog_exe = File.join(libexec, 'bolt_catalog')
 
       old_path = ENV['PATH']
-      ENV['PATH'] = "#{RbConfig::CONFIG['bindir']}:#{old_path}"
+      ENV['PATH'] = "#{RbConfig::CONFIG['bindir']}#{File::PATH_SEPARATOR}#{old_path}"
       out, err, stat = Open3.capture3('ruby', bolt_catalog_exe, 'compile', stdin_data: catalog_input.to_json)
       ENV['PATH'] = old_path
 
