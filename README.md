@@ -37,6 +37,12 @@ Bolt depends on gems containing native extensions. To install Bolt on *nix platf
 
 2. Install Bolt as a gem by running `gem install bolt`
 
+Users of the bash shell can activate command completion by using the completion include file:
+```
+source <git-checkout>/resources/bolt_bash_completion.sh
+```
+Add the script to /etc/bash_completion.d/ or add the command to your ".bashrc"
+
 ### On Windows
 
 Install Bolt and its dependencies on Windows systems.
