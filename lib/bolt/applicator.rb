@@ -22,14 +22,17 @@ module Bolt
       Task.new('apply_catalog', [impl], 'stdin')
     end
 
-    def compile(target, ast)
+    def compile(target, ast, plan_vars)
+      trusted = Puppet::Context::TrustedInformation.new('local', target.host, {})
+
       catalog_input = {
         code_ast: ast,
         modulepath: [],
         target: {
           name: target.host,
           facts: @inventory.facts(target),
-          variables: @inventory.vars(target)
+          variables: @inventory.vars(target).merge(plan_vars),
+          trusted: trusted.to_h
         }
       }
 
@@ -44,7 +47,7 @@ module Bolt
       JSON.parse(out)
     end
 
-    def apply(args, apply_body, _scope)
+    def apply(args, apply_body, scope)
       raise(ArgumentError, 'apply requires a TargetSpec') if args.empty?
       type0 = Puppet.lookup(:pal_script_compiler).type('TargetSpec')
       Puppet::Pal.assert_type(type0, args[0], 'apply targets')
@@ -56,10 +59,14 @@ module Bolt
         params = args[1]
       end
 
+      # collect plan vars and merge them over target vars
+      plan_vars = scope.to_hash
+      %w[trusted server_facts facts].each { |k| plan_vars.delete(k) }
+
       targets = @inventory.get_targets(args[0])
       ast = Puppet::Pops::Serialization::ToDataConverter.convert(apply_body, rich_data: true, symbol_to_string: true)
       results = targets.map do |target|
-        params['catalog'] = compile(target, ast)
+        params['catalog'] = compile(target, ast, plan_vars)
         @executor.run_task([target], catalog_apply_task, params, '_description' => 'apply catalog')
       end
       ResultSet.new results.reduce([]) { |result, result_set| result + result_set.results }
