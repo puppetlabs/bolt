@@ -1,0 +1,14 @@
+[Unit]
+Description=PE Bolt Server
+After=syslog.target network.target
+
+[Service]
+Type=simple
+EnvironmentFile=-/etc/sysconfig/pe-bolt-server-service
+EnvironmentFile=-/etc/default/pe-bolt-server-service
+ExecStart=/opt/puppetlabs/puppet/bin/pe-bolt-server $PE_BOLT_SERVER_OPTIONS --foreground
+Restart=always
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target

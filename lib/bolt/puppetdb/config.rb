@@ -6,10 +6,18 @@ require 'bolt/util'
 module Bolt
   module PuppetDB
     class Config
-      DEFAULT_TOKEN = File.expand_path('~/.puppetlabs/token')
-      DEFAULT_CONFIG = { user: File.expand_path('~/.puppetlabs/client-tools/puppetdb.conf'),
-                         global: '/etc/puppetlabs/client-tools/puppetdb.conf',
-                         win_global: 'C:/ProgramData/PuppetLabs/client-tools/puppetdb.conf' }.freeze
+      if !ENV['HOME'].nil?
+        DEFAULT_TOKEN = File.expand_path('~/.puppetlabs/token')
+        DEFAULT_CONFIG = { user: File.expand_path('~/.puppetlabs/client-tools/puppetdb.conf'),
+                           global: '/etc/puppetlabs/client-tools/puppetdb.conf',
+                           win_global: 'C:/ProgramData/PuppetLabs/client-tools/puppetdb.conf' }.freeze
+      else
+        DEFAULT_TOKEN = "/etc/puppetlabs/client-tools/pe-bolt-server/token"
+        DEFAULT_CONFIG = { user: "/etc/puppetlabs/puppet/puppetdb.conf",
+                           global: '/etc/puppetlabs/puppet/puppetdb.conf',
+                           win_global: 'C:/ProgramData/PuppetLabs/client-tools/puppetdb.conf' }.freeze
+
+      end
 
       def initialize(config_file, options)
         @settings = load_config(config_file)
