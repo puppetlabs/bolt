@@ -1031,6 +1031,7 @@ bar
         let(:task_t) { task_type(task_name, Regexp.new(task_path), input_method) }
 
         before :each do
+          allow(executor).to receive(:report_bundled_content)
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
         end
 
@@ -1343,6 +1344,7 @@ bar
 
         before :each do
           allow(executor).to receive(:report_function_call)
+          allow(executor).to receive(:report_bundled_content)
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
         end
 
@@ -1535,13 +1537,17 @@ bar
       let(:cli) { Bolt::CLI.new({}) }
       let(:targets) { [target] }
       let(:output) { StringIO.new }
+      let(:bundled_content) { ['test'] }
 
       before :each do
-        expect(Bolt::Executor).to receive(:new).with(config, anything, true).and_return(executor)
-
+        allow(cli).to receive(:bundled_content).and_return(bundled_content)
+        expect(Bolt::Executor).to receive(:new).with(config,
+                                                     anything,
+                                                     true,
+                                                     bundled_content: bundled_content).and_return(executor)
         outputter = Bolt::Outputter::JSON.new(false, false, output)
-
         allow(cli).to receive(:outputter).and_return(outputter)
+        allow(executor).to receive(:report_bundled_content)
       end
 
       context "when running a task", :reset_puppet_settings do

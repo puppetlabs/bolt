@@ -262,7 +262,7 @@ module Bolt
                          params: params }
         plan_context[:description] = options[:description] if options[:description]
 
-        executor = Bolt::Executor.new(config, @analytics, options[:noop])
+        executor = Bolt::Executor.new(config, @analytics, options[:noop], bundled_content: bundled_content)
         executor.start_plan(plan_context)
         result = pal.run_plan(options[:object], options[:task_options], executor, inventory, puppetdb_client)
 
@@ -271,7 +271,7 @@ module Bolt
         outputter.print_plan_result(result)
         code = result.ok? ? 0 : 1
       else
-        executor = Bolt::Executor.new(config, @analytics, options[:noop])
+        executor = Bolt::Executor.new(config, @analytics, options[:noop], bundled_content: bundled_content)
         targets = options[:targets]
 
         results = nil
@@ -352,6 +352,17 @@ module Bolt
 
     def outputter
       @outputter ||= Bolt::Outputter.for_format(config[:format], config[:color], config[:trace])
+    end
+
+    def bundled_content
+      default_content = Bolt::PAL.new(Bolt::Config.new)
+      plans = default_content.list_plans.each_with_object([]) do |iter, col|
+        col << iter&.first
+      end
+      tasks = default_content.list_tasks.each_with_object([]) do |iter, col|
+        col << iter&.first
+      end
+      plans.concat tasks
     end
   end
 end

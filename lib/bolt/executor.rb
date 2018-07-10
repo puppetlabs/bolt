@@ -18,9 +18,13 @@ module Bolt
     attr_reader :noop, :transports
     attr_accessor :run_as, :plan_logging
 
-    def initialize(config = Bolt::Config.new, analytics = Bolt::Analytics::NoopClient.new, noop = nil)
+    def initialize(config = Bolt::Config.new,
+                   analytics = Bolt::Analytics::NoopClient.new,
+                   noop = nil,
+                   bundled_content: nil)
       @config = config
       @analytics = analytics
+      @bundled_content = bundled_content
       @logger = Logging.logger[self]
       @plan_logging = false
 
@@ -125,6 +129,12 @@ module Bolt
 
     def report_function_call(function)
       @analytics&.event('Plan', 'call_function', function)
+    end
+
+    def report_bundled_content(mode, name)
+      if @bundled_content&.include?(name)
+        @analytics&.event('Bundled Content', mode, name)
+      end
     end
 
     def with_node_logging(description, batch)

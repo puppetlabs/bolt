@@ -416,6 +416,34 @@ describe "Bolt::Executor" do
         executor.report_function_call('add_facts')
       end
     end
+
+    context "#report_bundled_content" do
+      let(:executor) { Bolt::Executor.new(config, analytics, bundled_content: %w[canary facts]) }
+
+      it 'reports an event when bundled plan is used' do
+        expect(analytics).to receive(:event).with('Bundled Content', 'Plan', 'canary')
+
+        executor.report_bundled_content('Plan', 'canary')
+      end
+
+      it 'reports an event when bundled task is used' do
+        expect(analytics).to receive(:event).with('Bundled Content', 'Task', 'facts')
+
+        executor.report_bundled_content('Task', 'facts')
+      end
+
+      it 'does not report a an event when non-bundled plan is used' do
+        expect(analytics).to receive(:event).never
+
+        executor.report_bundled_content('plan', 'foo')
+      end
+
+      it 'does not report a an event when non-bundled task is used' do
+        expect(analytics).to receive(:event).never
+
+        executor.report_bundled_content('task', 'foo')
+      end
+    end
   end
 
   context "When running a plan" do
