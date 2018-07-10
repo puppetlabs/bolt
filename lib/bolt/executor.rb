@@ -15,31 +15,16 @@ require 'bolt/puppetdb'
 
 module Bolt
   class Executor
-    BUNDLED_CONTENT = ['apply::resource',
-                       'facts',
-                       'facts::bash',
-                       'facts::powershell',
-                       'facts::ruby',
-                       'package',
-                       'puppet_conf',
-                       'service',
-                       'service::linux',
-                       'service::windows',
-                       # plans
-                       'aggregate::count',
-                       'aggregate::nodes',
-                       'canary',
-                       'facts',
-                       'facts::info',
-                       'facts::retrieve',
-                       'puppetdb_fact'].freeze
-
     attr_reader :noop, :transports
     attr_accessor :run_as, :plan_logging
 
-    def initialize(config = Bolt::Config.new, analytics = Bolt::Analytics::NoopClient.new, noop = nil)
+    def initialize(config = Bolt::Config.new,
+                   analytics = Bolt::Analytics::NoopClient.new,
+                   noop = nil,
+                   bundled_content: nil)
       @config = config
       @analytics = analytics
+      @bundled_content = bundled_content
       @logger = Logging.logger[self]
       @plan_logging = false
 
@@ -147,7 +132,7 @@ module Bolt
     end
 
     def report_bundled_content(mode, name)
-      if BUNDLED_CONTENT.include?(name)
+      if @bundled_content&.include?(name)
         @analytics&.event('Bundled Content', mode, name)
       end
     end

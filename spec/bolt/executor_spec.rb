@@ -418,6 +418,8 @@ describe "Bolt::Executor" do
     end
 
     context "#report_bundled_content" do
+      let(:executor) { Bolt::Executor.new(config, analytics, bundled_content: %w[canary facts]) }
+
       it 'reports an event when bundled plan is used' do
         expect(analytics).to receive(:event).with('Bundled Content', 'Plan', 'canary')
 
