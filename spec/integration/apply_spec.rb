@@ -108,6 +108,50 @@ describe "Passes parsed AST to the apply_catalog task" do
         end
       end
     end
+
+    context 'with hiera config stubbed' do
+      let(:default_datadir) {
+        {
+          'hiera-config' => File.join(__dir__, '../fixtures/apply/hiera.yaml').to_s
+        }
+      }
+      let(:custom_datadir) {
+        {
+          'hiera-config' => File.join(__dir__, '../fixtures/apply/hiera_datadir.yaml').to_s
+        }
+      }
+      let(:bad_hiera_version) {
+        {
+          'hiera-config' => File.join(__dir__, '../fixtures/apply/hiera_invalid.yaml').to_s
+        }
+      }
+
+      it 'default datadir is accessible' do
+        with_tempfile_containing('conf', YAML.dump(default_datadir)) do |conf|
+          result = run_cli_json(%W[plan run basic::hiera_lookup --configfile #{conf.path}] + config_flags)
+          ast = result[0]['result']
+          notify = ast['resources'].select { |r| r['type'] == 'Notify' }
+          expect(notify[0]['title']).to eq("hello default datadir")
+        end
+      end
+
+      it 'non-default datadir specified in hiera config is accessible' do
+        with_tempfile_containing('conf', YAML.dump(custom_datadir)) do |conf|
+          result = run_cli_json(%W[plan run basic::hiera_lookup --configfile #{conf.path}] + config_flags)
+          ast = result[0]['result']
+          notify = ast['resources'].select { |r| r['type'] == 'Notify' }
+          expect(notify[0]['title']).to eq("hello custom datadir")
+        end
+      end
+
+      it 'hiera 5 version not specified' do
+        with_tempfile_containing('conf', YAML.dump(bad_hiera_version)) do |conf|
+          result = run_cli_json(%W[plan run basic::hiera_lookup --configfile #{conf.path}] + config_flags)
+          expect(result['kind']).to eq('bolt/apply-error')
+          expect(result['msg']).to match(/Hiera v5 is required./)
+        end
+      end
+    end
   end
 
   describe 'over winrm', winrm: true do
@@ -192,6 +236,50 @@ describe "Passes parsed AST to the apply_catalog task" do
           result = run_cli_json(%W[plan run basic::pdb_fact --configfile #{conf.path}] + config_flags)
           expect(result['kind']).to eq('bolt/apply-error')
           expect(result['msg']).to match(/Failed to query PuppetDB: /)
+        end
+      end
+    end
+
+    context 'with hiera config stubbed' do
+      let(:default_datadir) {
+        {
+          'hiera-config' => File.join(__dir__, '../fixtures/apply/hiera.yaml').to_s
+        }
+      }
+      let(:custom_datadir) {
+        {
+          'hiera-config' => File.join(__dir__, '../fixtures/apply/hiera_datadir.yaml').to_s
+        }
+      }
+      let(:bad_hiera_version) {
+        {
+          'hiera-config' => File.join(__dir__, '../fixtures/apply/hiera_invalid.yaml').to_s
+        }
+      }
+
+      it 'default datadir is accessible' do
+        with_tempfile_containing('conf', YAML.dump(default_datadir)) do |conf|
+          result = run_cli_json(%W[plan run basic::hiera_lookup --configfile #{conf.path}] + config_flags)
+          ast = result[0]['result']
+          notify = ast['resources'].select { |r| r['type'] == 'Notify' }
+          expect(notify[0]['title']).to eq("hello default datadir")
+        end
+      end
+
+      it 'non-default datadir specified in hiera config is accessible' do
+        with_tempfile_containing('conf', YAML.dump(custom_datadir)) do |conf|
+          result = run_cli_json(%W[plan run basic::hiera_lookup --configfile #{conf.path}] + config_flags)
+          ast = result[0]['result']
+          notify = ast['resources'].select { |r| r['type'] == 'Notify' }
+          expect(notify[0]['title']).to eq("hello custom datadir")
+        end
+      end
+
+      it 'hiera 5 version not specified' do
+        with_tempfile_containing('conf', YAML.dump(bad_hiera_version)) do |conf|
+          result = run_cli_json(%W[plan run basic::hiera_lookup --configfile #{conf.path}] + config_flags)
+          expect(result['kind']).to eq('bolt/apply-error')
+          expect(result['msg']).to match(/Hiera v5 is required./)
         end
       end
     end

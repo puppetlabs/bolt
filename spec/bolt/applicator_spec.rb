@@ -6,7 +6,7 @@ require 'bolt/target'
 
 describe Bolt::Applicator do
   let(:inventory) { nil }
-  let(:applicator) { Bolt::Applicator.new(inventory, nil, :mod, :pdb) }
+  let(:applicator) { Bolt::Applicator.new(inventory, nil, :mod, :pdb, nil) }
 
   it 'instantiates' do
     expect(applicator).to be
@@ -21,6 +21,7 @@ describe Bolt::Applicator do
         code_ast: :ast,
         modulepath: :mod,
         pdb_config: :pdb,
+        hiera_config: nil,
         target: {
           name: 'foobar',
           facts: {},

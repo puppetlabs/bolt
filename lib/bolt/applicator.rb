@@ -7,11 +7,12 @@ module Bolt
   Task = Struct.new(:name, :implementations, :input_method)
 
   class Applicator
-    def initialize(inventory, executor, modulepath, pdb_config)
+    def initialize(inventory, executor, modulepath, pdb_config, hiera_config)
       @inventory = inventory
       @executor = executor
       @modulepath = modulepath
       @pdb_config = pdb_config
+      @hiera_config = hiera_config ? validate_hiera_config(hiera_config) : nil
     end
 
     private def libexec
@@ -31,6 +32,7 @@ module Bolt
         code_ast: ast,
         modulepath: @modulepath,
         pdb_config: @pdb_config,
+        hiera_config: @hiera_config,
         target: {
           name: target.host,
           facts: @inventory.facts(target),
@@ -48,6 +50,16 @@ module Bolt
 
       raise ApplyError.new(target.to_s, err) unless stat.success?
       JSON.parse(out)
+    end
+
+    def validate_hiera_config(hiera_config)
+      if File.exist?(File.path(hiera_config))
+        data = File.open(File.path(hiera_config), "r:UTF-8") { |f| YAML.safe_load(f.read) }
+        unless data['version'] == 5
+          raise ApplyError.new("All Targets", "Hiera v5 is required.")
+        end
+        hiera_config
+      end
     end
 
     def apply(args, apply_body, scope)

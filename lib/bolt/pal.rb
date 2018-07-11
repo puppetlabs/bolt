@@ -119,7 +119,11 @@ module Bolt
         bolt_executor: executor,
         bolt_inventory: inventory,
         bolt_pdb_client: pdb_client,
-        apply_executor: Applicator.new(inventory, executor, full_modulepath(@config[:modulepath]), @config.puppetdb)
+        apply_executor: Applicator.new(inventory,
+                                       executor,
+                                       full_modulepath(@config[:modulepath]),
+                                       @config.puppetdb,
+                                       @config[:'hiera-config'])
       }
       Puppet.override(opts, &block)
     end

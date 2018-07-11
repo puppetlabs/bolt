@@ -69,31 +69,39 @@ describe Bolt::Config do
     let(:boltdir_path) { File.expand_path(File.join(config.boltdir, 'bolt.yaml')) }
     let(:default_path) { File.expand_path(File.join('~', '.puppetlabs', 'bolt.yaml')) }
     let(:alt_path) { File.expand_path(File.join('~', '.puppetlabs', 'bolt.yml')) }
+    let(:hiera_path) { File.expand_path(File.join(config.boltdir, 'hiera.yaml')) }
 
     before(:each) do
       expect(File).to receive(:exist?).with(boltdir_path).and_return(false)
     end
 
-    it "loads from a default file" do
-      expect(File).to receive(:exist?).with(default_path).twice.and_return(true)
-      expect(File).to receive(:open).with(default_path, 'r:UTF-8').and_raise(Errno::ENOENT)
-      config.load_file(nil)
-    end
+    context 'with hiera defaults' do
+      before(:each) do
+        expect(File).to receive(:open).with(hiera_path, 'r:UTF-8')
+        expect(File).to receive(:exist?).with(hiera_path)
+      end
 
-    it "falls back to the old default file" do
-      expect(File).to receive(:exist?).with(default_path).and_return(false)
-      expect(File).to receive(:exist?).with(alt_path).twice.and_return(true)
-      expect(File).to receive(:open).with(alt_path, 'r:UTF-8').and_raise(Errno::ENOENT)
-      config.load_file(nil)
-    end
+      it "loads from a default file" do
+        expect(File).to receive(:exist?).with(default_path).twice.and_return(true)
+        expect(File).to receive(:open).with(default_path, 'r:UTF-8').and_raise(Errno::ENOENT)
+        config.load_file(nil)
+      end
 
-    it "warns if the default exists, and uses the new default" do
-      expect(File).to receive(:exist?).with(default_path).twice.and_return(true)
-      expect(File).to receive(:open).with(default_path, 'r:UTF-8').and_raise(Errno::ENOENT)
+      it "falls back to the old default file" do
+        expect(File).to receive(:exist?).with(default_path).and_return(false)
+        expect(File).to receive(:exist?).with(alt_path).twice.and_return(true)
+        expect(File).to receive(:open).with(alt_path, 'r:UTF-8').and_raise(Errno::ENOENT)
+        config.load_file(nil)
+      end
 
-      config.load_file(nil)
+      it "warns if the default exists, and uses the new default" do
+        expect(File).to receive(:exist?).with(default_path).twice.and_return(true)
+        expect(File).to receive(:open).with(default_path, 'r:UTF-8').and_raise(Errno::ENOENT)
 
-      expect(@log_output.readline).to match(/WARN.*Found configfile at deprecated location #{default_path}/)
+        config.load_file(nil)
+
+        expect(@log_output.readline).to match(/WARN.*Found configfile at deprecated location #{default_path}/)
+      end
     end
 
     it "loads from the specified file" do
@@ -324,6 +332,24 @@ describe Bolt::Config do
         # Don't assert nil to be robust against a boltdir above tmp
         expect(config.boltdir).not_to eq(boltdir_path)
       end
+    end
+  end
+
+  describe 'default_hiera' do
+    let(:tmpdir) { Dir.mktmpdir }
+
+    it 'sets default hiera path when boltdir is specified' do
+      boltdir_path = File.join(tmpdir, "foo", "Boltdir")
+      FileUtils.mkdir_p(File.join(tmpdir, "foo", "Boltdir"))
+      config = Bolt::Config.new(pwd: File.dirname(boltdir_path))
+      config.update({})
+      expect(config[:'hiera-config']).to eq("#{config.boltdir}/hiera.yaml")
+    end
+
+    it 'sets default hiera path for default boltdir' do
+      config = Bolt::Config.new(pwd: tmpdir)
+      config.update({})
+      expect(config[:'hiera-config']).to eq("#{config.boltdir}/hiera.yaml")
     end
   end
 end
