@@ -7,9 +7,11 @@ module Bolt
   Task = Struct.new(:name, :implementations, :input_method)
 
   class Applicator
-    def initialize(inventory, executor)
+    def initialize(inventory, executor, modulepath, pdb_config)
       @inventory = inventory
       @executor = executor
+      @modulepath = modulepath
+      @pdb_config = pdb_config
     end
 
     private def libexec
@@ -27,7 +29,8 @@ module Bolt
 
       catalog_input = {
         code_ast: ast,
-        modulepath: [],
+        modulepath: @modulepath,
+        pdb_config: @pdb_config,
         target: {
           name: target.host,
           facts: @inventory.facts(target),

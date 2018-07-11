@@ -1,13 +1,15 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'bolt_spec/integration'
 require 'bolt_spec/conn'
+require 'bolt_spec/files'
+require 'bolt_spec/integration'
 require 'bolt/catalog'
 
 describe "Passes parsed AST to the apply_catalog task" do
-  include BoltSpec::Integration
   include BoltSpec::Conn
+  include BoltSpec::Files
+  include BoltSpec::Integration
 
   let(:modulepath) { File.join(__dir__, '../fixtures/apply') }
   let(:config_flags) { %W[--format json --nodes #{uri} --password #{password} --modulepath #{modulepath}] + tflags }
@@ -65,6 +67,47 @@ describe "Passes parsed AST to the apply_catalog task" do
       expect(notify.count).to eq(1)
       expect(notify[0]['title']).to eq('hello world')
     end
+
+    it 'applies a class from the modulepath' do
+      result = run_cli_json(%w[plan run basic::class] + config_flags)
+      ast = result[0]['result']
+      notify = ast['resources'].select { |r| r['type'] == 'Notify' }
+      expect(notify.count).to eq(1)
+    end
+
+    it 'errors calling run_task' do
+      result = run_cli_json(%w[plan run basic::disabled] + config_flags)
+      expect(result['kind']).to eq('bolt/apply-error')
+      expect(result['msg']).to match(/The task operation 'run_task' is not available when compiling a catalog/)
+    end
+
+    context 'with puppetdb stubbed' do
+      let(:config) {
+        {
+          'puppetdb' => {
+            'server_urls' => 'https://localhost:99999',
+            'cacert' => File.join(Gem::Specification.find_by_name('bolt').gem_dir, 'resources', 'ca.pem')
+
+          }
+        }
+      }
+
+      it 'calls puppetdb_query' do
+        with_tempfile_containing('conf', YAML.dump(config)) do |conf|
+          result = run_cli_json(%W[plan run basic::pdb_query --configfile #{conf.path}] + config_flags)
+          expect(result['kind']).to eq('bolt/apply-error')
+          expect(result['msg']).to match(/Failed to query PuppetDB: /)
+        end
+      end
+
+      it 'calls puppetdb_fact' do
+        with_tempfile_containing('conf', YAML.dump(config)) do |conf|
+          result = run_cli_json(%W[plan run basic::pdb_fact --configfile #{conf.path}] + config_flags)
+          expect(result['kind']).to eq('bolt/apply-error')
+          expect(result['msg']).to match(/Failed to query PuppetDB: /)
+        end
+      end
+    end
   end
 
   describe 'over winrm', winrm: true do
@@ -111,6 +154,46 @@ describe "Passes parsed AST to the apply_catalog task" do
       notify = ast['resources'].select { |r| r['type'] == 'Notify' }
       expect(notify.count).to eq(1)
       expect(notify[0]['title']).to eq('hello world')
+    end
+
+    it 'applies a class from the modulepath' do
+      result = run_cli_json(%w[plan run basic::class] + config_flags)
+      ast = result[0]['result']
+      notify = ast['resources'].select { |r| r['type'] == 'Notify' }
+      expect(notify.count).to eq(1)
+    end
+
+    it 'errors calling run_task' do
+      result = run_cli_json(%w[plan run basic::disabled] + config_flags)
+      expect(result['kind']).to eq('bolt/apply-error')
+      expect(result['msg']).to match(/The task operation 'run_task' is not available when compiling a catalog/)
+    end
+
+    context 'with puppetdb stubbed' do
+      let(:config) {
+        {
+          'puppetdb' => {
+            'server_urls' => 'https://localhost:99999',
+            'cacert' => File.join(Gem::Specification.find_by_name('bolt').gem_dir, 'resources', 'ca.pem')
+          }
+        }
+      }
+
+      it 'calls puppetdb_query' do
+        with_tempfile_containing('conf', YAML.dump(config)) do |conf|
+          result = run_cli_json(%W[plan run basic::pdb_query --configfile #{conf.path}] + config_flags)
+          expect(result['kind']).to eq('bolt/apply-error')
+          expect(result['msg']).to match(/Failed to query PuppetDB: /)
+        end
+      end
+
+      it 'calls puppetdb_fact' do
+        with_tempfile_containing('conf', YAML.dump(config)) do |conf|
+          result = run_cli_json(%W[plan run basic::pdb_fact --configfile #{conf.path}] + config_flags)
+          expect(result['kind']).to eq('bolt/apply-error')
+          expect(result['msg']).to match(/Failed to query PuppetDB: /)
+        end
+      end
     end
   end
 end

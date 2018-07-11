@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require 'bolt/pal'
+require 'bolt/puppetdb'
+require 'bolt/util/on_access'
 
 Bolt::PAL.load_puppet
 
@@ -93,6 +95,12 @@ module Bolt
     def compile_catalog(request)
       pal_main = request['code_ast'] || request['code_string']
       target = request['target']
+
+      pdb_client = Bolt::Util::OnAccess.new do
+        pdb_config = Bolt::PuppetDB::Config.new(nil, request['pdb_config'])
+        Bolt::PuppetDB::Client.from_config(pdb_config)
+      end
+
       with_puppet_settings do
         Puppet[:code] = ''
         Puppet[:node_name_value] = target['name']
@@ -105,7 +113,7 @@ module Bolt
           node = Puppet.lookup(:pal_current_node)
           setup_node(node, target["trusted"])
 
-          Puppet.override(pal_main: pal_main) do
+          Puppet.override(pal_main: pal_main, bolt_pdb_client: pdb_client) do
             compile_node(node)
           end
         end

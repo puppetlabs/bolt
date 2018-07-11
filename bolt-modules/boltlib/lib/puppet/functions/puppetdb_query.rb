@@ -16,7 +16,7 @@ Puppet::Functions.create_function(:puppetdb_query) do
 
   def make_query(query)
     puppetdb_client = Puppet.lookup(:bolt_pdb_client) { nil }
-    unless Puppet[:tasks] && puppetdb_client && Puppet.features.bolt?
+    unless puppetdb_client
       raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
         Puppet::Pops::Issues::TASK_MISSING_BOLT, action: _('query facts from puppetdb')
       )
