@@ -11,12 +11,8 @@ describe Bolt::Applicator do
   let(:executor) { Bolt::Executor.new }
   let(:applicator) { Bolt::Applicator.new(inventory, executor, :mod, :pdb, nil, 2) }
 
-  it 'instantiates' do
-    expect(applicator).to be
-  end
-
-  it 'passes catalog input' do
-    input = {
+  let(:input) {
+    {
       code_ast: :ast,
       modulepath: :mod,
       pdb_config: :pdb,
@@ -34,10 +30,36 @@ describe Bolt::Applicator do
         }
       }
     }
+  }
+
+  it 'instantiates' do
+    expect(applicator).to be
+  end
+
+  it 'passes catalog input' do
     expect(Open3).to receive(:capture3)
       .with('ruby', /bolt_catalog/, 'compile', stdin_data: input.to_json)
-      .and_return(['{}', :err, double(:status, success?: true)])
+      .and_return(['{}', '', double(:status, success?: true)])
     expect(applicator.compile(target, :ast, {})).to eq({})
+  end
+
+  it 'logs messages returned on stderr' do
+    logs = [
+      { debug: 'A message' },
+      { notice: 'Stuff happened' }
+    ]
+
+    expect(Open3).to receive(:capture3)
+      .with('ruby', /bolt_catalog/, 'compile', stdin_data: input.to_json)
+      .and_return(['{}', logs.map(&:to_json).join("\n"), double(:status, success?: true)])
+    expect(applicator.compile(target, :ast, {})).to eq({})
+    expect(@log_output.readlines).to eq(
+      [
+        " DEBUG  Bolt::Executor : Started with 100 max thread(s)\n",
+        " DEBUG  Bolt::Applicator : #{target.uri}: A message\n",
+        "NOTICE  Bolt::Applicator : #{target.uri}: Stuff happened\n"
+      ]
+    )
   end
 
   context 'with Puppet mocked' do

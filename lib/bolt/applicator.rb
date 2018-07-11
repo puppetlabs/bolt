@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
 require 'json'
+require 'logging'
 require 'open3'
 require 'concurrent'
+require 'bolt/util/puppet_log_level'
 
 module Bolt
   Task = Struct.new(:name, :implementations, :input_method)
@@ -16,6 +18,7 @@ module Bolt
       @hiera_config = hiera_config ? validate_hiera_config(hiera_config) : nil
 
       @pool = Concurrent::ThreadPoolExecutor.new(max_threads: max_compiles)
+      @logger = Logging.logger[self]
     end
 
     private def libexec
@@ -53,7 +56,28 @@ module Bolt
       out, err, stat = Open3.capture3('ruby', bolt_catalog_exe, 'compile', stdin_data: catalog_input.to_json)
       ENV['PATH'] = old_path
 
-      raise ApplyError.new(target.to_s, err) unless stat.success?
+      # stderr may contain formatted logs from Puppet's logger or other errors.
+      # Print them in order, but handle them separately. Anything not a formatted log is assumed
+      # to be an error message.
+      logs = err.lines.map do |l|
+        begin
+          JSON.parse(l)
+        rescue StandardError
+          l
+        end
+      end
+      logs.each do |log|
+        if log.is_a?(String)
+          @logger.error(log.chomp)
+        else
+          log.map { |k, v| [k.to_sym, v] }.each do |level, msg|
+            bolt_level = Bolt::Util::PuppetLogLevel::MAPPING[level]
+            @logger.send(bolt_level, "#{target.uri}: #{msg.chomp}")
+          end
+        end
+      end
+
+      raise(ApplyError, target.uri) unless stat.success?
       JSON.parse(out)
     end
 

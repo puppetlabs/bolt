@@ -7,6 +7,7 @@ require 'bolt/util/on_access'
 Bolt::PAL.load_puppet
 
 require 'bolt/catalog/compiler'
+require 'bolt/catalog/logging'
 
 module Bolt
   class Catalog
@@ -19,7 +20,10 @@ module Bolt
         Puppet.settings.send(:clear_everything_for_tests)
         Puppet.initialize_settings(cli)
         Puppet.settings[:hiera_config] = hiera_config
-        # self.class.configure_logging
+
+        # Use a special logdest that serializes all log messages and their level to stderr.
+        Puppet::Util::Log.newdestination(:stderr)
+        Puppet.settings[:log_level] = 'debug'
         yield
       end
     end

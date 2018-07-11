@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'bolt/util/puppet_log_level'
+
 Puppet::Util::Log.newdesttype :logging do
   match "Logging::Logger"
 
@@ -7,22 +9,9 @@ Puppet::Util::Log.newdesttype :logging do
   # an explicit mapping.
   def initialize(logger)
     @external_logger = logger
-
-    @log_level_map = {
-      debug: :debug,
-      info: :info,
-      notice: :notice,
-      warning: :warn,
-      err: :error,
-      # Nothing in Puppet actually uses alert, emerg or crit, so it's hard to say
-      # what they indicate, but they sound pretty bad.
-      alert: :error,
-      emerg: :fatal,
-      crit: :fatal
-    }
   end
 
   def handle(log)
-    @external_logger.send(@log_level_map[log.level], log.to_s)
+    @external_logger.send(Bolt::Util::PuppetLogLevel::MAPPING[log.level], log.to_s)
   end
 end
