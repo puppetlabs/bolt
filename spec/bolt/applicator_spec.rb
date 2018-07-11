@@ -9,7 +9,7 @@ describe Bolt::Applicator do
   let(:target) { Bolt::Target.new(uri) }
   let(:inventory) { Bolt::Inventory.new(nil) }
   let(:executor) { Bolt::Executor.new }
-  let(:applicator) { Bolt::Applicator.new(inventory, executor, :mod, :pdb, nil) }
+  let(:applicator) { Bolt::Applicator.new(inventory, executor, :mod, :pdb, nil, 2) }
 
   it 'instantiates' do
     expect(applicator).to be

@@ -94,7 +94,7 @@ module Bolt
 
   class ValidationError < Bolt::Error
     def initialize(msg)
-      super(msg, 'bolt.transport/validation-error')
+      super(msg, 'bolt/validation-error')
     end
   end
 

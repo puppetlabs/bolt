@@ -287,6 +287,65 @@ describe Bolt::Config do
         Bolt::Config.new(config).validate
       }.to raise_error(Bolt::ValidationError)
     end
+
+    it "does not accept negative concurrency" do
+      config = { concurrency: -1 }
+      expect {
+        Bolt::Config.new(config).validate
+      }.to raise_error(Bolt::ValidationError)
+    end
+
+    it "does not accept zero concurrency" do
+      config = { concurrency: 0 }
+      expect {
+        Bolt::Config.new(config).validate
+      }.to raise_error(Bolt::ValidationError)
+    end
+
+    it "does not accept string concurrency" do
+      config = { concurrency: '1' }
+      expect {
+        Bolt::Config.new(config).validate
+      }.to raise_error(Bolt::ValidationError)
+    end
+
+    it "accepts positive concurrency" do
+      config = { concurrency: 1 }
+      Bolt::Config.new(config).validate
+    end
+
+    it "does not accept negative compile-concurrency" do
+      config = { 'compile-concurrency': -1 }
+      expect {
+        Bolt::Config.new(config).validate
+      }.to raise_error(Bolt::ValidationError)
+    end
+
+    it "does not accept zero compile-concurrency" do
+      config = { 'compile-concurrency': 0 }
+      expect {
+        Bolt::Config.new(config).validate
+      }.to raise_error(Bolt::ValidationError)
+    end
+
+    it "does not accept large compile-concurrency" do
+      config = { 'compile-concurrency': 1000000 }
+      expect {
+        Bolt::Config.new(config).validate
+      }.to raise_error(Bolt::ValidationError)
+    end
+
+    it "does not accept string compile-concurrency" do
+      config = { 'compile-concurrency': '1' }
+      expect {
+        Bolt::Config.new(config).validate
+      }.to raise_error(Bolt::ValidationError)
+    end
+
+    it "accepts positive compile-concurrency" do
+      config = { 'compile-concurrency': 1 }
+      Bolt::Config.new(config).validate
+    end
   end
 
   describe 'boltdir' do
