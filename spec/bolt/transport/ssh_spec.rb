@@ -471,9 +471,13 @@ SHELL
 
     context "as non-root" do
       let(:config) {
-        mk_config('host-key-check' => false, 'sudo-password' => password, 'run_as' => user,
-                  user: user, password: password)
+        mk_config('host-key-check' => false, 'sudo-password' => bash_password, 'run-as' => user,
+                  user: bash_user, password: bash_password)
       }
+
+      it 'runs as that user', ssh: true do
+        expect(ssh.run_command(target, 'whoami')['stdout'].chomp).to eq(user)
+      end
 
       it "can override run_as for command via an option", ssh: true do
         expect(ssh.run_command(target, 'whoami', '_run_as' => 'root')['stdout']).to eq("root\n")
