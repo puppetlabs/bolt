@@ -20,7 +20,7 @@ describe "errors gracefully attempting to apply a manifest block" do
 
     it 'prints a helpful error if Puppet is not present' do
       result = run_cli_json(%w[plan run basic::class] + config_flags)
-      error = result[0]['result']['_error']
+      error = result['details']['result_set'][0]['result']['_error']
       expect(error['kind']).to eq('bolt/apply-error')
       expect(error['msg']).to eq("Puppet is not installed on the target, please install it to enable 'apply'")
     end
@@ -33,7 +33,7 @@ describe "errors gracefully attempting to apply a manifest block" do
 
     it 'prints a helpful error if Puppet is not present' do
       result = run_cli_json(%w[plan run basic::class] + config_flags)
-      error = result[0]['result']['_error']
+      error = result['details']['result_set'][0]['result']['_error']
       expect(error['kind']).to eq('bolt/apply-error')
       expect(error['msg'])
         .to eq("Puppet is not installed on the target in $env:ProgramFiles, please install it to enable 'apply'")

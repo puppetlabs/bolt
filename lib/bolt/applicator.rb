@@ -127,11 +127,11 @@ module Bolt
       type0 = Puppet.lookup(:pal_script_compiler).type('TargetSpec')
       Puppet::Pal.assert_type(type0, args[0], 'apply targets')
 
-      params = {}
+      options = {}
       if args.count > 1
         type1 = Puppet.lookup(:pal_script_compiler).type('Hash[String, Data]')
         Puppet::Pal.assert_type(type1, args[1], 'apply options')
-        params = args[1]
+        options = args[1]
       end
 
       # collect plan vars and merge them over target vars
@@ -142,7 +142,7 @@ module Bolt
       ast = Puppet::Pops::Serialization::ToDataConverter.convert(apply_body, rich_data: true, symbol_to_string: true)
       notify = proc { |_| nil }
 
-      @executor.log_action('apply catalog', targets) do
+      r = @executor.log_action('apply catalog', targets) do
         futures = targets.map do |target|
           Concurrent::Future.execute(executor: @pool) do
             @executor.with_node_logging("Compiling manifest block", [target]) do
@@ -154,10 +154,9 @@ module Bolt
         result_promises = targets.zip(futures).flat_map do |target, future|
           @executor.queue_execute([target]) do |transport, batch|
             @executor.with_node_logging("Applying manifest block", batch) do
-              arguments = params.clone
-              arguments['catalog'] = future.value
+              arguments = { 'catalog' => future.value, '_noop' => options['_noop'] }
               raise future.reason if future.rejected?
-              result = transport.batch_task(batch, catalog_apply_task, arguments, {}, &notify)
+              result = transport.batch_task(batch, catalog_apply_task, arguments, options, &notify)
               provide_puppet_missing_errors(result)
             end
           end
@@ -165,6 +164,11 @@ module Bolt
 
         @executor.await_results(result_promises)
       end
+
+      if !r.ok && !options['_catch_errors']
+        raise Bolt::RunFailure.new(r, 'apply', 'catalog')
+      end
+      r
     end
   end
 end
