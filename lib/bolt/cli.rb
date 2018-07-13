@@ -194,10 +194,8 @@ module Bolt
 
     def puppetdb_client
       return @puppetdb_client if @puppetdb_client
-      @puppetdb_client = Bolt::Util::OnAccess.new do
-        puppetdb_config = Bolt::PuppetDB::Config.new(nil, config.puppetdb)
-        Bolt::PuppetDB::Client.from_config(puppetdb_config)
-      end
+      puppetdb_config = Bolt::PuppetDB::Config.load_config(nil, config.puppetdb)
+      @puppetdb_client = Bolt::PuppetDB::Client.new(puppetdb_config)
     end
 
     def query_puppetdb_nodes(query)

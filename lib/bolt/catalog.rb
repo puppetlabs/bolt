@@ -97,11 +97,7 @@ module Bolt
       pal_main = request['code_ast'] || request['code_string']
       target = request['target']
 
-      pdb_client = Bolt::Util::OnAccess.new do
-        uri = URI.parse(request['pdb_config']['uri'])
-        cacert, token, cert, key = request['pdb_config'].values_at(:cacert, :token, :cert, :key)
-        Bolt::PuppetDB::Client.new(uri, cacert, token: token, cert: cert, key: key)
-      end
+      pdb_client = Bolt::PuppetDB::Client.new(Bolt::PuppetDB::Config.new(request['pdb_config']))
 
       with_puppet_settings(request['hiera_config']) do
         Puppet[:code] = ''

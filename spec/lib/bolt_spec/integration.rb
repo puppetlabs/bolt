@@ -8,7 +8,9 @@ module BoltSpec
       # prevent tests from reading users config
       allow(Bolt::Config).to receive(:legacy_conf).and_return(File.join('.', 'path', 'does not exist'))
       allow(Bolt::Boltdir).to receive(:find_boltdir).and_return(Bolt::Boltdir.new(Dir.mktmpdir))
-      puppetdb_client = Bolt::PuppetDB::Client.new(URI.parse('https://puppetdb.example.com'), '/path/to/cacert')
+      puppetdb_config = Bolt::PuppetDB::Config.new('server_urls' => 'https://puppetdb.example.com',
+                                                   'cacert' => '/path/to/cacert')
+      puppetdb_client = Bolt::PuppetDB::Client.new(puppetdb_config)
       allow(cli).to receive(:puppetdb_client).and_return(puppetdb_client)
       output =  StringIO.new
       outputter = outputter.new(false, false, output)

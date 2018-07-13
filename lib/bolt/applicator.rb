@@ -36,7 +36,7 @@ module Bolt
       catalog_input = {
         code_ast: ast,
         modulepath: @modulepath,
-        pdb_config: @pdb_client&.config,
+        pdb_config: @pdb_client.config.to_hash,
         hiera_config: @hiera_config,
         target: {
           name: target.host,
