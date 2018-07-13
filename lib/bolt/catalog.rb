@@ -2,7 +2,6 @@
 
 require 'bolt/pal'
 require 'bolt/puppetdb'
-require 'bolt/util/on_access'
 
 Bolt::PAL.load_puppet
 

@@ -18,7 +18,6 @@ require 'bolt/puppetdb'
 require 'bolt/pal'
 require 'bolt/target'
 require 'bolt/version'
-require 'bolt/util/on_access'
 
 module Bolt
   class CLIExit < StandardError; end
