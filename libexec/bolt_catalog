@@ -10,6 +10,7 @@ require 'json'
 #   "code_string": "String of code, ignored if AST is provided",
 #   "modulepath": "Array of directories to use as the modulepath for catalog compilation",
 #   "pdb_config": "A hash of PDB client config options as supplied to Bolt",
+#   "hiera_config": "File path to hiera config file",
 #   "target": {
 #     "name": "the name of the node usually fqdn fro url",
 #     "facts": "Hash of facts to use for the node",

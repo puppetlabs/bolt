@@ -55,7 +55,7 @@ end
 
 module Bolt
   class Catalog
-    def with_puppet_settings
+    def with_puppet_settings(hiera_config)
       Dir.mktmpdir('bolt') do |dir|
         cli = []
         Puppet::Settings::REQUIRED_APP_SETTINGS.each do |setting|
@@ -63,6 +63,7 @@ module Bolt
         end
         Puppet.settings.send(:clear_everything_for_tests)
         Puppet.initialize_settings(cli)
+        Puppet.settings[:hiera_config] = hiera_config
         # self.class.configure_logging
         yield
       end
@@ -101,7 +102,7 @@ module Bolt
         Bolt::PuppetDB::Client.from_config(pdb_config)
       end
 
-      with_puppet_settings do
+      with_puppet_settings(request['hiera_config']) do
         Puppet[:code] = ''
         Puppet[:node_name_value] = target['name']
         Puppet::Pal.in_tmp_environment(

@@ -1,0 +1,10 @@
+---
+# without specifying version 5, puppet would assume version 3. Apply only supports v5
+# version: 5 
+
+defaults:
+  data_hash: yaml_data
+
+hierarchy:
+  - name: "Common"
+    path: "common.yaml"

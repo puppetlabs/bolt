@@ -31,6 +31,7 @@ module Bolt
     :log,
     :modulepath,
     :puppetdb,
+    :'hiera-config',
     :color,
     :transport,
     :transports
@@ -131,7 +132,7 @@ module Bolt
         self[:modulepath] = data['modulepath'].split(File::PATH_SEPARATOR)
       end
 
-      %w[inventoryfile concurrency format puppetdb color transport].each do |key|
+      %w[inventoryfile concurrency format puppetdb hiera-config color transport].each do |key|
         if data.key?(key)
           self[key.to_sym] = data[key]
         end
@@ -197,6 +198,10 @@ module Bolt
       File.join(boltdir, 'inventory.yaml')
     end
 
+    def default_hiera
+      File.join(boltdir, 'hiera.yaml')
+    end
+
     def update_from_cli(options)
       %i[concurrency transport format trace modulepath inventoryfile color].each do |key|
         self[key] = options[key] if options.key?(key)
@@ -236,6 +241,7 @@ module Bolt
     # 'inventoryfile' cannot be included here or they will not be handled correctly.
     def update_from_defaults
       self[:modulepath] = default_modulepath
+      self[:'hiera-config'] = default_hiera
     end
 
     # The order in which config is processed is important
@@ -248,6 +254,7 @@ module Bolt
     def load_file(path)
       data = Bolt::Util.read_config_file(path, [default_config], 'config')
       update_from_file(data) if data
+      validate_hiera_conf(data ? data['hiera-config'] : nil)
     end
 
     def update_from_inventory(data)
@@ -261,6 +268,10 @@ module Bolt
     def transport_conf
       { transport: self[:transport],
         transports: self[:transports] }
+    end
+
+    def validate_hiera_conf(path)
+      Bolt::Util.read_config_file(path, [default_hiera], 'hiera-config')
     end
 
     def validate
