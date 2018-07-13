@@ -1,0 +1,140 @@
+#!/bin/bash
+# PE Bolt Server    Bolt transport API   
+#
+# chkconfig: - 98 02
+#
+# description: Service to expose bolt transport API
+# processname: pe-bolt-server
+# config: /etc/sysconfig/pe-bolt-server
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+[ -f /etc/sysconfig/pe-bolt-server ] && . /etc/sysconfig/pe-bolt-server
+
+exec=/opt/puppetlabs/server/apps/bolt-server/bin/pe-bolt-server
+prog="pe-bolt-server"
+desc="PE Bolt Server"
+
+lockfile=/var/lock/subsys/$prog
+piddir=/var/run/puppetlabs
+pidfile="${piddir}/${prog}.pid"
+logdir=/var/log/puppetlabs
+pid=$(cat $pidfile 2> /dev/null)
+RETVAL=0
+
+[ -x $exec ] || exit 5
+
+if status | grep -q -- '-p' 2>/dev/null; then
+    daemonopts="--pidfile $pidfile"
+    pidopts="-p $pidfile"
+    USEINITFUNCTIONS=true
+fi
+
+start() {
+    echo -n $"Starting PE Bolt Server: "
+    mkdir -p $piddir $logdir
+    daemon $daemonopts $exec ${PE_BOLT_SERVER_OPTIONS}
+    RETVAL=$?
+    echo
+    [ $RETVAL = 0 ] && touch ${lockfile}
+    return $RETVAL
+}
+
+stop() {
+    echo -n $"Stopping PE Bolt Server: "
+    if [ "$USEINITFUNCTIONS" = "true" ]; then
+        killproc $pidopts $exec
+        RETVAL=$?
+    else
+        if [ -n "${pid}" ]; then
+            kill -TERM $pid >/dev/null 2>&1
+            RETVAL=$?
+        fi
+    fi
+    echo
+    [ $RETVAL = 0 ] && rm -f ${lockfile} ${pidfile}
+    return $RETVAL
+}
+
+reload() {
+    echo -n $"Reloading PE Bolt Server: "
+    if [ "$USEINITFUNCTIONS" = "true" ]; then
+        killproc $pidopts $exec -HUP
+        RETVAL=$?
+    else
+        if [ -n "${pid}" ]; then
+            kill -HUP $pid >/dev/null 2>&1
+            RETVAL=$?
+        else
+            RETVAL=0
+        fi
+    fi
+    echo
+    return $RETVAL
+}
+
+restart() {
+    stop
+    start
+}
+
+rh_status() {
+    if [ "$USEINITFUNCTIONS" = "true" ]; then
+        status $pidopts $exec
+        RETVAL=$?
+        return $RETVAL
+    else
+        if [ -n "${pid}" ]; then
+            if `ps -p $pid | grep $pid > /dev/null 2>&1`; then
+                echo "${desc} (pid ${pid}) is running..."
+                RETVAL=0
+                return $RETVAL
+            fi
+        fi
+        if [ -f "${pidfile}" ] ; then
+            echo "${desc} dead but pid file exists"
+            RETVAL=1
+            return $RETVAL
+        fi
+        if [ -f "${lockfile}" ]; then
+            echo "${desc} dead but subsys locked"
+            RETVAL=2
+            return $RETVAL
+        fi
+        echo "${desc} is stopped"
+        RETVAL=3
+        return $RETVAL
+    fi
+}
+
+rh_status_q() {
+    rh_status >/dev/null 2>&1
+}
+
+case "$1" in
+    start)
+        start
+    ;;
+    stop)
+        stop
+    ;;
+    restart)
+        restart
+    ;;
+    reload|force-reload)
+        reload
+    ;;
+    condrestart|try-restart)
+        rh_status_q || exit 0
+        restart
+    ;;
+    status)
+        rh_status
+    ;;
+    *)
+        echo $"Usage: $0 {start|stop|status|restart|condrestart}"
+        exit 1
+esac
+
+exit $RETVAL

@@ -1,0 +1,2 @@
+# You may specify parameters to the PXP Agent here
+#PE_BOLT_SERVER_OPTIONS=--loglevel=debug
