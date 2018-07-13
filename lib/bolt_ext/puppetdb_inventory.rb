@@ -71,7 +71,7 @@ query results.
 
         if @show_help
           puts @parser.help
-          return 0
+          return
         end
 
         inventory_file = positional_args.shift
@@ -100,12 +100,6 @@ query results.
         else
           puts result
         end
-
-        0
-      rescue StandardError => e
-        puts "Error: #{e}"
-        puts e.backtrace if @trace
-        1
       end
 
       def resolve_group(group)
