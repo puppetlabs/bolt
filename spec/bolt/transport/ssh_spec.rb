@@ -412,6 +412,14 @@ SHELL
         end
       end
     end
+
+    it "runs a task that specifies its base64-encoded contents", ssh: true do
+      contents = "#!/bin/sh\necho -n ${PT_message_one} ${PT_message_two}"
+      arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
+      task = Bolt::Task.new(name: 'tasks_test', input_method: 'environment', file_content: Base64.encode64(contents))
+      expect(ssh.run_task(target, task, arguments).message)
+        .to eq('Hello from task Goodbye')
+    end
   end
 
   context 'when tmpdir is specified' do
