@@ -61,7 +61,7 @@ module Bolt
       if File.exist?(File.path(hiera_config))
         data = File.open(File.path(hiera_config), "r:UTF-8") { |f| YAML.safe_load(f.read) }
         unless data['version'] == 5
-          raise ApplyError.new("All Targets", "Hiera v5 is required.")
+          raise Bolt::ParseError, "Hiera v5 is required, found v#{data['version'] || 3} in #{hiera_config}"
         end
         hiera_config
       end

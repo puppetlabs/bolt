@@ -83,6 +83,12 @@ module Bolt
     end
   end
 
+  class ParseError < Error
+    def initialize(msg)
+      super(msg, 'bolt/parse-error')
+    end
+  end
+
   class InvalidPlanResult < Error
     def initialize(plan_name, result_str)
       super("Plan #{plan_name} returned an invalid result: #{result_str}",

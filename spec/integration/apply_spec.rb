@@ -149,8 +149,8 @@ describe "Passes parsed AST to the apply_catalog task" do
       it 'hiera 5 version not specified' do
         with_tempfile_containing('conf', YAML.dump(bad_hiera_version)) do |conf|
           result = run_cli_json(%W[plan run basic::hiera_lookup --configfile #{conf.path}] + config_flags)
-          expect(result['kind']).to eq('bolt/apply-error')
-          expect(result['msg']).to match(/Hiera v5 is required./)
+          expect(result['kind']).to eq('bolt/parse-error')
+          expect(result['msg']).to match(/Hiera v5 is required, found v3/)
         end
       end
     end
