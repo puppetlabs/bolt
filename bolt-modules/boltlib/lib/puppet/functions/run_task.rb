@@ -86,6 +86,9 @@ Puppet::Functions.create_function(:run_task) do
       executor.report_function_call('run_task')
     end
 
+    # Report bundled content, this should capture tasks run from both CLI and Plans
+    executor.report_bundled_content('Task', task_name)
+
     # Ensure that given targets are all Target instances
     targets = inventory.get_targets(targets)
 

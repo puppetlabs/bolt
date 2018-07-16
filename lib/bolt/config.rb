@@ -2,6 +2,7 @@
 
 require 'yaml'
 require 'logging'
+require 'concurrent'
 require 'bolt/cli'
 require 'bolt/transport/ssh'
 require 'bolt/transport/winrm'
@@ -25,12 +26,14 @@ module Bolt
 
   Config = Struct.new(
     :concurrency,
+    :'compile-concurrency',
     :format,
     :trace,
     :inventoryfile,
     :log,
     :modulepath,
     :puppetdb,
+    :'hiera-config',
     :color,
     :transport,
     :transports
@@ -38,6 +41,7 @@ module Bolt
 
     DEFAULTS = {
       concurrency: 100,
+      'compile-concurrency': Concurrent.processor_count,
       transport: 'ssh',
       format: 'human',
       modulepath: [],
@@ -131,7 +135,7 @@ module Bolt
         self[:modulepath] = data['modulepath'].split(File::PATH_SEPARATOR)
       end
 
-      %w[inventoryfile concurrency format puppetdb color transport].each do |key|
+      %w[inventoryfile concurrency compile-concurrency format puppetdb hiera-config color transport].each do |key|
         if data.key?(key)
           self[key.to_sym] = data[key]
         end
@@ -197,8 +201,12 @@ module Bolt
       File.join(boltdir, 'inventory.yaml')
     end
 
+    def default_hiera
+      File.join(boltdir, 'hiera.yaml')
+    end
+
     def update_from_cli(options)
-      %i[concurrency transport format trace modulepath inventoryfile color].each do |key|
+      %i[concurrency compile-concurrency transport format trace modulepath inventoryfile color].each do |key|
         self[key] = options[key] if options.key?(key)
       end
 
@@ -236,6 +244,7 @@ module Bolt
     # 'inventoryfile' cannot be included here or they will not be handled correctly.
     def update_from_defaults
       self[:modulepath] = default_modulepath
+      self[:'hiera-config'] = default_hiera
     end
 
     # The order in which config is processed is important
@@ -248,6 +257,7 @@ module Bolt
     def load_file(path)
       data = Bolt::Util.read_config_file(path, [default_config], 'config')
       update_from_file(data) if data
+      validate_hiera_conf(data ? data['hiera-config'] : nil)
     end
 
     def update_from_inventory(data)
@@ -263,6 +273,10 @@ module Bolt
         transports: self[:transports] }
     end
 
+    def validate_hiera_conf(path)
+      Bolt::Util.read_config_file(path, [default_hiera], 'hiera-config')
+    end
+
     def validate
       self[:log].each_pair do |name, params|
         if params.key?(:level) && !Bolt::Logger.valid_level?(params[:level])
@@ -272,6 +286,19 @@ module Bolt
         if params.key?(:append) && params[:append] != true && params[:append] != false
           raise Bolt::ValidationError, "append flag of log #{name} must be a Boolean, received #{params[:append]}"
         end
+      end
+
+      unless self[:concurrency].is_a?(Integer) && self[:concurrency] > 0
+        raise Bolt::ValidationError, 'Concurrency must be a positive integer'
+      end
+
+      unless self[:'compile-concurrency'].is_a?(Integer) && self[:'compile-concurrency'] > 0
+        raise Bolt::ValidationError, 'Compile concurrency must be a positive integer'
+      end
+
+      compile_limit = 2 * Concurrent.processor_count
+      unless self[:'compile-concurrency'] < compile_limit
+        raise Bolt::ValidationError, "Compilation is CPU-intensive, set concurrency less than #{compile_limit}"
       end
 
       unless %w[human json].include? self[:format]

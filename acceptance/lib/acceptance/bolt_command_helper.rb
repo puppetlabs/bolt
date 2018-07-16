@@ -13,17 +13,36 @@ module Acceptance
     # @option flags [nil] '--no-ssl' specify nil to use
     # @param [Hash] opts the options hash for this method
     def bolt_command_on(host, command, flags = {}, opts = {})
-      platform = host['platform']
       bolt_command = command.dup
       flags.each { |k, v| bolt_command << " #{k} #{v}" }
 
-      if platform =~ /windows/
+      case host['platform']
+      when /windows/
         execute_powershell_script_on(host, bolt_command, opts)
-      elsif platform =~ /osx/
+      when /osx/
         env = 'source /etc/profile  ~/.bash_profile ~/.bash_login ~/.profile &&'
         on(host, env + ' ' + bolt_command)
       else
         on(host, bolt_command, opts)
+      end
+    end
+
+    def default_modulepath
+      case bolt['platform']
+      when /windows/
+        home = on(bolt, 'cygpath -m $(printenv USERPROFILE)').stdout.chomp
+        File.join(home, '.puppetlabs/bolt/modules')
+      else
+        '$HOME/.puppetlabs/bolt/modules'
+      end
+    end
+
+    def modulepath(extra)
+      case bolt['platform']
+      when /windows/
+        "\"#{default_modulepath};#{extra}\""
+      else
+        "#{default_modulepath}:#{extra}"
       end
     end
   end

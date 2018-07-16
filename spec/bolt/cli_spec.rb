@@ -346,6 +346,27 @@ bar
       end
     end
 
+    describe "compile-concurrency" do
+      it "accepts a concurrency limit" do
+        cli = Bolt::CLI.new(%w[command run --compile-concurrency 2 --nodes foo])
+        expect(cli.parse).to include('compile-concurrency': 2)
+      end
+
+      it "defaults to unset" do
+        cli = Bolt::CLI.new(%w[command run --nodes foo])
+        cli.parse
+        expect(cli.config[:'compile-concurrency']).to eq(Concurrent.processor_count)
+      end
+
+      it "generates an error message if no concurrency value is given" do
+        cli = Bolt::CLI.new(%w[command run --nodes foo --compile-concurrency])
+        expect {
+          cli.parse
+        }.to raise_error(Bolt::CLIError,
+                         /Option '--compile-concurrency' needs a parameter/)
+      end
+    end
+
     describe "console log level" do
       it "is not sensitive to ordering of debug and verbose" do
         expect(Bolt::Logger).to receive(:configure).with(have_attributes(log: { 'console' => { level: :debug } }))
@@ -1031,6 +1052,7 @@ bar
         let(:task_t) { task_type(task_name, Regexp.new(task_path), input_method) }
 
         before :each do
+          allow(executor).to receive(:report_bundled_content)
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
         end
 
@@ -1343,6 +1365,7 @@ bar
 
         before :each do
           allow(executor).to receive(:report_function_call)
+          allow(executor).to receive(:report_bundled_content)
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
         end
 
@@ -1535,13 +1558,17 @@ bar
       let(:cli) { Bolt::CLI.new({}) }
       let(:targets) { [target] }
       let(:output) { StringIO.new }
+      let(:bundled_content) { ['test'] }
 
       before :each do
-        expect(Bolt::Executor).to receive(:new).with(config, anything, true).and_return(executor)
-
+        allow(cli).to receive(:bundled_content).and_return(bundled_content)
+        expect(Bolt::Executor).to receive(:new).with(config,
+                                                     anything,
+                                                     true,
+                                                     bundled_content: bundled_content).and_return(executor)
         outputter = Bolt::Outputter::JSON.new(false, false, output)
-
         allow(cli).to receive(:outputter).and_return(outputter)
+        allow(executor).to receive(:report_bundled_content)
       end
 
       context "when running a task", :reset_puppet_settings do
@@ -1598,6 +1625,7 @@ bar
       { 'modulepath' => "/foo/bar#{File::PATH_SEPARATOR}/baz/qux",
         'inventoryfile' => File.join(__dir__, '..', 'fixtures', 'inventory', 'empty.yml'),
         'concurrency' => 14,
+        'compile-concurrency' => 2,
         'format' => 'json',
         'log' => {
           'console' => {
@@ -1643,6 +1671,14 @@ bar
         cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-host-key-check])
         cli.parse
         expect(cli.config[:concurrency]).to eq(14)
+      end
+    end
+
+    it 'reads compile-concurrency' do
+      with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
+        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-host-key-check])
+        cli.parse
+        expect(cli.config[:'compile-concurrency']).to eq(2)
       end
     end
 
