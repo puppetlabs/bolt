@@ -346,6 +346,27 @@ bar
       end
     end
 
+    describe "compile-concurrency" do
+      it "accepts a concurrency limit" do
+        cli = Bolt::CLI.new(%w[command run --compile-concurrency 2 --nodes foo])
+        expect(cli.parse).to include('compile-concurrency': 2)
+      end
+
+      it "defaults to unset" do
+        cli = Bolt::CLI.new(%w[command run --nodes foo])
+        cli.parse
+        expect(cli.config[:'compile-concurrency']).to eq(Concurrent.processor_count)
+      end
+
+      it "generates an error message if no concurrency value is given" do
+        cli = Bolt::CLI.new(%w[command run --nodes foo --compile-concurrency])
+        expect {
+          cli.parse
+        }.to raise_error(Bolt::CLIError,
+                         /Option '--compile-concurrency' needs a parameter/)
+      end
+    end
+
     describe "console log level" do
       it "is not sensitive to ordering of debug and verbose" do
         expect(Bolt::Logger).to receive(:configure).with(have_attributes(log: { 'console' => { level: :debug } }))
@@ -1604,6 +1625,7 @@ bar
       { 'modulepath' => "/foo/bar#{File::PATH_SEPARATOR}/baz/qux",
         'inventoryfile' => File.join(__dir__, '..', 'fixtures', 'inventory', 'empty.yml'),
         'concurrency' => 14,
+        'compile-concurrency' => 2,
         'format' => 'json',
         'log' => {
           'console' => {
@@ -1649,6 +1671,14 @@ bar
         cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-host-key-check])
         cli.parse
         expect(cli.config[:concurrency]).to eq(14)
+      end
+    end
+
+    it 'reads compile-concurrency' do
+      with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
+        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-host-key-check])
+        cli.parse
+        expect(cli.config[:'compile-concurrency']).to eq(2)
       end
     end
 

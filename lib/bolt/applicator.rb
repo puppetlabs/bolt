@@ -2,17 +2,20 @@
 
 require 'json'
 require 'open3'
+require 'concurrent'
 
 module Bolt
   Task = Struct.new(:name, :implementations, :input_method)
 
   class Applicator
-    def initialize(inventory, executor, modulepath, pdb_config, hiera_config)
+    def initialize(inventory, executor, modulepath, pdb_config, hiera_config, max_compiles)
       @inventory = inventory
       @executor = executor
       @modulepath = modulepath
       @pdb_config = pdb_config
       @hiera_config = hiera_config ? validate_hiera_config(hiera_config) : nil
+
+      @pool = Concurrent::ThreadPoolExecutor.new(max_threads: max_compiles)
     end
 
     private def libexec
@@ -20,9 +23,11 @@ module Bolt
     end
 
     def catalog_apply_task
-      path = File.join(libexec, 'apply_catalog.rb')
-      impl = { 'name' => 'apply_catalog.rb', 'path' => path, 'requirements' => [], 'supports_noop' => true }
-      Task.new('apply_catalog', [impl], 'stdin')
+      @catalog_apply_task ||= begin
+        path = File.join(libexec, 'apply_catalog.rb')
+        impl = { 'name' => 'apply_catalog.rb', 'path' => path, 'requirements' => [], 'supports_noop' => true }
+        Task.new('apply_catalog', [impl], 'stdin')
+      end
     end
 
     def compile(target, ast, plan_vars)
@@ -80,11 +85,30 @@ module Bolt
 
       targets = @inventory.get_targets(args[0])
       ast = Puppet::Pops::Serialization::ToDataConverter.convert(apply_body, rich_data: true, symbol_to_string: true)
-      results = targets.map do |target|
-        params['catalog'] = compile(target, ast, plan_vars)
-        @executor.run_task([target], catalog_apply_task, params, '_description' => 'apply catalog')
+      notify = proc { |_| nil }
+
+      @executor.log_action('apply catalog', targets) do
+        futures = targets.map do |target|
+          Concurrent::Future.execute(executor: @pool) do
+            @executor.with_node_logging("Compiling manifest block", [target]) do
+              compile(target, ast, plan_vars)
+            end
+          end
+        end
+
+        result_promises = targets.zip(futures).flat_map do |target, future|
+          @executor.queue_execute([target]) do |transport, batch|
+            @executor.with_node_logging("Applying manifest block", batch) do
+              arguments = params.clone
+              arguments['catalog'] = future.value
+              raise future.reason if future.rejected?
+              transport.batch_task(batch, catalog_apply_task, arguments, {}, &notify)
+            end
+          end
+        end
+
+        @executor.await_results(result_promises)
       end
-      ResultSet.new results.reduce([]) { |result, result_set| result + result_set.results }
     end
   end
 end

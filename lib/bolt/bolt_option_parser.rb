@@ -183,6 +183,10 @@ Available options are:
              'Maximum number of simultaneous connections (default: 100)') do |concurrency|
         @options[:concurrency] = concurrency
       end
+      define('--compile-concurrency CONCURRENCY', Integer,
+             'Maximum number of simultaneous manifest block compiles (default: number of cores)') do |concurrency|
+        @options[:'compile-concurrency'] = concurrency
+      end
       define('--modulepath MODULES',
              "List of directories containing modules, separated by '#{File::PATH_SEPARATOR}'") do |modulepath|
         @options[:modulepath] = modulepath.split(File::PATH_SEPARATOR)
