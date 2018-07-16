@@ -18,7 +18,7 @@ This lesson covers everything you need to install Bolt on your machine. Just sel
 
 ## Install Bolt on Windows
 
-1.  Download the Bolt installer package from [https://downloads.puppet.com/windows/puppet5/bolt-x64-latest.msi.](https://downloads.puppet.com/windows/puppet5/bolt-x64-latest.msi)
+1.  Download the Bolt installer package from [https://downloads.puppet.com/windows/puppet5/puppet-bolt-x64-latest.msi](https://downloads.puppet.com/windows/puppet5/puppet-bolt-x64-latest.msi).
 2.  Double-click the MSI file and run the installation.
 3.  Run a Bolt command to verify it has installed correctly.  
 
@@ -33,10 +33,10 @@ This lesson covers everything you need to install Bolt on your machine. Just sel
 
     **Tip:** To find the macOS version number on your Mac, go to the Apple \(\) menu in the corner of your screen and choose **About This Mac**.
 
-    -   10.11 \(El Capitan\) [https://downloads.puppet.com/mac/puppet5/10.11/x86\_64/bolt-latest.dmg](https://downloads.puppet.com/mac/puppet5/10.11/x86_64/bolt-latest.dmg)
-    -   10.12 \(Sierra\) [https://downloads.puppet.com/mac/puppet5/10.12/x86\_64/bolt-latest.dmg](https://downloads.puppet.com/mac/puppet5/10.12/x86_64/bolt-latest.dmg)
-    -   10.13 \(High Sierra\) [https://downloads.puppet.com/mac/puppet5/10.13/x86\_64/bolt-latest.dmg](https://downloads.puppet.com/mac/puppet5/10.13/x86_64/bolt-latest.dmg)
-2.  Double-click the `bolt-latest.dmg` file to mount it and then double-click the `bolt-[version]-installer.pkg` to run the installation.
+    -   10.11 \(El Capitan\) [https://downloads.puppet.com/mac/puppet5/10.11/x86\_64/puppet-bolt-latest.dmg](https://downloads.puppet.com/mac/puppet5/10.11/x86_64/puppet-bolt-latest.dmg)
+    -   10.12 \(Sierra\) [https://downloads.puppet.com/mac/puppet5/10.12/x86\_64/puppet-bolt-latest.dmg](https://downloads.puppet.com/mac/puppet5/10.12/x86_64/puppet-bolt-latest.dmg)
+    -   10.13 \(High Sierra\) [https://downloads.puppet.com/mac/puppet5/10.13/x86\_64/puppet-bolt-latest.dmg](https://downloads.puppet.com/mac/puppet5/10.13/x86_64/puppet-bolt-latest.dmg)
+2.  Double-click the `puppet-bolt-latest.dmg` file to mount it and then double-click the `puppet-bolt-[version]-installer.pkg` to run the installation.
 3.  Run a Bolt command to verify it has installed correctly.  
 
     ```
@@ -59,7 +59,7 @@ The Puppet repository for the APT package management system is [https://apt.pupp
         wget https://apt.puppet.com/puppet5-release-jessie.deb
         sudo dpkg -i puppet5-release-jessie.deb
         sudo apt-get update 
-        sudo apt-get install bolt
+        sudo apt-get install puppet-bolt
         
         ```
 
@@ -69,7 +69,7 @@ The Puppet repository for the APT package management system is [https://apt.pupp
         wget https://apt.puppet.com/puppet5-release-stretch.deb
         sudo dpkg -i puppet5-release-stretch.deb
         sudo apt-get update 
-        sudo apt-get install bolt
+        sudo apt-get install puppet-bolt
         ```
 
     -   Ubuntu 14.04
@@ -78,7 +78,7 @@ The Puppet repository for the APT package management system is [https://apt.pupp
         wget https://apt.puppet.com/puppet5-release-trusty.deb
         sudo dpkg -i puppet5-release-trusty.deb
         sudo apt-get update 
-        sudo apt-get install bolt
+        sudo apt-get install puppet-bolt
         ```
 
     -   Ubuntu 16.04
@@ -87,7 +87,7 @@ The Puppet repository for the APT package management system is [https://apt.pupp
         wget https://apt.puppet.com/puppet5-release-xenial.deb
         sudo dpkg -i puppet5-release-xenial.deb
         sudo apt-get update 
-        sudo apt-get install bolt
+        sudo apt-get install puppet-bolt
         ```
 
 2.  Run a Bolt command to verify it has installed correctly. 
@@ -110,21 +110,21 @@ The Puppet repository for the YUM package management system is [http://yum.puppe
 
         ```
         sudo rpm -Uvh https://yum.puppet.com/puppet5/puppet5-release-el-6.noarch.rpm
-        sudo yum install bolt				
+        sudo yum install puppet-bolt
         ```
 
     -   Enterprise Linux 7
 
         ```
         sudo rpm -Uvh https://yum.puppet.com/puppet5/puppet5-release-el-7.noarch.rpm
-        sudo yum install bolt
+        sudo yum install puppet-bolt
         ```
 
     -   SUSE Linux Enterprise Server 12
 
         ```
         sudo rpm -Uvh https://yum.puppet.com/puppet5/puppet5-release-sles-12.noarch.rpm
-        sudo yum install bolt
+        sudo yum install puppet-bolt
         ```
 
 2.  Run a Bolt command  to verify it has installed correctly.  
