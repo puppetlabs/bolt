@@ -353,6 +353,35 @@ SHELLWORDS
       end
     end
 
+    it "does not reorder powershell output with lots of lines", winrm: true do
+      contents = 'for ($i = 0; $i -le 4000; $i++) { Write-Host $i }'
+
+      with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
+        result = winrm.run_script(target, file.path, [])
+        expect(result).to be_success
+        expected = (0..4000).to_a.join("\r\n")
+        expect(result['stdout'].chomp).to eq(expected)
+      end
+    end
+
+    context 'with a batch file' do
+      let(:config) { mk_config(ssl: false, extensions: 'bat', user: user, password: password) }
+
+      it "does not reorder output with lots of lines", winrm: true do
+        contents = <<-BAT
+        @echo off
+        for /l %%x in (0, 1, 4000) do echo %%x
+        BAT
+
+        with_tempfile_containing('script-test-winrm', contents, '.bat') do |file|
+          result = winrm.run_script(target, file.path, [])
+          expect(result).to be_success
+          expected = (0..4000).to_a.join("\r\n")
+          expect(result['stdout'].chomp).to eq(expected)
+        end
+      end
+    end
+
     it "can run a task remotely", winrm: true do
       contents = 'Write-Host "$env:PT_message_one ${env:PT_message two}"'
       arguments = { message_one: 'task is running',
@@ -823,8 +852,7 @@ OUTPUT
         with_task_containing('task-pp-winrm', "notice('hi')", 'stdin', '.pp') do |task|
           result = winrm.run_task(target, task, {})
           stderr = result.error_hash['msg']
-          expect(stderr).to match(/^Could not find executable 'puppet\.bat'/)
-          expect(stderr).to_not match(/CommandNotFoundException/)
+          expect(stderr).to match(/^The term 'puppet.bat' is not recognized as the name of a cmdlet/)
         end
       end
     end
