@@ -193,7 +193,7 @@ Available options are:
       end
       define('--boltdir FILEPATH',
              'Specify what Boltdir to load config from (default: autodiscovered from current working dir)') do |path|
-        @options[:configfile] = path
+        @options[:boltdir] = path
       end
       define('--configfile FILEPATH',
              'Specify where to load config from (default: ~/.puppetlabs/bolt/bolt.yaml)') do |path|
@@ -253,8 +253,8 @@ Available options are:
       # show the --nodes and --query switches by default
       @nodes.hide = @query.hide = false
 
-      # Update the banner according to the mode
-      self.banner = case @options[:mode]
+      # Update the banner according to the subcommand
+      self.banner = case @options[:subcommand]
                     when 'plan'
                       # don't show the --nodes and --query switches in the plan help
                       @nodes.hide = @query.hide = true

@@ -193,11 +193,11 @@ describe Bolt::Inventory do
 
   context 'with config' do
     let(:inventory) {
-      Bolt::Inventory.from_config(config(transport: 'winrm',
-                                         transports: { winrm: {
+      Bolt::Inventory.from_config(config('transport' => 'winrm',
+                                         'winrm' => {
                                            'ssl' => false,
                                            'ssl-verify' => false
-                                         } }))
+                                         }))
     }
     let(:target) { inventory.get_targets('nonode')[0] }
 
@@ -495,16 +495,15 @@ describe Bolt::Inventory do
           }
         }
       }
-      let(:conf) { Bolt::Config.new }
+      let(:conf) { Bolt::Config.default }
       let(:inventory) { Bolt::Inventory.new(data, conf) }
 
       it 'should not modify existing config' do
         get_target(inventory, 'ssh://node')
-        expect(conf[:modulepath]).to eq([])
-        expect(conf[:transport]).to eq('ssh')
-        expect(conf[:transports][:ssh]['host-key-check']).to be true
-        expect(conf[:transports][:winrm]['ssl']).to be true
-        expect(conf[:transports][:winrm]['ssl-verify']).to be true
+        expect(conf.transport).to eq('ssh')
+        expect(conf.transports[:ssh]['host-key-check']).to be true
+        expect(conf.transports[:winrm]['ssl']).to be true
+        expect(conf.transports[:winrm]['ssl-verify']).to be true
       end
 
       it 'uses the configured transport' do

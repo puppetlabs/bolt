@@ -20,7 +20,7 @@ describe 'Vars function' do
     }
   }
   let(:inventory) { Bolt::Inventory.new(data) }
-  let(:pal) { Bolt::PAL.new(config) }
+  let(:pal) { Bolt::PAL.new(modulepath, nil) }
 
   let(:target) { "$t = get_targets('example')[0]\n" }
   let(:vars) { "$t.vars\n" }

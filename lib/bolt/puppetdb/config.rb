@@ -11,14 +11,7 @@ module Bolt
                          global: '/etc/puppetlabs/client-tools/puppetdb.conf',
                          win_global: 'C:/ProgramData/PuppetLabs/client-tools/puppetdb.conf' }.freeze
 
-      def initialize(config_file, options)
-        @settings = load_config(config_file)
-        @settings.merge!(options)
-        expand_paths
-        validate
-      end
-
-      def load_config(filename)
+      def self.load_config(filename, options)
         global_path = Bolt::Util.windows? ? DEFAULT_CONFIG[:win_global] : DEFAULT_CONFIG[:global]
         if filename
           if File.exist?(filename)
@@ -33,20 +26,22 @@ module Bolt
         else
           config = {}
         end
-        config.fetch('puppetdb', {})
+        config = config.fetch('puppetdb', {})
+        new(config.merge(options))
+      end
+
+      def initialize(settings)
+        @settings = settings
+        expand_paths
       end
 
       def token
         return @token if @token
         if @settings['token']
-          File.read(@settings['token'])
+          @token = File.read(@settings['token'])
         elsif File.exist?(DEFAULT_TOKEN)
-          File.read(DEFAULT_TOKEN)
+          @token = File.read(DEFAULT_TOKEN)
         end
-      end
-
-      def [](key)
-        @settings[key]
       end
 
       def expand_paths
@@ -59,24 +54,56 @@ module Bolt
         if @settings[file] && !File.exist?(@settings[file])
           raise Bolt::PuppetDBError, "#{file} file #{@settings[file]} does not exist"
         end
+        true
       end
 
-      def validate
-        unless @settings['server_urls']
-          raise Bolt::PuppetDBError, "server_urls must be specified"
-        end
-        unless @settings['cacert']
+      def uri
+        return @uri if @uri
+        uri = case @settings['server_urls']
+              when String
+                @settings['server_urls']
+              when Array
+                @settings['server_urls'].first
+              when nil
+                raise Bolt::PuppetDBError, "server_urls must be specified"
+              else
+                raise Bolt::PuppetDBError, "server_urls must be a string or array"
+              end
+
+        @uri = URI.parse(uri)
+        @uri.port ||= 8081
+        @uri
+      end
+
+      def cacert
+        if @settings['cacert'] && validate_file_exists('cacert')
+          @settings['cacert']
+        else
           raise Bolt::PuppetDBError, "cacert must be specified"
         end
+      end
 
+      def cert
+        validate_cert_and_key
+        validate_file_exists('cert')
+        @settings['cert']
+      end
+
+      def key
+        validate_cert_and_key
+        validate_file_exists('key')
+        @settings['key']
+      end
+
+      def validate_cert_and_key
         if (@settings['cert'] && !@settings['key']) ||
            (!@settings['cert'] && @settings['key'])
           raise Bolt::PuppetDBError, "cert and key must be specified together"
         end
+      end
 
-        validate_file_exists('cacert')
-        validate_file_exists('cert')
-        validate_file_exists('key')
+      def to_hash
+        @settings.dup
       end
     end
   end

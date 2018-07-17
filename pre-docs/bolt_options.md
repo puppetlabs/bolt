@@ -228,6 +228,7 @@ Options are optional unless marked as required.
 | `--concurrency, -c` | Maximum number of simultaneous connections (default: 100) |
 | `--modulepath` | Required for tasks and plans. The path to the module containing the task. Separate multiple paths with a semicolon (`;`) on Windows or a colon (`:`) on all other platforms. |
 | `--configfile` | Specify where to load config from (default: `bolt.yaml` inside the `Boltdir`) |
+| `--boltdir` | Specify what Boltdir to load config from (default: autodiscovered from current working dir) |
 | `--inventoryfile` | Specify where to load inventory from (default: `inventory.yaml` inside the `Boltdir`) |
 ||
 | Transports |

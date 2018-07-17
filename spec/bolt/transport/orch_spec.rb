@@ -14,12 +14,12 @@ describe Bolt::Transport::Orch, orchestrator: true do
 
   let(:hostname) { "localhost" }
   let(:target) do
-    Bolt::Target.new(hostname).update_conf(Bolt::Config.new.transport_conf)
+    Bolt::Target.new(hostname).update_conf(Bolt::Config.default.transport_conf)
   end
 
   let(:targets) do
-    [Bolt::Target.new('pcp://node1').update_conf(Bolt::Config.new.transport_conf),
-     Bolt::Target.new('node2').update_conf(Bolt::Config.new.transport_conf)]
+    [Bolt::Target.new('pcp://node1').update_conf(Bolt::Config.default.transport_conf),
+     Bolt::Target.new('node2').update_conf(Bolt::Config.default.transport_conf)]
   end
 
   let(:mock_client) { instance_double("OrchestratorClient", run_task: results) }

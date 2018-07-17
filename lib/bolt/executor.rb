@@ -18,11 +18,10 @@ module Bolt
     attr_reader :noop, :transports
     attr_accessor :run_as, :plan_logging
 
-    def initialize(config = Bolt::Config.new,
+    def initialize(concurrency = 1,
                    analytics = Bolt::Analytics::NoopClient.new,
                    noop = nil,
                    bundled_content: nil)
-      @config = config
       @analytics = analytics
       @bundled_content = bundled_content
       @logger = Logging.logger[self]
@@ -37,8 +36,8 @@ module Bolt
 
       @noop = noop
       @run_as = nil
-      @pool = Concurrent::ThreadPoolExecutor.new(max_threads: @config[:concurrency])
-      @logger.debug { "Started with #{@config[:concurrency]} max thread(s)" }
+      @pool = Concurrent::ThreadPoolExecutor.new(max_threads: concurrency)
+      @logger.debug { "Started with #{concurrency} max thread(s)" }
       @notifier = Bolt::Notifier.new
     end
 

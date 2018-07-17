@@ -83,8 +83,8 @@ query results.
           raise "Unknown argument(s) #{positional_args.join(', ')}"
         end
 
-        config = Bolt::PuppetDB::Config.new(@config_file, @cli_opts)
-        @puppetdb_client = Bolt::PuppetDB::Client.from_config(config)
+        config = Bolt::PuppetDB::Config.load_config(@config_file, @cli_opts)
+        @puppetdb_client = Bolt::PuppetDB::Client.new(config)
 
         unless File.readable?(inventory_file)
           raise "Can't read the inventory file #{inventory_file}"

@@ -2,7 +2,6 @@
 
 require 'bolt/pal'
 require 'bolt/puppetdb'
-require 'bolt/util/on_access'
 
 Bolt::PAL.load_puppet
 
@@ -97,10 +96,7 @@ module Bolt
       pal_main = request['code_ast'] || request['code_string']
       target = request['target']
 
-      pdb_client = Bolt::Util::OnAccess.new do
-        pdb_config = Bolt::PuppetDB::Config.new(nil, request['pdb_config'])
-        Bolt::PuppetDB::Client.from_config(pdb_config)
-      end
+      pdb_client = Bolt::PuppetDB::Client.new(Bolt::PuppetDB::Config.new(request['pdb_config']))
 
       with_puppet_settings(request['hiera_config']) do
         Puppet[:code] = ''
