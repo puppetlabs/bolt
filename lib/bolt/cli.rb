@@ -385,14 +385,16 @@ module Bolt
     end
 
     def bundled_content
-      default_content = Bolt::PAL.new([], nil)
-      plans = default_content.list_plans.each_with_object([]) do |iter, col|
-        col << iter&.first
+      if %w[plan task].include?(options[:subcommand])
+        default_content = Bolt::PAL.new([], nil)
+        plans = default_content.list_plans.each_with_object([]) do |iter, col|
+          col << iter&.first
+        end
+        tasks = default_content.list_tasks.each_with_object([]) do |iter, col|
+          col << iter&.first
+        end
+        plans.concat tasks
       end
-      tasks = default_content.list_tasks.each_with_object([]) do |iter, col|
-        col << iter&.first
-      end
-      plans.concat tasks
     end
   end
 end

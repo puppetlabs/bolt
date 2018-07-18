@@ -631,6 +631,38 @@ bar
       end
     end
 
+    describe "bundled_content" do
+      it "does not calculate bundled content for a command" do
+        cli = Bolt::CLI.new(%w[command run foo --nodes bar])
+        cli.parse
+        expect(cli.bundled_content).to be_nil
+      end
+
+      it "does not calculate bundled content for a script" do
+        cli = Bolt::CLI.new(%w[script run foo --nodes bar])
+        cli.parse
+        expect(cli.bundled_content).to be_nil
+      end
+
+      it "does not calculate bundled content for a file" do
+        cli = Bolt::CLI.new(%w[file upload /tmp /var foo --nodes bar])
+        cli.parse
+        expect(cli.bundled_content).to be_nil
+      end
+
+      it "calculates bundled content for a task" do
+        cli = Bolt::CLI.new(%w[task run foo --nodes bar])
+        cli.parse
+        expect(cli.bundled_content).to be
+      end
+
+      it "calculates bundled content for a plan" do
+        cli = Bolt::CLI.new(%w[plan run foo --nodes bar])
+        cli.parse
+        expect(cli.bundled_content).to be
+      end
+    end
+
     describe "execute" do
       let(:executor) { double('executor', noop: false) }
       let(:cli) { Bolt::CLI.new({}) }
