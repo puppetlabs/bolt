@@ -17,6 +17,7 @@ require 'bolt/logger'
 require 'bolt/outputter'
 require 'bolt/puppetdb'
 require 'bolt/pal'
+require 'bolt/r10k_log_proxy'
 require 'bolt/target'
 require 'bolt/version'
 
@@ -370,8 +371,8 @@ module Bolt
         }
         install_action = R10K::Action::Puppetfile::Install.new(r10k_config, nil)
 
-        # Override the r10k logger with our own logger
-        install_action.instance_variable_set(:@logger, Logging.logger[install_action])
+        # Override the r10k logger with a proxy to our own logger
+        R10K::Logging.instance_variable_set(:@outputter, Bolt::R10KLogProxy.new)
 
         ok = install_action.call
         outputter.print_puppetfile_result(ok, puppetfile, moduledir)
