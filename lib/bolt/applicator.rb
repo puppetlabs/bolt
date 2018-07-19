@@ -91,6 +91,37 @@ module Bolt
       end
     end
 
+    def provide_puppet_missing_errors(result)
+      error_hash = result.error_hash
+      exit_code = error_hash['details']['exit_code'] if error_hash && error_hash['details']
+      # If we get exit code 126 or 127 back, it means the shebang command wasn't found; Puppet isn't present
+      if [126, 127].include?(exit_code)
+        Result.new(result.target, error:
+          {
+            'msg' => "Puppet is not installed on the target, please install it to enable 'apply'",
+            'kind' => 'bolt/apply-error'
+          })
+      elsif exit_code == 1 && error_hash['msg'] =~ /Could not find executable 'ruby.exe'/
+        # Windows does not have Ruby present
+        Result.new(result.target, error:
+          {
+            'msg' => "Puppet is not installed on the target in $env:ProgramFiles, please install it to enable 'apply'",
+            'kind' => 'bolt/apply-error'
+          })
+      elsif exit_code == 1 && error_hash['msg'] =~ /cannot load such file -- puppet \(LoadError\)/
+        # Windows uses a Ruby that doesn't have Puppet installed
+        # TODO: fix so we don't find other Rubies, or point to a known issues URL for more info
+        Result.new(result.target, error:
+          {
+            'msg' => 'Found a Ruby without Puppet present, please install Puppet ' \
+                     "or remove Ruby from $env:Path to enable 'apply'",
+            'kind' => 'bolt/apply-error'
+          })
+      else
+        result
+      end
+    end
+
     def apply(args, apply_body, scope)
       raise(ArgumentError, 'apply requires a TargetSpec') if args.empty?
       type0 = Puppet.lookup(:pal_script_compiler).type('TargetSpec')
@@ -126,7 +157,8 @@ module Bolt
               arguments = params.clone
               arguments['catalog'] = future.value
               raise future.reason if future.rejected?
-              transport.batch_task(batch, catalog_apply_task, arguments, {}, &notify)
+              result = transport.batch_task(batch, catalog_apply_task, arguments, {}, &notify)
+              provide_puppet_missing_errors(result)
             end
           end
         end
