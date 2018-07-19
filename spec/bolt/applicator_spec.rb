@@ -61,7 +61,7 @@ describe Bolt::Applicator do
     expect(applicator.compile(target, :ast, {})).to eq({})
     expect(@log_output.readlines).to eq(
       [
-        " DEBUG  Bolt::Executor : Started with 100 max thread(s)\n",
+        " DEBUG  Bolt::Executor : Started with 1 max thread(s)\n",
         " DEBUG  Bolt::Applicator : #{target.uri}: A message\n",
         "NOTICE  Bolt::Applicator : #{target.uri}: Stuff happened\n"
       ]
