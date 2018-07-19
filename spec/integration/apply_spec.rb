@@ -6,7 +6,7 @@ require 'bolt_spec/files'
 require 'bolt_spec/integration'
 require 'bolt/catalog'
 
-describe "Passes parsed AST to the apply_catalog task" do
+describe "passes parsed AST to the apply_catalog task" do
   include BoltSpec::Conn
   include BoltSpec::Files
   include BoltSpec::Integration
