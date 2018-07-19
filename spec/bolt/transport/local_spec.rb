@@ -164,6 +164,40 @@ SHELL
       end
     end
 
+    context "when implementations are provided" do
+      let(:contents) { "#!/bin/sh\necho ${PT_message_one} ${PT_message_two}" }
+      let(:arguments) { { message_one: 'Hello from task', message_two: 'Goodbye' } }
+
+      it "runs a task requires 'shell'" do
+        with_task_containing('tasks_test', contents, 'environment') do |task|
+          impls = task.implementations.map { |impl| impl.merge('requirements' => ['shell']) }
+          expect(task).to receive(:implementations).and_return(impls)
+          expect(local.run_task(target, task, arguments).message.chomp)
+            .to eq('Hello from task Goodbye')
+        end
+      end
+
+      it "errors when a task only requires an unsupported requirement" do
+        with_task_containing('tasks_test', contents, 'environment') do |task|
+          impls = task.implementations.map { |impl| impl.merge('requirements' => ['powershell']) }
+          expect(task).to receive(:implementations).and_return(impls)
+          expect {
+            local.run_task(target, task, arguments)
+          }.to raise_error("No suitable implementation of #{task.name} for #{target.name}")
+        end
+      end
+
+      it "errors when a task only requires an unknown requirement" do
+        with_task_containing('tasks_test', contents, 'environment') do |task|
+          impls = task.implementations.map { |impl| impl.merge('requirements' => ['foobar']) }
+          expect(task).to receive(:implementations).and_return(impls)
+          expect {
+            local.run_task(target, task, arguments)
+          }.to raise_error("No suitable implementation of #{task.name} for #{target.name}")
+        end
+      end
+    end
+
     context "when it can't upload a file" do
       it 'returns an error result for upload' do
         contents = "kljhdfg"

@@ -518,6 +518,40 @@ PS
       end
     end
 
+    context "when implementations are provided", winrm: true do
+      let(:contents) { 'Write-Host "$env:PT_message_one $env:PT_message_two"' }
+      let(:arguments) { { message_one: 'Hello from task', message_two: 'Goodbye' } }
+
+      it "runs a task requires 'shell'" do
+        with_task_containing('tasks_test', contents, 'environment', '.ps1') do |task|
+          impls = task.implementations.map { |impl| impl.merge('requirements' => ['powershell']) }
+          expect(task).to receive(:implementations).and_return(impls)
+          expect(winrm.run_task(target, task, arguments).message.chomp)
+            .to eq('Hello from task Goodbye')
+        end
+      end
+
+      it "errors when a task only requires an unsupported requirement" do
+        with_task_containing('tasks_test', contents, 'environment', '.ps1') do |task|
+          impls = task.implementations.map { |impl| impl.merge('requirements' => ['shell']) }
+          expect(task).to receive(:implementations).and_return(impls)
+          expect {
+            winrm.run_task(target, task, arguments)
+          }.to raise_error("No suitable implementation of #{task.name} for #{target.name}")
+        end
+      end
+
+      it "errors when a task only requires an unknown requirement" do
+        with_task_containing('tasks_test', contents, 'environment', '.ps1') do |task|
+          impls = task.implementations.map { |impl| impl.merge('requirements' => ['foobar']) }
+          expect(task).to receive(:implementations).and_return(impls)
+          expect {
+            winrm.run_task(target, task, arguments)
+          }.to raise_error("No suitable implementation of #{task.name} for #{target.name}")
+        end
+      end
+    end
+
     describe "when determining result" do
       it "fails to run a .pp task without Puppet agent installed", winrm: true do
         with_task_containing('task-pp-winrm', "notice('hi')", 'stdin', '.pp') do |task|
