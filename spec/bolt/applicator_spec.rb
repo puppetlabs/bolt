@@ -134,7 +134,7 @@ describe Bolt::Applicator do
     it 'captures compile errors in a result set' do
       expect(applicator).to receive(:compile).and_raise('Something weird happened')
 
-      resultset = applicator.apply([uri], :body, {})
+      resultset = applicator.apply([uri, '_catch_errors' => true], :body, {})
       expect(resultset).to be_a(Bolt::ResultSet)
       expect(resultset.count).to eq(1)
       expect(resultset.first.ok).to be(false)
@@ -157,8 +157,9 @@ describe Bolt::Applicator do
       end
 
       targets = [Bolt::Target.new('node1'), Bolt::Target.new('node2'), Bolt::Target.new('node3')]
-      results = targets.map { |target| Bolt::Result.new(target) }
-      allow_any_instance_of(Bolt::Transport::SSH).to receive(:batch_task).and_return(*results)
+      allow_any_instance_of(Bolt::Transport::SSH).to receive(:batch_task) do |_, batch|
+        Bolt::Result.new(batch.first)
+      end
 
       t = Thread.new {
         applicator.apply([targets], :body, {})

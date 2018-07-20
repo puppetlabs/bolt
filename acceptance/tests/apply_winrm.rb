@@ -29,9 +29,11 @@ test_name "bolt plan run with should apply manifest block on remote hosts via wi
     '--format'     => 'json'
   }
 
-  step "execute `bolt plan run noop=true` via WinRM with json output" do
+  teardown do
     on(winrm_nodes, "rm -rf #{filepath}")
+  end
 
+  step "execute `bolt plan run noop=true` via WinRM with json output" do
     result = bolt_command_on(bolt, bolt_command + ' noop=true', flags)
     assert_equal(0, result.exit_code,
                  "Bolt did not exit with exit code 0")
