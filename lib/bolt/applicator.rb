@@ -124,8 +124,15 @@ module Bolt
 
     def identify_resource_failures(result)
       if result.ok? && result.value['status'] == 'failed'
+        resources = result.value['resource_statuses']
+        failed = resources.select { |_, r| r['failed'] }.flat_map do |key, resource|
+          resource['events'].select { |e| e['status'] == 'failure' }.map do |event|
+            "\n  #{key}: #{event['message']}"
+          end
+        end
+
         result.value['_error'] = {
-          'msg' => "Resources failed to apply for #{result.target.name}",
+          'msg' => "Resources failed to apply for #{result.target.name}#{failed.join}",
           'kind' => 'bolt/resource-failure'
         }
       end
