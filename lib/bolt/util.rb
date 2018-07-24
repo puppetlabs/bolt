@@ -104,9 +104,9 @@ module Bolt
           end
 
           cl.instance_variables.each do |var|
-            v = cl.instance_eval { var }
+            v = cl.instance_variable_get(var)
             v_cl = deep_clone(v, cloned)
-            cl.instance_eval { @var = v_cl }
+            cl.instance_variable_set(var, v_cl)
           end
 
           return cl

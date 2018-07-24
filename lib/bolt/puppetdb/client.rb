@@ -7,30 +7,10 @@ require 'httpclient'
 module Bolt
   module PuppetDB
     class Client
-      def self.from_config(config)
-        uri = if config['server_urls'].is_a? String
-                config['server_urls']
-              else
-                config['server_urls'].first
-              end
-        uri = URI.parse(uri)
-        uri.port ||= 8081
+      attr_reader :config
 
-        cacert = File.expand_path(config['cacert'])
-        token = config.token
-
-        cert = config['cert']
-        key = config['key']
-
-        new(uri, cacert, token: token, cert: cert, key: key)
-      end
-
-      def initialize(uri, cacert, token: nil, cert: nil, key: nil)
-        @uri = uri
-        @cacert = cacert
-        @token = token
-        @cert = cert
-        @key = key
+      def initialize(config)
+        @config = config
       end
 
       def query_certnames(query)
@@ -61,7 +41,7 @@ module Bolt
 
       def make_query(query, path = nil)
         body = JSON.generate(query: query)
-        url = "#{@uri}/pdb/query/v4"
+        url = "#{@config.uri}/pdb/query/v4"
         url += "/#{path}" if path
 
         begin
@@ -82,15 +62,15 @@ module Bolt
       def http_client
         return @http if @http
         @http = HTTPClient.new
-        @http.ssl_config.set_client_cert_file(@cert, @key) if @cert
-        @http.ssl_config.add_trust_ca(@cacert)
+        @http.ssl_config.set_client_cert_file(@config.cert, @config.key) if @config.cert
+        @http.ssl_config.add_trust_ca(@config.cacert)
 
         @http
       end
 
       def headers
         headers = { 'Content-Type' => 'application/json' }
-        headers['X-Authentication'] = @token if @token
+        headers['X-Authentication'] = @config.token if @config.token
         headers
       end
     end

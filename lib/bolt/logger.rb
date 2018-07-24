@@ -27,12 +27,12 @@ module Bolt
       )
     end
 
-    def self.configure(config)
+    def self.configure(destinations, color)
       root_logger = Logging.logger[:root]
 
       root_logger.add_appenders Logging.appenders.stderr(
         'console',
-        layout: console_layout(config[:color]),
+        layout: console_layout(color),
         level: default_level
       )
 
@@ -40,7 +40,7 @@ module Bolt
       # limit what's actually logged in every appender individually.
       root_logger.level = :all
 
-      config[:log].each_pair do |name, params|
+      destinations.each_pair do |name, params|
         appender = Logging.appenders[name]
         if appender.nil?
           unless name.start_with?('file:')

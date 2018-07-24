@@ -48,15 +48,16 @@ describe "Bolt::CLI" do
     allow(cli).to receive(:file_stat).with(path).and_return(stat)
   end
 
-  def stub_config(config, file_content = nil)
-    file_content ||= {}
+  def stub_config(file_content = {})
     allow(Bolt::Util).to receive(:read_config_file).and_return(file_content)
-    allow(Bolt::Config).to receive(:new).and_return(config)
   end
 
   context "without a config file" do
-    let(:config) { Bolt::Config.new }
-    before(:each) { stub_config(config) }
+    let(:boltdir) { Bolt::Boltdir.new('.') }
+    before(:each) do
+      allow(Bolt::Boltdir).to receive(:find_boltdir).and_return(boltdir)
+      allow(Bolt::Util).to receive(:read_config_file).and_return({})
+    end
 
     it "generates an error message if an unknown argument is given" do
       cli = Bolt::CLI.new(%w[command run --unknown])
@@ -313,7 +314,7 @@ bar
                                  --private-key ~/.ssh/google_compute_engine
                                  --nodes foo])
         expect(cli.parse).to include('private-key': '~/.ssh/google_compute_engine')
-        expect(cli.config[:transports][:ssh]['private-key']).to eq('~/.ssh/google_compute_engine')
+        expect(cli.config.transports[:ssh]['private-key']).to eq('~/.ssh/google_compute_engine')
       end
 
       it "generates an error message if no key value is given" do
@@ -334,7 +335,7 @@ bar
       it "defaults to 100" do
         cli = Bolt::CLI.new(%w[command run --nodes foo])
         cli.parse
-        expect(cli.config[:concurrency]).to eq(100)
+        expect(cli.config.concurrency).to eq(100)
       end
 
       it "generates an error message if no concurrency value is given" do
@@ -355,7 +356,7 @@ bar
       it "defaults to unset" do
         cli = Bolt::CLI.new(%w[command run --nodes foo])
         cli.parse
-        expect(cli.config[:'compile-concurrency']).to eq(Concurrent.processor_count)
+        expect(cli.config.compile_concurrency).to eq(Concurrent.processor_count)
       end
 
       it "generates an error message if no concurrency value is given" do
@@ -369,7 +370,7 @@ bar
 
     describe "console log level" do
       it "is not sensitive to ordering of debug and verbose" do
-        expect(Bolt::Logger).to receive(:configure).with(have_attributes(log: { 'console' => { level: :debug } }))
+        expect(Bolt::Logger).to receive(:configure).with({ 'console' => { level: :debug } }, true)
 
         cli = Bolt::CLI.new(%w[command run --nodes foo --debug --verbose])
         cli.parse
@@ -380,19 +381,19 @@ bar
       it "accepts `--host-key-check`" do
         cli = Bolt::CLI.new(%w[command run --host-key-check --nodes foo])
         cli.parse
-        expect(cli.config[:transports][:ssh]['host-key-check']).to eq(true)
+        expect(cli.config.transports[:ssh]['host-key-check']).to eq(true)
       end
 
       it "accepts `--no-host-key-check`" do
         cli = Bolt::CLI.new(%w[command run --no-host-key-check --nodes foo])
         cli.parse
-        expect(cli.config[:transports][:ssh]['host-key-check']).to eq(false)
+        expect(cli.config.transports[:ssh]['host-key-check']).to eq(false)
       end
 
       it "defaults to true" do
         cli = Bolt::CLI.new(%w[command run --nodes foo])
         cli.parse
-        expect(cli.config[:transports][:ssh]['host-key-check']).to eq(true)
+        expect(cli.config.transports[:ssh]['host-key-check']).to eq(true)
       end
     end
 
@@ -453,7 +454,7 @@ bar
       it "defaults to 'ssh'" do
         cli = Bolt::CLI.new(%w[command run --nodes foo whoami])
         cli.parse
-        expect(cli.config[:transport]).to eq('ssh')
+        expect(cli.config.transport).to eq('ssh')
       end
 
       it "accepts ssh" do
@@ -489,7 +490,7 @@ bar
 
     it "distinguishes subcommands" do
       cli = Bolt::CLI.new(%w[script run --nodes foo])
-      expect(cli.parse).to include(mode: 'script')
+      expect(cli.parse).to include(subcommand: 'script')
     end
 
     describe "file" do
@@ -630,6 +631,38 @@ bar
       end
     end
 
+    describe "bundled_content" do
+      it "does not calculate bundled content for a command" do
+        cli = Bolt::CLI.new(%w[command run foo --nodes bar])
+        cli.parse
+        expect(cli.bundled_content).to be_nil
+      end
+
+      it "does not calculate bundled content for a script" do
+        cli = Bolt::CLI.new(%w[script run foo --nodes bar])
+        cli.parse
+        expect(cli.bundled_content).to be_nil
+      end
+
+      it "does not calculate bundled content for a file" do
+        cli = Bolt::CLI.new(%w[file upload /tmp /var foo --nodes bar])
+        cli.parse
+        expect(cli.bundled_content).to be_nil
+      end
+
+      it "calculates bundled content for a task" do
+        cli = Bolt::CLI.new(%w[task run foo --nodes bar])
+        cli.parse
+        expect(cli.bundled_content).to be
+      end
+
+      it "calculates bundled content for a plan" do
+        cli = Bolt::CLI.new(%w[plan run foo --nodes bar])
+        cli.parse
+        expect(cli.bundled_content).to be
+      end
+    end
+
     describe "execute" do
       let(:executor) { double('executor', noop: false) }
       let(:cli) { Bolt::CLI.new({}) }
@@ -681,7 +714,7 @@ bar
         let(:options) {
           {
             targets: targets,
-            mode: 'command',
+            subcommand: 'command',
             action: 'run',
             object: 'whoami'
           }
@@ -728,7 +761,7 @@ bar
       context "when running a script" do
         let(:script) { 'bar.sh' }
         let(:options) {
-          { targets: targets, mode: 'script', action: 'run', object: script,
+          { targets: targets, subcommand: 'script', action: 'run', object: script,
             leftovers: [] }
         }
 
@@ -808,7 +841,7 @@ bar
 
         it "lists tasks with description" do
           options = {
-            mode: 'task',
+            subcommand: 'task',
             action: 'show'
           }
           cli.execute(options)
@@ -831,7 +864,7 @@ bar
         it "shows an individual task data" do
           task_name = 'sample::params'
           options = {
-            mode: 'task',
+            subcommand: 'task',
             action: 'show',
             object: task_name
           }
@@ -883,7 +916,7 @@ bar
 
         it "task show prints a warning but shows other valid tasks" do
           options = {
-            mode: 'task',
+            subcommand: 'task',
             action: 'show'
           }
           cli.execute(options)
@@ -912,7 +945,7 @@ bar
 
         it "task show displays an error" do
           options = {
-            mode: 'task',
+            subcommand: 'task',
             action: 'show',
             object: 'abcdefg'
           }
@@ -932,7 +965,7 @@ bar
 
         it "lists plans" do
           options = {
-            mode: 'plan',
+            subcommand: 'plan',
             action: 'show'
           }
           cli.execute(options)
@@ -950,7 +983,7 @@ bar
         it "shows an individual plan data" do
           plan_name = 'sample::optional_params_task'
           options = {
-            mode: 'plan',
+            subcommand: 'plan',
             action: 'show',
             object: plan_name
           }
@@ -981,7 +1014,7 @@ bar
 
         it "plan show prints a warning but shows other valid plans" do
           options = {
-            mode: 'plan',
+            subcommand: 'plan',
             action: 'show'
           }
 
@@ -1005,7 +1038,7 @@ bar
 
           options = {
             nodes: [],
-            mode: 'plan',
+            subcommand: 'plan',
             action: 'run',
             object: plan_name,
             task_options: plan_params
@@ -1021,7 +1054,7 @@ bar
 
         it "plan show displays an error" do
           options = {
-            mode: 'plan',
+            subcommand: 'plan',
             action: 'show',
             object: 'abcdefg'
           }
@@ -1040,7 +1073,7 @@ bar
         let(:options) {
           {
             targets: targets,
-            mode: 'task',
+            subcommand: 'task',
             action: 'run',
             object: task_name,
             task_options: task_params,
@@ -1355,7 +1388,7 @@ bar
         let(:options) {
           {
             nodes: [],
-            mode: 'plan',
+            subcommand: 'plan',
             action: 'run',
             object: plan_name,
             task_options: plan_params
@@ -1494,7 +1527,7 @@ bar
         let(:options) {
           {
             targets: targets,
-            mode: 'file',
+            subcommand: 'file',
             action: 'upload',
             object: source,
             leftovers: [dest]
@@ -1562,7 +1595,7 @@ bar
 
       before :each do
         allow(cli).to receive(:bundled_content).and_return(bundled_content)
-        expect(Bolt::Executor).to receive(:new).with(config,
+        expect(Bolt::Executor).to receive(:new).with(Bolt::Config.default.concurrency,
                                                      anything,
                                                      true,
                                                      bundled_content: bundled_content).and_return(executor)
@@ -1577,7 +1610,7 @@ bar
         let(:options) {
           {
             targets: targets,
-            mode: 'task',
+            subcommand: 'task',
             action: 'run',
             object: task_name,
             task_options: task_params,
@@ -1615,6 +1648,77 @@ bar
 
           expect { cli.execute(options) }.to raise_error('Task does not support noop')
         end
+      end
+    end
+
+    describe "installing a Puppetfile" do
+      let(:options) {
+        {
+          subcommand: 'puppetfile',
+          action: 'run'
+        }
+      }
+      let(:output) { StringIO.new }
+      let(:puppetfile) { Pathname.new('path/to/puppetfile') }
+      let(:modulepath) { [Pathname.new('path/to/modules')] }
+      let(:action_stub) { double('r10k_action_puppetfile_install') }
+      let(:cli) { Bolt::CLI.new({}) }
+
+      before :each do
+        allow(cli).to receive(:outputter).and_return(Bolt::Outputter::JSON.new(false, false, output))
+        allow(puppetfile).to receive(:exist?).and_return(true)
+
+        # Ensure we never actually install modules.
+        allow(R10K::Action::Puppetfile::Install).to receive(:new).and_return(action_stub)
+      end
+
+      it 'fails if the Puppetfile does not exist' do
+        allow(puppetfile).to receive(:exist?).and_return(false)
+
+        expect do
+          cli.install_puppetfile(puppetfile, modulepath)
+        end.to raise_error(Bolt::FileError, /Could not find a Puppetfile/)
+      end
+
+      it 'installs to the first directory of the modulepath' do
+        expect(R10K::Action::Puppetfile::Install).to receive(:new)
+          .with({ root: puppetfile.dirname.to_s, puppetfile: puppetfile.to_s, moduledir: modulepath.first.to_s }, nil)
+
+        allow(action_stub).to receive(:call).and_return(true)
+
+        cli.install_puppetfile(puppetfile, modulepath)
+      end
+
+      it 'returns 0 and prints a result if successful' do
+        allow(action_stub).to receive(:call).and_return(true)
+
+        expect(cli.install_puppetfile(puppetfile, modulepath)).to eq(0)
+
+        result = JSON.parse(output.string)
+        expect(result['success']).to eq(true)
+        expect(result['puppetfile']).to eq(puppetfile.to_s)
+        expect(result['moduledir']).to eq(modulepath.first.to_s)
+      end
+
+      it 'returns 1 and prints a result if unsuccessful' do
+        allow(action_stub).to receive(:call).and_return(false)
+
+        expect(cli.install_puppetfile(puppetfile, modulepath)).to eq(1)
+
+        result = JSON.parse(output.string)
+        expect(result['success']).to eq(false)
+        expect(result['puppetfile']).to eq(puppetfile.to_s)
+        expect(result['moduledir']).to eq(modulepath.first.to_s)
+      end
+
+      it 'propagates any r10k errors' do
+        allow(action_stub).to receive(:call).and_raise(R10K::Error.new('everything is terrible'))
+
+        expect do
+          cli.install_puppetfile(puppetfile, modulepath)
+        end.to raise_error(Bolt::PuppetfileError, /everything is terrible/)
+
+        expect(output.string).to be_empty
       end
     end
   end
@@ -1662,7 +1766,7 @@ bar
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-host-key-check])
         cli.parse
-        expect(cli.config[:modulepath]).to eq(['/foo/bar', '/baz/qux'])
+        expect(cli.config.modulepath).to eq(['/foo/bar', '/baz/qux'])
       end
     end
 
@@ -1670,7 +1774,7 @@ bar
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-host-key-check])
         cli.parse
-        expect(cli.config[:concurrency]).to eq(14)
+        expect(cli.config.concurrency).to eq(14)
       end
     end
 
@@ -1678,7 +1782,7 @@ bar
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-host-key-check])
         cli.parse
-        expect(cli.config[:'compile-concurrency']).to eq(2)
+        expect(cli.config.compile_concurrency).to eq(2)
       end
     end
 
@@ -1686,7 +1790,7 @@ bar
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-host-key-check])
         cli.parse
-        expect(cli.config[:format]).to eq('json')
+        expect(cli.config.format).to eq('json')
       end
     end
 
@@ -1695,7 +1799,7 @@ bar
         cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-host-key-check])
         cli.parse
         normalized_path = File.expand_path(File.join(configdir, 'debug.log'))
-        expect(cli.config[:log]).to eq(
+        expect(cli.config.log).to eq(
           'console' => { level: 'warn' },
           "file:#{normalized_path}" => { level: 'debug', append: false }
         )
@@ -1706,7 +1810,7 @@ bar
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-host-key-check])
         cli.parse
-        expect(cli.config[:transports][:ssh]['private-key']).to eq('/bar/foo')
+        expect(cli.config.transports[:ssh]['private-key']).to eq('/bar/foo')
       end
     end
 
@@ -1714,7 +1818,7 @@ bar
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo])
         cli.parse
-        expect(cli.config[:transports][:ssh]['host-key-check']).to eq(false)
+        expect(cli.config.transports[:ssh]['host-key-check']).to eq(false)
       end
     end
 
@@ -1722,7 +1826,7 @@ bar
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --password bar --no-host-key-check])
         cli.parse
-        expect(cli.config[:transports][:ssh]['run-as']).to eq('Fakey McFakerson')
+        expect(cli.config.transports[:ssh]['run-as']).to eq('Fakey McFakerson')
       end
     end
 
@@ -1730,8 +1834,8 @@ bar
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-host-key-check --no-ssl])
         cli.parse
-        expect(cli.config[:transports][:ssh]['connect-timeout']).to eq(4)
-        expect(cli.config[:transports][:winrm]['connect-timeout']).to eq(7)
+        expect(cli.config.transports[:ssh]['connect-timeout']).to eq(4)
+        expect(cli.config.transports[:winrm]['connect-timeout']).to eq(7)
       end
     end
 
@@ -1739,7 +1843,7 @@ bar
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo])
         cli.parse
-        expect(cli.config[:transports][:winrm]['ssl']).to eq(false)
+        expect(cli.config.transports[:winrm]['ssl']).to eq(false)
       end
     end
 
@@ -1747,7 +1851,7 @@ bar
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo])
         cli.parse
-        expect(cli.config[:transports][:winrm]['ssl-verify']).to eq(false)
+        expect(cli.config.transports[:winrm]['ssl-verify']).to eq(false)
       end
     end
 
@@ -1755,7 +1859,7 @@ bar
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-ssl])
         cli.parse
-        expect(cli.config[:transports][:winrm]['extensions']).to eq(['.py', '.bat'])
+        expect(cli.config.transports[:winrm]['extensions']).to eq(['.py', '.bat'])
       end
     end
 
@@ -1763,7 +1867,7 @@ bar
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo])
         cli.parse
-        expect(cli.config[:transports][:pcp]['task-environment']).to eq('testenv')
+        expect(cli.config.transports[:pcp]['task-environment']).to eq('testenv')
       end
     end
 
@@ -1771,7 +1875,7 @@ bar
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo])
         cli.parse
-        expect(cli.config[:transports][:pcp]['service-url']).to eql('http://foo.org')
+        expect(cli.config.transports[:pcp]['service-url']).to eql('http://foo.org')
       end
     end
 
@@ -1779,7 +1883,7 @@ bar
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo])
         cli.parse
-        expect(cli.config[:transports][:pcp]['token-file']).to eql('/path/to/token')
+        expect(cli.config.transports[:pcp]['token-file']).to eql('/path/to/token')
       end
     end
 
@@ -1787,7 +1891,7 @@ bar
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo])
         cli.parse
-        expect(cli.config[:transports][:pcp]['local-validation']).to eql(false)
+        expect(cli.config.transports[:pcp]['local-validation']).to eql(false)
       end
     end
 
@@ -1795,8 +1899,8 @@ bar
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-host-key-check --no-ssl])
         cli.parse
-        expect(cli.config[:transports][:pcp]['cacert']).to eql('/path/to/cacert')
-        expect(cli.config[:transports][:winrm]['cacert']).to eql('/path/to/winrm-cacert')
+        expect(cli.config.transports[:pcp]['cacert']).to eql('/path/to/cacert')
+        expect(cli.config.transports[:winrm]['cacert']).to eql('/path/to/winrm-cacert')
       end
     end
 

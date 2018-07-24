@@ -3,6 +3,8 @@
 require 'yaml'
 require 'logging'
 require 'concurrent'
+require 'pathname'
+require 'bolt/boltdir'
 require 'bolt/cli'
 require 'bolt/transport/ssh'
 require 'bolt/transport/winrm'
@@ -24,30 +26,10 @@ module Bolt
     end
   end
 
-  Config = Struct.new(
-    :concurrency,
-    :'compile-concurrency',
-    :format,
-    :trace,
-    :inventoryfile,
-    :log,
-    :modulepath,
-    :puppetdb,
-    :'hiera-config',
-    :color,
-    :transport,
-    :transports
-  ) do
-
-    DEFAULTS = {
-      concurrency: 100,
-      'compile-concurrency': Concurrent.processor_count,
-      transport: 'ssh',
-      format: 'human',
-      modulepath: [],
-      puppetdb: {},
-      color: true
-    }.freeze
+  class Config
+    attr_accessor :concurrency, :format, :trace, :log, :puppetdb, :color,
+                  :transport, :transports, :inventoryfile, :compile_concurrency
+    attr_writer :modulepath
 
     TRANSPORT_OPTIONS = %i[password run-as sudo-password extensions
                            private-key tty tmpdir user connect-timeout
@@ -73,35 +55,55 @@ module Bolt
       local: {}
     }.freeze
 
-    BOLTDIR_NAME = 'Boltdir'
+    def self.default
+      new(Bolt::Boltdir.new('.'), {})
+    end
 
-    def initialize(**kwargs)
-      super()
+    def self.from_boltdir(boltdir, overrides = {})
+      # *Optionally* load the boltdir config file, and fall back to the legacy
+      # config if that isn't found. Because logging is built in to the
+      # legacy_conf method, we don't want to look that up unless we need it.
+      configs = if boltdir.config_file.exist?
+                  [boltdir.config_file]
+                else
+                  [legacy_conf]
+                end
+
+      data = Bolt::Util.read_config_file(nil, configs, 'config') || {}
+
+      new(boltdir, data, overrides)
+    end
+
+    def self.from_file(configfile, overrides = {})
+      boltdir = Bolt::Boltdir.new(Pathname.new(configfile).expand_path.dirname)
+      data = Bolt::Util.read_config_file(configfile, [], 'config') || {}
+
+      new(boltdir, data, overrides)
+    end
+
+    def initialize(boltdir, config_data, overrides = {})
       @logger = Logging.logger[self]
-      @pwd = kwargs.delete(:pwd)
 
-      DEFAULTS.merge(kwargs).each { |k, v| self[k] = v }
+      @boltdir = boltdir
+      @concurrency = 100
+      @compile_concurrency = Concurrent.processor_count
+      @transport = 'ssh'
+      @format = 'human'
+      @puppetdb = {}
+      @color = true
 
       # add an entry for the default console logger
-      self[:log] ||= {}
-      self[:log]['console'] ||= {}
+      @log = { 'console' => {} }
 
-      self[:transports] ||= {}
+      @transports = {}
       TRANSPORTS.each_key do |transport|
-        self[:transports][transport] ||= {}
-
-        TRANSPORT_DEFAULTS.each do |k, v|
-          unless self[:transports][transport][k]
-            self[:transports][transport][k] = v
-          end
-        end
-
-        TRANSPORT_SPECIFIC_DEFAULTS[transport].each do |k, v|
-          unless self[:transports][transport].key? k
-            self[:transports][transport][k] = v
-          end
-        end
+        @transports[transport] = TRANSPORT_DEFAULTS.merge(TRANSPORT_SPECIFIC_DEFAULTS[transport])
       end
+
+      update_from_file(config_data)
+      apply_overrides(overrides)
+
+      validate
     end
 
     def deep_clone
@@ -114,110 +116,79 @@ module Bolt
       'file:' + File.expand_path(target)
     end
 
+    def update_logs(logs)
+      logs.each_pair do |k, v|
+        log_name = normalize_log(k)
+        @log[log_name] ||= {}
+        log = @log[log_name]
+
+        next unless v.is_a?(Hash)
+
+        if v.key?('level')
+          log[:level] = v['level'].to_s
+        end
+
+        if v.key?('append')
+          log[:append] = v['append']
+        end
+      end
+    end
+
     def update_from_file(data)
       if data['log'].is_a?(Hash)
-        data['log'].each_pair do |k, v|
-          log = (self[:log][normalize_log(k)] ||= {})
-
-          next unless v.is_a?(Hash)
-
-          if v.key?('level')
-            log[:level] = v['level'].to_s
-          end
-
-          if v.key?('append')
-            log[:append] = v['append']
-          end
-        end
+        update_logs(data['log'])
       end
 
-      if data['modulepath']
-        self[:modulepath] = data['modulepath'].split(File::PATH_SEPARATOR)
-      end
+      @modulepath = data['modulepath'].split(File::PATH_SEPARATOR) if data.key?('modulepath')
 
-      %w[inventoryfile concurrency compile-concurrency format puppetdb hiera-config color transport].each do |key|
-        if data.key?(key)
-          self[key.to_sym] = data[key]
-        end
+      @inventoryfile = data['inventoryfile'] if data.key?('inventoryfile')
+
+      @hiera_config = data['hiera-config'] if data.key?('hiera-config')
+      @compile_concurrency = data['compile-concurrency'] if data.key?('compile-concurrency')
+
+      %w[concurrency format puppetdb color transport].each do |key|
+        send("#{key}=", data[key]) if data.key?(key)
       end
 
       TRANSPORTS.each do |key, impl|
         if data[key.to_s]
           selected = data[key.to_s].select { |k| impl.options.include?(k) }
-          self[:transports][key].merge!(selected)
+          @transports[key].merge!(selected)
         end
       end
     end
     private :update_from_file
 
-    def find_boltdir(dir)
-      path = dir
-      boltdir = nil
-      while boltdir.nil? && path && path != File.dirname(path)
-        maybe_boltdir = File.join(path, BOLTDIR_NAME)
-        boltdir = maybe_boltdir if File.directory?(maybe_boltdir)
-        path = File.dirname(path)
-      end
-      boltdir
-    end
-
-    def pwd
-      @pwd ||= Dir.pwd
-    end
-
-    def boltdir
-      @boltdir ||= find_boltdir(pwd) || default_boltdir
-    end
-
-    def default_boltdir
-      File.expand_path(File.join('~', '.puppetlabs', 'bolt'))
-    end
-
-    def default_modulepath
-      [File.join(boltdir, "modules")]
-    end
-
     # TODO: This is deprecated in 0.21.0 and can be removed in release 0.22.0.
-    def legacy_conf
-      return @legacy_conf if defined?(@legacy_conf)
+    def self.legacy_conf
       root_path = File.expand_path(File.join('~', '.puppetlabs'))
       legacy_paths = [File.join(root_path, 'bolt.yaml'), File.join(root_path, 'bolt.yml')]
-      @legacy_conf = legacy_paths.find { |path| File.exist?(path) }
-      @legacy_conf ||= legacy_paths[0]
-      if @legacy_conf
-        correct_path = File.join(default_boltdir, 'bolt.yaml')
-        msg = "Found configfile at deprecated location #{@legacy_conf}. Global config should be in #{correct_path}"
-        @logger.warn(msg)
+      legacy_conf = legacy_paths.find { |path| File.exist?(path) }
+      found_legacy_conf = !!legacy_conf
+      legacy_conf ||= legacy_paths[0]
+      if found_legacy_conf
+        correct_path = Bolt::Boltdir.default_boltdir.config_file
+        msg = "Found configfile at deprecated location #{legacy_conf}. Global config should be in #{correct_path}"
+        Logging.logger[self].warn(msg)
       end
-      @legacy_conf
+      legacy_conf
     end
 
-    def default_config
-      path = File.join(boltdir, 'bolt.yaml')
-      File.exist?(path) ? path : legacy_conf
-    end
-
-    def default_inventory
-      File.join(boltdir, 'inventory.yaml')
-    end
-
-    def default_hiera
-      File.join(boltdir, 'hiera.yaml')
-    end
-
-    def update_from_cli(options)
-      %i[concurrency compile-concurrency transport format trace modulepath inventoryfile color].each do |key|
-        self[key] = options[key] if options.key?(key)
+    def apply_overrides(options)
+      %i[concurrency transport format trace modulepath inventoryfile color].each do |key|
+        send("#{key}=", options[key]) if options.key?(key)
       end
 
       if options[:debug]
-        self[:log]['console'][:level] = :debug
+        @log['console'][:level] = :debug
       elsif options[:verbose]
-        self[:log]['console'][:level] = :info
+        @log['console'][:level] = :info
       end
 
+      @compile_concurrency = options[:'compile-concurrency'] if options[:'compile-concurrency']
+
       TRANSPORTS.each_key do |transport|
-        transport = self[:transports][transport]
+        transport = @transports[transport]
         TRANSPORT_OPTIONS.each do |key|
           if options[key]
             transport[key.to_s] = Bolt::Util.walk_keys(options[key], &:to_s)
@@ -226,59 +197,49 @@ module Bolt
       end
 
       if options.key?(:ssl) # this defaults to true so we need to check the presence of the key
-        self[:transports][:winrm]['ssl'] = options[:ssl]
+        @transports[:winrm]['ssl'] = options[:ssl]
       end
 
       if options.key?(:'ssl-verify') # this defaults to true so we need to check the presence of the key
-        self[:transports][:winrm]['ssl-verify'] = options[:'ssl-verify']
+        @transports[:winrm]['ssl-verify'] = options[:'ssl-verify']
       end
 
       if options.key?(:'host-key-check') # this defaults to true so we need to check the presence of the key
-        self[:transports][:ssh]['host-key-check'] = options[:'host-key-check']
+        @transports[:ssh]['host-key-check'] = options[:'host-key-check']
       end
-    end
-
-    # Defaults that do not vary based on boltdir should not be included here.
-    #
-    # Defaults which are treated differently from specified values like
-    # 'inventoryfile' cannot be included here or they will not be handled correctly.
-    def update_from_defaults
-      self[:modulepath] = default_modulepath
-      self[:'hiera-config'] = default_hiera
-    end
-
-    # The order in which config is processed is important
-    def update(options)
-      update_from_defaults
-      load_file(options[:configfile])
-      update_from_cli(options)
-    end
-
-    def load_file(path)
-      data = Bolt::Util.read_config_file(path, [default_config], 'config')
-      update_from_file(data) if data
-      validate_hiera_conf(data ? data['hiera-config'] : nil)
     end
 
     def update_from_inventory(data)
       update_from_file(data)
 
       if data['transport']
-        self[:transport] = data['transport']
+        @transport = data['transport']
       end
     end
 
     def transport_conf
-      { transport: self[:transport],
-        transports: self[:transports] }
+      { transport: @transport,
+        transports: @transports }
     end
 
-    def validate_hiera_conf(path)
-      Bolt::Util.read_config_file(path, [default_hiera], 'hiera-config')
+    def default_inventoryfile
+      [@boltdir.inventory_file]
+    end
+
+    def hiera_config
+      @hiera_config || @boltdir.hiera_config
+    end
+
+    def puppetfile
+      @boltdir.puppetfile
+    end
+
+    def modulepath
+      @modulepath || @boltdir.modulepath
     end
 
     def validate
-      self[:log].each_pair do |name, params|
+      @log.each_pair do |name, params|
         if params.key?(:level) && !Bolt::Logger.valid_level?(params[:level])
           raise Bolt::ValidationError,
                 "level of log #{name} must be one of: #{Bolt::Logger.levels.join(', ')}; received #{params[:level]}"
@@ -288,29 +249,33 @@ module Bolt
         end
       end
 
-      unless self[:concurrency].is_a?(Integer) && self[:concurrency] > 0
+      unless @concurrency.is_a?(Integer) && @concurrency > 0
         raise Bolt::ValidationError, 'Concurrency must be a positive integer'
       end
 
-      unless self[:'compile-concurrency'].is_a?(Integer) && self[:'compile-concurrency'] > 0
+      unless @compile_concurrency.is_a?(Integer) && @compile_concurrency > 0
         raise Bolt::ValidationError, 'Compile concurrency must be a positive integer'
       end
 
       compile_limit = 2 * Concurrent.processor_count
-      unless self[:'compile-concurrency'] < compile_limit
+      unless @compile_concurrency < compile_limit
         raise Bolt::ValidationError, "Compilation is CPU-intensive, set concurrency less than #{compile_limit}"
       end
 
-      unless %w[human json].include? self[:format]
-        raise Bolt::ValidationError, "Unsupported format: '#{self[:format]}'"
+      unless %w[human json].include? @format
+        raise Bolt::ValidationError, "Unsupported format: '#{@format}'"
       end
 
-      unless self[:transport].nil? || Bolt::TRANSPORTS.include?(self[:transport].to_sym)
-        raise UnknownTransportError, self[:transport]
+      if @hiera_config && !(File.file?(@hiera_config) && File.readable?(@hiera_config))
+        raise Bolt::FileError, "Could not read hiera-config file #{@hiera_config}", @hiera_config
+      end
+
+      unless @transport.nil? || Bolt::TRANSPORTS.include?(@transport.to_sym)
+        raise UnknownTransportError, @transport
       end
 
       TRANSPORTS.each do |transport, impl|
-        impl.validate(self[:transports][transport])
+        impl.validate(@transports[transport])
       end
     end
   end

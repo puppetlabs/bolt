@@ -28,6 +28,7 @@ Available subcommands:
   bolt plan show                   Show list of available plans
   bolt plan show <plan>            Show details for plan
   bolt plan run <plan> [params]    Run a Puppet task plan
+  bolt puppetfile install          Install modules from a Puppetfile into a Boltdir
 
 Run `bolt <subcommand> --help` to view specific examples.
 
@@ -89,6 +90,18 @@ Available actions are:
   upload <src> <dest>              Upload local file <src> to <dest> on each node
 
 #{examples('file upload /tmp/source /etc/profile.d/login.sh', 'upload a file to')}
+Available options are:
+    HELP
+
+    PUPPETFILE_HELP = <<-HELP
+Usage: bolt puppetfile <action> [options]
+
+Available actions are:
+  install                          Install modules from a Puppetfile into a Boltdir
+
+Install modules into the local Boltdir
+  bolt puppetfile install
+
 Available options are:
     HELP
 
@@ -193,7 +206,7 @@ Available options are:
       end
       define('--boltdir FILEPATH',
              'Specify what Boltdir to load config from (default: autodiscovered from current working dir)') do |path|
-        @options[:configfile] = path
+        @options[:boltdir] = path
       end
       define('--configfile FILEPATH',
              'Specify where to load config from (default: ~/.puppetlabs/bolt/bolt.yaml)') do |path|
@@ -253,8 +266,8 @@ Available options are:
       # show the --nodes and --query switches by default
       @nodes.hide = @query.hide = false
 
-      # Update the banner according to the mode
-      self.banner = case @options[:mode]
+      # Update the banner according to the subcommand
+      self.banner = case @options[:subcommand]
                     when 'plan'
                       # don't show the --nodes and --query switches in the plan help
                       @nodes.hide = @query.hide = true
@@ -267,6 +280,8 @@ Available options are:
                       TASK_HELP
                     when 'file'
                       FILE_HELP
+                    when 'puppetfile'
+                      PUPPETFILE_HELP
                     else
                       BANNER
                     end

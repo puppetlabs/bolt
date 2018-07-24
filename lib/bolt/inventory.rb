@@ -41,10 +41,10 @@ module Bolt
         begin
           data = YAML.safe_load(ENV[ENVIRONMENT_VAR])
         rescue Psych::Exception
-          raise Bolt::Error.new("Could not parse inventory from $#{ENVIRONMENT_VAR}", 'bolt/parse-error')
+          raise Bolt::ParseError, "Could not parse inventory from $#{ENVIRONMENT_VAR}"
         end
       else
-        data = Bolt::Util.read_config_file(config[:inventoryfile], [config.default_inventory], 'inventory')
+        data = Bolt::Util.read_config_file(config.inventoryfile, config.default_inventoryfile, 'inventory')
       end
 
       inventory = new(data, config)
@@ -56,7 +56,7 @@ module Bolt
     def initialize(data, config = nil)
       @logger = Logging.logger[self]
       # Config is saved to add config options to targets
-      @config = config || Bolt::Config.new
+      @config = config || Bolt::Config.default
       @data = data ||= {}
       @groups = Group.new(data.merge('name' => 'all'))
       @group_lookup = {}

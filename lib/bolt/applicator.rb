@@ -1,20 +1,23 @@
 # frozen_string_literal: true
 
 require 'json'
+require 'logging'
 require 'open3'
 require 'bolt/task'
 require 'concurrent'
+require 'bolt/util/puppet_log_level'
 
 module Bolt
   class Applicator
-    def initialize(inventory, executor, modulepath, pdb_config, hiera_config, max_compiles)
+    def initialize(inventory, executor, modulepath, pdb_client, hiera_config, max_compiles)
       @inventory = inventory
       @executor = executor
       @modulepath = modulepath
-      @pdb_config = pdb_config
+      @pdb_client = pdb_client
       @hiera_config = hiera_config ? validate_hiera_config(hiera_config) : nil
 
       @pool = Concurrent::ThreadPoolExecutor.new(max_threads: max_compiles)
+      @logger = Logging.logger[self]
     end
 
     private def libexec
@@ -35,7 +38,7 @@ module Bolt
       catalog_input = {
         code_ast: ast,
         modulepath: @modulepath,
-        pdb_config: @pdb_config,
+        pdb_config: @pdb_client.config.to_hash,
         hiera_config: @hiera_config,
         target: {
           name: target.host,
@@ -52,7 +55,28 @@ module Bolt
       out, err, stat = Open3.capture3('ruby', bolt_catalog_exe, 'compile', stdin_data: catalog_input.to_json)
       ENV['PATH'] = old_path
 
-      raise ApplyError.new(target.to_s, err) unless stat.success?
+      # stderr may contain formatted logs from Puppet's logger or other errors.
+      # Print them in order, but handle them separately. Anything not a formatted log is assumed
+      # to be an error message.
+      logs = err.lines.map do |l|
+        begin
+          JSON.parse(l)
+        rescue StandardError
+          l
+        end
+      end
+      logs.each do |log|
+        if log.is_a?(String)
+          @logger.error(log.chomp)
+        else
+          log.map { |k, v| [k.to_sym, v] }.each do |level, msg|
+            bolt_level = Bolt::Util::PuppetLogLevel::MAPPING[level]
+            @logger.send(bolt_level, "#{target.uri}: #{msg.chomp}")
+          end
+        end
+      end
+
+      raise(ApplyError, target.uri) unless stat.success?
       JSON.parse(out)
     end
 
@@ -60,9 +84,40 @@ module Bolt
       if File.exist?(File.path(hiera_config))
         data = File.open(File.path(hiera_config), "r:UTF-8") { |f| YAML.safe_load(f.read) }
         unless data['version'] == 5
-          raise ApplyError.new("All Targets", "Hiera v5 is required.")
+          raise Bolt::ParseError, "Hiera v5 is required, found v#{data['version'] || 3} in #{hiera_config}"
         end
         hiera_config
+      end
+    end
+
+    def provide_puppet_missing_errors(result)
+      error_hash = result.error_hash
+      exit_code = error_hash['details']['exit_code'] if error_hash && error_hash['details']
+      # If we get exit code 126 or 127 back, it means the shebang command wasn't found; Puppet isn't present
+      if [126, 127].include?(exit_code)
+        Result.new(result.target, error:
+          {
+            'msg' => "Puppet is not installed on the target, please install it to enable 'apply'",
+            'kind' => 'bolt/apply-error'
+          })
+      elsif exit_code == 1 && error_hash['msg'] =~ /Could not find executable 'ruby.exe'/
+        # Windows does not have Ruby present
+        Result.new(result.target, error:
+          {
+            'msg' => "Puppet is not installed on the target in $env:ProgramFiles, please install it to enable 'apply'",
+            'kind' => 'bolt/apply-error'
+          })
+      elsif exit_code == 1 && error_hash['msg'] =~ /cannot load such file -- puppet \(LoadError\)/
+        # Windows uses a Ruby that doesn't have Puppet installed
+        # TODO: fix so we don't find other Rubies, or point to a known issues URL for more info
+        Result.new(result.target, error:
+          {
+            'msg' => 'Found a Ruby without Puppet present, please install Puppet ' \
+                     "or remove Ruby from $env:Path to enable 'apply'",
+            'kind' => 'bolt/apply-error'
+          })
+      else
+        result
       end
     end
 
@@ -71,11 +126,11 @@ module Bolt
       type0 = Puppet.lookup(:pal_script_compiler).type('TargetSpec')
       Puppet::Pal.assert_type(type0, args[0], 'apply targets')
 
-      params = {}
+      options = {}
       if args.count > 1
         type1 = Puppet.lookup(:pal_script_compiler).type('Hash[String, Data]')
         Puppet::Pal.assert_type(type1, args[1], 'apply options')
-        params = args[1]
+        options = args[1]
       end
 
       # collect plan vars and merge them over target vars
@@ -86,7 +141,7 @@ module Bolt
       ast = Puppet::Pops::Serialization::ToDataConverter.convert(apply_body, rich_data: true, symbol_to_string: true)
       notify = proc { |_| nil }
 
-      @executor.log_action('apply catalog', targets) do
+      r = @executor.log_action('apply catalog', targets) do
         futures = targets.map do |target|
           Concurrent::Future.execute(executor: @pool) do
             @executor.with_node_logging("Compiling manifest block", [target]) do
@@ -98,16 +153,21 @@ module Bolt
         result_promises = targets.zip(futures).flat_map do |target, future|
           @executor.queue_execute([target]) do |transport, batch|
             @executor.with_node_logging("Applying manifest block", batch) do
-              arguments = params.clone
-              arguments['catalog'] = future.value
+              arguments = { 'catalog' => future.value, '_noop' => options['_noop'] }
               raise future.reason if future.rejected?
-              transport.batch_task(batch, catalog_apply_task, arguments, {}, &notify)
+              result = transport.batch_task(batch, catalog_apply_task, arguments, options, &notify)
+              provide_puppet_missing_errors(result)
             end
           end
         end
 
         @executor.await_results(result_promises)
       end
+
+      if !r.ok && !options['_catch_errors']
+        raise Bolt::RunFailure.new(r, 'apply', 'catalog')
+      end
+      r
     end
   end
 end

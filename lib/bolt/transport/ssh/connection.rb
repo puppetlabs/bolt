@@ -226,7 +226,7 @@ module Bolt
 
           session_channel = @session.open_channel do |channel|
             # Request a pseudo tty
-            channel.request_pty if target.options['tty']
+            channel.request_pty(modes: { Net::SSH::Connection::Term::ECHO => 0 }) if target.options['tty']
 
             channel.exec(command_str) do |_, success|
               unless success

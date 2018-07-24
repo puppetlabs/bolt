@@ -6,7 +6,7 @@ require 'bolt_spec/files'
 require 'bolt_spec/integration'
 require 'bolt/catalog'
 
-describe "Passes parsed AST to the apply_catalog task" do
+describe "passes parsed AST to the apply_catalog task" do
   include BoltSpec::Conn
   include BoltSpec::Files
   include BoltSpec::Integration
@@ -74,11 +74,46 @@ describe "Passes parsed AST to the apply_catalog task" do
       expect(notify.count).to eq(1)
     end
 
+    it 'logs messages emitted during compilation' do
+      result = run_cli_json(%w[plan run basic::error] + config_flags)
+      expect(result[0]['status']).to eq('success')
+      logs = @log_output.readlines
+      expect(logs).to include(/DEBUG.*Debugging/)
+      expect(logs).to include(/INFO.*Meh/)
+      expect(logs).to include(/WARN.*Warned/)
+      expect(logs).to include(/NOTICE.*Helpful/)
+      expect(logs).to include(/ERROR.*Fire/)
+      expect(logs).to include(/ERROR.*Stop/)
+      expect(logs).to include(/FATAL.*Drop/)
+      expect(logs).to include(/FATAL.*Roll/)
+    end
+
+    it 'fails immediately on a compile error' do
+      result = run_cli_json(%w[plan run basic::catch_error catch=false] + config_flags)
+      expect(result['kind']).to eq('bolt/run-failure')
+      error = result['details']['result_set'][0]['result']['_error']
+      expect(error['kind']).to eq('bolt/apply-error')
+      expect(error['msg']).to match(/Apply failed to compile for #{uri}/)
+      expect(@log_output.readlines)
+        .to include(/stop the insanity/)
+    end
+
+    it 'returns a ResultSet containing failure with _catch_errors=true' do
+      result = run_cli_json(%w[plan run basic::catch_error catch=true] + config_flags)
+      expect(result['kind']).to eq('bolt/apply-error')
+      expect(result['msg']).to match(/Apply failed to compile for #{uri}/)
+      expect(@log_output.readlines)
+        .to include(/stop the insanity/)
+    end
+
     it 'errors calling run_task' do
       result = run_cli_json(%w[plan run basic::disabled] + config_flags)
-      error = result[0]['result']['_error']
+      expect(result['kind']).to eq('bolt/run-failure')
+      error = result['details']['result_set'][0]['result']['_error']
       expect(error['kind']).to eq('bolt/apply-error')
-      expect(error['msg']).to match(/The task operation 'run_task' is not available when compiling a catalog/)
+      expect(error['msg']).to match(/Apply failed to compile for #{uri}/)
+      expect(@log_output.readlines)
+        .to include(/The task operation 'run_task' is not available when compiling a catalog/)
     end
 
     context 'with puppetdb stubbed' do
@@ -95,18 +130,22 @@ describe "Passes parsed AST to the apply_catalog task" do
       it 'calls puppetdb_query' do
         with_tempfile_containing('conf', YAML.dump(config)) do |conf|
           result = run_cli_json(%W[plan run basic::pdb_query --configfile #{conf.path}] + config_flags)
-          error = result[0]['result']['_error']
+          expect(result['kind']).to eq('bolt/run-failure')
+          error = result['details']['result_set'][0]['result']['_error']
           expect(error['kind']).to eq('bolt/apply-error')
-          expect(error['msg']).to match(/Failed to query PuppetDB: /)
+          expect(error['msg']).to match(/Apply failed to compile for #{uri}/)
+          expect(@log_output.readlines).to include(/Failed to query PuppetDB: /)
         end
       end
 
       it 'calls puppetdb_fact' do
         with_tempfile_containing('conf', YAML.dump(config)) do |conf|
           result = run_cli_json(%W[plan run basic::pdb_fact --configfile #{conf.path}] + config_flags)
-          error = result[0]['result']['_error']
+          expect(result['kind']).to eq('bolt/run-failure')
+          error = result['details']['result_set'][0]['result']['_error']
           expect(error['kind']).to eq('bolt/apply-error')
-          expect(error['msg']).to match(/Failed to query PuppetDB: /)
+          expect(error['msg']).to match(/Apply failed to compile for #{uri}/)
+          expect(@log_output.readlines).to include(/Failed to query PuppetDB: /)
         end
       end
     end
@@ -149,8 +188,8 @@ describe "Passes parsed AST to the apply_catalog task" do
       it 'hiera 5 version not specified' do
         with_tempfile_containing('conf', YAML.dump(bad_hiera_version)) do |conf|
           result = run_cli_json(%W[plan run basic::hiera_lookup --configfile #{conf.path}] + config_flags)
-          expect(result['kind']).to eq('bolt/apply-error')
-          expect(result['msg']).to match(/Hiera v5 is required./)
+          expect(result['kind']).to eq('bolt/parse-error')
+          expect(result['msg']).to match(/Hiera v5 is required, found v3/)
         end
       end
     end

@@ -42,17 +42,15 @@ describe Bolt::Logger do
   end
 
   describe '::configure' do
-    let(:config) {
-      Bolt::Config.new(
-        log: {
-          'file:/bolt.log' => {
-          },
-          'file:/debug.log' => {
-            level: :debug,
-            append: false
-          }
+    let(:appenders) {
+      {
+        'file:/bolt.log' => {
+        },
+        'file:/debug.log' => {
+          level: :debug,
+          append: false
         }
-      )
+      }
     }
 
     before :each do
@@ -61,7 +59,7 @@ describe Bolt::Logger do
     end
 
     it 'sets the root logger level to :all' do
-      Bolt::Logger.configure(Bolt::Config.new)
+      Bolt::Logger.configure({}, true)
 
       expect(Logging.logger[:root].level).to eq(Logging.level_num(:all))
     end
@@ -69,7 +67,7 @@ describe Bolt::Logger do
     it 'creates the console appender with the expected properties' do
       expect(Logging.appenders['console']).to be_nil
 
-      Bolt::Logger.configure(Bolt::Config.new)
+      Bolt::Logger.configure({}, true)
 
       console_appender = Logging.appenders['console']
 
@@ -82,15 +80,15 @@ describe Bolt::Logger do
     end
 
     it 'overrides the level of the console appender if specified' do
-      config[:log] = { 'console' => { level: :warn } }
+      appenders = { 'console' => { level: :warn } }
 
-      Bolt::Logger.configure(config)
+      Bolt::Logger.configure(appenders, true)
 
       expect(Logging.appenders['console'].level).to eq(Logging.level_num(:warn))
     end
 
     it 'disables color if specified' do
-      Bolt::Logger.configure(Bolt::Config.new(color: false))
+      Bolt::Logger.configure({}, false)
 
       console_appender = Logging.appenders['console']
 
@@ -114,29 +112,29 @@ describe Bolt::Logger do
           appender
         end
 
-      Bolt::Logger.configure(config)
+      Bolt::Logger.configure(appenders, true)
     end
 
     it 'adds all the additional appenders to the root logger' do
-      appenders = []
+      expected_appenders = []
 
       expect(Logging.appenders)
-        .to receive(:file).exactly(config[:log].count - 1) do |*args|
+        .to receive(:file).exactly(appenders.count) do |*args|
           appender = MockAppender.new(args.first)
-          appenders << appender
+          expected_appenders << appender
           appender
         end
 
-      Bolt::Logger.configure(config)
-      appenders.unshift(Logging.appenders['console'])
+      Bolt::Logger.configure(appenders, true)
+      expected_appenders.unshift(Logging.appenders['console'])
 
-      expect(Logging.logger[:root].appenders).to eq(appenders)
+      expect(Logging.logger[:root].appenders).to eq(expected_appenders)
     end
 
     it 'fails if any of the logs could not be opened' do
-      config[:log] = { 'file:/nonexistent/file' => {} }
+      appenders = { 'file:/nonexistent/file' => {} }
 
-      expect { Bolt::Logger.configure(config) }.to raise_error(%r{^Failed to open log file:/nonexistent/file})
+      expect { Bolt::Logger.configure(appenders, true) }.to raise_error(%r{^Failed to open log file:/nonexistent/file})
     end
   end
 end

@@ -14,9 +14,11 @@ describe Bolt::Transport::SSH do
   include BoltSpec::Files
   include BoltSpec::Task
 
+  let(:boltdir) { Bolt::Boltdir.new('.') }
+
   def mk_config(conf)
     conf = Bolt::Util.walk_keys(conf, &:to_s)
-    Bolt::Config.new(transports: { ssh: conf })
+    Bolt::Config.new(boltdir, 'ssh' => conf)
   end
 
   let(:hostname) { ENV['BOLT_SSH_HOST'] || "localhost" }
@@ -421,14 +423,6 @@ SHELL
         end
       end
     end
-
-    it "runs a task that specifies its base64-encoded contents", ssh: true do
-      contents = "#!/bin/sh\necho -n ${PT_message_one} ${PT_message_two}"
-      arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-      task = Bolt::Task.new(name: 'tasks_test', input_method: 'environment', file_content: Base64.encode64(contents))
-      expect(ssh.run_task(target, task, arguments).message)
-        .to eq('Hello from task Goodbye')
-    end
   end
 
   context 'when tmpdir is specified' do
@@ -511,9 +505,13 @@ SHELL
 
     context "as non-root" do
       let(:config) {
-        mk_config('host-key-check' => false, 'sudo-password' => password, 'run_as' => user,
-                  user: user, password: password)
+        mk_config('host-key-check' => false, 'sudo-password' => bash_password, 'run-as' => user,
+                  user: bash_user, password: bash_password)
       }
+
+      it 'runs as that user', ssh: true do
+        expect(ssh.run_command(target, 'whoami')['stdout'].chomp).to eq(user)
+      end
 
       it "can override run_as for command via an option", ssh: true do
         expect(ssh.run_command(target, 'whoami', '_run_as' => 'root')['stdout']).to eq("root\n")
