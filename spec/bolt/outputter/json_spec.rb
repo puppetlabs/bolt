@@ -6,8 +6,7 @@ require 'bolt/cli'
 
 describe "Bolt::Outputter::JSON" do
   let(:output) { StringIO.new }
-  let(:outputter) { Bolt::Outputter::JSON.new(false, output) }
-  let(:config)  { Bolt::Config.new }
+  let(:outputter) { Bolt::Outputter::JSON.new(false, false, output) }
   let(:target1) { Bolt::Target.new('node1') }
   let(:target2) { Bolt::Target.new('node2') }
   let(:results) { { node1: Bolt::Result.new(target1, value: { 'msg' => "ok" }) } }
@@ -95,6 +94,14 @@ describe "Bolt::Outputter::JSON" do
     result = "some data"
     outputter.print_plan_result(result)
     expect(output.string.strip).to eq('"' + result + '"')
+  end
+
+  it "prints the result of installing a Puppetfile" do
+    outputter.print_puppetfile_result(true, '/path/to/Puppetfile', '/path/to/modules')
+    parsed = JSON.parse(output.string)
+    expect(parsed['success']).to eq(true)
+    expect(parsed['puppetfile']).to eq('/path/to/Puppetfile')
+    expect(parsed['moduledir']).to eq('/path/to/modules')
   end
 
   it "handles fatal errors" do

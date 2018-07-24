@@ -18,12 +18,12 @@ module Bolt
       operating_system: :cd1,
       inventory_nodes: :cd2,
       inventory_groups: :cd3,
-      target_nodes: :cd4
+      target_nodes: :cd4,
+      output_format: :cd5
     }.freeze
 
     def self.build_client
       logger = Logging.logger[self]
-
       config_file = File.expand_path('~/.puppetlabs/bolt/analytics.yaml')
       config = load_config(config_file)
 

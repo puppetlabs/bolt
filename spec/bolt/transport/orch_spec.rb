@@ -14,12 +14,12 @@ describe Bolt::Transport::Orch, orchestrator: true do
 
   let(:hostname) { "localhost" }
   let(:target) do
-    Bolt::Target.new(hostname).update_conf(Bolt::Config.new.transport_conf)
+    Bolt::Target.new(hostname).update_conf(Bolt::Config.default.transport_conf)
   end
 
   let(:targets) do
-    [Bolt::Target.new('pcp://node1').update_conf(Bolt::Config.new.transport_conf),
-     Bolt::Target.new('node2').update_conf(Bolt::Config.new.transport_conf)]
+    [Bolt::Target.new('pcp://node1').update_conf(Bolt::Config.default.transport_conf),
+     Bolt::Target.new('node2').update_conf(Bolt::Config.default.transport_conf)]
   end
 
   let(:mock_client) { instance_double("OrchestratorClient", run_task: results) }
@@ -31,7 +31,7 @@ describe Bolt::Transport::Orch, orchestrator: true do
   end
 
   let(:mtask) { mock_task('foo', 'foo/tasks/init', 'input') }
-  let(:params) { { param: 'val' } }
+  let(:params) { { 'param' => 'val' } }
 
   let(:result_state) { 'finished' }
   let(:result) { { '_output' => 'ok' } }
@@ -87,6 +87,12 @@ describe Bolt::Transport::Orch, orchestrator: true do
     it "doesn't pass noop as a parameter" do
       params = { 'foo' => 1, 'bar' => 'baz' }
       body = conn.build_request(targets, mtask, params.merge('_noop' => true))
+      expect(body[:params]).to eq(params)
+    end
+
+    it "doesn't pass _task as a parameter" do
+      params = { 'foo' => 1, 'bar' => 'baz' }
+      body = conn.build_request(targets, mtask, params.merge('_task' => 'my::task'))
       expect(body[:params]).to eq(params)
     end
 
@@ -284,7 +290,7 @@ describe Bolt::Transport::Orch, orchestrator: true do
     let(:body) {
       {
         task: 'bolt_shim::command',
-        params: { command: command }
+        params: { 'command' => command }
       }
     }
 
@@ -352,7 +358,7 @@ describe Bolt::Transport::Orch, orchestrator: true do
 
       {
         task: 'bolt_shim::upload',
-        params: { path: dest_path, content: content, mode: mode }
+        params: { 'path' => dest_path, 'content' => content, 'mode' => mode }
       }
     }
 
@@ -399,7 +405,7 @@ describe Bolt::Transport::Orch, orchestrator: true do
 
       {
         task: 'bolt_shim::script',
-        params: { content: content, arguments: args }
+        params: { 'content' => content, 'arguments' => args }
       }
     }
 

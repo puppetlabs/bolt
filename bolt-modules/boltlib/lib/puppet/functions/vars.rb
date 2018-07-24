@@ -2,9 +2,9 @@
 
 require 'bolt/error'
 
-# Returns a hash of the 'vars' (variables) assigned to a target through the
-# inventory file or `set_var` function.
+# Returns a hash of the 'vars' (variables) assigned to a target.
 #
+# Vars can be assigned through the inventory file or `set_var` function.
 # Plan authors can call this function on a target to get the variable hash
 # for that target.
 Puppet::Functions.create_function(:vars) do

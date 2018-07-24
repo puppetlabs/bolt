@@ -14,9 +14,11 @@ describe Bolt::Transport::SSH do
   include BoltSpec::Files
   include BoltSpec::Task
 
+  let(:boltdir) { Bolt::Boltdir.new('.') }
+
   def mk_config(conf)
     conf = Bolt::Util.walk_keys(conf, &:to_s)
-    Bolt::Config.new(transports: { ssh: conf })
+    Bolt::Config.new(boltdir, 'ssh' => conf)
   end
 
   let(:hostname) { ENV['BOLT_SSH_HOST'] || "localhost" }
@@ -289,6 +291,15 @@ SHELLWORDS
       end
     end
 
+    it "serializes hashes as json in environment input", ssh: true do
+      contents = "#!/bin/sh\nprintenv PT_message"
+      arguments = { message: { key: 'val' } }
+      with_task_containing('tasks_test_hash', contents, 'environment') do |task|
+        expect(ssh.run_task(target, task, arguments).value)
+          .to eq('key' => 'val')
+      end
+    end
+
     it "can run a task passing input on stdin and environment", ssh: true do
       contents = <<SHELL
 #!/bin/sh
@@ -368,13 +379,47 @@ SHELL
         end
       end
 
-      it "can run a task", ssh: true do
+      it "errors when it tries to run a task", ssh: true do
         contents = "#!/bin/sh\necho -n ${PT_message_one} ${PT_message_two}"
         arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
         with_task_containing('tasks_test', contents, 'environment') do |task|
           expect {
             ssh.run_task(target, task, arguments)
           }.to raise_error(Bolt::Node::FileError, 'no tmpdir')
+        end
+      end
+    end
+
+    context "when implementations are provided", ssh: true do
+      let(:contents) { "#!/bin/sh\necho -n ${PT_message_one} ${PT_message_two}" }
+      let(:arguments) { { message_one: 'Hello from task', message_two: 'Goodbye' } }
+
+      it "runs a task requires 'shell'" do
+        with_task_containing('tasks_test', contents, 'environment') do |task|
+          impls = task.implementations.map { |impl| impl.merge('requirements' => ['shell']) }
+          expect(task).to receive(:implementations).and_return(impls)
+          expect(ssh.run_task(target, task, arguments).message)
+            .to eq('Hello from task Goodbye')
+        end
+      end
+
+      it "errors when a task only requires an unsupported requirement" do
+        with_task_containing('tasks_test', contents, 'environment') do |task|
+          impls = task.implementations.map { |impl| impl.merge('requirements' => ['powershell']) }
+          expect(task).to receive(:implementations).and_return(impls)
+          expect {
+            ssh.run_task(target, task, arguments)
+          }.to raise_error("No suitable implementation of #{task.name} for #{target.name}")
+        end
+      end
+
+      it "errors when a task only requires an unknown requirement" do
+        with_task_containing('tasks_test', contents, 'environment') do |task|
+          impls = task.implementations.map { |impl| impl.merge('requirements' => ['foobar']) }
+          expect(task).to receive(:implementations).and_return(impls)
+          expect {
+            ssh.run_task(target, task, arguments)
+          }.to raise_error("No suitable implementation of #{task.name} for #{target.name}")
         end
       end
     end
@@ -460,9 +505,13 @@ SHELL
 
     context "as non-root" do
       let(:config) {
-        mk_config('host-key-check' => false, 'sudo-password' => password, 'run_as' => user,
-                  user: user, password: password)
+        mk_config('host-key-check' => false, 'sudo-password' => bash_password, 'run-as' => user,
+                  user: bash_user, password: bash_password)
       }
+
+      it 'runs as that user', ssh: true do
+        expect(ssh.run_command(target, 'whoami')['stdout'].chomp).to eq(user)
+      end
 
       it "can override run_as for command via an option", ssh: true do
         expect(ssh.run_command(target, 'whoami', '_run_as' => 'root')['stdout']).to eq("root\n")

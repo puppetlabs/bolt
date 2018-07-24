@@ -1,4 +1,4 @@
-# A Planresult describes the supported return values of a plan. It
+# A PlanResult describes the supported return values of a plan. It
 # should be used as the return type of functions that run plans and return the
 # results.
 

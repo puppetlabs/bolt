@@ -71,7 +71,7 @@ query results.
 
         if @show_help
           puts @parser.help
-          return 0
+          return
         end
 
         inventory_file = positional_args.shift
@@ -83,8 +83,8 @@ query results.
           raise "Unknown argument(s) #{positional_args.join(', ')}"
         end
 
-        config = Bolt::PuppetDB::Config.new(@config_file, @cli_opts)
-        @puppetdb_client = Bolt::PuppetDB::Client.from_config(config)
+        config = Bolt::PuppetDB::Config.load_config(@config_file, @cli_opts)
+        @puppetdb_client = Bolt::PuppetDB::Client.new(config)
 
         unless File.readable?(inventory_file)
           raise "Can't read the inventory file #{inventory_file}"
@@ -100,12 +100,6 @@ query results.
         else
           puts result
         end
-
-        0
-      rescue StandardError => e
-        puts "Error: #{e}"
-        puts e.backtrace if @trace
-        1
       end
 
       def resolve_group(group)

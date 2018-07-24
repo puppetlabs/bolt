@@ -117,7 +117,7 @@ module Bolt
         # Building lots of strings...
         pretty_params = +""
         task_info = +""
-        usage = +"bolt task run --nodes, -n <node-name> #{task['name']}"
+        usage = +"bolt task run --nodes <node-name> #{task['name']}"
 
         if task['parameters']
           replace_data_type(task['parameters'])
@@ -165,8 +165,18 @@ module Bolt
       def print_plan_result(plan_result)
         if plan_result.value.nil?
           @stream.puts("Plan completed successfully with no result")
+        elsif plan_result.value.is_a? Bolt::ApplyFailure
+          @stream.puts(colorize(:red, plan_result.value.message))
         else
           @stream.puts(::JSON.pretty_generate(plan_result, quirks_mode: true))
+        end
+      end
+
+      def print_puppetfile_result(success, puppetfile, moduledir)
+        if success
+          @stream.puts("Successfully synced modules from #{puppetfile} to #{moduledir}")
+        else
+          @stream.puts(colorize(:red, "Failed to sync modules from #{puppetfile} to #{moduledir}"))
         end
       end
 
@@ -174,6 +184,12 @@ module Bolt
         @stream.puts(colorize(:red, err.message))
         if err.is_a? Bolt::RunFailure
           @stream.puts ::JSON.pretty_generate(err.result_set)
+        end
+
+        if @trace && err.backtrace
+          err.backtrace.each do |line|
+            @stream.puts(colorize(:red, "\t#{line}"))
+          end
         end
       end
     end

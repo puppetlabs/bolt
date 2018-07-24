@@ -23,6 +23,7 @@ module Bolt
 
         @vars = data['vars'] || {}
         @facts = data['facts'] || {}
+        @features = data['features'] || []
         @config = data['config'] || {}
         @groups = if data['groups']
                     data['groups'].map { |g| Group.new(g) }
@@ -89,7 +90,7 @@ module Bolt
       end
 
       # The data functions below expect and return nil or a hash of the schema
-      # { 'config' => Hash , 'vars' => Hash, 'facts' => Hash, groups => Array }
+      # { 'config' => Hash , 'vars' => Hash, 'facts' => Hash, 'features' => Array, groups => Array }
       def data_for(node_name)
         data_merge(group_collect(node_name), node_collect(node_name))
       end
@@ -99,23 +100,26 @@ module Bolt
           { 'config' => data['config'] || {},
             'vars' => data['vars'] || {},
             'facts' => data['facts'] || {},
+            'features' => data['features'] || [],
             # groups come from group_data
             'groups' => [] }
         end
       end
 
       def group_data
-        { 'config' => @config,
-          'vars'   => @vars,
-          'facts'  => @facts,
-          'groups' => [@name] }
+        { 'config'   => @config,
+          'vars'     => @vars,
+          'facts'    => @facts,
+          'features' => @features,
+          'groups'   => [@name] }
       end
 
       def empty_data
-        { 'config' => {},
-          'vars'   => {},
-          'facts'  => {},
-          'groups' => [] }
+        { 'config'   => {},
+          'vars'     => {},
+          'facts'    => {},
+          'features' => [],
+          'groups'   => [] }
       end
 
       def data_merge(data1, data2)
@@ -130,6 +134,7 @@ module Bolt
           # with the value meant to replace it
           'vars'   => data1['vars'].merge(data2['vars']),
           'facts'  => Bolt::Util.deep_merge(data1['facts'], data2['facts']),
+          'features' => data1['features'] | data2['features'],
           'groups' => data2['groups'] + data1['groups']
         }
       end

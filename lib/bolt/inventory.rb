@@ -36,19 +36,15 @@ module Bolt
       end
     end
 
-    def self.default_paths
-      [File.expand_path(File.join('~', '.puppetlabs', 'bolt', 'inventory.yaml'))]
-    end
-
     def self.from_config(config)
       if ENV.include?(ENVIRONMENT_VAR)
         begin
           data = YAML.safe_load(ENV[ENVIRONMENT_VAR])
         rescue Psych::Exception
-          raise Bolt::Error.new("Could not parse inventory from $#{ENVIRONMENT_VAR}", 'bolt/parse-error')
+          raise Bolt::ParseError, "Could not parse inventory from $#{ENVIRONMENT_VAR}"
         end
       else
-        data = Bolt::Util.read_config_file(config[:inventoryfile], default_paths, 'inventory')
+        data = Bolt::Util.read_config_file(config.inventoryfile, config.default_inventoryfile, 'inventory')
       end
 
       inventory = new(data, config)
@@ -60,7 +56,7 @@ module Bolt
     def initialize(data, config = nil)
       @logger = Logging.logger[self]
       # Config is saved to add config options to targets
-      @config = config || Bolt::Config.new
+      @config = config || Bolt::Config.default
       @data = data ||= {}
       @groups = Group.new(data.merge('name' => 'all'))
       @group_lookup = {}
@@ -142,7 +138,9 @@ module Bolt
 
       unless data
         data = {}
-        data['config'] = { 'transport' => 'local' } if target.name == 'localhost'
+        unless Bolt::Util.windows?
+          data['config'] = { 'transport' => 'local' } if target.name == 'localhost'
+        end
       end
 
       unless data['config']
@@ -154,6 +152,7 @@ module Bolt
       # been instantiated
       set_vars_from_hash(target.name, data['vars']) unless @target_vars[target.name]
       set_facts(target.name, data['facts']) unless @target_facts[target.name]
+      data['features']&.each { |feature| set_feature(target, feature) } unless @target_features[target.name]
 
       # Use Config object to ensure config section is treated consistently with config file
       conf = @config.deep_clone

@@ -50,12 +50,13 @@ describe 'run_plan' do
       end
     end
 
-    it 'reports the call to analytics' do
+    it 'reports the function call to analytics' do
       executor.expects(:report_function_call).with('run_plan')
+      executor.expects(:report_bundled_content).with('Plan', 'test::run_me').once
       is_expected.to run.with_params('test::run_me').and_return('worked2')
     end
 
-    it 'skips reporting the call to analytics if called internally from Bolt' do
+    it 'skips reporting the function call to analytics if called internally from Bolt' do
       executor.expects(:report_function_call).never
       is_expected.to run.with_params('test::run_me', '_bolt_api_call' => true).and_return('worked2')
     end

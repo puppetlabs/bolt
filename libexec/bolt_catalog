@@ -1,0 +1,37 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'bolt'
+require 'bolt/catalog'
+require 'json'
+
+# This accepts a catalog request on stdin:
+# { "code_ast": "JSON serialized Puppet AST",
+#   "code_string": "String of code, ignored if AST is provided",
+#   "modulepath": "Array of directories to use as the modulepath for catalog compilation",
+#   "pdb_config": "A hash of PDB client config options as supplied to Bolt",
+#   "hiera_config": "File path to hiera config file",
+#   "target": {
+#     "name": "the name of the node usually fqdn fro url",
+#     "facts": "Hash of facts to use for the node",
+#     "variables": "Hash of variables to use for compilation",
+#     "trusted": "Hash of trusted data for the node"
+#   }
+# }
+
+command = ARGV[0]
+if command == "parse"
+  code = File.open(ARGV[1], &:read)
+  puts JSON.pretty_generate(Bolt::Catalog.new.generate_ast(code))
+elsif command == "compile"
+  request = if ARGV[1]
+              File.open(ARGV[1]) { |fh| JSON.parse(fh.read) }
+            else
+              JSON.parse(STDIN.read)
+            end
+  catalog = Bolt::Catalog.new.compile_catalog(request)
+  puts JSON.pretty_generate(catalog)
+else
+  puts "USAGE: run 'bolt_catalog compile' with a request on STDIN " \
+       "or 'bolt_catalog parse manifest.pp' to generate JSON AST"
+end

@@ -112,6 +112,7 @@ catch
 
           if ENVIRONMENT_METHODS.include?(input_method)
             arguments.each do |(arg, val)|
+              val = val.to_json unless val.is_a?(String)
               cmd = "[Environment]::SetEnvironmentVariable('PT_#{arg}', @'\n#{val}\n'@)"
               result = conn.execute(cmd)
               if result.exit_code != 0
@@ -128,9 +129,12 @@ catch
                 # fortunately, using PS with stdin input_method should never happen
                 if input_method == 'powershell'
                   conn.execute(<<-PS)
-$private:taskArgs = Get-ContentAsJson (
+$private:tempArgs = Get-ContentAsJson (
   $utf8.GetString([System.Convert]::FromBase64String('#{Base64.encode64(JSON.dump(arguments))}'))
 )
+$allowedArgs = (Get-Command "#{remote_path}").Parameters.Keys
+$private:taskArgs = @{}
+$private:tempArgs.Keys | ? { $allowedArgs -contains $_ } | % { $private:taskArgs[$_] = $private:tempArgs[$_] }
 try { & "#{remote_path}" @taskArgs } catch { Write-Error $_.Exception; exit 1 }
               PS
                 else

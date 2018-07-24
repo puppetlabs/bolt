@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
-# Define a block where default logging is suppressed. Messages for actions within this block
-# will be logged at `info` level instead of `notice`, so they will not be seen normally but
-# will still be present when `verbose` logging is requested.
+# Define a block where default logging is suppressed.
+#
+# Messages for actions within this block will be logged at `info` level instead
+# of `notice`, so they will not be seen normally but # will still be present
+# when `verbose` logging is requested.
 Puppet::Functions.create_function(:without_default_logging) do
   # @param block The block where action logging is suppressed.
   # @return [Undef]

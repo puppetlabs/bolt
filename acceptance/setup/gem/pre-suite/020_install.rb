@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
-gem_source = ENV['GEM_SOURCE'] || "https://rubygems.org"
-gem_version = ENV['BOLT_GEM'] || ""
+require 'bolt_setup_helper'
 
 test_name "Install Bolt gem" do
+  extend Acceptance::BoltSetupHelper
+
   step "Install Bolt gem" do
     install_command = "gem install bolt --source #{gem_source} --no-ri --no-rdoc"
     install_command += " -v '#{gem_version}'" unless gem_version.empty?
@@ -14,6 +15,7 @@ test_name "Install Bolt gem" do
       on(bolt, install_command)
     end
   end
+
   step "Ensure install succeeded" do
     cmd = 'bolt --help'
     case bolt['platform']

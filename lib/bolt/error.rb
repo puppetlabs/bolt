@@ -41,6 +41,12 @@ module Bolt
     end
   end
 
+  class CLIError < Bolt::Error
+    def initialize(msg)
+      super(msg, "bolt/cli-error")
+    end
+  end
+
   class RunFailure < Error
     attr_reader :result_set
 
@@ -54,6 +60,17 @@ module Bolt
       super(message, 'bolt/run-failure', details)
       @result_set = result_set
       @error_code = 2
+    end
+  end
+
+  class ApplyFailure < RunFailure
+    def initialize(result_set)
+      super(result_set, 'apply', 'catalog')
+      @kind = 'bolt/apply-failure'
+    end
+
+    def to_s
+      result_set.select(&:error_hash).map { |result| result.error_hash['msg'] }.join("\n")
     end
   end
 
@@ -71,6 +88,24 @@ module Bolt
     end
   end
 
+  class PuppetfileError < Error
+    def initialize(err)
+      super("Failed to sync modules from the Puppetfile: #{err}", 'bolt/puppetfile-error')
+    end
+  end
+
+  class ApplyError < Error
+    def initialize(target)
+      super("Apply failed to compile for #{target}", 'bolt/apply-error')
+    end
+  end
+
+  class ParseError < Error
+    def initialize(msg)
+      super(msg, 'bolt/parse-error')
+    end
+  end
+
   class InvalidPlanResult < Error
     def initialize(plan_name, result_str)
       super("Plan #{plan_name} returned an invalid result: #{result_str}",
@@ -82,7 +117,7 @@ module Bolt
 
   class ValidationError < Bolt::Error
     def initialize(msg)
-      super(msg, 'bolt.transport/validation-error')
+      super(msg, 'bolt/validation-error')
     end
   end
 

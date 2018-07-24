@@ -3,11 +3,11 @@
 module Bolt
   class Outputter
     class JSON < Bolt::Outputter
-      def initialize(color, stream = $stdout)
+      def initialize(color, trace, stream = $stdout)
         @items_open = false
         @object_open = false
         @preceding_item = false
-        super(color, stream)
+        super(color, trace, stream)
       end
 
       def print_head
@@ -57,10 +57,21 @@ module Bolt
         @stream.puts result.to_json
       end
 
+      def print_puppetfile_result(success, puppetfile, moduledir)
+        @stream.puts({ "success": success,
+                       "puppetfile": puppetfile,
+                       "moduledir": moduledir }.to_json)
+      end
+
       def fatal_error(err)
         @stream.puts "],\n" if @items_open
         @stream.puts '"_error": ' if @object_open
-        @stream.puts err.to_json
+        err_obj = err.to_h
+        if @trace && err.backtrace
+          err_obj[:details] ||= {}
+          err_obj[:details][:backtrace] = err.backtrace
+        end
+        @stream.puts err_obj.to_json
         @stream.puts '}' if @object_open
       end
 

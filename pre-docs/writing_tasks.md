@@ -268,8 +268,9 @@ implementation requires the `shell` feature, and the `sql.ps1` implementations
 requires the `powershell` feature.
 
 The set of features available on the target is determined by the task runner.
-The task runner will choose the *first* implementation whose requirements are
-satisfied.
+Additional features can be specified for a target via `set_feature`, or by
+adding `features` in the inventory. The task runner will choose the *first*
+implementation whose requirements are satisfied.
 
 The following features are defined by default:
 * `puppet-agent`: present if the target has the puppet agent package installed

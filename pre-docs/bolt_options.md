@@ -52,7 +52,7 @@ the `--nodes` flag and an `@` symbol: `bolt command run --nodes @nodes.txt`
 To pass nodes on `stdin`, on the command line, use a command to generate a node
 list, and pipe the result to Bolt with `-` after `--nodes` : `<COMMAND> | bolt command run --nodes -` For
 example, if you have a node list in a text file, you might run `cat nodes.txt |
-bolt command run --nodes`
+bolt command run --nodes -`
 
 
 ### Specifying nodes from an inventory file
@@ -96,6 +96,8 @@ This is useful on Windows, so that you do not have to include the winrm
 transport for each node. To override the default transport, specify the
 protocol on a per-host basis, such as `bolt command run facter --nodes
 win1,ssh://linux --transport winrm`
+
+If `localhost` is passed to `--nodes` when invoking Bolt on a non-windows OS the `local` transport is used automatically. This behaviour can be avoided by prepending the target with the desired transport (ex: `ssh://localhost`).
 
 
 ## Specifying connection credentials
@@ -225,8 +227,9 @@ Options are optional unless marked as required.
 | Run context |
 | `--concurrency, -c` | Maximum number of simultaneous connections (default: 100) |
 | `--modulepath` | Required for tasks and plans. The path to the module containing the task. Separate multiple paths with a semicolon (`;`) on Windows or a colon (`:`) on all other platforms. |
-| `--configfile` | Specify where to load config from (default: ~/.puppetlabs/bolt.yaml) |
-| `--inventoryfile` | Specify where to load inventory from (default: ~/.puppetlabs/bolt/inventory.yaml) |
+| `--configfile` | Specify where to load config from (default: `bolt.yaml` inside the `Boltdir`) |
+| `--boltdir` | Specify what Boltdir to load config from (default: autodiscovered from current working dir) |
+| `--inventoryfile` | Specify where to load inventory from (default: `inventory.yaml` inside the `Boltdir`) |
 ||
 | Transports |
 | `--transport` | Specifies the default transport for this command. To override, specify the transport for a given node, such as ssh://linuxnode. |

@@ -1,0 +1,32 @@
+# Bolt Functions
+
+<% for func in @functions %>
+## <%= func['name'] %>
+
+<%= func['text'] %>
+
+<% for sig in func['signatures'] %>
+<% if sig['text'] != func['text'] -%>
+### <%= sig['text'] %>
+
+<% end -%>
+```
+<%= sig['signature'] %>
+```
+
+<% for ret in sig['returns'] -%>
+*Returns:* `<%= ret['types'].first %>` <%= ret['text'] %>
+<% end -%>
+
+<% for param in sig['params'] -%>
+* **<%= param['name'] %>** `<%= param['types'].first %>` <%= param['text'] %>
+<% end -%>
+
+<% for example in sig['examples'] -%>
+**Example:** <%= example['name'] %>
+```
+<%= example['text'] %>
+```
+<% end -%>
+<% end %>
+<% end %>

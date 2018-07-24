@@ -5,9 +5,9 @@ require 'bolt/puppetdb/client'
 
 describe Bolt::PuppetDB::Client do
   let(:uri) { 'https://puppetdb:8081' }
-  let(:cacert) { '/path/to/cacert' }
-  let(:options) { {} }
-  let(:client) { Bolt::PuppetDB::Client.new(uri, cacert, options) }
+  let(:cacert) { File.expand_path('/path/to/cacert') }
+  let(:config) { double('config', uri: URI.parse(uri), cacert: cacert, token: nil, cert: nil, key: nil) }
+  let(:client) { Bolt::PuppetDB::Client.new(config) }
 
   describe "#headers" do
     it 'sets content-type' do
@@ -16,7 +16,7 @@ describe Bolt::PuppetDB::Client do
 
     it 'includes the token if specified' do
       token = 'footokentest'
-      options[:token] = token
+      allow(config).to receive(:token).and_return(token)
 
       expect(client.headers['X-Authentication']).to eq(token)
     end

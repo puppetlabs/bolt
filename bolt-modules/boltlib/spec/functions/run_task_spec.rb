@@ -86,8 +86,9 @@ describe 'run_task' do
       is_expected.to run.with_params('Test::Yes', []).and_return(Bolt::ResultSet.new([]))
     end
 
-    it 'reports the call to analytics' do
+    it 'reports the function call and task name to analytics' do
       executor.expects(:report_function_call).with('run_task')
+      executor.expects(:report_bundled_content).with('Task', 'Test::Echo').once
       executable = File.join(tasks_root, 'echo.sh')
 
       executor.expects(:run_task).with([target], mock_task(executable, nil), default_args, {}).returns(result_set)
@@ -96,7 +97,7 @@ describe 'run_task' do
       is_expected.to run.with_params('Test::Echo', hostname, default_args).and_return(result_set)
     end
 
-    it 'skips reporting the call to analytics if called internally from Bolt' do
+    it 'skips reporting the function call to analytics if called internally from Bolt' do
       executor.expects(:report_function_call).with('run_task').never
       executable = File.join(tasks_root, 'echo.sh')
 

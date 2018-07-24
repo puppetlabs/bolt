@@ -2,7 +2,7 @@
 
 require 'bolt/error'
 
-# Runs the `plan` referenced by its name. A plan is autoloaded from <moduleroot>/plans.
+# Runs the `plan` referenced by its name. A plan is autoloaded from `<moduleroot>/plans`.
 Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction) do
   # @param plan_name The plan to run.
   # @param named_args Arguments to the plan. Can also include additional options: '_catch_errors', '_run_as'.
@@ -13,6 +13,7 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
     scope_param
     param 'String', :plan_name
     optional_param 'Hash', :named_args
+    return_type 'Boltlib::PlanResult'
   end
 
   def run_plan(scope, plan_name, named_args = {})
@@ -34,6 +35,9 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
     unless named_args['_bolt_api_call']
       executor.report_function_call('run_plan')
     end
+
+    # Report bundled content, this should capture plans run from both CLI and Plans
+    executor.report_bundled_content('Plan', plan_name)
 
     params = named_args.reject { |k, _| k.start_with?('_') }
 

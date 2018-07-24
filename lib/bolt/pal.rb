@@ -4,6 +4,7 @@ require 'bolt/executor'
 require 'bolt/error'
 require 'bolt/plan_result'
 require 'bolt/util'
+require 'bolt/applicator'
 
 module Bolt
   class PAL
@@ -35,7 +36,7 @@ module Bolt
       end
     end
 
-    def initialize(config)
+    def initialize(modulepath, hiera_config, max_compiles = Concurrent.processor_count)
       # Nothing works without initialized this global state. Reinitializing
       # is safe and in practice only happen in tests
       self.class.load_puppet
@@ -43,7 +44,9 @@ module Bolt
       # This makes sure we don't accidentally create puppet dirs
       with_puppet_settings { |_| nil }
 
-      @config = config
+      @modulepath = [BOLTLIB_PATH, *modulepath, MODULES_PATH]
+      @hiera_config = hiera_config
+      @max_compiles = max_compiles
     end
 
     # Puppet logging is global so this is class method to avoid confusion
@@ -85,15 +88,11 @@ module Bolt
       compiler.evaluate_string('type PlanResult = Boltlib::PlanResult')
     end
 
-    def full_modulepath(modulepath)
-      [BOLTLIB_PATH, *modulepath, MODULES_PATH]
-    end
-
     # Runs a block in a PAL script compiler configured for Bolt.  Catches
     # exceptions thrown by the block and re-raises them ensuring they are
     # Bolt::Errors since the script compiler block will squash all exceptions.
     def in_bolt_compiler
-      r = Puppet::Pal.in_tmp_environment('bolt', modulepath: full_modulepath(@config[:modulepath]), facts: {}) do |pal|
+      r = Puppet::Pal.in_tmp_environment('bolt', modulepath: @modulepath, facts: {}) do |pal|
         pal.with_script_compiler do |compiler|
           alias_types(compiler)
           begin
@@ -114,7 +113,20 @@ module Bolt
     end
 
     def with_bolt_executor(executor, inventory, pdb_client = nil, &block)
-      Puppet.override({ bolt_executor: executor, bolt_inventory: inventory, bolt_pdb_client: pdb_client }, &block)
+      opts = {
+        bolt_executor: executor,
+        bolt_inventory: inventory,
+        bolt_pdb_client: pdb_client,
+        apply_executor: Applicator.new(
+          inventory,
+          executor,
+          @modulepath,
+          pdb_client,
+          @hiera_config,
+          @max_compiles
+        )
+      }
+      Puppet.override(opts, &block)
     end
 
     def in_plan_compiler(executor, inventory, pdb_client)
@@ -147,6 +159,7 @@ module Bolt
         end
         Puppet.settings.send(:clear_everything_for_tests)
         Puppet.initialize_settings(cli)
+        Puppet::GettextConfig.create_default_text_domain
         self.class.configure_logging
         yield
       end

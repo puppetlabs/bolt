@@ -13,11 +13,13 @@ describe Bolt::Transport::WinRM do
   include BoltSpec::Files
   include BoltSpec::Task
 
+  let(:boltdir) { Bolt::Boltdir.new('.') }
+
   def mk_config(conf)
     stringified = conf.each_with_object({}) { |(k, v), coll| coll[k.to_s] = v }
     # The default of 10 seconds seems to be too short to always succeed in AppVeyor.
     stringified['connect-timeout'] ||= 20
-    Bolt::Config.new(transport: 'winrm', transports: { winrm: stringified })
+    Bolt::Config.new(boltdir, 'transport' => 'winrm', 'winrm' => stringified)
   end
 
   let(:host) { ENV['BOLT_WINRM_HOST'] || 'localhost' }
@@ -38,7 +40,7 @@ foreach ($i in $args)
 PS
 
   def make_target(host_: host, port_: port, conf: config)
-    Bolt::Target.new("#{host_}:#{port_}").update_conf(conf)
+    Bolt::Target.new("#{host_}:#{port_}").update_conf(conf.transport_conf)
   end
 
   let(:target) { make_target }
@@ -80,7 +82,7 @@ PS
     it "adheres to the specified timeout" do
       TCPServer.open(0) do |socket|
         port = socket.addr[1]
-        config[:transports][:winrm]['connect-timeout'] = 2
+        config.transports[:winrm]['connect-timeout'] = 2
 
         Timeout.timeout(3) do
           expect_node_error(Bolt::Node::ConnectError,
@@ -401,22 +403,18 @@ Height: $Height ($(if ($Height -ne $null) { $Height.GetType().Name } else { 'nul
       end
     end
 
-    it "fails when the powershell input method is used to pass unexpected parameters to a task", winrm: true do
+    it "ignores unexpected parameters when the powershell input method is used", winrm: true do
       contents = <<-PS
         param (
           [Parameter()]
           [String]$foo
         )
 
-        $bar = $env:PT_bar
-        Write-Host `
-          "foo: $foo ($(if ($foo -ne $null) { $foo.GetType().Name } else { 'null' }))," `
-          "bar: $bar ($(if ($bar -ne $null) { $bar.GetType().Name } else { 'null' }))"
+        Write-Host "foo=$foo"
       PS
-      arguments = { bar: 30 } # note that the script doesn't recognize the 'bar' parameter
+      arguments = { foo: 30 } # note that the script doesn't recognize the 'bar' parameter
       with_task_containing('task-params-test-winrm', contents, 'powershell', '.ps1') do |task|
-        expect(winrm.run_task(target, task, arguments).error_hash)
-          .to_not be_nil
+        expect(winrm.run_task(target, task, arguments).message).to eq("foo=30\r\n")
       end
     end
 
@@ -497,6 +495,16 @@ PS
       end
     end
 
+    it "serializes hashes as json in environment input", winrm: true do
+      contents = "echo $env:PT_message"
+      arguments = { message: { key: 'val' } }
+      with_task_containing('tasks_test_hash', contents, 'environment', '.ps1') do |task|
+        expect(
+          winrm.run_task(target, task, arguments).value
+        ).to eq('key' => 'val')
+      end
+    end
+
     it "defaults to powershell input method when executing .ps1", winrm: true do
       contents = <<PS
 param ($message_one, $message_two)
@@ -507,6 +515,40 @@ PS
         expect(
           winrm.run_task(target, task, arguments).message
         ).to eq("Hello from task Goodbye\r\n")
+      end
+    end
+
+    context "when implementations are provided", winrm: true do
+      let(:contents) { 'Write-Host "$env:PT_message_one $env:PT_message_two"' }
+      let(:arguments) { { message_one: 'Hello from task', message_two: 'Goodbye' } }
+
+      it "runs a task requires 'shell'" do
+        with_task_containing('tasks_test', contents, 'environment', '.ps1') do |task|
+          impls = task.implementations.map { |impl| impl.merge('requirements' => ['powershell']) }
+          expect(task).to receive(:implementations).and_return(impls)
+          expect(winrm.run_task(target, task, arguments).message.chomp)
+            .to eq('Hello from task Goodbye')
+        end
+      end
+
+      it "errors when a task only requires an unsupported requirement" do
+        with_task_containing('tasks_test', contents, 'environment', '.ps1') do |task|
+          impls = task.implementations.map { |impl| impl.merge('requirements' => ['shell']) }
+          expect(task).to receive(:implementations).and_return(impls)
+          expect {
+            winrm.run_task(target, task, arguments)
+          }.to raise_error("No suitable implementation of #{task.name} for #{target.name}")
+        end
+      end
+
+      it "errors when a task only requires an unknown requirement" do
+        with_task_containing('tasks_test', contents, 'environment', '.ps1') do |task|
+          impls = task.implementations.map { |impl| impl.merge('requirements' => ['foobar']) }
+          expect(task).to receive(:implementations).and_return(impls)
+          expect {
+            winrm.run_task(target, task, arguments)
+          }.to raise_error("No suitable implementation of #{task.name} for #{target.name}")
+        end
       end
     end
 

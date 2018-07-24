@@ -24,10 +24,12 @@ ssh:
 `format`: The format to use when printing results. Options are human and json. Default is human.
 
 `modulepath`: The module path for loading tasks and plan code. This is a list of
-directories seperated by the OS specific file path seperator.
+directories separated by the OS specific file path seperator. The default path
+for modules is `modules` inside the `Boltdir`.
 
 `inventoryfile`: The path to a structured data inventory file used to refer to
-groups of nodes on the commandline and from plans.
+groups of nodes on the commandline and from plans. The default path for the
+inventory file is `inventory.yaml` inside the `Boltdir`.
 
 `color`: Whether to use colored output when printing messages to the console.
 

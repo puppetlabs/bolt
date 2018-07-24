@@ -6,14 +6,14 @@ module BoltSpec
   module PAL
     include BoltSpec::Files
 
-    def modulepath
-      [File.join(__FILE__, '..', '..', '..', 'fixtures', 'modules')]
-    end
-
     def config
       conf = Bolt::Config.new
       conf[:modulepath] = modulepath
       conf
+    end
+
+    def modulepath
+      [File.join(__FILE__, '..', '..', '..', 'fixtures', 'modules')]
     end
 
     def peval(code, pal, executor = nil, inventory = nil, pdb_client = nil)
@@ -37,9 +37,7 @@ module BoltSpec
     def pal_with_module_content(mods)
       Dir.mktmpdir do |tmpdir|
         mk_files(tmpdir, mods)
-        conf = config
-        conf[:modulepath] = tmpdir
-        pal = Bolt::PAL.new(conf)
+        pal = Bolt::PAL.new(tmpdir, nil)
         yield pal
       end
     end

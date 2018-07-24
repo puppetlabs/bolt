@@ -7,9 +7,8 @@ require 'bolt/executor'
 describe "Bolt::Executor" do
   include BoltSpec::Task
 
-  let(:config) { Bolt::Config.new(concurrency: 1) }
   let(:analytics) { Bolt::Analytics::NoopClient.new }
-  let(:executor) { Bolt::Executor.new(config, analytics) }
+  let(:executor) { Bolt::Executor.new(1, analytics) }
   let(:command) { "hostname" }
   let(:script) { '/path/to/script.sh' }
   let(:dest) { '/tmp/upload' }
@@ -348,7 +347,7 @@ describe "Bolt::Executor" do
       [Bolt::Target.new('node1'), Bolt::Target.new('node2'), Bolt::Target.new('node3')]
     }
 
-    let(:config) { Bolt::Config.new(concurrency: 2) }
+    let(:executor) { Bolt::Executor.new(2, analytics) }
 
     it "batch_execute only creates 2 threads" do
       state = targets.each_with_object({}) do |target, acc|
@@ -416,10 +415,37 @@ describe "Bolt::Executor" do
         executor.report_function_call('add_facts')
       end
     end
+
+    context "#report_bundled_content" do
+      let(:executor) { Bolt::Executor.new(2, analytics, bundled_content: %w[canary facts]) }
+
+      it 'reports an event when bundled plan is used' do
+        expect(analytics).to receive(:event).with('Bundled Content', 'Plan', 'canary')
+
+        executor.report_bundled_content('Plan', 'canary')
+      end
+
+      it 'reports an event when bundled task is used' do
+        expect(analytics).to receive(:event).with('Bundled Content', 'Task', 'facts')
+
+        executor.report_bundled_content('Task', 'facts')
+      end
+
+      it 'does not report a an event when non-bundled plan is used' do
+        expect(analytics).to receive(:event).never
+
+        executor.report_bundled_content('plan', 'foo')
+      end
+
+      it 'does not report a an event when non-bundled task is used' do
+        expect(analytics).to receive(:event).never
+
+        executor.report_bundled_content('task', 'foo')
+      end
+    end
   end
 
   context "When running a plan" do
-    let(:executor) { Bolt::Executor.new(config, nil) }
     let(:nodes_string) { results.map(&:first).map(&:uri) }
     let(:plan_context) { { name: 'foo' } }
 
