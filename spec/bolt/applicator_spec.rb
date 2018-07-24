@@ -124,7 +124,6 @@ describe Bolt::Applicator do
       expect(applicator).to receive(:compile).and_return(:ast)
       allow_any_instance_of(Bolt::Transport::SSH).to receive(:batch_task).and_return(:result)
 
-      target = Bolt::Target.new('node')
       result = Bolt::Result.new(target)
       expect(applicator).to receive(:provide_puppet_missing_errors).with(:result).and_return(result)
 
@@ -136,9 +135,29 @@ describe Bolt::Applicator do
 
       resultset = applicator.apply([uri, '_catch_errors' => true], :body, {})
       expect(resultset).to be_a(Bolt::ResultSet)
+      expect(resultset).not_to be_ok
       expect(resultset.count).to eq(1)
-      expect(resultset.first.ok).to be(false)
+      expect(resultset.first).not_to be_ok
       expect(resultset.first.error_hash['msg']).to eq('Something weird happened')
+    end
+
+    it 'fails if the report signals failure' do
+      expect(applicator).to receive(:compile).and_return(:ast)
+      allow_any_instance_of(Bolt::Transport::SSH).to receive(:batch_task).and_return(
+        Bolt::Result.new(target, value:
+          {
+            'host' => 'node',
+            'status' => 'failed',
+            'resource_statuses' => []
+          })
+      )
+
+      resultset = applicator.apply([target, '_catch_errors' => true], :body, {})
+      expect(resultset).to be_a(Bolt::ResultSet)
+      expect(resultset).not_to be_ok
+      expect(resultset.count).to eq(1)
+      expect(resultset.first).not_to be_ok
+      expect(resultset.first.error_hash['msg']).to match(/Resources failed to apply for #{uri}/)
     end
 
     it "only creates 2 threads" do

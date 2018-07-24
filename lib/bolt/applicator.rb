@@ -122,6 +122,16 @@ module Bolt
       end
     end
 
+    def identify_resource_failures(result)
+      if result.ok? && result.value['status'] == 'failed'
+        result.value['_error'] = {
+          'msg' => "Resources failed to apply for #{result.target.name}",
+          'kind' => 'bolt/resource-failure'
+        }
+      end
+      result
+    end
+
     def apply(args, apply_body, scope)
       raise(ArgumentError, 'apply requires a TargetSpec') if args.empty?
       type0 = Puppet.lookup(:pal_script_compiler).type('TargetSpec')
@@ -157,7 +167,8 @@ module Bolt
               arguments = { 'catalog' => future.value, '_noop' => options['_noop'] }
               raise future.reason if future.rejected?
               result = transport.batch_task(batch, catalog_apply_task, arguments, options, &notify)
-              provide_puppet_missing_errors(result)
+              result = provide_puppet_missing_errors(result)
+              identify_resource_failures(result)
             end
           end
         end
