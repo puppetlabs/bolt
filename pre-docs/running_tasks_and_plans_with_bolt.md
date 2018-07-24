@@ -19,9 +19,8 @@ tasks based on the results of previous tasks.
 ## Installing tasks and plans
 
 Tasks and plans are packaged in Puppet modules, so you can install them as you
-would any module from the Forge. Install from the command line with the puppet
-module install command, or install and manage them with a Puppetfile and Code
-Manager. For more details, see the installing modules documentation.
+would any module from the Forge and manage them with a Puppetfile. For more
+details, see the installing modules documentation.
 
 
 ## Inspecting tasks and plans
