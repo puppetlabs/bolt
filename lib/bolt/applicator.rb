@@ -72,12 +72,12 @@ module Bolt
         else
           log.map { |k, v| [k.to_sym, v] }.each do |level, msg|
             bolt_level = Bolt::Util::PuppetLogLevel::MAPPING[level]
-            @logger.send(bolt_level, "#{target.uri}: #{msg.chomp}")
+            @logger.send(bolt_level, "#{target.name}: #{msg.chomp}")
           end
         end
       end
 
-      raise(ApplyError, target.uri) unless stat.success?
+      raise(ApplyError, target.name) unless stat.success?
       JSON.parse(out)
     end
 
