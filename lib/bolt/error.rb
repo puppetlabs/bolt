@@ -77,6 +77,12 @@ module Bolt
     end
   end
 
+  class PuppetfileError < Error
+    def initialize(err)
+      super("Failed to sync modules from the Puppetfile: #{err}", 'bolt/puppetfile-error')
+    end
+  end
+
   class ApplyError < Error
     def initialize(target)
       super("Apply failed to compile for #{target}", 'bolt/apply-error')

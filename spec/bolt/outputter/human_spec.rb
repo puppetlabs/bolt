@@ -232,6 +232,16 @@ PARAMETERS:
     expect(output.string.strip).to eq("Plan completed successfully with no result")
   end
 
+  it "prints the result of installing a Puppetfile successfully" do
+    outputter.print_puppetfile_result(true, '/path/to/Puppetfile', '/path/to/modules')
+    expect(output.string.strip).to eq("Successfully synced modules from /path/to/Puppetfile to /path/to/modules")
+  end
+
+  it "prints the result of installing a Puppetfile with a failure" do
+    outputter.print_puppetfile_result(false, '/path/to/Puppetfile', '/path/to/modules')
+    expect(output.string.strip).to eq("Failed to sync modules from /path/to/Puppetfile to /path/to/modules")
+  end
+
   it "handles fatal errors" do
     outputter.fatal_error(Bolt::CLIError.new("oops"))
     expect(output.string).to eq("oops\n")

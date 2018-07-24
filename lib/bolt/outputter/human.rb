@@ -170,6 +170,14 @@ module Bolt
         end
       end
 
+      def print_puppetfile_result(success, puppetfile, moduledir)
+        if success
+          @stream.puts("Successfully synced modules from #{puppetfile} to #{moduledir}")
+        else
+          @stream.puts(colorize(:red, "Failed to sync modules from #{puppetfile} to #{moduledir}"))
+        end
+      end
+
       def fatal_error(err)
         @stream.puts(colorize(:red, err.message))
         if err.is_a? Bolt::RunFailure
