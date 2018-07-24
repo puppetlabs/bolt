@@ -177,7 +177,7 @@ module Bolt
       end
 
       if !r.ok && !options['_catch_errors']
-        raise Bolt::RunFailure.new(r, 'apply', 'catalog')
+        raise Bolt::ApplyFailure, r
       end
       r
     end

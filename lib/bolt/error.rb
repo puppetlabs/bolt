@@ -63,6 +63,17 @@ module Bolt
     end
   end
 
+  class ApplyFailure < RunFailure
+    def initialize(result_set)
+      super(result_set, 'apply', 'catalog')
+      @kind = 'bolt/apply-failure'
+    end
+
+    def to_s
+      result_set.select(&:error_hash).map { |result| result.error_hash['msg'] }.join("\n")
+    end
+  end
+
   class PlanFailure < Error
     def initialize(*args)
       super(*args)
