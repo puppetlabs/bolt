@@ -4,6 +4,7 @@
 require 'json'
 require 'puppet'
 require 'puppet/configurer'
+require 'puppet/module_tool/tar'
 require 'tempfile'
 
 args = JSON.parse(STDIN.read)
@@ -39,7 +40,12 @@ Puppet[:skip_tags] = nil
 Puppet[:prerun_command] = nil
 Puppet[:postrun_command] = nil
 
-env = Puppet.lookup(:environments).get('production')
+moduledir = Dir.mktmpdir
+plugins = Tempfile.new('plugins.tar.gz')
+File.binwrite(plugins, Base64.decode64(args['plugins']))
+Puppet::ModuleTool::Tar.instance.unpack(plugins, moduledir, Etc.getlogin)
+
+env = Puppet.lookup(:environments).get('production').override_with(modulepath: [moduledir])
 
 report = if Puppet::Util::Package.versioncmp(Puppet.version, '5.0.0') > 0
            Puppet::Transaction::Report.new
