@@ -9,7 +9,6 @@ For more details about specifying modules in a Puppetfile, see the [Puppetfile d
 
 1.   Create a file named Puppetfile and store it in the Boltdir, which can be a directory named Boltdir at the root of your project or a global directory in `$HOME/.puppetlabs/bolt`. 
 2.   Open the Puppetfile in a text editor and add the modules and versions that you want to install. If the modules have dependencies, list those as well. 
-
     ```
     # Modules from the Puppet Forge.
     mod 'puppetlabs/package', '0.2.0'
@@ -19,7 +18,6 @@ For more details about specifying modules in a Puppetfile, see the [Puppetfile d
     mod 'puppetlabs/puppetlabs-facter_task', git: 'git@github.com:puppetlabs/puppetlabs-facter_task.git', ref: 'master'
     
     ```
-
 3.   Add any task or plan modules stored locally in Boltdir to the list. If these modules are not listed in the Puppetfile, they will be deleted. 
 
     ```
