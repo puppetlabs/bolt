@@ -1,33 +1,28 @@
+# Installing modules 
 
-# Installing modules with Bolt
+Set up Bolt to download and install modules.
 
-Bolt uses a Puppetfile to specify which modules to install. The Puppetfile
-should be in the Boltdir, which can either be a project-specific directory
-named `Boltdir` at the root of your project, or a global directory in
-`$HOME/.puppetlabs/bolt`.
+Before you can use Bolt to install modules, you must first create a Puppetfile. A Puppetfile is a formatted text file that contains a list of modules and their versions. It can include modules from the Puppet Forge or a Git repository.
 
-The Puppetfile contains a list of modules and versions to install. If the
-modules have dependencies on other modules, those dependencies will need to be
-listed in the Puppetfile as well.
+For more details about specifying modules in a Puppetfile, see the [Puppetfile documentation](https://puppet.com/docs/pe/2018.1/puppetfile.html).
 
-By default, modules will be downloaded from the Puppet Forge. Modules can be
-installed from git repositories instead by setting the `git` and `ref`
-properties.
+
+1.   Create a file named Puppetfile and store it in the Boltdir, which can be a directory named Boltdir at the root of your project or a global directory in `$HOME/.puppetlabs/bolt`. 
+2.   Open the Puppetfile in a text editor and add the modules and versions that you want to install. If the modules have dependencies, list those as well. 
 ```
-mod 'puppetlabs/package', '0.2.0'
-mod 'puppetlabs/service', '0.3.1'
-mod 'puppetlabs/puppetlabs-facter_task', git: 'git@github.com:puppetlabs/puppetlabs-facter_task.git', ref: 'master'
-mod 'myteam/app_foo', local: true
+        # Modules from the Puppet Forge.
+        mod 'puppetlabs/package', '0.2.0'
+        mod 'puppetlabs/service', '0.3.1'
+        
+        # Module from a Git repository.
+        mod 'puppetlabs/puppetlabs-facter_task', git: 'git@github.com:puppetlabs/puppetlabs-facter_task.git', ref: 'master'
+```
+3.   Add any task or plan modules stored locally in Boltdir to the list. If these modules are not listed in the Puppetfile, they will be deleted. 
+
+```
+        mod 'myteam/app_foo', local: true
 ```
 
-The modules from the Puppetfile can be installed with the `bolt puppetfile
-install` command. By default, this will install them to the `modules`
-subdirectory inside the Boltdir. This location can be overridden with the
-`modulepath` setting in the Bolt config file.
+4.   From a terminal, install the modules listed in the Puppetfile: `bolt puppetfile install`. 
 
-If the Boltdir contains any modules which aren't listed in the Puppetfile, they
-will be deleted. If you want to commit modules containing tasks/plans directly
-to a project, add the module to the Puppetfile with `local: true`.
-
-For more details about specifying modules in a Puppetfile, see [the complete
-Puppetfile documentation](https://puppet.com/docs/pe/latest/puppetfile.html).
+        By default, Bolt installs modules to the modules subdirectory inside the Boltdir. To override this location, update the modulepath setting in the Bolt config file.
