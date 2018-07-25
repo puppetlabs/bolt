@@ -21,7 +21,6 @@ end
 
 group(:development) do
   gem "puppet-strings", "~> 2.0"
-  gem "r10k", "~> 2.6"
 end
 
 local_gemfile = File.join(__dir__, 'Gemfile.local')
