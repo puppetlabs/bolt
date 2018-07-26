@@ -23,12 +23,13 @@ test_name "bolt plan run with should apply manifest block on remote hosts via ss
   end
 
   step 'disable requiretty for root user' do
-    create_remote_file(ssh_nodes, "/etc/sudoers.d/#{user}", <<-FILE)
+    linux_nodes = ssh_nodes.reject { |host| host['platform'] =~ /osx/ }
+    create_remote_file(linux_nodes, "/etc/sudoers.d/#{user}", <<-FILE)
 Defaults:root !requiretty
 FILE
 
     teardown do
-      on(ssh_nodes, "rm /etc/sudoers.d/#{user}")
+      on(linux_nodes, "rm /etc/sudoers.d/#{user}")
     end
   end
 
