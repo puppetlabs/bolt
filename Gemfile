@@ -5,7 +5,8 @@ source ENV['GEM_SOURCE'] || 'https://rubygems.org'
 # Disable analytics when running in development
 ENV['BOLT_DISABLE_ANALYTICS'] = 'true'
 
-gemspec
+gemspec name: 'bolt'
+gemspec name: 'bolt-server'
 gem "puma"
 gem "sinatra"
 
