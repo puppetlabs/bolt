@@ -40,6 +40,8 @@ Puppet[:skip_tags] = nil
 Puppet[:prerun_command] = nil
 Puppet[:postrun_command] = nil
 
+Puppet[:default_file_terminus] = :file_server
+
 moduledir = Dir.mktmpdir
 plugins = Tempfile.new('plugins.tar.gz')
 File.binwrite(plugins, Base64.decode64(args['plugins']))
