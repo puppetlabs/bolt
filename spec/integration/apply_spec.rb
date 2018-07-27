@@ -193,5 +193,44 @@ describe "passes parsed AST to the apply_catalog task" do
         end
       end
     end
+
+    context 'with inventoryfile stubbed' do
+      let(:inventory) {
+        {
+          'inventoryfile' => File.join(__dir__, '../fixtures/apply/inventory.yaml').to_s,
+          'ssh' => { 'connect-timeout' => 11 }
+        }
+      }
+
+      it 'targets in inventory can be queried' do
+        with_tempfile_containing('conf', YAML.dump(inventory)) do |conf|
+          result = run_cli_json(%W[plan run basic::inventory_lookup --configfile #{conf.path}] + config_flags)
+          ast = result[0]['result']
+          notify = ast['resources'].select { |r| r['type'] == 'Notify' }
+          expect(notify[0]['title']).to eq("Num Targets: 3")
+          expect(notify[1]['title']).to eq("Target 1 Facts: {operatingsystem => Ubuntu, added => fact}")
+          expect(notify[2]['title']).to eq("Target 1 Vars: {environment => production, features => [puppet-agent]}")
+          res = "Target 0 Config: Target('foo', {\"connect-timeout\"=>11, \"tty\"=>false, \"host-key-check\"=>false})"
+          expect(notify[3]['title']).to eq(res)
+          expect(notify[4]['title']).to eq("Target 1 Password: secret")
+        end
+      end
+
+      it 'vars cannot be set on the target' do
+        with_tempfile_containing('conf', YAML.dump(inventory)) do |conf|
+          result = run_cli_json(%W[plan run basic::xfail_set_var --configfile #{conf.path}] + config_flags)
+          expect(result['kind']).to eq('bolt/apply-failure')
+          expect(result['msg']).to match(/Apply failed to compile for/)
+        end
+      end
+
+      it 'features cannot be set on the target' do
+        with_tempfile_containing('conf', YAML.dump(inventory)) do |conf|
+          result = run_cli_json(%W[plan run basic::xfail_set_feature --configfile #{conf.path}] + config_flags)
+          expect(result['kind']).to eq('bolt/apply-failure')
+          expect(result['msg']).to match(/Apply failed to compile for/)
+        end
+      end
+    end
   end
 end

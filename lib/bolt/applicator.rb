@@ -46,11 +46,11 @@ module Bolt
           facts: @inventory.facts(target),
           variables: @inventory.vars(target).merge(plan_vars),
           trusted: trusted.to_h
-        }
+        },
+        inventory: @inventory.data_hash
       }
 
       bolt_catalog_exe = File.join(libexec, 'bolt_catalog')
-
       old_path = ENV['PATH']
       ENV['PATH'] = "#{RbConfig::CONFIG['bindir']}#{File::PATH_SEPARATOR}#{old_path}"
       out, err, stat = Open3.capture3('ruby', bolt_catalog_exe, 'compile', stdin_data: catalog_input.to_json)

@@ -34,6 +34,26 @@ describe Bolt::Applicator do
           hostname: uri,
           domain: nil
         }
+      },
+      inventory: {
+        data: {},
+        target_hash: {
+          target_vars: {},
+          target_facts: {},
+          target_features: {}
+        },
+        config: {
+          transport: "ssh",
+          transports: {
+            ssh: { 'connect-timeout' => 10, tty: false, "host-key-check" => true },
+            winrm: { 'connect-timeout' => 10, tty: false, ssl: true, "ssl-verify" => true },
+            pcp: { 'connect-timeout' => 10,
+                   tty: false,
+                   "task-environment" => "production",
+                   "local-validation" => false },
+            local: { 'connect-timeout' => 10, tty: false }
+          }
+        }
       }
     }
   }
