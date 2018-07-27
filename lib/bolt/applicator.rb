@@ -71,12 +71,12 @@ module Bolt
         else
           log.map { |k, v| [k.to_sym, v] }.each do |level, msg|
             bolt_level = Bolt::Util::PuppetLogLevel::MAPPING[level]
-            @logger.send(bolt_level, "#{target.uri}: #{msg.chomp}")
+            @logger.send(bolt_level, "#{target.name}: #{msg.chomp}")
           end
         end
       end
 
-      raise(ApplyError, target.uri) unless stat.success?
+      raise(ApplyError, target.name) unless stat.success?
       JSON.parse(out)
     end
 
@@ -121,6 +121,23 @@ module Bolt
       end
     end
 
+    def identify_resource_failures(result)
+      if result.ok? && result.value['status'] == 'failed'
+        resources = result.value['resource_statuses']
+        failed = resources.select { |_, r| r['failed'] }.flat_map do |key, resource|
+          resource['events'].select { |e| e['status'] == 'failure' }.map do |event|
+            "\n  #{key}: #{event['message']}"
+          end
+        end
+
+        result.value['_error'] = {
+          'msg' => "Resources failed to apply for #{result.target.name}#{failed.join}",
+          'kind' => 'bolt/resource-failure'
+        }
+      end
+      result
+    end
+
     def apply(args, apply_body, scope)
       raise(ArgumentError, 'apply requires a TargetSpec') if args.empty?
       type0 = Puppet.lookup(:pal_script_compiler).type('TargetSpec')
@@ -156,7 +173,8 @@ module Bolt
               arguments = { 'catalog' => future.value, '_noop' => options['_noop'] }
               raise future.reason if future.rejected?
               result = transport.batch_task(batch, catalog_apply_task, arguments, options, &notify)
-              provide_puppet_missing_errors(result)
+              result = provide_puppet_missing_errors(result)
+              identify_resource_failures(result)
             end
           end
         end
@@ -165,7 +183,7 @@ module Bolt
       end
 
       if !r.ok && !options['_catch_errors']
-        raise Bolt::RunFailure.new(r, 'apply', 'catalog')
+        raise Bolt::ApplyFailure, r
       end
       r
     end

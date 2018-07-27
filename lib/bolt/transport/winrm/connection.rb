@@ -109,99 +109,6 @@ $ENV:RUBYLIB
 Add-Type -AssemblyName System.ServiceModel.Web, System.Runtime.Serialization
 $utf8 = [System.Text.Encoding]::UTF8
 
-function Invoke-Interpreter
-{
-[CmdletBinding()]
-Param (
-  [Parameter()]
-  [String]
-  $Path,
-
-  [Parameter()]
-  [String]
-  $Arguments,
-
-  [Parameter()]
-  [Int32]
-  $Timeout,
-
-  [Parameter()]
-  [String]
-  $StdinInput = $Null
-)
-
-try
-{
-  if (-not (Get-Command $Path -ErrorAction SilentlyContinue))
-  {
-    throw "Could not find executable '$Path' in ${ENV:PATH} on target node"
-  }
-
-  $startInfo = New-Object System.Diagnostics.ProcessStartInfo($Path, $Arguments)
-  $startInfo.UseShellExecute = $false
-  $startInfo.WorkingDirectory = Split-Path -Parent (Get-Command $Path).Path
-  $startInfo.CreateNoWindow = $true
-  if ($StdinInput) { $startInfo.RedirectStandardInput = $true }
-  $startInfo.RedirectStandardOutput = $true
-  $startInfo.RedirectStandardError = $true
-
-  $stdoutHandler = { if (-not ([String]::IsNullOrEmpty($EventArgs.Data))) { $Host.UI.WriteLine($EventArgs.Data) } }
-  $stderrHandler = { if (-not ([String]::IsNullOrEmpty($EventArgs.Data))) { $Host.UI.WriteErrorLine($EventArgs.Data) } }
-  $invocationId = [Guid]::NewGuid().ToString()
-
-  $process = New-Object System.Diagnostics.Process
-  $process.StartInfo = $startInfo
-  $process.EnableRaisingEvents = $true
-
-  # https://msdn.microsoft.com/en-us/library/system.diagnostics.process.standarderror(v=vs.110).aspx#Anchor_2
-  $stdoutEvent = Register-ObjectEvent -InputObject $process -EventName 'OutputDataReceived' -Action $stdoutHandler
-  $stderrEvent = Register-ObjectEvent -InputObject $process -EventName 'ErrorDataReceived' -Action $stderrHandler
-  $exitedEvent = Register-ObjectEvent -InputObject $process -EventName 'Exited' -SourceIdentifier $invocationId
-
-  $process.Start() | Out-Null
-
-  $process.BeginOutputReadLine()
-  $process.BeginErrorReadLine()
-
-  if ($StdinInput)
-  {
-    $process.StandardInput.WriteLine($StdinInput)
-    $process.StandardInput.Close()
-  }
-
-  # park current thread until the PS event is signaled upon process exit
-  # OR the timeout has elapsed
-  $waitResult = Wait-Event -SourceIdentifier $invocationId -Timeout $Timeout
-  if (! $process.HasExited)
-  {
-    $Host.UI.WriteErrorLine("Process $Path did not complete in $Timeout seconds")
-    return 1
-  }
-
-  return $process.ExitCode
-}
-catch
-{
-  $Host.UI.WriteErrorLine($_)
-  return 1
-}
-finally
-{
-  @($stdoutEvent, $stderrEvent, $exitedEvent) |
-    ? { $_ -ne $Null } |
-    % { Unregister-Event -SourceIdentifier $_.Name }
-
-  if ($process -ne $Null)
-  {
-    if (($process.Handle -ne $Null) -and (! $process.HasExited))
-    {
-      try { $process.Kill() } catch { $Host.UI.WriteErrorLine("Failed To Kill Process $Path") }
-    }
-    $process.Dispose()
-  }
-}
-}
-
 function Write-Stream {
 PARAM(
   [Parameter(Position=0)] $stream,
@@ -408,30 +315,22 @@ PS
           raise
         end
 
-        # 10 minutes in seconds
-        DEFAULT_EXECUTION_TIMEOUT = 10 * 60
-
-        def execute_process(path = '', arguments = [], stdin = nil,
-                            timeout = DEFAULT_EXECUTION_TIMEOUT)
+        def execute_process(path = '', arguments = [], stdin = nil)
           quoted_args = arguments.map do |arg|
             "'" + arg.gsub("'", "''") + "'"
-          end.join(',')
+          end.join(' ')
 
+          exec_cmd =
+            if stdin.nil?
+              "& #{path} #{quoted_args}"
+            else
+              "@'\n#{stdin}\n'@ | & #{path} #{quoted_args}"
+            end
           execute(<<-PS)
-$quoted_array = @(
-  #{quoted_args}
-)
-
-$invokeArgs = @{
-  Path = "#{path}"
-  Arguments = $quoted_array -Join ' '
-  Timeout = #{timeout}
-  #{stdin.nil? ? '' : "StdinInput = @'\n" + stdin + "\n'@"}
-}
-
-# winrm gem checks $? prior to using $LASTEXITCODE
-# making it necessary to exit with the desired code to propagate status properly
-exit $(Invoke-Interpreter @invokeArgs)
+$OutputEncoding = [Console]::OutputEncoding
+#{exec_cmd}
+if (-not $? -and ($LASTEXITCODE -eq $null)) { exit 1 }
+exit $LASTEXITCODE
 PS
         end
 
