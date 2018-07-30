@@ -28,7 +28,7 @@ module Bolt
       @catalog_apply_task ||= begin
         path = File.join(libexec, 'apply_catalog.rb')
         impl = { 'name' => 'apply_catalog.rb', 'path' => path, 'requirements' => [], 'supports_noop' => true }
-        Task.new('apply_catalog', [impl], 'stdin')
+        Task.new(name: 'apply_catalog', implementations: [impl], input_method: 'stdin')
       end
     end
 
