@@ -4,7 +4,7 @@
 # chkconfig: - 98 02
 #
 # description: Service to expose bolt transport API
-# processname: pe-bolt-server
+# processname: bolt-server
 # config: /etc/sysconfig/pe-bolt-server
 
 # Source function library.
@@ -12,7 +12,8 @@
 
 [ -f /etc/sysconfig/pe-bolt-server ] && . /etc/sysconfig/pe-bolt-server
 
-exec=/opt/puppetlabs/server/apps/bolt-server/bin/pe-bolt-server
+export GEM_HOME=/opt/puppetlabs/server/apps/bolt-server/lib/ruby/gems/2.4.0
+exec=/opt/puppetlabs/server/apps/bolt-server/bin/bolt-server
 prog="pe-bolt-server"
 desc="PE Bolt Server"
 

@@ -22,6 +22,17 @@ test_name "bolt plan run with should apply manifest block on remote hosts via ss
     end
   end
 
+  step 'disable requiretty for root user' do
+    linux_nodes = ssh_nodes.reject { |host| host['platform'] =~ /osx/ }
+    create_remote_file(linux_nodes, "/etc/sudoers.d/#{user}", <<-FILE)
+Defaults:root !requiretty
+FILE
+
+    teardown do
+      on(linux_nodes, "rm /etc/sudoers.d/#{user}")
+    end
+  end
+
   step "create plan on bolt controller" do
     on(bolt, "mkdir -p #{dir}/modules/example_apply/plans")
     create_remote_file(bolt,
@@ -32,8 +43,7 @@ test_name "bolt plan run with should apply manifest block on remote hosts via ss
   bolt_command = "bolt plan run example_apply filepath=#{filepath} nodes=ssh_nodes"
   flags = {
     '--modulepath' => modulepath(File.join(dir, 'modules')),
-    '--format'     => 'json',
-    '--tty'        => nil
+    '--format'     => 'json'
   }
 
   step "execute `bolt plan run run_as=#{user}` via SSH with json output" do
@@ -54,7 +64,7 @@ test_name "bolt plan run with should apply manifest block on remote hosts via ss
       result = json.select { |n| n['node'] == host }
       assert_equal('failure', result[0]['status'],
                    "The task did not fail on #{host}")
-      assert_match(/Permission denied/, result[0]['result']['_output'])
+      assert_match(/Permission denied/, result[0]['result']['_error']['msg'])
 
       # Verify that files were not created on the target
       on(node, "cat #{filepath}/hello.txt", acceptable_exit_codes: [1])

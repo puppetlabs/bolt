@@ -6,7 +6,8 @@ After=syslog.target network.target
 Type=simple
 EnvironmentFile=-/etc/sysconfig/pe-bolt-server-service
 EnvironmentFile=-/etc/default/pe-bolt-server-service
-ExecStart=/opt/puppetlabs/puppet/bin/pe-bolt-server $PE_BOLT_SERVER_OPTIONS --foreground
+Environment=GEM_HOME=/opt/puppetlabs/server/apps/bolt-server/lib/ruby/gems/2.4.0
+ExecStart=/opt/puppetlabs/server/apps/bolt-server/bin/bolt-server $PE_BOLT_SERVER_OPTIONS --foreground
 Restart=always
 KillMode=process
 

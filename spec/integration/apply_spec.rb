@@ -5,6 +5,7 @@ require 'bolt_spec/conn'
 require 'bolt_spec/files'
 require 'bolt_spec/integration'
 require 'bolt/catalog'
+require 'bolt/task'
 
 describe "passes parsed AST to the apply_catalog task" do
   include BoltSpec::Conn
@@ -18,7 +19,7 @@ describe "passes parsed AST to the apply_catalog task" do
     allow_any_instance_of(Bolt::Applicator).to receive(:catalog_apply_task) {
       path = File.join(__dir__, "../fixtures/apply/#{apply_task}")
       impl = { 'name' => apply_task, 'path' => path, 'requirements' => [], 'supports_noop' => true }
-      Bolt::Task.new('apply_catalog', [impl], 'environment')
+      Bolt::Task.new(name: 'apply_catalog', implementations: [impl], input_method: 'environment')
     }
   end
 
@@ -90,7 +91,7 @@ describe "passes parsed AST to the apply_catalog task" do
 
     it 'fails immediately on a compile error' do
       result = run_cli_json(%w[plan run basic::catch_error catch=false] + config_flags)
-      expect(result['kind']).to eq('bolt/run-failure')
+      expect(result['kind']).to eq('bolt/apply-failure')
       error = result['details']['result_set'][0]['result']['_error']
       expect(error['kind']).to eq('bolt/apply-error')
       expect(error['msg']).to match(/Apply failed to compile for #{uri}/)
@@ -108,7 +109,7 @@ describe "passes parsed AST to the apply_catalog task" do
 
     it 'errors calling run_task' do
       result = run_cli_json(%w[plan run basic::disabled] + config_flags)
-      expect(result['kind']).to eq('bolt/run-failure')
+      expect(result['kind']).to eq('bolt/apply-failure')
       error = result['details']['result_set'][0]['result']['_error']
       expect(error['kind']).to eq('bolt/apply-error')
       expect(error['msg']).to match(/Apply failed to compile for #{uri}/)
@@ -130,7 +131,7 @@ describe "passes parsed AST to the apply_catalog task" do
       it 'calls puppetdb_query' do
         with_tempfile_containing('conf', YAML.dump(config)) do |conf|
           result = run_cli_json(%W[plan run basic::pdb_query --configfile #{conf.path}] + config_flags)
-          expect(result['kind']).to eq('bolt/run-failure')
+          expect(result['kind']).to eq('bolt/apply-failure')
           error = result['details']['result_set'][0]['result']['_error']
           expect(error['kind']).to eq('bolt/apply-error')
           expect(error['msg']).to match(/Apply failed to compile for #{uri}/)
@@ -141,7 +142,7 @@ describe "passes parsed AST to the apply_catalog task" do
       it 'calls puppetdb_fact' do
         with_tempfile_containing('conf', YAML.dump(config)) do |conf|
           result = run_cli_json(%W[plan run basic::pdb_fact --configfile #{conf.path}] + config_flags)
-          expect(result['kind']).to eq('bolt/run-failure')
+          expect(result['kind']).to eq('bolt/apply-failure')
           error = result['details']['result_set'][0]['result']['_error']
           expect(error['kind']).to eq('bolt/apply-error')
           expect(error['msg']).to match(/Apply failed to compile for #{uri}/)

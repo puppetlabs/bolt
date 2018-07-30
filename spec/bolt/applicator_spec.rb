@@ -124,7 +124,6 @@ describe Bolt::Applicator do
       expect(applicator).to receive(:compile).and_return(:ast)
       allow_any_instance_of(Bolt::Transport::SSH).to receive(:batch_task).and_return(:result)
 
-      target = Bolt::Target.new('node')
       result = Bolt::Result.new(target)
       expect(applicator).to receive(:provide_puppet_missing_errors).with(:result).and_return(result)
 
@@ -136,9 +135,53 @@ describe Bolt::Applicator do
 
       resultset = applicator.apply([uri, '_catch_errors' => true], :body, {})
       expect(resultset).to be_a(Bolt::ResultSet)
+      expect(resultset).not_to be_ok
       expect(resultset.count).to eq(1)
-      expect(resultset.first.ok).to be(false)
+      expect(resultset.first).not_to be_ok
       expect(resultset.first.error_hash['msg']).to eq('Something weird happened')
+    end
+
+    it 'fails if the report signals failure' do
+      expect(applicator).to receive(:compile).and_return(:ast)
+      allow_any_instance_of(Bolt::Transport::SSH).to receive(:batch_task).and_return(
+        Bolt::Result.new(target, value:
+          {
+            'status' => 'failed',
+            'resource_statuses' => {}
+          })
+      )
+
+      resultset = applicator.apply([target, '_catch_errors' => true], :body, {})
+      expect(resultset).to be_a(Bolt::ResultSet)
+      expect(resultset).not_to be_ok
+      expect(resultset.count).to eq(1)
+      expect(resultset.first).not_to be_ok
+      expect(resultset.first.error_hash['msg']).to match(/Resources failed to apply for #{uri}/)
+    end
+
+    it 'includes failed resource events for all failing nodes when errored' do
+      resources = {
+        '/tmp/does/not/exist' => [{ 'status' => 'failure', 'message' => 'It failed.' }],
+        'C:/does/not/exist' => [{ 'status' => 'failure', 'message' => 'It failed.' }],
+        '/tmp/sure' => []
+      }.map { |name, events| { "File[#{name}]" => { 'failed' => !events.empty?, 'events' => events } } }
+
+      targets = [Bolt::Target.new('node1'), Bolt::Target.new('node2'), Bolt::Target.new('node3')]
+      results = targets.zip(resources, %w[failed failed success]).map do |target, res, status|
+        Bolt::Result.new(target, value: { 'status' => status, 'resource_statuses' => res })
+      end
+
+      allow(applicator).to receive(:compile).and_return(:ast)
+      allow_any_instance_of(Bolt::Transport::SSH).to receive(:batch_task).and_return(*results)
+
+      expect {
+        applicator.apply([targets], :body, {})
+      }.to raise_error(Bolt::ApplyFailure, <<-MSG.chomp)
+Resources failed to apply for node1
+  File[/tmp/does/not/exist]: It failed.
+Resources failed to apply for node2
+  File[C:/does/not/exist]: It failed.
+MSG
     end
 
     it "only creates 2 threads" do
