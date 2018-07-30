@@ -14,13 +14,11 @@ test_name "bolt plan run with should apply manifest block on remote hosts via wi
 
   dir = bolt.tmpdir('apply_winrm')
   fixtures = File.absolute_path('files')
-  filepath = 'C:/test'
+  filepath = winrm_nodes.first.tmpdir('example_apply')
 
   step "create plan on bolt controller" do
-    on(bolt, "mkdir -p #{dir}/modules/example_apply/plans")
-    create_remote_file(bolt,
-                       "#{dir}/modules/example_apply/plans/init.pp",
-                       File.read(File.join(fixtures, 'example_apply.pp')))
+    on(bolt, "mkdir -p #{dir}/modules")
+    scp_to(bolt, File.join(fixtures, 'example_apply'), "#{dir}/modules/example_apply")
   end
 
   bolt_command = "bolt plan run example_apply filepath=#{filepath} nodes=winrm_nodes"
@@ -76,9 +74,18 @@ test_name "bolt plan run with should apply manifest block on remote hosts via wi
       assert_equal('success', result[0]['status'],
                    "The task did not succeed on #{host}")
 
+      # Verify the custom type was invoked
+      logs = result[0]['result']['logs']
+      warnings = logs.select { |l| l['level'] == 'warning' }
+      assert_equal(1, warnings.count)
+      assert_equal('Writing a MOTD!', warnings[0]['message'])
+
       # Verify that files were created on the target
-      content = on(node, 'cat C:/test/hello.txt')
-      assert_match(/^hi there I'm windows$/, content.stdout)
+      hello = on(node, "cat #{filepath}/hello.txt")
+      assert_match(/^hi there I'm windows$/, hello.stdout)
+
+      motd = on(node, "cat #{filepath}/motd")
+      assert_equal("Today's #WordOfTheDay is 'gloss'", motd.stdout)
     end
   end
 end
