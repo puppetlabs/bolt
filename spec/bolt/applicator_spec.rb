@@ -115,7 +115,7 @@ describe Bolt::Applicator do
 
   context 'with Puppet mocked' do
     before(:each) do
-      allow(Puppet).to receive(:lookup).and_return(double(:type, type: nil))
+      allow(Puppet).to receive(:lookup).and_return(double(:type, type: nil, modules: []))
       allow(Puppet::Pal).to receive(:assert_type)
       allow(Puppet::Pops::Serialization::ToDataConverter).to receive(:convert).and_return(:ast)
     end
