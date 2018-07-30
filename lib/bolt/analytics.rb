@@ -24,7 +24,6 @@ module Bolt
 
     def self.build_client
       logger = Logging.logger[self]
-
       config_file = File.expand_path('~/.puppetlabs/bolt/analytics.yaml')
       config = load_config(config_file)
 

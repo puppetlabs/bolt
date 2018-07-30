@@ -1,0 +1,10 @@
+---
+version: 5
+
+defaults:
+  datadir: "hiera_datadir"
+  data_hash: yaml_data
+
+hierarchy:
+  - name: "Common"
+    path: "common.yaml"

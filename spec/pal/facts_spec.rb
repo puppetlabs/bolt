@@ -22,7 +22,7 @@ describe 'Facts functions' do
     }
   }
   let(:inv) { Bolt::Inventory.new(data) }
-  let(:pal) { Bolt::PAL.new(config) }
+  let(:pal) { Bolt::PAL.new(modulepath, nil) }
 
   let(:target) { "$t = get_targets(#{node})[0]\n" }
   let(:facts) { "facts($t)\n" }

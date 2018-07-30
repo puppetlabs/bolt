@@ -63,6 +63,17 @@ module Bolt
     end
   end
 
+  class ApplyFailure < RunFailure
+    def initialize(result_set)
+      super(result_set, 'apply', 'catalog')
+      @kind = 'bolt/apply-failure'
+    end
+
+    def to_s
+      result_set.select(&:error_hash).map { |result| result.error_hash['msg'] }.join("\n")
+    end
+  end
+
   class PlanFailure < Error
     def initialize(*args)
       super(*args)
@@ -77,9 +88,21 @@ module Bolt
     end
   end
 
+  class PuppetfileError < Error
+    def initialize(err)
+      super("Failed to sync modules from the Puppetfile: #{err}", 'bolt/puppetfile-error')
+    end
+  end
+
   class ApplyError < Error
-    def initialize(target, err)
-      super("Apply failed to compile for #{target}: #{err}", 'bolt/apply-error')
+    def initialize(target)
+      super("Apply failed to compile for #{target}", 'bolt/apply-error')
+    end
+  end
+
+  class ParseError < Error
+    def initialize(msg)
+      super(msg, 'bolt/parse-error')
     end
   end
 
@@ -94,7 +117,7 @@ module Bolt
 
   class ValidationError < Bolt::Error
     def initialize(msg)
-      super(msg, 'bolt.transport/validation-error')
+      super(msg, 'bolt/validation-error')
     end
   end
 

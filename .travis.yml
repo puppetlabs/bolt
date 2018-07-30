@@ -1,6 +1,8 @@
-sudo: false
+sudo: required
 language: ruby
 cache: bundler
+services:
+- docker
 rvm:
 - 2.4
 - 2.3
@@ -8,7 +10,7 @@ before_script:
 - eval `ssh-agent`
 - cat Gemfile.lock
 - bundle exec r10k puppetfile install
-- docker-compose build && docker-compose up -d
+- docker-compose up -d --build
 
 script:
 - bundle exec rake travisci

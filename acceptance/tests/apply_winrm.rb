@@ -9,6 +9,9 @@ test_name "bolt plan run with should apply manifest block on remote hosts via wi
   winrm_nodes = select_hosts(roles: ['winrm'])
   skip_test('no applicable nodes to test on') if winrm_nodes.empty?
 
+  controller_has_ruby = on(bolt, 'which ruby', accept_all_exit_codes: true).exit_code == 0
+  skip_test('FIX: apply uses wrong Ruby') if controller_has_ruby && bolt[:roles].include?('winrm')
+
   dir = bolt.tmpdir('apply_winrm')
   fixtures = File.absolute_path('files')
   filepath = 'C:/test'
@@ -22,13 +25,15 @@ test_name "bolt plan run with should apply manifest block on remote hosts via wi
 
   bolt_command = "bolt plan run example_apply filepath=#{filepath} nodes=winrm_nodes"
   flags = {
-    '--modulepath' => "$HOME/.puppetlabs/bolt/modules:#{dir}/modules",
+    '--modulepath' => modulepath(File.join(dir, 'modules')),
     '--format'     => 'json'
   }
 
-  step "execute `bolt plan run noop=true` via WinRM with json output" do
+  teardown do
     on(winrm_nodes, "rm -rf #{filepath}")
+  end
 
+  step "execute `bolt plan run noop=true` via WinRM with json output" do
     result = bolt_command_on(bolt, bolt_command + ' noop=true', flags)
     assert_equal(0, result.exit_code,
                  "Bolt did not exit with exit code 0")

@@ -8,7 +8,6 @@ require 'bolt/plan_result'
 describe "Bolt::Outputter::Human" do
   let(:output) { StringIO.new }
   let(:outputter) { Bolt::Outputter::Human.new(false, false, output) }
-  let(:config) { Bolt::Config.new }
   let(:target) { Bolt::Target.new('node1') }
   let(:target2) { Bolt::Target.new('node2') }
   let(:results) {
@@ -231,6 +230,16 @@ PARAMETERS:
   it "prints a message when a plan returns undef" do
     outputter.print_plan_result(Bolt::PlanResult.new(nil, 'success'))
     expect(output.string.strip).to eq("Plan completed successfully with no result")
+  end
+
+  it "prints the result of installing a Puppetfile successfully" do
+    outputter.print_puppetfile_result(true, '/path/to/Puppetfile', '/path/to/modules')
+    expect(output.string.strip).to eq("Successfully synced modules from /path/to/Puppetfile to /path/to/modules")
+  end
+
+  it "prints the result of installing a Puppetfile with a failure" do
+    outputter.print_puppetfile_result(false, '/path/to/Puppetfile', '/path/to/modules')
+    expect(output.string.strip).to eq("Failed to sync modules from /path/to/Puppetfile to /path/to/modules")
   end
 
   it "handles fatal errors" do

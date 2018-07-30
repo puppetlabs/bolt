@@ -13,11 +13,13 @@ describe Bolt::Transport::WinRM do
   include BoltSpec::Files
   include BoltSpec::Task
 
+  let(:boltdir) { Bolt::Boltdir.new('.') }
+
   def mk_config(conf)
     stringified = conf.each_with_object({}) { |(k, v), coll| coll[k.to_s] = v }
     # The default of 10 seconds seems to be too short to always succeed in AppVeyor.
     stringified['connect-timeout'] ||= 20
-    Bolt::Config.new(transport: 'winrm', transports: { winrm: stringified })
+    Bolt::Config.new(boltdir, 'transport' => 'winrm', 'winrm' => stringified)
   end
 
   let(:host) { ENV['BOLT_WINRM_HOST'] || 'localhost' }
@@ -38,7 +40,7 @@ foreach ($i in $args)
 PS
 
   def make_target(host_: host, port_: port, conf: config)
-    Bolt::Target.new("#{host_}:#{port_}").update_conf(conf)
+    Bolt::Target.new("#{host_}:#{port_}").update_conf(conf.transport_conf)
   end
 
   let(:target) { make_target }
@@ -80,7 +82,7 @@ PS
     it "adheres to the specified timeout" do
       TCPServer.open(0) do |socket|
         port = socket.addr[1]
-        config[:transports][:winrm]['connect-timeout'] = 2
+        config.transports[:winrm]['connect-timeout'] = 2
 
         Timeout.timeout(3) do
           expect_node_error(Bolt::Node::ConnectError,
@@ -351,6 +353,35 @@ SHELLWORDS
       end
     end
 
+    it "does not reorder powershell output with lots of lines", winrm: true do
+      contents = 'for ($i = 0; $i -le 4000; $i++) { Write-Host $i }'
+
+      with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
+        result = winrm.run_script(target, file.path, [])
+        expect(result).to be_success
+        expected = (0..4000).to_a.join("\r\n")
+        expect(result['stdout'].chomp).to eq(expected)
+      end
+    end
+
+    context 'with a batch file' do
+      let(:config) { mk_config(ssl: false, extensions: 'bat', user: user, password: password) }
+
+      it "does not reorder output with lots of lines", winrm: true do
+        contents = <<-BAT
+        @echo off
+        for /l %%x in (0, 1, 4000) do echo %%x
+        BAT
+
+        with_tempfile_containing('script-test-winrm', contents, '.bat') do |file|
+          result = winrm.run_script(target, file.path, [])
+          expect(result).to be_success
+          expected = (0..4000).to_a.join("\r\n")
+          expect(result['stdout'].chomp).to eq(expected)
+        end
+      end
+    end
+
     it "can run a task remotely", winrm: true do
       contents = 'Write-Host "$env:PT_message_one ${env:PT_message two}"'
       arguments = { message_one: 'task is running',
@@ -513,6 +544,40 @@ PS
         expect(
           winrm.run_task(target, task, arguments).message
         ).to eq("Hello from task Goodbye\r\n")
+      end
+    end
+
+    context "when implementations are provided", winrm: true do
+      let(:contents) { 'Write-Host "$env:PT_message_one $env:PT_message_two"' }
+      let(:arguments) { { message_one: 'Hello from task', message_two: 'Goodbye' } }
+
+      it "runs a task requires 'shell'" do
+        with_task_containing('tasks_test', contents, 'environment', '.ps1') do |task|
+          impls = task.implementations.map { |impl| impl.merge('requirements' => ['powershell']) }
+          expect(task).to receive(:implementations).and_return(impls)
+          expect(winrm.run_task(target, task, arguments).message.chomp)
+            .to eq('Hello from task Goodbye')
+        end
+      end
+
+      it "errors when a task only requires an unsupported requirement" do
+        with_task_containing('tasks_test', contents, 'environment', '.ps1') do |task|
+          impls = task.implementations.map { |impl| impl.merge('requirements' => ['shell']) }
+          expect(task).to receive(:implementations).and_return(impls)
+          expect {
+            winrm.run_task(target, task, arguments)
+          }.to raise_error("No suitable implementation of #{task.name} for #{target.name}")
+        end
+      end
+
+      it "errors when a task only requires an unknown requirement" do
+        with_task_containing('tasks_test', contents, 'environment', '.ps1') do |task|
+          impls = task.implementations.map { |impl| impl.merge('requirements' => ['foobar']) }
+          expect(task).to receive(:implementations).and_return(impls)
+          expect {
+            winrm.run_task(target, task, arguments)
+          }.to raise_error("No suitable implementation of #{task.name} for #{target.name}")
+        end
       end
     end
 
@@ -787,8 +852,7 @@ OUTPUT
         with_task_containing('task-pp-winrm', "notice('hi')", 'stdin', '.pp') do |task|
           result = winrm.run_task(target, task, {})
           stderr = result.error_hash['msg']
-          expect(stderr).to match(/^Could not find executable 'puppet\.bat'/)
-          expect(stderr).to_not match(/CommandNotFoundException/)
+          expect(stderr).to match(/^The term 'puppet.bat' is not recognized as the name of a cmdlet/)
         end
       end
     end

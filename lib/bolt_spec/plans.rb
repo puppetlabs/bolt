@@ -98,7 +98,9 @@ module BoltSpec
 
     # Override in your tests
     def config
-      Bolt::Config.new(modulepath: modulepath)
+      config = Bolt::Config.new(Bolt::Boltdir.new('.'), {})
+      config.modulepath = modulepath
+      config
     end
 
     # Override in your tests
@@ -111,7 +113,7 @@ module BoltSpec
     end
 
     def run_plan(name, params)
-      pal = Bolt::PAL.new(config)
+      pal = Bolt::PAL.new(config.modulepath, config.hiera_config)
       result = pal.run_plan(name, params, executor, inventory, puppetdb_client)
 
       if executor.error_message

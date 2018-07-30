@@ -22,13 +22,15 @@ test_name "bolt plan run with should apply manifest block on remote hosts via ss
 
   bolt_command = "bolt plan run example_apply filepath=#{filepath} nodes=ssh_nodes"
   flags = {
-    '--modulepath' => "$HOME/.puppetlabs/bolt/modules:#{dir}/modules",
+    '--modulepath' => modulepath(File.join(dir, 'modules')),
     '--format'     => 'json'
   }
 
-  step "execute `bolt plan run noop=true` via SSH with json output" do
+  teardown do
     on(ssh_nodes, "rm -rf #{filepath}")
+  end
 
+  step "execute `bolt plan run noop=true` via SSH with json output" do
     result = bolt_command_on(bolt, bolt_command + ' noop=true', flags)
     assert_equal(0, result.exit_code,
                  "Bolt did not exit with exit code 0")

@@ -165,8 +165,18 @@ module Bolt
       def print_plan_result(plan_result)
         if plan_result.value.nil?
           @stream.puts("Plan completed successfully with no result")
+        elsif plan_result.value.is_a? Bolt::ApplyFailure
+          @stream.puts(colorize(:red, plan_result.value.message))
         else
           @stream.puts(::JSON.pretty_generate(plan_result, quirks_mode: true))
+        end
+      end
+
+      def print_puppetfile_result(success, puppetfile, moduledir)
+        if success
+          @stream.puts("Successfully synced modules from #{puppetfile} to #{moduledir}")
+        else
+          @stream.puts(colorize(:red, "Failed to sync modules from #{puppetfile} to #{moduledir}"))
         end
       end
 
