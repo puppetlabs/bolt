@@ -11,7 +11,7 @@ test_name "bolt plan run with should apply manifest block on remote hosts via ss
 
   dir = bolt.tmpdir('apply_ssh')
   fixtures = File.absolute_path('files')
-  filepath = bolt.tmpdir('example_apply')
+  filepath = File.join('/tmp', SecureRandom.uuid.to_s)
 
   step "create plan on bolt controller" do
     on(bolt, "mkdir -p #{dir}/modules")

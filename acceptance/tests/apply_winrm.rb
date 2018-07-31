@@ -14,7 +14,7 @@ test_name "bolt plan run with should apply manifest block on remote hosts via wi
 
   dir = bolt.tmpdir('apply_winrm')
   fixtures = File.absolute_path('files')
-  filepath = winrm_nodes.first.tmpdir('example_apply')
+  filepath = File.join('C:/', SecureRandom.uuid.to_s)
 
   step "create plan on bolt controller" do
     on(bolt, "mkdir -p #{dir}/modules")
