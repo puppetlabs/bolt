@@ -235,6 +235,28 @@ BASH
       end
     end
 
+    it "can upload a directory to a host", ssh: true do
+      Dir.mktmpdir do |dir|
+        subdir = File.join(dir, 'subdir')
+        File.write(File.join(dir, 'content'), 'hello world')
+        Dir.mkdir(subdir)
+        File.write(File.join(subdir, 'more'), 'lorem ipsum')
+
+        target_dir = "/home/#{user}/directory-test"
+        ssh.upload(target, dir, target_dir)
+
+        expect(
+          ssh.run_command(target, "ls #{target_dir}")['stdout'].split("\n")
+        ).to eq(%w[content subdir])
+
+        expect(
+          ssh.run_command(target, "ls #{File.join(target_dir, 'subdir')}")['stdout'].split("\n")
+        ).to eq(%w[more])
+
+        ssh.run_command(target, "rm -r #{target_dir}")
+      end
+    end
+
     it "can run a script remotely", ssh: true do
       contents = "#!/bin/sh\necho hellote"
       with_tempfile_containing('script test', contents) do |file|

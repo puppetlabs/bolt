@@ -298,7 +298,7 @@ module Bolt
               if dest.nil?
                 raise Bolt::CLIError, "A destination path must be specified"
               end
-              validate_file('source file', src)
+              validate_file('source file', src, true)
               executor.upload_file(targets, src, dest, executor_opts) do |event|
                 outputter.print_event(event)
               end
@@ -392,7 +392,7 @@ module Bolt
       @pal ||= Bolt::PAL.new(config.modulepath, config.hiera_config, config.compile_concurrency)
     end
 
-    def validate_file(type, path)
+    def validate_file(type, path, allow_dir = false)
       if path.nil?
         raise Bolt::CLIError, "A #{type} must be specified"
       end
@@ -401,8 +401,9 @@ module Bolt
 
       if !stat.readable?
         raise Bolt::FileError.new("The #{type} '#{path}' is unreadable", path)
-      elsif !stat.file?
-        raise Bolt::FileError.new("The #{type} '#{path}' is not a file", path)
+      elsif !stat.file? && (!allow_dir || !stat.directory?)
+        expected = allow_dir ? 'file or directory' : 'file'
+        raise Bolt::FileError.new("The #{type} '#{path}' is not a #{expected}", path)
       end
     rescue Errno::ENOENT
       raise Bolt::FileError.new("The #{type} '#{path}' does not exist", path)
