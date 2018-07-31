@@ -20,7 +20,14 @@ Puppet::Functions.create_function(:apply_prep) do
     targets = inventory.get_targets(target_spec)
 
     # Ensure Puppet is installed
-    call_function(:run_task, 'puppet_agent::install', targets)
+    versions = call_function(:run_task, 'puppet_agent::version', targets)
+    need_install, installed = versions.partition { |r| r.message.chomp.empty? }
+    installed.each do |r|
+      Puppet.info "Puppet Agent #{r.message.chomp} installed on #{r.target.name}"
+    end
+    unless need_install.empty?
+      call_function(:run_task, 'puppet_agent::install', need_install.map(&:target))
+    end
     targets.each { |target| inventory.set_feature(target, 'puppet-agent') }
 
     # Gather facts, including custom facts
