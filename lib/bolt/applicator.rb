@@ -22,11 +22,26 @@ module Bolt
 
       @pool = Concurrent::ThreadPoolExecutor.new(max_threads: max_compiles)
       @logger = Logging.logger[self]
-      @plugin_tarball = Concurrent::Delay.new { build_plugin_tarball }
+      @plugin_tarball = Concurrent::Delay.new do
+        build_plugin_tarball do |mod|
+          search_dirs = []
+          search_dirs << mod.plugins if mod.plugins?
+          search_dirs << mod.files if mod.files?
+          search_dirs
+        end
+      end
     end
 
     private def libexec
       @libexec ||= File.join(Gem::Specification.find_by_name('bolt').gem_dir, 'libexec')
+    end
+
+    def custom_facts_task
+      @custom_facts_task ||= begin
+        path = File.join(libexec, 'custom_facts.rb')
+        impl = { 'name' => 'custom_facts.rb', 'path' => path, 'requirements' => [], 'supports_noop' => true }
+        Task.new('custom_facts', [impl], 'stdin')
+      end
     end
 
     def catalog_apply_task
@@ -204,9 +219,7 @@ module Bolt
       output = Minitar::Output.new(Zlib::GzipWriter.new(sio))
 
       Puppet.lookup(:current_environment).modules.each do |mod|
-        search_dirs = []
-        search_dirs << mod.plugins if mod.plugins?
-        search_dirs << mod.files if mod.files?
+        search_dirs = yield mod
 
         parent = Pathname.new(mod.path).parent
         files = Find.find(*search_dirs).select { |file| File.file?(file) }
