@@ -42,28 +42,32 @@ Puppet[:postrun_command] = nil
 
 Puppet[:default_file_terminus] = :file_server
 
-moduledir = Dir.mktmpdir
-plugins = Tempfile.new('plugins.tar.gz')
-File.binwrite(plugins, Base64.decode64(args['plugins']))
-Puppet::ModuleTool::Tar.instance.unpack(plugins, moduledir, Etc.getlogin)
+exit_code = 0
+Dir.mktmpdir do |moduledir|
+  Tempfile.open('plugins.tar.gz') do |plugins|
+    File.binwrite(plugins, Base64.decode64(args['plugins']))
+    Puppet::ModuleTool::Tar.instance.unpack(plugins, moduledir, Etc.getlogin)
+  end
 
-env = Puppet.lookup(:environments).get('production').override_with(modulepath: [moduledir])
+  env = Puppet.lookup(:environments).get('production').override_with(modulepath: [moduledir])
 
-report = if Puppet::Util::Package.versioncmp(Puppet.version, '5.0.0') > 0
-           Puppet::Transaction::Report.new
-         else
-           Puppet::Transaction::Report.new('apply')
-         end
+  report = if Puppet::Util::Package.versioncmp(Puppet.version, '5.0.0') > 0
+             Puppet::Transaction::Report.new
+           else
+             Puppet::Transaction::Report.new('apply')
+           end
 
-Puppet.override(current_environment: env, loaders: Puppet::Pops::Loaders.new(env)) do
-  catalog = Puppet::Resource::Catalog.from_data_hash(args['catalog']).to_ral
-  catalog.environment = env.name.to_s
-  catalog.environment_instance = env
+  Puppet.override(current_environment: env, loaders: Puppet::Pops::Loaders.new(env)) do
+    catalog = Puppet::Resource::Catalog.from_data_hash(args['catalog']).to_ral
+    catalog.environment = env.name.to_s
+    catalog.environment_instance = env
 
-  configurer = Puppet::Configurer.new
-  configurer.run(catalog: catalog, report: report, pluginsync: false)
+    configurer = Puppet::Configurer.new
+    configurer.run(catalog: catalog, report: report, pluginsync: false)
+  end
+
+  puts JSON.pretty_generate(report.to_data_hash)
+  exit_code = report.exit_status != 1
 end
 
-puts JSON.pretty_generate(report.to_data_hash)
-
-exit report.exit_status != 1
+exit exit_code
