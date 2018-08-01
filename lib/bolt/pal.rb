@@ -97,6 +97,8 @@ module Bolt
           alias_types(compiler)
           begin
             yield compiler
+          rescue Bolt::Error => err
+            err
           rescue Puppet::PreformattedError => err
             PALError.from_preformatted_error(err)
           rescue StandardError => err

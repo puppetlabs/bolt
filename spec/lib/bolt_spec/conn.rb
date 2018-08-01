@@ -35,5 +35,16 @@ module BoltSpec
       port = override_port || conn[:port]
       "#{conn[:protocol]}://#{conn[:user]}#{passwd}@#{conn[:host]}:#{port}"
     end
+
+    def conn_inventory
+      groups = %w[ssh winrm].map do |transport|
+        { "name" => transport,
+          "nodes" => [conn_uri(transport)],
+          "config" => {
+            transport => Bolt::Util.walk_keys(conn_info(transport), &:to_s)
+          } }
+      end
+      { "groups" => groups }
+    end
   end
 end

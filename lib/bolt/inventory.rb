@@ -49,7 +49,6 @@ module Bolt
 
       inventory = new(data, config)
       inventory.validate
-      inventory.collect_groups
       inventory
     end
 
@@ -63,6 +62,7 @@ module Bolt
       @target_vars = target_vars
       @target_facts = target_facts
       @target_features = target_features
+      collect_groups
     end
 
     def validate
