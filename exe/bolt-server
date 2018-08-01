@@ -1,6 +1,4 @@
-#!/usr/bin/env ruby
-# frozen_string_literal: true
+#!/opt/puppetlabs/puppet/bin/ruby
 
-require 'bolt_ext/server.rb'
-
-TransportAPI.run!
+# Used in https://gist.github.com/rennex/f379b8a53c8f2791d5838b4622ed6dd8
+`rackup --env production -D /opt/puppetlabs/server/apps/bolt-server/config.ru`

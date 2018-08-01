@@ -6,7 +6,9 @@ source ENV['GEM_SOURCE'] || 'https://rubygems.org'
 ENV['BOLT_DISABLE_ANALYTICS'] = 'true'
 
 gemspec
+gem "hocon"
 gem "puma"
+gem "rack"
 gem "sinatra"
 
 # Required to pick up plan specs in the rake spec task
