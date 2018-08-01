@@ -6,7 +6,7 @@ require 'bolt/inventory/group'
 
 # This is largely internal and probably shouldn't be tested
 describe Bolt::Inventory::Group do
-  let(:data) { {} }
+  let(:data) { { 'name' => 'all' } }
   let(:group) { Bolt::Inventory::Group.new(data) }
   let(:node1_ssh) { group.data_for('node1')['config']['ssh']['user'] }
 
@@ -112,6 +112,7 @@ describe Bolt::Inventory::Group do
   context 'with node data in parent and group in the child' do
     let(:data) do
       {
+        'name' => 'all',
         'nodes' => [{
           'name' => 'node1',
           'config' => { 'ssh' => { 'user' => 'parent_node' } }
@@ -135,6 +136,7 @@ describe Bolt::Inventory::Group do
   context 'with group data at all levels' do
     let(:data) do
       {
+        'name' => 'all',
         'nodes' => [{
           'name' => 'node1'
         }],
@@ -157,6 +159,7 @@ describe Bolt::Inventory::Group do
   context 'with two children which both set node' do
     let(:data) do
       {
+        'name' => 'all',
         'nodes' => [{
           'name' => 'node1',
           'config' => { 'ssh' => { 'user' => 'parent_node' } }
@@ -192,6 +195,7 @@ describe Bolt::Inventory::Group do
   context 'with two children where the second sets node' do
     let(:data) do
       {
+        'name' => 'all',
         'nodes' => [{
           'name' => 'node1',
           'config' => { 'ssh' => { 'user' => 'parent_node' } }
@@ -227,6 +231,7 @@ describe Bolt::Inventory::Group do
   context 'with two children where both set group' do
     let(:data) do
       {
+        'name' => 'all',
         'nodes' => [{
           'name' => 'node1',
           'config' => { 'ssh' => {} }
@@ -262,6 +267,7 @@ describe Bolt::Inventory::Group do
   context 'with two children where the second sets group' do
     let(:data) do
       {
+        'name' => 'all',
         'nodes' => [{
           'name' => 'node1',
           'config' => { 'ssh' => {} }
@@ -557,6 +563,55 @@ describe Bolt::Inventory::Group do
       expect(group.data_for('node1')['groups']).to eq(%w[parent1 child1 parent2 root])
       expect(group.data_for('node1')['vars']).to eq('foo' => 'bar', 'a' => 'b')
       expect(group.data_for('node1')['features']).to match_array(%w[a b])
+    end
+  end
+
+  context 'when the input is structurally invalid' do
+    let(:data) do
+      {
+        'name' => 'root',
+        'nodes' => ['foo.example.com', 'bar.example.com'],
+        'groups' => [{ 'name' => 'foo_group' }],
+        'vars' => { 'key' => 'value' },
+        'facts' => { 'osfamily' => 'windows' },
+        'features' => ['shell'],
+        'config' => { 'transport' => 'ssh' }
+      }
+    end
+
+    it 'fails if the nodes list is not an array' do
+      data['nodes'] = 'foo.example.com,bar.example.com'
+      expect { Bolt::Inventory::Group.new(data) }.to raise_error(/Expected nodes to be of type Array/)
+    end
+
+    it 'fails if a node in the list is not a string or hash' do
+      data['nodes'] = [['foo.example.com']]
+      expect { Bolt::Inventory::Group.new(data) }.to raise_error(/Node entry must be a String or Hash/)
+    end
+
+    it 'fails if the groups list is not an array' do
+      data['groups'] = { 'name' => 'foo_group' }
+      expect { Bolt::Inventory::Group.new(data) }.to raise_error(/Expected groups to be of type Array/)
+    end
+
+    it 'fails if vars is not a hash' do
+      data['vars'] = ['foo=bar']
+      expect { Bolt::Inventory::Group.new(data) }.to raise_error(/Expected vars to be of type Hash/)
+    end
+
+    it 'fails if facts is not a hash' do
+      data['facts'] = ['foo=bar']
+      expect { Bolt::Inventory::Group.new(data) }.to raise_error(/Expected facts to be of type Hash/)
+    end
+
+    it 'fails if features is not an array' do
+      data['features'] = 'shell'
+      expect { Bolt::Inventory::Group.new(data) }.to raise_error(/Expected features to be of type Array/)
+    end
+
+    it 'fails if config is not a hash' do
+      data['config'] = 'transport=ssh'
+      expect { Bolt::Inventory::Group.new(data) }.to raise_error(/Expected config to be of type Hash/)
     end
   end
 end
