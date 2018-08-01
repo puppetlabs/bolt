@@ -106,6 +106,15 @@ module Bolt
       validate
     end
 
+    def overwrite_transport_data(transport, transports)
+      @transport = transport
+      @transports = transports
+    end
+
+    def transport_data_get
+      { transport: @transport, transports: @transports }
+    end
+
     def deep_clone
       Bolt::Util.deep_clone(self)
     end
