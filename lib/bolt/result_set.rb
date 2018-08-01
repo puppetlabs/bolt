@@ -27,6 +27,7 @@ module Bolt
 
     def each
       @results.each { |r| yield r }
+      self
     end
 
     def result_hash
