@@ -1,0 +1,19 @@
+groups:
+  - name: group_1
+    nodes: 
+      - foo
+    config:
+      transport: ssh
+  - name: group_2
+    vars:
+      environment: production
+      features: ['puppet-agent']
+    nodes: 
+      - bar
+      - baz
+    facts:
+      operatingsystem: Ubuntu
+    config:
+      transport: ssh
+      ssh:
+        password: secret

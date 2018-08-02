@@ -1,10 +1,13 @@
 # frozen_string_literal: true
 
+require 'base64'
+require 'concurrent'
+require 'find'
 require 'json'
 require 'logging'
+require 'minitar'
 require 'open3'
 require 'bolt/task'
-require 'concurrent'
 require 'bolt/util/puppet_log_level'
 
 module Bolt
@@ -18,6 +21,7 @@ module Bolt
 
       @pool = Concurrent::ThreadPoolExecutor.new(max_threads: max_compiles)
       @logger = Logging.logger[self]
+      @plugin_tarball = Concurrent::Delay.new { build_plugin_tarball }
     end
 
     private def libexec
@@ -45,11 +49,11 @@ module Bolt
           facts: @inventory.facts(target),
           variables: @inventory.vars(target).merge(plan_vars),
           trusted: trusted.to_h
-        }
+        },
+        inventory: @inventory.data_hash
       }
 
       bolt_catalog_exe = File.join(libexec, 'bolt_catalog')
-
       old_path = ENV['PATH']
       ENV['PATH'] = "#{RbConfig::CONFIG['bindir']}#{File::PATH_SEPARATOR}#{old_path}"
       out, err, stat = Open3.capture3('ruby', bolt_catalog_exe, 'compile', stdin_data: catalog_input.to_json)
@@ -170,7 +174,7 @@ module Bolt
         result_promises = targets.zip(futures).flat_map do |target, future|
           @executor.queue_execute([target]) do |transport, batch|
             @executor.with_node_logging("Applying manifest block", batch) do
-              arguments = { 'catalog' => future.value, '_noop' => options['_noop'] }
+              arguments = { 'catalog' => future.value, 'plugins' => plugins, '_noop' => options['_noop'] }
               raise future.reason if future.rejected?
               result = transport.batch_task(batch, catalog_apply_task, arguments, options, &notify)
               result = provide_puppet_missing_errors(result)
@@ -186,6 +190,48 @@ module Bolt
         raise Bolt::ApplyFailure, r
       end
       r
+    end
+
+    def plugins
+      @plugin_tarball.value ||
+        raise(Bolt::Error.new("Failed to pack module plugins: #{@plugin_tarball.reason}", 'bolt/plugin-error'))
+    end
+
+    def build_plugin_tarball
+      start_time = Time.now
+      sio = StringIO.new
+      output = Minitar::Output.new(Zlib::GzipWriter.new(sio))
+
+      Puppet.lookup(:current_environment).modules.each do |mod|
+        search_dirs = []
+        search_dirs << mod.plugins if mod.plugins?
+        search_dirs << mod.files if mod.files?
+
+        parent = Pathname.new(mod.path).parent
+        files = Find.find(*search_dirs).select { |file| File.file?(file) }
+
+        files.each do |file|
+          tar_path = Pathname.new(file).relative_path_from(parent)
+          @logger.debug("Packing plugin #{file} to #{tar_path}")
+          stat = File.stat(file)
+          content = File.binread(file)
+          output.tar.add_file_simple(
+            tar_path.to_s,
+            data: content,
+            size: content.size,
+            mode: stat.mode & 0o777,
+            mtime: stat.mtime
+          )
+        end
+      end
+
+      duration = Time.now - start_time
+      @logger.debug("Packed plugins in #{duration * 1000} ms")
+
+      output.close
+      Base64.encode64(sio.string)
+    ensure
+      output&.close
     end
   end
 end

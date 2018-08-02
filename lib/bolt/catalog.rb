@@ -51,6 +51,19 @@ module Bolt
       end
     end
 
+    def setup_inventory(inventory)
+      config = Bolt::Config.default
+      config.overwrite_transport_data(inventory['config']['transport'],
+                                      Bolt::Util.symbolize_top_level_keys(inventory['config']['transports']))
+
+      bolt_inventory = Bolt::Inventory.new(inventory['data'],
+                                           config,
+                                           Bolt::Util.symbolize_top_level_keys(inventory['target_hash']))
+
+      bolt_inventory.collect_groups
+      bolt_inventory
+    end
+
     def compile_catalog(request)
       pal_main = request['code_ast'] || request['code_string']
       target = request['target']
@@ -69,7 +82,10 @@ module Bolt
           node = Puppet.lookup(:pal_current_node)
           setup_node(node, target["trusted"])
 
-          Puppet.override(pal_main: pal_main, bolt_pdb_client: pdb_client) do
+          Puppet.override(pal_main: pal_main,
+                          bolt_pdb_client: pdb_client,
+                          bolt_inventory:
+                          setup_inventory(request['inventory'])) do
             compile_node(node)
           end
         end

@@ -72,13 +72,4 @@ describe 'get_targets' do
                         .and_raise_error(/The 'bolt' library is required to process targets through inventory/)
     end
   end
-
-  context 'without tasks enabled' do
-    let(:tasks_enabled) { false }
-
-    it 'fails and reports that run_command is not available' do
-      is_expected.to run.with_params('echo hello')
-                        .and_raise_error(/The task operation 'get_targets' is not available/)
-    end
-  end
 end

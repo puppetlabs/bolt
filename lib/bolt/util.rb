@@ -117,6 +117,11 @@ module Bolt
       def windows?
         !!File::ALT_SEPARATOR
       end
+
+      # Accept hash and return hash with top level keys of type "String" converted to symbols.
+      def symbolize_top_level_keys(hsh)
+        hsh.each_with_object({}) { |(k, v), h| k.is_a?(String) ? h[k.to_sym] = v : h[k] = v }
+      end
     end
   end
 end

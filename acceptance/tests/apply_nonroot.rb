@@ -34,10 +34,8 @@ FILE
   end
 
   step "create plan on bolt controller" do
-    on(bolt, "mkdir -p #{dir}/modules/example_apply/plans")
-    create_remote_file(bolt,
-                       "#{dir}/modules/example_apply/plans/init.pp",
-                       File.read(File.join(fixtures, 'example_apply.pp')))
+    on(bolt, "mkdir -p #{dir}/modules")
+    scp_to(bolt, File.join(fixtures, 'example_apply'), "#{dir}/modules/example_apply")
   end
 
   bolt_command = "bolt plan run example_apply filepath=#{filepath} nodes=ssh_nodes"
