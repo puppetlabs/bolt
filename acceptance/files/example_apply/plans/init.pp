@@ -19,5 +19,11 @@ plan example_apply (
       ensure  => file,
       content => "hi there I'm ${$facts['os']['family']}\n",
     }
+
+    warn { 'Writing a MOTD!':
+    } -> file { "${filepath}/motd":
+      ensure => file,
+      source => 'puppet:///modules/example_apply/motd',
+    }
   }
 }
