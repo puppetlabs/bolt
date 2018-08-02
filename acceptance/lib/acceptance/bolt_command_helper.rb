@@ -29,7 +29,7 @@ module Acceptance
 
     def default_boltdir
       @default_boltdir ||= begin
-        query = bolt['platform'] =~ /windows/ ? 'cygpath -m $(printenv USERPROFILE)' : 'echo $HOME'
+        query = bolt['platform'] =~ /windows/ ? 'cygpath -m $(printenv HOME)' : 'printenv HOME'
         home = on(bolt, query).stdout.chomp
         File.join(home, '.puppetlabs/bolt')
       end
