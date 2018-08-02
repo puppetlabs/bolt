@@ -9,30 +9,54 @@ module Bolt
 
       def initialize(data)
         @logger = Logging.logger[self]
-        @name = data['name']
-        @nodes = {}
 
-        data['nodes']&.each do |n|
-          n = { 'name' => n } if n.is_a? String
-          if @nodes.include? n['name']
-            @logger.warn("Ignoring duplicate node in #{@name}: #{n}")
+        unless data.is_a?(Hash)
+          raise ValidationError.new("Expected group to be a Hash, not #{data.class}", nil)
+        end
+
+        if data.key?('name')
+          if data['name'].is_a?(String)
+            @name = data['name']
           else
-            @nodes[n['name']] = n
+            raise ValidationError.new("Group name must be a String, not #{data['name'].inspect}", nil)
+          end
+        else
+          raise ValidationError.new("Group does not have a name", nil)
+        end
+
+        @vars = fetch_value(data, 'vars', Hash)
+        @facts = fetch_value(data, 'facts', Hash)
+        @features = fetch_value(data, 'features', Array)
+        @config = fetch_value(data, 'config', Hash)
+
+        nodes = fetch_value(data, 'nodes', Array)
+        groups = fetch_value(data, 'groups', Array)
+
+        @nodes = {}
+        nodes.each do |node|
+          node = { 'name' => node } if node.is_a? String
+          unless node.is_a?(Hash)
+            raise ValidationError.new("Node entry must be a String or Hash, not #{node.class}", @name)
+          end
+          if @nodes.include? node['name']
+            @logger.warn("Ignoring duplicate node in #{@name}: #{node}")
+          else
+            @nodes[node['name']] = node
           end
         end
 
-        @vars = data['vars'] || {}
-        @facts = data['facts'] || {}
-        @features = data['features'] || []
-        @config = data['config'] || {}
-        @groups = if data['groups']
-                    data['groups'].map { |g| Group.new(g) }
-                  else
-                    []
-                  end
+        @groups = groups.map { |g| Group.new(g) }
 
         # this allows arbitrary info for the top level
-        @rest = data.reject { |k, _| %w[name nodes config groups].include? k }
+        @rest = data.reject { |k, _| %w[name nodes config groups vars facts features].include? k }
+      end
+
+      def fetch_value(data, key, type)
+        value = data.fetch(key, type.new)
+        unless value.is_a?(type)
+          raise ValidationError.new("Expected #{key} to be of type #{type}, not #{value.class}", @name)
+        end
+        value
       end
 
       def check_deprecated_config(context, name, config)
@@ -44,11 +68,10 @@ module Bolt
       end
 
       def validate(used_names = Set.new, node_names = Set.new, depth = 0)
-        raise ValidationError.new("Group does not have a name", nil) unless @name
         if used_names.include?(@name)
           raise ValidationError.new("Tried to redefine group #{@name}", @name)
         end
-        raise ValidationError.new("Invalid Group name #{@name}", @name) unless @name =~ /\A[a-z0-9_]+\Z/
+        raise ValidationError.new("Invalid group name #{@name}", @name) unless @name =~ /\A[a-z0-9_]+\Z/
 
         if node_names.include?(@name)
           raise ValidationError.new("Group #{@name} conflicts with node of the same name", @name)
