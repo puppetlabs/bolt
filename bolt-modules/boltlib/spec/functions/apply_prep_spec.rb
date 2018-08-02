@@ -51,7 +51,7 @@ describe 'apply_prep' do
       facts = Bolt::ResultSet.new(targets.map { |t| Bolt::Result.new(t, value: fact) })
       executor.expects(:run_task).with(targets, custom_facts_task, 'plugins' => :tarball).returns(facts)
 
-      is_expected.to run.with_params(hostnames.join(','))
+      is_expected.to run.with_params(hostnames.join(',')).and_return(nil)
       targets.each do |target|
         expect(inventory.features(target)).to include('puppet-agent')
         expect(inventory.facts(target)).to eq(fact)

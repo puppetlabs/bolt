@@ -58,5 +58,8 @@ Puppet::Functions.create_function(:apply_prep) do
         end
       end
     end
+
+    # Return nothing
+    nil
   end
 end
