@@ -27,6 +27,7 @@ Puppet::Functions.create_function(:apply_prep) do
 
         # Ensure Puppet is installed
         version_task = script_compiler.task_signature('puppet_agent::version')
+        raise Bolt::Error.new('puppet_agent::version could not be found', 'bolt/apply-prep') unless version_task
         versions = executor.run_task(targets, version_task.task, {})
         raise Bolt::RunFailure.new(versions, 'run_task', version_task.name) unless versions.ok?
         need_install, installed = versions.partition { |r| r['version'].nil? }
@@ -36,6 +37,7 @@ Puppet::Functions.create_function(:apply_prep) do
 
         unless need_install.empty?
           install_task = script_compiler.task_signature('puppet_agent::install')
+          raise Bolt::Error.new('puppet_agent::install could not be found', 'bolt/apply-prep') unless install_task
           installed = executor.run_task(need_install.map(&:target), install_task.task, {})
           raise Bolt::RunFailure.new(installed, 'run_task', install_task.name) unless installed.ok?
         end
