@@ -76,6 +76,13 @@ describe 'apply_prep' do
       end
     end
 
+    it 'fails if version task is not found' do
+      Puppet::Pal::ScriptCompiler.any_instance.expects(:task_signature).with('puppet_agent::version')
+      is_expected.to run.with_params(hostnames).and_raise_error(
+        Bolt::Error, 'puppet_agent::version could not be found'
+      )
+    end
+
     it 'fails if version check fails' do
       failed_results = Bolt::ResultSet.new(
         targets.map { |t| Bolt::Result.new(t, error: { 'msg' => 'could not get version' }) }
@@ -84,6 +91,16 @@ describe 'apply_prep' do
 
       is_expected.to run.with_params(hostnames).and_raise_error(
         Bolt::RunFailure, "Plan aborted: run_task 'puppet_agent::version' failed on 2 nodes"
+      )
+    end
+
+    it 'fails if install task is not found' do
+      versions = Bolt::ResultSet.new(targets.map { |t| Bolt::Result.new(t, value: {}) })
+      executor.expects(:run_task).with(targets, :version_task, anything, anything).returns(versions)
+
+      Puppet::Pal::ScriptCompiler.any_instance.expects(:task_signature).with('puppet_agent::install')
+      is_expected.to run.with_params(hostnames).and_raise_error(
+        Bolt::Error, 'puppet_agent::install could not be found'
       )
     end
 
