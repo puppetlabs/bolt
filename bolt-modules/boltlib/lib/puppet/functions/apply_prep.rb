@@ -21,31 +21,42 @@ Puppet::Functions.create_function(:apply_prep) do
 
     targets = inventory.get_targets(target_spec)
 
-    # Ensure Puppet is installed
-    versions = call_function(:run_task, 'puppet_agent::version', targets)
-    need_install, installed = versions.partition { |r| r.message.chomp.empty? }
-    installed.each do |r|
-      Puppet.info "Puppet Agent #{r.message.chomp} installed on #{r.target.name}"
-    end
-    unless need_install.empty?
-      call_function(:run_task, 'puppet_agent::install', need_install.map(&:target))
-    end
-    targets.each { |target| inventory.set_feature(target, 'puppet-agent') }
+    executor.log_action('install puppet and gather facts', targets) do
+      executor.without_default_logging do
+        script_compiler = Puppet::Pal::ScriptCompiler.new(closure_scope.compiler)
 
-    # Gather facts, including custom facts
-    plugins = applicator.build_plugin_tarball do |mod|
-      search_dirs = []
-      search_dirs << mod.plugins if mod.plugins?
-      search_dirs << mod.pluginfacts if mod.pluginfacts?
-      search_dirs
-    end
+        # Ensure Puppet is installed
+        version_task = script_compiler.task_signature('puppet_agent::version')
+        versions = executor.run_task(targets, version_task.task, {})
+        raise Bolt::RunFailure.new(versions, 'run_task', version_task.name) unless versions.ok?
+        need_install, installed = versions.partition { |r| r['version'].nil? }
+        installed.each do |r|
+          Puppet.info "Puppet Agent #{r['version']} installed on #{r.target.name}"
+        end
 
-    task = applicator.custom_facts_task
-    results = executor.run_task(targets, task, 'plugins' => plugins)
-    raise Bolt::RunFailure.new(results, 'run_task', task.name) unless results.ok
+        unless need_install.empty?
+          install_task = script_compiler.task_signature('puppet_agent::install')
+          installed = executor.run_task(need_install.map(&:target), install_task.task, {})
+          raise Bolt::RunFailure.new(installed, 'run_task', install_task.name) unless installed.ok?
+        end
+        targets.each { |target| inventory.set_feature(target, 'puppet-agent') }
 
-    results.each do |result|
-      inventory.add_facts(result.target, result.value)
+        # Gather facts, including custom facts
+        plugins = applicator.build_plugin_tarball do |mod|
+          search_dirs = []
+          search_dirs << mod.plugins if mod.plugins?
+          search_dirs << mod.pluginfacts if mod.pluginfacts?
+          search_dirs
+        end
+
+        task = applicator.custom_facts_task
+        results = executor.run_task(targets, task, 'plugins' => plugins)
+        raise Bolt::RunFailure.new(results, 'run_task', task.name) unless results.ok?
+
+        results.each do |result|
+          inventory.add_facts(result.target, result.value)
+        end
+      end
     end
   end
 end
