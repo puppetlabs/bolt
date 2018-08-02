@@ -17,6 +17,8 @@ Puppet::Functions.create_function(:apply_prep) do
       )
     end
 
+    executor.report_function_call('apply_prep')
+
     targets = inventory.get_targets(target_spec)
 
     # Ensure Puppet is installed
