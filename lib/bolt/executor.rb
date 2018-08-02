@@ -16,7 +16,7 @@ require 'bolt/puppetdb'
 module Bolt
   class Executor
     attr_reader :noop, :transports
-    attr_accessor :run_as, :plan_logging
+    attr_accessor :run_as
 
     def initialize(concurrency = 1,
                    analytics = Bolt::Analytics::NoopClient.new,
@@ -243,6 +243,14 @@ module Bolt
 
     def finish_plan(plan_result)
       transport('pcp').finish_plan(plan_result)
+    end
+
+    def without_default_logging
+      old_log = @plan_logging
+      @plan_logging = false
+      yield
+    ensure
+      @plan_logging = old_log
     end
   end
 end

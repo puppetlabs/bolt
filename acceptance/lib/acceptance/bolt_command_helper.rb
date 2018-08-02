@@ -27,22 +27,20 @@ module Acceptance
       end
     end
 
-    def default_modulepath
-      case bolt['platform']
-      when /windows/
-        home = on(bolt, 'cygpath -m $(printenv USERPROFILE)').stdout.chomp
-        File.join(home, '.puppetlabs/bolt/modules')
-      else
-        '$HOME/.puppetlabs/bolt/modules'
+    def default_boltdir
+      @default_boltdir ||= begin
+        query = bolt['platform'] =~ /windows/ ? 'cygpath -m $(printenv USERPROFILE)' : 'echo $HOME'
+        home = on(bolt, query).stdout.chomp
+        File.join(home, '.puppetlabs/bolt')
       end
     end
 
     def modulepath(extra)
       case bolt['platform']
       when /windows/
-        "\"#{default_modulepath};#{extra}\""
+        "\"#{default_boltdir}/modules;#{extra}\""
       else
-        "#{default_modulepath}:#{extra}"
+        "#{default_boltdir}/modules:#{extra}"
       end
     end
   end
