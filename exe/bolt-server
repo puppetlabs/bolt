@@ -1,4 +1,5 @@
-#!/opt/puppetlabs/puppet/bin/ruby
+#!/usr/bin/env ruby
 
-# Used in https://gist.github.com/rennex/f379b8a53c8f2791d5838b4622ed6dd8
-`rackup --env production -D /opt/puppetlabs/server/apps/bolt-server/config.ru`
+# ARGV[0] is the path to config.ru
+# The rackup file that configures the bolt-server
+exec 'rackup', '--env', 'production', '-D', ARGV[0]
