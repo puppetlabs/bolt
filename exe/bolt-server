@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
-# frozen_string_literal: true
 
-require 'bolt_ext/server.rb'
-
-TransportAPI.run!
+# ARGV[0] is the path to config.ru
+# The rackup file that configures the bolt-server
+exec 'rackup', '--env', 'production', '-D', ARGV[0]

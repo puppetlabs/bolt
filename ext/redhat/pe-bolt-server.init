@@ -12,8 +12,9 @@
 
 [ -f /etc/sysconfig/pe-bolt-server ] && . /etc/sysconfig/pe-bolt-server
 
-export GEM_HOME=/opt/puppetlabs/server/apps/bolt-server/lib/ruby/gems/2.4.0
-exec=/opt/puppetlabs/server/apps/bolt-server/bin/bolt-server
+prefix='/opt/puppetlabs/server/apps/bolt-server'
+export GEM_HOME="${prefix}/lib/ruby/gems/2.4.0"
+exec="${prefix}/bin/bolt-server ${prefix}/config.ru"
 prog="pe-bolt-server"
 desc="PE Bolt Server"
 

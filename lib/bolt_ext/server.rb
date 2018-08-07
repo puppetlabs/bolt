@@ -6,9 +6,9 @@ require 'bolt/task'
 require 'json'
 
 class TransportAPI < Sinatra::Base
-  set :server, :puma
-
   post '/ssh/run_task' do
+    content_type :json
+
     body = JSON.parse(request.body.read)
     keys = %w[user password port ssh-key-content]
     opts = body['target'].select { |k, _| keys.include? k }
@@ -25,7 +25,7 @@ class TransportAPI < Sinatra::Base
         @r = event[:result].to_json
       end
     end
-    response.body = @r
-    response.status = 200
+
+    [200, [@r]]
   end
 end

@@ -7,7 +7,7 @@ Type=simple
 EnvironmentFile=-/etc/sysconfig/pe-bolt-server-service
 EnvironmentFile=-/etc/default/pe-bolt-server-service
 Environment=GEM_HOME=/opt/puppetlabs/server/apps/bolt-server/lib/ruby/gems/2.4.0
-ExecStart=/opt/puppetlabs/server/apps/bolt-server/bin/bolt-server $PE_BOLT_SERVER_OPTIONS --foreground
+ExecStart=/opt/puppetlabs/server/apps/bolt-server/bin/bolt-server /opt/puppetlabs/server/apps/bolt-server/config.ru
 Restart=always
 KillMode=process
 

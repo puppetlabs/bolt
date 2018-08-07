@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-ENV['RACK_ENV'] = 'test'
-
+require 'spec_helper'
 require 'bolt_spec/conn'
 require 'bolt_ext/server'
 require 'json'
