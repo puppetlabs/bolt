@@ -1,113 +1,109 @@
+# Running basic Bolt commands
 
-# Running Bolt commands
+Use Bolt commands to connect directly to the systems where you want to execute commands, run scripts, and upload files.
 
+## Run a command on remote nodes
 
-Bolt executes ad hoc commands, runs scripts, uploads files, and runs Puppet
-tasks or task plans on remote nodes from a controller node, such as your laptop
-or workstation.
+Specify the command you want to run and which nodes to run it on.
 
-When you run bolt commands, you specify the nodes that you want to execute
-commands on. You can also specify your username and password for nodes that
-require credentials.
+When you have credentials on remote systems, you can use Bolt to run commands across those systems.
 
-Bolt connects to remote nodes over SSH by default.
-
-To run simple commands or to verify host connectivity, Bolt supports running
-commands against a node or nodes.
-
-Example of a cross-platform command:
+-   To run a command on a list of nodes:
 
 ```
-bolt command run "echo 'hello world'"
-
+bolt command run <COMMAND> --nodes <NODE NAME>,<NODE NAME>,<NODE NAME>
 ```
 
-> Note: When connecting to Bolt hosts over WinRM that have not configured SSL for
-> port 5986, passing the `--ssl` switch is required to connect to the default WinRM
-> port 5985.
+-   To run a command on WinRM nodes, indicate the WinRM protocol in the nodes string:
 
-## Running arbitrary commands
-
-You can run commands on remote nodes with Bolt.
-
-Specify the command you want to run and which nodes to run it on. Specify nodes
-with the node flag, `--nodes` or `-n`:
-
-```
-bolt command run <COMMAND> --nodes <NODE>
-```
-
-When executing on WinRM nodes, indicate the WinRM protocol in the nodes string:
 ```
 bolt command run <COMMAND> --nodes winrm://<WINDOWS.NODE> --user <USERNAME> --password <PASSWORD>
 ```
 
-If the command contains spaces or shell special characters, then you must single quote the command:
+-   To run a command that contains spaces or shell special characters, wrap the command in single quotation marks:
+
 ```
-bolt command run 'echo $HOME' --nodes <NODE>
+bolt command run 'echo $HOME' --nodes web5.mydomain.edu, web6.mydomain.edu
 ```
 
-## Running scripts
+```
+bolt command run "netstat -an | grep 'tcp.*LISTEN'" --nodes web5.mydomain.edu, web6.mydomain.edu
+```
 
-You can execute scripts on remote machines with Bolt.
+-   To run a cross-platform command:
 
-Bolt copies the script from the local system to the remote node, executes it on
-that remote node, and then deletes the script from the remote node.
+    ```
+    bolt command run "echo 'hello world'"
+    ```
 
-You can run scripts in any language (such as Bash, PowerShell, or Python), if
-the appropriate interpreter is installed on the remote system.
-
-To run on remote *nix systems, the script must include a shebang (`#!`) line
-specifying the interpreter. For example, for a script written in Bash, provide
-the path to the Bash interpreter:
+    **Note:** When connecting to Bolt hosts over WinRM that have not configured SSL for port 5986, passing the `--no-ssl` switch is required to connect to the default WinRM port 5985.
 
 
-```bash
+## Run a script on remote nodes
+
+Specify the script you want to run and which nodes to run it on.
+
+Use the `bolt script run` command to run existing scripts that you use or to combine the commands that you regularly run as part of sequence. When you run a script with Bolt, the script is transferred into a temporary directory on the remote system, run on that system, and then deleted.
+
+You can run scripts in any language as long as the appropriate interpreter is installed on the remote system. This includes Bash, PowerShell, or Python.
+
+-   To run a script, specify the path to the script, and which nodes to run it on:
+
+```
+bolt script run <PATH/TO/SCRIPT> --nodes <NODE NAME>,<NODE NAME>,<NODE NAME>
+```
+
+```
+bolt script run ../myscript.sh --nodes web5.mydomain.edu, web6.mydomain.edu
+```
+
+-   When executing on WinRM nodes, include the WinRM protocol in the nodes string:
+
+```
+bolt script run <PATH/TO/SCRIPT> --nodes winrm://<NODE NAME> --user <USERNAME> --password <PASSWORD>
+```
+
+-   To pass arguments to a script, specify them after the command. If an argument contain spaces or special characters, you must quote it:
+
+    ```
+    bolt script run myscript.sh 'echo hello'
+    ```
+
+    Argument values are passed literally and are not interpolated by the shell on the remote host. If you run `bolt script run myscript.sh 'echo $HOME'`, then the script receives the argument `'echo $HOME'`, rather than any interpolated value.
+
+
+### Requirements for scripts run on remote \*nix systems
+
+A script must include a shebang \(`#!`\) line specifying the interpreter. For example, for a script written in Bash, provide the path to the Bash interpreter:
+
+```
 #!/bin/bash
 echo hello
 ```
 
-On *nix, Bolt adds execute permissions on the remote system before
-executing it. For remote Windows systems, Bolt supports the extensions `.ps1`,
-`.rb`, and `.pp`. To enable other file extensions, add them to your Bolt config, as
-follows:
+### Requirements for scripts run on remote Windows systems
 
-```yaml
+Bolt supports the extensions `.ps1`, `.rb`, and `.pp`. To enable other file extensions, add them to your Bolt config, as follows:
+
+```
 winrm:
    extensions: [.py, .pl]
 ```
 
-To run a script, specify the path to the script, and which nodes to run it on.
-Specify nodes with node flag, `--nodes` or `-n`:
+## Upload files to remote nodes
+
+Use Bolt to copy files to remote nodes.
+
+**Note:** Most transports are not optimized for file copying, so this command is best limited to small files.
+
+-   To upload a file to a remote node, run the `bolt file upload` command. Specify the local path to the file, the destination location, and the target nodes.
 
 ```
-bolt script run <PATH/TO/SCRIPT> --nodes <NODE>
+bolt file upload <SOURCE> <DESTINATION> --nodes <NODE NAME>,<NODE NAME>
 ```
 
-When executing on WinRM nodes, include the WinRM protocol in the nodes string:
-
 ```
-bolt script run <PATH/TO/SCRIPT> --nodes winrm://<NODE> --user <USERNAME> --password <PASSWORD>
-
-```
-To pass arguments to a script, specify them after the command, such as `bolt
-script run myscript.sh 'echo hello'`. If an argument contain spaces or special
-characters, you must quote it. Argument values are passed literally and are not
-interpolated by the shell on the remote host, so if you `run bolt script run
-myscript.sh 'echo $HOME'`, then the script receives the argument `'echo $HOME'`,
-rather than any interpolated value.
-
-## Uploading files
-You can use Bolt to copy files to remote nodes.
-
-To upload a file to a remote node, run the bolt file upload command, specifying
-the local path to the file and the destination location on the target node, in
-the format `bolt file upload <SOURCE> <DESTINATION>`. Specify the nodes with the
-`--nodes` flag. For example:
-
-```
-bolt file upload my_file.txt /tmp/remote_file.txt --nodes node1,node2
+bolt file upload my_file.txt /tmp/remote_file.txt --nodes web5.mydomain.edu, web6.mydomain.edu
 ```
 
-Note that most transports are not optimized for file copying, so this is best
-limited to small files.
+
