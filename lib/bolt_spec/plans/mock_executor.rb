@@ -209,6 +209,12 @@ module BoltSpec
         @task_doubles[task_name] ||= TaskDouble.new
       end
 
+      def log_start_plan(plan_name)
+        Time.now
+      end
+      
+      def log_finish_plan(plan_name, start_time); end
+      
       def report_function_call(_function); end
 
       def report_bundled_content(_mode, _name); end

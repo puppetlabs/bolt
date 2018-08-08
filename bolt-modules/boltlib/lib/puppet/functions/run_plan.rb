@@ -29,7 +29,7 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
         Puppet::Pops::Issues::TASK_MISSING_BOLT, action: _('run a plan')
       )
     end
-    
+
     # Bolt calls this function internally to trigger plans from the CLI. We
     # don't want to count those invocations.
     unless named_args['_bolt_api_call']
@@ -55,7 +55,7 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
 
     # print starting log message and begin profiling
     start_time = executor.log_start_plan(plan_name)
-    
+
     if (run_as = named_args['_run_as'])
       old_run_as = executor.run_as
       executor.run_as = run_as
@@ -86,7 +86,7 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
       # print finished message and end profiling
       executor.log_finish_plan(plan_name, start_time)
     end
-    
+
     result
   end
 end
