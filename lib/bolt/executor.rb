@@ -134,6 +134,18 @@ module Bolt
       results
     end
 
+    def log_start_plan(plan_name)
+      log_method = @plan_logging ? :notice : :info
+      @logger.send(log_method, "Starting: plan #{plan_name}")
+      Time.now
+    end
+
+    def log_finish_plan(plan_name, start_time)
+      log_method = @plan_logging ? :notice : :info
+      duration = Time.now - start_time
+      @logger.send(log_method, "Finished: plan #{plan_name} in #{duration.round(2)} sec")
+    end
+
     def report_transport(transport, count)
       name = transport.class.name.split('::').last.downcase
       @analytics&.event('Transport', 'initialize', name, count) unless @reported_transports.include?(name)

@@ -30,6 +30,8 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
       )
     end
 
+    start_time = executor.log_start_plan(plan_name)
+    
     # Bolt calls this function internally to trigger plans from the CLI. We
     # don't want to count those invocations.
     unless named_args['_bolt_api_call']
@@ -83,6 +85,8 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
       end
     end
 
+    executor.log_finish_plan(plan_name, start_time)
+    
     result
   end
 end
