@@ -39,7 +39,7 @@ module Bolt
       @custom_facts_task ||= begin
         path = File.join(libexec, 'custom_facts.rb')
         impl = { 'name' => 'custom_facts.rb', 'path' => path, 'requirements' => [], 'supports_noop' => true }
-        Task.new('custom_facts', [impl], 'stdin')
+        Task.new(name: 'custom_facts', implementations: [impl], input_method: 'stdin')
       end
     end
 
