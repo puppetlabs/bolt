@@ -56,12 +56,9 @@ module Bolt
       config.overwrite_transport_data(inventory['config']['transport'],
                                       Bolt::Util.symbolize_top_level_keys(inventory['config']['transports']))
 
-      bolt_inventory = Bolt::Inventory.new(inventory['data'],
-                                           config,
-                                           Bolt::Util.symbolize_top_level_keys(inventory['target_hash']))
-
-      bolt_inventory.collect_groups
-      bolt_inventory
+      Bolt::Inventory.new(inventory['data'],
+                          config,
+                          Bolt::Util.symbolize_top_level_keys(inventory['target_hash']))
     end
 
     def compile_catalog(request)

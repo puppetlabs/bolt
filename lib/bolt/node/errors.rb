@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'bolt/error'
+
 module Bolt
   class Node
     class BaseError < Bolt::Error
