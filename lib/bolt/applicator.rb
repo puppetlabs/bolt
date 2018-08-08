@@ -26,6 +26,7 @@ module Bolt
         build_plugin_tarball do |mod|
           search_dirs = []
           search_dirs << mod.plugins if mod.plugins?
+          search_dirs << mod.pluginfacts if mod.pluginfacts?
           search_dirs << mod.files if mod.files?
           search_dirs
         end
