@@ -16,7 +16,6 @@ describe "apply" do
   describe 'over ssh', ssh: true do
     let(:uri) { conn_uri('ssh') }
     let(:password) { conn_info('ssh')[:password] }
-    let(:apply_task) { 'apply_catalog.sh' }
     let(:tflags) { %W[--no-host-key-check --run-as root --sudo-password #{password}] }
 
     after(:each) do
