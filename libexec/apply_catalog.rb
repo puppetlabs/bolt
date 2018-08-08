@@ -7,7 +7,7 @@ require 'puppet/configurer'
 require 'puppet/module_tool/tar'
 require 'tempfile'
 
-args = JSON.parse(STDIN.read)
+args = JSON.parse(ARGV[0] ? File.read(ARGV[0]) : STDIN.read)
 
 Puppet.initialize_settings([])
 run_mode = Puppet::Util::RunMode[:user]
@@ -50,6 +50,13 @@ Dir.mktmpdir do |moduledir|
   end
 
   env = Puppet.lookup(:environments).get('production').override_with(modulepath: [moduledir])
+  # Needed to ensure features are loaded
+  env.each_plugin_directory do |dir|
+    $LOAD_PATH << dir unless $LOAD_PATH.include?(dir)
+  end
+
+  # Ensure custom facts are available for provider suitability tests
+  Puppet::Node::Facts.indirection.find('puppetversion', environment: env)
 
   report = if Puppet::Util::Package.versioncmp(Puppet.version, '5.0.0') > 0
              Puppet::Transaction::Report.new
