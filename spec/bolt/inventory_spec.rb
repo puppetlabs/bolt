@@ -135,20 +135,17 @@ describe Bolt::Inventory do
   describe :collect_groups do
     it 'finds the all group with an empty inventory' do
       inventory = Bolt::Inventory.new({})
-      inventory.collect_groups
       expect(inventory.get_targets('all')).to eq([])
     end
 
     it 'finds the all group with a non-empty inventory' do
       inventory = Bolt::Inventory.new(data)
-      inventory.collect_groups
       targets = inventory.get_targets('all')
       expect(targets.size).to eq(9)
     end
 
     it 'finds nodes in a subgroup' do
       inventory = Bolt::Inventory.new(data)
-      inventory.collect_groups
       targets = inventory.get_targets('group2')
       expect(targets).to eq(targets(%w[node6 node7 ssh://node8 node9]))
     end
@@ -248,7 +245,6 @@ describe Bolt::Inventory do
     context 'non-empty inventory' do
       let(:inventory) {
         inv = Bolt::Inventory.new(data)
-        inv.collect_groups
         inv
       }
 

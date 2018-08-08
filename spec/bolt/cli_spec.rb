@@ -930,6 +930,7 @@ bar
               ["facts::ruby", "Gather system facts using ruby and facter"],
               ["package", "Manage and inspect the state of packages"],
               ["puppet_agent::install", "Install the Puppet 5 agent package"],
+              ["puppet_agent::install_powershell", nil],
               ["puppet_agent::install_shell", nil],
               ["puppet_agent::version",
                "Get the version of the Puppet 5 agent package installed. Returns nothing if none present."],

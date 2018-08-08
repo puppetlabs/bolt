@@ -6,6 +6,7 @@ require 'bolt/puppetdb'
 Bolt::PAL.load_puppet
 
 require 'bolt/catalog/compiler'
+require 'bolt/catalog/loaders'
 require 'bolt/catalog/logging'
 
 module Bolt
@@ -37,6 +38,10 @@ module Bolt
     end
 
     def compile_node(node)
+      # Add boltlib to system loaders so modules can use its functions without an
+      # explicit dependency.
+      node.environment.loaders = Bolt::Catalog::BoltLoaders.new(node.environment)
+
       compiler = Puppet::Parser::BoltCompiler.new(node)
       compiler.compile(&:to_resource)
     end
@@ -56,12 +61,9 @@ module Bolt
       config.overwrite_transport_data(inventory['config']['transport'],
                                       Bolt::Util.symbolize_top_level_keys(inventory['config']['transports']))
 
-      bolt_inventory = Bolt::Inventory.new(inventory['data'],
-                                           config,
-                                           Bolt::Util.symbolize_top_level_keys(inventory['target_hash']))
-
-      bolt_inventory.collect_groups
-      bolt_inventory
+      Bolt::Inventory.new(inventory['data'],
+                          config,
+                          Bolt::Util.symbolize_top_level_keys(inventory['target_hash']))
     end
 
     def compile_catalog(request)
