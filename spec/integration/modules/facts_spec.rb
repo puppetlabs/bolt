@@ -4,27 +4,28 @@ require 'spec_helper'
 require 'bolt_spec/config'
 require 'bolt_spec/conn'
 require 'bolt_spec/integration'
+require 'bolt_spec/run'
 require 'bolt/cli'
 
 describe "running the facts plan" do
-  include BoltSpec::Config
   include BoltSpec::Conn
-  include BoltSpec::Integration
+  include BoltSpec::Run
 
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
 
+  let(:config_data) {
+    { "ssh" => { "host-key-check" => false },
+      "winrm" => { "ssl" => false } }
+  }
+  let(:inventory) { conn_inventory }
+
   describe 'over ssh', ssh: true do
-    let(:uri) { conn_uri('ssh') }
-    let(:user) { conn_info('ssh')[:user] }
-    let(:password) { conn_info('ssh')[:password] }
-    let(:config_flags) { %W[--nodes #{uri} --no-host-key-check --format json --password #{password}] }
-
     it 'gathers os facts' do
-      result = run_cli_json(%w[plan run facts] + config_flags)
-      expect(result.size).to eq(1)
+      result = run_plan('facts', { "nodes" => 'ssh' }, config: config_data, inventory: inventory)
 
-      data = result[0]
-      expect(data['node']).to eq(uri)
+      expect(result['value'].size).to eq(1)
+      data = result['value'][0]
+
       expect(data['status']).to eq('success')
       expect(data['result'].size).to eq(1)
       expect(data['result']['os']['name']).to be
@@ -34,17 +35,12 @@ describe "running the facts plan" do
   end
 
   describe 'over winrm', winrm: true do
-    let(:uri) { conn_uri('winrm') }
-    let(:user) { conn_info('winrm')[:user] }
-    let(:password) { conn_info('winrm')[:password] }
-    let(:config_flags) { %W[--nodes #{uri} --no-ssl --format json --password #{password}] }
-
     it 'gathers os facts' do
-      result = run_cli_json(%w[plan run facts] + config_flags)
-      expect(result.size).to eq(1)
+      result = run_plan('facts', { "nodes" => 'winrm' }, config: config_data, inventory: inventory)
 
-      data = result[0]
-      expect(data['node']).to eq(uri)
+      expect(result['value'].size).to eq(1)
+      data = result['value'][0]
+
       expect(data['status']).to eq('success')
       expect(data['result'].size).to eq(1)
       expect(data['result']['os']['name']).to eq('windows')

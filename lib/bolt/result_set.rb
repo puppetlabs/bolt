@@ -82,6 +82,10 @@ module Bolt
       self.class == other.class && @results == other.results
     end
 
+    def to_a
+      @results.map(&:status_hash)
+    end
+
     def to_json(opts = nil)
       @results.map(&:status_hash).to_json(opts)
     end

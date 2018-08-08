@@ -227,7 +227,7 @@ MSG
       t = Thread.new {
         applicator.apply([targets], :body, {})
       }
-      sleep(0.1)
+      sleep(0.2)
 
       expect(running.value).to eq(2)
 
