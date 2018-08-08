@@ -3,16 +3,20 @@
 require 'hocon'
 
 class TransportConfig
-  attr_accessor :port
+  attr_accessor :port, :ssl_cert, :ssl_key, :ssl_ca_cert
 
   def initialize(global = nil, local = nil)
     @port = 8144
+    @ssl_cert = nil
+    @ssl_key = nil
+    @ssl_ca_cert = nil
 
     global_path = global || '/etc/puppetlabs/bolt-server/conf.d/bolt-server.conf'
     local_path = local || File.join(ENV['HOME'].to_s, ".puppetlabs", "bolt-server.conf")
 
     load_config(global_path)
     load_config(local_path)
+    validate
   end
 
   def load_config(path)
@@ -26,12 +30,29 @@ class TransportConfig
 
     unless parsed_hocon.nil?
       @port = parsed_hocon['port'] if parsed_hocon.key?('port')
+      @ssl_cert = parsed_hocon['ssl-cert'] if parsed_hocon.key?('ssl-cert')
+      @ssl_key = parsed_hocon['ssl-key'] if parsed_hocon.key?('ssl-key')
+      @ssl_ca_cert = parsed_hocon['ssl-ca-cert'] if parsed_hocon.key?('ssl-ca-cert')
     end
   end
 
   def validate
+    required_keys = %w[ssl_cert ssl_key ssl_ca_cert]
+    ssl_keys = %w[ssl_cert ssl_key ssl_ca_cert]
+    required_keys.each do |k|
+      next unless send(k).nil?
+      raise Bolt::ValidationError, <<-MSG
+You must configure #{k} in either /etc/puppetlabs/bolt-server/conf.d/bolt-server.conf or ~/.puppetlabs/bolt-server.conf
+      MSG
+    end
+
     unless @port.is_a?(Integer) && @port > 0
-      raise Bolt::ValidationError, 'Port must be a valid integer greater than 0'
+      raise Bolt::ValidationError, "Configured 'port' must be a valid integer greater than 0"
+    end
+    ssl_keys.each do |sk|
+      unless File.file?(send(sk)) && File.readable?(send(sk))
+        raise Bolt::ValidationError, "Configured #{sk} must be a valid filepath"
+      end
     end
   end
 end

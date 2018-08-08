@@ -28,4 +28,13 @@ configure do
   # end
 end
 
-Rack::Handler::Puma.run(TransportAPI, Port: config.port)
+host = "0.0.0.0"
+bind_addr = "ssl://#{host}?"
+bind_addr << "cert=#{config.ssl_cert}"
+bind_addr << "&key=#{config.ssl_key}"
+bind_addr << "&ca=#{config.ssl_ca_cert}"
+bind_addr << "&verify_mode=force_peer"
+
+Rack::Handler::Puma.run(TransportAPI,
+                        Port: config.port,
+                        Host: bind_addr)
