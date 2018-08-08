@@ -8,8 +8,8 @@ require 'bolt/applicator'
 
 module Bolt
   class PAL
-    BOLTLIB_PATH = File.join(__FILE__, '../../../bolt-modules')
-    MODULES_PATH = File.join(__FILE__, '../../../modules')
+    BOLTLIB_PATH = File.join(__dir__, '../../bolt-modules')
+    MODULES_PATH = File.join(__dir__, '../../modules')
 
     # PALError is used to convert errors from executing puppet code into
     # Bolt::Errors
