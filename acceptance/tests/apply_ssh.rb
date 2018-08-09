@@ -117,10 +117,10 @@ test_name "bolt plan run should apply manifest block on remote hosts via ssh" do
     user = 'apply_nonroot'
 
     step 'create nonroot user on targets' do
-      on(ssh_nodes, puppet('resource', 'user', user, 'ensure=present'))
+      on(ssh_nodes, "/opt/puppetlabs/bin/puppet resource user #{user} ensure=present")
 
       teardown do
-        on(ssh_nodes, puppet('resource', 'user', user, 'ensure=absent'))
+        on(ssh_nodes, "/opt/puppetlabs/bin/puppet resource user #{user} ensure=absent")
       end
     end
 
