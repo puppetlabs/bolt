@@ -3,7 +3,7 @@
 require 'bolt_command_helper'
 require 'json'
 
-test_name "bolt plan run with should apply manifest block on remote hosts via winrm" do
+test_name "bolt plan run should apply manifest block on remote hosts via winrm" do
   extend Acceptance::BoltCommandHelper
 
   winrm_nodes = select_hosts(roles: ['winrm'])
@@ -86,6 +86,33 @@ test_name "bolt plan run with should apply manifest block on remote hosts via wi
 
       motd = on(node, "cat #{filepath}/motd")
       assert_equal("Today's #WordOfTheDay is 'gloss'", motd.stdout)
+    end
+  end
+
+  step "puppet service should be stopped" do
+    service_command = 'bolt task run service action=status name=puppet -n winrm_nodes'
+    flags = { '--format' => 'json' }
+    result = bolt_command_on(bolt, service_command, flags)
+
+    assert_equal(0, result.exit_code,
+                 "Bolt did not exit with exit code 0")
+
+    begin
+      json = JSON.parse(result.stdout)
+    rescue JSON.ParserError
+      assert_equal("Output should be JSON", result.string,
+                   "Output should be JSON")
+    end
+
+    winrm_nodes.each do |node|
+      # Verify that node succeeded
+      host = node.hostname
+      result = json['items'].select { |n| n['node'] == host }
+      assert_equal('success', result[0]['status'],
+                   "The task did not succeed on #{host}")
+
+      assert_equal('stopped', result[0]['result']['status'], "Puppet must be stopped")
+      assert_equal('false', result[0]['result']['enabled'], "Puppet must be disabled")
     end
   end
 end
