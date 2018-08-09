@@ -113,7 +113,7 @@ test_name "bolt plan run should apply manifest block on remote hosts via ssh" do
   end
 
   step "apply as non-root user" do
-    newfilepath = '/etc/puppetlabs/test'
+    restricted_filepath = '/etc/puppetlabs/test'
     user = 'apply_nonroot'
 
     step 'create nonroot user on targets' do
@@ -135,7 +135,7 @@ FILE
       end
     end
 
-    bolt_command = "bolt plan run example_apply filepath=#{newfilepath} nodes=ssh_nodes"
+    bolt_command = "bolt plan run example_apply filepath=#{restricted_filepath} nodes=ssh_nodes"
 
     step "execute `bolt plan run run_as=#{user}` via SSH with json output" do
       result = bolt_command_on(bolt, bolt_command + " run_as=#{user}", flags)
@@ -158,7 +158,7 @@ FILE
         assert_match(/Permission denied/, result[0]['result']['_error']['msg'])
 
         # Verify that files were not created on the target
-        on(node, "cat #{filepath}/hello.txt", acceptable_exit_codes: [1])
+        on(node, "cat #{restricted_filepath}/hello.txt", acceptable_exit_codes: [1])
       end
     end
   end
