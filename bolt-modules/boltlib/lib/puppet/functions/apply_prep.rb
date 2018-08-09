@@ -7,6 +7,18 @@ Puppet::Functions.create_function(:apply_prep) do
     param 'Boltlib::TargetSpec', :targets
   end
 
+  def script_compiler
+    @script_compiler ||= Puppet::Pal::ScriptCompiler.new(closure_scope.compiler)
+  end
+
+  def run_task(executor, targets, name, args = {})
+    task = script_compiler.task_signature(name)&.task
+    raise Bolt::Error.new("#{name} could not be found", 'bolt/apply-prep') unless task
+    results = executor.run_task(targets, task, args)
+    raise Bolt::RunFailure.new(results, 'run_task', task.name) unless results.ok?
+    results
+  end
+
   def apply_prep(target_spec)
     applicator = Puppet.lookup(:apply_executor) { nil }
     executor = Puppet.lookup(:bolt_executor) { nil }
@@ -23,23 +35,20 @@ Puppet::Functions.create_function(:apply_prep) do
 
     executor.log_action('install puppet and gather facts', targets) do
       executor.without_default_logging do
-        script_compiler = Puppet::Pal::ScriptCompiler.new(closure_scope.compiler)
-
         # Ensure Puppet is installed
-        version_task = script_compiler.task_signature('puppet_agent::version')&.task
-        raise Bolt::Error.new('puppet_agent::version could not be found', 'bolt/apply-prep') unless version_task
-        versions = executor.run_task(targets, version_task, {})
-        raise Bolt::RunFailure.new(versions, 'run_task', version_task.name) unless versions.ok?
+        versions = run_task(executor, targets, 'puppet_agent::version')
         need_install, installed = versions.partition { |r| r['version'].nil? }
         installed.each do |r|
           Puppet.info "Puppet Agent #{r['version']} installed on #{r.target.name}"
         end
 
         unless need_install.empty?
-          install_task = script_compiler.task_signature('puppet_agent::install')&.task
-          raise Bolt::Error.new('puppet_agent::install could not be found', 'bolt/apply-prep') unless install_task
-          installed = executor.run_task(need_install.map(&:target), install_task, {})
-          raise Bolt::RunFailure.new(installed, 'run_task', install_task.name) unless installed.ok?
+          need_install_targets = need_install.map(&:target)
+          run_task(executor, need_install_targets, 'puppet_agent::install')
+
+          # Ensure the Puppet service is stopped after new install
+          run_task(executor, need_install_targets, 'service', 'action' => 'stop', 'name' => 'puppet')
+          run_task(executor, need_install_targets, 'service', 'action' => 'disable', 'name' => 'puppet')
         end
         targets.each { |target| inventory.set_feature(target, 'puppet-agent') }
 

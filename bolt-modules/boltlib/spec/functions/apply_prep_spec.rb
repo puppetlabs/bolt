@@ -30,6 +30,7 @@ describe 'apply_prep' do
     let(:custom_facts_task) { mock('custom_facts_task') }
     let(:version_task) { mock('version_task') }
     let(:install_task) { mock('install_task') }
+    let(:service_task) { mock('service_task') }
 
     before(:each) do
       applicator.stubs(:build_plugin_tarball).returns(:tarball)
@@ -44,6 +45,10 @@ describe 'apply_prep' do
       task2.stubs(:task).returns(install_task)
       install_task.stubs(:name).returns('puppet_agent::install')
       Puppet::Pal::ScriptCompiler.any_instance.stubs(:task_signature).with('puppet_agent::install').returns(task2)
+      task3 = mock('service_task_sig')
+      task3.stubs(:task).returns(service_task)
+      service_task.stubs(:name).returns('service')
+      Puppet::Pal::ScriptCompiler.any_instance.stubs(:task_signature).with('service').returns(task3)
     end
 
     it 'sets feature and gathers facts' do
@@ -67,6 +72,7 @@ describe 'apply_prep' do
       executor.expects(:run_task).with(targets, version_task, anything, anything).returns(versions)
       ok_result = Bolt::ResultSet.new([])
       executor.expects(:run_task).with(targets[1..1], install_task, anything, anything).returns(ok_result)
+      executor.expects(:run_task).with(targets[1..1], service_task, anything, anything).returns(ok_result).twice
 
       facts = Bolt::ResultSet.new(targets.map { |t| Bolt::Result.new(t, value: fact) })
       executor.expects(:run_task).with(targets, custom_facts_task, 'plugins' => :tarball).returns(facts)
