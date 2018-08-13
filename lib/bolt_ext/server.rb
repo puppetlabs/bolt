@@ -17,7 +17,7 @@ class TransportAPI < Sinatra::Base
     task = Bolt::Task.new(body['task'])
     parameters = body['parameters'] || {}
 
-    executor = Bolt::Executor.new
+    executor = Bolt::Executor.new(load_config: false)
 
     # Since this will only be on one node we can just set r to the result
     executor.run_task(target, task, parameters) do |event|

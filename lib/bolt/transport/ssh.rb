@@ -60,8 +60,8 @@ module Bolt
         end
       end
 
-      def with_connection(target)
-        conn = Connection.new(target)
+      def with_connection(target, load_config = true)
+        conn = Connection.new(target, load_config)
         conn.connect
         yield conn
       ensure
@@ -125,7 +125,7 @@ module Bolt
 
       def run_task(target, task, arguments, options = {})
         input_method = task.input_method || "both"
-        with_connection(target) do |conn|
+        with_connection(target, options.fetch('_load_config', true)) do |conn|
           conn.running_as(options['_run_as']) do
             stdin, output = nil
 

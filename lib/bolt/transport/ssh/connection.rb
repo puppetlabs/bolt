@@ -54,10 +54,12 @@ module Bolt
         attr_reader :logger, :user, :target
         attr_writer :run_as
 
-        def initialize(target)
+        def initialize(target, load_config = true)
           @target = target
+          @load_config = load_config
 
-          @user = @target.user || Net::SSH::Config.for(target.host)[:user] || Etc.getlogin
+          ssh_user = load_config ? Net::SSH::Config.for(target.host)[:user] : nil
+          @user = @target.user || ssh_user || Etc.getlogin
           @run_as = nil
 
           @logger = Logging.logger[@target.host]
@@ -97,6 +99,7 @@ module Bolt
                                         Net::SSH::Verifiers::Lenient.new
                                       end
           options[:timeout] = target.options['connect-timeout'] if target.options['connect-timeout']
+          options[:config] = @load_config
 
           # Mirroring:
           # https://github.com/net-ssh/net-ssh/blob/master/lib/net/ssh/authentication/agent.rb#L80
