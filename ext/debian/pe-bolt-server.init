@@ -13,6 +13,7 @@ export GEM_HOME="${prefix}/lib/ruby/gems/2.4.0"
 exec="${prefix}/bin/bolt-server ${prefix}/config.ru"
 prog="pe-bolt-server"
 desc="PE Bolt Server"
+owner="pe-bolt-server:pe-bolt-server"
 
 piddir=/var/run/puppetlabs
 pidfile="${piddir}/${prog}.pid"
@@ -25,16 +26,16 @@ logdir=/var/log/puppetlabs
 . /lib/lsb/init-functions
 
 reload_pe_bolt_server() {
-    start-stop-daemon --stop --quiet --signal HUP --pidfile $pidfile --name $prog
+    start-stop-daemon --stop --quiet --signal HUP --chuid $owner --pidfile $pidfile --name $prog
 }
 
 start_pe_bolt_server() {
     mkdir -p $piddir $logdir
-    start-stop-daemon --start --quiet --pidfile $pidfile --startas $exec -- $PE_BOLT_SERVER_OPTIONS
+    start-stop-daemon --start --quiet --chuid $owner --pidfile $pidfile --startas $exec -- $PE_BOLT_SERVER_OPTIONS
 }
 
 stop_pe_bolt_server() {
-    start-stop-daemon --stop --retry TERM/10/KILL/5 --quiet --oknodo --pidfile $pidfile --name $prog && rm -f "${pidfile}"
+    start-stop-daemon --stop --chuid $owner --retry TERM/10/KILL/5 --quiet --oknodo --pidfile $pidfile --name $prog && rm -f "${pidfile}"
 }
 
 restart_pe_bolt_server() {
