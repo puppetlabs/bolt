@@ -75,6 +75,13 @@ describe "passes parsed AST to the apply_catalog task" do
       expect(notify.count).to eq(1)
     end
 
+    it 'applies a complex type from the modulepath' do
+      result = run_cli_json(%w[plan run basic::type] + config_flags)
+      ast = result[0]['result']
+      notify = ast['resources'].select { |r| r['type'] == 'Warn' }
+      expect(notify.count).to eq(1)
+    end
+
     it 'logs messages emitted during compilation' do
       result = run_cli_json(%w[plan run basic::error] + config_flags)
       expect(result[0]['status']).to eq('success')

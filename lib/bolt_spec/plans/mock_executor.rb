@@ -209,6 +209,10 @@ module BoltSpec
         @task_doubles[task_name] ||= TaskDouble.new
       end
 
+      def log_plan(_plan_name)
+        yield
+      end
+
       def report_function_call(_function); end
 
       def report_bundled_content(_mode, _name); end

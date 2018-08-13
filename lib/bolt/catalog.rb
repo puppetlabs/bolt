@@ -82,6 +82,12 @@ module Bolt
           variables: target["variables"] || {}
         ) do |_pal|
           node = Puppet.lookup(:pal_current_node)
+
+          # Ensure files that custom facts and types/providers depend on can be loaded
+          node.environment.each_plugin_directory do |dir|
+            $LOAD_PATH << dir unless $LOAD_PATH.include?(dir)
+          end
+
           setup_node(node, target["trusted"])
 
           Puppet.override(pal_main: pal_main,
