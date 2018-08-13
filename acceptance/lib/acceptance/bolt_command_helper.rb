@@ -20,7 +20,9 @@ module Acceptance
       when /windows/
         execute_powershell_script_on(host, bolt_command, opts)
       when /osx/
-        env = 'source /etc/profile  ~/.bash_profile ~/.bash_login ~/.profile &&'
+        # Ensure Bolt runs with UTF-8 under macOS. Otherwise we get issues with
+        # UTF-8 content in task results.
+        env = 'source /etc/profile  ~/.bash_profile ~/.bash_login ~/.profile && env LANG=en_US.UTF-8'
         on(host, env + ' ' + bolt_command)
       else
         on(host, bolt_command, opts)

@@ -686,6 +686,7 @@ bar
 
       before :each do
         allow(Bolt::Executor).to receive(:new).and_return(executor)
+        allow(executor).to receive(:log_plan) { |_plan_name, &block| block.call }
 
         outputter = Bolt::Outputter::JSON.new(false, false, output)
 
@@ -1422,6 +1423,7 @@ bar
             .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0)]))
 
           expect(executor).to receive(:start_plan)
+          expect(executor).to receive(:log_plan)
           expect(executor).to receive(:finish_plan)
 
           cli.execute(options)
@@ -1447,6 +1449,7 @@ bar
             .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0)]))
 
           expect(executor).to receive(:start_plan)
+          expect(executor).to receive(:log_plan)
           expect(executor).to receive(:finish_plan)
 
           cli.execute(options)
@@ -1462,6 +1465,7 @@ bar
             .and_raise("Could not connect to target")
 
           expect(executor).to receive(:start_plan)
+          expect(executor).to receive(:log_plan)
           expect(executor).to receive(:finish_plan)
 
           expect(cli.execute(options)).to eq(1)
@@ -1475,6 +1479,7 @@ bar
             .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'no', '', 1)]))
 
           expect(executor).to receive(:start_plan)
+          expect(executor).to receive(:log_plan)
           expect(executor).to receive(:finish_plan)
 
           cli.execute(options)
@@ -1517,6 +1522,7 @@ bar
             end
 
           expect(executor).to receive(:start_plan)
+          expect(executor).to receive(:log_plan)
           expect(executor).to receive(:finish_plan)
 
           expect(cli).to receive(:exit!) do

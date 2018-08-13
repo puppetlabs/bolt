@@ -28,31 +28,4 @@ test_name "C100549: \
       assert_match(/{#{node.ip}}/, result.stdout, message)
     end
   end
-
-  rb_script = "C100549.rb"
-  step "create ruby script on bolt controller" do
-    create_remote_file(bolt, rb_script, <<-FILE)
-    1001.times { |t| puts t }
-    FILE
-  end
-
-  step "execute `bolt script run` via WinRM for Ruby script and verify output is in-order" do
-    bolt_command = "bolt script run #{rb_script}"
-    flags = { '--nodes' => 'winrm_nodes', '--format' => 'json' }
-
-    result = bolt_command_on(bolt, bolt_command, flags)
-
-    begin
-      json = JSON.parse(result.stdout)
-    rescue JSON.ParserError
-      assert_equal("Output should be JSON", result.string,
-                   "Output should be JSON")
-    end
-
-    winrm_nodes.each do |node|
-      output = json['items'].select { |n| n['node'] == node.hostname }.first
-      expected = (0..1000).to_a.join("\r\n")
-      assert_equal(output['result']['stdout'].chomp, expected)
-    end
-  end
 end

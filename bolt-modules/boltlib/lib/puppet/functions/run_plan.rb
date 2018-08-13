@@ -53,36 +53,40 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
       )
     end
 
-    # TODO: Add profiling around this
     if (run_as = named_args['_run_as'])
       old_run_as = executor.run_as
       executor.run_as = run_as
     end
-    result = nil
-    begin
-      # If the plan does not throw :return by calling the return function it's result is
-      # undef/nil
-      result = catch(:return) do
-        func.class.dispatcher.dispatchers[0].call_by_name_with_scope(scope, params, true)
-        nil
-      end&.value
-      # Validate the result is a PlanResult
-      unless Puppet::Pops::Types::TypeParser.singleton.parse('Boltlib::PlanResult').instance?(result)
-        raise Bolt::InvalidPlanResult.new(plan_name, result.to_s)
-      end
-      result
-    rescue Puppet::PreformattedError => err
-      if named_args['_catch_errors'] && err.cause.is_a?(Bolt::Error)
-        result = err.cause.to_puppet_error
-      else
-        raise err
-      end
-    ensure
-      if run_as
-        executor.run_as = old_run_as
-      end
-    end
 
-    result
+    # wrap plan execution in logging messages
+    executor.log_plan(plan_name) do
+      result = nil
+      begin
+        # If the plan does not throw :return by calling the return function it's result is
+        # undef/nil
+        result = catch(:return) do
+          func.class.dispatcher.dispatchers[0].call_by_name_with_scope(scope, params, true)
+          nil
+        end&.value
+        # Validate the result is a PlanResult
+        unless Puppet::Pops::Types::TypeParser.singleton.parse('Boltlib::PlanResult').instance?(result)
+          raise Bolt::InvalidPlanResult.new(plan_name, result.to_s)
+        end
+
+        result
+      rescue Puppet::PreformattedError => err
+        if named_args['_catch_errors'] && err.cause.is_a?(Bolt::Error)
+          result = err.cause.to_puppet_error
+        else
+          raise err
+        end
+      ensure
+        if run_as
+          executor.run_as = old_run_as
+        end
+      end
+
+      result
+    end
   end
 end
