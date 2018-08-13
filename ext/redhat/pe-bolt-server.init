@@ -17,6 +17,7 @@ export GEM_HOME="${prefix}/lib/ruby/gems/2.4.0"
 exec="${prefix}/bin/bolt-server ${prefix}/config.ru"
 prog="pe-bolt-server"
 desc="PE Bolt Server"
+owner="pe-bolt-server"
 
 lockfile=/var/lock/subsys/$prog
 piddir=/var/run/puppetlabs
@@ -36,7 +37,7 @@ fi
 start() {
     echo -n $"Starting PE Bolt Server: "
     mkdir -p $piddir $logdir
-    daemon $daemonopts $exec ${PE_BOLT_SERVER_OPTIONS}
+    daemon $daemonopts --user=$owner $exec ${PE_BOLT_SERVER_OPTIONS}
     RETVAL=$?
     echo
     [ $RETVAL = 0 ] && touch ${lockfile}

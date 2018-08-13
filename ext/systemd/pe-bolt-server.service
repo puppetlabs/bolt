@@ -4,6 +4,8 @@ After=syslog.target network.target
 
 [Service]
 Type=simple
+User=pe-bolt-server
+Group=pe-bolt-server
 EnvironmentFile=-/etc/sysconfig/pe-bolt-server-service
 EnvironmentFile=-/etc/default/pe-bolt-server-service
 Environment=GEM_HOME=/opt/puppetlabs/server/apps/bolt-server/lib/ruby/gems/2.4.0

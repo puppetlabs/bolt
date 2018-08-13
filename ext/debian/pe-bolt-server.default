@@ -1,4 +1,0 @@
-# Defaults for pe-bolt-server - sourced by /etc/init.d/pe-bolt-server
-
-# Startup options
-#PE_BOLT_SERVER_OPTIONS=--loglevel=debug
