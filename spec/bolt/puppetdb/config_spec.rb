@@ -39,27 +39,47 @@ describe Bolt::PuppetDB::Config do
     end
 
     context "token" do
-      before :each do
-        allow(File).to receive(:read).with(token).and_return 'footoken'
-        allow(File).to receive(:read).with(Bolt::PuppetDB::Config::DEFAULT_TOKEN).and_return 'bartoken'
+      context "token is valid" do
+        before :each do
+          allow(File).to receive(:read).with(token).and_return 'footoken'
+          allow(File).to receive(:read).with(Bolt::PuppetDB::Config::DEFAULT_TOKEN).and_return 'bartoken'
+        end
+
+        it 'loads the token file if one was specified' do
+          expect(config.token).to eq('footoken')
+        end
+
+        it 'loads the default token if no file was specified' do
+          allow(File).to receive(:exist?).with(Bolt::PuppetDB::Config::DEFAULT_TOKEN).and_return true
+          options.delete('token')
+
+          expect(config.token).to eq('bartoken')
+        end
+
+        it 'returns nil if no file was specified and the default does not exist' do
+          allow(File).to receive(:exist?).with(Bolt::PuppetDB::Config::DEFAULT_TOKEN).and_return false
+          options.delete('token')
+
+          expect(config.token).to be_nil
+        end
       end
 
-      it 'loads the token file if one was specified' do
-        expect(config.token).to eq('footoken')
-      end
+      context "token is invalid" do
+        before :each do
+          allow(File).to receive(:read).with(token).and_return "footoken\n"
+          allow(File).to receive(:read).with(Bolt::PuppetDB::Config::DEFAULT_TOKEN).and_return "bartoken\n"
+        end
 
-      it 'loads the default token if no file was specified' do
-        allow(File).to receive(:exist?).with(Bolt::PuppetDB::Config::DEFAULT_TOKEN).and_return true
-        options.delete('token')
+        it 'loads and strips the token file if one was specified' do
+          expect(config.token).to eq('footoken')
+        end
 
-        expect(config.token).to eq('bartoken')
-      end
+        it 'loads and strips the default token if no file was specified' do
+          allow(File).to receive(:exist?).with(Bolt::PuppetDB::Config::DEFAULT_TOKEN).and_return true
+          options.delete('token')
 
-      it 'returns nil if no file was specified and the default does not exist' do
-        allow(File).to receive(:exist?).with(Bolt::PuppetDB::Config::DEFAULT_TOKEN).and_return false
-        options.delete('token')
-
-        expect(config.token).to be_nil
+          expect(config.token).to eq('bartoken')
+        end
       end
     end
 

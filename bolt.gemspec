@@ -36,7 +36,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "logging", "~> 2.2"
   spec.add_dependency "net-scp", "~> 1.2"
   spec.add_dependency "net-ssh", "~> 4.2"
-  spec.add_dependency "orchestrator_client", "~> 0.2"
+  spec.add_dependency "orchestrator_client", "~> 0.3.1"
   spec.add_dependency "r10k", "~> 2.6"
   spec.add_dependency "terminal-table", "~> 1.8"
   spec.add_dependency "winrm", "~> 2.0"
