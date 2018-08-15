@@ -1,6 +1,6 @@
 # Applying Manifest Blocks
 
-Within a plan, you can use Bolt to apply blocks of Puppet code (manifest blocks) to remote nodes. Similar to the `puppet apply` command - that applies a standalone Puppet manifest to a local system - Bolt leverages manifest blocks to pass code to remote nodes from the command line. You can create manifest blocks that use existing content from the Forge, or mix declarative resource configuration via manifest blocks with procedural orchestration and action in a plan.
+Within a plan, you can use Bolt to apply blocks of Puppet code (manifest blocks) to remote nodes. Similar to the `puppet apply` command, which applies a standalone Puppet manifest to a local system, the Bolt `apply` command leverages manifest blocks to pass code to remote nodes from the command line. You can create manifest blocks that use existing content from the Forge, or mix declarative resource configuration via manifest blocks with procedural orchestration and action in a plan.
 
 **Parent topic:** [Tasks and plans](writing_tasks_and_plans.md)
 
