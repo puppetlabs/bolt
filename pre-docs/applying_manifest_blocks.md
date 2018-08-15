@@ -8,16 +8,16 @@ Within a plan, you can use Bolt to apply blocks of Puppet code (manifest blocks)
 
 [Writing plans](writing_plans.md)
 
-## A short example
+## Create a sample manifest for nginx on Linux
 
-To get started, we'll show creating a manifest for web server and running it as a plan in Bolt. We'll put this module in Bolt's default Boltdir (`~/.puppetlabs/bolt`).
+Create a manifest to set up a web server with [nginx](https://nginx.org) and run it as a plan. 
 
-### nginx on Linux
-
-Setting up a web server using [nginx](https://nginx.org):
+Save this module in the Bolt default Boltdir (`~/.puppetlabs/bolt`).
 
 1. Go to `~/.puppetlabs/bolt/modules`
-1. Create a new module with `pdk new module profiles` and add a `plans` directory (or create `~/.puppetlabs/bolt/modules/profiles/plans`)
+1. Create a new module.
+   * If you use PDK, run `pdk new module profiles` and add a `plans` directory 
+   * Otherwise create `~/.puppetlabs/bolt/modules/profiles/plans`
 1. Add the following code to the manifest `profiles/plans/nginx_install.pp`
    ```
    plan profiles::nginx_install(
@@ -59,21 +59,25 @@ Setting up a web server using [nginx](https://nginx.org):
      }
    }
    ```
-1. Run `bolt plan run profiles::nginx_install --nodes <NODE NAME>`
-1. From a web browser, navigate to `<NODE NAME>` and you should see a page saying `hello!`
+1. Run the plan on a target node: `bolt plan run profiles::nginx_install --nodes <NODE NAME>`
+1. From a web browser, navigate to `<NODE NAME>`. The page displays the text `hello!`
 
-### iis on Windows
+## Create a sample manifest for iis on Windows
 
-Setting up a web server using [iis](https://www.iis.net):
+Create a manifest to set up a web server with [iis](https://www.iis.net) and run it as a plan. 
 
 1. Go to `~/.puppetlabs/bolt/modules`
-1. Create a new module with `pdk new module profiles` and add a `plans` directory (or create `~/.puppetlabs/bolt/modules/profiles/plans`)
-1. Install dependencies by adding the following to `~/.puppetlabs/bolt/Puppetfile` and run `bolt puppetfile install`
+1. Create a new module.
+   * If you use PDK, run `pdk new module profiles` and add a `plans` directory 
+   * Otherwise create `~/.puppetlabs/bolt/modules/profiles/plans`
+1. Install the IIS dependencies
+   * Add the following to `~/.puppetlabs/bolt/Puppetfile`  
    ```
    forge 'http://forge.puppetlabs.com'
    mod 'puppetlabs-iis', '4.3.2'
    mod 'profiles', local: true
    ```
+   * run `bolt puppetfile install`
 1. Add the following code to the manifest `profiles/plans/iis_install.pp`
    ```
    plan profiles::iis_install(
@@ -118,8 +122,8 @@ Setting up a web server using [iis](https://www.iis.net):
      }
    }
    ```
-1. Run `bolt plan run profiles::iis_install --nodes <NODE NAME> --transport winrm`
-1. From a web browser, navigate to `<NODE NAME>` and you should see a page saying `hello!`
+1. Run the plan on a target node: `bolt plan run profiles::iis_install --nodes <NODE NAME> --transport winrm`
+1. From a web browser, navigate to `<NODE NAME>`. The page displays the text `hello!`
 
 ### Explanation
 
