@@ -59,6 +59,7 @@
         -   [Plan Logging](writing_plans.md#concept-1852)
         -   [Plan execution functions](plan_functions.md#concept-6192)
             -   [Bolt functions](plan_functions.md#bolt_functions)
+    -   [Applying Manifest Blocks](applying_manifest_blocks.md)
 -   [Configuring Bolt](configuring_bolt.md)
     -   [Bolt configuration options](bolt_configuration_options.md)
     -   [Configuring Bolt to use orchestrator](bolt_configure_orchestrator.md)
