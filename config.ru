@@ -35,6 +35,10 @@ bind_addr << "&key=#{config.ssl_key}"
 bind_addr << "&ca=#{config.ssl_ca_cert}"
 bind_addr << "&verify_mode=force_peer"
 
+# This doesn't seem ideal, but it behaves well. I couldn't figure out how to get Puma or Rack to do
+# it for me. An alternative might be rewriting this to use 'puma -C config.rb'.
+Process.daemon
 Rack::Handler::Puma.run(TransportAPI,
+                        pidfile: '/var/run/puppetlabs/bolt-server/bolt-server.pid',
                         Port: config.port,
                         Host: bind_addr)

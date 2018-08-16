@@ -3,7 +3,8 @@ Description=PE Bolt Server
 After=syslog.target network.target
 
 [Service]
-Type=simple
+Type=fork
+PIDFile=/var/run/puppetlabs/bolt-server/bolt-server.pid
 User=pe-bolt-server
 Group=pe-bolt-server
 EnvironmentFile=-/etc/sysconfig/pe-bolt-server-service
