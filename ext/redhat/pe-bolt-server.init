@@ -15,14 +15,14 @@
 prefix='/opt/puppetlabs/server/apps/bolt-server'
 export GEM_HOME="${prefix}/lib/ruby/gems/2.4.0"
 exec="${prefix}/bin/bolt-server"
-prog="pe-bolt-server"
+prog="bolt-server"
 desc="PE Bolt Server"
 owner="pe-bolt-server"
 
 lockfile=/var/lock/subsys/$prog
-piddir=/var/run/puppetlabs
+piddir=/var/run/puppetlabs/$prog
 pidfile="${piddir}/${prog}.pid"
-logdir=/var/log/puppetlabs
+logdir=/var/log/puppetlabs/$prog
 pid=$(cat $pidfile 2> /dev/null)
 RETVAL=0
 

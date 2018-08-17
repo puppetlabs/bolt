@@ -4,4 +4,4 @@
 # ARGV[0] is the path to config.ru, the rackup file that configures the bolt-server
 
 require 'rack'
-Rack::Server.start(environment: 'production', daemonize: true, config: ARGV[0])
+Rack::Server.start(config: ARGV[0])
