@@ -13,7 +13,7 @@ Puppet.initialize_settings([])
 run_mode = Puppet::Util::RunMode[:user]
 Puppet.settings.initialize_app_defaults(Puppet::Settings.app_defaults_for_run_mode(run_mode))
 
-Puppet::ApplicationSupport.push_application_context(run_mode, :local)
+Puppet::ApplicationSupport.push_application_context(run_mode)
 
 # Avoid extraneous output
 Puppet[:summarize] = false

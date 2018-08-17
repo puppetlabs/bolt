@@ -50,6 +50,7 @@ module Bolt
         elsif File.exist?(DEFAULT_TOKEN)
           @token = File.read(DEFAULT_TOKEN)
         end
+        @token = @token.strip if @token
       end
 
       def expand_paths
