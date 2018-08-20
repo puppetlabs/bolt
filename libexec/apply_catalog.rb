@@ -1,6 +1,7 @@
 #! /opt/puppetlabs/puppet/bin/ruby
 # frozen_string_literal: true
 
+require 'fileutils'
 require 'json'
 require 'puppet'
 require 'puppet/configurer'
@@ -43,7 +44,8 @@ Puppet[:postrun_command] = nil
 Puppet[:default_file_terminus] = :file_server
 
 exit_code = 0
-Dir.mktmpdir do |moduledir|
+moduledir = Dir.mktmpdir
+begin
   Tempfile.open('plugins.tar.gz') do |plugins|
     File.binwrite(plugins, Base64.decode64(args['plugins']))
     Puppet::ModuleTool::Tar.instance.unpack(plugins, moduledir, Etc.getlogin || Etc.getpwuid.name)
@@ -75,6 +77,12 @@ Dir.mktmpdir do |moduledir|
 
   puts JSON.pretty_generate(report.to_data_hash)
   exit_code = report.exit_status != 1
+ensure
+  begin
+    FileUtils.remove_dir(moduledir)
+  rescue Errno::ENOTEMPTY => e
+    STDERR.puts("Could not cleanup temporary directory: #{e}")
+  end
 end
 
 exit exit_code
