@@ -3,7 +3,7 @@ Description=PE Bolt Server
 After=syslog.target network.target
 
 [Service]
-Type=fork
+Type=forking
 PIDFile=/var/run/puppetlabs/bolt-server/bolt-server.pid
 User=pe-bolt-server
 Group=pe-bolt-server
