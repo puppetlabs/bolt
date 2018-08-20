@@ -30,6 +30,10 @@ module Bolt
       if @options['port']
         @port = @options['port']
       end
+
+      if @options['protocol']
+        @protocol = @options['protocol']
+      end
     end
 
     def update_conf(conf)

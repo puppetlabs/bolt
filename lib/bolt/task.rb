@@ -5,7 +5,7 @@ module Bolt
     :name,
     :implementations,
     :input_method,
-    :file_content,
+    :file,
     :metadata
   ) do
 

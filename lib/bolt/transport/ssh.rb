@@ -117,15 +117,6 @@ module Bolt
         end
       end
 
-      def from_api?(task)
-        if task.respond_to? :file_content
-          unless task.file_content.nil?
-            return true
-          end
-        end
-        false
-      end
-
       def run_task(target, task, arguments, options = {})
         input_method = task.input_method || "both"
         with_connection(target, options.fetch('_load_config', true)) do |conn|
@@ -149,9 +140,9 @@ module Bolt
 
             conn.with_remote_tempdir do |dir|
               if from_api?(task)
-                filename = task.name.split("::").last
+                filename = task.file['filename']
                 remote_task_path = conn.write_executable_from_content(dir,
-                                                                      Base64.decode64(task.file_content),
+                                                                      Base64.decode64(task.file['file_content']),
                                                                       filename)
               else
                 executable = target.select_impl(task, PROVIDED_FEATURES)

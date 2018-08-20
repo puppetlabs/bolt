@@ -35,9 +35,9 @@ body['task']['metadata'] = {
   "description": "Echo a message",
   "parameters": { "message" => "Hello world!" }
 }
-# This is just so the file isn't overtaken with base64 file content
 file = File.open(File.join(File.dirname(__FILE__), "echo-task"))
-body['task']['file_content'] = file.read
+body['task']['file'] = { 'filename': 'echo.rb',
+                         'file_content': file.read }
 body['target']['hostname'] = 'localhost'
 body['target']['user'] = ENV['BOLT_USER']
 body['target']['password'] = ENV['BOLT_PW']
@@ -48,9 +48,9 @@ make_request(body)
 
 # Second request
 file = File.open(File.join(File.dirname(__FILE__), "package-task"))
-body['task']['file_content'] = file.read
+body['task']['file'] = { 'filename': 'package',
+                         'file_content': file.read }
 body['task']['name'] = 'package::status'
-# This is a little gross but works
 body['parameters'] = { 'name' => 'cowsay',
                        'action' => "status",
                        'version' => "",
