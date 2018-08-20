@@ -10,9 +10,9 @@ class TransportAPI < Sinatra::Base
     content_type :json
 
     body = JSON.parse(request.body.read)
-    keys = %w[user password port ssh-key-content]
+    keys = %w[user password port ssh-key-content connect-timeout run-as-command
+              run-as tmpdir host-key-check known-hosts-content sudo-password]
     opts = body['target'].select { |k, _| keys.include? k }
-    opts.merge(body['target']['options'])
     target = [Bolt::Target.new(body['target']['hostname'], opts)]
     task = Bolt::Task.new(body['task'])
     parameters = body['parameters']
