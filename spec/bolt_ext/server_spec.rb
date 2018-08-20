@@ -25,22 +25,22 @@ echo $PT_message
 TASK
 
       body = {
-        'task' => {
-          'name' => 'echo',
-          'metadata' => {
-            'description' => 'Echo a message',
-            'parameters' => { 'message' => 'Hello world!' }
+        'task': {
+          'name': 'echo',
+          'metadata': {
+            'description': 'Echo a message',
+            'parameters': { 'message': 'Default message' }
           },
-          'file_content' => Base64.encode64(impl)
+          'file_content': Base64.encode64(impl)
         },
-        'target' => {
-          'hostname' => target[:host],
-          'user' => target[:user],
-          'password' => target[:password],
-          'port' => target[:port],
-          'options' => { "host-key-check" => "false" }
+        'target': {
+          'hostname': target[:host],
+          'user': target[:user],
+          'password': target[:password],
+          'port': target[:port],
+          'host-key-check': false
         },
-        'parameters' => { "message" => "Hello!" }
+        'parameters': { "message": "Hello!" }
       }
 
       post path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json'
