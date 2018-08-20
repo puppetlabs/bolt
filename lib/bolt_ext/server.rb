@@ -15,7 +15,7 @@ class TransportAPI < Sinatra::Base
     opts = body['target'].select { |k, _| keys.include? k }
     target = [Bolt::Target.new(body['target']['hostname'], opts)]
     task = Bolt::Task.new(body['task'])
-    parameters = body['parameters']
+    parameters = body['parameters'] || {}
 
     executor = Bolt::Executor.new
 
