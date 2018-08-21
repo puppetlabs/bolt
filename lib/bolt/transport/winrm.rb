@@ -66,6 +66,9 @@ module Bolt
       end
 
       def run_script(target, script, arguments, _options = {})
+        # unpack any Sensitive data
+        arguments = unwrap_sensitive_args(arguments)
+        
         with_connection(target) do |conn|
           conn.with_remote_file(script) do |remote_path|
             if powershell_file?(remote_path)
@@ -103,6 +106,9 @@ catch
         executable = target.select_impl(task, PROVIDED_FEATURES)
         raise "No suitable implementation of #{task.name} for #{target.name}" unless executable
 
+        # unpack any Sensitive data
+        arguments = unwrap_args(arguments)
+        
         input_method = task.input_method
         input_method ||= powershell_file?(executable) ? 'powershell' : 'both'
         with_connection(target) do |conn|

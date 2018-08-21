@@ -171,6 +171,32 @@ module Bolt
       def upload(*_args)
         raise NotImplementedError, "upload() must be implemented by the transport class"
       end
+      
+      # Unwraps any Sensitive data in an arguments Hash, so the plain-text is passed
+      # to the Task/Script.
+      #
+      # This works on deeply nested data structures composed of Hashes, Arrays, and
+      # and plain-old data types (int, string, etc).
+      def unwrap_sensitive_args(arguments)
+        case arguments
+        when Array
+          # iterate over the array, unwrapping all elements
+          unwrapped = arguments.map { |x| unwrap_args(x) }
+        when Hash
+          # iterate over the arguments hash and unwrap all keys and values
+          unwrapped = arguments.each_with_object({}) { |(k, v), h|
+            h[unwrap_args(k)] = unwrap_args(v)
+          }
+        when Puppet::Pops::Types::PSensitiveType::Sensitive
+          # this value is Sensitive, unwrap it
+          unwrapped = arguments.unwrap
+        else
+          # unknown data type, just return it
+          unwrapped = arguments
+        end
+        return unwarpped
+      end
+      
     end
   end
 end

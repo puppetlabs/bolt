@@ -70,6 +70,8 @@ module Bolt
         with_tmpscript(File.absolute_path(script), target.options['tmpdir']) do |file|
           logger.debug "Running '#{file}' with #{arguments}"
 
+          # unpack any Sensitive data AFTER we log
+          arguments = unwrap_sensitive_args(arguments)
           if arguments.empty?
             # We will always provide separated arguments, so work-around Open3's handling of a single
             # argument as the entire command string for script paths containing spaces.
@@ -84,11 +86,15 @@ module Bolt
         executable = target.select_impl(task, PROVIDED_FEATURES)
         raise "No suitable implementation of #{task.name} for #{target.name}" unless executable
 
+        # unpack any Sensitive data, write it to a separate variable because
+        # we log 'arguments' below
+        unwrapped_arguments = unwrap_sensitive_args(arguments)
         input_method = task.input_method || "both"
-        stdin = STDIN_METHODS.include?(input_method) ? JSON.dump(arguments) : nil
-        env = ENVIRONMENT_METHODS.include?(input_method) ? arguments : nil
+        stdin = STDIN_METHODS.include?(input_method) ? JSON.dump(unwrapped_arguments) : nil
+        env = ENVIRONMENT_METHODS.include?(input_method) ? unwrapped_arguments : nil
 
         with_tmpscript(executable, target.options['tmpdir']) do |script|
+          # log the arguments with sensitive data redacted, do NOT log unwrapped_arguments
           logger.debug("Running '#{script}' with #{arguments}")
 
           output = @conn.execute(script, stdin: stdin, env: env)
