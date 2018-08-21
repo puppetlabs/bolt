@@ -298,7 +298,7 @@ describe 'run_task' do
       )
     end
 
-    it "errors when a specified parameter value is not Data" do
+    it "errors when a specified parameter value is not RichData" do
       task_params.merge!(
         'mandatory_string'  => 'str',
         'mandatory_integer' => 10,
@@ -307,7 +307,7 @@ describe 'run_task' do
       )
 
       is_expected.to run.with_params(task_name, hostname, task_params).and_raise_error(
-        Puppet::ParseError, /Task parameters is not of type Data/
+        Puppet::ParseError, /Task parameters is not of type RichData/
       )
     end
   end
