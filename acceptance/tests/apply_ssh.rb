@@ -9,9 +9,6 @@ test_name "bolt plan run should apply manifest block on remote hosts via ssh" do
   ssh_nodes = select_hosts(roles: ['ssh'])
   skip_test('no applicable nodes to test on') if ssh_nodes.empty?
 
-  sles_nodes = ssh_nodes.select { |host| host['platform'] =~ /sles/ }
-  skip_test('FIX: agent install does not support SLES') unless sles_nodes.empty?
-
   dir = bolt.tmpdir('apply_ssh')
   fixtures = File.absolute_path('files')
   filepath = File.join('/tmp', SecureRandom.uuid.to_s)
