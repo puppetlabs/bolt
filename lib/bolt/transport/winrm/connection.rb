@@ -11,7 +11,7 @@ module Bolt
 
         DEFAULT_EXTENSIONS = ['.ps1', '.rb', '.pp'].freeze
 
-        def initialize(target)
+        def initialize(target, transport_logger)
           @target = target
 
           default_port = target.options['ssl'] ? HTTPS_PORT : HTTP_PORT
@@ -23,6 +23,7 @@ module Bolt
           @extensions = DEFAULT_EXTENSIONS.to_set.merge(extensions)
 
           @logger = Logging.logger[@target.host]
+          @transport_logger = transport_logger
         end
 
         HTTP_PORT = 5985
@@ -47,9 +48,7 @@ module Bolt
 
           Timeout.timeout(target.options['connect-timeout']) do
             @connection = ::WinRM::Connection.new(options)
-            transport_logger = Logging.logger[::WinRM]
-            transport_logger.level = :warn
-            @connection.logger = transport_logger
+            @connection.logger = @transport_logger
 
             @session = @connection.shell(:powershell)
             @session.run('$PSVersionTable.PSVersion')
