@@ -107,7 +107,7 @@ catch
         raise "No suitable implementation of #{task.name} for #{target.name}" unless executable
 
         # unpack any Sensitive data
-        arguments = unwrap_args(arguments)
+        arguments = unwrap_sensitive_args(arguments)
 
         input_method = task.input_method
         input_method ||= powershell_file?(executable) ? 'powershell' : 'both'

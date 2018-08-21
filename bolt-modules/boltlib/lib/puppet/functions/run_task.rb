@@ -119,8 +119,14 @@ Puppet::Functions.create_function(:run_task) do
       task = task_signature.task
     end
 
-    unless Puppet::Pops::Types::TypeFactory.data.instance?(use_args)
-      raise with_stack(:TYPE_NOT_DATA, 'Task parameters is not of type Data')
+    unless Puppet::Pops::Types::TypeFactory.rich_data.instance?(use_args)
+      # produce a meaningful error messages, showing the details of the type
+      # alias we're expecting (RichData)
+      # also show the Puppet type of use_args so that users can compare 
+      rich_data_alias = Puppet::Pops::Loader::StaticLoader::BUILTIN_ALIASES['RichData']
+      use_args_type = Puppet::Pops::Types::TypeCalculator.infer_set(use_args)
+      use_args_type_s = Puppet::Pops::Types::TypeFormatter.string(use_args_type)
+      raise with_stack(:TYPE_NOT_DATA, "Task parameters is not of type RichData (#{rich_data_alias}) it is of type: #{use_args_type_s}")
     end
 
     if executor.noop
