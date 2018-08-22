@@ -16,26 +16,72 @@ describe TransportConfig do
     expect { TransportConfig.new }.to raise_error(Bolt::ValidationError, /You must configure/)
   end
 
-  it "reads a port from 'global' config" do
-    config = TransportConfig.new(globalconfig, missingconfig)
-    expect(config.port).to be(12345)
+  context 'with global config' do
+    let(:config) { TransportConfig.new(globalconfig, missingconfig) }
+
+    it 'reads host' do
+      expect(config.host).to eq('10.0.0.1')
+    end
+
+    it 'reads port' do
+      expect(config.port).to eq(12345)
+    end
+
+    it 'reads loglevel' do
+      expect(config.loglevel).to eq('debug')
+    end
+
+    it 'reads logfile' do
+      expect(config.logfile).to eq('/var/log/global')
+    end
   end
 
-  it "reads a port from local config" do
-    # This needs to have the empty config as the global config so that rspec
-    # doesn't try to read /etc/puppetlabs/bolt-server/conf.d/bolt-server.conf
-    config = TransportConfig.new(requiredconfig, localconfig)
-    expect(config.port).to be(6789)
+  context 'with local config' do
+    let(:config) { TransportConfig.new(missingconfig, localconfig) }
+
+    it 'reads host' do
+      expect(config.host).to eq('0.0.0.0')
+    end
+
+    it 'reads port' do
+      expect(config.port).to eq(6789)
+    end
+
+    it 'reads loglevel' do
+      expect(config.loglevel).to eq('info')
+    end
+
+    it 'reads logfile' do
+      expect(config.logfile).to eq('/var/log/local')
+    end
   end
 
-  it "local config overrides global config" do
-    config = TransportConfig.new(globalconfig, localconfig)
-    expect(config.port).to be(6789)
+  context 'with local and global config' do
+    let(:config) { TransportConfig.new(globalconfig, localconfig) }
+
+    it 'local host overrides global' do
+      expect(config.host).to eq('0.0.0.0')
+    end
+
+    it 'local port overrides global' do
+      expect(config.port).to eq(6789)
+    end
+
+    it 'local loglevel overrides global' do
+      expect(config.loglevel).to eq('info')
+    end
+
+    it 'local logfile overrides global' do
+      expect(config.logfile).to eq('/var/log/local')
+    end
   end
 
-  it "accepts an empty config" do
+  it "accepts only required config" do
     config = TransportConfig.new(requiredconfig, missingconfig)
+    expect(config.host).to eq('127.0.0.1')
     expect(config.port).to be(62658)
+    expect(config.loglevel).to eq('notice')
+    expect(config.logfile).to eq(nil)
   end
 
   it "reads ssl keys from config" do
