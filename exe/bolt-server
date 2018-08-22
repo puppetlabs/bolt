@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-# ARGV[0] is the path to config.ru, the rackup file that configures the bolt-server
-
-require 'rack'
-Rack::Server.start(config: ARGV[0])
+require 'puma/cli'
+cli = Puma::CLI.new ARGV
+cli.run
