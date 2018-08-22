@@ -6,6 +6,10 @@ require 'bolt/task'
 require 'json'
 
 class TransportAPI < Sinatra::Base
+  get '/' do
+    200
+  end
+
   post '/ssh/run_task' do
     content_type :json
 
