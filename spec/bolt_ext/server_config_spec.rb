@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'bolt_ext/server-config'
+require 'bolt_ext/server_config'
 
 describe TransportConfig do
   let(:missingconfig) { File.join(__dir__, '..', 'fixtures', 'configs', 'non-existent.conf') }

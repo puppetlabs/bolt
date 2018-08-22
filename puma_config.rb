@@ -7,7 +7,7 @@
 ##############################################################
 
 require 'bolt_ext/server'
-require 'bolt_ext/server-config'
+require 'bolt_ext/server_config'
 
 config = if ENV['RACK_ENV'] == 'test'
            TransportConfig.new(File.join(__FILE__, 'spec', 'fixtures', 'configs', 'emptyconfig'))
