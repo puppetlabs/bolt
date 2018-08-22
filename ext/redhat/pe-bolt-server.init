@@ -37,7 +37,7 @@ fi
 start() {
     echo -n $"Starting PE Bolt Server: "
     mkdir -p $piddir $logdir
-    daemon $daemonopts --user=$owner $exec -C "${prefix}/config.ru" -d --pidfile $pidfile ${PE_BOLT_SERVER_OPTIONS}
+    daemon $daemonopts --user=$owner $exec -C "${prefix}/puma_config.rb" -d --pidfile $pidfile ${PE_BOLT_SERVER_OPTIONS}
     RETVAL=$?
     echo
     [ $RETVAL = 0 ] && touch ${lockfile}
