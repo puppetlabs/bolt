@@ -3,9 +3,10 @@
 require 'hocon'
 
 class TransportConfig
-  attr_accessor :port, :ssl_cert, :ssl_key, :ssl_ca_cert
+  attr_accessor :host, :port, :ssl_cert, :ssl_key, :ssl_ca_cert
 
   def initialize(global = nil, local = nil)
+    @host = '127.0.0.1'
     @port = 62658
     @ssl_cert = nil
     @ssl_key = nil
@@ -29,6 +30,7 @@ class TransportConfig
     end
 
     unless parsed_hocon.nil?
+      @host = parsed_hocon['host'] if parsed_hocon.key?('host')
       @port = parsed_hocon['port'] if parsed_hocon.key?('port')
       @ssl_cert = parsed_hocon['ssl-cert'] if parsed_hocon.key?('ssl-cert')
       @ssl_key = parsed_hocon['ssl-key'] if parsed_hocon.key?('ssl-key')

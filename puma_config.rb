@@ -15,8 +15,7 @@ config = if ENV['RACK_ENV'] == 'test'
            TransportConfig.new
          end
 
-host = "0.0.0.0"
-bind_addr = +"ssl://#{host}:#{config.port}?"
+bind_addr = +"ssl://#{config.host}:#{config.port}?"
 bind_addr << "cert=#{config.ssl_cert}"
 bind_addr << "&key=#{config.ssl_key}"
 bind_addr << "&ca=#{config.ssl_ca_cert}"
