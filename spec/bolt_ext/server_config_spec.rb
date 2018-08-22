@@ -28,7 +28,7 @@ describe TransportConfig do
 
   it "accepts an empty config" do
     config = TransportConfig.new(requiredconfig)
-    expect(config.port).to be(8144)
+    expect(config.port).to be(62658)
   end
 
   it "reads ssl keys from config" do
