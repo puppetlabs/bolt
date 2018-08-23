@@ -6,7 +6,7 @@ class TransportConfig
   attr_accessor :port, :ssl_cert, :ssl_key, :ssl_ca_cert
 
   def initialize(global = nil, local = nil)
-    @port = 8144
+    @port = 62658
     @ssl_cert = nil
     @ssl_key = nil
     @ssl_ca_cert = nil

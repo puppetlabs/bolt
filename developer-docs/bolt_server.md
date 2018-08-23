@@ -11,7 +11,7 @@ Bolt server can be configured by defining content in HOCON format at one of the 
 **Local Config**: `~/.puppetlabs/bolt-server.conf`
 
 **Options**
-- `port`: Integer, *optional* - The port the bolt server will run on (default 8144)
+- `port`: Integer, *optional* - The port the bolt server will run on (default 62658)
 - `ssl-cert`: String, *required* - Path to the cert file.
 - `ssl-key`: String, *required* - Path to the key file.
 - `ssl-ca-cert`: String, *required* - Path to the ca cert file.
@@ -19,7 +19,7 @@ Bolt server can be configured by defining content in HOCON format at one of the 
 **Example**
 ```
 bolt-server: {
-    port: 8144
+    port: 62658
     ssl-cert: /etc/puppetlabs/bolt-server/ssl/cert.pem
     ssl-key: /etc/puppetlabs/bolt-server/ssl/private_key.pem
     ssl-ca-cert: /etc/puppetlabs/bolt-server/ssl/ca.pem
@@ -133,7 +133,7 @@ Save the following JSON to `~/request.json`
 ```
 9. Make request
 ```
-curl -X POST -H "Content-Type: application/json" -d @request.json -E /etc/puppetlabs/bolt-server/ssl/$HOSTNAME.cert.pem --key /etc/puppetlabs/bolt-server/ssl/$HOSTNAME.key.pem -k https://0.0.0.0:8144/ssh/run_task
+curl -X POST -H "Content-Type: application/json" -d @request.json -E /etc/puppetlabs/bolt-server/ssl/$HOSTNAME.cert.pem --key /etc/puppetlabs/bolt-server/ssl/$HOSTNAME.key.pem -k https://0.0.0.0:62658/ssh/run_task
 
 ```
 10. Expected Output
