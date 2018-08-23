@@ -23,14 +23,9 @@ class TransportAPI < Sinatra::Base
 
     executor = Bolt::Executor.new(load_config: false)
 
-    # Since this will only be on one node we can just set r to the result
-    executor.run_task(target, task, parameters) do |event|
-      if event[:type] == :node_result
-        @r = event[:result].to_json
-      end
-
-      [200, [@r]]
-    end
+    # Since this will only be on one node we can just return the first result
+    results = executor.run_task(target, task, parameters)
+    [200, results.first.to_json]
   end
 
   post '/winrm/run_task' do
@@ -46,12 +41,8 @@ class TransportAPI < Sinatra::Base
 
     executor = Bolt::Executor.new(load_config: false)
 
-    executor.run_task(target, task, parameters) do |event|
-      if event[:type] == :node_result
-        @r = event[:result].to_json
-      end
-
-      [200, [@r]]
-    end
+    # Since this will only be on one node we can just return the first result
+    results = executor.run_task(target, task, parameters)
+    [200, results.first.to_json]
   end
 end
