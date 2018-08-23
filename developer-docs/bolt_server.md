@@ -99,9 +99,9 @@ For example, the following runs 'echo' task on localhost:
 ### SSH Target Object
 The Target be a JSON object. The following keys are available:
 - `hostname`: String, *required* - Target identifier.
-- `password`: String, *optional* - Password for SSH transport authentication.
+- `user`: String, *required* - Login user
+- `password`: String, *required* - Password for SSH transport authentication.
 - `port`: Integer, *optional* - Connection port (Default: `22`).
-- `user`: String, *optional* - Login user (Default: `root`).
 - `connect-timeout`: Integer, *optional* - How long Bolt should wait when establishing connections.
 - `run-as-command`: Array, *optional* - Command elevate permissions. Bolt appends the user and command strings to the configured `run-as` command before running it on the target. This command must not require an interactive password prompt, and the `sudo-password` option is ignored when `run-as-command` is specified.
 - `run-as`: String, *optional* - A different user to run commands as after login.
@@ -112,9 +112,9 @@ The Target be a JSON object. The following keys are available:
 ### WinRM Target Object
 The Target be a JSON object. The following keys are available:
 - `hostname`: String, *required* - Target identifier.
-- `password`: String, *optional* - Password for WinRM transport authentication.
+- `user`: String, *required* - Login user
+- `password`: String, *required* - Password for WinRM transport authentication.
 - `port`: Integer, *optional* - Connection port (Default: `5986`, or `5985` if `ssl: false`.)
-- `user`: String, *optional* - Login user (Default: `root`).
 - `connect-timeout`: Integer, *optional* - How long Bolt should wait when establishing connections.
 - `tmpdir`: String, *optional* - The directory to upload and execute temporary files on the target.
 - `ssl`: Boolean, *optional* - When true, Bolt will use https connections for WinRM (Default: `true`).
