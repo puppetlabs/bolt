@@ -34,6 +34,68 @@ Each API endpoint accepts a request as described below. The request body must be
 - `task`: [Task Object](#task-object), *required* - Task to run on target.
 - `parameters`: Object, *optional* - JSON formatted parameters to be provided to task.
 
+For example, the following runs the 'echo' task on localhost:
+```
+{
+  "target": {
+    "hostname": "localhost",
+    "user": "marauder",
+    "password": "I solemnly swear that I am up to no good",
+    "host-key-check": "false"
+  },
+  "task": {
+    "name": "echo",
+    "metadata": {
+      "description": "Echo a message",
+      "parameters": {
+        "message": "Default string"
+      }
+    },
+    "file": {
+      "filename": "echo.rb",
+      "file_content": "IyEvdXNyL2Jpbi9lbnYgYmFzaAplY2hvICRQVF9tZXNzYWdlCg==\n"
+    }
+  },
+  "parameters": {
+    "message": "Hello world"
+  }
+}
+```
+
+## POST /winrm/run_task
+- `target`: [WinRM Target Object](#winrm-target-object), *required* - Target information to run task on.
+- `task`: [Task Object](#task-object), *required* - Task to run on target.
+- `parameters`: Object, *optional* - JSON formatted parameters to be provided to task.
+
+For example, the following runs 'echo' task on localhost:
+```
+{
+  "target": {
+    "hostname": "localhost",
+    "user": "chamber-of-secrets",
+    "password": "parseltongue",
+    "host-key-check": "false"
+  },
+  "task": {
+    "name": "echo",
+    "metadata": {
+      "description": "Echo a message",
+      "parameters": {
+        "message": "Default string"
+      }
+    },
+    "file": {
+      "filename": "echo.rb",
+      "file_content": "IyEvdXNyL2Jpbi9lbnYgYmFzaAplY2hvICRQVF9tZXNzYWdlCg==\n"
+    }
+  },
+  "parameters": {
+    "message": "Hello world"
+  }
+}
+
+```
+
 ### SSH Target Object
 The Target be a JSON object. The following keys are available:
 - `hostname`: String, *required* - Target identifier.
@@ -47,11 +109,66 @@ The Target be a JSON object. The following keys are available:
 - `host-key-check`: Bool, *optional* - Whether to perform host key validation when connecting over SSH (Default: `true`).
 - `sudo-password`: String, *optional* - Password to use when changing users via `run-as`
 
+### WinRM Target Object
+The Target be a JSON object. The following keys are available:
+- `hostname`: String, *required* - Target identifier.
+- `password`: String, *optional* - Password for WinRM transport authentication.
+- `port`: Integer, *optional* - Connection port (Default: `5986`, or `5985` if `ssl: false`.)
+- `user`: String, *optional* - Login user (Default: `root`).
+- `connect-timeout`: Integer, *optional* - How long Bolt should wait when establishing connections.
+- `tmpdir`: String, *optional* - The directory to upload and execute temporary files on the target.
+- `ssl`: Boolean, *optional* - When true, Bolt will use https connections for WinRM (Default: `true`).
+- `ssl-verify`: Boolean, *optional* - When true, verifies the targets certificate matches the cacert (Default: `true`)
+- `tmpdir`: String, *optional* - The directory to upload and execute temporary files on the target.
+- `cacert`: String, *optional* - The path to the CA certificate.
+- `extensions`: List, *optional* - List of file extensions that are accepted for scripts or tasks. Scripts with these file extensions rely on the target node's file type association to run. For example, if Python is installed on the system, a .py script should run with python.exe. The extensions .ps1, .rb, and .pp are always allowed and run via hard-coded executables
+
 ### Task Object
-The Task be a JSON object. The following keys are available:
-- `name`: String, *required* - The name of the task.
-- `metadata`: String, *optional* - The contents of the task's metadata.json file. 
+This is nearly identical to the [task detail JSON
+object](https://github.com/puppetlabs/puppetserver/blob/master/documentation/puppet-api/v3/task_detail.json)
+from [puppetserver](https://github.com/puppetlabs/puppetserver), with an
+additional `file_content` key.
+
+The task is a JSON object which includes the following keys:
+
+#### Name
+
+The name of the task
+
+#### Metadata
+The metadata object is optional, and contains metadata about the task being run. It includes the following keys:
+
+- `description`: String, *optional* - The task description from it's metadata
+- `parameters`: Object, *optional* - A JSON object whose keys are parameter names, and whose values are JSON objects with 2 keys:
+    - `description`: String, *optional* - The parameter description
+    - `type`: String, *optional* - The type the parameter should accept
+
+#### File
+**NOTE**: We plan to eventually get this information directly from puppetserver
+
+The task file and it's metadata. This is a JSON object that includes the following keys:
+- `filename`: String, *required* - The name of the file the task is in. Note: Will reject any string that contains `/` if using SSH transport, and any string that contains `\` if using WinRM.
 - `file_content`: String, *required* - Task's base64 encoded file content.
+
+For example:
+```
+{
+  "name": "package",
+  "metadata": {
+    "description": "Install a package",
+    "parameters": {
+      "name": {
+        "description": "The package to install",
+        "type": "String[1]"
+      }
+    }
+  },
+  "file": {
+    "filename": "package.rb",
+    "file_content": "IyEvdXNyL2Jpbi9lbnYgYmFzaAplY2hvICRQVF9tZXNzYWdlCg==\n"
+  }
+}
+```
 
 ## Response 
 If the task runs the response will have status 200.
@@ -124,7 +241,10 @@ Save the following JSON to `~/request.json`
         "message": "Default string"
       }
     },
-    "file_content": "IyEvdXNyL2Jpbi9lbnYgYmFzaAplY2hvICRQVF9tZXNzYWdlCg==\n"
+    "file": {
+      "filename": "echo.rb",
+      "file_content": "IyEvdXNyL2Jpbi9lbnYgYmFzaAplY2hvICRQVF9tZXNzYWdlCg==\n"
+    }
   },
   "parameters": {
     "message": "Hello world"
