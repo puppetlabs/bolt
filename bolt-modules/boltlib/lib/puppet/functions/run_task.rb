@@ -122,7 +122,7 @@ Puppet::Functions.create_function(:run_task) do
       # Wrap parameters marked with '"sensitive": true' in the task metadata with a
       # Sensitive wrapper type. This way it's not shown in logs
       use_args.each do |k, v|
-        if task.parameters and task.parameters[k]['sensitive']
+        if task.parameters && task.parameters[k]['sensitive']
           use_args[k] = Puppet::Pops::Types::PSensitiveType::Sensitive.new(v)
         end
       end
@@ -147,15 +147,12 @@ Puppet::Functions.create_function(:run_task) do
         raise with_stack(:TASK_NO_NOOP, 'Task does not support noop')
       end
     end
-    puts use_args
- 
+
     if targets.empty?
-      result = Bolt::ResultSet.new([])
+      Bolt::ResultSet.new([])
     else
-      result = executor.run_task(targets, task, use_args, options, &block)
+      executor.run_task(targets, task, use_args, options, &block)
     end
-    puts result
-    result
   end
 
   def with_stack(kind, msg)
