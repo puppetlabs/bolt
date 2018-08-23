@@ -134,7 +134,9 @@ Puppet::Functions.create_function(:run_task) do
       # Boltlib::ArgSpec and the actual type of use_args
       use_args_t = Puppet::Pops::Types::TypeCalculator.infer_set(use_args)
       desc = Puppet::Pops::Types::TypeMismatchDescriber.singleton.describe_mismatch(
-        'Task parameters are not of type Boltlib::ArgsSpec. run_task()', args_spec_t, use_args_t)
+        'Task parameters are not of type Boltlib::ArgsSpec. run_task()',
+        args_spec_t, use_args_t
+      )
       raise with_stack(:TYPE_NOT_DATA, desc)
     end
 

@@ -8,6 +8,9 @@ require 'bolt_spec/task'
 require 'bolt/transport/ssh'
 require 'bolt/config'
 require 'bolt/util'
+require 'puppet/pops/types/p_sensitive_type'
+
+Sensitive = Puppet::Pops::Types::PSensitiveType::Sensitive
 
 describe Bolt::Transport::SSH do
   include BoltSpec::Errors
@@ -252,6 +255,17 @@ QUOTED
       end
     end
 
+    it "can run a script with Sensitive arguments", ssh: true do
+      contents = "#!/bin/sh\necho $1\necho $2"
+      arguments = ['non-sensitive-arg',
+                   Sensitive.new('$ecret!')]
+      with_tempfile_containing('sensitive_test', contents) do |file|
+        expect(
+          ssh.run_script(target, file.path, arguments)['stdout']
+        ).to eq("non-sensitive-arg\n$ecret!\n")
+      end
+    end
+
     it "escapes unsafe shellwords in arguments", ssh: true do
       with_tempfile_containing('script-test-ssh-escape', echo_script) do |file|
         expect(
@@ -324,6 +338,38 @@ SHELL
       arguments = { message: "foo ' bar ' baz" }
       with_task_containing('tasks_test_quotes', contents, 'both') do |task|
         expect(ssh.run_task(target, task, arguments).message).to eq "foo ' bar ' baz"
+      end
+    end
+
+    it "can run a task with Sensitive params via environment" do
+      contents = <<SHELL
+#!/bin/sh
+echo ${PT_sensitive_string}
+echo ${PT_sensitive_array}
+echo -n ${PT_sensitive_hash}
+SHELL
+      deep_hash = { 'k' => Sensitive.new('v') }
+      arguments = { 'sensitive_string' => Sensitive.new('$ecret!'),
+                    'sensitive_array'  => Sensitive.new([1, 2, Sensitive.new(3)]),
+                    'sensitive_hash'   => Sensitive.new(deep_hash) }
+      with_task_containing('tasks_test_sensitive', contents, 'both') do |task|
+        expect(ssh.run_task(target, task, arguments).message).to eq(<<SHELL.strip)
+$ecret!
+[1,2,3]
+{"k":"v"}
+SHELL
+      end
+    end
+
+    it "can run a task with Sensitive params via stdin" do
+      contents = <<SHELL
+#!/bin/sh
+cat -
+SHELL
+      arguments = { 'sensitive_string' => Sensitive.new('$ecret!') }
+      with_task_containing('tasks_test_sensitive', contents, 'stdin') do |task|
+        expect(ssh.run_task(target, task, arguments).value)
+          .to eq("sensitive_string" => "$ecret!")
       end
     end
 
