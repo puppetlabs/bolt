@@ -3,13 +3,17 @@
 require 'hocon'
 
 class TransportConfig
-  attr_accessor :port, :ssl_cert, :ssl_key, :ssl_ca_cert
+  attr_accessor :host, :port, :ssl_cert, :ssl_key, :ssl_ca_cert, :loglevel, :logfile
 
   def initialize(global = nil, local = nil)
+    @host = '127.0.0.1'
     @port = 62658
     @ssl_cert = nil
     @ssl_key = nil
     @ssl_ca_cert = nil
+
+    @loglevel = 'notice'
+    @logfile = nil
 
     global_path = global || '/etc/puppetlabs/bolt-server/conf.d/bolt-server.conf'
     local_path = local || File.join(ENV['HOME'].to_s, ".puppetlabs", "bolt-server.conf")
@@ -29,10 +33,10 @@ class TransportConfig
     end
 
     unless parsed_hocon.nil?
-      @port = parsed_hocon['port'] if parsed_hocon.key?('port')
-      @ssl_cert = parsed_hocon['ssl-cert'] if parsed_hocon.key?('ssl-cert')
-      @ssl_key = parsed_hocon['ssl-key'] if parsed_hocon.key?('ssl-key')
-      @ssl_ca_cert = parsed_hocon['ssl-ca-cert'] if parsed_hocon.key?('ssl-ca-cert')
+      %w[host port ssl-cert ssl-key ssl-ca-cert loglevel logfile].each do |key|
+        varname = '@' + key.tr('-', '_')
+        instance_variable_set(varname, parsed_hocon[key]) if parsed_hocon.key?(key)
+      end
     end
   end
 

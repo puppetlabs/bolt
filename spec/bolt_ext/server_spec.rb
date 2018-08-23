@@ -14,6 +14,12 @@ describe "TransportAPI" do
     TransportAPI
   end
 
+  it 'responds ok' do
+    get '/'
+    expect(last_response).to be_ok
+    expect(last_response.status).to eq(200)
+  end
+
   context 'with ssh target', ssh: true do
     let(:target) { conn_info('ssh') }
     let(:path) { '/ssh/run_task' }
