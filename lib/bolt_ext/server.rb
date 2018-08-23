@@ -28,8 +28,30 @@ class TransportAPI < Sinatra::Base
       if event[:type] == :node_result
         @r = event[:result].to_json
       end
-    end
 
-    [200, [@r]]
+      [200, [@r]]
+    end
+  end
+
+  post '/winrm/run_task' do
+    content_type :json
+
+    body = JSON.parse(request.body.read)
+    keys = %w[user password port connect-timeout ssl ssl-verify tmpdir cacert extensions]
+    opts = body['target'].select { |k, _| keys.include? k }
+    opts['protocol'] = 'winrm'
+    target = [Bolt::Target.new(body['target']['hostname'], opts)]
+    task = Bolt::Task.new(body['task'])
+    parameters = body['parameters'] || {}
+
+    executor = Bolt::Executor.new(load_config: false)
+
+    executor.run_task(target, task, parameters) do |event|
+      if event[:type] == :node_result
+        @r = event[:result].to_json
+      end
+
+      [200, [@r]]
+    end
   end
 end

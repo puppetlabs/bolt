@@ -103,8 +103,18 @@ catch
       end
 
       def run_task(target, task, arguments, _options = {})
-        executable = target.select_impl(task, PROVIDED_FEATURES)
-        raise "No suitable implementation of #{task.name} for #{target.name}" unless executable
+        if from_api?(task)
+          # TODO: Remove as part of BOLT-664
+          dir = Dir.mktmpdir
+          executable = File.join(dir, task.file['filename'])
+          File.open(executable, 'w') { |f|
+            f.write(Base64.decode64(task.file['file_content']))
+          }
+          task.input_method = powershell_file?(executable) ? 'powershell' : 'both'
+        else
+          executable = target.select_impl(task, PROVIDED_FEATURES)
+          raise "No suitable implementation of #{task.name} for #{target.name}" unless executable
+        end
 
         input_method = task.input_method
         input_method ||= powershell_file?(executable) ? 'powershell' : 'both'
@@ -147,6 +157,10 @@ try { & "#{remote_path}" @taskArgs } catch { Write-Error $_.Exception; exit 1 }
                 path, args = *process_from_extension(remote_path)
                 conn.execute_process(path, args, stdin)
               end
+
+            if from_api?(task)
+              FileUtils.remove_entry dir
+            end
             Bolt::Result.for_task(target, output.stdout.string,
                                   output.stderr.string,
                                   output.exit_code)
