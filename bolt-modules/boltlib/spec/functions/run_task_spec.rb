@@ -355,7 +355,7 @@ describe 'run_task' do
       )
     end
 
-    it "errors when a specified parameter value is not RichData" do
+    it "errors when a specified parameter value is not Boltlib::ArgsSpec" do
       task_params.merge!(
         'mandatory_string'  => 'str',
         'mandatory_integer' => 10,
@@ -364,7 +364,7 @@ describe 'run_task' do
       )
 
       is_expected.to run.with_params(task_name, hostname, task_params).and_raise_error(
-        Puppet::ParseError, /Task parameters is not of type RichData/
+        Puppet::ParseError, /Task parameters are not of type Boltlib::ArgsSpec. run_task()/
       )
     end
   end

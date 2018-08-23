@@ -126,18 +126,16 @@ Puppet::Functions.create_function(:run_task) do
           use_args[k] = Puppet::Pops::Types::PSensitiveType::Sensitive.new(v)
         end
       end
-
     end
 
-    unless Puppet::Pops::Types::TypeFactory.rich_data.instance?(use_args)
-      # produce a meaningful error messages, showing the details of the type
-      # alias we're expecting (RichData)
-      # also show the Puppet type of use_args so that users can compare
-      rich_data_alias = Puppet::Pops::Loader::StaticLoader::BUILTIN_ALIASES['RichData']
-      use_args_type = Puppet::Pops::Types::TypeCalculator.infer_set(use_args)
-      use_args_type_s = Puppet::Pops::Types::TypeFormatter.string(use_args_type)
-      raise with_stack(:TYPE_NOT_DATA, "Task parameters is not of type RichData (#{rich_data_alias})"\
-                                       " it is of type: #{use_args_type_s}")
+    args_spec_t = Puppet::Pops::Types::TypeParser.singleton.parse('Boltlib::ArgsSpec')
+    unless Puppet::Pops::Types::TypeCalculator.instance?(args_spec_t, use_args)
+      # generate a helpful error message about the type-mismatch between our
+      # Boltlib::ArgSpec and the actual type of use_args
+      use_args_t = Puppet::Pops::Types::TypeCalculator.infer_set(use_args)
+      desc = Puppet::Pops::Types::TypeMismatchDescriber.singleton.describe_mismatch(
+        'Task parameters are not of type Boltlib::ArgsSpec. run_task()', args_spec_t, use_args_t)
+      raise with_stack(:TYPE_NOT_DATA, desc)
     end
 
     if executor.noop
