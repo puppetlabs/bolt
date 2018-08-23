@@ -10,6 +10,9 @@
 # Source function library.
 . /etc/rc.d/init.d/functions
 
+#set default privileges to -rw-r-----
+umask 027
+
 [ -f /etc/sysconfig/pe-bolt-server ] && . /etc/sysconfig/pe-bolt-server
 
 prefix='/opt/puppetlabs/server/apps/bolt-server'
