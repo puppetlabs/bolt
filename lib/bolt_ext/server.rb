@@ -14,9 +14,18 @@ class TransportAPI < Sinatra::Base
     content_type :json
 
     body = JSON.parse(request.body.read)
-    keys = %w[user password port ssh-key-content connect-timeout run-as-command
-              run-as tmpdir host-key-check known-hosts-content sudo-password]
+    keys = %w[user password port ssh-key-content connect-timeout run-as-command run-as
+              tmpdir host-key-check known-hosts-content private-key-content sudo-password]
     opts = body['target'].select { |k, _| keys.include? k }
+
+    if opts['private-key-content'] && opts['password']
+      return [400, "Only include one of 'password' and 'private-key-content'"]
+    end
+    if opts['private-key-content']
+      opts['private-key'] = { 'key-data' => opts['private-key-content'] }
+      opts.delete('private-key-content')
+    end
+
     target = [Bolt::Target.new(body['target']['hostname'], opts)]
     task = Bolt::Task.new(body['task'])
     parameters = body['parameters'] || {}

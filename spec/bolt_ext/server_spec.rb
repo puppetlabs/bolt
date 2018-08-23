@@ -37,6 +37,23 @@ describe "TransportAPI" do
       }
     }
 
+    it 'errors if both password and private-key-content are present' do
+      body = {
+        'task': echo_task,
+        'target': {
+          'password': 'foo',
+          'private-key-content': 'content'
+        },
+        'parameters': { "message": "Hello!" }
+      }
+
+      post path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json'
+      expect(last_response).not_to be_ok
+      expect(last_response.status).to eq(400)
+      result = last_response.body
+      expect(result).to eq("Only include one of 'password' and 'private-key-content'")
+    end
+
     it 'fails if no authorization is present' do
       body = {
         'task': echo_task,
@@ -64,6 +81,30 @@ describe "TransportAPI" do
           'hostname': target[:host],
           'user': target[:user],
           'password': target[:password],
+          'port': target[:port],
+          'host-key-check': false
+        },
+        'parameters': { "message": "Hello!" }
+      }
+
+      post path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json'
+      expect(last_response).to be_ok
+      expect(last_response.status).to eq(200)
+      result = JSON.parse(last_response.body)
+      expect(result['status']).to eq('success')
+      expect(result['result']['_output'].chomp).to eq('Hello!')
+    end
+
+    it 'runs an echo task using a private key' do
+      private_key = ENV['BOLT_SSH_KEY'] || Dir["spec/fixtures/keys/id_rsa"][0]
+      private_key_content = File.read(private_key)
+
+      body = {
+        'task': echo_task,
+        'target': {
+          'hostname': target[:host],
+          'user': target[:user],
+          'private-key-content': private_key_content,
           'port': target[:port],
           'host-key-check': false
         },

@@ -99,8 +99,10 @@ For example, the following runs 'echo' task on localhost:
 ### SSH Target Object
 The Target be a JSON object. The following keys are available:
 - `hostname`: String, *required* - Target identifier.
-- `user`: String, *required* - Login user
-- `password`: String, *required* - Password for SSH transport authentication.
+- `user`: String, *required* - Login user.
+- *Require one and only one of*
+  - `password`: String - Password for SSH transport authentication.
+  - `private-key-content`: String - Contents of private key for SSH.
 - `port`: Integer, *optional* - Connection port (Default: `22`).
 - `connect-timeout`: Integer, *optional* - How long Bolt should wait when establishing connections.
 - `run-as-command`: Array, *optional* - Command elevate permissions. Bolt appends the user and command strings to the configured `run-as` command before running it on the target. This command must not require an interactive password prompt, and the `sudo-password` option is ignored when `run-as-command` is specified.
@@ -112,7 +114,7 @@ The Target be a JSON object. The following keys are available:
 ### WinRM Target Object
 The Target be a JSON object. The following keys are available:
 - `hostname`: String, *required* - Target identifier.
-- `user`: String, *required* - Login user
+- `user`: String, *required* - Login user.
 - `password`: String, *required* - Password for WinRM transport authentication.
 - `port`: Integer, *optional* - Connection port (Default: `5986`, or `5985` if `ssl: false`.)
 - `connect-timeout`: Integer, *optional* - How long Bolt should wait when establishing connections.
