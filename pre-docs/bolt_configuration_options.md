@@ -91,7 +91,7 @@ Capture the results of your plan runs in a log file.
 `log`: the configuration of the log file output. This option includes the following properties:
 
 -   `console` or `path/to.log`: the location of the log output.
--   `level`: the type of information in the log. Your options are `debug`, `verbose`, `notice`, `warn`.
+-   `level`: the type of information in the log. Your options are `debug`, `info`, `notice`, `warn`, `error`.
 
 -   `append` add output to an existing log file. Available for only for logs output to a filepath. Your options are `true` \(default\) and `false`.
 
