@@ -930,7 +930,7 @@ bar
               ["facts::powershell", "Gather system facts using powershell"],
               ["facts::ruby", "Gather system facts using ruby and facter"],
               ["package", "Manage and inspect the state of packages"],
-              ["puppet_agent::install", "Install the Puppet 5 agent package"],
+              ["puppet_agent::install", "Install the Puppet agent package"],
               ["puppet_agent::install_powershell", nil],
               ["puppet_agent::install_shell", nil],
               ["puppet_agent::version",

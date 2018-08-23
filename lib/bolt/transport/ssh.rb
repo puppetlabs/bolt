@@ -58,10 +58,13 @@ module Bolt
             "Authentication method 'gssapi-with-mic' is not available"
           }
         end
+
+        @transport_logger = Logging.logger[Net::SSH]
+        @transport_logger.level = :warn
       end
 
       def with_connection(target, load_config = true)
-        conn = Connection.new(target, load_config)
+        conn = Connection.new(target, @transport_logger, load_config)
         conn.connect
         yield conn
       ensure
