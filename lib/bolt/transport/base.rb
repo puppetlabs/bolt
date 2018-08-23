@@ -189,7 +189,7 @@ module Bolt
           }
         when Puppet::Pops::Types::PSensitiveType::Sensitive
           # this value is Sensitive, unwrap it
-          arguments.unwrap
+          unwrap_sensitive_args(arguments.unwrap)
         else
           # unknown data type, just return it
           arguments

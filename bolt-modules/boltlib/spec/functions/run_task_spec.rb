@@ -5,6 +5,10 @@ require 'bolt/executor'
 require 'bolt/result'
 require 'bolt/result_set'
 require 'bolt/target'
+require 'puppet/pops/types/p_sensitive_type'
+require 'rspec/expectations'
+
+Sensitive = Puppet::Pops::Types::PSensitiveType::Sensitive
 
 describe 'run_task' do
   include PuppetlabsSpec::Fixtures
@@ -38,7 +42,7 @@ describe 'run_task' do
     let(:result_set) { Bolt::ResultSet.new([result]) }
     let(:tasks_root) { File.expand_path(fixtures('modules', 'test', 'tasks')) }
     let(:default_args) { { 'message' => message } }
-
+    
     it 'when running a task without metadata the input method is "both"' do
       executable = File.join(tasks_root, 'echo.sh')
 
@@ -226,6 +230,59 @@ describe 'run_task' do
       is_expected.to run.with_params('test::nonesuch', []).and_raise_error(
         /Could not find a task named "test::nonesuch"/
       )
+    end
+
+    context 'with sensitive data parameters' do  
+      let(:sensitive_string) { '$up3r$ecr3t!' }
+      let(:sensitive_array) { [1, 2, 3] }
+      let(:sensitive_hash) { {'k' => 'v'} }
+      let(:sensitive_json) { "#{sensitive_string}\n#{sensitive_array}\n{\"k\":\"v\"}\n" }
+      let(:result) { Bolt::Result.new(target, value: { '_output' => sensitive_json }) }
+      let(:result_set) { Bolt::ResultSet.new([result]) }
+      let(:task_params) { {} }
+    
+      it 'with Sensitive types - matches parameter metadata' do
+        executable = File.join(tasks_root, 'sensitive_type.sh')
+        task_params.merge!(
+          'sensitive_string' => Sensitive.new(sensitive_string),
+          'sensitive_array'  => Sensitive.new(sensitive_array),
+          'sensitive_hash'   => Sensitive.new(sensitive_hash),
+        )
+        
+        executor.expects(:run_task).with([target], mock_task(executable, nil), task_params, {})
+          .returns(result_set)
+        inventory.expects(:get_targets).with(hostname).returns([target])
+        
+        is_expected.to run.with_params('Test::Sensitive_Type', hostname, task_params).and_return(result_set)
+      end
+
+      it 'with Sensitive metadata - input parameters are wrapped in Sensitive' do
+        executable = File.join(tasks_root, 'sensitive_meta.sh')
+        input_params = {
+          'sensitive_string' => sensitive_string,
+          'sensitive_array'  => sensitive_array,
+          'sensitive_hash'   => sensitive_hash,
+        }
+          
+        expected_params = {
+          'sensitive_string' => Sensitive.new(sensitive_string),
+          'sensitive_array'  => Sensitive.new(sensitive_array),
+          'sensitive_hash'   => Sensitive.new(sensitive_hash),
+        }
+
+        Sensitive.expects(:new).with(input_params['sensitive_string'])
+          .returns(expected_params['sensitive_string'])
+        Sensitive.expects(:new).with(input_params['sensitive_array'])
+          .returns(expected_params['sensitive_array'])
+        Sensitive.expects(:new).with(input_params['sensitive_hash'])
+          .returns(expected_params['sensitive_hash'])
+        
+        executor.expects(:run_task).with([target], mock_task(executable, nil), expected_params, {})
+          .returns(result_set)
+        inventory.expects(:get_targets).with(hostname).returns([target])
+        
+        is_expected.to run.with_params('Test::Sensitive_Meta', hostname, input_params).and_return(result_set)
+      end
     end
   end
 
