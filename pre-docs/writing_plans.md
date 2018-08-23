@@ -355,7 +355,7 @@ plan run_with_facts(TargetSpec $nodes) {
   run_plan(**facts**, nodes => $nodes)
 
   $centos_nodes = get_targets($nodes).filter |$n| { $n.facts['os']['name'] == 'CentOS' }
-  $ubuntu_nodes = get_targets($nodes).filter |$n| { $n.facts['os']['name' == 'Ubuntu' }
+  $ubuntu_nodes = get_targets($nodes).filter |$n| { $n.facts['os']['name'] == 'Ubuntu' }
   run_task(centos_task, $centos_nodes)
   run_task(ubuntu_task, $ubuntu_nodes)
 }
@@ -371,7 +371,7 @@ plan run_with_facts(TargetSpec $nodes) {
   run_plan(**puppetdb\_fact**, nodes => $nodes)
 
   $centos_nodes = get_targets($nodes).filter |$n| { $n.facts['os']['name'] == 'CentOS' }
-  $ubuntu_nodes = get_targets($nodes).filter |$n| { $n.facts['os']['name' == 'Ubuntu' }
+  $ubuntu_nodes = get_targets($nodes).filter |$n| { $n.facts['os']['name'] == 'Ubuntu' }
   run_task(centos_task, $centos_nodes)
   run_task(ubuntu_task, $ubuntu_nodes)
 }

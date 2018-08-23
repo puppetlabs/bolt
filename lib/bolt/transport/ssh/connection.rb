@@ -54,7 +54,7 @@ module Bolt
         attr_reader :logger, :user, :target
         attr_writer :run_as
 
-        def initialize(target, load_config = true)
+        def initialize(target, transport_logger, load_config = true)
           @target = target
           @load_config = load_config
 
@@ -63,6 +63,7 @@ module Bolt
           @run_as = nil
 
           @logger = Logging.logger[@target.host]
+          @transport_logger = transport_logger
         end
 
         if Bolt::Util.windows?
@@ -76,10 +77,8 @@ module Bolt
         end
 
         def connect
-          transport_logger = Logging.logger[Net::SSH]
-          transport_logger.level = :warn
           options = {
-            logger: transport_logger,
+            logger: @transport_logger,
             non_interactive: true
           }
 
@@ -96,7 +95,7 @@ module Bolt
           options[:verify_host_key] = if target.options['host-key-check']
                                         Net::SSH::Verifiers::Secure.new
                                       else
-                                        Net::SSH::Verifiers::Lenient.new
+                                        Net::SSH::Verifiers::Null.new
                                       end
           options[:timeout] = target.options['connect-timeout'] if target.options['connect-timeout']
           options[:config] = @load_config
