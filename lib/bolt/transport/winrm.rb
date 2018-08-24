@@ -37,10 +37,13 @@ module Bolt
         super
         require 'winrm'
         require 'winrm-fs'
+
+        @transport_logger = Logging.logger[::WinRM]
+        @transport_logger.level = :warn
       end
 
       def with_connection(target)
-        conn = Connection.new(target)
+        conn = Connection.new(target, @transport_logger)
         conn.connect
         yield conn
       ensure
