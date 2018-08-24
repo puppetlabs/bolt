@@ -16,7 +16,7 @@ umask 027
 [ -f /etc/sysconfig/pe-bolt-server ] && . /etc/sysconfig/pe-bolt-server
 
 prefix='/opt/puppetlabs/server/apps/bolt-server'
-export GEM_HOME="${prefix}/lib/ruby/gems/2.4.0"
+export GEM_PATH="${prefix}/lib/ruby/gems/2.4.0:/opt/puppetlabs/puppet/lib/ruby/gems/2.4.0:/opt/puppetlabs/puppet/lib/ruby/vendor_gems"
 exec="${prefix}/bin/bolt-server"
 prog="bolt-server"
 desc="PE Bolt Server"
