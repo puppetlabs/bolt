@@ -558,10 +558,10 @@ PS
                     'sensitive_array'  => Sensitive.new([1, 2, Sensitive.new(3)]),
                     'sensitive_hash'   => Sensitive.new(deep_hash) }
       with_task_containing('tasks_test_sensitive', contents, 'both', '.ps1') do |task|
-        expect(winrm.run_task(target, task, arguments).message).to eq(<<QUOTED.strip)
-$ecret!
-[1,2,3]
-{"k":"v"}
+        expect(winrm.run_task(target, task, arguments).message).to eq(<<QUOTED)
+$ecret!\r
+[1,2,3]\r
+{"k":"v"}\r
 QUOTED
       end
     end
