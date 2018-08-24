@@ -12,8 +12,8 @@ module Bolt
                            global: '/etc/puppetlabs/client-tools/puppetdb.conf',
                            win_global: 'C:/ProgramData/PuppetLabs/client-tools/puppetdb.conf' }.freeze
       else
-        DEFAULT_TOKEN = "/etc/puppetlabs/client-tools/pe-bolt-server/token"
-        DEFAULT_CONFIG = { user: "/etc/puppetlabs/puppet/puppetdb.conf",
+        DEFAULT_TOKEN = Bolt::Util.windows? ? 'nul' : '/dev/null'
+        DEFAULT_CONFIG = { user: '/etc/puppetlabs/puppet/puppetdb.conf',
                            global: '/etc/puppetlabs/puppet/puppetdb.conf',
                            win_global: 'C:/ProgramData/PuppetLabs/client-tools/puppetdb.conf' }.freeze
 
