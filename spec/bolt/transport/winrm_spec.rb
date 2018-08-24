@@ -550,14 +550,14 @@ PS
     it "can run a task with Sensitive params via environment", winrm: true do
       contents = <<PS
 Write-Host "$env:PT_sensitive_string"
-Write-Host  $env:PT_sensitive_array"
-Write-Host  $env:PT_sensitive_hash"
+Write-Host "$env:PT_sensitive_array"
+Write-Host "$env:PT_sensitive_hash"
 PS
       deep_hash = { 'k' => Sensitive.new('v') }
       arguments = { 'sensitive_string' => Sensitive.new('$ecret!'),
                     'sensitive_array'  => Sensitive.new([1, 2, Sensitive.new(3)]),
                     'sensitive_hash'   => Sensitive.new(deep_hash) }
-      with_task_containing('tasks_test_sensitive', contents, 'both', 'ps1') do |task|
+      with_task_containing('tasks_test_sensitive', contents, 'both', '.ps1') do |task|
         expect(winrm.run_task(target, task, arguments).message).to eq(<<QUOTED.strip)
 $ecret!
 [1,2,3]
@@ -572,7 +572,7 @@ $line = [Console]::In.ReadLine()
 Write-Host $line
 PS
       arguments = { 'sensitive_string' => Sensitive.new('$ecret!') }
-      with_task_containing('tasks_test_sensitive', contents, 'stdin', 'ps1') do |task|
+      with_task_containing('tasks_test_sensitive', contents, 'stdin', '.ps1') do |task|
         expect(winrm.run_task(target, task, arguments).value)
           .to eq("sensitive_string" => "$ecret!")
       end
