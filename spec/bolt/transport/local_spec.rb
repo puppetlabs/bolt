@@ -6,9 +6,6 @@ require 'bolt_spec/files'
 require 'bolt_spec/task'
 require 'bolt/transport/local'
 require 'bolt/config'
-require 'puppet/pops/types/p_sensitive_type'
-
-Sensitive = Puppet::Pops::Types::PSensitiveType::Sensitive
 
 describe Bolt::Transport::Local do
   include BoltSpec::Errors

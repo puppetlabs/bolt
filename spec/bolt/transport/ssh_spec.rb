@@ -8,9 +8,6 @@ require 'bolt_spec/task'
 require 'bolt/transport/ssh'
 require 'bolt/config'
 require 'bolt/util'
-require 'puppet/pops/types/p_sensitive_type'
-
-Sensitive = Puppet::Pops::Types::PSensitiveType::Sensitive
 
 describe Bolt::Transport::SSH do
   include BoltSpec::Errors

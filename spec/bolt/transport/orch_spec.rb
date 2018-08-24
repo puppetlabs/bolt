@@ -7,9 +7,6 @@ require 'bolt/transport/orch'
 require 'bolt/cli'
 require 'bolt/plan_result'
 require 'open3'
-require 'puppet/pops/types/p_sensitive_type'
-
-Sensitive = Puppet::Pops::Types::PSensitiveType::Sensitive
 
 describe Bolt::Transport::Orch, orchestrator: true do
   include BoltSpec::Files

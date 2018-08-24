@@ -6,10 +6,7 @@ require 'bolt_spec/files'
 require 'bolt_spec/task'
 require 'bolt/transport/winrm'
 require 'httpclient'
-require 'puppet/pops/types/p_sensitive_type'
 require 'winrm'
-
-Sensitive = Puppet::Pops::Types::PSensitiveType::Sensitive
 
 describe Bolt::Transport::WinRM do
   include BoltSpec::Errors
@@ -330,7 +327,7 @@ QUOTED
       end
     end
 
-    it "can run a script with Sensitive arguments", ssh: true do
+    it "can run a script with Sensitive arguments", winrm: true do
       arguments = ['non-sensitive-arg',
                    Sensitive.new('$ecret!')]
       with_tempfile_containing('script-sensitive-winrm', echo_script, '.ps1') do |file|
@@ -550,7 +547,7 @@ PS
       end
     end
 
-    it "can run a task with Sensitive params via environment" do
+    it "can run a task with Sensitive params via environment", winrm: true  do
       contents = <<PS
 Write-Host "$env:PT_sensitive_string"
 Write-Host  $env:PT_sensitive_array"
@@ -569,7 +566,7 @@ QUOTED
       end
     end
 
-    it "can run a task with Sensitive params via stdin" do
+    it "can run a task with Sensitive params via stdin", winrm: true do
       contents = <<PS
 $line = [Console]::In.ReadLine()
 Write-Host $line
