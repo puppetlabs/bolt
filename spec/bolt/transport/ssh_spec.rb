@@ -338,7 +338,7 @@ SHELL
       end
     end
 
-    it "can run a task with Sensitive params via environment" do
+    it "can run a task with Sensitive params via environment", ssh: true do
       contents = <<SHELL
 #!/bin/sh
 echo ${PT_sensitive_string}
@@ -358,7 +358,7 @@ SHELL
       end
     end
 
-    it "can run a task with Sensitive params via stdin" do
+    it "can run a task with Sensitive params via stdin", ssh: true do
       contents = <<SHELL
 #!/bin/sh
 cat -
