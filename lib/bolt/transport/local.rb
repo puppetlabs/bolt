@@ -86,7 +86,7 @@ module Bolt
 
         input_method = task.input_method || "both"
         stdin = STDIN_METHODS.include?(input_method) ? JSON.dump(arguments) : nil
-        env = ENVIRONMENT_METHODS.include?(input_method) ? arguments : nil
+        env = ENVIRONMENT_METHODS.include?(input_method) ? envify_params(arguments) : nil
 
         with_tmpscript(executable, target.options['tmpdir']) do |script|
           logger.debug("Running '#{script}' with #{arguments}")

@@ -134,11 +134,7 @@ module Bolt
             end
 
             if ENVIRONMENT_METHODS.include?(input_method)
-              environment = arguments.inject({}) do |env, (param, val)|
-                val = val.to_json unless val.is_a?(String)
-                env.merge("PT_#{param}" => val)
-              end
-              execute_options[:environment] = environment
+              execute_options[:environment] = envify_params(arguments)
             end
 
             conn.with_remote_tempdir do |dir|
