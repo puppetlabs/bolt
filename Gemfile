@@ -6,6 +6,7 @@ source ENV['GEM_SOURCE'] || 'https://rubygems.org'
 ENV['BOLT_DISABLE_ANALYTICS'] = 'true'
 
 gemspec
+gem  "winrm-fs", git: "https://github.com/donoghuc/winrm-fs.git", branch: "BOLT-664"
 gem "hocon"
 gem "puma"
 gem "rack"

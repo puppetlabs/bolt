@@ -355,16 +355,23 @@ PS
         end
 
         def with_remote_file(file)
-          ext = File.extname(file)
+          if file.is_a?(Hash)
+            ext = File.extname(file[:filename])
+            file_base = File.basename(file[:filename])
+            from_mem = true
+          elsif File.file?(file)
+            ext = File.extname(file)
+            file_base = File.basename(file)
+          end
+
           unless @extensions.include?(ext)
             raise Bolt::Node::FileError.new("File extension #{ext} is not enabled, "\
                                 "to run it please add to 'winrm: extensions'", 'FILETYPE_ERROR')
           end
-          file_base = File.basename(file)
           dir = make_tempdir
           dest = "#{dir}\\#{file_base}"
           begin
-            write_remote_file(file, dest)
+            write_remote_file(from_mem ? file[:file_content] : file, dest)
             shell_init
             yield dest
           ensure
