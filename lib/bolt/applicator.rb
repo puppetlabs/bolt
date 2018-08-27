@@ -7,11 +7,10 @@ require 'json'
 require 'logging'
 require 'minitar'
 require 'open3'
+require 'bolt/task'
 require 'bolt/util/puppet_log_level'
 
 module Bolt
-  Task = Struct.new(:name, :implementations, :input_method)
-
   class Applicator
     def initialize(inventory, executor, modulepath, pdb_client, hiera_config, max_compiles)
       @inventory = inventory
@@ -41,7 +40,7 @@ module Bolt
       @custom_facts_task ||= begin
         path = File.join(libexec, 'custom_facts.rb')
         impl = { 'name' => 'custom_facts.rb', 'path' => path, 'requirements' => [], 'supports_noop' => true }
-        Task.new('custom_facts', [impl], 'stdin')
+        Task.new(name: 'custom_facts', implementations: [impl], input_method: 'stdin')
       end
     end
 
@@ -49,7 +48,7 @@ module Bolt
       @catalog_apply_task ||= begin
         path = File.join(libexec, 'apply_catalog.rb')
         impl = { 'name' => 'apply_catalog.rb', 'path' => path, 'requirements' => [], 'supports_noop' => true }
-        Task.new('apply_catalog', [impl], 'stdin')
+        Task.new(name: 'apply_catalog', implementations: [impl], input_method: 'stdin')
       end
     end
 

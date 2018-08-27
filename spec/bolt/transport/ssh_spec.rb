@@ -31,6 +31,7 @@ describe Bolt::Transport::SSH do
   let(:command) { "pwd" }
   let(:config) { mk_config(user: user, password: password) }
   let(:no_host_key_check) { mk_config('host-key-check' => false, user: user, password: password) }
+  let(:no_user_config) { mk_config('host-key-check' => false, user: nil, password: password) }
   let(:ssh) { Bolt::Transport::SSH.new }
   let(:echo_script) { <<BASH }
 for var in "$@"
@@ -141,6 +142,24 @@ BASH
         }.to raise_error(Bolt::Node::ConnectError)
         expect(Time.now - exec_time).to be > 2
       end
+    end
+
+    it "uses Net::SSH config when no user is specified" do
+      expect(Net::SSH::Config)
+        .to receive(:for)
+        .at_least(:once)
+        .with(hostname, any_args)
+        .and_return(user: user)
+
+      ssh.with_connection(make_target(conf: no_user_config)) {}
+    end
+
+    it "doesn't read system config if load_config is false" do
+      allow(Etc).to receive(:getlogin).and_return('bolt')
+      expect(Net::SSH::Config).not_to receive(:for)
+
+      config_user = ssh.with_connection(make_target(conf: no_user_config), false, &:user)
+      expect(config_user).to be('bolt')
     end
   end
 

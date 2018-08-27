@@ -26,6 +26,21 @@ describe Bolt::Target do
       expect(uri.password).to eq(password)
     end
 
+    it "defaults user from options" do
+      uri = Bolt::Target.new("neptune", 'user' => 'none')
+      expect(uri.user).to eq('none')
+    end
+
+    it "defaults password from options" do
+      uri = Bolt::Target.new("neptune", 'password' => 'none')
+      expect(uri.password).to eq('none')
+    end
+
+    it "defaults port from options" do
+      uri = Bolt::Target.new("neptune", 'port' => 1234)
+      expect(uri.port).to eq(1234)
+    end
+
     it "rejects unescaped special characters" do
       expect {
         Bolt::Target.new("#{user}:a/b@neptune")

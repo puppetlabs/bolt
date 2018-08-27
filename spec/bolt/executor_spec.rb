@@ -14,6 +14,7 @@ describe "Bolt::Executor" do
   let(:dest) { '/tmp/upload' }
   let(:task) { 'service::restart' }
   let(:task_arguments) { { 'name' => 'apache' } }
+  let(:task_options) { { '_load_config' => true } }
   let(:transport) { double('holodeck', initialize_transport: nil) }
 
   def start_event(target)
@@ -176,11 +177,11 @@ describe "Bolt::Executor" do
       node_results.each do |target, result|
         expect(ssh)
           .to receive(:run_task)
-          .with(target, task_type(task), task_arguments, {})
+          .with(target, task_type(task), task_arguments, task_options)
           .and_return(result)
       end
 
-      results = executor.run_task(targets, mock_task(task), task_arguments, {})
+      results = executor.run_task(targets, mock_task(task), task_arguments, task_options)
       results.each do |result|
         expect(result).to be_instance_of(Bolt::Result)
         expect(result).to be_success
@@ -192,11 +193,11 @@ describe "Bolt::Executor" do
       node_results.each do |target, result|
         expect(ssh)
           .to receive(:run_task)
-          .with(target, task_type(task), task_arguments, '_run_as' => 'foo')
+          .with(target, task_type(task), task_arguments, { '_run_as' => 'foo' }.merge(task_options))
           .and_return(result)
       end
 
-      results = executor.run_task(targets, mock_task(task), task_arguments, {})
+      results = executor.run_task(targets, mock_task(task), task_arguments, task_options)
       results.each do |result|
         expect(result).to be_instance_of(Bolt::Result)
       end
@@ -212,15 +213,15 @@ describe "Bolt::Executor" do
         executor.run_as = 'bar'
         expect(ssh)
           .to receive(:run_task)
-          .with(targets[0], task_type(task), task_arguments, {})
+          .with(targets[0], task_type(task), task_arguments, task_options)
           .and_return(node_results[targets[0]])
 
         expect(ssh)
           .to receive(:run_task)
-          .with(targets[1], task_type(task), task_arguments, '_run_as' => 'bar')
+          .with(targets[1], task_type(task), task_arguments, { '_run_as' => 'bar' }.merge(task_options))
           .and_return(node_results[targets[1]])
 
-        results = executor.run_task(targets, mock_task(task), task_arguments, {})
+        results = executor.run_task(targets, mock_task(task), task_arguments, task_options)
         results.each do |result|
           expect(result).to be_instance_of(Bolt::Result)
         end
@@ -231,12 +232,12 @@ describe "Bolt::Executor" do
       node_results.each do |target, result|
         expect(ssh)
           .to receive(:run_task)
-          .with(target, task_type(task), task_arguments, {})
+          .with(target, task_type(task), task_arguments, task_options)
           .and_return(result)
       end
 
       results = []
-      executor.run_task(targets, mock_task(task), task_arguments) do |result|
+      executor.run_task(targets, mock_task(task), task_arguments, task_options) do |result|
         results << result
       end
       node_results.each do |target, result|
@@ -249,11 +250,11 @@ describe "Bolt::Executor" do
       node_results.each_key do |target|
         expect(ssh)
           .to receive(:run_task)
-          .with(target, task_type(task), task_arguments, {})
+          .with(target, task_type(task), task_arguments, task_options)
           .and_raise(Bolt::Error, 'failed', 'my-exception')
       end
 
-      executor.run_task(targets, mock_task(task), task_arguments) do |result|
+      executor.run_task(targets, mock_task(task), task_arguments, task_options) do |result|
         expect(result.error_hash['msg']).to eq('failed')
         expect(result.error_hash['kind']).to eq('my-exception')
       end
@@ -490,12 +491,12 @@ describe "Bolt::Executor" do
       node_results.each do |target, result|
         expect(ssh)
           .to receive(:run_task)
-          .with(target, task_type(task), task_arguments, {})
+          .with(target, task_type(task), task_arguments, task_options)
           .and_return(result)
       end
 
       executor.start_plan(plan_context)
-      executor.run_task(targets, mock_task(task), task_arguments)
+      executor.run_task(targets, mock_task(task), task_arguments, task_options)
 
       expect(@log_output.readline).to match(/NOTICE.*Starting: task service::restart on .*/)
       expect(@log_output.readline).to match(/NOTICE.*Finished: task service::restart with 0 failures/)

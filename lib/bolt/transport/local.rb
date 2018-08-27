@@ -91,7 +91,7 @@ module Bolt
         unwrapped_arguments = unwrap_sensitive_args(arguments)
         input_method = task.input_method || "both"
         stdin = STDIN_METHODS.include?(input_method) ? JSON.dump(unwrapped_arguments) : nil
-        env = ENVIRONMENT_METHODS.include?(input_method) ? unwrapped_arguments : nil
+        env = ENVIRONMENT_METHODS.include?(input_method) ? envify_params(unwrapped_arguments) : nil
 
         with_tmpscript(executable, target.options['tmpdir']) do |script|
           # log the arguments with sensitive data redacted, do NOT log unwrapped_arguments

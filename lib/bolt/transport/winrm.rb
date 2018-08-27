@@ -106,8 +106,18 @@ catch
       end
 
       def run_task(target, task, arguments, _options = {})
-        executable = target.select_impl(task, PROVIDED_FEATURES)
-        raise "No suitable implementation of #{task.name} for #{target.name}" unless executable
+        if from_api?(task)
+          # TODO: Remove as part of BOLT-664
+          dir = Dir.mktmpdir
+          executable = File.join(dir, task.file['filename'])
+          File.open(executable, 'w') { |f|
+            f.write(Base64.decode64(task.file['file_content']))
+          }
+          task.input_method = powershell_file?(executable) ? 'powershell' : 'both'
+        else
+          executable = target.select_impl(task, PROVIDED_FEATURES)
+          raise "No suitable implementation of #{task.name} for #{target.name}" unless executable
+        end
 
         # unpack any Sensitive data
         arguments = unwrap_sensitive_args(arguments)
@@ -120,12 +130,11 @@ catch
           end
 
           if ENVIRONMENT_METHODS.include?(input_method)
-            arguments.each do |(arg, val)|
-              val = val.to_json unless val.is_a?(String)
-              cmd = "[Environment]::SetEnvironmentVariable('PT_#{arg}', @'\n#{val}\n'@)"
+            envify_params(arguments).each do |(arg, val)|
+              cmd = "[Environment]::SetEnvironmentVariable('#{arg}', @'\n#{val}\n'@)"
               result = conn.execute(cmd)
               if result.exit_code != 0
-                raise EnvironmentVarError(var, value)
+                raise Bolt::Node::EnvironmentVarError.new(arg, val)
               end
             end
           end
@@ -153,6 +162,10 @@ try { & "#{remote_path}" @taskArgs } catch { Write-Error $_.Exception; exit 1 }
                 path, args = *process_from_extension(remote_path)
                 conn.execute_process(path, args, stdin)
               end
+
+            if from_api?(task)
+              FileUtils.remove_entry dir
+            end
             Bolt::Result.for_task(target, output.stdout.string,
                                   output.stderr.string,
                                   output.exit_code)

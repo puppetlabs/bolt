@@ -5,6 +5,7 @@ require 'bolt_spec/conn'
 require 'bolt_spec/files'
 require 'bolt_spec/integration'
 require 'bolt/catalog'
+require 'bolt/task'
 
 describe "passes parsed AST to the apply_catalog task" do
   include BoltSpec::Conn
@@ -18,7 +19,7 @@ describe "passes parsed AST to the apply_catalog task" do
     allow_any_instance_of(Bolt::Applicator).to receive(:catalog_apply_task) {
       path = File.join(__dir__, "../fixtures/apply/#{apply_task}")
       impl = { 'name' => apply_task, 'path' => path, 'requirements' => [], 'supports_noop' => true }
-      Bolt::Task.new('apply_catalog', [impl], 'environment')
+      Bolt::Task.new(name: 'apply_catalog', implementations: [impl], input_method: 'environment')
     }
   end
 
