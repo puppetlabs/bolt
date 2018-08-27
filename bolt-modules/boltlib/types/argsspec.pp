@@ -1,5 +1,4 @@
-# SensitiveData represent the acceptable types to pass as arguments into the run_xxx()
-# functions:
+# ArgsSpec represent the acceptable types to pass as arguments into the run_xxx() functions:
 #   - run_script()
 #   - run_plan()
 #   - run_task()

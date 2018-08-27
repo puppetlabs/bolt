@@ -302,7 +302,7 @@ the metadata for that parameter.
 run_task('task_with_secrets', ..., password => '$ecret!')
 ```
 
-Alternatively paramters can have a `Sensitive` type defined within the task metadata.
+Alternatively parameters can have a `Sensitive` type defined within the task metadata.
 In this case, when calling the task, the plan author must create a `Sensitive` data type
 and pass that into the `run_task()` function.
 
