@@ -210,6 +210,13 @@ bar
         end
       end
 
+      it "expands tilde to a user directory when --nodes starts with @" do
+        expect(File).to receive(:read).with(File.join(Dir.home, 'nodes.txt')).and_return("foo\nbar\n")
+        cli = Bolt::CLI.new(%w[command run --nodes @~/nodes.txt])
+        result = cli.parse
+        expect(result[:targets]).to eq(targets)
+      end
+
       it "generates an error message if no nodes given" do
         cli = Bolt::CLI.new(%w[command run --nodes])
         expect {

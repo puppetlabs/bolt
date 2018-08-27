@@ -306,7 +306,7 @@ Available options are:
     end
 
     def read_arg_file(file)
-      File.read(file)
+      File.read(File.expand_path(file))
     rescue StandardError => err
       raise Bolt::FileError.new("Error attempting to read #{file}: #{err}", file)
     end
