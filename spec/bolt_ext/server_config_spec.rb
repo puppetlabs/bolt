@@ -9,6 +9,7 @@ describe TransportConfig do
   let(:globalconfig) { File.join(__dir__, '..', 'fixtures', 'configs', 'global-bolt-server.conf') }
   let(:localconfig) { File.join(__dir__, '..', 'fixtures', 'configs', 'local-bolt-server.conf') }
   let(:requiredconfig) { File.join(__dir__, '..', 'fixtures', 'configs', 'required-bolt-server.conf') }
+  let(:badwhitelist) { File.join(__dir__, '..', 'fixtures', 'configs', 'bad-whitelist.conf') }
 
   it "reads from default paths" do
     expect(Hocon).to receive(:load).with('/etc/puppetlabs/bolt-server/conf.d/bolt-server.conf').and_return({})
@@ -34,6 +35,10 @@ describe TransportConfig do
     it 'reads logfile' do
       expect(config.logfile).to eq('/var/log/global')
     end
+
+    it 'reads whitelist' do
+      expect(config.whitelist).to eq(['a'])
+    end
   end
 
   context 'with local config' do
@@ -53,6 +58,10 @@ describe TransportConfig do
 
     it 'reads logfile' do
       expect(config.logfile).to eq('/var/log/local')
+    end
+
+    it 'reads whitelist' do
+      expect(config.whitelist).to eq(['b'])
     end
   end
 
@@ -74,6 +83,10 @@ describe TransportConfig do
     it 'local logfile overrides global' do
       expect(config.logfile).to eq('/var/log/local')
     end
+
+    it 'local whitelist overrides global' do
+      expect(config.whitelist).to eq(['b'])
+    end
   end
 
   it "accepts only required config" do
@@ -82,6 +95,7 @@ describe TransportConfig do
     expect(config.port).to be(62658)
     expect(config.loglevel).to eq('notice')
     expect(config.logfile).to eq(nil)
+    expect(config.whitelist).to eq(nil)
   end
 
   it "reads ssl keys from config" do
@@ -95,6 +109,12 @@ describe TransportConfig do
     expect {
       TransportConfig.new(emptyconfig, missingconfig)
     }.to raise_error(Bolt::ValidationError, /You must configure/)
+  end
+
+  it "errors when whitelist is not an array" do
+    expect {
+      TransportConfig.new(requiredconfig, badwhitelist)
+    }.to raise_error(Bolt::ValidationError, /Configured 'whitelist' must be an array of names/)
   end
 
   it "errors when a specified file does not exist" do
