@@ -11,10 +11,13 @@ Bolt server can be configured by defining content in HOCON format at one of the 
 **Local Config**: `~/.puppetlabs/bolt-server.conf`
 
 **Options**
-- `port`: Integer, *optional* - The port the bolt server will run on (default 62658)
+- `host`: String, *optional* - Hostname for server (default "127.0.0.1").
+- `port`: Integer, *optional* - The port the bolt server will run on (default 62658).
 - `ssl-cert`: String, *required* - Path to the cert file.
 - `ssl-key`: String, *required* - Path to the key file.
 - `ssl-ca-cert`: String, *required* - Path to the ca cert file.
+- `loglevel`: String, *optional* - Bolt log level, acceptable values are `debug`, `info`, `notice`, `warn`, `error` (default `notice`).
+- `logfile`: String, *optional* - Path to log file.
 
 **Example**
 ```
@@ -38,10 +41,10 @@ For example, the following runs the 'echo' task on localhost:
 ```
 {
   "target": {
-    "hostname": "localhost",
+    "hostname": "linux_target.net",
     "user": "marauder",
     "password": "I solemnly swear that I am up to no good",
-    "host-key-check": "false"
+    "host-key-check": false
   },
   "task": {
     "name": "echo",
@@ -52,7 +55,7 @@ For example, the following runs the 'echo' task on localhost:
       }
     },
     "file": {
-      "filename": "echo.rb",
+      "filename": "echo.sh",
       "file_content": "IyEvdXNyL2Jpbi9lbnYgYmFzaAplY2hvICRQVF9tZXNzYWdlCg==\n"
     }
   },
@@ -71,10 +74,11 @@ For example, the following runs 'echo' task on localhost:
 ```
 {
   "target": {
-    "hostname": "localhost",
-    "user": "chamber-of-secrets",
-    "password": "parseltongue",
-    "host-key-check": "false"
+    "hostname": "windows_target.net",
+    "user": "Administrator",
+    "password": "Secret",
+    "ssl": false,
+    "ssl-verify": false
   },
   "task": {
     "name": "echo",
@@ -85,15 +89,14 @@ For example, the following runs 'echo' task on localhost:
       }
     },
     "file": {
-      "filename": "echo.rb",
-      "file_content": "IyEvdXNyL2Jpbi9lbnYgYmFzaAplY2hvICRQVF9tZXNzYWdlCg==\n"
+      "filename": "echo.ps1",
+      "file_content": "cGFyYW0gKCRtZXNzYWdlKQpXcml0ZS1PdXRwdXQgIiRtZXNzYWdlIg==\n"
     }
   },
   "parameters": {
     "message": "Hello world"
   }
 }
-
 ```
 
 ### SSH Target Object
@@ -155,19 +158,18 @@ The task file and it's metadata. This is a JSON object that includes the followi
 For example:
 ```
 {
-  "name": "package",
-  "metadata": {
-    "description": "Install a package",
-    "parameters": {
-      "name": {
-        "description": "The package to install",
-        "type": "String[1]"
+  "task": {
+    "name": "echo",
+    "metadata": {
+      "description": "Echo a message",
+      "parameters": {
+        "message": "Default string"
       }
+    },
+    "file": {
+      "filename": "echo.sh",
+      "file_content": "IyEvdXNyL2Jpbi9lbnYgYmFzaAplY2hvICRQVF9tZXNzYWdlCg==\n"
     }
-  },
-  "file": {
-    "filename": "package.rb",
-    "file_content": "IyEvdXNyL2Jpbi9lbnYgYmFzaAplY2hvICRQVF9tZXNzYWdlCg==\n"
   }
 }
 ```
@@ -202,8 +204,8 @@ Check that the following certs have been generated
 ```
 3. Download and install bolt-server. The latest release can be found at http://builds.delivery.puppetlabs.net/pe-bolt-server
 ```
-curl -O http://builds.delivery.puppetlabs.net/pe-bolt-server/0.21.7/artifacts/deb/xenial/pe-bolt-server_0.21.7-1xenial_amd64.deb
-dpkg -i pe-bolt-server_0.21.7-1xenial_amd64.deb
+curl -O http://builds.delivery.puppetlabs.net/pe-bolt-server/0.21.8/repos/deb/xenial/pe-bolt-server_0.21.8-1xenial_amd64.deb
+dpkg -i pe-bolt-server_0.21.8-1xenial_amd64.deb
 ```
 4. Copy over certs to bolt-server directory
 
@@ -230,10 +232,10 @@ Save the following JSON to `~/request.json`
 ```
 {
   "target": {
-    "hostname": "juvct8xnyr2ihvm.delivery.puppetlabs.net",
+    "hostname": "xlr5bknywm58t94.delivery.puppetlabs.net",
     "user": "root",
-    "password": "Secret",
-    "host-key-check": "false"
+    "private-key-content": [Contents of ssh private key as a string],
+    "host-key-check": false
   },
   "task": {
     "name": "echo",
@@ -244,7 +246,7 @@ Save the following JSON to `~/request.json`
       }
     },
     "file": {
-      "filename": "echo.rb",
+      "filename": "echo.sh",
       "file_content": "IyEvdXNyL2Jpbi9lbnYgYmFzaAplY2hvICRQVF9tZXNzYWdlCg==\n"
     }
   },
@@ -255,13 +257,11 @@ Save the following JSON to `~/request.json`
 ```
 9. Make request
 ```
-curl -X POST -H "Content-Type: application/json" -d @request.json -E /etc/puppetlabs/bolt-server/ssl/$HOSTNAME.cert.pem --key /etc/puppetlabs/bolt-server/ssl/$HOSTNAME.key.pem -k https://0.0.0.0:62658/ssh/run_task
-
+curl -X POST -H "Content-Type: application/json" -d @request.json --cert /etc/puppetlabs/bolt-server/ssl/cert.pem --key /etc/puppetlabs/bolt-server/ssl/key.pem -k https://xlr5bknywm58t94.delivery.puppetlabs.net:62658/ssh/run_task
 ```
 10. Expected Output
 ```
-{ "node":"juvct8xnyr2ihvm.delivery.puppetlabs.net",
-  "status":"success",
-  "result": { "_output":"Hello world\n" }
-}
+{"node":"xlr5bknywm58t94.delivery.puppetlabs.net",
+"status":"success",
+"result":{"_output":"Hello world\n"}}
 ```
