@@ -198,8 +198,8 @@ SHELL
       with_task_containing('tasks_test_sensitive', contents, 'both') do |task|
         expect(local.run_task(target, task, arguments).message).to eq(<<SHELL.strip)
 $ecret!
-[1, 2, 3]
-{"k"=>"v"}
+[1,2,3]
+{"k":"v"}
 SHELL
       end
     end
