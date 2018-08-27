@@ -13,6 +13,11 @@ Bolt is a Ruby command-line tool for executing commands, scripts, and tasks on r
 
 > For a step-by-step introduction to Bolt, see our [hands-on-lab](https://github.com/puppetlabs/tasks-hands-on-lab).
 
+Additionally the Bolt project includes:
+
+* bolt-server, an experimental Sinatra server for executing tasks over SSH and WinRM.
+* bolt-inventory-pdb, a command-line tool for generating an inventory file from a template containing PuppetDB queries.
+
 ## Supported platforms
 
 * Linux, OSX, Windows

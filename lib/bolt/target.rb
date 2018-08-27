@@ -18,6 +18,22 @@ module Bolt
       @uri_obj = parse(uri)
       @options = options || {}
       @options.freeze
+
+      if @options['user']
+        @user = @options['user']
+      end
+
+      if @options['password']
+        @password = @options['password']
+      end
+
+      if @options['port']
+        @port = @options['port']
+      end
+
+      if @options['protocol']
+        @protocol = @options['protocol']
+      end
     end
 
     def update_conf(conf)

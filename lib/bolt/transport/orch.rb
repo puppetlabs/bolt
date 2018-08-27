@@ -11,7 +11,11 @@ require 'bolt/result'
 module Bolt
   module Transport
     class Orch < Base
-      CONF_FILE = File.expand_path('~/.puppetlabs/client-tools/orchestrator.conf')
+      CONF_FILE = if !ENV['HOME'].nil?
+                    File.expand_path('~/.puppetlabs/client-tools/orchestrator.conf')
+                  else
+                    '/etc/puppetlabs/client-tools/orchestrator.conf'
+                  end
       BOLT_COMMAND_TASK = Struct.new(:name).new('bolt_shim::command').freeze
       BOLT_SCRIPT_TASK = Struct.new(:name).new('bolt_shim::script').freeze
       BOLT_UPLOAD_TASK = Struct.new(:name).new('bolt_shim::upload').freeze

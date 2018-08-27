@@ -161,6 +161,15 @@ module Bolt
         targets.map { |target| [target] }
       end
 
+      def from_api?(task)
+        if task.respond_to? :file
+          unless task.file.nil?
+            return true
+          end
+        end
+        false
+      end
+
       # Transports should override this method with their own implementation of running a command.
       def run_command(*_args)
         raise NotImplementedError, "run_command() must be implemented by the transport class"
