@@ -120,7 +120,9 @@ module Bolt
             'msg' => "Puppet is not installed on the target, please install it to enable 'apply'",
             'kind' => 'bolt/apply-error'
           })
-      elsif exit_code == 1 && error_hash['msg'] =~ /Could not find executable 'ruby.exe'/
+      elsif exit_code == 1 &&
+            (error_hash['msg'] =~ /Could not find executable 'ruby.exe'/ ||
+             error_hash['msg'] =~ /The term 'ruby.exe' is not recognized as the name of a cmdlet/)
         # Windows does not have Ruby present
         Result.new(result.target, error:
           {
