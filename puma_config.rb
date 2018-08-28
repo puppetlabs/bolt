@@ -7,9 +7,9 @@
 ##############################################################
 
 require 'bolt_ext/server'
+require 'bolt_ext/server_acl'
 require 'bolt_ext/server_config'
 require 'bolt/logger'
-require 'rails/auth/rack'
 
 Bolt::Logger.initialize_logging
 
@@ -38,26 +38,7 @@ bind bind_addr
 
 impl = TransportAPI.new
 unless config.whitelist.nil?
-  acls = []
-  config.whitelist.each do |entry|
-    acls << {
-      'resources' => [
-        {
-          'method' => 'ALL',
-          'path' => '/.*'
-        }
-      ],
-      'allow_x509_subject' => {
-        'cn' => entry
-      }
-    }
-  end
-  acl = Rails::Auth::ACL.new(acls, matchers: { allow_x509_subject: Rails::Auth::X509::Matcher })
-  impl = Rails::Auth::ACL::Middleware.new(impl, acl: acl)
-  impl = Rails::Auth::X509::Middleware.new(impl,
-                                           ca_file: config.ssl_ca_cert,
-                                           cert_filters: { 'puma.peercert' => proc { |x| x } },
-                                           require_cert: true)
+  impl = TransportACL.new(impl, config.whitelist)
 end
 
 app impl
