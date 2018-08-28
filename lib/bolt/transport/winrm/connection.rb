@@ -335,8 +335,9 @@ PS
 
         def write_remote_file(source, destination)
           fs = ::WinRM::FS::FileManager.new(@connection)
-          # TODO: raise FileError here if this fails
           fs.upload(source, destination)
+        rescue StandardError => e
+          raise Bolt::Node::FileError.new(e.message, 'WRITE_ERROR')
         end
 
         def make_tempdir
@@ -354,32 +355,35 @@ PS
           result.stdout.string.chomp
         end
 
-        def with_remote_file(file)
-          if file.is_a?(Hash)
-            ext = File.extname(file[:filename])
-            file_base = File.basename(file[:filename])
-            from_mem = true
-          elsif File.file?(file)
-            ext = File.extname(file)
-            file_base = File.basename(file)
-          end
+        def with_remote_tempdir
+          dir = make_tempdir
+          yield dir
+        ensure
+          execute(<<-PS)
+Remove-Item -Force -Recurse -Path "#{dir}"
+PS
+        end
 
+        def validate_extensions(ext)
           unless @extensions.include?(ext)
             raise Bolt::Node::FileError.new("File extension #{ext} is not enabled, "\
                                 "to run it please add to 'winrm: extensions'", 'FILETYPE_ERROR')
           end
-          dir = make_tempdir
-          dest = "#{dir}\\#{file_base}"
-          begin
-            write_remote_file(from_mem ? file[:file_content] : file, dest)
-            shell_init
-            yield dest
-          ensure
-            execute(<<-PS)
-Remove-Item -Force "#{dest}"
-Remove-Item -Force "#{dir}"
-PS
-          end
+        end
+
+        def write_remote_executable(dir, file, filename = nil)
+          filename ||= File.basename(file)
+          validate_extensions(File.extname(filename))
+          remote_path = "#{dir}\\#{filename}"
+          write_remote_file(file, remote_path)
+          remote_path
+        end
+
+        def write_executable_from_content(dir, content, filename)
+          validate_extensions(File.extname(filename))
+          remote_path = "#{dir}\\#{filename}"
+          write_remote_file(content, remote_path)
+          remote_path
         end
       end
     end

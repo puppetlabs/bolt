@@ -6,11 +6,11 @@ source ENV['GEM_SOURCE'] || 'https://rubygems.org'
 ENV['BOLT_DISABLE_ANALYTICS'] = 'true'
 
 gemspec
-gem  "winrm-fs", git: "https://github.com/donoghuc/winrm-fs.git", branch: "BOLT-664"
 gem "hocon"
 gem "puma"
 gem "rack"
 gem "sinatra"
+gem "winrm-fs", git: "https://github.com/donoghuc/winrm-fs.git", branch: "BOLT-664"
 
 # Required to pick up plan specs in the rake spec task
 gem "puppetlabs_spec_helper",
