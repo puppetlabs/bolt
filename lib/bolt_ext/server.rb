@@ -6,8 +6,15 @@ require 'bolt/task'
 require 'json'
 
 class TransportAPI < Sinatra::Base
+  # This disables Sinatra's error page generation
+  set :show_exceptions, false
+
   get '/' do
     200
+  end
+
+  get '/500_error' do
+    raise 'Unexpected error'
   end
 
   post '/ssh/run_task' do
@@ -53,5 +60,14 @@ class TransportAPI < Sinatra::Base
     # Since this will only be on one node we can just return the first result
     results = executor.run_task(target, task, parameters)
     [200, results.first.to_json]
+  end
+
+  error 404 do
+    [404, "Could not find route #{request.path}"]
+  end
+
+  error 500 do
+    e = env['sinatra.error']
+    [500, "500: Unknown error: #{e.message}"]
   end
 end

@@ -176,4 +176,47 @@ describe "TransportAPI" do
       expect(result['result']['_output'].chomp).to eq('Hello!')
     end
   end
+
+  context 'when raising errors' do
+    let(:target) { conn_info('ssh') }
+    let(:echo_task) {
+      {
+        'name': 'echo',
+        'metadata': {
+          'description': 'Echo a message',
+          'parameters': { 'message': 'Default message' }
+        },
+        'file': {
+          'file_content': Base64.encode64("#!/usr/bin/env bash\necho $PT_message"),
+          'filename': "echo.sh"
+        }
+      }
+    }
+
+    it 'returns non-html 404 when the endpoint is not found' do
+      body = {
+        'task': echo_task,
+        'target': {
+          'hostname': target[:host],
+          'user': target[:user],
+          'password': target[:password],
+          'port': target[:port],
+          'host-key-check': false
+        },
+        'parameters': { "message": "Hello!" }
+      }
+
+      post '/ssh/run_tasksss', JSON.generate(body), 'CONTENT_TYPE' => 'text/json'
+      expect(last_response).not_to be_ok
+      expect(last_response.status).to eq(404)
+      expect(last_response.body).to eq("Could not find route /ssh/run_tasksss")
+    end
+
+    it 'returns non-html 500 when the request times out' do
+      get '/500_error'
+      expect(last_response).not_to be_ok
+      expect(last_response.status).to eq(500)
+      expect(last_response.body).to eq('500: Unknown error: Unexpected error')
+    end
+  end
 end
