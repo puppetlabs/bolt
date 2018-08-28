@@ -376,7 +376,7 @@ describe "Bolt::Executor" do
 
       expect(running).to eq(2)
       # execute all the promises to release the threads
-      state.keys.each { |k| state[k][:promise].execute }
+      state.each_key { |k| state[k][:promise].execute }
       t.join
     end
   end

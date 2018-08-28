@@ -602,6 +602,54 @@ For example, the following code in a metadata file describes a `provider` parame
  }
 ```
 
+### Making parameters sensitive
+
+To prevent a task parameter's value from being written to the Bolt logs in plain-text the `Sensitive` property can be associated with the parameter. This construct should be used for things like passwords, API keys, secrets, etc.
+
+There are two options for defining a task parameter as `Sensitive`:
+
+1) Specify the `"sensitive": true` property on the parameter within the JSON metadata [**PREFERRED**]:
+
+```
+{
+  "description": "Task has a sensitive property denoted by metadata",
+  "input_method": "stdin",
+  "parameters": {
+    "user": {
+      "description": "The user",
+      "type": "String[1]"
+    },
+    "password": {
+      "description": "The password",
+      "type": "String[1]",
+      "sensitive": true
+    }
+  }
+}
+```
+
+2) Wrap the parameter with `Sensitive` in the `type` property within the JSON metadata: 
+
+```
+{
+  "description": "Task has a sensitive property denoted by its type",
+  "input_method": "stdin",
+  "parameters": {
+    "password": {
+      "description": "The password",
+      "type": "Sensitive[String[1]]",
+    }
+  }
+}
+```
+
+When a parameter is `Sensitive` the only expectation, currently, is that the parameter
+will not be logged. No other precautions are taken.
+
+It is up to the task author to implement their tasks in such a way that `Sensitive`
+parameters are not exposed or logged. Please be mindful when coding your tasks!
+
+
 ### Task metadata reference
 
 The following table shows task metadata keys, values, and default values.

@@ -105,6 +105,9 @@ module Bolt
       end
 
       def run_script(target, script, arguments, options = {})
+        # unpack any Sensitive data
+        arguments = unwrap_sensitive_args(arguments)
+
         with_connection(target) do |conn|
           conn.running_as(options['_run_as']) do
             conn.with_remote_tempdir do |dir|
@@ -118,6 +121,8 @@ module Bolt
       end
 
       def run_task(target, task, arguments, options = {})
+        # unpack any Sensitive data
+        arguments = unwrap_sensitive_args(arguments)
         input_method = task.input_method || "both"
         with_connection(target, options.fetch('_load_config', true)) do |conn|
           conn.running_as(options['_run_as']) do

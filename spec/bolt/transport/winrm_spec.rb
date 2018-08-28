@@ -327,6 +327,19 @@ QUOTED
       end
     end
 
+    it "can run a script with Sensitive arguments", winrm: true do
+      arguments = ['non-sensitive-arg',
+                   Sensitive.new('$ecret!')]
+      with_tempfile_containing('script-sensitive-winrm', echo_script, '.ps1') do |file|
+        expect(
+          winrm.run_script(target, file.path, arguments)['stdout']
+        ).to eq(<<QUOTED)
+non-sensitive-arg\r
+$ecret!\r
+QUOTED
+      end
+    end
+
     it "escapes unsafe shellwords", winrm: true do
       with_tempfile_containing('script-test-winrm-escape', echo_script, '.ps1') do |file|
         expect(
@@ -541,6 +554,37 @@ PS
         expect(
           winrm.run_task(target, task, arguments).value
         ).to eq('key' => 'val')
+      end
+    end
+
+    it "can run a task with Sensitive params via environment", winrm: true do
+      contents = <<PS
+Write-Host "$env:PT_sensitive_string"
+Write-Host "$env:PT_sensitive_array"
+Write-Host "$env:PT_sensitive_hash"
+PS
+      deep_hash = { 'k' => Sensitive.new('v') }
+      arguments = { 'sensitive_string' => Sensitive.new('$ecret!'),
+                    'sensitive_array'  => Sensitive.new([1, 2, Sensitive.new(3)]),
+                    'sensitive_hash'   => Sensitive.new(deep_hash) }
+      with_task_containing('tasks_test_sensitive', contents, 'both', '.ps1') do |task|
+        expect(winrm.run_task(target, task, arguments).message).to eq(<<QUOTED)
+$ecret!\r
+[1,2,3]\r
+{"k":"v"}\r
+QUOTED
+      end
+    end
+
+    it "can run a task with Sensitive params via stdin", winrm: true do
+      contents = <<PS
+$line = [Console]::In.ReadLine()
+Write-Host $line
+PS
+      arguments = { 'sensitive_string' => Sensitive.new('$ecret!') }
+      with_task_containing('tasks_test_sensitive', contents, 'stdin', '.ps1') do |task|
+        expect(winrm.run_task(target, task, arguments).value)
+          .to eq("sensitive_string" => "$ecret!")
       end
     end
 

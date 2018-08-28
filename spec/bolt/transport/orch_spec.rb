@@ -283,6 +283,20 @@ describe Bolt::Transport::Orch, orchestrator: true do
 
       orch.batch_task(targets, mtask, params, '_description' => 'test message')
     end
+
+    it "unwraps Sensitive parameters" do
+      allow(mock_client).to receive(:run_task).and_return(results)
+      sensitive_params = { 'sensitive_string' => Sensitive.new('$ecret!') }
+      expect(mock_client).to receive(:run_task)
+        .with(hash_including(params: { "sensitive_string" => "$ecret!" }))
+
+      node_results = orch.batch_task(targets, mtask, sensitive_params)
+
+      expect(node_results[0].value).to eq('_output' => 'hello')
+      expect(node_results[1].value).to eq('_output' => 'goodbye')
+      expect(node_results[0]).to be_success
+      expect(node_results[1]).to be_success
+    end
   end
 
   describe :batch_command do
@@ -414,8 +428,10 @@ describe Bolt::Transport::Orch, orchestrator: true do
        { 'name' => 'node2', 'state' => 'finished', 'result' => { '_output' => '', 'exit_code' => 0 } }]
     }
 
-    before(:each) do
-      expect(mock_client).to receive(:run_task).with(include(body)).and_return(results)
+    before(:each) do |test|
+      unless test.metadata[:skip_before]
+        expect(mock_client).to receive(:run_task).with(include(body)).and_return(results)
+      end
     end
 
     it 'returns a success' do
@@ -434,6 +450,20 @@ describe Bolt::Transport::Orch, orchestrator: true do
         expect(events).to include(type: :node_start, target: result.target)
         expect(events).to include(type: :node_result, result: result)
       end
+    end
+
+    it "unwraps Sensitive parameters", skip_before: true do
+      allow(mock_client).to receive(:run_task).and_return(results)
+      sensitive_params = { 'sensitive_string' => Sensitive.new('$ecret!') }
+      expect(mock_client).to receive(:run_task)
+        .with(hash_including(params:
+                hash_including("arguments" =>
+                  hash_including('sensitive_string' => '$ecret!'))))
+
+      results = orch.batch_script(targets, script_path, sensitive_params)
+
+      expect(results[0]).to be_success
+      expect(results[1]).to be_success
     end
 
     context "when the script succeeds" do

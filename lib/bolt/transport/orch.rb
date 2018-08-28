@@ -153,6 +153,8 @@ module Bolt
         end
 
         begin
+          # unpack any Sensitive data
+          arguments = unwrap_sensitive_args(arguments)
           results = get_connection(targets.first.options).run_task(targets, task, arguments, options)
 
           process_run_results(targets, results)

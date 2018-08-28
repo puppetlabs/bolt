@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'bolt/error'
+require 'bolt/pal'
 
 # Runs a given instance of a `Task` on the given set of targets and returns the result from each.
 # This function does nothing if the list of targets is empty.
@@ -117,10 +118,26 @@ Puppet::Functions.create_function(:run_task) do
       end || (raise with_stack(:TYPE_MISMATCH, 'Task parameters do not match'))
 
       task = task_signature.task
+
+      # Wrap parameters marked with '"sensitive": true' in the task metadata with a
+      # Sensitive wrapper type. This way it's not shown in logs
+      use_args.each do |k, v|
+        if task.parameters && task.parameters[k]['sensitive']
+          use_args[k] = Puppet::Pops::Types::PSensitiveType::Sensitive.new(v)
+        end
+      end
     end
 
-    unless Puppet::Pops::Types::TypeFactory.data.instance?(use_args)
-      raise with_stack(:TYPE_NOT_DATA, 'Task parameters is not of type Data')
+    args_spec_t = Puppet::Pops::Types::TypeParser.singleton.parse('Boltlib::ArgsSpec')
+    unless Puppet::Pops::Types::TypeCalculator.instance?(args_spec_t, use_args)
+      # generate a helpful error message about the type-mismatch between our
+      # Boltlib::ArgSpec and the actual type of use_args
+      use_args_t = Puppet::Pops::Types::TypeCalculator.infer_set(use_args)
+      desc = Puppet::Pops::Types::TypeMismatchDescriber.singleton.describe_mismatch(
+        'Task parameters are not of type Boltlib::ArgsSpec. run_task()',
+        args_spec_t, use_args_t
+      )
+      raise with_stack(:TYPE_NOT_DATA, desc)
     end
 
     if executor.noop
