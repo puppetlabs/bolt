@@ -3,7 +3,7 @@
 require 'hocon'
 
 class TransportConfig
-  attr_accessor :host, :port, :ssl_cert, :ssl_key, :ssl_ca_cert, :loglevel, :logfile
+  attr_accessor :host, :port, :ssl_cert, :ssl_key, :ssl_ca_cert, :loglevel, :logfile, :whitelist
 
   def initialize(global = nil, local = nil)
     @host = '127.0.0.1'
@@ -14,6 +14,7 @@ class TransportConfig
 
     @loglevel = 'notice'
     @logfile = nil
+    @whitelist = nil
 
     global_path = global || '/etc/puppetlabs/bolt-server/conf.d/bolt-server.conf'
     local_path = local || File.join(ENV['HOME'].to_s, ".puppetlabs", "bolt-server.conf")
@@ -33,7 +34,7 @@ class TransportConfig
     end
 
     unless parsed_hocon.nil?
-      %w[host port ssl-cert ssl-key ssl-ca-cert loglevel logfile].each do |key|
+      %w[host port ssl-cert ssl-key ssl-ca-cert loglevel logfile whitelist].each do |key|
         varname = '@' + key.tr('-', '_')
         instance_variable_set(varname, parsed_hocon[key]) if parsed_hocon.key?(key)
       end
@@ -57,6 +58,10 @@ You must configure #{k} in either /etc/puppetlabs/bolt-server/conf.d/bolt-server
       unless File.file?(send(sk)) && File.readable?(send(sk))
         raise Bolt::ValidationError, "Configured #{sk} must be a valid filepath"
       end
+    end
+
+    unless @whitelist.nil? || @whitelist.is_a?(Array)
+      raise Bolt::ValidationError, "Configured 'whitelist' must be an array of names"
     end
   end
 end

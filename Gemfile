@@ -9,6 +9,7 @@ gemspec
 gem "hocon"
 gem "puma"
 gem "rack"
+gem "rails-auth"
 gem "sinatra"
 
 # Required to pick up plan specs in the rake spec task

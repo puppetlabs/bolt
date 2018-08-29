@@ -7,6 +7,7 @@
 ##############################################################
 
 require 'bolt_ext/server'
+require 'bolt_ext/server_acl'
 require 'bolt_ext/server_config'
 require 'bolt/logger'
 
@@ -35,4 +36,9 @@ bind_addr << "&ca=#{config.ssl_ca_cert}"
 bind_addr << "&verify_mode=force_peer"
 bind bind_addr
 
-app TransportAPI
+impl = TransportAPI.new
+unless config.whitelist.nil?
+  impl = TransportACL.new(impl, config.whitelist)
+end
+
+app impl
