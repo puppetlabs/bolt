@@ -292,7 +292,7 @@ $r.each |$result| {
 
 ## Passing sensitive data to tasks
 
-Tasks can define parameters to be `Sensitive`, meaning the parameter values will not be logged by Bolt.
+Tasks can define parameters to be `sensitive`, meaning the parameter values will not be logged by Bolt.
 
 If a parameter is declared with `"sensitive": true` within the task's metadata, then the task
 can be run normally. Bolt will automatically ensure that this parameter is not logged using
@@ -300,14 +300,6 @@ the metadata for that parameter.
 
 ```
 run_task('task_with_secrets', ..., password => '$ecret!')
-```
-
-Alternatively parameters can have a `Sensitive` type defined within the task metadata.
-In this case, when calling the task, the plan author must create a `Sensitive` data type
-and pass that into the `run_task()` function.
-
-```
-run_task('task_with_sensitive_type', ..., password => Sensitive('$ecret!'))
 ```
 
 ## Target objects

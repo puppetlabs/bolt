@@ -241,21 +241,6 @@ describe 'run_task' do
       let(:result_set) { Bolt::ResultSet.new([result]) }
       let(:task_params) { {} }
 
-      it 'with Sensitive types - matches parameter metadata' do
-        executable = File.join(tasks_root, 'sensitive_type.sh')
-        task_params.merge!(
-          'sensitive_string' => Sensitive.new(sensitive_string),
-          'sensitive_array'  => Sensitive.new(sensitive_array),
-          'sensitive_hash'   => Sensitive.new(sensitive_hash)
-        )
-
-        executor.expects(:run_task).with([target], mock_task(executable, nil), task_params, {})
-                .returns(result_set)
-        inventory.expects(:get_targets).with(hostname).returns([target])
-
-        is_expected.to run.with_params('Test::Sensitive_Type', hostname, task_params).and_return(result_set)
-      end
-
       it 'with Sensitive metadata - input parameters are wrapped in Sensitive' do
         executable = File.join(tasks_root, 'sensitive_meta.sh')
         input_params = {
@@ -355,7 +340,7 @@ describe 'run_task' do
       )
     end
 
-    it "errors when a specified parameter value is not Boltlib::ArgsSpec" do
+    it "errors when a specified parameter value is not Data" do
       task_params.merge!(
         'mandatory_string'  => 'str',
         'mandatory_integer' => 10,
@@ -364,7 +349,7 @@ describe 'run_task' do
       )
 
       is_expected.to run.with_params(task_name, hostname, task_params).and_raise_error(
-        Puppet::ParseError, /Task parameters are not of type Boltlib::ArgsSpec. run_task()/
+        Puppet::ParseError, /Task parameters are not of type Data. run_task()/
       )
     end
   end
