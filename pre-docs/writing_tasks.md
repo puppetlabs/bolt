@@ -684,7 +684,6 @@ Some types supported by Puppet can not be represented as JSON, such as `Hash[Int
 | `Hash` |Matches a JSON object.|
 | `Variant[Integer, Pattern[/\A\d+\Z/]]` |Matches an integer or a String of an integer|
 | `Boolean` |Accepts Boolean values.|
-| `Sensitive` |Identifies data as sensitive. Values are masked when they appear in logs and API responses.|
 
 **Related information**  
 
