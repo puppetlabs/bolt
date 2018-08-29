@@ -16,10 +16,26 @@ Bolt server can be configured by defining content in HOCON format at one of the 
 - `ssl-cert`: String, *required* - Path to the cert file.
 - `ssl-key`: String, *required* - Path to the key file.
 - `ssl-ca-cert`: String, *required* - Path to the ca cert file.
+- `ssl-cipher-suites`: Array, *optional* - TLS cipher suites in order of preference ([default](#default-ssl-cipher-suites)).
 - `loglevel`: String, *optional* - Bolt log level, acceptable values are `debug`, `info`, `notice`, `warn`, `error` (default `notice`).
 - `logfile`: String, *optional* - Path to log file.
-- `whitelist`: Array, *optional* - A list of hosts which can connect to pe-bolt-server
-- `concurrency`: Integer, *optional* - The maximum number of server threads (default `100`)
+- `whitelist`: Array, *optional* - A list of hosts which can connect to pe-bolt-server.
+- `concurrency`: Integer, *optional* - The maximum number of server threads (default `100`).
+
+### Default SSL Cipher Suites
+Based on https://wiki.mozilla.org/Security/Server_Side_TLS#Modern_compatibility
+```
+ECDHE-ECDSA-AES256-GCM-SHA384
+ECDHE-RSA-AES256-GCM-SHA384
+ECDHE-ECDSA-CHACHA20-POLY1305
+ECDHE-RSA-CHACHA20-POLY1305
+ECDHE-ECDSA-AES128-GCM-SHA256
+ECDHE-RSA-AES128-GCM-SHA256
+ECDHE-ECDSA-AES256-SHA384
+ECDHE-RSA-AES256-SHA384
+ECDHE-ECDSA-AES128-SHA256
+ECDHE-RSA-AES128-SHA256
+```
 
 **Example**
 ```
@@ -114,7 +130,7 @@ The Target be a JSON object. The following keys are available:
 - `run-as`: String, *optional* - A different user to run commands as after login.
 - `tmpdir`: String, *optional* - The directory to upload and execute temporary files on the target.
 - `host-key-check`: Bool, *optional* - Whether to perform host key validation when connecting over SSH (Default: `true`).
-- `sudo-password`: String, *optional* - Password to use when changing users via `run-as`
+- `sudo-password`: String, *optional* - Password to use when changing users via `run-as`.
 
 ### WinRM Target Object
 The Target be a JSON object. The following keys are available:
@@ -128,7 +144,7 @@ The Target be a JSON object. The following keys are available:
 - `ssl-verify`: Boolean, *optional* - When true, verifies the targets certificate matches the cacert (Default: `true`)
 - `tmpdir`: String, *optional* - The directory to upload and execute temporary files on the target.
 - `cacert`: String, *optional* - The path to the CA certificate.
-- `extensions`: List, *optional* - List of file extensions that are accepted for scripts or tasks. Scripts with these file extensions rely on the target node's file type association to run. For example, if Python is installed on the system, a .py script should run with python.exe. The extensions .ps1, .rb, and .pp are always allowed and run via hard-coded executables
+- `extensions`: Array, *optional* - List of file extensions that are accepted for scripts or tasks. Scripts with these file extensions rely on the target node's file type association to run. For example, if Python is installed on the system, a .py script should run with python.exe. The extensions .ps1, .rb, and .pp are always allowed and run via hard-coded executables.
 
 ### Task Object
 This is nearly identical to the [task detail JSON
@@ -145,10 +161,10 @@ The name of the task
 #### Metadata
 The metadata object is optional, and contains metadata about the task being run. It includes the following keys:
 
-- `description`: String, *optional* - The task description from it's metadata
+- `description`: String, *optional* - The task description from it's metadata.
 - `parameters`: Object, *optional* - A JSON object whose keys are parameter names, and whose values are JSON objects with 2 keys:
-    - `description`: String, *optional* - The parameter description
-    - `type`: String, *optional* - The type the parameter should accept
+    - `description`: String, *optional* - The parameter description.
+    - `type`: String, *optional* - The type the parameter should accept.
 
 #### File
 **NOTE**: We plan to eventually get this information directly from puppetserver

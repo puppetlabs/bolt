@@ -3,7 +3,8 @@
 require 'hocon'
 
 class TransportConfig
-  attr_accessor :host, :port, :ssl_cert, :ssl_key, :ssl_ca_cert, :loglevel, :logfile, :whitelist, :concurrency
+  attr_accessor :host, :port, :ssl_cert, :ssl_key, :ssl_ca_cert, :ssl_cipher_suites,
+                :loglevel, :logfile, :whitelist, :concurrency
 
   def initialize(global = nil, local = nil)
     @host = '127.0.0.1'
@@ -11,6 +12,16 @@ class TransportConfig
     @ssl_cert = nil
     @ssl_key = nil
     @ssl_ca_cert = nil
+    @ssl_cipher_suites = ['ECDHE-ECDSA-AES256-GCM-SHA384',
+                          'ECDHE-RSA-AES256-GCM-SHA384',
+                          'ECDHE-ECDSA-CHACHA20-POLY1305',
+                          'ECDHE-RSA-CHACHA20-POLY1305',
+                          'ECDHE-ECDSA-AES128-GCM-SHA256',
+                          'ECDHE-RSA-AES128-GCM-SHA256',
+                          'ECDHE-ECDSA-AES256-SHA384',
+                          'ECDHE-RSA-AES256-SHA384',
+                          'ECDHE-ECDSA-AES128-SHA256',
+                          'ECDHE-RSA-AES128-SHA256']
 
     @loglevel = 'notice'
     @logfile = nil
@@ -35,7 +46,7 @@ class TransportConfig
     end
 
     unless parsed_hocon.nil?
-      %w[host port ssl-cert ssl-key ssl-ca-cert loglevel logfile whitelist concurrency].each do |key|
+      %w[host port ssl-cert ssl-key ssl-ca-cert ssl-cipher-suites loglevel logfile whitelist concurrency].each do |key|
         varname = '@' + key.tr('-', '_')
         instance_variable_set(varname, parsed_hocon[key]) if parsed_hocon.key?(key)
       end
@@ -59,6 +70,10 @@ You must configure #{k} in either /etc/puppetlabs/bolt-server/conf.d/bolt-server
       unless File.file?(send(sk)) && File.readable?(send(sk))
         raise Bolt::ValidationError, "Configured #{sk} must be a valid filepath"
       end
+    end
+
+    unless @ssl_cipher_suites.is_a?(Array)
+      raise Bolt::ValidationError, "Configured 'ssl-cipher-suites' must be an array of cipher suite names"
     end
 
     unless @whitelist.nil? || @whitelist.is_a?(Array)
