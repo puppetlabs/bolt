@@ -34,6 +34,7 @@ bind_addr << "cert=#{config.ssl_cert}"
 bind_addr << "&key=#{config.ssl_key}"
 bind_addr << "&ca=#{config.ssl_ca_cert}"
 bind_addr << "&verify_mode=force_peer"
+bind_addr << "&ssl_cipher_filter=#{config.ssl_cipher_suites.join(':')}"
 bind bind_addr
 
 threads 0, config.concurrency

@@ -10,6 +10,7 @@ describe TransportConfig do
   let(:localconfig) { File.join(__dir__, '..', 'fixtures', 'configs', 'local-bolt-server.conf') }
   let(:requiredconfig) { File.join(__dir__, '..', 'fixtures', 'configs', 'required-bolt-server.conf') }
   let(:badwhitelist) { File.join(__dir__, '..', 'fixtures', 'configs', 'bad-whitelist.conf') }
+  let(:badcipher) { File.join(__dir__, '..', 'fixtures', 'configs', 'bad-ssl-cipher-suites.conf') }
 
   let(:base_config) { Hocon.load(requiredconfig) }
 
@@ -42,6 +43,10 @@ describe TransportConfig do
       expect(config.whitelist).to eq(['a'])
     end
 
+    it 'reads ssl-cipher-suites' do
+      expect(config.ssl_cipher_suites).to eq(['a'])
+    end
+
     it 'reads concurrency' do
       expect(config.concurrency).to eq(12)
     end
@@ -68,6 +73,10 @@ describe TransportConfig do
 
     it 'reads whitelist' do
       expect(config.whitelist).to eq(['b'])
+    end
+
+    it 'reads ssl-cipher-suites' do
+      expect(config.ssl_cipher_suites).to eq(['b'])
     end
 
     it 'reads concurrency' do
@@ -98,6 +107,10 @@ describe TransportConfig do
       expect(config.whitelist).to eq(['b'])
     end
 
+    it 'local ssl-cipher-suites overrides global' do
+      expect(config.ssl_cipher_suites).to eq(['b'])
+    end
+
     it 'local concurrency overrides global' do
       expect(config.concurrency).to eq(1)
     end
@@ -110,6 +123,7 @@ describe TransportConfig do
     expect(config.loglevel).to eq('notice')
     expect(config.logfile).to eq(nil)
     expect(config.whitelist).to eq(nil)
+    expect(config.ssl_cipher_suites).to include('ECDHE-ECDSA-AES256-GCM-SHA384')
     expect(config.concurrency).to eq(100)
   end
 
@@ -130,6 +144,12 @@ describe TransportConfig do
     expect {
       TransportConfig.new(requiredconfig, badwhitelist)
     }.to raise_error(Bolt::ValidationError, /Configured 'whitelist' must be an array of names/)
+  end
+
+  it "errors when ssl-cipher-suites is not an array" do
+    expect {
+      TransportConfig.new(requiredconfig, badcipher)
+    }.to raise_error(Bolt::ValidationError, /Configured 'ssl-cipher-suites' must be an array of cipher suite names/)
   end
 
   it "errors when concurrency is not an integer" do
