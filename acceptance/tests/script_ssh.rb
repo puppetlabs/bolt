@@ -14,20 +14,19 @@ test_name "C100548: \
   step "create script on bolt controller" do
     create_remote_file(bolt, script, <<-FILE)
     #!/bin/sh
-    echo "hello from $(hostname)"
+    echo "$* from $(hostname)"
     FILE
   end
 
   step "execute `bolt script run` via SSH" do
-    bolt_command = "bolt script run #{script}"
+    bolt_command = "bolt script run #{script} hello"
 
     flags = { '--nodes' => 'ssh_nodes' }
 
     result = bolt_command_on(bolt, bolt_command, flags)
     ssh_nodes.each do |node|
       message = "Unexpected output from the command:\n#{result.cmd}"
-      regex = /hello from #{node.hostname.split('.')[0]}/
-      assert_match(regex, result.stdout, message)
+      assert_match(/hello from #{node.hostname.split('.')[0]}/, result.stdout, message)
     end
   end
 end
