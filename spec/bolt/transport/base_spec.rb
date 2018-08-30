@@ -2,71 +2,71 @@
 
 require 'spec_helper'
 require 'bolt/transport/base'
-require 'puppet/pops/types/p_sensitive_type'
-
-Sensitive = Puppet::Pops::Types::PSensitiveType::Sensitive
+require 'bolt_spec/sensitive'
 
 describe Bolt::Transport::Base do
+  include BoltSpec::Sensitive
+
   let(:base) { Bolt::Transport::Base.new }
 
   context "when executing" do
     it "Sensitive String arguments are unwrapped" do
-      args = { 'str' => Sensitive.new('$ecret!') }
+      args = { 'str' => make_sensitive('$ecret!') }
       expected = { 'str' => '$ecret!' }
       expect(base.unwrap_sensitive_args(args)).to eq(expected)
     end
 
     it "Sensitive deeply wrapped String arguments are unwrapped" do
-      args = { 'str' => Sensitive.new(Sensitive.new(Sensitive.new('$ecret!'))) }
+      args = { 'str' => make_sensitive(make_sensitive(make_sensitive('$ecret!'))) }
       expected = { 'str' => '$ecret!' }
       expect(base.unwrap_sensitive_args(args)).to eq(expected)
     end
 
     it "Sensitive Array arguments are unwrapped" do
-      args = { 'arr' => Sensitive.new([1, 2, 3]) }
+      args = { 'arr' => make_sensitive([1, 2, 3]) }
       expected = { 'arr' => [1, 2, 3] }
       expect(base.unwrap_sensitive_args(args)).to eq(expected)
     end
 
     it "Sensitive Array elements are unwrapped" do
-      args = { 'arr' => [Sensitive.new('a'),
-                         Sensitive.new(1),
-                         Sensitive.new(true)] }
+      args = { 'arr' => [make_sensitive('a'),
+                         make_sensitive(1),
+                         make_sensitive(true)] }
       expected = { 'arr' => ['a', 1, true] }
       expect(base.unwrap_sensitive_args(args)).to eq(expected)
     end
 
     it "Sensitive Hash arguments are unwrapped" do
       nested_hash = { 'k' => 'v' }
-      args = { 'hash' => Sensitive.new(nested_hash) }
+      args = { 'hash' => make_sensitive(nested_hash) }
       expected = { 'hash' => { 'k' => 'v' } }
       expect(base.unwrap_sensitive_args(args)).to eq(expected)
     end
 
     it "Sensitive Hash keys and values are unwrapped" do
-      args = { 'hash' => { Sensitive.new('k') => Sensitive.new('v') } }
+      args = { 'hash' => { make_sensitive('k') => make_sensitive('v') } }
       expected = { 'hash' => { 'k' => 'v' } }
       expect(base.unwrap_sensitive_args(args)).to eq(expected)
     end
 
     it "Sensitive deeply nested Hash is unwrapped" do
-      arr = [Sensitive.new(1),
-             Sensitive.new(true),
-             Sensitive.new([Sensitive.new('c')])]
-      very_deep_hash = { Sensitive.new('dk') => Sensitive.new('dv') }
-      deep_hash = { Sensitive.new('k') => Sensitive.new(very_deep_hash) }
-      args = { 'hash' => { Sensitive.new(Sensitive.new('arr')) => arr,
-                           Sensitive.new('deep_hash') => deep_hash } }
+      arr = [make_sensitive(1),
+             make_sensitive(true),
+             make_sensitive([make_sensitive('c')])]
+      very_deep_hash = { make_sensitive('dk') => make_sensitive('dv') }
+      deep_hash = { make_sensitive('k') => make_sensitive(very_deep_hash) }
+      args = { 'hash' => { make_sensitive(make_sensitive('arr')) => arr,
+                           make_sensitive('deep_hash') => deep_hash } }
       expected = { 'hash' => { 'arr' => [1, true, ['c']],
                                'deep_hash' => { 'k' => { 'dk' => 'dv' } } } }
       expect(base.unwrap_sensitive_args(args)).to eq(expected)
     end
 
     it "Sensitive deeply nested Array is unwrapped" do
-      deep_hash = { Sensitive.new('k') => Sensitive.new(['x', false]) }
-      args = [Sensitive.new('a'),
+      deep_hash = { make_sensitive('k') => make_sensitive(['x', false]) }
+      args = [make_sensitive('a'),
               deep_hash,
-              Sensitive.new([Sensitive.new('c')])]
+              make_sensitive([make_sensitive('c')])]
       expected = ['a',
                   { 'k' => ['x', false] },
                   ['c']]

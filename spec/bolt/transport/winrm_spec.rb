@@ -3,6 +3,7 @@
 require 'spec_helper'
 require 'bolt_spec/errors'
 require 'bolt_spec/files'
+require 'bolt_spec/sensitive'
 require 'bolt_spec/task'
 require 'bolt/transport/winrm'
 require 'httpclient'
@@ -11,6 +12,7 @@ require 'winrm'
 describe Bolt::Transport::WinRM do
   include BoltSpec::Errors
   include BoltSpec::Files
+  include BoltSpec::Sensitive
   include BoltSpec::Task
 
   let(:boltdir) { Bolt::Boltdir.new('.') }
@@ -329,7 +331,7 @@ QUOTED
 
     it "can run a script with Sensitive arguments", winrm: true do
       arguments = ['non-sensitive-arg',
-                   Sensitive.new('$ecret!')]
+                   make_sensitive('$ecret!')]
       with_tempfile_containing('script-sensitive-winrm', echo_script, '.ps1') do |file|
         expect(
           winrm.run_script(target, file.path, arguments)['stdout']
@@ -563,10 +565,10 @@ Write-Host "$env:PT_sensitive_string"
 Write-Host "$env:PT_sensitive_array"
 Write-Host "$env:PT_sensitive_hash"
 PS
-      deep_hash = { 'k' => Sensitive.new('v') }
-      arguments = { 'sensitive_string' => Sensitive.new('$ecret!'),
-                    'sensitive_array'  => Sensitive.new([1, 2, Sensitive.new(3)]),
-                    'sensitive_hash'   => Sensitive.new(deep_hash) }
+      deep_hash = { 'k' => make_sensitive('v') }
+      arguments = { 'sensitive_string' => make_sensitive('$ecret!'),
+                    'sensitive_array'  => make_sensitive([1, 2, make_sensitive(3)]),
+                    'sensitive_hash'   => make_sensitive(deep_hash) }
       with_task_containing('tasks_test_sensitive', contents, 'both', '.ps1') do |task|
         expect(winrm.run_task(target, task, arguments).message).to eq(<<QUOTED)
 $ecret!\r
@@ -581,7 +583,7 @@ QUOTED
 $line = [Console]::In.ReadLine()
 Write-Host $line
 PS
-      arguments = { 'sensitive_string' => Sensitive.new('$ecret!') }
+      arguments = { 'sensitive_string' => make_sensitive('$ecret!') }
       with_task_containing('tasks_test_sensitive', contents, 'stdin', '.ps1') do |task|
         expect(winrm.run_task(target, task, arguments).value)
           .to eq("sensitive_string" => "$ecret!")
