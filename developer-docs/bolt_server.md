@@ -18,6 +18,8 @@ Bolt server can be configured by defining content in HOCON format at one of the 
 - `ssl-ca-cert`: String, *required* - Path to the ca cert file.
 - `loglevel`: String, *optional* - Bolt log level, acceptable values are `debug`, `info`, `notice`, `warn`, `error` (default `notice`).
 - `logfile`: String, *optional* - Path to log file.
+- `whitelist`: Array, *optional* - A list of hosts which can connect to pe-bolt-server
+- `concurrency`: Integer, *optional* - The maximum number of server threads (default `100`)
 
 **Example**
 ```
