@@ -302,6 +302,19 @@ the metadata for that parameter.
 run_task('task_with_secrets', ..., password => '$ecret!')
 ```
 
+### Working with the Sensitive type
+
+In Puppet the `Sensitive` type can be used to mask data from being output to logs.
+Since Plans are simply written in Puppet DSL this type can be used freely.
+The `run_task()` function does not allow parameters of `Sensitive` type to be passed.
+If a `Sensitive` vlue needs to be passed to a task, it must be unwrapped prior to
+the `run_task()` function call. 
+
+```
+$pass = Sensitive('$ecret!')
+run_task('task_with_secrets', ..., password => $pass.unwrap)
+```
+
 ## Target objects
 
 The `Target` object represents a node and its specific connection options.
