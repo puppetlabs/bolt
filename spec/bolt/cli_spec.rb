@@ -929,28 +929,15 @@ bar
           }
           cli.execute(options)
           json = JSON.parse(output.string)
-          expect(json).to eq(
-            [
-              ["apply::resource", "Apply a single Puppet resource"],
-              ["facts", "Gather system facts"],
-              ["facts::bash", "Gather system facts using bash"],
-              ["facts::powershell", "Gather system facts using powershell"],
-              ["facts::ruby", "Gather system facts using ruby and facter"],
-              ["package", "Manage and inspect the state of packages"],
-              ["puppet_agent::install", "Install the Puppet agent package"],
-              ["puppet_agent::install_powershell", nil],
-              ["puppet_agent::install_shell", nil],
-              ["puppet_agent::version",
-               "Get the version of the Puppet 5 agent package installed. Returns nothing if none present."],
-              ["puppet_agent::version_powershell", nil],
-              ["puppet_agent::version_shell", nil],
-              ["puppet_conf", "Inspect puppet agent configuration settings"],
-              ["sample::ok", nil],
-              ["service", "Manage and inspect the state of services"],
-              ["service::linux", "Manage the state of services (without a puppet agent)"],
-              ["service::windows", "Manage the state of Windows services (without a puppet agent)"]
-            ]
-          )
+          tasks = [
+            ["package", "Manage and inspect the state of packages"],
+            ["service", "Manage and inspect the state of services"],
+            ["service::linux", "Manage the state of services (without a puppet agent)"],
+            ["service::windows", "Manage the state of Windows services (without a puppet agent)"]
+          ]
+          tasks.each do |task|
+            expect(json).to include(task)
+          end
           output = @log_output.readlines.join
           expect(output).to match(/unexpected token.*params\.json/m)
         end
