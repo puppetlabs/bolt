@@ -1548,7 +1548,7 @@ bar
           stub_file(source)
 
           expect(executor)
-            .to receive(:file_upload)
+            .to receive(:upload_file)
             .with(targets, source, dest, kind_of(Hash))
             .and_return(Bolt::ResultSet.new([]))
 
@@ -1560,7 +1560,7 @@ bar
           stub_file(source)
 
           expect(executor)
-            .to receive(:file_upload)
+            .to receive(:upload_file)
             .with(targets, source, dest, kind_of(Hash))
             .and_return(fail_set)
 

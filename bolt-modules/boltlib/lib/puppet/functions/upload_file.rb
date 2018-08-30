@@ -4,7 +4,7 @@ require 'bolt/error'
 
 # Uploads the given file or directory to the given set of targets and returns the result from each upload.
 # This function does nothing if the list of targets is empty.
-Puppet::Functions.create_function(:file_upload, Puppet::Functions::InternalFunction) do
+Puppet::Functions.create_function(:upload_file, Puppet::Functions::InternalFunction) do
   # Upload a file.
   # @param source A source path, either an absolute path or a modulename/filename selector for a file in
   #               <moduleroot>/files.
@@ -13,10 +13,10 @@ Puppet::Functions.create_function(:file_upload, Puppet::Functions::InternalFunct
   # @param options Additional options: '_catch_errors', '_run_as'.
   # @return A list of results, one entry per target.
   # @example Upload a local file to Linux targets and change owner to 'root'
-  #   file_upload('/var/tmp/payload.tgz', '/tmp/payload.tgz', $targets, '_run_as' => 'root')
+  #   upload_file('/var/tmp/payload.tgz', '/tmp/payload.tgz', $targets, '_run_as' => 'root')
   # @example Upload a module file to a Windows target
-  #   file_upload('postgres/default.conf', 'C:/ProgramData/postgres/default.conf', $target)
-  dispatch :file_upload do
+  #   upload_file('postgres/default.conf', 'C:/ProgramData/postgres/default.conf', $target)
+  dispatch :upload_file do
     scope_param
     param 'String[1]', :source
     param 'String[1]', :destination
@@ -34,8 +34,8 @@ Puppet::Functions.create_function(:file_upload, Puppet::Functions::InternalFunct
   # @param options Additional options: '_catch_errors', '_run_as'.
   # @return A list of results, one entry per target.
   # @example Upload a file
-  #   file_upload('/var/tmp/payload.tgz', '/tmp/payload.tgz', $targets, 'Uploading payload to unpack')
-  dispatch :file_upload_with_description do
+  #   upload_file('/var/tmp/payload.tgz', '/tmp/payload.tgz', $targets, 'Uploading payload to unpack')
+  dispatch :upload_file_with_description do
     scope_param
     param 'String[1]', :source
     param 'String[1]', :destination
@@ -45,17 +45,17 @@ Puppet::Functions.create_function(:file_upload, Puppet::Functions::InternalFunct
     return_type 'ResultSet'
   end
 
-  def file_upload(scope, source, destination, targets, options = nil)
-    file_upload_with_description(scope, source, destination, targets, nil, options)
+  def upload_file(scope, source, destination, targets, options = nil)
+    upload_file_with_description(scope, source, destination, targets, nil, options)
   end
 
-  def file_upload_with_description(scope, source, destination, targets, description = nil, options = nil)
+  def upload_file_with_description(scope, source, destination, targets, description = nil, options = nil)
     options ||= {}
     options = options.merge('_description' => description) if description
 
     unless Puppet[:tasks]
       raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
-        Puppet::Pops::Issues::TASK_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, operation: 'file_upload'
+        Puppet::Pops::Issues::TASK_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, operation: 'upload_file'
       )
     end
 
@@ -67,7 +67,7 @@ Puppet::Functions.create_function(:file_upload, Puppet::Functions::InternalFunct
       )
     end
 
-    executor.report_function_call('file_upload')
+    executor.report_function_call('upload_file')
 
     found = Puppet::Parser::Files.find_file(source, scope.compiler.environment)
     unless found && Puppet::FileSystem.exist?(found)
@@ -82,7 +82,7 @@ Puppet::Functions.create_function(:file_upload, Puppet::Functions::InternalFunct
       call_function('debug', "Simulating file upload of '#{found}' - no targets given - no action taken")
       r = Bolt::ResultSet.new([])
     else
-      r = executor.file_upload(targets, found, destination, options)
+      r = executor.upload_file(targets, found, destination, options)
     end
 
     if !r.ok && !options['_catch_errors']

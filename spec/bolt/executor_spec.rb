@@ -270,7 +270,7 @@ describe "Bolt::Executor" do
           .and_return(result)
       end
 
-      results = executor.file_upload(targets, script, dest)
+      results = executor.upload_file(targets, script, dest)
       results.each do |result|
         expect(result).to be_instance_of(Bolt::Result)
       end
@@ -285,7 +285,7 @@ describe "Bolt::Executor" do
       end
 
       results = []
-      executor.file_upload(targets, script, dest) do |result|
+      executor.upload_file(targets, script, dest) do |result|
         results << result
       end
       node_results.each do |target, result|
@@ -302,7 +302,7 @@ describe "Bolt::Executor" do
           .and_raise(Bolt::Error, 'failed', 'my-exception')
       end
 
-      executor.file_upload(targets, script, dest) do |result|
+      executor.upload_file(targets, script, dest) do |result|
         expect(result.error_hash['msg']).to eq('failed')
         expect(result.error_hash['kind']).to eq('my-exception')
       end
@@ -511,7 +511,7 @@ describe "Bolt::Executor" do
       end
 
       executor.start_plan(plan_context)
-      executor.file_upload(targets, script, dest)
+      executor.upload_file(targets, script, dest)
 
       expect(@log_output.readline).to match(/NOTICE.*Starting: file upload from .* to .* on .*/)
       expect(@log_output.readline).to match(/NOTICE.*Finished: file upload from .* to .* with 0 failures/)

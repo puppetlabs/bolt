@@ -93,7 +93,7 @@ Uploads the given file or directory to the given set of targets and returns the 
 #### Upload a file.
 
 ```
-file_upload(String[1] $source, String[1] $destination, Boltlib::TargetSpec $targets, Optional[Hash[String[1], Any]] $options)
+upload_file(String[1] $source, String[1] $destination, Boltlib::TargetSpec $targets, Optional[Hash[String[1], Any]] $options)
 ```
 
  *Returns:* `ResultSet` A list of results, one entry per target.
@@ -106,19 +106,19 @@ file_upload(String[1] $source, String[1] $destination, Boltlib::TargetSpec $targ
  **Example:** Upload a local file to Linux targets and change owner to 'root'
 
 ```
-file_upload('/var/tmp/payload.tgz', '/tmp/payload.tgz', $targets, '_run_as' => 'root')
+upload_file('/var/tmp/payload.tgz', '/tmp/payload.tgz', $targets, '_run_as' => 'root')
 ```
 
  **Example:** Upload a module file to a Windows target
 
 ```
-file_upload('postgres/default.conf', 'C:/ProgramData/postgres/default.conf', $target)
+upload_file('postgres/default.conf', 'C:/ProgramData/postgres/default.conf', $target)
 ```
 
 #### Upload a file, logging the provided description.
 
 ```
-file_upload(String[1] $source, String[1] $destination, Boltlib::TargetSpec $targets, String $description, Optional[Hash[String[1], Any]] $options)
+upload_file(String[1] $source, String[1] $destination, Boltlib::TargetSpec $targets, String $description, Optional[Hash[String[1], Any]] $options)
 ```
 
  *Returns:* `ResultSet` A list of results, one entry per target.
@@ -132,7 +132,7 @@ file_upload(String[1] $source, String[1] $destination, Boltlib::TargetSpec $targ
  **Example:** Upload a file
 
 ```
-file_upload('/var/tmp/payload.tgz', '/tmp/payload.tgz', $targets, 'Uploading payload to unpack')
+upload_file('/var/tmp/payload.tgz', '/tmp/payload.tgz', $targets, 'Uploading payload to unpack')
 ```
 
 ### get\_targets
@@ -301,7 +301,7 @@ run_script('/var/tmp/myscript', $targets, '_run_as' => 'root')
  **Example:** Run a module-provided script with arguments
 
 ```
-file_upload('iis/setup.ps1', $target, 'arguments' => ['/u', 'Administrator'])
+run_script('iis/setup.ps1', $target, 'arguments' => ['/u', 'Administrator'])
 ```
 
 #### Run a script, logging the provided description.
@@ -320,7 +320,7 @@ run_script(String[1] $script, Boltlib::TargetSpec $targets, String $description,
  **Example:** Run a script
 
 ```
-file_upload('/var/tmp/myscript', $targets, 'Downloading my application')
+run_script('/var/tmp/myscript', $targets, 'Downloading my application')
 ```
 
 ### run\_task

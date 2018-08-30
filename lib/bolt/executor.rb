@@ -230,7 +230,7 @@ module Bolt
       end
     end
 
-    def file_upload(targets, source, destination, options = {}, &callback)
+    def upload_file(targets, source, destination, options = {}, &callback)
       description = options.fetch('_description', "file upload from #{source} to #{destination}")
       log_action(description, targets) do
         notify = proc { |event| @notifier.notify(callback, event) if callback }

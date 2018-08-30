@@ -145,7 +145,7 @@ Any plan that completes execution without an error is considered successful. The
 
 ### Failing plans
 
-If `file_upload`, `run_command`, `run_script`, or `run_task` are called without the `_catch_errors` option and they fail on any nodes, the plan itself will fail. To fail a plan directly call the `fail_plan` function. Create a new error with a message and include the kind, details, or issue code, or pass an existing error to it.
+If `upload_file`, `run_command`, `run_script`, or `run_task` are called without the `_catch_errors` option and they fail on any nodes, the plan itself will fail. To fail a plan directly call the `fail_plan` function. Create a new error with a message and include the kind, details, or issue code, or pass an existing error to it.
 
 ```
 fail_plan('The plan is failing', 'mymodules/pear-shaped', {'failednodes' => $result.error_set.names})
@@ -407,7 +407,7 @@ To generate log messages from a plan, use the puppet log function that correspon
 
 ### Default Action Logging
 
-Bolt logs actions that a plan takes on targets through the  `file_upload`,  `run_command`, `run_script`, or `run_task`  functions. By default it logs a notice level message when an action starts and another when it completes. If you pass a description to the function, that will be used in place of the generic log message.
+Bolt logs actions that a plan takes on targets through the  `upload_file`,  `run_command`, `run_script`, or `run_task`  functions. By default it logs a notice level message when an action starts and another when it completes. If you pass a description to the function, that will be used in place of the generic log message.
 
 ```
 run_task(my_task, $targets, "Better description", param1 => "val")
