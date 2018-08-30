@@ -604,11 +604,7 @@ For example, the following code in a metadata file describes a `provider` parame
 
 ### Making parameters sensitive
 
-To prevent a task parameter's value from being written to the Bolt logs in plain-text the `Sensitive` property can be associated with the parameter. This construct should be used for things like passwords, API keys, secrets, etc.
-
-There are two options for defining a task parameter as `Sensitive`:
-
-1) Specify the `"sensitive": true` property on the parameter within the JSON metadata [**PREFERRED**]:
+To prevent a task parameter's value from being written to the Bolt logs in plain-text the `sensitive` property can be associated with the parameter in the task's metadata. This construct should be used for things like passwords, API keys, secrets, etc.
 
 ```
 {
@@ -628,25 +624,10 @@ There are two options for defining a task parameter as `Sensitive`:
 }
 ```
 
-2) Wrap the parameter with `Sensitive` in the `type` property within the JSON metadata: 
+When a parameter is `sensitive` the only expectation, currently, is that the parameter
+will not be logged (except when passing `--debug`). No other precautions are taken.
 
-```
-{
-  "description": "Task has a sensitive property denoted by its type",
-  "input_method": "stdin",
-  "parameters": {
-    "password": {
-      "description": "The password",
-      "type": "Sensitive[String[1]]",
-    }
-  }
-}
-```
-
-When a parameter is `Sensitive` the only expectation, currently, is that the parameter
-will not be logged. No other precautions are taken.
-
-It is up to the task author to implement their tasks in such a way that `Sensitive`
+It is up to the task author to implement their tasks in such a way that `sensitive`
 parameters are not exposed or logged. Please be mindful when coding your tasks!
 
 
@@ -703,7 +684,6 @@ Some types supported by Puppet can not be represented as JSON, such as `Hash[Int
 | `Hash` |Matches a JSON object.|
 | `Variant[Integer, Pattern[/\A\d+\Z/]]` |Matches an integer or a String of an integer|
 | `Boolean` |Accepts Boolean values.|
-| `Sensitive` |Identifies data as sensitive. Values are masked when they appear in logs and API responses.|
 
 **Related information**  
 
