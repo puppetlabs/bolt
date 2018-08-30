@@ -2,6 +2,7 @@
 
 require 'spec_helper'
 require 'bolt_spec/files'
+require 'bolt_spec/sensitive'
 require 'bolt_spec/task'
 require 'bolt/transport/orch'
 require 'bolt/cli'
@@ -10,6 +11,7 @@ require 'open3'
 
 describe Bolt::Transport::Orch, orchestrator: true do
   include BoltSpec::Files
+  include BoltSpec::Sensitive
   include BoltSpec::Task
 
   let(:hostname) { "localhost" }
@@ -286,7 +288,7 @@ describe Bolt::Transport::Orch, orchestrator: true do
 
     it "unwraps Sensitive parameters" do
       allow(mock_client).to receive(:run_task).and_return(results)
-      sensitive_params = { 'sensitive_string' => Sensitive.new('$ecret!') }
+      sensitive_params = { 'sensitive_string' => make_sensitive('$ecret!') }
       expect(mock_client).to receive(:run_task)
         .with(hash_including(params: { "sensitive_string" => "$ecret!" }))
 
@@ -454,7 +456,7 @@ describe Bolt::Transport::Orch, orchestrator: true do
 
     it "unwraps Sensitive parameters", skip_before: true do
       allow(mock_client).to receive(:run_task).and_return(results)
-      sensitive_params = { 'sensitive_string' => Sensitive.new('$ecret!') }
+      sensitive_params = { 'sensitive_string' => make_sensitive('$ecret!') }
       expect(mock_client).to receive(:run_task)
         .with(hash_including(params:
                 hash_including("arguments" =>
