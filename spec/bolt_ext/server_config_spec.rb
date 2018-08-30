@@ -11,6 +11,8 @@ describe TransportConfig do
   let(:requiredconfig) { File.join(__dir__, '..', 'fixtures', 'configs', 'required-bolt-server.conf') }
   let(:badwhitelist) { File.join(__dir__, '..', 'fixtures', 'configs', 'bad-whitelist.conf') }
 
+  let(:base_config) { Hocon.load(requiredconfig) }
+
   it "reads from default paths" do
     expect(Hocon).to receive(:load).with('/etc/puppetlabs/bolt-server/conf.d/bolt-server.conf').and_return({})
     expect(Hocon).to receive(:load).with(File.join(ENV['HOME'].to_s, ".puppetlabs", "bolt-server.conf")).and_return({})
@@ -39,6 +41,10 @@ describe TransportConfig do
     it 'reads whitelist' do
       expect(config.whitelist).to eq(['a'])
     end
+
+    it 'reads concurrency' do
+      expect(config.concurrency).to eq(12)
+    end
   end
 
   context 'with local config' do
@@ -62,6 +68,10 @@ describe TransportConfig do
 
     it 'reads whitelist' do
       expect(config.whitelist).to eq(['b'])
+    end
+
+    it 'reads concurrency' do
+      expect(config.concurrency).to eq(1)
     end
   end
 
@@ -87,6 +97,10 @@ describe TransportConfig do
     it 'local whitelist overrides global' do
       expect(config.whitelist).to eq(['b'])
     end
+
+    it 'local concurrency overrides global' do
+      expect(config.concurrency).to eq(1)
+    end
   end
 
   it "accepts only required config" do
@@ -96,6 +110,7 @@ describe TransportConfig do
     expect(config.loglevel).to eq('notice')
     expect(config.logfile).to eq(nil)
     expect(config.whitelist).to eq(nil)
+    expect(config.concurrency).to eq(100)
   end
 
   it "reads ssl keys from config" do
@@ -117,6 +132,30 @@ describe TransportConfig do
     }.to raise_error(Bolt::ValidationError, /Configured 'whitelist' must be an array of names/)
   end
 
-  it "errors when a specified file does not exist" do
+  it "errors when concurrency is not an integer" do
+    conf = base_config
+    conf['bolt-server']['concurrency'] = '10'
+    expect(Hocon).to receive(:load).with(:foo).and_return(conf).twice
+    expect {
+      TransportConfig.new(:foo, :foo)
+    }.to raise_error(Bolt::ValidationError, "Configured 'concurrency' must be a positive integer")
+  end
+
+  it "errors when concurrency is zero" do
+    conf = base_config
+    conf['bolt-server']['concurrency'] = 0
+    expect(Hocon).to receive(:load).with(:foo).and_return(conf).twice
+    expect {
+      TransportConfig.new(:foo, :foo)
+    }.to raise_error(Bolt::ValidationError, "Configured 'concurrency' must be a positive integer")
+  end
+
+  it "errors when concurrency is negative" do
+    conf = base_config
+    conf['bolt-server']['concurrency'] = -1
+    expect(Hocon).to receive(:load).with(:foo).and_return(conf).twice
+    expect {
+      TransportConfig.new(:foo, :foo)
+    }.to raise_error(Bolt::ValidationError, "Configured 'concurrency' must be a positive integer")
   end
 end
