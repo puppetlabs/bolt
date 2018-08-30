@@ -196,6 +196,9 @@ module Bolt
       # This works on deeply nested data structures composed of Hashes, Arrays, and
       # and plain-old data types (int, string, etc).
       def unwrap_sensitive_args(arguments)
+        # Skip this if Puppet isn't loaded
+        return arguments unless defined?(Puppet::Pops::Types::PSensitiveType::Sensitive)
+
         case arguments
         when Array
           # iterate over the array, unwrapping all elements
