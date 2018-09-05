@@ -231,6 +231,14 @@ PS
       end
     end
 
+    it "catches winrm-fs upload error", winrm: true do
+      expect_node_error(Bolt::Node::FileError,
+                        'WRITE_ERROR',
+                        /No such file or directory/) do
+        winrm.run_script(target, 'fake.ps1', [])
+      end
+    end
+
     it "can run a PowerShell script remotely", winrm: true do
       contents = "Write-Output \"hellote\""
       with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|

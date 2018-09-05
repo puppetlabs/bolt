@@ -40,7 +40,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "r10k", "~> 2.6"
   spec.add_dependency "terminal-table", "~> 1.8"
   spec.add_dependency "winrm", "~> 2.0"
-  spec.add_dependency "winrm-fs", "~> 1.1"
+  spec.add_dependency "winrm-fs", "~> 1.3"
 
   # Dependencies of our vendored puppet, etc
   spec.add_dependency "CFPropertyList", "~> 2.2"
