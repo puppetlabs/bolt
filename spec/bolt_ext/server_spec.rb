@@ -51,7 +51,7 @@ describe "TransportAPI" do
       expect(last_response).not_to be_ok
       expect(last_response.status).to eq(400)
       result = last_response.body
-      expect(result).to eq("Only include one of 'password' and 'private-key-content'")
+      expect(result).to match(%r{The property '#/target' of type object matched more than one of the required schemas})
     end
 
     it 'fails if no authorization is present' do
@@ -67,11 +67,10 @@ describe "TransportAPI" do
       }
 
       post path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json'
-      expect(last_response).to be_ok
-      expect(last_response.status).to eq(200)
-      result = JSON.parse(last_response.body)
-      expect(result['status']).to eq('failure')
-      expect(result['result']['_error']['msg']).to match(/Authentication failed for user/)
+      expect(last_response).not_to be_ok
+      expect(last_response.status).to eq(400)
+      result = last_response.body
+      expect(result).to match(%r{The property '#/target' of type object did not match any of the required schemas})
     end
 
     it 'runs an echo task' do
@@ -149,11 +148,33 @@ describe "TransportAPI" do
       }
 
       post path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json'
-      expect(last_response).to be_ok
-      expect(last_response.status).to eq(200)
-      result = JSON.parse(last_response.body)
-      expect(result['status']).to eq('failure')
-      expect(result['result']['_error']['msg']).to match(/Failed to connect to .* password is a required option/)
+      expect(last_response).not_to be_ok
+      expect(last_response.status).to eq(400)
+      result = last_response.body
+      expect(result).to match(%r{The property '#/target' did not contain a required property of 'password'})
+    end
+
+    it 'fails if either port or connect-timeout is a string' do
+      body = {
+        'task': echo_task,
+        'target': {
+          'hostname': target[:host],
+          'user': target[:user],
+          'password': target[:password],
+          'port': "port",
+          'connect-timeout': "timeout"
+        },
+        'parameters': { "message": "Hello!" }
+      }
+
+      post path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json'
+      expect(last_response).not_to be_ok
+      expect(last_response.status).to eq(400)
+      result = last_response.body
+
+      expect(result).to match(%r{The property '#/target/port' of type string did not match the following type: integer})
+      expect(result)
+        .to match(%r{The property '#/target/connect-timeout' of type string did not match the following type: integer})
     end
 
     it 'runs an echo task' do
