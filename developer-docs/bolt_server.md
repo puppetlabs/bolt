@@ -62,7 +62,8 @@ For example, the following runs the 'echo' task on localhost:
     "hostname": "linux_target.net",
     "user": "marauder",
     "password": "I solemnly swear that I am up to no good",
-    "host-key-check": false
+    "host-key-check": false,
+    "run-as": "george_weasley"
   },
   "task": {
     "name": "echo",
@@ -126,9 +127,9 @@ The Target be a JSON object. The following keys are available:
   - `private-key-content`: String - Contents of private key for SSH.
 - `port`: Integer, *optional* - Connection port (Default: `22`).
 - `connect-timeout`: Integer, *optional* - How long Bolt should wait when establishing connections.
+- `tmpdir`: String, *optional* - The directory to upload and execute temporary files on the target.
 - `run-as-command`: Array, *optional* - Command elevate permissions. Bolt appends the user and command strings to the configured `run-as` command before running it on the target. This command must not require an interactive password prompt, and the `sudo-password` option is ignored when `run-as-command` is specified.
 - `run-as`: String, *optional* - A different user to run commands as after login.
-- `tmpdir`: String, *optional* - The directory to upload and execute temporary files on the target.
 - `host-key-check`: Bool, *optional* - Whether to perform host key validation when connecting over SSH (Default: `true`).
 - `sudo-password`: String, *optional* - Password to use when changing users via `run-as`.
 
@@ -141,8 +142,7 @@ The Target be a JSON object. The following keys are available:
 - `connect-timeout`: Integer, *optional* - How long Bolt should wait when establishing connections.
 - `tmpdir`: String, *optional* - The directory to upload and execute temporary files on the target.
 - `ssl`: Boolean, *optional* - When true, Bolt will use https connections for WinRM (Default: `true`).
-- `ssl-verify`: Boolean, *optional* - When true, verifies the targets certificate matches the cacert (Default: `true`)
-- `tmpdir`: String, *optional* - The directory to upload and execute temporary files on the target.
+- `ssl-verify`: Boolean, *optional* - When true, verifies the targets certificate matches the cacert (Default: `true`).
 - `cacert`: String, *optional* - The path to the CA certificate.
 - `extensions`: Array, *optional* - List of file extensions that are accepted for scripts or tasks. Scripts with these file extensions rely on the target node's file type association to run. For example, if Python is installed on the system, a .py script should run with python.exe. The extensions .ps1, .rb, and .pp are always allowed and run via hard-coded executables.
 
