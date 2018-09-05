@@ -1,3 +1,10 @@
+# Plan execution functions
+Your plan can execute multiple functions on remote systems.
+
+Your plan can include functions to run commands, scripts, tasks, and other plans on remote nodes. These execution functions correspond to task runner commands.
+
+**Note:** All the $nodes arguments support the patterns supported by --nodes (except for shell expansion).
+
 # Bolt Functions
 
 
