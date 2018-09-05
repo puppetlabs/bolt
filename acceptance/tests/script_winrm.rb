@@ -11,21 +11,20 @@ test_name "C100549: \
 
   script = "C100549.ps1"
 
-  step "create script on bolt controller" do
+  step "create powershell script on bolt controller" do
     create_remote_file(bolt, script, <<-FILE)
-    [System.Net.Dns]::GetHostByName(($env:computerName))
+    Write-Host "${args} from $([System.Net.Dns]::GetHostByName($env:computername).hostname)"
     FILE
   end
 
   step "execute `bolt script run` via WinRM" do
-    bolt_command = "bolt script run #{script}"
+    bolt_command = "bolt script run #{script} hello"
     flags = { '--nodes' => 'winrm_nodes' }
 
     result = bolt_command_on(bolt, bolt_command, flags)
     winrm_nodes.each do |node|
       message = "Unexpected output from the command:\n#{result.cmd}"
-      assert_match(/#{node.hostname.split('.')[0]}/, result.stdout, message)
-      assert_match(/{#{node.ip}}/, result.stdout, message)
+      assert_match(/hello from #{node.hostname.split('.')[0]}/, result.stdout, message)
     end
   end
 end

@@ -12,8 +12,6 @@ describe "when runnning over the winrm transport", winrm: true do
 
   let(:modulepath) { File.join(__dir__, '../fixtures/modules') }
   let(:whoami) { "echo $env:UserName" }
-  let(:stdin_task) { "sample::winstdin" }
-  let(:param_task) { "sample::winparams" }
   let(:uri) { conn_uri('winrm') }
   let(:password) { conn_info('winrm')[:password] }
   let(:user) { conn_info('winrm')[:user] }
@@ -35,14 +33,32 @@ describe "when runnning over the winrm transport", winrm: true do
       expect(result['_error']['msg']).to eq('The command failed with exit code 1')
     end
 
-    it 'runs a task', :reset_puppet_settings do
-      result = run_one_node(%W[task run #{stdin_task} message=somemessage] + config_flags)
-      expect(result['_output'].strip).to match(/STDIN: {"messa/)
+    it 'runs a task reading from stdin', :reset_puppet_settings do
+      result = run_one_node(%w[task run sample::winstdin message=µsomemessage] + config_flags)
+      output = result['_output'].strip
+      output = output.force_encoding(Encoding.default_external).encode!(''.encoding) if RUBY_VERSION =~ /^2\.3\./
+      expect(output).to match(/STDIN: {"message":"µsomemessage"/)
+    end
+
+    it 'runs a task reading from $input', :reset_puppet_settings do
+      result = run_one_node(%w[task run sample::wininput message=µsomemessage] + config_flags)
+      output = result['_output'].strip
+      output = output.force_encoding(Encoding.default_external).encode!(''.encoding) if RUBY_VERSION =~ /^2\.3\./
+      expect(output).to match(/INPUT: {"message":"µsomemessage"/)
     end
 
     it 'runs a task with parameters', :reset_puppet_settings do
-      result = run_one_node(%w[task run sample::winparams message=somemessage] + config_flags)
-      expect(result['_output'].strip).to match(/Message: somemessage/)
+      result = run_one_node(%w[task run sample::winparams message=µsomemessage] + config_flags)
+      output = result['_output'].strip
+      output = output.force_encoding(Encoding.default_external).encode!(''.encoding) if RUBY_VERSION =~ /^2\.3\./
+      expect(output).to match(/Message: µsomemessage/)
+    end
+
+    it 'runs a task reading from environment variables', :reset_puppet_settings do
+      result = run_one_node(%w[task run sample::winenv message=µsomemessage] + config_flags)
+      output = result['_output'].strip
+      output = output.force_encoding(Encoding.default_external).encode!(''.encoding) if RUBY_VERSION =~ /^2\.3\./
+      expect(output).to match(/ENV: µsomemessage/)
     end
 
     it 'runs a task with complex parameters', :reset_puppet_settings do
@@ -90,7 +106,8 @@ describe "when runnning over the winrm transport", winrm: true do
 
     it 'runs a task', :reset_puppet_settings do
       with_tempfile_containing('conf', YAML.dump(config)) do |conf|
-        result = run_one_node(%W[task run #{stdin_task} message=somemessage --configfile #{conf.path}] + config_flags)
+        cmd = %W[task run sample::winstdin message=somemessage --configfile #{conf.path}] + config_flags
+        result = run_one_node(cmd)
         expect(result['_output'].strip).to match(/STDIN: {"messa/)
       end
     end

@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
+require 'bolt_command_helper'
 require 'bolt_setup_helper'
 
 test_name "build bolt inventory file" do
+  extend Acceptance::BoltCommandHelper
   extend Acceptance::BoltSetupHelper
 
   ssh_nodes = select_hosts(roles: ['ssh'])
@@ -33,10 +35,8 @@ test_name "build bolt inventory file" do
     ]
   }
 
-  bolt_confdir = "#{on(bolt, 'echo $HOME').stdout.chomp}/.puppetlabs/bolt"
+  on bolt, "mkdir -p #{default_boltdir}"
+  create_remote_file(bolt, "#{default_boltdir}/inventory.yaml", inventory.to_yaml)
 
-  on bolt, "mkdir -p #{bolt_confdir}"
-  create_remote_file(bolt, "#{bolt_confdir}/inventory.yaml", inventory.to_yaml)
-
-  create_remote_file(bolt, "#{bolt_confdir}/analytics.yaml", { 'disabled' => true }.to_yaml)
+  create_remote_file(bolt, "#{default_boltdir}/analytics.yaml", { 'disabled' => true }.to_yaml)
 end

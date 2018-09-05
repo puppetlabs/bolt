@@ -3,6 +3,7 @@
 require 'spec_helper'
 require 'bolt_spec/errors'
 require 'bolt_spec/files'
+require 'bolt_spec/sensitive'
 require 'bolt_spec/task'
 require 'bolt/transport/local'
 require 'bolt/config'
@@ -10,6 +11,7 @@ require 'bolt/config'
 describe Bolt::Transport::Local do
   include BoltSpec::Errors
   include BoltSpec::Files
+  include BoltSpec::Sensitive
   include BoltSpec::Task
 
   let(:local) { Bolt::Transport::Local.new }
@@ -92,6 +94,17 @@ QUOTED
       end
     end
 
+    it "can run a script with Sensitive arguments" do
+      contents = "#!/bin/sh\necho $1\necho $2"
+      arguments = ['non-sensitive-arg',
+                   make_sensitive('$ecret!')]
+      with_tempfile_containing('sensitive_test', contents) do |file|
+        expect(
+          local.run_script(target, file.path, arguments)['stdout']
+        ).to eq("non-sensitive-arg\n$ecret!\n")
+      end
+    end
+
     it "escapes unsafe shellwords in arguments" do
       with_tempfile_containing('script-test-ssh-escape', echo_script) do |file|
         expect(
@@ -119,6 +132,15 @@ SHELLWORDS
       with_task_containing('tasks_test_stdin', contents, 'stdin') do |task|
         expect(local.run_task(target, task, arguments).value)
           .to eq("message_one" => "Hello from task", "message_two" => "Goodbye")
+      end
+    end
+
+    it "serializes hashes as json in environment input" do
+      contents = "#!/bin/sh\nprintenv PT_message"
+      arguments = { message: { key: 'val' } }
+      with_task_containing('tasks_test_hash', contents, 'environment') do |task|
+        expect(local.run_task(target, task, arguments).value)
+          .to eq('key' => 'val')
       end
     end
 
@@ -161,6 +183,38 @@ SHELL
       arguments = { message: "foo ' bar ' baz" }
       with_task_containing('tasks_test_quotes', contents, 'both') do |task|
         expect(local.run_task(target, task, arguments).message.strip).to eq "foo ' bar ' baz"
+      end
+    end
+
+    it "can run a task with Sensitive params via environment" do
+      contents = <<SHELL
+#!/bin/sh
+echo ${PT_sensitive_string}
+echo ${PT_sensitive_array}
+echo ${PT_sensitive_hash}
+SHELL
+      deep_hash = { 'k' => make_sensitive('v') }
+      arguments = { 'sensitive_string' => make_sensitive('$ecret!'),
+                    'sensitive_array'  => make_sensitive([1, 2, make_sensitive(3)]),
+                    'sensitive_hash'   => make_sensitive(deep_hash) }
+      with_task_containing('tasks_test_sensitive', contents, 'both') do |task|
+        expect(local.run_task(target, task, arguments).message.strip).to eq(<<SHELL.strip)
+$ecret!
+[1,2,3]
+{"k":"v"}
+SHELL
+      end
+    end
+
+    it "can run a task with Sensitive params via stdin" do
+      contents = <<SHELL
+#!/bin/sh
+cat -
+SHELL
+      arguments = { 'sensitive_string' => make_sensitive('$ecret!') }
+      with_task_containing('tasks_test_sensitive', contents, 'stdin') do |task|
+        expect(local.run_task(target, task, arguments).value)
+          .to eq("sensitive_string" => "$ecret!")
       end
     end
 

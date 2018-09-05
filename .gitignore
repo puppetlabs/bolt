@@ -38,6 +38,7 @@ acceptance/hosts.yaml
 modules/apply
 modules/facts
 modules/package
+modules/puppet_agent
 modules/puppet_conf
 modules/service
 

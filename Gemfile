@@ -6,6 +6,11 @@ source ENV['GEM_SOURCE'] || 'https://rubygems.org'
 ENV['BOLT_DISABLE_ANALYTICS'] = 'true'
 
 gemspec
+gem "hocon"
+gem "puma"
+gem "rack"
+gem "rails-auth"
+gem "sinatra"
 
 # Required to pick up plan specs in the rake spec task
 gem "puppetlabs_spec_helper",
@@ -16,12 +21,12 @@ group(:test) do
   gem "beaker-hostgenerator"
   gem "gettext-setup", '~> 0.28', require: false
   gem "mocha", '~> 1.4.0'
+  gem "rack-test", '~> 1.0'
   gem "rubocop", '~> 0.50', require: false
 end
 
 group(:development) do
   gem "puppet-strings", "~> 2.0"
-  gem "r10k", "~> 2.6"
 end
 
 local_gemfile = File.join(__dir__, 'Gemfile.local')

@@ -46,15 +46,19 @@ describe "when logging executor activity", ssh: true do
 
   it 'logs with a plan that includes a description' do
     result = run_cli_json(%W[plan run #{echo_plan} description=somemessage] + config_flags)
+    expect(@log_output.readline).to match(/NOTICE.*Starting: plan #{echo_plan}/)
     expect(@log_output.readline).to match(/Starting: somemessage on/)
     expect(@log_output.readline).to match(/Finished: somemessage/)
+    expect(@log_output.readline).to match(/NOTICE.*Finished: plan #{echo_plan}/)
     expect(result[0]['result']['_output'].strip).to match(/hi there/)
   end
 
   it 'logs extra with a plan' do
     result = run_cli_json(%W[plan run #{echo_plan}] + config_flags)
+    expect(@log_output.readline).to match(/NOTICE.*Starting: plan #{echo_plan}/)
     expect(@log_output.readline).to match(/Starting: task sample::echo/)
     expect(@log_output.readline).to match(/Finished: task sample::echo/)
+    expect(@log_output.readline).to match(/NOTICE.*Finished: plan #{echo_plan}/)
     expect(result[0]['result']['_output'].strip).to match(/hi there/)
   end
 
@@ -88,19 +92,23 @@ describe "when logging executor activity", ssh: true do
 
     it 'logs extra with a plan' do
       result = run_cli_json(%W[plan run #{echo_plan}] + config_flags)
+      expect(@log_output.readline).to match(/NOTICE.*Starting: plan #{echo_plan}/)
       expect(@log_output.readline).to match(/Starting: task sample::echo/)
       expect(@log_output.readline).to match(/Running task sample::echo with/)
       expect(@log_output.readline).to match(/hi there/)
       expect(@log_output.readline).to match(/Finished: task sample::echo/)
+      expect(@log_output.readline).to match(/NOTICE.*Finished: plan #{echo_plan}/)
       expect(result[0]['result']['_output'].strip).to match(/hi there/)
     end
 
     it 'logs extra without_default in a plan' do
       run_cli_json(%W[plan run #{without_default_plan}] + config_flags)
+      expect(@log_output.readline).to match(/NOTICE.*Starting: plan #{without_default_plan}/)
       expect(@log_output.readline).to match(/Starting: task logging::echo/)
       expect(@log_output.readline).to match(/Running task logging::echo with/)
       expect(@log_output.readline).to match(/hi there/)
       expect(@log_output.readline).to match(/Finished: task logging::echo/)
+      expect(@log_output.readline).to match(/NOTICE.*Finished: plan #{without_default_plan}/)
     end
   end
 end

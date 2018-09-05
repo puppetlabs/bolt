@@ -6,6 +6,7 @@ require 'bolt/puppetdb'
 Bolt::PAL.load_puppet
 
 require 'bolt/catalog/compiler'
+require 'bolt/catalog/loaders'
 require 'bolt/catalog/logging'
 
 module Bolt
@@ -37,6 +38,10 @@ module Bolt
     end
 
     def compile_node(node)
+      # Add boltlib to system loaders so modules can use its functions without an
+      # explicit dependency.
+      node.environment.loaders = Bolt::Catalog::BoltLoaders.new(node.environment)
+
       compiler = Puppet::Parser::BoltCompiler.new(node)
       compiler.compile(&:to_resource)
     end
@@ -49,6 +54,16 @@ module Bolt
           compiler.dump_ast(compiler.parse_string(code))
         end
       end
+    end
+
+    def setup_inventory(inventory)
+      config = Bolt::Config.default
+      config.overwrite_transport_data(inventory['config']['transport'],
+                                      Bolt::Util.symbolize_top_level_keys(inventory['config']['transports']))
+
+      Bolt::Inventory.new(inventory['data'],
+                          config,
+                          Bolt::Util.symbolize_top_level_keys(inventory['target_hash']))
     end
 
     def compile_catalog(request)
@@ -67,9 +82,18 @@ module Bolt
           variables: target["variables"] || {}
         ) do |_pal|
           node = Puppet.lookup(:pal_current_node)
+
+          # Ensure files that custom facts and types/providers depend on can be loaded
+          node.environment.each_plugin_directory do |dir|
+            $LOAD_PATH << dir unless $LOAD_PATH.include?(dir)
+          end
+
           setup_node(node, target["trusted"])
 
-          Puppet.override(pal_main: pal_main, bolt_pdb_client: pdb_client) do
+          Puppet.override(pal_main: pal_main,
+                          bolt_pdb_client: pdb_client,
+                          bolt_inventory:
+                          setup_inventory(request['inventory'])) do
             compile_node(node)
           end
         end

@@ -6,7 +6,7 @@ require 'bolt/result'
 require 'bolt/result_set'
 require 'bolt/target'
 
-describe 'file_upload' do
+describe 'upload_file' do
   include PuppetlabsSpec::Fixtures
   let(:executor) { Bolt::Executor.new }
   let(:inventory) { mock('inventory') }
@@ -19,7 +19,7 @@ describe 'file_upload' do
     end
   end
 
-  context 'it calls bolt executor file_upload' do
+  context 'it calls bolt executor upload_file' do
     let(:hostname) { 'test.example.com' }
     let(:target) { Bolt::Target.new(hostname) }
 
@@ -35,28 +35,28 @@ describe 'file_upload' do
     end
 
     it 'with fully resolved path of file and destination' do
-      executor.expects(:file_upload).with([target], full_path, destination, {}).returns(result_set)
+      executor.expects(:upload_file).with([target], full_path, destination, {}).returns(result_set)
       inventory.stubs(:get_targets).with(hostname).returns([target])
 
       is_expected.to run.with_params('test/uploads/index.html', destination, hostname).and_return(result_set)
     end
 
     it 'with fully resolved path of directory and destination' do
-      executor.expects(:file_upload).with([target], full_dir_path, destination, {}).returns(result_set)
+      executor.expects(:upload_file).with([target], full_dir_path, destination, {}).returns(result_set)
       inventory.stubs(:get_targets).with(hostname).returns([target])
 
       is_expected.to run.with_params('test/uploads', destination, hostname).and_return(result_set)
     end
 
     it 'with target specified as a Target' do
-      executor.expects(:file_upload).with([target], full_dir_path, destination, {}).returns(result_set)
+      executor.expects(:upload_file).with([target], full_dir_path, destination, {}).returns(result_set)
       inventory.stubs(:get_targets).with(target).returns([target])
 
       is_expected.to run.with_params('test/uploads', destination, target).and_return(result_set)
     end
 
     it 'runs as another user' do
-      executor.expects(:file_upload)
+      executor.expects(:upload_file)
               .with([target], full_dir_path, destination, '_run_as' => 'soandso')
               .returns(result_set)
       inventory.stubs(:get_targets).with(target).returns([target])
@@ -65,9 +65,9 @@ describe 'file_upload' do
     end
 
     it 'reports the call to analytics' do
-      executor.expects(:file_upload).with([target], full_path, destination, {}).returns(result_set)
+      executor.expects(:upload_file).with([target], full_path, destination, {}).returns(result_set)
       inventory.stubs(:get_targets).with(hostname).returns([target])
-      executor.expects(:report_function_call).with('file_upload')
+      executor.expects(:report_function_call).with('upload_file')
 
       is_expected.to run.with_params('test/uploads/index.html', destination, hostname).and_return(result_set)
     end
@@ -76,7 +76,7 @@ describe 'file_upload' do
       let(:message) { 'test message' }
 
       it 'passes the description through if parameters are passed' do
-        executor.expects(:file_upload)
+        executor.expects(:upload_file)
                 .with([target], full_dir_path, destination, '_description' => message)
                 .returns(result_set)
         inventory.stubs(:get_targets).with(target).returns([target])
@@ -85,7 +85,7 @@ describe 'file_upload' do
       end
 
       it 'passes the description through if no parameters are passed' do
-        executor.expects(:file_upload)
+        executor.expects(:upload_file)
                 .with([target], full_dir_path, destination, '_description' => message)
                 .returns(result_set)
         inventory.stubs(:get_targets).with(target).returns([target])
@@ -96,14 +96,14 @@ describe 'file_upload' do
 
     context 'without description' do
       it 'ignores description if parameters are passed' do
-        executor.expects(:file_upload).with([target], full_dir_path, destination, {}).returns(result_set)
+        executor.expects(:upload_file).with([target], full_dir_path, destination, {}).returns(result_set)
         inventory.stubs(:get_targets).with(target).returns([target])
 
         is_expected.to run.with_params('test/uploads', destination, target, {}).and_return(result_set)
       end
 
       it 'ignores description if no parameters are passed' do
-        executor.expects(:file_upload).with([target], full_dir_path, destination, {}).returns(result_set)
+        executor.expects(:upload_file).with([target], full_dir_path, destination, {}).returns(result_set)
         inventory.stubs(:get_targets).with(target).returns([target])
 
         is_expected.to run.with_params('test/uploads', destination, target).and_return(result_set)
@@ -119,7 +119,7 @@ describe 'file_upload' do
 
       it 'propagates multiple hosts and returns multiple results' do
         executor
-          .expects(:file_upload).with([target, target2], full_path, destination, {})
+          .expects(:upload_file).with([target, target2], full_path, destination, {})
           .returns(result_set)
         inventory.stubs(:get_targets).with([hostname, hostname2]).returns([target, target2])
 
@@ -131,7 +131,7 @@ describe 'file_upload' do
         let(:result2) { Bolt::Result.new(target2, error: { 'msg' => 'oops' }) }
 
         it 'errors by default' do
-          executor.expects(:file_upload).with([target, target2], full_path, destination, {})
+          executor.expects(:upload_file).with([target, target2], full_path, destination, {})
                   .returns(result_set)
           inventory.expects(:get_targets).with([hostname, hostname2]).returns([target, target2])
 
@@ -140,7 +140,7 @@ describe 'file_upload' do
         end
 
         it 'does not error with _catch_errors' do
-          executor.expects(:file_upload).with([target, target2], full_path, destination, '_catch_errors' => true)
+          executor.expects(:upload_file).with([target, target2], full_path, destination, '_catch_errors' => true)
                   .returns(result_set)
           inventory.expects(:get_targets).with([hostname, hostname2]).returns([target, target2])
 
@@ -151,7 +151,7 @@ describe 'file_upload' do
     end
 
     it 'without nodes - does not invoke bolt' do
-      executor.expects(:file_upload).never
+      executor.expects(:upload_file).never
       inventory.expects(:get_targets).with([]).returns([])
 
       is_expected.to run.with_params('test/uploads/index.html', destination, [])
@@ -159,7 +159,7 @@ describe 'file_upload' do
     end
 
     it 'errors when file is not found' do
-      executor.expects(:file_upload).never
+      executor.expects(:upload_file).never
 
       is_expected.to run.with_params('test/uploads/nonesuch.html', destination, [])
                         .and_raise_error(/No such file or directory: .*nonesuch\.html/)
@@ -177,9 +177,9 @@ describe 'file_upload' do
   context 'without tasks enabled' do
     let(:tasks_enabled) { false }
 
-    it 'fails and reports that file_upload is not available' do
+    it 'fails and reports that upload_file is not available' do
       is_expected.to run.with_params('test/uploads/nonesuch.html', '/some/place', [])
-                        .and_raise_error(/The task operation 'file_upload' is not available/)
+                        .and_raise_error(/The task operation 'upload_file' is not available/)
     end
   end
 end

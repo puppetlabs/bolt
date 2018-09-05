@@ -49,20 +49,20 @@ module Bolt
 
       inventory = new(data, config)
       inventory.validate
-      inventory.collect_groups
       inventory
     end
 
-    def initialize(data, config = nil)
+    def initialize(data, config = nil, target_vars: {}, target_facts: {}, target_features: {})
       @logger = Logging.logger[self]
       # Config is saved to add config options to targets
       @config = config || Bolt::Config.default
       @data = data ||= {}
       @groups = Group.new(data.merge('name' => 'all'))
       @group_lookup = {}
-      @target_vars = {}
-      @target_facts = {}
-      @target_features = {}
+      @target_vars = target_vars
+      @target_facts = target_facts
+      @target_features = target_features
+      collect_groups
     end
 
     def validate
@@ -121,6 +121,18 @@ module Bolt
 
     def features(target)
       @target_features[target.name] || Set.new
+    end
+
+    def data_hash
+      {
+        data: @data,
+        target_hash: {
+          target_vars: @target_vars,
+          target_facts: @target_facts,
+          target_features: @target_features
+        },
+        config: @config.transport_data_get
+      }
     end
 
     #### PRIVATE ####

@@ -6,8 +6,7 @@
     'setup/gem/pre-suite/020_install.rb',
     'setup/common/pre-suite/030_set_password.rb',
     'setup/common/pre-suite/050_build_bolt_inventory.rb',
-    'setup/common/pre-suite/070_install_puppet.rb',
-    'setup/common/pre-suite/071_install_facts.rb'
+    'setup/common/pre-suite/071_install_modules.rb'
   ],
   load_path: './lib/acceptance'
 }

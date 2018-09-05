@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'bolt/error'
+require 'bolt/pal'
 
 # Runs a given instance of a `Task` on the given set of targets and returns the result from each.
 # This function does nothing if the list of targets is empty.
@@ -120,7 +121,24 @@ Puppet::Functions.create_function(:run_task) do
     end
 
     unless Puppet::Pops::Types::TypeFactory.data.instance?(use_args)
-      raise with_stack(:TYPE_NOT_DATA, 'Task parameters is not of type Data')
+      # generate a helpful error message about the type-mismatch between the type Data
+      # and the actual type of use_args
+      use_args_t = Puppet::Pops::Types::TypeCalculator.infer_set(use_args)
+      desc = Puppet::Pops::Types::TypeMismatchDescriber.singleton.describe_mismatch(
+        'Task parameters are not of type Data. run_task()',
+        Puppet::Pops::Types::TypeFactory.data, use_args_t
+      )
+      raise with_stack(:TYPE_NOT_DATA, desc)
+    end
+
+    # Wrap parameters marked with '"sensitive": true' in the task metadata with a
+    # Sensitive wrapper type. This way it's not shown in logs.
+    if task.parameters
+      use_args.each do |k, v|
+        if task.parameters[k] && task.parameters[k]['sensitive']
+          use_args[k] = Puppet::Pops::Types::PSensitiveType::Sensitive.new(v)
+        end
+      end
     end
 
     if executor.noop

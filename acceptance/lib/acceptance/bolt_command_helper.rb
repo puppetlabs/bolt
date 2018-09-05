@@ -20,29 +20,29 @@ module Acceptance
       when /windows/
         execute_powershell_script_on(host, bolt_command, opts)
       when /osx/
-        env = 'source /etc/profile  ~/.bash_profile ~/.bash_login ~/.profile &&'
+        # Ensure Bolt runs with UTF-8 under macOS. Otherwise we get issues with
+        # UTF-8 content in task results.
+        env = 'source /etc/profile  ~/.bash_profile ~/.bash_login ~/.profile && env LANG=en_US.UTF-8'
         on(host, env + ' ' + bolt_command)
       else
         on(host, bolt_command, opts)
       end
     end
 
-    def default_modulepath
-      case bolt['platform']
-      when /windows/
-        home = on(bolt, 'cygpath -m $(printenv USERPROFILE)').stdout.chomp
-        File.join(home, '.puppetlabs/bolt/modules')
-      else
-        '$HOME/.puppetlabs/bolt/modules'
+    def default_boltdir
+      @default_boltdir ||= begin
+        query = bolt['platform'] =~ /windows/ ? 'cygpath -m $(printenv HOME)' : 'printenv HOME'
+        home = on(bolt, query).stdout.chomp
+        File.join(home, '.puppetlabs/bolt')
       end
     end
 
     def modulepath(extra)
       case bolt['platform']
       when /windows/
-        "\"#{default_modulepath};#{extra}\""
+        "\"#{default_boltdir}/modules;#{extra}\""
       else
-        "#{default_modulepath}:#{extra}"
+        "#{default_boltdir}/modules:#{extra}"
       end
     end
   end

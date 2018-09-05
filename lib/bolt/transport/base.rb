@@ -75,6 +75,15 @@ module Bolt
         end
       end
 
+      # Transform a parameter map to an environment variable map, with parameter names prefixed
+      # with 'PT_' and values transformed to JSON unless they're strings.
+      def envify_params(params)
+        params.each_with_object({}) do |(k, v), h|
+          v = v.to_json unless v.is_a?(String)
+          h["PT_#{k}"] = v
+        end
+      end
+
       # Raises an error if more than one target was given in the batch.
       #
       # The default implementations of batch_* strictly assume the transport is
@@ -152,6 +161,15 @@ module Bolt
         targets.map { |target| [target] }
       end
 
+      def from_api?(task)
+        if task.respond_to? :file
+          unless task.file.nil?
+            return true
+          end
+        end
+        false
+      end
+
       # Transports should override this method with their own implementation of running a command.
       def run_command(*_args)
         raise NotImplementedError, "run_command() must be implemented by the transport class"
@@ -170,6 +188,33 @@ module Bolt
       # Transports should override this method with their own implementation of file upload.
       def upload(*_args)
         raise NotImplementedError, "upload() must be implemented by the transport class"
+      end
+
+      # Unwraps any Sensitive data in an arguments Hash, so the plain-text is passed
+      # to the Task/Script.
+      #
+      # This works on deeply nested data structures composed of Hashes, Arrays, and
+      # and plain-old data types (int, string, etc).
+      def unwrap_sensitive_args(arguments)
+        # Skip this if Puppet isn't loaded
+        return arguments unless defined?(Puppet::Pops::Types::PSensitiveType::Sensitive)
+
+        case arguments
+        when Array
+          # iterate over the array, unwrapping all elements
+          arguments.map { |x| unwrap_sensitive_args(x) }
+        when Hash
+          # iterate over the arguments hash and unwrap all keys and values
+          arguments.each_with_object({}) { |(k, v), h|
+            h[unwrap_sensitive_args(k)] = unwrap_sensitive_args(v)
+          }
+        when Puppet::Pops::Types::PSensitiveType::Sensitive
+          # this value is Sensitive, unwrap it
+          unwrap_sensitive_args(arguments.unwrap)
+        else
+          # unknown data type, just return it
+          arguments
+        end
       end
     end
   end

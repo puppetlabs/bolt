@@ -54,13 +54,16 @@ module Bolt
         attr_reader :logger, :user, :target
         attr_writer :run_as
 
-        def initialize(target)
+        def initialize(target, transport_logger, load_config = true)
           @target = target
+          @load_config = load_config
 
-          @user = @target.user || Net::SSH::Config.for(target.host)[:user] || Etc.getlogin
+          ssh_user = load_config ? Net::SSH::Config.for(target.host)[:user] : nil
+          @user = @target.user || ssh_user || Etc.getlogin
           @run_as = nil
 
           @logger = Logging.logger[@target.host]
+          @transport_logger = transport_logger
         end
 
         if Bolt::Util.windows?
@@ -74,10 +77,8 @@ module Bolt
         end
 
         def connect
-          transport_logger = Logging.logger[Net::SSH]
-          transport_logger.level = :warn
           options = {
-            logger: transport_logger,
+            logger: @transport_logger,
             non_interactive: true
           }
 
@@ -94,24 +95,30 @@ module Bolt
           options[:verify_host_key] = if target.options['host-key-check']
                                         Net::SSH::Verifiers::Secure.new
                                       else
-                                        Net::SSH::Verifiers::Lenient.new
+                                        Net::SSH::Verifiers::Null.new
                                       end
           options[:timeout] = target.options['connect-timeout'] if target.options['connect-timeout']
 
-          # Mirroring:
-          # https://github.com/net-ssh/net-ssh/blob/master/lib/net/ssh/authentication/agent.rb#L80
-          # https://github.com/net-ssh/net-ssh/blob/master/lib/net/ssh/authentication/pageant.rb#L403
-          if defined?(UNIXSocket) && UNIXSocket
-            if ENV['SSH_AUTH_SOCK'].to_s.empty?
-              @logger.debug { "Disabling use_agent in net-ssh: ssh-agent is not available" }
-              options[:use_agent] = false
+          if @load_config
+            # Mirroring:
+            # https://github.com/net-ssh/net-ssh/blob/master/lib/net/ssh/authentication/agent.rb#L80
+            # https://github.com/net-ssh/net-ssh/blob/master/lib/net/ssh/authentication/pageant.rb#L403
+            if defined?(UNIXSocket) && UNIXSocket
+              if ENV['SSH_AUTH_SOCK'].to_s.empty?
+                @logger.debug { "Disabling use_agent in net-ssh: ssh-agent is not available" }
+                options[:use_agent] = false
+              end
+            elsif Bolt::Util.windows?
+              pageant_wide = 'Pageant'.encode('UTF-16LE')
+              if Win.FindWindow(pageant_wide, pageant_wide).to_i == 0
+                @logger.debug { "Disabling use_agent in net-ssh: pageant process not running" }
+                options[:use_agent] = false
+              end
             end
-          elsif Bolt::Util.windows?
-            pageant_wide = 'Pageant'.encode('UTF-16LE')
-            if Win.FindWindow(pageant_wide, pageant_wide).to_i == 0
-              @logger.debug { "Disabling use_agent in net-ssh: pageant process not running" }
-              options[:use_agent] = false
-            end
+          else
+            # Disable ssh config and ssh-agent if requested via load_config
+            options[:config] = false
+            options[:use_agent] = false
           end
 
           @session = Net::SSH.start(target.host, @user, options)
@@ -226,7 +233,7 @@ module Bolt
 
           session_channel = @session.open_channel do |channel|
             # Request a pseudo tty
-            channel.request_pty(modes: { Net::SSH::Connection::Term::ECHO => 0 }) if target.options['tty']
+            channel.request_pty if target.options['tty']
 
             channel.exec(command_str) do |_, success|
               unless success
@@ -303,8 +310,15 @@ module Bolt
 
         def write_remote_executable(dir, file, filename = nil)
           filename ||= File.basename(file)
-          remote_path = "#{dir}/#{filename}"
+          remote_path = File.join(dir.to_s, filename)
           write_remote_file(file, remote_path)
+          make_executable(remote_path)
+          remote_path
+        end
+
+        def write_executable_from_content(dest, content, filename)
+          remote_path = File.join(dest.to_s, filename)
+          @session.scp.upload!(StringIO.new(content), remote_path)
           make_executable(remote_path)
           remote_path
         end

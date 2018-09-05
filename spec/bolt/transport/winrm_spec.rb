@@ -3,6 +3,7 @@
 require 'spec_helper'
 require 'bolt_spec/errors'
 require 'bolt_spec/files'
+require 'bolt_spec/sensitive'
 require 'bolt_spec/task'
 require 'bolt/transport/winrm'
 require 'httpclient'
@@ -11,6 +12,7 @@ require 'winrm'
 describe Bolt::Transport::WinRM do
   include BoltSpec::Errors
   include BoltSpec::Files
+  include BoltSpec::Sensitive
   include BoltSpec::Task
 
   let(:boltdir) { Bolt::Boltdir.new('.') }
@@ -229,6 +231,14 @@ PS
       end
     end
 
+    it "catches winrm-fs upload error", winrm: true do
+      expect_node_error(Bolt::Node::FileError,
+                        'WRITE_ERROR',
+                        /No such file or directory/) do
+        winrm.run_script(target, 'fake.ps1', [])
+      end
+    end
+
     it "can run a PowerShell script remotely", winrm: true do
       contents = "Write-Output \"hellote\""
       with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
@@ -327,6 +337,19 @@ QUOTED
       end
     end
 
+    it "can run a script with Sensitive arguments", winrm: true do
+      arguments = ['non-sensitive-arg',
+                   make_sensitive('$ecret!')]
+      with_tempfile_containing('script-sensitive-winrm', echo_script, '.ps1') do |file|
+        expect(
+          winrm.run_script(target, file.path, arguments)['stdout']
+        ).to eq(<<QUOTED)
+non-sensitive-arg\r
+$ecret!\r
+QUOTED
+      end
+    end
+
     it "escapes unsafe shellwords", winrm: true do
       with_tempfile_containing('script-test-winrm-escape', echo_script, '.ps1') do |file|
         expect(
@@ -353,6 +376,35 @@ SHELLWORDS
       end
     end
 
+    it "does not reorder powershell output with lots of lines", winrm: true do
+      contents = 'for ($i = 0; $i -le 4000; $i++) { Write-Host $i }'
+
+      with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
+        result = winrm.run_script(target, file.path, [])
+        expect(result).to be_success
+        expected = (0..4000).to_a.join("\r\n")
+        expect(result['stdout'].chomp).to eq(expected)
+      end
+    end
+
+    context 'with a batch file' do
+      let(:config) { mk_config(ssl: false, extensions: 'bat', user: user, password: password) }
+
+      it "does not reorder output with lots of lines", winrm: true do
+        contents = <<-BAT
+        @echo off
+        for /l %%x in (0, 1, 4000) do echo %%x
+        BAT
+
+        with_tempfile_containing('script-test-winrm', contents, '.bat') do |file|
+          result = winrm.run_script(target, file.path, [])
+          expect(result).to be_success
+          expected = (0..4000).to_a.join("\r\n")
+          expect(result['stdout'].chomp).to eq(expected)
+        end
+      end
+    end
+
     it "can run a task remotely", winrm: true do
       contents = 'Write-Host "$env:PT_message_one ${env:PT_message two}"'
       arguments = { message_one: 'task is running',
@@ -369,6 +421,16 @@ SHELLWORDS
       with_task_containing('task-test-winrm', contents, 'environment', '.ps1') do |task|
         expect(winrm.run_task(target, task, arguments).message)
           .to eq("it's a hello world\r\n")
+      end
+    end
+
+    it 'errors if environment variables cannot be set', winrm: true do
+      contents = 'Write-Host "$env:PT_message"'
+      arguments = { message: "it's a hello world" }
+      result = double('result', exit_code: 1)
+      expect_any_instance_of(Bolt::Transport::WinRM::Connection).to receive(:execute).and_return(result)
+      with_task_containing('task-test-winrm', contents, 'environment', '.ps1') do |task|
+        expect { winrm.run_task(target, task, arguments) }.to raise_error(Bolt::Node::EnvironmentVarError)
       end
     end
 
@@ -502,6 +564,37 @@ PS
         expect(
           winrm.run_task(target, task, arguments).value
         ).to eq('key' => 'val')
+      end
+    end
+
+    it "can run a task with Sensitive params via environment", winrm: true do
+      contents = <<PS
+Write-Host "$env:PT_sensitive_string"
+Write-Host "$env:PT_sensitive_array"
+Write-Host "$env:PT_sensitive_hash"
+PS
+      deep_hash = { 'k' => make_sensitive('v') }
+      arguments = { 'sensitive_string' => make_sensitive('$ecret!'),
+                    'sensitive_array'  => make_sensitive([1, 2, make_sensitive(3)]),
+                    'sensitive_hash'   => make_sensitive(deep_hash) }
+      with_task_containing('tasks_test_sensitive', contents, 'both', '.ps1') do |task|
+        expect(winrm.run_task(target, task, arguments).message).to eq(<<QUOTED)
+$ecret!\r
+[1,2,3]\r
+{"k":"v"}\r
+QUOTED
+      end
+    end
+
+    it "can run a task with Sensitive params via stdin", winrm: true do
+      contents = <<PS
+$line = [Console]::In.ReadLine()
+Write-Host $line
+PS
+      arguments = { 'sensitive_string' => make_sensitive('$ecret!') }
+      with_task_containing('tasks_test_sensitive', contents, 'stdin', '.ps1') do |task|
+        expect(winrm.run_task(target, task, arguments).value)
+          .to eq("sensitive_string" => "$ecret!")
       end
     end
 
@@ -823,8 +916,7 @@ OUTPUT
         with_task_containing('task-pp-winrm', "notice('hi')", 'stdin', '.pp') do |task|
           result = winrm.run_task(target, task, {})
           stderr = result.error_hash['msg']
-          expect(stderr).to match(/^Could not find executable 'puppet\.bat'/)
-          expect(stderr).to_not match(/CommandNotFoundException/)
+          expect(stderr).to match(/^The term 'puppet.bat' is not recognized as the name of a cmdlet/)
         end
       end
     end

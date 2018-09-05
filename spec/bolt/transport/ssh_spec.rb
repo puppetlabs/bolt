@@ -4,6 +4,7 @@ require 'spec_helper'
 require 'net/ssh'
 require 'bolt_spec/errors'
 require 'bolt_spec/files'
+require 'bolt_spec/sensitive'
 require 'bolt_spec/task'
 require 'bolt/transport/ssh'
 require 'bolt/config'
@@ -12,6 +13,7 @@ require 'bolt/util'
 describe Bolt::Transport::SSH do
   include BoltSpec::Errors
   include BoltSpec::Files
+  include BoltSpec::Sensitive
   include BoltSpec::Task
 
   let(:boltdir) { Bolt::Boltdir.new('.') }
@@ -31,6 +33,7 @@ describe Bolt::Transport::SSH do
   let(:command) { "pwd" }
   let(:config) { mk_config(user: user, password: password) }
   let(:no_host_key_check) { mk_config('host-key-check' => false, user: user, password: password) }
+  let(:no_user_config) { mk_config('host-key-check' => false, user: nil, password: password) }
   let(:ssh) { Bolt::Transport::SSH.new }
   let(:echo_script) { <<BASH }
 for var in "$@"
@@ -69,7 +72,7 @@ BASH
         .with(anything,
               anything,
               hash_including(
-                verify_host_key: instance_of(Net::SSH::Verifiers::Lenient)
+                verify_host_key: instance_of(Net::SSH::Verifiers::Null)
               ))
       ssh.with_connection(make_target(conf: no_host_key_check)) {}
     end
@@ -141,6 +144,24 @@ BASH
         }.to raise_error(Bolt::Node::ConnectError)
         expect(Time.now - exec_time).to be > 2
       end
+    end
+
+    it "uses Net::SSH config when no user is specified" do
+      expect(Net::SSH::Config)
+        .to receive(:for)
+        .at_least(:once)
+        .with(hostname, any_args)
+        .and_return(user: user)
+
+      ssh.with_connection(make_target(conf: no_user_config)) {}
+    end
+
+    it "doesn't read system config if load_config is false" do
+      allow(Etc).to receive(:getlogin).and_return('bolt')
+      expect(Net::SSH::Config).not_to receive(:for)
+
+      config_user = ssh.with_connection(make_target(conf: no_user_config), false, &:user)
+      expect(config_user).to be('bolt')
     end
   end
 
@@ -252,6 +273,17 @@ QUOTED
       end
     end
 
+    it "can run a script with Sensitive arguments", ssh: true do
+      contents = "#!/bin/sh\necho $1\necho $2"
+      arguments = ['non-sensitive-arg',
+                   make_sensitive('$ecret!')]
+      with_tempfile_containing('sensitive_test', contents) do |file|
+        expect(
+          ssh.run_script(target, file.path, arguments)['stdout']
+        ).to eq("non-sensitive-arg\n$ecret!\n")
+      end
+    end
+
     it "escapes unsafe shellwords in arguments", ssh: true do
       with_tempfile_containing('script-test-ssh-escape', echo_script) do |file|
         expect(
@@ -324,6 +356,38 @@ SHELL
       arguments = { message: "foo ' bar ' baz" }
       with_task_containing('tasks_test_quotes', contents, 'both') do |task|
         expect(ssh.run_task(target, task, arguments).message).to eq "foo ' bar ' baz"
+      end
+    end
+
+    it "can run a task with Sensitive params via environment", ssh: true do
+      contents = <<SHELL
+#!/bin/sh
+echo ${PT_sensitive_string}
+echo ${PT_sensitive_array}
+echo -n ${PT_sensitive_hash}
+SHELL
+      deep_hash = { 'k' => make_sensitive('v') }
+      arguments = { 'sensitive_string' => make_sensitive('$ecret!'),
+                    'sensitive_array'  => make_sensitive([1, 2, make_sensitive(3)]),
+                    'sensitive_hash'   => make_sensitive(deep_hash) }
+      with_task_containing('tasks_test_sensitive', contents, 'both') do |task|
+        expect(ssh.run_task(target, task, arguments).message).to eq(<<SHELL.strip)
+$ecret!
+[1,2,3]
+{"k":"v"}
+SHELL
+      end
+    end
+
+    it "can run a task with Sensitive params via stdin", ssh: true do
+      contents = <<SHELL
+#!/bin/sh
+cat -
+SHELL
+      arguments = { 'sensitive_string' => make_sensitive('$ecret!') }
+      with_task_containing('tasks_test_sensitive', contents, 'stdin') do |task|
+        expect(ssh.run_task(target, task, arguments).value)
+          .to eq("sensitive_string" => "$ecret!")
       end
     end
 

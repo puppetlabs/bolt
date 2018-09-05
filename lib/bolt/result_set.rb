@@ -27,6 +27,7 @@ module Bolt
 
     def each
       @results.each { |r| yield r }
+      self
     end
 
     def result_hash
@@ -79,6 +80,10 @@ module Bolt
 
     def eql?(other)
       self.class == other.class && @results == other.results
+    end
+
+    def to_a
+      @results.map(&:status_hash)
     end
 
     def to_json(opts = nil)

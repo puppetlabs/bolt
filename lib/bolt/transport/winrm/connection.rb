@@ -11,7 +11,7 @@ module Bolt
 
         DEFAULT_EXTENSIONS = ['.ps1', '.rb', '.pp'].freeze
 
-        def initialize(target)
+        def initialize(target, transport_logger)
           @target = target
 
           default_port = target.options['ssl'] ? HTTPS_PORT : HTTP_PORT
@@ -23,6 +23,7 @@ module Bolt
           @extensions = DEFAULT_EXTENSIONS.to_set.merge(extensions)
 
           @logger = Logging.logger[@target.host]
+          @transport_logger = transport_logger
         end
 
         HTTP_PORT = 5985
@@ -47,9 +48,7 @@ module Bolt
 
           Timeout.timeout(target.options['connect-timeout']) do
             @connection = ::WinRM::Connection.new(options)
-            transport_logger = Logging.logger[::WinRM]
-            transport_logger.level = :warn
-            @connection.logger = transport_logger
+            @connection.logger = @transport_logger
 
             @session = @connection.shell(:powershell)
             @session.run('$PSVersionTable.PSVersion')
@@ -108,99 +107,6 @@ $ENV:RUBYLIB
 
 Add-Type -AssemblyName System.ServiceModel.Web, System.Runtime.Serialization
 $utf8 = [System.Text.Encoding]::UTF8
-
-function Invoke-Interpreter
-{
-[CmdletBinding()]
-Param (
-  [Parameter()]
-  [String]
-  $Path,
-
-  [Parameter()]
-  [String]
-  $Arguments,
-
-  [Parameter()]
-  [Int32]
-  $Timeout,
-
-  [Parameter()]
-  [String]
-  $StdinInput = $Null
-)
-
-try
-{
-  if (-not (Get-Command $Path -ErrorAction SilentlyContinue))
-  {
-    throw "Could not find executable '$Path' in ${ENV:PATH} on target node"
-  }
-
-  $startInfo = New-Object System.Diagnostics.ProcessStartInfo($Path, $Arguments)
-  $startInfo.UseShellExecute = $false
-  $startInfo.WorkingDirectory = Split-Path -Parent (Get-Command $Path).Path
-  $startInfo.CreateNoWindow = $true
-  if ($StdinInput) { $startInfo.RedirectStandardInput = $true }
-  $startInfo.RedirectStandardOutput = $true
-  $startInfo.RedirectStandardError = $true
-
-  $stdoutHandler = { if (-not ([String]::IsNullOrEmpty($EventArgs.Data))) { $Host.UI.WriteLine($EventArgs.Data) } }
-  $stderrHandler = { if (-not ([String]::IsNullOrEmpty($EventArgs.Data))) { $Host.UI.WriteErrorLine($EventArgs.Data) } }
-  $invocationId = [Guid]::NewGuid().ToString()
-
-  $process = New-Object System.Diagnostics.Process
-  $process.StartInfo = $startInfo
-  $process.EnableRaisingEvents = $true
-
-  # https://msdn.microsoft.com/en-us/library/system.diagnostics.process.standarderror(v=vs.110).aspx#Anchor_2
-  $stdoutEvent = Register-ObjectEvent -InputObject $process -EventName 'OutputDataReceived' -Action $stdoutHandler
-  $stderrEvent = Register-ObjectEvent -InputObject $process -EventName 'ErrorDataReceived' -Action $stderrHandler
-  $exitedEvent = Register-ObjectEvent -InputObject $process -EventName 'Exited' -SourceIdentifier $invocationId
-
-  $process.Start() | Out-Null
-
-  $process.BeginOutputReadLine()
-  $process.BeginErrorReadLine()
-
-  if ($StdinInput)
-  {
-    $process.StandardInput.WriteLine($StdinInput)
-    $process.StandardInput.Close()
-  }
-
-  # park current thread until the PS event is signaled upon process exit
-  # OR the timeout has elapsed
-  $waitResult = Wait-Event -SourceIdentifier $invocationId -Timeout $Timeout
-  if (! $process.HasExited)
-  {
-    $Host.UI.WriteErrorLine("Process $Path did not complete in $Timeout seconds")
-    return 1
-  }
-
-  return $process.ExitCode
-}
-catch
-{
-  $Host.UI.WriteErrorLine($_)
-  return 1
-}
-finally
-{
-  @($stdoutEvent, $stderrEvent, $exitedEvent) |
-    ? { $_ -ne $Null } |
-    % { Unregister-Event -SourceIdentifier $_.Name }
-
-  if ($process -ne $Null)
-  {
-    if (($process.Handle -ne $Null) -and (! $process.HasExited))
-    {
-      try { $process.Kill() } catch { $Host.UI.WriteErrorLine("Failed To Kill Process $Path") }
-    }
-    $process.Dispose()
-  }
-}
-}
 
 function Write-Stream {
 PARAM(
@@ -408,37 +314,30 @@ PS
           raise
         end
 
-        # 10 minutes in seconds
-        DEFAULT_EXECUTION_TIMEOUT = 10 * 60
-
-        def execute_process(path = '', arguments = [], stdin = nil,
-                            timeout = DEFAULT_EXECUTION_TIMEOUT)
+        def execute_process(path = '', arguments = [], stdin = nil)
           quoted_args = arguments.map do |arg|
             "'" + arg.gsub("'", "''") + "'"
-          end.join(',')
+          end.join(' ')
 
+          exec_cmd =
+            if stdin.nil?
+              "& #{path} #{quoted_args}"
+            else
+              "@'\n#{stdin}\n'@ | & #{path} #{quoted_args}"
+            end
           execute(<<-PS)
-$quoted_array = @(
-  #{quoted_args}
-)
-
-$invokeArgs = @{
-  Path = "#{path}"
-  Arguments = $quoted_array -Join ' '
-  Timeout = #{timeout}
-  #{stdin.nil? ? '' : "StdinInput = @'\n" + stdin + "\n'@"}
-}
-
-# winrm gem checks $? prior to using $LASTEXITCODE
-# making it necessary to exit with the desired code to propagate status properly
-exit $(Invoke-Interpreter @invokeArgs)
+$OutputEncoding = [Console]::OutputEncoding
+#{exec_cmd}
+if (-not $? -and ($LASTEXITCODE -eq $null)) { exit 1 }
+exit $LASTEXITCODE
 PS
         end
 
         def write_remote_file(source, destination)
           fs = ::WinRM::FS::FileManager.new(@connection)
-          # TODO: raise FileError here if this fails
           fs.upload(source, destination)
+        rescue StandardError => e
+          raise Bolt::Node::FileError.new(e.message, 'WRITE_ERROR')
         end
 
         def make_tempdir
@@ -456,25 +355,35 @@ PS
           result.stdout.string.chomp
         end
 
-        def with_remote_file(file)
-          ext = File.extname(file)
+        def with_remote_tempdir
+          dir = make_tempdir
+          yield dir
+        ensure
+          execute(<<-PS)
+Remove-Item -Force -Recurse -Path "#{dir}"
+PS
+        end
+
+        def validate_extensions(ext)
           unless @extensions.include?(ext)
             raise Bolt::Node::FileError.new("File extension #{ext} is not enabled, "\
                                 "to run it please add to 'winrm: extensions'", 'FILETYPE_ERROR')
           end
-          file_base = File.basename(file)
-          dir = make_tempdir
-          dest = "#{dir}\\#{file_base}"
-          begin
-            write_remote_file(file, dest)
-            shell_init
-            yield dest
-          ensure
-            execute(<<-PS)
-Remove-Item -Force "#{dest}"
-Remove-Item -Force "#{dir}"
-PS
-          end
+        end
+
+        def write_remote_executable(dir, file, filename = nil)
+          filename ||= File.basename(file)
+          validate_extensions(File.extname(filename))
+          remote_path = "#{dir}\\#{filename}"
+          write_remote_file(file, remote_path)
+          remote_path
+        end
+
+        def write_executable_from_content(dir, content, filename)
+          validate_extensions(File.extname(filename))
+          remote_path = "#{dir}\\#{filename}"
+          write_remote_file(content, remote_path)
+          remote_path
         end
       end
     end

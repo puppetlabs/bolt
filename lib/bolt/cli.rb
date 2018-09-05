@@ -296,7 +296,7 @@ module Bolt
                 raise Bolt::CLIError, "A destination path must be specified"
               end
               validate_file('source file', src)
-              executor.file_upload(targets, src, dest, executor_opts) do |event|
+              executor.upload_file(targets, src, dest, executor_opts) do |event|
                 outputter.print_event(event)
               end
             end

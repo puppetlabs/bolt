@@ -210,6 +210,13 @@ bar
         end
       end
 
+      it "expands tilde to a user directory when --nodes starts with @" do
+        expect(File).to receive(:read).with(File.join(Dir.home, 'nodes.txt')).and_return("foo\nbar\n")
+        cli = Bolt::CLI.new(%w[command run --nodes @~/nodes.txt])
+        result = cli.parse
+        expect(result[:targets]).to eq(targets)
+      end
+
       it "generates an error message if no nodes given" do
         cli = Bolt::CLI.new(%w[command run --nodes])
         expect {
@@ -686,6 +693,7 @@ bar
 
       before :each do
         allow(Bolt::Executor).to receive(:new).and_return(executor)
+        allow(executor).to receive(:log_plan) { |_plan_name, &block| block.call }
 
         outputter = Bolt::Outputter::JSON.new(false, false, output)
 
@@ -921,18 +929,15 @@ bar
           }
           cli.execute(options)
           json = JSON.parse(output.string)
-          expect(json).to eq([["apply::resource", "Apply a single Puppet resource"],
-                              ["facts", "Gather system facts"],
-                              ["facts::bash", "Gather system facts using bash"],
-                              ["facts::powershell", "Gather system facts using powershell"],
-                              ["facts::ruby", "Gather system facts using ruby and facter"],
-                              ["package", "Manage and inspect the state of packages"],
-                              ["puppet_conf", "Inspect puppet agent configuration settings"],
-                              ["sample::ok", nil],
-                              ["service", "Manage and inspect the state of services"],
-                              ["service::linux", "Manage the state of services (without a puppet agent)"],
-                              ["service::windows",
-                               "Manage the state of Windows services (without a puppet agent)"]])
+          tasks = [
+            ["package", "Manage and inspect the state of packages"],
+            ["service", "Manage and inspect the state of services"],
+            ["service::linux", "Manage the state of services (without a puppet agent)"],
+            ["service::windows", "Manage the state of Windows services (without a puppet agent)"]
+          ]
+          tasks.each do |task|
+            expect(json).to include(task)
+          end
           output = @log_output.readlines.join
           expect(output).to match(/unexpected token.*params\.json/m)
         end
@@ -1412,6 +1417,7 @@ bar
             .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0)]))
 
           expect(executor).to receive(:start_plan)
+          expect(executor).to receive(:log_plan)
           expect(executor).to receive(:finish_plan)
 
           cli.execute(options)
@@ -1437,6 +1443,7 @@ bar
             .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0)]))
 
           expect(executor).to receive(:start_plan)
+          expect(executor).to receive(:log_plan)
           expect(executor).to receive(:finish_plan)
 
           cli.execute(options)
@@ -1452,6 +1459,7 @@ bar
             .and_raise("Could not connect to target")
 
           expect(executor).to receive(:start_plan)
+          expect(executor).to receive(:log_plan)
           expect(executor).to receive(:finish_plan)
 
           expect(cli.execute(options)).to eq(1)
@@ -1465,6 +1473,7 @@ bar
             .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'no', '', 1)]))
 
           expect(executor).to receive(:start_plan)
+          expect(executor).to receive(:log_plan)
           expect(executor).to receive(:finish_plan)
 
           cli.execute(options)
@@ -1507,6 +1516,7 @@ bar
             end
 
           expect(executor).to receive(:start_plan)
+          expect(executor).to receive(:log_plan)
           expect(executor).to receive(:finish_plan)
 
           expect(cli).to receive(:exit!) do
@@ -1538,7 +1548,7 @@ bar
           stub_file(source)
 
           expect(executor)
-            .to receive(:file_upload)
+            .to receive(:upload_file)
             .with(targets, source, dest, kind_of(Hash))
             .and_return(Bolt::ResultSet.new([]))
 
@@ -1550,7 +1560,7 @@ bar
           stub_file(source)
 
           expect(executor)
-            .to receive(:file_upload)
+            .to receive(:upload_file)
             .with(targets, source, dest, kind_of(Hash))
             .and_return(fail_set)
 
