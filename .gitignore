@@ -1,3 +1,4 @@
+
 *.gem
 *.rbc
 /.config
@@ -39,3 +40,8 @@ modules/facts
 modules/package
 modules/puppet_conf
 modules/service
+
+# OS generated files #
+######################
+.DS_Store
+
