@@ -5,6 +5,18 @@ require 'bolt/result'
 
 module Bolt
   module Transport
+    # Provides a common pattern for streaming output from a transport.
+    # Requires @logger and @target.
+    module Streaming
+      def log_output(msg, level = :debug)
+        if @target.options['stream']
+          @logger.stream { "[#{@target.name}] #{msg.chomp}" }
+        else
+          @logger.send(level) { "[#{@target.name}] #{msg.chomp}" }
+        end
+      end
+    end
+
     # This class provides the default behavior for Transports. A Transport is
     # responsible for uploading files and running commands, scripts, and tasks
     # on Targets.

@@ -251,6 +251,9 @@ Usage: bolt apply <manifest.pp> [options]
       define('--tmpdir DIR', 'The directory to upload and execute temporary files on the target') do |tmpdir|
         @options[:tmpdir] = tmpdir
       end
+      define('--[no-]stream', 'Request results be streamed for transports that support streaming output') do |stream|
+        @options[:stream] = stream
+      end
 
       separator 'Display:'
       define('--format FORMAT', 'Output format to use: human or json') do |format|

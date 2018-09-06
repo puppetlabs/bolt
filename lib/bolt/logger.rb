@@ -14,7 +14,7 @@ module Bolt
       # redefs, so skip it if it's already been initialized
       return if Logging.initialized?
 
-      Logging.init :debug, :info, :notice, :warn, :error, :fatal, :any
+      Logging.init :debug, :info, :notice, :warn, :error, :fatal, :stream, :any
 
       Logging.color_scheme(
         'bolt',

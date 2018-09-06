@@ -60,6 +60,8 @@ module Bolt
           end
         end
 
+        include Streaming
+
         attr_reader :logger, :user, :target
         attr_writer :run_as
 
@@ -246,7 +248,7 @@ module Bolt
             command_str = "#{env_decls.join(' ')} #{command_str}"
           end
 
-          @logger.debug { "Executing: #{command_str}" }
+          log_output "Executing: #{command_str}"
 
           session_channel = @session.open_channel do |channel|
             # Request a pseudo tty
@@ -264,14 +266,14 @@ module Bolt
                 unless use_sudo && handled_sudo(channel, data)
                   result_output.stdout << data
                 end
-                @logger.debug { "stdout: #{data.strip}" }
+                log_output "out: #{data.strip}"
               end
 
               channel.on_extended_data do |_, _, data|
                 unless use_sudo && handled_sudo(channel, data)
                   result_output.stderr << data
                 end
-                @logger.debug { "stderr: #{data.strip}" }
+                log_output "err: #{data.strip}"
               end
 
               channel.on_request("exit-status") do |_, data|
@@ -287,13 +289,13 @@ module Bolt
           session_channel.wait
 
           if result_output.exit_code == 0
-            @logger.debug { "Command returned successfully" }
+            log_output "Command returned successfully"
           else
-            @logger.info { "Command failed with exit code #{result_output.exit_code}" }
+            log_output("Command failed with exit code #{result_output.exit_code}", :info)
           end
           result_output
         rescue StandardError
-          @logger.debug { "Command aborted" }
+          log_output "Command aborted"
           raise
         end
 

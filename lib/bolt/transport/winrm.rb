@@ -11,7 +11,7 @@ module Bolt
       ].freeze
 
       def self.options
-        %w[port user password connect-timeout ssl ssl-verify tmpdir cacert extensions]
+        %w[port user password connect-timeout ssl ssl-verify stream tmpdir cacert extensions]
       end
 
       PROVIDED_FEATURES = ['powershell'].freeze

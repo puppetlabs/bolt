@@ -34,7 +34,7 @@ module Bolt
 
     TRANSPORT_OPTIONS = %i[password run-as sudo-password extensions
                            private-key tty tmpdir user connect-timeout
-                           cacert token-file service-url].freeze
+                           stream cacert token-file service-url].freeze
 
     TRANSPORT_DEFAULTS = {
       'connect-timeout' => 10,

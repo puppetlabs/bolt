@@ -36,7 +36,7 @@ describe Bolt::Logger do
       Bolt::Logger.initialize_logging
 
       expect(Logging::LEVELS).to eq(
-        %w[debug info notice warn error fatal any].each_with_object({}) { |l, h| h[l] = h.count }
+        %w[debug info notice warn error fatal stream any].each_with_object({}) { |l, h| h[l] = h.count }
       )
     end
   end

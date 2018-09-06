@@ -98,7 +98,7 @@ describe Bolt::Config do
       }
 
       expect { Bolt::Config.new(boltdir, config) }.to raise_error(
-        /level of log file:.* must be one of: debug, info, notice, warn, error, fatal, any; received foo/
+        /level of log file:.* must be one of: debug, info, notice, warn, error, fatal, stream, any; received foo/
       )
     end
 

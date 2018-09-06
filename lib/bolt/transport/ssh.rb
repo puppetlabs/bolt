@@ -9,7 +9,8 @@ module Bolt
   module Transport
     class SSH < Base
       def self.options
-        %w[port user password sudo-password private-key host-key-check connect-timeout tmpdir run-as tty run-as-command]
+        %w[port user password sudo-password private-key host-key-check
+           connect-timeout tmpdir run-as stream tty run-as-command]
       end
 
       PROVIDED_FEATURES = ['shell'].freeze

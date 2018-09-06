@@ -8,6 +8,8 @@ module Bolt
   module Transport
     class Docker < Base
       class Connection
+        include Streaming
+
         def initialize(target)
           @target = target
           @logger = Logging.logger[target.host]
@@ -32,16 +34,18 @@ module Bolt
             command = ['env'] + envs + command
           end
 
-          @logger.debug { "Executing: #{command}" }
-          result = @container.exec(command, options) { |stream, chunk| @logger.debug("#{stream}: #{chunk}") }
+          log_output "Executing: #{command}"
+          result = @container.exec(command, options) do |stream, chunk|
+            log_output "#{stream.to_s.sub(/^std/, '')}: #{chunk}"
+          end
           if result[2] == 0
-            @logger.debug { "Command returned successfully" }
+            log_output "Command returned successfully"
           else
-            @logger.info { "Command failed with exit code #{result[2]}" }
+            log_output("Command failed with exit code #{result[2]}", :info)
           end
           result
         rescue StandardError
-          @logger.debug { "Command aborted" }
+          log_output "Command aborted"
           raise
         end
 

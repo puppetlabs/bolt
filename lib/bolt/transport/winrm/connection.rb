@@ -7,6 +7,8 @@ module Bolt
   module Transport
     class WinRM < Base
       class Connection
+        include Streaming
+
         attr_reader :logger, :target
 
         DEFAULT_EXTENSIONS = ['.ps1', '.rb', '.pp'].freeze
@@ -295,23 +297,23 @@ PS
         def execute(command)
           result_output = Bolt::Node::Output.new
 
-          @logger.debug { "Executing command: #{command}" }
+          log_output "Executing: #{command}"
 
           output = @session.run(command) do |stdout, stderr|
             result_output.stdout << stdout
-            @logger.debug { "stdout: #{stdout}" }
+            log_output "out: #{stdout}"
             result_output.stderr << stderr
-            @logger.debug { "stderr: #{stderr}" }
+            log_output "err: #{stderr}"
           end
           result_output.exit_code = output.exitcode
           if output.exitcode.zero?
-            @logger.debug { "Command returned successfully" }
+            log_output "Command returned successfully"
           else
-            @logger.info { "Command failed with exit code #{output.exitcode}" }
+            log_output("Command failed with exit code #{output.exitcode}", :info)
           end
           result_output
         rescue StandardError
-          @logger.debug { "Command aborted" }
+          log_output { "Command aborted" }
           raise
         end
 
