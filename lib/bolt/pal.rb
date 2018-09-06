@@ -8,8 +8,8 @@ require 'bolt/applicator'
 
 module Bolt
   class PAL
-    BOLTLIB_PATH = File.join(__dir__, '../../bolt-modules')
-    MODULES_PATH = File.join(__dir__, '../../modules')
+    BOLTLIB_PATH = File.expand_path('../../bolt-modules', __dir__)
+    MODULES_PATH = File.expand_path('../../modules', __dir__)
 
     # PALError is used to convert errors from executing puppet code into
     # Bolt::Errors
@@ -47,6 +47,11 @@ module Bolt
       @modulepath = [BOLTLIB_PATH, *modulepath, MODULES_PATH]
       @hiera_config = hiera_config
       @max_compiles = max_compiles
+
+      @logger = Logging.logger[self]
+      if modulepath && !modulepath.empty?
+        @logger.info("Loading modules from #{@modulepath.join(File::PATH_SEPARATOR)}")
+      end
     end
 
     # Puppet logging is global so this is class method to avoid confusion
