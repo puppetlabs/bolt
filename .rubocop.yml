@@ -29,6 +29,9 @@ Style/NumericLiterals:
 Style/NumericPredicate:
   Enabled: false
 
+Layout/EmptyLineAfterGuardClause:
+  Enabled: false
+
 Layout/IndentHeredoc:
   Enabled: false
 
