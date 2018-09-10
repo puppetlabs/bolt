@@ -1,0 +1,23 @@
+{
+  "target": {
+    "hostname": "test.delivery.puppetlabs.net",
+    "user": "root",
+    "password": "Q*****!",
+    "options": {
+    "host-key-check": "false"
+    }
+  },
+  "task": {
+    "name": "exec",
+    "metadata": {
+    "description": "Execute a command"
+    },
+    "file": {
+        "filename" : "echo.sh",
+        "file_content": "IyEvdXNyL2Jpbi9lbnYgcnVieQoKcmVxdWlyZSAnanNvbicKCmNvbW1hbmQgPSBKU09OLnBhcnNlKFNURElOLnJlYWQpWydjb21tYW5kJ10KCmV4ZWMoY29tbWFuZCkK\n"
+    }
+  },
+  "parameters": {
+    "command": "whoami"
+  }
+}
