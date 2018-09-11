@@ -21,6 +21,12 @@ describe Bolt::Config do
       config = Bolt::Config.new(boltdir, { 'concurrency' => 200 }, concurrency: 100)
       expect(config.concurrency).to eq(100)
     end
+
+    it "treats relative modulepath as relative to Boltdir" do
+      module_dirs = %w[site modules]
+      config = Bolt::Config.new(boltdir, 'modulepath' => module_dirs.join(File::PATH_SEPARATOR))
+      expect(config.modulepath).to eq(module_dirs.map { |dir| (boltdir.path + dir).to_s })
+    end
   end
 
   describe "deep_clone" do

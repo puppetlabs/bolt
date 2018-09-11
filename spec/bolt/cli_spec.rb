@@ -420,9 +420,11 @@ bar
     end
 
     describe "modulepath" do
-      it "accepts a modulepath directory" do
-        cli = Bolt::CLI.new(%w[command run --modulepath ./modules --nodes foo])
-        expect(cli.parse).to include(modulepath: ['./modules'])
+      it "treats relative modulepath as relative to pwd" do
+        site = File.expand_path('site')
+        modulepath = [site, 'modules'].join(File::PATH_SEPARATOR)
+        cli = Bolt::CLI.new(%W[command run --modulepath #{modulepath} --nodes foo])
+        expect(cli.parse).to include(modulepath: [site, File.expand_path('modules')])
       end
 
       it "generates an error message if no value is given" do
@@ -1735,8 +1737,9 @@ bar
 
   describe 'configfile' do
     let(:configdir) { File.join(__dir__, '..', 'fixtures', 'configs') }
+    let(:modulepath) { [File.expand_path('/foo/bar'), File.expand_path('/baz/qux')] }
     let(:complete_config) do
-      { 'modulepath' => "/foo/bar#{File::PATH_SEPARATOR}/baz/qux",
+      { 'modulepath' => modulepath.join(File::PATH_SEPARATOR),
         'inventoryfile' => File.join(__dir__, '..', 'fixtures', 'inventory', 'empty.yml'),
         'concurrency' => 14,
         'compile-concurrency' => 2,
@@ -1776,7 +1779,7 @@ bar
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-host-key-check])
         cli.parse
-        expect(cli.config.modulepath).to eq(['/foo/bar', '/baz/qux'])
+        expect(cli.config.modulepath).to eq(modulepath)
       end
     end
 

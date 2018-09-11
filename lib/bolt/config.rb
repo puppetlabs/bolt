@@ -148,11 +148,17 @@ module Bolt
         update_logs(data['log'])
       end
 
-      @modulepath = data['modulepath'].split(File::PATH_SEPARATOR) if data.key?('modulepath')
+      # Expand paths relative to the Boltdir. Any settings that came from the
+      # CLI will already be absolute, so the expand will be skipped.
+      if data.key?('modulepath')
+        @modulepath = data['modulepath'].split(File::PATH_SEPARATOR).map do |moduledir|
+          File.expand_path(moduledir, @boltdir.path)
+        end
+      end
 
-      @inventoryfile = data['inventoryfile'] if data.key?('inventoryfile')
+      @inventoryfile = File.expand_path(data['inventoryfile'], @boltdir.path) if data.key?('inventoryfile')
 
-      @hiera_config = data['hiera-config'] if data.key?('hiera-config')
+      @hiera_config = File.expand_path(data['hiera-config'], @boltdir.path) if data.key?('hiera-config')
       @compile_concurrency = data['compile-concurrency'] if data.key?('compile-concurrency')
 
       %w[concurrency format puppetdb color transport].each do |key|
