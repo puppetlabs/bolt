@@ -58,10 +58,10 @@ module Bolt
         callback&.call(type: :node_start, target: target)
 
         result = begin
-          yield
-        rescue StandardError => ex
-          Bolt::Result.from_exception(target, ex)
-        end
+                   yield
+                 rescue StandardError => ex
+                   Bolt::Result.from_exception(target, ex)
+                 end
 
         callback&.call(type: :node_result, result: result)
         result
