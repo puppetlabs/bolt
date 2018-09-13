@@ -24,6 +24,8 @@ For more details about specifying modules in a Puppetfile, see the [Puppetfile d
      mod 'myteam/app_foo', local: true
      ```
 
+     Alternately, any modules you don't want to manage with the Puppetfile can be manually installed to a different subdirectory in the Boltdir, such as `site`.
+
 4.   From a terminal, install the modules listed in the Puppetfile: `bolt puppetfile install`.
 
      By default, Bolt installs modules to the modules subdirectory inside the Boltdir. To override this location, update the modulepath setting in the Bolt config file.
