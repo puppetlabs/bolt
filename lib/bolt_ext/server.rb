@@ -25,6 +25,17 @@ class TransportAPI < Sinatra::Base
     200
   end
 
+  if ENV['RACK_ENV'] == 'dev'
+    get '/admin/gc' do
+      GC.start
+      200
+    end
+  end
+
+  get '/admin/gc_stat' do
+    [200, GC.stat.to_json]
+  end
+
   get '/500_error' do
     raise 'Unexpected error'
   end
