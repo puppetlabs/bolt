@@ -40,7 +40,7 @@ module Bolt
 
       @noop = noop
       @run_as = nil
-      @pool = Concurrent::ThreadPoolExecutor.new(max_threads: concurrency)
+      @pool = concurrency > 0 ? Concurrent::ThreadPoolExecutor.new(max_threads: concurrency) : nil
       @logger.debug { "Started with #{concurrency} max thread(s)" }
       @notifier = Bolt::Notifier.new
     end
@@ -60,6 +60,8 @@ module Bolt
     # defined by the transport. Yields each batch, along with the corresponding
     # transport, to the block in turn and returns an array of result promises.
     def queue_execute(targets)
+      raise 'No thread pool configured, please provide a non-zero concurrency' unless @pool
+
       targets.group_by(&:protocol).flat_map do |protocol, protocol_targets|
         transport = transport(protocol)
         report_transport(transport, protocol_targets.count)
@@ -111,8 +113,19 @@ module Bolt
     # transport, is yielded to the block in turn and the results all collected
     # into a single ResultSet.
     def batch_execute(targets, &block)
-      promises = queue_execute(targets, &block)
-      await_results(promises)
+      if @pool
+        promises = queue_execute(targets, &block)
+        await_results(promises)
+      else
+        results = targets.map do |target|
+          begin
+            yield transport(target.protocol), [target]
+          rescue StandardError, NotImplementedError => e
+            Bolt::Result.from_exception(target, e)
+          end
+        end
+        ResultSet.new(results)
+      end
     end
 
     def log_action(description, targets)
