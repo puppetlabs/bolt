@@ -19,14 +19,12 @@ module BoltSpec
         raise Error, "The transport must be either 'ssh' or 'winrm'"
       end
 
-      port = ENV["BOLT_#{tu}_PORT"] || default_port
-
       {
         protocol: transport,
         host: ENV["BOLT_#{tu}_HOST"] || "localhost",
         user: ENV["BOLT_#{tu}_USER"] || default_user,
         password: ENV["BOLT_#{tu}_PASSWORD"] || default_password,
-        port: port.to_i,
+        port: ENV["BOLT_#{tu}_PORT"] || default_port,
         key: ENV["BOLT_#{tu}_KEY"] || default_key
       }
     end

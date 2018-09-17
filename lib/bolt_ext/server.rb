@@ -4,7 +4,6 @@ require 'sinatra'
 require 'bolt'
 require 'bolt/task'
 require 'json'
-require 'json-schema'
 
 class TransportAPI < Sinatra::Base
   # This disables Sinatra's error page generation
@@ -22,14 +21,13 @@ class TransportAPI < Sinatra::Base
     content_type :json
 
     body = JSON.parse(request.body.read)
-    schema = "lib/bolt_ext/schemas/ssh-run_task.json"
-    schema_error = JSON::Validator.fully_validate(schema, body)
-    return [400, schema_error.join] if schema_error.any?
-
     keys = %w[user password port ssh-key-content connect-timeout run-as-command run-as
               tmpdir host-key-check known-hosts-content private-key-content sudo-password]
     opts = body['target'].select { |k, _| keys.include? k }
 
+    if opts['private-key-content'] && opts['password']
+      return [400, "Only include one of 'password' and 'private-key-content'"]
+    end
     if opts['private-key-content']
       opts['private-key'] = { 'key-data' => opts['private-key-content'] }
       opts.delete('private-key-content')
@@ -50,10 +48,6 @@ class TransportAPI < Sinatra::Base
     content_type :json
 
     body = JSON.parse(request.body.read)
-    schema = "lib/bolt_ext/schemas/winrm-run_task.json"
-    schema_error = JSON::Validator.fully_validate(schema, body)
-    return [400, schema_error.join] if schema_error.any?
-
     keys = %w[user password port connect-timeout ssl ssl-verify tmpdir cacert extensions]
     opts = body['target'].select { |k, _| keys.include? k }
     opts['protocol'] = 'winrm'
