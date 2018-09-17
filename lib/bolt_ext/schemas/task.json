@@ -1,5 +1,5 @@
 {
-  "id": "file:lib/bolt_ext/schemas/task.json",
+  "id": "file:task",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Task",
   "description": "Task schema for bolt-server",
