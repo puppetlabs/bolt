@@ -17,6 +17,7 @@ Gem::Specification.new do |spec|
   spec.license       = "Apache-2.0"
   spec.files         = Dir['exe/*'] +
                        Dir['lib/**/*.rb'] +
+                       Dir['lib/**/*.json'] +
                        Dir['libexec/*'] +
                        Dir['vendored/*.rb'] +
                        Dir['vendored/*/lib/**/*.rb'] +

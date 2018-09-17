@@ -61,7 +61,7 @@
       "required": ["hostname", "user"],
       "additionalProperties": false
     },
-    "task": { "$ref": "file:lib/bolt_ext/schemas/task.json"},
+    "task": { "$ref": "file:task"},
     "parameters": {
       "type": "object",
       "description": "JSON formatted parameters to be provided to task"
