@@ -10,6 +10,17 @@ class TransportAPI < Sinatra::Base
   # This disables Sinatra's error page generation
   set :show_exceptions, false
 
+  def initialize
+    super()
+    @schemas = {
+      "ssh-run_task" => JSON.parse(File.read(File.join(__dir__, 'schemas', 'ssh-run_task.json'))),
+      "winrm-run_task" => JSON.parse(File.read(File.join(__dir__, 'schemas', 'ssh-run_task.json')))
+    }
+    shared_schema = JSON::Schema.new(JSON.parse(File.read(File.join(__dir__, 'schemas', 'task.json'))),
+                                     Addressable::URI.parse("file:task"))
+    JSON::Validator.add_schema(shared_schema)
+  end
+
   get '/' do
     200
   end
@@ -22,8 +33,7 @@ class TransportAPI < Sinatra::Base
     content_type :json
 
     body = JSON.parse(request.body.read)
-    schema = "lib/bolt_ext/schemas/ssh-run_task.json"
-    schema_error = JSON::Validator.fully_validate(schema, body)
+    schema_error = JSON::Validator.fully_validate(@schemas["ssh-run_task"], body)
     return [400, schema_error.join] if schema_error.any?
 
     keys = %w[user password port ssh-key-content connect-timeout run-as-command run-as
@@ -50,8 +60,7 @@ class TransportAPI < Sinatra::Base
     content_type :json
 
     body = JSON.parse(request.body.read)
-    schema = "lib/bolt_ext/schemas/winrm-run_task.json"
-    schema_error = JSON::Validator.fully_validate(schema, body)
+    schema_error = JSON::Validator.fully_validate(@schemas["winrm-run_task"], body)
     return [400, schema_error.join] if schema_error.any?
 
     keys = %w[user password port connect-timeout ssl ssl-verify tmpdir cacert extensions]
