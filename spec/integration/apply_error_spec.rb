@@ -4,7 +4,6 @@ require 'spec_helper'
 require 'bolt_spec/conn'
 require 'bolt_spec/files'
 require 'bolt_spec/integration'
-require 'bolt/catalog'
 
 describe "errors gracefully attempting to apply a manifest block" do
   include BoltSpec::Conn
