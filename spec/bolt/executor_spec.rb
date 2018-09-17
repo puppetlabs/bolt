@@ -396,12 +396,6 @@ describe "Bolt::Executor" do
 
       expect(targs).to eq(targets)
     end
-
-    it "queue_execute errors" do
-      expect {
-        executor.queue_execute(targets) do |_transport, _batch|; end
-      }.to raise_error('No thread pool configured, please provide a non-zero concurrency')
-    end
   end
 
   it "returns an exception result if the connect raises an unhandled error" do
