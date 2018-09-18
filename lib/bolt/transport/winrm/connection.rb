@@ -99,6 +99,7 @@ module Bolt
           return nil if @shell_initialized
           result = execute(<<-PS)
 $ENV:PATH += ";${ENV:ProgramFiles}\\Puppet Labs\\Puppet\\bin\\;" +
+"${ENV:ProgramFiles}\\Puppet Labs\\Puppet\\puppet\\bin;" +
 "${ENV:ProgramFiles}\\Puppet Labs\\Puppet\\sys\\ruby\\bin\\"
 $ENV:RUBYLIB = "${ENV:ProgramFiles}\\Puppet Labs\\Puppet\\puppet\\lib;" +
 "${ENV:ProgramFiles}\\Puppet Labs\\Puppet\\facter\\lib;" +
