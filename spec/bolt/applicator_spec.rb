@@ -15,12 +15,13 @@ describe Bolt::Applicator do
                                'token' => 'token')
   end
   let(:pdb_client) { Bolt::PuppetDB::Client.new(config) }
-  let(:applicator) { Bolt::Applicator.new(inventory, executor, :mod, pdb_client, nil, 2) }
+  let(:modulepath) { [Bolt::PAL::BOLTLIB_PATH, Bolt::PAL::MODULES_PATH] }
+  let(:applicator) { Bolt::Applicator.new(inventory, executor, modulepath, [], pdb_client, nil, 2) }
 
   let(:input) {
     {
       code_ast: :ast,
-      modulepath: :mod,
+      modulepath: modulepath,
       pdb_config: config.to_hash,
       hiera_config: nil,
       target: {
@@ -135,7 +136,9 @@ describe Bolt::Applicator do
 
   context 'with Puppet mocked' do
     before(:each) do
-      allow(Puppet).to receive(:lookup).and_return(double(:type, type: nil, modules: []))
+      env = Puppet::Node::Environment.create(:testing, modulepath)
+      allow(Puppet).to receive(:lookup).with(:pal_script_compiler).and_return(double(:script_compiler, type: nil))
+      allow(Puppet).to receive(:lookup).with(:current_environment).and_return(env)
       allow(Puppet::Pal).to receive(:assert_type)
       allow(Puppet::Pops::Serialization::ToDataConverter).to receive(:convert).and_return(:ast)
     end

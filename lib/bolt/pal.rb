@@ -44,6 +44,7 @@ module Bolt
       # This makes sure we don't accidentally create puppet dirs
       with_puppet_settings { |_| nil }
 
+      @original_modulepath = modulepath
       @modulepath = [BOLTLIB_PATH, *modulepath, MODULES_PATH]
       @hiera_config = hiera_config
       @max_compiles = max_compiles
@@ -128,6 +129,10 @@ module Bolt
           inventory,
           executor,
           @modulepath,
+          # Skip syncing built-in plugins, since we vendor some Puppet 6
+          # versions of "core" types, which are already present on the agent,
+          # but may cause issues on Puppet 5 agents.
+          @original_modulepath,
           pdb_client,
           @hiera_config,
           @max_compiles

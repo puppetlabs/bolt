@@ -12,10 +12,11 @@ require 'bolt/util/puppet_log_level'
 
 module Bolt
   class Applicator
-    def initialize(inventory, executor, modulepath, pdb_client, hiera_config, max_compiles)
+    def initialize(inventory, executor, modulepath, plugin_dirs, pdb_client, hiera_config, max_compiles)
       @inventory = inventory
       @executor = executor
       @modulepath = modulepath
+      @plugin_dirs = plugin_dirs
       @pdb_client = pdb_client
       @hiera_config = hiera_config ? validate_hiera_config(hiera_config) : nil
 
@@ -222,7 +223,7 @@ module Bolt
       sio = StringIO.new
       output = Minitar::Output.new(Zlib::GzipWriter.new(sio))
 
-      Puppet.lookup(:current_environment).modules.each do |mod|
+      Puppet.lookup(:current_environment).override_with(modulepath: @plugin_dirs).modules.each do |mod|
         search_dirs = yield mod
 
         parent = Pathname.new(mod.path).parent
