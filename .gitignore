@@ -34,9 +34,21 @@ Gemfile.local
 .byebug_history
 
 acceptance/hosts.yaml
+
 modules/apply
 modules/facts
 modules/package
 modules/puppet_agent
 modules/puppet_conf
 modules/service
+
+modules/augeas_core/
+modules/cron_core/
+modules/host_core/
+modules/mount_core/
+modules/scheduled_task/
+modules/selinux_core/
+modules/sshkeys_core/
+modules/yumrepo_core/
+modules/zfs_core/
+modules/zone_core/
