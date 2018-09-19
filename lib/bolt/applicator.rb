@@ -199,9 +199,10 @@ module Bolt
             @executor.with_node_logging("Applying manifest block", batch) do
               arguments = { 'catalog' => future.value, 'plugins' => plugins, '_noop' => options['_noop'] }
               raise future.reason if future.rejected?
-              result = transport.batch_task(batch, catalog_apply_task, arguments, options, &notify)
-              result = provide_puppet_missing_errors(result)
-              identify_resource_failures(result)
+              results = transport.batch_task(batch, catalog_apply_task, arguments, options, &notify)
+              Array(results).map do |result|
+                identify_resource_failures(provide_puppet_missing_errors(result))
+              end
             end
           end
         end
