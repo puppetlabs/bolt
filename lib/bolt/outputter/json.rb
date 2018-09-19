@@ -44,7 +44,6 @@ module Bolt
       end
 
       def print_task_info(task)
-        replace_data_type(task['parameters'])
         @stream.puts task.to_json
       end
 

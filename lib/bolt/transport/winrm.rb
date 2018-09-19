@@ -108,19 +108,18 @@ catch
 
       def run_task(target, task, arguments, _options = {})
         if from_api?(task)
-          task.input_method = powershell_file?(task["file"]["filename"]) ? 'powershell' : 'both'
-          executable = { filename: task["file"]["filename"],
-                         file_content: StringIO.new(Base64.decode64(task.file['file_content'])) }
+          executable = task.file['filename']
+          file_content = StringIO.new(Base64.decode64(task.file['file_content']))
+          input_method = task.metadata['input_method']
         else
-          executable = target.select_impl(task, PROVIDED_FEATURES)
-          raise "No suitable implementation of #{task.name} for #{target.name}" unless executable
+          implementation = task.select_implementation(target, PROVIDED_FEATURES)
+          executable = implementation['path']
+          input_method = implementation['input_method']
         end
+        input_method ||= powershell_file?(executable) ? 'powershell' : 'both'
 
         # unpack any Sensitive data
         arguments = unwrap_sensitive_args(arguments)
-
-        input_method = task.input_method
-        input_method ||= powershell_file?(executable) ? 'powershell' : 'both'
         with_connection(target) do |conn|
           if STDIN_METHODS.include?(input_method)
             stdin = JSON.dump(arguments)
@@ -138,9 +137,7 @@ catch
 
           conn.with_remote_tempdir do |dir|
             remote_task_path = if from_api?(task)
-                                 conn.write_executable_from_content(dir,
-                                                                    executable[:file_content],
-                                                                    executable[:filename])
+                                 conn.write_executable_from_content(dir, file_content, executable)
                                else
                                  conn.write_remote_executable(dir, executable)
                                end

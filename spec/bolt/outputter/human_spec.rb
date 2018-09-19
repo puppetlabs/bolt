@@ -94,11 +94,13 @@ c1   d
   it "formats a task" do
     task = {
       'name' => 'cinnamon_roll',
-      'description' => 'A delicious sweet bun',
-      'parameters' => {
-        'icing' => {
-          'type' => 'Cream cheese',
-          'description' => 'Rich, tangy, sweet'
+      'metadata' => {
+        'description' => 'A delicious sweet bun',
+        'parameters' => {
+          'icing' => {
+            'type' => 'Cream cheese',
+            'description' => 'Rich, tangy, sweet'
+          }
         }
       }
     }
@@ -120,15 +122,17 @@ PARAMETERS:
   it 'converts Data (undef) to Any' do
     task = {
       'name' => 'sticky_bun',
-      'description' => 'A delicious sweet bun with nuts',
-      'parameters' => {
-        'glaze' => {
-          'type' => 'Sticky',
-          'description' => 'Sweet'
-        },
-        'pecans' => {
-          'description' => 'The best kind of nut',
-          'type' => 'Data'
+      'metadata' => {
+        'description' => 'A delicious sweet bun with nuts',
+        'parameters' => {
+          'glaze' => {
+            'type' => 'Sticky',
+            'description' => 'Sweet'
+          },
+          'pecans' => {
+            'description' => 'The best kind of nut',
+            'type' => 'Data'
+          }
         }
       }
     }
@@ -143,7 +147,7 @@ bolt task run --nodes <node-name> sticky_bun glaze=<value> pecans=<value>
 PARAMETERS:
 - glaze: Sticky
     Sweet
-- pecans: Any
+- pecans: Data
     The best kind of nut
 
     TASK_OUTPUT
