@@ -387,6 +387,23 @@ describe "Bolt::Executor" do
     end
   end
 
+  context "with concurrency 0" do
+    let(:targets) {
+      [Bolt::Target.new('node1'), Bolt::Target.new('node2')]
+    }
+
+    let(:executor) { Bolt::Executor.new(0) }
+
+    it "batch_execute runs sequentially" do
+      targs = []
+      executor.batch_execute(targets) do |_transport, batch|
+        targs.concat(batch)
+      end
+
+      expect(targs).to eq(targets)
+    end
+  end
+
   it "returns an exception result if the connect raises an unhandled error" do
     node_results.each_key do |_target|
       expect(ssh).to receive(:with_connection).and_raise("reset")

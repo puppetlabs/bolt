@@ -18,11 +18,25 @@ class TransportAPI < Sinatra::Base
     shared_schema = JSON::Schema.new(JSON.parse(File.read(File.join(__dir__, 'schemas', 'task.json'))),
                                      Addressable::URI.parse("file:task"))
     JSON::Validator.add_schema(shared_schema)
+
+    @executor = Bolt::Executor.new(0, load_config: false)
+
     super(app)
   end
 
   get '/' do
     200
+  end
+
+  if ENV['RACK_ENV'] == 'dev'
+    get '/admin/gc' do
+      GC.start
+      200
+    end
+  end
+
+  get '/admin/gc_stat' do
+    [200, GC.stat.to_json]
   end
 
   get '/500_error' do
@@ -49,10 +63,8 @@ class TransportAPI < Sinatra::Base
     task = Bolt::Task.new(body['task'])
     parameters = body['parameters'] || {}
 
-    executor = Bolt::Executor.new(load_config: false)
-
     # Since this will only be on one node we can just return the first result
-    results = executor.run_task(target, task, parameters)
+    results = @executor.run_task(target, task, parameters)
     [200, results.first.to_json]
   end
 
@@ -70,10 +82,8 @@ class TransportAPI < Sinatra::Base
     task = Bolt::Task.new(body['task'])
     parameters = body['parameters'] || {}
 
-    executor = Bolt::Executor.new(load_config: false)
-
     # Since this will only be on one node we can just return the first result
-    results = executor.run_task(target, task, parameters)
+    results = @executor.run_task(target, task, parameters)
     [200, results.first.to_json]
   end
 
