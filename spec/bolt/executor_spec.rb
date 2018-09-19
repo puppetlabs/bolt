@@ -366,12 +366,18 @@ describe "Bolt::Executor" do
           result
         end
       }
-      # without pausing here running seems to evaluate to 0
-      sleep(0.1)
 
-      running = state.reduce(0) do |acc, (_k, v)|
-        acc += 1 if v[:running]
-        acc
+      running = 0
+      time = 0
+      timer = Time.now
+
+      while (time < 5) && (running != 2)
+        sleep(0.1)
+        running = state.reduce(0) do |acc, (_k, v)|
+          acc += 1 if v[:running]
+          acc
+        end
+        time = Time.now - timer
       end
 
       expect(running).to eq(2)
