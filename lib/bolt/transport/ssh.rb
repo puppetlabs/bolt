@@ -174,7 +174,7 @@ module Bolt
       def make_wrapper_stringio(task_path, stdin)
         StringIO.new(<<-SCRIPT)
 #!/bin/sh
-'#{task_path}' <<EOF
+'#{task_path}' <<'EOF'
 #{stdin}
 EOF
 SCRIPT
