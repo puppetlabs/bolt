@@ -107,15 +107,11 @@ module Bolt
     end
 
     def user
-      Addressable::URI.unencode_component(
-        @uri_obj.user || @user
-      )
+      Addressable::URI.unencode_component(@uri_obj.user) || @user
     end
 
     def password
-      Addressable::URI.unencode_component(
-        @uri_obj.password || @password
-      )
+      Addressable::URI.unencode_component(@uri_obj.password) || @password
     end
   end
 end

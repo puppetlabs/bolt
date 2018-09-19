@@ -7,6 +7,7 @@ describe Bolt::Target do
   describe "when parsing userinfo" do
     let(:user)     { 'günther' }
     let(:password) { 'foobar' }
+    let(:complex)  { '~%F3/-w@ho!#$%^* ' }
 
     it "accepts userinfo when a port is specified" do
       uri = Bolt::Target.new("ssh://#{user}:#{password}@neptune:2222")
@@ -27,13 +28,13 @@ describe Bolt::Target do
     end
 
     it "defaults user from options" do
-      uri = Bolt::Target.new("neptune", 'user' => 'none')
-      expect(uri.user).to eq('none')
+      uri = Bolt::Target.new("neptune", 'user' => complex)
+      expect(uri.user).to eq(complex)
     end
 
     it "defaults password from options" do
-      uri = Bolt::Target.new("neptune", 'password' => 'none')
-      expect(uri.password).to eq('none')
+      uri = Bolt::Target.new("neptune", 'password' => complex)
+      expect(uri.password).to eq(complex)
     end
 
     it "defaults port from options" do
