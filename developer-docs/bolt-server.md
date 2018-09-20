@@ -192,11 +192,11 @@ For example:
 }
 ```
 
-## Response 
+### Response 
 If the task runs the response will have status 200.
 The response will be a standard bolt Result JSON object.
 
-## Setup for manual testing changes
+## Install from Source
 
 The following example walks through the setup to get the bolt-server running on an Ubuntu 16.04 vmpooler node. 
 
