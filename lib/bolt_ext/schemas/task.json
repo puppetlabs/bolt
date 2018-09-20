@@ -4,7 +4,6 @@
   "title": "Task",
   "description": "Task schema for bolt-server",
   "type": "object",
-  "description": "The task is a JSON object which includes the following keys",
   "properties": {
     "name": {
       "type": "string",
@@ -29,11 +28,19 @@
             "type": {
               "type": "string",
               "description": "The type the parameter should accept"
+            },
+            "sensitive": {
+              "description": "Whether the task runner should treat the parameter value as sensitive",
+              "type": "boolean"
             }
           }
+        },
+        "input_method": {
+          "type": "string",
+          "enum": ["stdin", "environment", "powershell"],
+          "description": "What input method should be used to pass params to the task"
         }
-      },
-      "additionalProperties": false
+      }
     },
     "file": {
       "type": "object",
