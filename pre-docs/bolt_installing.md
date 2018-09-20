@@ -201,7 +201,8 @@ If Ruby is already included in your operating system, verify that it is version 
     ```
     bolt --help
     ```
-
+4. Copy the contents of [bolt's Puppetfile](../Puppetfile) to `~/.puppetlabs/bolt/Puppetfile`
+5. Run `bolt puppetfile install`
 
 ## Analytics data collection
 

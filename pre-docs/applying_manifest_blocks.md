@@ -8,6 +8,10 @@ Within a plan, you can use Bolt to apply blocks of Puppet code (manifest blocks)
 
 [Writing plans](writing_plans.md)
 
+**Note:** If you installed bolt as a ruby gem, you'll want to:
+1. Create a Puppetfile with the contents of [bolt's Puppetfile](../Puppetfile) at `~/.puppetlabs/bolt/Puppetfile`
+2. Run `bolt puppetfile install`
+
 ## Create a sample manifest for nginx on Linux
 
 Create a manifest to set up a web server with [nginx](https://nginx.org) and run it as a plan. 
