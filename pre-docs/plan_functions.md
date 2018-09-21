@@ -200,7 +200,7 @@ puppetdb_fact(['app.example.com', 'db.example.com'])
 
 ### puppetdb\_query
 
-Makes a query to puppetdb using Bolt's PuppetDB client.
+Makes a query to [puppetdb](https://puppet.com/docs/puppetdb/latest/index.html) using Bolt's PuppetDB client.
 
 ```
 puppetdb_query(Variant[String, Array[Data]] $query)
@@ -208,7 +208,7 @@ puppetdb_query(Variant[String, Array[Data]] $query)
 
  *Returns:* `Array[Data]` Results of the PuppetDB query.
 
--    **query** `Variant[String, Array[Data]]` A PQL query.
+-    **query** `Variant[String, Array[Data]]` A PQL query. [Learn more about Puppet's query language, PQL](https://puppet.com/docs/puppetdb/latest/api/query/tutorial-pql.html)
 
  **Example:** Request certnames for all nodes
 
