@@ -1,43 +1,48 @@
 # Bolt Service
 
-This project creates a docker image for the bolt service. 
-Currently the service generates test certificates that are copied into the
-image. For production use these should be overwritten with your own certs,
-see details below.
+Bolt service is a systemd service that runs a puma webserver implementing the
+[bolt-server API](../developer-docs/bolt_server.md). This project creates a
+docker image for the bolt service.  
 
+## Generating Certs
 
-## Building
-Run make to build the project, this generates test certs and creates a docker
-image called puppet/bolt-service:latest
+The first thing to do is generate certificates for the bolt service to use
 
 ```
-make
+make certs
 ```
 
-## Running the service
-You can run the service by creating a new container. **N.B** by default the Service
-listens on port 62658, so you must ensure it is exposed.
+## Build the Image
+
+This uses [Docker]() to build the image used to create the container
+
+```
+docker build --rm -t puppet/bolt-server:latest
+```
+
+## Run the Service
+
+You can run the service by creating a new container based on the image you
+just built. **N.B** by default the Service listens on port 62658, so you must
+ensure it is exposed.
 ```
 docker run -it --rm -p 62658:62658 --name "bolt-service" puppet/bolt-service:latest
 ```
-
-Alternatively you can use the run target in the makefile
-```
-make run
-```
-
 ## Testing the Service
 You can use curl to test the service. A helper script with an example request
-can be found in the test folder. This executes a simple ruby script that executes
-`whoami`.
+can be found in the test directory. This executes a simple ruby script that runs `whoami`.
 
 To run the test do the following:
 
-1. Create a linux VM running SSH
-2. Edit `test/request.json` and set the host, username and password fields
-3. Run `test/test.sh`
+1. Edit `test/request.json` and set the host, username and password fields
+2. Run 
 ```
-test/test.sh
+curl -X POST -H "Content-Type: application/json" \
+  -d @test/request.json \
+  -E certs/127.0.0.1.crt \
+  --key certs/127.0.0.1 \
+  --cacert certs/bolt-server-ca.crt \
+  https://localhost:62658/ssh/run_task
 ```
 
 The output should look like this:
@@ -51,15 +56,14 @@ starting the container. For example:
 
 ```
 docker run -it --rm -p 62658:62658 \
-  -v <Path to bolt>/bolt-service/certs:/etc/puppetlabs/bolt-server/ssl/ \
+  -v certs:/etc/puppetlabs/bolt-server/ssl/ \
   --name "bolt-service" puppet/bolt-service:latest
 ```
 
-**N.B** This assumes you have named your certs localhost.crt, localhost.key and
-bolt-server-ca.crt. If you use different names you will need to override the
-SSL config by creating a local file and mounting that into the container. For example:
+**N.B** This assumes you have named your certs localhost.crt, localhost.key
+and bolt-server-ca.crt. If you use different names you will need to modify
+the [SSL config](resources/bolt-server.conf)
 
-/Users/me/bolt/bolt-service/conf.d/bolt-server.conf
 ```
 bolt-server: {
      ssl-cert: "/etc/puppetlabs/bolt-server/ssl/custom_cert.crt"
@@ -68,9 +72,11 @@ bolt-server: {
 }
 ```
 
+Then rebuild the container to contain your new config file
+
 ```
+docker build $DOCKER_OPTS --rm -t puppet/bolt-server:latest
 docker run -it --rm -p 62658:62658 \
- -v <Path to bolt>/bolt-service/certs:/etc/puppetlabs/bolt-server/ssl/ \
- -v <Path to bolt>/bolt-service/conf.d/:/etc/puppetlabs/bolt-server/conf.d/ \
+ -v certs:/etc/puppetlabs/bolt-server/ssl/ \
  --name "bolt-service" puppet/bolt-service:latest
 ```
