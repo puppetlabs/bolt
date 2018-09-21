@@ -66,7 +66,9 @@ begin
              Puppet::Transaction::Report.new('apply')
            end
 
-  Puppet.override(current_environment: env, loaders: Puppet::Pops::Loaders.new(env)) do
+  Puppet.override(current_environment: env,
+                  environments: Puppet::Environments::Static.new(env),
+                  loaders: Puppet::Pops::Loaders.new(env)) do
     catalog = Puppet::Resource::Catalog.from_data_hash(args['catalog']).to_ral
     catalog.environment = env.name.to_s
     catalog.environment_instance = env
