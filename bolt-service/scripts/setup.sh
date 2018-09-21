@@ -4,14 +4,13 @@ BOLT_SERVER_PACKAGE=pe-bolt-server_0.22.0.7.g3257f59-1bionic_amd64.deb
 
 # Install Puppet-Agent and Bolt Server
 apt update -y
-apt install -y curl vim
+apt install -y curl
 mkdir /tmp/bolt && pushd /tmp/bolt
 # Setup Puppet Agent Repo
 curl -O http://nightlies.puppet.com/apt/puppet6-nightly-release-bionic.deb && apt install -y ./puppet6-nightly-release-bionic.deb && rm ./puppet6-nightly-release-bionic.deb && apt update -y
 
 # Install PE Package
-curl -O https://artifactory.delivery.puppetlabs.net/artifactory/debian__local/pool/development/pe-bolt-server/3257f5940e3d4cebfa60ff9a06540f3b689020a6/ubuntu-18.04/${BOLT_SERVER_PACKAGE}
-apt install -y ./${BOLT_SERVER_PACKAGE}
+apt install -y pe-bolt-server
 popd
 rm -rf /tmp/bolt
 
@@ -26,7 +25,7 @@ bolt-server: {
   ssl-cert: "/etc/puppetlabs/bolt-server/ssl/localhost.crt"
   ssl-key: "/etc/puppetlabs/bolt-server/ssl/localhost.key"
   ssl-ca-cert: "/etc/puppetlabs/bolt-server/ssl/bolt-server-ca.crt"
-  port: 8144
+  port: 62658
   host: 0.0.0.0
 }
 EOF

@@ -22,4 +22,4 @@ image: certs
 
 run:
 	@echo "Starting Bolt Service on localhost:8144"
-	@docker run -it --rm -p 8144:8144 --name "bolt-service" puppet/bolt-service:latest
+	@docker run -it --rm -p 62658:62658 --name "bolt-service" puppet/bolt-service:latest
