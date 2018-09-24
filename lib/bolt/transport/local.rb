@@ -31,9 +31,7 @@ module Bolt
       def in_tmpdir(base)
         args = base ? [nil, base] : []
         Dir.mktmpdir(*args) do |dir|
-          Dir.chdir(dir) do
-            yield dir
-          end
+          yield dir
         end
       end
       private :in_tmpdir
@@ -49,7 +47,7 @@ module Bolt
           dest = File.join(dir, File.basename(script))
           copy_file(script, dest)
           File.chmod(0o750, dest)
-          yield dest
+          yield dest, dir
         end
       end
       private :with_tmpscript
@@ -60,14 +58,14 @@ module Bolt
       end
 
       def run_command(target, command, _options = {})
-        in_tmpdir(target.options['tmpdir']) do |_|
-          output = @conn.execute(command, {})
+        in_tmpdir(target.options['tmpdir']) do |dir|
+          output = @conn.execute(command, dir: dir)
           Bolt::Result.for_command(target, output.stdout.string, output.stderr.string, output.exit_code)
         end
       end
 
       def run_script(target, script, arguments, _options = {})
-        with_tmpscript(File.absolute_path(script), target.options['tmpdir']) do |file|
+        with_tmpscript(File.absolute_path(script), target.options['tmpdir']) do |file, dir|
           logger.debug "Running '#{file}' with #{arguments}"
 
           # unpack any Sensitive data AFTER we log
@@ -77,7 +75,7 @@ module Bolt
             # argument as the entire command string for script paths containing spaces.
             arguments = ['']
           end
-          output = @conn.execute(file, *arguments, {})
+          output = @conn.execute(file, *arguments, dir: dir)
           Bolt::Result.for_command(target, output.stdout.string, output.stderr.string, output.exit_code)
         end
       end
@@ -93,11 +91,11 @@ module Bolt
         stdin = STDIN_METHODS.include?(input_method) ? JSON.dump(unwrapped_arguments) : nil
         env = ENVIRONMENT_METHODS.include?(input_method) ? envify_params(unwrapped_arguments) : nil
 
-        with_tmpscript(executable, target.options['tmpdir']) do |script|
+        with_tmpscript(executable, target.options['tmpdir']) do |script, dir|
           # log the arguments with sensitive data redacted, do NOT log unwrapped_arguments
           logger.debug("Running '#{script}' with #{arguments}")
 
-          output = @conn.execute(script, stdin: stdin, env: env)
+          output = @conn.execute(script, stdin: stdin, env: env, dir: dir)
           Bolt::Result.for_task(target, output.stdout.string, output.stderr.string, output.exit_code)
         end
       end
