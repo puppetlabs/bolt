@@ -82,33 +82,35 @@ describe "when runnning over the ssh transport", ssh: true do
       { 'format' => 'json',
         'modulepath' => modulepath,
         'ssh' => {
+          'user' => user,
+          'password' => password,
           'host-key-check' => false
         } }
     end
+    let(:uri) { (1..2).map { |i| "#{conn_uri('ssh')}?id=#{i}" }.join(',') }
+    let(:config_flags) { %W[--nodes #{uri}] }
 
-    let(:config_flags) { %W[--nodes #{uri} --password #{password}] }
-
-    it 'runs a command' do
+    it 'runs multiple commands' do
       with_tempfile_containing('conf', YAML.dump(config)) do |conf|
-        result = run_one_node(%W[command run #{whoami} --configfile #{conf.path}] + config_flags)
-        expect(result['stdout'].strip).to eq(user)
+        result = run_nodes(%W[command run #{whoami} --configfile #{conf.path}] + config_flags)
+        expect(result.map { |r| r['stdout'].strip }).to eq([user, user])
       end
     end
 
-    it 'runs a task', :reset_puppet_settings do
+    it 'runs multiple tasks', :reset_puppet_settings do
       with_tempfile_containing('conf', YAML.dump(config)) do |conf|
-        result = run_one_node(%W[task run #{stdin_task} message=somemessage --configfile #{conf.path}] + config_flags)
-        expect(result['message'].strip).to eq("somemessage")
+        result = run_nodes(%W[task run #{stdin_task} message=somemessage --configfile #{conf.path}] + config_flags)
+        expect(result.map { |r| r['message'].strip }).to eq(%w[somemessage somemessage])
       end
     end
 
-    it 'runs a task as a specified user', :reset_puppet_settings do
+    it 'runs multiple tasks as a specified user', :reset_puppet_settings do
       config['ssh']['run-as'] = user
 
       with_tempfile_containing('conf', YAML.dump(config)) do |conf|
-        result = run_one_node(%W[command run #{whoami} --configfile #{conf.path}
-                                 --sudo-password #{password}] + config_flags)
-        expect(result['stdout'].strip).to eq(user)
+        result = run_nodes(%W[command run #{whoami} --configfile #{conf.path}
+                              --sudo-password #{password}] + config_flags)
+        expect(result.map { |r| r['stdout'].strip }).to eq([user, user])
       end
     end
   end
