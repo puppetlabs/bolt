@@ -34,11 +34,11 @@ can be found in the test directory. This executes a simple ruby script that runs
 
 To run the test do the following:
 
-1. Edit `test/request.json` and set the host, username and password fields
+1. Edit `resources/request.json` and set the host, username and password fields
 2. Run 
 ```
 curl -X POST -H "Content-Type: application/json" \
-  -d @test/request.json \
+  -d @resources/request.json \
   -E certs/127.0.0.1.crt \
   --key certs/127.0.0.1 \
   --cacert certs/bolt-server-ca.crt \
