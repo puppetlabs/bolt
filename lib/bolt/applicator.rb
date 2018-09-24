@@ -40,16 +40,18 @@ module Bolt
     def custom_facts_task
       @custom_facts_task ||= begin
         path = File.join(libexec, 'custom_facts.rb')
-        impl = { 'name' => 'custom_facts.rb', 'path' => path, 'requirements' => [], 'supports_noop' => true }
-        Task.new(name: 'custom_facts', implementations: [impl], input_method: 'stdin')
+        file = { 'name' => 'custom_facts.rb', 'path' => path }
+        metadata = { 'supports_noop' => true, 'input_method' => 'stdin' }
+        Bolt::Task.new(name: 'custom_facts', files: [file], metadata: metadata)
       end
     end
 
     def catalog_apply_task
       @catalog_apply_task ||= begin
         path = File.join(libexec, 'apply_catalog.rb')
-        impl = { 'name' => 'apply_catalog.rb', 'path' => path, 'requirements' => [], 'supports_noop' => true }
-        Task.new(name: 'apply_catalog', implementations: [impl], input_method: 'stdin')
+        file = { 'name' => 'apply_catalog.rb', 'path' => path }
+        metadata = { 'supports_noop' => true, 'input_method' => 'stdin' }
+        Bolt::Task.new(name: 'apply_catalog', files: [file], metadata: metadata)
       end
     end
 

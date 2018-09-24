@@ -43,11 +43,13 @@ describe "Bolt::Outputter::JSON" do
   it "formats a task" do
     task = {
       'name' => 'cinnamon roll',
-      'description' => 'A delicious sweet bun',
-      'parameters' => {
-        'icing' => {
-          'type' => 'Cream cheese',
-          'description' => 'Rich, tangy, sweet'
+      'metadata' => {
+        'description' => 'A delicious sweet bun',
+        'parameters' => {
+          'icing' => {
+            'type' => 'Cream cheese',
+            'description' => 'Rich, tangy, sweet'
+          }
         }
       }
     }

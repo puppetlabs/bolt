@@ -5,6 +5,7 @@ require 'bolt/executor'
 require 'bolt/result'
 require 'bolt/result_set'
 require 'bolt/target'
+require 'bolt/task'
 
 describe 'apply_prep' do
   include PuppetlabsSpec::Fixtures
@@ -27,27 +28,23 @@ describe 'apply_prep' do
     let(:hostnames) { %w[a.b.com x.y.com] }
     let(:targets) { hostnames.map { |h| Bolt::Target.new(h) } }
     let(:fact) { { 'osfamily' => 'none' } }
-    let(:custom_facts_task) { mock('custom_facts_task') }
-    let(:version_task) { mock('version_task') }
-    let(:install_task) { mock('install_task') }
-    let(:service_task) { mock('service_task') }
+    let(:custom_facts_task) { Bolt::Task.new(name: 'custom_facts_task') }
+    let(:version_task) { Bolt::Task.new(name: 'puppet_agent::version') }
+    let(:install_task) { Bolt::Task.new(name: 'puppet_agent::install') }
+    let(:service_task) { Bolt::Task.new(name: 'service') }
 
     before(:each) do
       applicator.stubs(:build_plugin_tarball).returns(:tarball)
       applicator.stubs(:custom_facts_task).returns(custom_facts_task)
-      custom_facts_task.stubs(:name).returns('custom_facts_task')
 
-      task1 = mock('version_task_sig')
-      task1.stubs(:task).returns(version_task)
-      version_task.stubs(:name).returns('puppet_agent::version')
+      task1 = mock('version_task')
+      task1.stubs(:task_hash).returns(name: 'puppet_agent::version')
       Puppet::Pal::ScriptCompiler.any_instance.stubs(:task_signature).with('puppet_agent::version').returns(task1)
       task2 = mock('install_task')
-      task2.stubs(:task).returns(install_task)
-      install_task.stubs(:name).returns('puppet_agent::install')
+      task2.stubs(:task_hash).returns(name: 'puppet_agent::install')
       Puppet::Pal::ScriptCompiler.any_instance.stubs(:task_signature).with('puppet_agent::install').returns(task2)
-      task3 = mock('service_task_sig')
-      task3.stubs(:task).returns(service_task)
-      service_task.stubs(:name).returns('service')
+      task3 = mock('service_task')
+      task3.stubs(:task_hash).returns(name: 'service')
       Puppet::Pal::ScriptCompiler.any_instance.stubs(:task_signature).with('service').returns(task3)
     end
 

@@ -224,7 +224,7 @@ module Bolt
         arguments['_task'] = task.name
 
         results = batch_execute(targets) do |transport, batch|
-          with_node_logging("Running task #{task.name} with '#{arguments}' via #{task.input_method}", batch) do
+          with_node_logging("Running task #{task.name} with '#{arguments}'", batch) do
             transport.batch_task(batch, task, arguments, options, &notify)
           end
         end

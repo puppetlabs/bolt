@@ -119,26 +119,23 @@ module Bolt
         task_info = +""
         usage = +"bolt task run --nodes <node-name> #{task['name']}"
 
-        if task['parameters']
-          replace_data_type(task['parameters'])
-          task['parameters'].each do |k, v|
-            pretty_params << "- #{k}: #{v['type']}\n"
-            pretty_params << "    #{v['description']}\n" if v['description']
-            usage << if v['type'].is_a?(Puppet::Pops::Types::POptionalType)
-                       " [#{k}=<value>]"
-                     else
-                       " #{k}=<value>"
-                     end
-          end
+        task['metadata']['parameters']&.each do |k, v|
+          pretty_params << "- #{k}: #{v['type'] || 'Any'}\n"
+          pretty_params << "    #{v['description']}\n" if v['description']
+          usage << if v['type'].is_a?(Puppet::Pops::Types::POptionalType)
+                     " [#{k}=<value>]"
+                   else
+                     " #{k}=<value>"
+                   end
         end
 
-        usage << " [--noop]" if task['supports_noop']
+        usage << " [--noop]" if task['metadata']['supports_noop']
 
         task_info << "\n#{task['name']}"
-        task_info << " - #{task['description']}" if task['description']
+        task_info << " - #{task['metadata']['description']}" if task['metadata']['description']
         task_info << "\n\n"
         task_info << "USAGE:\n#{usage}\n\n"
-        task_info << "PARAMETERS:\n#{pretty_params}\n" if task['parameters']
+        task_info << "PARAMETERS:\n#{pretty_params}\n" unless pretty_params.empty?
         @stream.puts(task_info)
       end
 

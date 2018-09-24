@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
+require 'bolt/applicator'
 require 'bolt/executor'
 require 'bolt/error'
 require 'bolt/plan_result'
 require 'bolt/util'
-require 'bolt/applicator'
 
 module Bolt
   class PAL
@@ -182,7 +182,7 @@ module Bolt
         tasks = compiler.list_tasks
         tasks.map(&:name).sort.map do |task_name|
           task_sig = compiler.task_signature(task_name)
-          [task_name, task_sig.task.description]
+          [task_name, task_sig.task_hash['metadata']['description']]
         end
       end
     end
@@ -190,15 +190,15 @@ module Bolt
     def parse_params(type, object_name, params)
       in_bolt_compiler do |compiler|
         if type == 'task'
-          param_spec = compiler.task_signature(object_name)&.task_hash
+          param_spec = compiler.task_signature(object_name)&.task_hash&.dig('parameters')
         elsif type == 'plan'
           plan = compiler.plan_signature(object_name)
-          param_spec = plan_hash(object_name, plan) if plan
+          param_spec = plan.params_type.elements&.each_with_object({}) { |t, h| h[t.name] = t.value_type } if plan
         end
         param_spec ||= {}
 
         params.each_with_object({}) do |(name, str), acc|
-          type = param_spec.dig('parameters', name, 'type')
+          type = param_spec[name]
           begin
             parsed = JSON.parse(str, quirks_mode: true)
             # The type may not exist if the module is remote on orch or if a task
@@ -227,7 +227,7 @@ module Bolt
         raise Bolt::Error.new(Bolt::Error.unknown_task(task_name), 'bolt/unknown-task')
       end
 
-      task.task_hash
+      task.task_hash.reject { |k, _| k == 'parameters' }
     end
 
     def list_plans
@@ -236,9 +236,8 @@ module Bolt
       end
     end
 
-    # This converts a plan signature object into a format approximating the
-    # task_hash of a task_signature. Must be called from within bolt compiler
-    # to pickup type aliases used in the plan signature.
+    # This converts a plan signature object into a format used by the outputter.
+    # Must be called from within bolt compiler to pickup type aliases used in the plan signature.
     def plan_hash(plan_name, plan)
       elements = plan.params_type.elements || []
       parameters = elements.each_with_object({}) do |param, acc|
@@ -250,6 +249,7 @@ module Bolt
         'parameters' => parameters
       }
     end
+    private :plan_hash
 
     def get_plan_info(plan_name)
       plan_info = in_bolt_compiler do |compiler|

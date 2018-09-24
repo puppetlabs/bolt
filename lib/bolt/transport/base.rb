@@ -162,12 +162,7 @@ module Bolt
       end
 
       def from_api?(task)
-        if task.respond_to? :file
-          unless task.file.nil?
-            return true
-          end
-        end
-        false
+        !task.file.nil?
       end
 
       # Transports should override this method with their own implementation of running a command.

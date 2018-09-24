@@ -10,6 +10,19 @@ require 'rspec/expectations'
 
 Sensitive = Puppet::Pops::Types::PSensitiveType::Sensitive
 
+class TaskTypeMatcher < Mocha::ParameterMatchers::Equals
+  def initialize(executable, input_method)
+    super(nil)
+    @executable = Regexp.new(executable)
+    @input_method = input_method
+  end
+
+  def matches?(available_parameters)
+    other = available_parameters.shift
+    @executable =~ other.files.first['path'] && @input_method == other.metadata['input_method']
+  end
+end
+
 describe 'run_task' do
   include PuppetlabsSpec::Fixtures
   let(:executor) { Bolt::Executor.new }
@@ -27,8 +40,7 @@ describe 'run_task' do
   end
 
   def mock_task(executable, input_method)
-    implementations = [{ 'name' => File.basename(executable), 'path' => executable, 'requirements' => [] }]
-    responds_with(:implementations, implementations) & responds_with(:input_method, input_method)
+    TaskTypeMatcher.new(executable, input_method)
   end
 
   context 'it calls bolt executor run_task' do

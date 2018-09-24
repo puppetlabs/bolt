@@ -7,7 +7,7 @@
   "properties": {
     "name": {
       "type": "string",
-       "description": "Task name"
+      "description": "Task name"
     },
     "metadata": {
       "type": "object",

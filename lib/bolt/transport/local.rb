@@ -81,13 +81,13 @@ module Bolt
       end
 
       def run_task(target, task, arguments, _options = {})
-        executable = target.select_impl(task, PROVIDED_FEATURES)
-        raise "No suitable implementation of #{task.name} for #{target.name}" unless executable
+        implementation = task.select_implementation(target, PROVIDED_FEATURES)
+        executable = implementation['path']
+        input_method = implementation['input_method'] || 'both'
 
         # unpack any Sensitive data, write it to a separate variable because
         # we log 'arguments' below
         unwrapped_arguments = unwrap_sensitive_args(arguments)
-        input_method = task.input_method || "both"
         stdin = STDIN_METHODS.include?(input_method) ? JSON.dump(unwrapped_arguments) : nil
         env = ENVIRONMENT_METHODS.include?(input_method) ? envify_params(unwrapped_arguments) : nil
 
