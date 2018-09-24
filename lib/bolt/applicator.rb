@@ -42,7 +42,7 @@ module Bolt
         path = File.join(libexec, 'custom_facts.rb')
         file = { 'name' => 'custom_facts.rb', 'path' => path }
         metadata = { 'supports_noop' => true, 'input_method' => 'stdin' }
-        Bolt::Task.new(name: 'custom_facts', files: [file], metadata: metadata)
+        Bolt::Task.new(name: 'apply_helpers::custom_facts', files: [file], metadata: metadata)
       end
     end
 
@@ -51,7 +51,7 @@ module Bolt
         path = File.join(libexec, 'apply_catalog.rb')
         file = { 'name' => 'apply_catalog.rb', 'path' => path }
         metadata = { 'supports_noop' => true, 'input_method' => 'stdin' }
-        Bolt::Task.new(name: 'apply_catalog', files: [file], metadata: metadata)
+        Bolt::Task.new(name: 'apply_helpers::apply_catalog', files: [file], metadata: metadata)
       end
     end
 
