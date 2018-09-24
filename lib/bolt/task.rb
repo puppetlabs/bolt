@@ -54,9 +54,12 @@ module Bolt
                files.first.dup
              end
 
-      unless (inmethod = metadata['input_method']).nil?
-        impl['input_method'] = inmethod
-      end
+      inmethod = impl['input_method'] || metadata['input_method']
+      impl['input_method'] = inmethod unless inmethod.nil?
+
+      mfiles = impl.fetch('files', []) + metadata.fetch('files', [])
+      impl['files'] = mfiles.map { |file| { 'name' => file, 'path' => file_map[file] } } unless mfiles.empty?
+
       impl
     end
   end

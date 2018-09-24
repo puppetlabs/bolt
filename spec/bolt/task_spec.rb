@@ -22,6 +22,19 @@ describe Bolt::Task do
       allow(target).to receive(:features).and_return(Set.new(['powershell']))
     end
 
+    context 'with input_method in metadata' do
+      let(:implementations) { [{ 'name' => 'foo.sh', 'requirements' => [] }] }
+      let(:metadata) { { 'input_method' => 'stdin', 'implementations' => implementations } }
+
+      it { expect(task.select_implementation(target)).to eq(files.first.merge('input_method' => 'stdin')) }
+
+      context 'with input_method in implementation' do
+        let(:implementations) { [{ 'name' => 'foo.sh', 'requirements' => [], 'input_method' => 'environment' }] }
+
+        it { expect(task.select_implementation(target)).to eq(files.first.merge('input_method' => 'environment')) }
+      end
+    end
+
     context 'no metadata present' do
       let(:metadata) { {} }
 
