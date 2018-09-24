@@ -27,9 +27,7 @@ describe "when runnning over the ssh transport", ssh: true do
 
     it 'runs a command' do
       result = run_one_node(%W[command run #{whoami}] + config_flags)
-      expect(result['stdout'].strip).to eq(
-        conn_info('ssh')[:user]
-      )
+      expect(result['stdout'].strip).to eq(user)
     end
 
     it 'reports errors when command fails' do
@@ -93,7 +91,7 @@ describe "when runnning over the ssh transport", ssh: true do
     it 'runs a command' do
       with_tempfile_containing('conf', YAML.dump(config)) do |conf|
         result = run_one_node(%W[command run #{whoami} --configfile #{conf.path}] + config_flags)
-        expect(result['stdout'].strip).to eq(conn_info('ssh')[:user])
+        expect(result['stdout'].strip).to eq(user)
       end
     end
 
