@@ -230,6 +230,16 @@ SHELL
         end
       end
 
+      it "runs a task with the implementation's input method" do
+        with_task_containing('tasks_test', contents, 'stdin') do |task|
+          task['metadata']['implementations'] = [{
+            'name' => 'tasks_test', 'requirements' => ['shell'], 'input_method' => 'environment'
+          }]
+          expect(local.run_task(target, task, arguments).message.chomp)
+            .to eq('Hello from task Goodbye')
+        end
+      end
+
       it "errors when a task only requires an unsupported requirement" do
         with_task_containing('tasks_test', contents, 'environment') do |task|
           task['metadata']['implementations'] = [{ 'name' => 'tasks_test', 'requirements' => ['powershell'] }]
