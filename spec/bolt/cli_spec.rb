@@ -884,7 +884,9 @@ bar
           expect(json).to eq(
             "name" => "sample::params",
             "metadata" => {
+              "anything" => true,
               "description" => "Task with parameters",
+              "extensions" => {},
               "input_method" => 'stdin',
               "parameters" => {
                 "mandatory_string" => {
