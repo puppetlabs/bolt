@@ -7,7 +7,6 @@ require 'bolt/logger'
 require 'logging'
 require 'rspec/logging_helper'
 # Make sure puppet is required for the 'reset puppet settings' context
-require_relative '../vendored/require_vendored'
 require 'puppet_pal'
 
 ENV['RACK_ENV'] = 'test'

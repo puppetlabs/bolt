@@ -73,7 +73,6 @@ module Bolt
       end
 
       begin
-        require_relative '../../vendored/require_vendored'
         require 'puppet_pal'
       rescue LoadError
         raise Bolt::Error.new("Puppet must be installed to execute tasks", "bolt/puppet-missing")
