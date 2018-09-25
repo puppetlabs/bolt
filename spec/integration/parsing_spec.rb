@@ -40,6 +40,7 @@ describe "CLI parses input" do
 
     expect(result).to eq(
       "name" => "parsing",
+      "module_dir" => File.absolute_path(File.join(__dir__, '..', 'fixtures', 'modules', 'parsing')),
       "parameters" => {
         "string" => { "type" => "String" },
         "string_bool" => { "type" => "Variant[String, Boolean]" },

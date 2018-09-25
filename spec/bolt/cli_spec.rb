@@ -883,6 +883,7 @@ bar
           json.delete("files")
           expect(json).to eq(
             "name" => "sample::params",
+            "module_dir" => File.absolute_path(File.join(__dir__, "..", "fixtures", "modules", "sample")),
             "metadata" => {
               "anything" => true,
               "description" => "Task with parameters",
@@ -1001,6 +1002,7 @@ bar
           json = JSON.parse(output.string)
           expect(json).to eq(
             "name" => "sample::optional_params_task",
+            "module_dir" => File.absolute_path(File.join(__dir__, "..", "fixtures", "modules", "sample")),
             "parameters" => {
               "param_mandatory" => {
                 "type" => "String"

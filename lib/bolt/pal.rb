@@ -254,7 +254,9 @@ module Bolt
     def get_plan_info(plan_name)
       plan_info = in_bolt_compiler do |compiler|
         plan = compiler.plan_signature(plan_name)
-        plan_hash(plan_name, plan) if plan
+        hash = plan_hash(plan_name, plan) if plan
+        hash['module'] = plan.instance_variable_get(:@plan_func).loader.parent.path if plan
+        hash
       end
 
       if plan_info.nil?
