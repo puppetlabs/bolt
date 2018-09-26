@@ -42,6 +42,10 @@ elsif command == "compile"
               JSON.parse(STDIN.read)
             end
   catalog = Bolt::Catalog.new.compile_catalog(request)
+  # This seems to be a string in ruby 2.3
+  if catalog.is_a?(String)
+    catalog = JSON.parse(catalog)
+  end
   puts JSON.pretty_generate(catalog)
 else
   puts "USAGE: run 'bolt_catalog compile' with a request on STDIN " \
