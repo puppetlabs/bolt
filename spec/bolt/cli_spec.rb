@@ -1035,7 +1035,6 @@ bar
                               ["canary"],
                               ["facts"],
                               ["facts::info"],
-                              ["facts::retrieve"],
                               ["puppetdb_fact"],
                               ["sample::ok"]])
 
