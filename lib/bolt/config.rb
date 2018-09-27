@@ -60,17 +60,7 @@ module Bolt
     end
 
     def self.from_boltdir(boltdir, overrides = {})
-      # *Optionally* load the boltdir config file, and fall back to the legacy
-      # config if that isn't found. Because logging is built in to the
-      # legacy_conf method, we don't want to look that up unless we need it.
-      configs = if boltdir.config_file.exist?
-                  [boltdir.config_file]
-                else
-                  [legacy_conf]
-                end
-
-      data = Bolt::Util.read_config_file(nil, configs, 'config') || {}
-
+      data = Bolt::Util.read_config_file(nil, [boltdir.config_file], 'config') || {}
       new(boltdir, data, overrides)
     end
 
@@ -173,21 +163,6 @@ module Bolt
       end
     end
     private :update_from_file
-
-    # TODO: This is deprecated in 0.21.0 and can be removed in release 0.22.0.
-    def self.legacy_conf
-      root_path = File.expand_path(File.join('~', '.puppetlabs'))
-      legacy_paths = [File.join(root_path, 'bolt.yaml'), File.join(root_path, 'bolt.yml')]
-      legacy_conf = legacy_paths.find { |path| File.exist?(path) }
-      found_legacy_conf = !!legacy_conf
-      legacy_conf ||= legacy_paths[0]
-      if found_legacy_conf
-        correct_path = Bolt::Boltdir.default_boltdir.config_file
-        msg = "Found configfile at deprecated location #{legacy_conf}. Global config should be in #{correct_path}"
-        Logging.logger[self].warn(msg)
-      end
-      legacy_conf
-    end
 
     def apply_overrides(options)
       %i[concurrency transport format trace modulepath inventoryfile color].each do |key|
