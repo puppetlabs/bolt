@@ -94,6 +94,10 @@ c1   d
   it "formats a task" do
     task = {
       'name' => 'cinnamon_roll',
+      'files' => [{ 'name' => 'cinnamon.rb',
+                    'path' => '/path/to/cinnamony/goodness/tasks/cinnamon.rb' },
+                  { 'name' => 'roll.sh',
+                    'path' => '/path/to/wrong/module/tasks/roll.sh' }],
       'metadata' => {
         'description' => 'A delicious sweet bun',
         'parameters' => {
@@ -116,12 +120,18 @@ PARAMETERS:
 - icing: Cream cheese
     Rich, tangy, sweet
 
+MODULE:
+/path/to/cinnamony/goodness
     TASK_OUTPUT
   end
 
   it 'converts Data (undef) to Any' do
     task = {
       'name' => 'sticky_bun',
+      'files' => [{ 'name' => 'sticky.rb',
+                    'path' => '/this/test/is/making/me/hungry/tasks/sticky.rb' },
+                  { 'name' => 'bun.sh',
+                    'path' => '/path/to/wrong/module/tasks/bun.sh' }],
       'metadata' => {
         'description' => 'A delicious sweet bun with nuts',
         'parameters' => {
@@ -150,12 +160,35 @@ PARAMETERS:
 - pecans: Data
     The best kind of nut
 
+MODULE:
+/this/test/is/making/me/hungry
+    TASK_OUTPUT
+  end
+
+  it 'prints module path as builtin for builtin modules' do
+    task = {
+      'name' => 'monkey_bread',
+      'files' => [{ 'name' => 'monkey_bread.rb',
+                    'path' => "#{Bolt::PAL::MODULES_PATH}/monkey/bread" }],
+      'metadata' => {}
+    }
+    outputter.print_task_info(task)
+    expect(output.string).to eq(<<-TASK_OUTPUT)
+
+monkey_bread
+
+USAGE:
+bolt task run --nodes <node-name> monkey_bread
+
+MODULE:
+built-in module
     TASK_OUTPUT
   end
 
   it "formats a plan" do
     plan = {
       'name' => 'planity_plan',
+      'module' => 'plans/plans/plans/plans',
       'parameters' => {
         'foo' => {
           'type' => 'Bar'
@@ -178,6 +211,8 @@ PARAMETERS:
 - foo: Bar
 - baz: Bar
 
+MODULE:
+plans/plans/plans/plans
     PLAN_OUTPUT
   end
 

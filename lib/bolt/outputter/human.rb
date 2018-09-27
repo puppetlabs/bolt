@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require 'terminal-table'
+require 'bolt/pal'
+
 module Bolt
   class Outputter
     class Human < Bolt::Outputter
@@ -136,6 +138,14 @@ module Bolt
         task_info << "\n\n"
         task_info << "USAGE:\n#{usage}\n\n"
         task_info << "PARAMETERS:\n#{pretty_params}\n" unless pretty_params.empty?
+        task_info << "MODULE:\n"
+
+        path = task['files'][0]['path'].chomp("/tasks/#{task['files'][0]['name']}")
+        task_info << if path.start_with?(Bolt::PAL::MODULES_PATH)
+                       "built-in module"
+                     else
+                       path
+                     end
         @stream.puts(task_info)
       end
 
@@ -155,6 +165,14 @@ module Bolt
         plan_info << "\n\n"
         plan_info << "USAGE:\n#{usage}\n\n"
         plan_info << "PARAMETERS:\n#{pretty_params}\n" if plan['parameters']
+        plan_info << "MODULE:\n"
+
+        path = plan['module']
+        plan_info << if path.start_with?(Bolt::PAL::MODULES_PATH)
+                       "built-in module"
+                     else
+                       path
+                     end
         @stream.puts(plan_info)
       end
 

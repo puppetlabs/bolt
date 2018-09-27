@@ -44,10 +44,22 @@ module Bolt
       end
 
       def print_task_info(task)
+        path = task['files'][0]['path'].chomp("/tasks/#{task['files'][0]['name']}")
+        task['module_dir'] = if path.start_with?(Bolt::PAL::MODULES_PATH)
+                               "built-in module"
+                             else
+                               path
+                             end
         @stream.puts task.to_json
       end
 
       def print_plan_info(plan)
+        path = plan.delete('module')
+        plan['module_dir'] = if path.start_with?(Bolt::PAL::MODULES_PATH)
+                               "built-in module"
+                             else
+                               path
+                             end
         @stream.puts plan.to_json
       end
 
