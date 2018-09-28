@@ -8,6 +8,7 @@ require 'logging'
 require 'minitar'
 require 'open3'
 require 'bolt/task'
+require 'bolt/apply_result'
 require 'bolt/util/puppet_log_level'
 
 module Bolt
@@ -113,56 +114,6 @@ module Bolt
       end
     end
 
-    def provide_puppet_missing_errors(result)
-      error_hash = result.error_hash
-      exit_code = error_hash['details']['exit_code'] if error_hash && error_hash['details']
-      # If we get exit code 126 or 127 back, it means the shebang command wasn't found; Puppet isn't present
-      if [126, 127].include?(exit_code)
-        Result.new(result.target, error:
-          {
-            'msg' => "Puppet is not installed on the target, please install it to enable 'apply'",
-            'kind' => 'bolt/apply-error'
-          })
-      elsif exit_code == 1 &&
-            (error_hash['msg'] =~ /Could not find executable 'ruby.exe'/ ||
-             error_hash['msg'] =~ /The term 'ruby.exe' is not recognized as the name of a cmdlet/)
-        # Windows does not have Ruby present
-        Result.new(result.target, error:
-          {
-            'msg' => "Puppet is not installed on the target in $env:ProgramFiles, please install it to enable 'apply'",
-            'kind' => 'bolt/apply-error'
-          })
-      elsif exit_code == 1 && error_hash['msg'] =~ /cannot load such file -- puppet \(LoadError\)/
-        # Windows uses a Ruby that doesn't have Puppet installed
-        # TODO: fix so we don't find other Rubies, or point to a known issues URL for more info
-        Result.new(result.target, error:
-          {
-            'msg' => 'Found a Ruby without Puppet present, please install Puppet ' \
-                     "or remove Ruby from $env:Path to enable 'apply'",
-            'kind' => 'bolt/apply-error'
-          })
-      else
-        result
-      end
-    end
-
-    def identify_resource_failures(result)
-      if result.ok? && result.value['status'] == 'failed'
-        resources = result.value['resource_statuses']
-        failed = resources.select { |_, r| r['failed'] }.flat_map do |key, resource|
-          resource['events'].select { |e| e['status'] == 'failure' }.map do |event|
-            "\n  #{key}: #{event['message']}"
-          end
-        end
-
-        result.value['_error'] = {
-          'msg' => "Resources failed to apply for #{result.target.name}#{failed.join}",
-          'kind' => 'bolt/resource-failure'
-        }
-      end
-      result
-    end
-
     def apply(args, apply_body, scope)
       raise(ArgumentError, 'apply requires a TargetSpec') if args.empty?
       type0 = Puppet.lookup(:pal_script_compiler).type('TargetSpec')
@@ -204,9 +155,7 @@ module Bolt
               }
               raise future.reason if future.rejected?
               results = transport.batch_task(batch, catalog_apply_task, arguments, options, &notify)
-              Array(results).map do |result|
-                identify_resource_failures(provide_puppet_missing_errors(result))
-              end
+              Array(results).map { |result| ApplyResult.from_task_result(result) }
             end
           end
         end

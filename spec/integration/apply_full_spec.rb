@@ -25,21 +25,23 @@ describe "apply" do
 
     it 'installs puppet' do
       result = run_cli_json(%w[plan run prep] + config_flags)
+      expect(result).not_to include('kind')
       expect(result.count).to eq(1)
       expect(result[0]['status']).to eq('success')
-      report = result[0]['result']
+      report = result[0]['result']['report']
       expect(report['resource_statuses']).to include("Notify[Hello #{conn_info('ssh')[:host]}]")
     end
 
     it 'succeeds when run twice' do
       result = run_cli_json(%w[plan run prep] + config_flags)
+      expect(result).not_to include('kind')
       expect(result.count).to eq(1)
       expect(result[0]['status']).to eq('success')
 
       result = run_cli_json(%w[plan run prep] + config_flags)
       expect(result.count).to eq(1)
       expect(result[0]['status']).to eq('success')
-      report = result[0]['result']
+      report = result[0]['result']['report']
       expect(report['resource_statuses']).to include("Notify[Hello #{conn_info('ssh')[:host]}]")
     end
   end
