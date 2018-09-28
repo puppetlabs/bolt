@@ -64,7 +64,8 @@ Puppet::Functions.create_function(:apply_prep) do
         end
 
         task = applicator.custom_facts_task
-        results = executor.run_task(targets, task, 'plugins' => plugins)
+        arguments = { 'plugins' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(plugins) }
+        results = executor.run_task(targets, task, arguments)
         raise Bolt::RunFailure.new(results, 'run_task', task.name) unless results.ok?
 
         results.each do |result|

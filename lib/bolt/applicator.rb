@@ -197,7 +197,11 @@ module Bolt
         result_promises = targets.zip(futures).flat_map do |target, future|
           @executor.queue_execute([target]) do |transport, batch|
             @executor.with_node_logging("Applying manifest block", batch) do
-              arguments = { 'catalog' => future.value, 'plugins' => plugins, '_noop' => options['_noop'] }
+              arguments = {
+                'catalog' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(future.value),
+                'plugins' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(plugins),
+                '_noop' => options['_noop']
+              }
               raise future.reason if future.rejected?
               results = transport.batch_task(batch, catalog_apply_task, arguments, options, &notify)
               Array(results).map do |result|
