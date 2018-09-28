@@ -53,7 +53,7 @@ describe 'apply_prep' do
       executor.expects(:run_task).with(targets, version_task, anything, anything).returns(versions)
 
       facts = Bolt::ResultSet.new(targets.map { |t| Bolt::Result.new(t, value: fact) })
-      executor.expects(:run_task).with(targets, custom_facts_task, 'plugins' => :tarball).returns(facts)
+      executor.expects(:run_task).with(targets, custom_facts_task, includes('plugins')).returns(facts)
 
       is_expected.to run.with_params(hostnames.join(',')).and_return(nil)
       targets.each do |target|
@@ -72,7 +72,7 @@ describe 'apply_prep' do
       executor.expects(:run_task).with(targets[1..1], service_task, anything, anything).returns(ok_result).twice
 
       facts = Bolt::ResultSet.new(targets.map { |t| Bolt::Result.new(t, value: fact) })
-      executor.expects(:run_task).with(targets, custom_facts_task, 'plugins' => :tarball).returns(facts)
+      executor.expects(:run_task).with(targets, custom_facts_task, includes('plugins')).returns(facts)
 
       is_expected.to run.with_params(hostnames)
       targets.each do |target|
@@ -130,7 +130,7 @@ describe 'apply_prep' do
       results = Bolt::ResultSet.new(
         targets.map { |t| Bolt::Result.new(t, error: { 'msg' => 'could not gather facts' }) }
       )
-      executor.expects(:run_task).with(targets, custom_facts_task, 'plugins' => :tarball).returns(results)
+      executor.expects(:run_task).with(targets, custom_facts_task, includes('plugins')).returns(results)
 
       is_expected.to run.with_params(hostnames).and_raise_error(
         Bolt::RunFailure, "Plan aborted: run_task 'custom_facts_task' failed on 2 nodes"
