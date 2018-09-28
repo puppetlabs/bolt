@@ -24,6 +24,12 @@ describe "passes parsed AST to the apply_catalog task" do
     }
   end
 
+  def get_notifies(result)
+    expect(result).not_to include('kind')
+    expect(result[0]).to include('status' => 'success')
+    result[0]['result']['report']['resources'].select { |r| r['type'] == 'Notify' }
+  end
+
   # SSH only required to simplify capturing stdin passed to the task. WinRM omitted as slower and unnecessary.
   describe 'over ssh', ssh: true do
     let(:uri) { conn_uri('ssh') }
@@ -33,10 +39,10 @@ describe "passes parsed AST to the apply_catalog task" do
 
     it 'echos the catalog ast' do
       result = run_cli_json(%w[plan run basic] + config_flags)
-      ast = result[0]
-      expect(ast.count).to eq(5)
+      reports = result[0]
+      expect(reports.count).to eq(5)
 
-      resources = ast.group_by { |r| r['type'] }
+      resources = reports.group_by { |r| r['type'] }
       expect(resources['File'].count).to eq(2)
       files = resources['File'].select { |f| f['title'] == '/root/test/hello.txt' }
       expect(files.count).to eq(1)
@@ -45,8 +51,7 @@ describe "passes parsed AST to the apply_catalog task" do
 
     it 'uses trusted facts' do
       result = run_cli_json(%w[plan run basic::trusted] + config_flags)
-      ast = result[0]['result']
-      notify = ast['resources'].select { |r| r['type'] == 'Notify' }
+      notify = get_notifies(result)
       expect(notify.count).to eq(1)
       expect(notify[0]['title']).to eq(
         'trusted {authenticated => local, certname => localhost, extensions => {}, hostname => localhost, domain => }'
@@ -55,32 +60,29 @@ describe "passes parsed AST to the apply_catalog task" do
 
     it 'uses target vars' do
       result = run_cli_json(%w[plan run basic::target_vars] + config_flags)
-      ast = result[0]['result']
-      notify = ast['resources'].select { |r| r['type'] == 'Notify' }
+      notify = get_notifies(result)
       expect(notify.count).to eq(1)
       expect(notify[0]['title']).to eq('hello there')
     end
 
     it 'plan vars override target vars' do
       result = run_cli_json(%w[plan run basic::plan_vars] + config_flags)
-      ast = result[0]['result']
-      notify = ast['resources'].select { |r| r['type'] == 'Notify' }
+      notify = get_notifies(result)
       expect(notify.count).to eq(1)
       expect(notify[0]['title']).to eq('hello world')
     end
 
     it 'applies a class from the modulepath' do
       result = run_cli_json(%w[plan run basic::class] + config_flags)
-      ast = result[0]['result']
-      notify = ast['resources'].select { |r| r['type'] == 'Notify' }
+      notify = get_notifies(result)
       expect(notify.count).to eq(1)
     end
 
     it 'applies a complex type from the modulepath' do
       result = run_cli_json(%w[plan run basic::type] + config_flags)
-      ast = result[0]['result']
-      notify = ast['resources'].select { |r| r['type'] == 'Warn' }
-      expect(notify.count).to eq(1)
+      report = result[0]['result']['report']
+      warn = report['resources'].select { |r| r['type'] == 'Warn' }
+      expect(warn.count).to eq(1)
     end
 
     it 'logs messages emitted during compilation' do
@@ -179,8 +181,7 @@ describe "passes parsed AST to the apply_catalog task" do
       it 'default datadir is accessible' do
         with_tempfile_containing('conf', YAML.dump(default_datadir)) do |conf|
           result = run_cli_json(%W[plan run basic::hiera_lookup --configfile #{conf.path}] + config_flags)
-          ast = result[0]['result']
-          notify = ast['resources'].select { |r| r['type'] == 'Notify' }
+          notify = get_notifies(result)
           expect(notify[0]['title']).to eq("hello default datadir")
         end
       end
@@ -188,8 +189,7 @@ describe "passes parsed AST to the apply_catalog task" do
       it 'non-default datadir specified in hiera config is accessible' do
         with_tempfile_containing('conf', YAML.dump(custom_datadir)) do |conf|
           result = run_cli_json(%W[plan run basic::hiera_lookup --configfile #{conf.path}] + config_flags)
-          ast = result[0]['result']
-          notify = ast['resources'].select { |r| r['type'] == 'Notify' }
+          notify = get_notifies(result)
           expect(notify[0]['title']).to eq("hello custom datadir")
         end
       end
@@ -214,8 +214,7 @@ describe "passes parsed AST to the apply_catalog task" do
       it 'targets in inventory can be queried' do
         with_tempfile_containing('conf', YAML.dump(inventory)) do |conf|
           result = run_cli_json(%W[plan run basic::inventory_lookup --configfile #{conf.path}] + config_flags)
-          ast = result[0]['result']
-          notify = ast['resources'].select { |r| r['type'] == 'Notify' }
+          notify = get_notifies(result)
           expect(notify[0]['title']).to eq("Num Targets: 3")
           expect(notify[1]['title']).to eq("Target 1 Facts: {operatingsystem => Ubuntu, added => fact}")
           expect(notify[2]['title']).to eq("Target 1 Vars: {environment => production, features => [puppet-agent]}")
