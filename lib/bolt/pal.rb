@@ -241,7 +241,12 @@ module Bolt
     def plan_hash(plan_name, plan)
       elements = plan.params_type.elements || []
       parameters = elements.each_with_object({}) do |param, acc|
-        acc[param.name] = { 'type' => param.value_type }
+        type = if param.value_type.is_a?(Puppet::Pops::Types::PTypeAliasType)
+                 param.value_type.name
+               else
+                 param.value_type.to_s
+               end
+        acc[param.name] = { 'type' => type }
         acc[param.name]['default_value'] = nil if param.key_type.is_a?(Puppet::Pops::Types::POptionalType)
       end
       {
