@@ -75,7 +75,7 @@ module Bolt
         end
       end
 
-      def print_summary(results, elapsed_time)
+      def print_summary(results, elapsed_time = nil)
         ok_set = results.ok_set
         unless ok_set.empty?
           @stream.puts format('Successful on %<size>d node%<plural>s: %<names>s',
@@ -93,10 +93,11 @@ module Bolt
                                        names: error_set.names.join(',')))
         end
 
-        @stream.puts format('Ran on %<size>d node%<plural>s in %<elapsed>.2f seconds',
-                            size: results.size,
-                            plural: results.size == 1 ? '' : 's',
-                            elapsed: elapsed_time)
+        total_msg = format('Ran on %<size>d node%<plural>s',
+                           size: results.size,
+                           plural: results.size == 1 ? '' : 's')
+        total_msg += format(' in %<elapsed>.2f seconds', elapsed: elapsed_time) unless elapsed_time.nil?
+        @stream.puts total_msg
       end
 
       def print_table(results)
@@ -178,10 +179,14 @@ module Bolt
 
       # @param [Bolt::PlanResult] plan_result A PlanResult object
       def print_plan_result(plan_result)
-        if plan_result.value.nil?
+        value = plan_result.value
+        if value.nil?
           @stream.puts("Plan completed successfully with no result")
-        elsif plan_result.value.is_a? Bolt::ApplyFailure
-          @stream.puts(colorize(:red, plan_result.value.message))
+        elsif value.is_a? Bolt::ApplyFailure
+          @stream.puts(colorize(:red, value.message))
+        elsif value.is_a? Bolt::ResultSet
+          value.each { |result| print_result(result) }
+          print_summary(value)
         else
           @stream.puts(::JSON.pretty_generate(plan_result, quirks_mode: true))
         end
