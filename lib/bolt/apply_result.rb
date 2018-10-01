@@ -33,7 +33,7 @@ module Bolt
     end
 
     def self.resource_error(result)
-      if result.ok? && result.value['status'] == 'failed'
+      if result.value['status'] == 'failed'
         resources = result.value['resource_statuses']
         failed = resources.select { |_, r| r['failed'] }.flat_map do |key, resource|
           resource['events'].select { |e| e['status'] == 'failure' }.map do |event|
@@ -51,6 +51,8 @@ module Bolt
         new(result.target,
             error: puppet_missing,
             report: result.value.delete('_error'))
+      elsif !result.ok?
+        new(result.target, error: result.error_hash)
       elsif (resource_error = resource_error(result))
         new(result.target,
             error: resource_error,
