@@ -77,7 +77,10 @@ describe "apply" do
         expect(error['msg']).to match(/Resources failed to apply/)
       end
 
-      it 'applies a notify' do
+      it 'applies a notify and ignores local settings' do
+        run_command('echo environment=doesnotexist > /etc/puppetlabs/puppet/puppet.conf',
+                    uri, config: root_config, inventory: conn_inventory)
+
         result = run_cli_json(%w[plan run basic::class] + config_flags)
         expect(result).not_to include('kind')
         expect(result[0]).to include('status' => 'success')
