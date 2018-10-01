@@ -79,7 +79,7 @@ test_name "bolt plan run should apply manifest block on remote hosts via ssh" do
                    "The task did not succeed on #{host}")
 
       # Verify the custom type was invoked
-      logs = result[0]['result']['logs']
+      logs = result[0]['result']['report']['logs']
       warnings = logs.select { |l| l['level'] == 'warning' }
       assert_equal(1, warnings.count)
       assert_equal('Writing a MOTD!', warnings[0]['message'])
