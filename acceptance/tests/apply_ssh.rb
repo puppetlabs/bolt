@@ -160,9 +160,9 @@ FILE
         # Verify that node succeeded
         host = node.hostname
         result = json.select { |n| n['node'] == host }
-        assert_equal('failure', result[0]['status'],
-                     "The task did not fail on #{host}")
-        assert_match(/Permission denied/, result[0]['result']['_error']['msg'])
+        assert_equal('success', result[0]['status'],
+                     "The task did not pass on #{host}")
+        assert_match(/Permission denied/, result[0]['result']['report']['_error']['msg'])
 
         # Verify that files were not created on the target
         on(node, "cat #{restricted_filepath}/hello.txt", acceptable_exit_codes: [1])
