@@ -23,6 +23,15 @@ describe "errors gracefully attempting to apply a manifest block" do
       expect(error['kind']).to eq('bolt/apply-error')
       expect(error['msg']).to eq("Puppet is not installed on the target, please install it to enable 'apply'")
     end
+
+    context 'when it cannot connect to the target' do
+      let(:password) { 'incorrect_password' }
+      it 'displays a connection error' do
+        result = run_cli_json(%w[plan run basic::class] + config_flags)
+        error = result['details']['result_set'][0]['result']['_error']
+        expect(error['kind']).to eq('puppetlabs.tasks/connect-error')
+      end
+    end
   end
 
   describe 'over winrm', winrm: true do
