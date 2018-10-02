@@ -6,7 +6,7 @@ Write plans in the Puppet language, giving them a `.pp` extension, and place the
 
 **Parent topic:** [Tasks and plans](writing_tasks_and_plans.md)
 
-**Related information**  
+**Related information**
 
 
 [Plan execution functions](plan_functions.md#)
@@ -61,7 +61,7 @@ The plan then calls the `run_task` function, specifying which nodes the tasks sh
 
 ```
 plan mymodule::my_plan(
-  String[1] $load_balancer, 
+  String[1] $load_balancer,
   TargetSpec  $frontends,
   TargetSpec  $backends,
 ) {
@@ -70,7 +70,7 @@ plan mymodule::my_plan(
   run_task('mymodule::lb_remove', $load_balancer, frontends => $frontends)
   run_task('mymodule::update_frontend_app', $frontends, version => '1.2.3')
   run_task('mymodule::lb_add', $load_balancer, frontends => $frontends)
-}       
+}
 ```
 
 To execute this plan from the command line, pass the parameters as `parameter=value`. The `Targetspec` will accept either an array as json or a comma seperated string of target names.
@@ -80,7 +80,7 @@ bolt plan run mymodule::myplan --modulepath ./PATH/TO/MODULES --params load_bala
 
 ```
 
-**Related information**  
+**Related information**
 
 
 [Task metadata types](writing_tasks.md#)
@@ -101,14 +101,14 @@ plan return_result(
 
 The result of a plan must match the `PlanResult` type alias. This roughly includes JSON types as well as the Plan language types which have well defined JSON representations in Bolt.
 
--    `Undef` 
--    `String` 
--    `Numeric` 
--    `Boolean` 
--    `Target` 
--    `Result` 
--    `ResultSet` 
--    `Error` 
+-    `Undef`
+-    `String`
+-    `Numeric`
+-    `Boolean`
+-    `Target`
+-    `Result`
+-    `ResultSet`
+-    `Error`
 -   `Array` with only `PlanResult`
 -   Hash with `String` keys and `PlanResult` values
 
@@ -176,10 +176,10 @@ Below, the first plan continues whether it succeeds or fails with a`mymodule/not
 plan mymodule::handle_errors {
   $result = run_plan('mymodule::myplan', '_catch_errors' => true)
   case $result {
-    Error['mymodule/not-serious'] : { 
+    Error['mymodule/not-serious'] : {
       notice("${result.message}")
-    }   
-    Error : { fail_plan($result) } } 
+    }
+    Error : { fail_plan($result) } }
   run_plan('mymodule::plan2')
 }
 
@@ -227,7 +227,7 @@ You should be aware of some other Puppet behaviors in plans:
 
 Plan execution functions each return a result object that returns details about the execution.
 
-Each execution function returns an object type `ResultSet`. For each node that the execution takes place on, this object contains a `Result` object.
+Each [execution function](./plan_functions.md) returns an object type `ResultSet`. For each node that the execution takes place on, this object contains a `Result` object. The [apply_statement](./applying_manifest_blocks.md) returns a `ResultSet` containing `ApplyResult` objects.
 
 A `ResultSet` has the following methods:
 
@@ -265,7 +265,18 @@ A `Result` has the following methods:
 -   `[]`: Accesses the value hash directly.
 
 
-An instance of `ResultSet` is `Iterable` as if it were an `Array[Result]` so that iterative functions such as `each`, `map`, `reduce`, or `filter` work directly on the ResultSet returning each result.
+An `ApplyResult` has the following methods:
+
+-   `report()`: The hash containing the puppet report from the application.
+
+-   `target()`: The `Target` object that the `Result` is from.
+
+-   `error()`: An `Error` object constructed from the `_error` in the value.
+
+-   `ok()`: Returns `true` if the `Result` was successful.
+
+
+An instance of `ResultSet` is `Iterable` as if it were an `Array[Variant[Result, ApplyResult]]` so that iterative functions such as `each`, `map`, `reduce`, or `filter` work directly on the ResultSet returning each result.
 
 This example checks if a task ran correctly on all nodes. If it did not, the check fails:
 
@@ -273,7 +284,7 @@ This example checks if a task ran correctly on all nodes. If it did not, the che
 $r = run_task('sometask', ..., '_catch_errors' => true)
 unless $r.ok {
   fail("Running sometask failed on the nodes ${r.error_nodes.names}")
-}   
+}
 ```
 
 You can do iteration and checking if the result is an Error. This example outputs some simple feedback about the result of a task:
@@ -283,11 +294,11 @@ $r = run_task('sometask', ..., '_catch_errors' => true)
 $r.each |$result| {
   $node = $result.target.name
   if $result.ok {
-    notice("${node} returned a value: ${result.value}") 
+    notice("${node} returned a value: ${result.value}")
   } else {
-    notice("${node} errored with a message: ${result.error.message}") 
+    notice("${node} errored with a message: ${result.error.message}")
   }
-}     
+}
 ```
 
 ## Passing sensitive data to tasks
@@ -308,7 +319,7 @@ In Puppet the `Sensitive` type can be used to mask data from being output to log
 Since Plans are simply written in Puppet DSL this type can be used freely.
 The `run_task()` function does not allow parameters of `Sensitive` type to be passed.
 If a `Sensitive` vlue needs to be passed to a task, it must be unwrapped prior to
-the `run_task()` function call. 
+the `run_task()` function call.
 
 ```
 $pass = Sensitive('$ecret!')
@@ -445,7 +456,7 @@ without_default_logging { run_command('echo hi', $nodes) }
 
 ### puppetdb\_query
 
- 
+
 
 You can use the `puppetdb_query` function in plans to make direct queries to PuppetDB. For example you can discover nodes from PuppetDB and then run tasks on them. You'll have to configure the [puppetdb client](bolt_connect_puppetdb.md)before running it.
 
