@@ -6,6 +6,7 @@ require 'json'
 require 'puppet'
 require 'puppet/configurer'
 require 'puppet/module_tool/tar'
+require 'securerandom'
 require 'tempfile'
 
 args = JSON.parse(ARGV[0] ? File.read(ARGV[0]) : STDIN.read)
@@ -57,7 +58,7 @@ begin
   end
 
   # Ensure custom facts are available for provider suitability tests
-  Puppet::Node::Facts.indirection.find('puppetversion', environment: env)
+  facts = Puppet::Node::Facts.indirection.find(SecureRandom.uuid, environment: env)
 
   report = if Puppet::Util::Package.versioncmp(Puppet.version, '5.0.0') > 0
              Puppet::Transaction::Report.new
@@ -67,9 +68,14 @@ begin
 
   Puppet.override(current_environment: env,
                   loaders: Puppet::Pops::Loaders.new(env)) do
-    catalog = Puppet::Resource::Catalog.from_data_hash(args['catalog']).to_ral
+    catalog = Puppet::Resource::Catalog.from_data_hash(args['catalog'])
     catalog.environment = env.name.to_s
     catalog.environment_instance = env
+    if defined?(Puppet::Pops::Evaluator::DeferredResolver)
+      # Only available in Puppet 6
+      Puppet::Pops::Evaluator::DeferredResolver.resolve_and_replace(facts, catalog)
+    end
+    catalog = catalog.to_ral
 
     configurer = Puppet::Configurer.new
     configurer.run(catalog: catalog, report: report, pluginsync: false)
