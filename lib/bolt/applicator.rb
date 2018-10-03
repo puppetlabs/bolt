@@ -134,29 +134,43 @@ module Bolt
 
       targets = @inventory.get_targets(args[0])
       ast = Puppet::Pops::Serialization::ToDataConverter.convert(apply_body, rich_data: true, symbol_to_string: true)
-      notify = proc { |_| nil }
 
-      r = @executor.log_action('apply catalog', targets) do
+      log_proc = proc do |event|
+        if event[:type] == :node_result
+          result = event[:result]
+          # If the catalog finished there will be a message.
+          if result.message
+            status = result.ok? ? "Finished" : "Failed"
+            @logger.info("#{status} apply on #{result.target.host}: #{result.message}")
+          else
+            @logger.info(event[:result])
+          end
+        end
+      end
+
+      # TODO: what should the detailed message be? the manifest block is
+      # probably too long
+      r = @executor.log_action('apply catalog', 'Applying catalog', targets) do
         futures = targets.map do |target|
           Concurrent::Future.execute(executor: @pool) do
-            @executor.with_node_logging("Compiling manifest block", [target]) do
-              compile(target, ast, plan_vars)
-            end
+            @logger.debug("Compiling manifest block on #{target.uri}")
+            catalog = compile(target, ast, plan_vars)
+            @logger.debug(catalog)
+            catalog
           end
         end
 
+        @logger.debug("Applying catalog on #{targets.map(&:uri)}")
         result_promises = targets.zip(futures).flat_map do |target, future|
           @executor.queue_execute([target]) do |transport, batch|
-            @executor.with_node_logging("Applying manifest block", batch) do
-              arguments = {
-                'catalog' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(future.value),
-                'plugins' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(plugins),
-                '_noop' => options['_noop']
-              }
-              raise future.reason if future.rejected?
-              results = transport.batch_task(batch, catalog_apply_task, arguments, options, &notify)
-              Array(results).map { |result| ApplyResult.from_task_result(result) }
-            end
+            arguments = {
+              'catalog' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(future.value),
+              'plugins' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(plugins),
+              '_noop' => options['_noop']
+            }
+            raise future.reason if future.rejected?
+            results = transport.batch_task(batch, catalog_apply_task, arguments, options, &log_proc)
+            Array(results).map { |result| ApplyResult.from_task_result(result) }
           end
         end
 
