@@ -37,6 +37,7 @@ Bolt uses a task to execute commands, upload files, and run scripts over orchest
 ```
 mod 'puppetlabs-bolt_shim', '0.1.1'
 ```
+In addition to the bolt\_shim module, any task or module content intended to be executed over PCP will need to be present in the PE environment. The modules described in the [Installing Modules](https://github.com/puppetlabs/bolt/blob/master/pre-docs/bolt_installing_modules.md#installing-modules) documentation are recommended to be downloaded and made available in the PE environment. By only allowing content that is present in the PE environment to be executed over PCP it is possible to maintain role based access control over nodes managed by PE.   
 
 ## Assign task permissions to a user role
 
@@ -64,7 +65,7 @@ Set up the orchestrator API for Bolt in the same user-specified configuration fi
 
 **Note:** If you use a global configuration file stored at `/etc/puppetlabs/client-tools/orchestrator.conf` \(or `C:\ProgramData\PuppetLabs\client-tools\orchestrator.conf` for Windows\), copy the file to your home directory.
 
-**Tip:** You can also configure orchestrator in the Bolt configuration file \(`~/.puppetlabs/bolt.yml`\) or the configuration section of the inventory file \(`~/.puppetlabs/bolt/inventory.yaml`\).
+**Tip:** You can also configure orchestrator in the Bolt configuration file \(`~/.puppetlabs/bolt/bolt.yaml`\) or the configuration section of the inventory file \(`~/.puppetlabs/bolt/inventory.yaml`\).
 
 Bolt can be configured to connect to Orchestrator in the `pcp` section of the bolt config file as well. This configuration will not be shared with `puppet task`.
 
