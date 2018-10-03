@@ -1,6 +1,6 @@
 # Applying Manifest Blocks
 
-Within a plan, you can use Bolt to apply blocks of Puppet code (manifest blocks) to remote nodes. Similar to the `puppet apply` command, which applies a standalone Puppet manifest to a local system, the Bolt `apply` command leverages manifest blocks to pass code to remote nodes from the command line. You can create manifest blocks that use existing content from the Forge, or mix declarative resource configuration via manifest blocks with procedural orchestration and action in a plan. Most features of the Puppet language are available in a manifest block: classes, custom resource types, and functions. Exceptions are noted in [caveats](#caveats). 
+Within a plan, you can use Bolt to apply blocks of Puppet code (manifest blocks) to remote nodes. Similar to the `puppet apply` command, which applies a standalone Puppet manifest to a local system, the Bolt `apply` command leverages manifest blocks to pass code to remote nodes from the command line. You can create manifest blocks that use existing content from the Forge, or mix declarative resource configuration via manifest blocks with procedural orchestration and action in a plan. Most features of the Puppet language are available in a manifest block: classes, custom resource types, and functions. Exceptions are noted in [caveats](#caveats).
 
 **Parent topic:** [Tasks and plans](writing_tasks_and_plans.md)
 
@@ -14,13 +14,13 @@ Within a plan, you can use Bolt to apply blocks of Puppet code (manifest blocks)
 
 ## Create a sample manifest for nginx on Linux
 
-Create a manifest to set up a web server with [nginx](https://nginx.org) and run it as a plan. 
+Create a manifest to set up a web server with [nginx](https://nginx.org) and run it as a plan.
 
 Save this module in the Bolt default Boltdir (`~/.puppetlabs/bolt`).
 
 1. Go to `~/.puppetlabs/bolt/modules`
 1. Create a new module.
-   * If you use PDK, run `pdk new module profiles` and add a `plans` directory 
+   * If you use PDK, run `pdk new module profiles` and add a `plans` directory
    * Otherwise create `~/.puppetlabs/bolt/modules/profiles/plans`
 1. Add the following code to the manifest `profiles/plans/nginx_install.pp`
    ```
@@ -70,14 +70,14 @@ Save this module in the Bolt default Boltdir (`~/.puppetlabs/bolt`).
 
 ## Create a sample manifest for iis on Windows
 
-Create a manifest to set up a web server with [iis](https://www.iis.net) and run it as a plan. 
+Create a manifest to set up a web server with [iis](https://www.iis.net) and run it as a plan.
 
 1. Go to `~/.puppetlabs/bolt/modules`
 1. Create a new module.
-   * If you use PDK, run `pdk new module profiles` and add a `plans` directory 
+   * If you use PDK, run `pdk new module profiles` and add a `plans` directory
    * Otherwise create `~/.puppetlabs/bolt/modules/profiles/plans`
 1. Install the IIS dependencies
-   * Add the following to `~/.puppetlabs/bolt/Puppetfile`  
+   * Add the following to `~/.puppetlabs/bolt/Puppetfile`
    ```
    forge 'http://forge.puppetlabs.com'
    mod 'puppetlabs-iis', '4.3.2'
@@ -90,7 +90,7 @@ Create a manifest to set up a web server with [iis](https://www.iis.net) and run
      TargetSpec $nodes,
      String $site_content = 'hello!',
    ) {
-   
+
      # Install the puppet-agent package if Puppet is not detected.
      # Copy over custom facts from the Bolt modulepath.
      # Run the `facter` command line tool to gather node information.
@@ -136,7 +136,7 @@ Create a manifest to set up a web server with [iis](https://www.iis.net) and run
 1. Run the plan on a target node: `bolt plan run profiles::iis_install --nodes <NODE NAME> --transport winrm`
 1. From a web browser, navigate to `<NODE NAME>`. The page displays the text `hello!`
 
-### How manifest blocks are applied 
+### How manifest blocks are applied
 
 The `apply_prep` function sets up the remote node by installing our puppet-agent package from puppet.com using a `puppet_agent::install` task (from [the puppet_agent module](https://github.com/puppetlabs/puppetlabs-puppet_agent)) if Puppet is not detected on a target. It also copies over custom facts from Bolt's modulepath and executes `facter` on the targets.
 
@@ -164,7 +164,7 @@ plan do_thing() {
 }
 ```
 
-Manifest block compilation can access Hiera data that you add to your Bolt config. The default location for Hiera config is `$BOLTDIR/hiera.yaml`; you can change this with the `hiera-config` key in a Bolt config file. 
+Manifest block compilation can access Hiera data that you add to your Bolt config. The default location for Hiera config is `$BOLTDIR/hiera.yaml`; you can change this with the `hiera-config` key in a Bolt config file.
 
 Following the Hiera 5 convention, the default data dir is relative to `hiera.yaml` at `$BOLTDIR/data`. For config file examples, see https://puppet.com/docs/puppet/5.5/hiera_config_yaml_5.html.
 
@@ -183,10 +183,14 @@ In addition to normal Puppet functions available to a catalog, such as `lookup`,
 
 ## Options
 
-The 'apply' function supports common metaparameters available to other Bolt functions:
+The 'apply' statement supports common metaparameters available to other Bolt functions:
 - `_catch_errors => true` returns a `ResultSet` including failed results, rather than failing the plan.
 - `_noop => true` applies the manifest block in Puppet's no-operation mode, returning a report of the changes it would make, but takes no action.
 - `_run_as => <user>` applies the manifest block as the specified user (on transports that support it).
+
+## Return Value of Apply Statement
+
+The apply statement returns a `ResultSet` with an (`ApplyResult`)[writing_plans.md#handling_plan_function_results] object for each target.
 
 ## Configuring Concurrency
 
