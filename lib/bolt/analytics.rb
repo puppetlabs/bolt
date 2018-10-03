@@ -134,7 +134,6 @@ module Bolt
 
       def compute_os
         Concurrent::Future.execute(executor: @executor) do
-          require_relative '../../vendored/require_vendored'
           require 'facter'
           os = Facter.value('os')
           "#{os['name']} #{os.dig('release', 'major')}"
