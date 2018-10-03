@@ -52,6 +52,14 @@ describe "apply" do
         report = result[0]['result']['report']
         expect(report['resource_statuses']).to include("Notify[Hello #{conn_info('ssh')[:host]}]")
 
+        # Includes agent facts from apply_prep
+        agent_facts = report['resource_statuses']['Notify[agent facts]']['events'][0]['desired_value'].split("\n")
+        expect(agent_facts[0]).to match(/^\w+\./)
+        expect(agent_facts[1]).to eq(agent_facts[0])
+        expect(agent_facts[2]).to match(/^\d+\.\d+\.\d+$/)
+        expect(agent_facts[3]).to eq(agent_facts[2])
+        expect(agent_facts[4]).to eq('false')
+
         result = run_cli_json(%w[plan run prep] + config_flags)
         expect(result.count).to eq(1)
         expect(result[0]['status']).to eq('success')

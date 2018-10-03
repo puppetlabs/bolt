@@ -8,37 +8,29 @@ require 'tempfile'
 
 args = JSON.parse(STDIN.read)
 
-Dir.mktmpdir do |moduledir|
+Dir.mktmpdir do |puppet_root|
+  # Create temporary directories for all core Puppet settings so we don't clobber
+  # existing state or read from puppet.conf. Also create a temporary modulepath.
+  moduledir = File.join(puppet_root, 'modules')
+  Dir.mkdir(moduledir)
+  cli = Puppet::Settings::REQUIRED_APP_SETTINGS.flat_map do |setting|
+    ["--#{setting}", File.join(puppet_root, setting.to_s.chomp('dir'))]
+  end
+  cli << '--modulepath' << moduledir
+  Puppet.initialize_settings(cli)
+
   Tempfile.open('plugins.tar.gz') do |plugins|
     File.binwrite(plugins, Base64.decode64(args['plugins']))
     Puppet::ModuleTool::Tar.instance.unpack(plugins, moduledir, Etc.getlogin || Etc.getpwuid.name)
   end
 
-  Puppet.initialize_settings
-  env = Puppet.lookup(:environments).get('production').override_with(modulepath: [moduledir])
+  env = Puppet.lookup(:environments).get('production')
   env.each_plugin_directory do |dir|
     $LOAD_PATH << dir unless $LOAD_PATH.include?(dir)
   end
 
-  dirs = []
-  external_dirs = []
-  env.modules.each do |mod|
-    dirs << File.join(mod.plugins, 'facter') if mod.plugins?
-    external_dirs << mod.pluginfacts if mod.pluginfacts?
-  end
-
-  Facter.reset
-  Facter.search(*dirs) unless dirs.empty?
-  Facter.search_external(external_dirs)
-
-  if Puppet.respond_to? :initialize_facts
-    Puppet.initialize_facts
-  else
-    Facter.add(:puppetversion) do
-      setcode { Puppet.version.to_s }
-    end
-  end
-
-  puts(Facter.to_hash.to_json)
+  facts = Puppet::Node::Facts.indirection.find(SecureRandom.uuid, environment: env)
+  puts(facts.values.to_json)
 end
+
 exit 0
