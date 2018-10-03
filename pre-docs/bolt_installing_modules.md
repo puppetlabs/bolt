@@ -38,6 +38,8 @@ In the case where a different version of a bundled module is desired the user ca
 
 Before you can use Bolt to install modules, you must first create a Puppetfile. A Puppetfile is a formatted text file that contains a list of modules and their versions. It can include modules from the Puppet Forge or a Git repository.
 
+For modules that require Ruby gems, see [Installing Gems with Bolt Packages](bolt_installing.md#installing-gems-with-bolt-packages).
+
 For more details about specifying modules in a Puppetfile, see the [Puppetfile documentation](https://puppet.com/docs/pe/2018.1/puppetfile.html).
 
 1.   Create a file named Puppetfile and store it in the Boltdir, which can be a directory named Boltdir at the root of your project or a global directory in `$HOME/.puppetlabs/bolt`. 
