@@ -84,6 +84,7 @@ describe "apply" do
         result = run_cli_json(%w[plan run basic::class] + config_flags)
         expect(result).not_to include('kind')
         expect(result[0]).to include('status' => 'success')
+        expect(result[0]['result']['_output']).to eq('changed: 1, failed: 0, unchanged: 0 skipped: 0, noop: 0')
         resources = result[0]['result']['report']['resource_statuses']
         expect(resources).to include('Notify[hello world]')
       end

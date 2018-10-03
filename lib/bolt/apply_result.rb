@@ -50,13 +50,13 @@ module Bolt
       if (puppet_missing = puppet_missing_error(result))
         new(result.target,
             error: puppet_missing,
-            report: result.value.delete('_error'))
+            report: result.value.reject { |k| k == '_error' })
       elsif !result.ok?
         new(result.target, error: result.error_hash)
       elsif (resource_error = resource_error(result))
         new(result.target,
             error: resource_error,
-            report: result.value.delete('_error'))
+            report: result.value.reject { |k| k == '_error' })
       else
         new(result.target, report: result.value)
       end
@@ -67,6 +67,46 @@ module Bolt
       @value = {}
       value['report'] = report if report
       value['_error'] = error if error
+      value['_output'] = metrics_message if metrics_message
+    end
+
+    def event_metrics
+      if (events = value.dig('report', 'metrics', 'resources', 'values'))
+        events.each_with_object({}) { |ev, h| h[ev[0]] = ev[2] }
+      end
+    end
+
+    # TODO: We've gotten requests for this type of logging but I'm not sure
+    # what we shold do with it exactly.
+    def log_events
+      logger = Logging.logger[target.name]
+      if (logs = value.dig('report', 'logs'))
+        logs.each do |log|
+          case log["level"]
+          when 'err'
+            logger.error(log['message'])
+          when 'warn'
+            logger.info(log['message'])
+          when 'notice'
+            logger.notice(log['message'])
+          when 'info'
+            logger.info(log['message'])
+          else
+            logger.debug(log["message"])
+          end
+        end
+      end
+    end
+
+    def metrics_message
+      if (metrics = event_metrics)
+        changed = metrics['changed']
+        failed = metrics['failed']
+        skipped = metrics['skipped']
+        unchanged = metrics['total'] - changed - failed - skipped
+        noop = metrics['out_of_sync'] - changed - failed
+        "changed: #{changed}, failed: #{failed}, unchanged: #{unchanged} skipped: #{skipped}, noop: #{noop}"
+      end
     end
 
     def report
