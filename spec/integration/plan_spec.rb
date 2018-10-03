@@ -30,9 +30,17 @@ describe "When a plan succeeds" do
 
   it 'prints a placeholder if no result is returned', ssh: true do
     result = run_cli(['plan', 'run', 'sample::single_task', '--nodes', target] + config_flags,
-                     outputter: Bolt::Outputter::Human)
+                     outputter: Bolt::Outputter::JSON)
     json = JSON.parse(result)[0]
     expect(json['node']).to eq(target.to_s)
     expect(json['status']).to eq('success')
+  end
+
+  it 'prints a placeholder if no result is returned', ssh: true do
+    result = run_cli(['plan', 'run', 'sample::single_task', '--nodes', target] + config_flags,
+                     outputter: Bolt::Outputter::Human)
+    expect(result).to match(/got passed the message: hi there/)
+    expect(result).to match(/Successful on 1 node:/)
+    expect(result).to match(/Ran on 1 node/)
   end
 end

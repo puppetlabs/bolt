@@ -202,7 +202,10 @@ Available options are:
       end
       define('--modulepath MODULES',
              "List of directories containing modules, separated by '#{File::PATH_SEPARATOR}'") do |modulepath|
-        @options[:modulepath] = modulepath.split(File::PATH_SEPARATOR)
+        # When specified from the CLI, modulepath entries are relative to pwd
+        @options[:modulepath] = modulepath.split(File::PATH_SEPARATOR).map do |moduledir|
+          File.expand_path(moduledir)
+        end
       end
       define('--boltdir FILEPATH',
              'Specify what Boltdir to load config from (default: autodiscovered from current working dir)') do |path|
@@ -217,7 +220,7 @@ Available options are:
         if ENV.include?(Bolt::Inventory::ENVIRONMENT_VAR)
           raise Bolt::CLIError, "Cannot pass inventory file when #{Bolt::Inventory::ENVIRONMENT_VAR} is set"
         end
-        @options[:inventoryfile] = path
+        @options[:inventoryfile] = File.expand_path(path)
       end
 
       separator 'Transports:'

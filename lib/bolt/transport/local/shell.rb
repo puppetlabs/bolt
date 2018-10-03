@@ -11,9 +11,9 @@ module Bolt
           command = [options[:env]] + command if options[:env]
 
           if options[:stdin]
-            stdout, stderr, rc = Open3.capture3(*command, stdin_data: options[:stdin])
+            stdout, stderr, rc = Open3.capture3(*command, stdin_data: options[:stdin], chdir: options[:dir])
           else
-            stdout, stderr, rc = Open3.capture3(*command)
+            stdout, stderr, rc = Open3.capture3(*command, chdir: options[:dir])
           end
 
           result_output = Bolt::Node::Output.new

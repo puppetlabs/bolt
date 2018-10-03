@@ -7,6 +7,7 @@ ENV['BOLT_DISABLE_ANALYTICS'] = 'true'
 
 gemspec
 gem "hocon"
+gem "json-schema"
 gem "puma"
 gem "rack"
 gem "rails-auth"

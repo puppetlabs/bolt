@@ -55,7 +55,8 @@ module Bolt
           require 'net/ssh/krb'
         rescue LoadError
           logger.debug {
-            "Authentication method 'gssapi-with-mic' is not available"
+            "Authentication method 'gssapi-with-mic' is not available. "\
+            "Please install the kerberos gem with `gem install net-ssh-krb`"
           }
         end
 
@@ -121,9 +122,19 @@ module Bolt
       end
 
       def run_task(target, task, arguments, options = {})
+        if from_api?(task)
+          executable = task.file['filename']
+          file_content = Base64.decode64(task.file['file_content'])
+          input_method = task.metadata['input_method']
+        else
+          implementation = task.select_implementation(target, PROVIDED_FEATURES)
+          executable = implementation['path']
+          input_method = implementation['input_method']
+        end
+        input_method ||= 'both'
+
         # unpack any Sensitive data
         arguments = unwrap_sensitive_args(arguments)
-        input_method = task.input_method || "both"
         with_connection(target, options.fetch('_load_config', true)) do |conn|
           conn.running_as(options['_run_as']) do
             stdin, output = nil
@@ -140,17 +151,12 @@ module Bolt
             end
 
             conn.with_remote_tempdir do |dir|
-              if from_api?(task)
-                filename = task.file['filename']
-                remote_task_path = conn.write_executable_from_content(dir,
-                                                                      Base64.decode64(task.file['file_content']),
-                                                                      filename)
-              else
-                executable = target.select_impl(task, PROVIDED_FEATURES)
-                raise "No suitable implementation of #{task.name} for #{target.name}" unless executable
+              remote_task_path = if from_api?(task)
+                                   conn.write_executable_from_content(dir, file_content, executable)
+                                 else
+                                   conn.write_remote_executable(dir, executable)
+                                 end
 
-                remote_task_path = conn.write_remote_executable(dir, executable)
-              end
               if conn.run_as && stdin
                 wrapper = make_wrapper_stringio(remote_task_path, stdin)
                 remote_wrapper_path = conn.write_remote_executable(dir, wrapper, 'wrapper.sh')
@@ -174,7 +180,7 @@ module Bolt
       def make_wrapper_stringio(task_path, stdin)
         StringIO.new(<<-SCRIPT)
 #!/bin/sh
-'#{task_path}' <<EOF
+'#{task_path}' <<'EOF'
 #{stdin}
 EOF
 SCRIPT

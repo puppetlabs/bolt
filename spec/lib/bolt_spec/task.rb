@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'bolt_spec/files'
+require 'bolt/task'
 
 module BoltSpec
   module Task
@@ -12,7 +13,9 @@ module BoltSpec
       end
 
       def ===(other)
-        @name == other.name && @executable =~ other.implementations.first['path'] && @input_method == other.input_method
+        @name == other.name &&
+          @executable =~ other.files.first['path'] &&
+          @input_method == other.metadata['input_method']
       end
 
       def description
@@ -21,8 +24,8 @@ module BoltSpec
     end
 
     def mock_task(name, executable = name, input_method = nil)
-      impls = [{ 'name' => executable, 'path' => executable }]
-      double('task', name: name, implementations: impls, input_method: input_method)
+      files = [{ 'name' => name, 'path' => executable }]
+      Bolt::Task.new(name: name, files: files, metadata: { 'input_method' => input_method })
     end
 
     def task_type(name, executable = nil, input_method = nil)

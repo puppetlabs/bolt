@@ -5,16 +5,9 @@ Plans allow you to run more than one task with a single command, compute values 
 Write plans in the Puppet language, giving them a `.pp` extension, and place them in the module's `/plans` directory.
 
 **Parent topic:** [Tasks and plans](writing_tasks_and_plans.md)
-<<<<<<< HEAD
 
-**Related information**  
-=======
+**Related information**
 
-**Related information**  
-
->>>>>>> upstream/master
-
-[Plan execution functions](plan_functions.md#)
 
 [Plan execution functions](plan_functions.md#)
 
@@ -31,17 +24,10 @@ Plan names are composed of two or more name segments, indicating:
 -   The name of the plan file, without the extension.
 
 -   The path within the module, if the plan is in a subdirectory of `./plans`.
-<<<<<<< HEAD
 
 
 For example, given a module called `mymodule` with a plan defined in `./mymodule/plans/myplan.pp`, the plan name is `mymodule::myplan`. A plan defined in `./mymodule/plans/service/myplan.pp`would be `mymodule::service::myplan`. This name is how you refer to the plan when you run commands.
 
-=======
-
-
-For example, given a module called `mymodule` with a plan defined in `./mymodule/plans/myplan.pp`, the plan name is `mymodule::myplan`. A plan defined in `./mymodule/plans/service/myplan.pp`would be `mymodule::service::myplan`. This name is how you refer to the plan when you run commands.
-
->>>>>>> upstream/master
 The plan filename `init` is special: the plan it defines is referenced using the module name only. For example, in a module called `mymodule`, the plan defined in `init.pp` is the `mymodule` plan.
 
 Avoid giving plans the same names as constructs in the Puppet language. Although plans do not share their namespace with other language constructs, giving plans these names makes your code difficult to read.
@@ -53,15 +39,9 @@ Each plan name segment must begin with a lowercase letter and:
 -   May include digits.
 
 -   May include underscores.
-<<<<<<< HEAD
 
 -   Must not be a [reserved word](https://docs.puppet.com/puppet/5.3/lang_reserved.html).
 
-=======
-
--   Must not be a [reserved word](https://docs.puppet.com/puppet/5.3/lang_reserved.html).
-
->>>>>>> upstream/master
 -   Must not have the same name as any Puppet data types.
 
 -   Namespace segments must match the following regular expression `\A[a-z][a-z0-9_]*\Z`
@@ -81,7 +61,7 @@ The plan then calls the `run_task` function, specifying which nodes the tasks sh
 
 ```
 plan mymodule::my_plan(
-  String[1] $load_balancer, 
+  String[1] $load_balancer,
   TargetSpec  $frontends,
   TargetSpec  $backends,
 ) {
@@ -90,7 +70,7 @@ plan mymodule::my_plan(
   run_task('mymodule::lb_remove', $load_balancer, frontends => $frontends)
   run_task('mymodule::update_frontend_app', $frontends, version => '1.2.3')
   run_task('mymodule::lb_add', $load_balancer, frontends => $frontends)
-}       
+}
 ```
 
 To execute this plan from the command line, pass the parameters as `parameter=value`. The `Targetspec` will accept either an array as json or a comma seperated string of target names.
@@ -100,7 +80,7 @@ bolt plan run mymodule::myplan --modulepath ./PATH/TO/MODULES --params load_bala
 
 ```
 
-**Related information**  
+**Related information**
 
 
 [Task metadata types](writing_tasks.md#)
@@ -121,14 +101,14 @@ plan return_result(
 
 The result of a plan must match the `PlanResult` type alias. This roughly includes JSON types as well as the Plan language types which have well defined JSON representations in Bolt.
 
--    `Undef` 
--    `String` 
--    `Numeric` 
--    `Boolean` 
--    `Target` 
--    `Result` 
--    `ResultSet` 
--    `Error` 
+-    `Undef`
+-    `String`
+-    `Numeric`
+-    `Boolean`
+-    `Target`
+-    `Result`
+-    `ResultSet`
+-    `Error`
 -   `Array` with only `PlanResult`
 -   Hash with `String` keys and `PlanResult` values
 
@@ -165,11 +145,7 @@ Any plan that completes execution without an error is considered successful. The
 
 ### Failing plans
 
-<<<<<<< HEAD
-If `file_upload`, `run_command`, `run_script`, or `run_task` are called without the `_catch_errors` option and they fail on any nodes, the plan itself will fail. To fail a plan directly call the `fail_plan` function. Create a new error with a message and include the kind, details, or issue code, or pass an existing error to it.
-=======
 If `upload_file`, `run_command`, `run_script`, or `run_task` are called without the `_catch_errors` option and they fail on any nodes, the plan itself will fail. To fail a plan directly call the `fail_plan` function. Create a new error with a message and include the kind, details, or issue code, or pass an existing error to it.
->>>>>>> upstream/master
 
 ```
 fail_plan('The plan is failing', 'mymodules/pear-shaped', {'failednodes' => $result.error_set.names})
@@ -186,7 +162,6 @@ The `Error` data type includes:
 -   `msg`: The error message string.
 
 -   `kind`: A string that defines the kind of error similar to an error class.
-<<<<<<< HEAD
 
 -   `details`: A hash with details about the error from a task or from information about the state of a plan when it fails, for example, `exit_code` or `stack_trace`.
 
@@ -195,26 +170,16 @@ The `Error` data type includes:
 
 Use the `Error` data type in a case expression to match against different kind of errors. To recover from certain errors, while failing on or ignoring others, set up your plan to include conditionals based on errors that occur while your plan runs. For example, you can set up a plan to retry a task when a timeout error occurs, but to fail when there is an authentication error.
 
-=======
-
--   `details`: A hash with details about the error from a task or from information about the state of a plan when it fails, for example, `exit_code` or `stack_trace`.
-
--   `issue_code`: A unique code for the message that can be used for translation.
-
-
-Use the `Error` data type in a case expression to match against different kind of errors. To recover from certain errors, while failing on or ignoring others, set up your plan to include conditionals based on errors that occur while your plan runs. For example, you can set up a plan to retry a task when a timeout error occurs, but to fail when there is an authentication error.
-
->>>>>>> upstream/master
 Below, the first plan continues whether it succeeds or fails with a`mymodule/not-serious`error. Other errors cause the plan to fail.
 
 ```
 plan mymodule::handle_errors {
   $result = run_plan('mymodule::myplan', '_catch_errors' => true)
   case $result {
-    Error['mymodule/not-serious'] : { 
+    Error['mymodule/not-serious'] : {
       notice("${result.message}")
-    }   
-    Error : { fail_plan($result) } } 
+    }
+    Error : { fail_plan($result) } }
   run_plan('mymodule::plan2')
 }
 
@@ -262,7 +227,7 @@ You should be aware of some other Puppet behaviors in plans:
 
 Plan execution functions each return a result object that returns details about the execution.
 
-Each execution function returns an object type `ResultSet`. For each node that the execution takes place on, this object contains a `Result` object.
+Each [execution function](./plan_functions.md) returns an object type `ResultSet`. For each node that the execution takes place on, this object contains a `Result` object. The [apply_statement](./applying_manifest_blocks.md) returns a `ResultSet` containing `ApplyResult` objects.
 
 A `ResultSet` has the following methods:
 
@@ -292,7 +257,6 @@ A `Result` has the following methods:
 -   `target()`: The `Target` object that the `Result` is from.
 
 -   `error()`: An `Error` object constructed from the `_error` in the value.
-<<<<<<< HEAD
 
 -   `message()`: The `_output` key from the value.
 
@@ -301,27 +265,26 @@ A `Result` has the following methods:
 -   `[]`: Accesses the value hash directly.
 
 
-An instance of `ResultSet` is `Iterable` as if it were an `Array[Result]` so that iterative functions such as `each`, `map`, `reduce`, or `filter` work directly on the ResultSet returning each result.
+An `ApplyResult` has the following methods:
 
-=======
+-   `report()`: The hash containing the puppet report from the application.
 
--   `message()`: The `_output` key from the value.
+-   `target()`: The `Target` object that the `Result` is from.
+
+-   `error()`: An `Error` object constructed from the `_error` in the value.
 
 -   `ok()`: Returns `true` if the `Result` was successful.
 
--   `[]`: Accesses the value hash directly.
 
+An instance of `ResultSet` is `Iterable` as if it were an `Array[Variant[Result, ApplyResult]]` so that iterative functions such as `each`, `map`, `reduce`, or `filter` work directly on the ResultSet returning each result.
 
-An instance of `ResultSet` is `Iterable` as if it were an `Array[Result]` so that iterative functions such as `each`, `map`, `reduce`, or `filter` work directly on the ResultSet returning each result.
-
->>>>>>> upstream/master
 This example checks if a task ran correctly on all nodes. If it did not, the check fails:
 
 ```
 $r = run_task('sometask', ..., '_catch_errors' => true)
 unless $r.ok {
   fail("Running sometask failed on the nodes ${r.error_nodes.names}")
-}   
+}
 ```
 
 You can do iteration and checking if the result is an Error. This example outputs some simple feedback about the result of a task:
@@ -331,13 +294,11 @@ $r = run_task('sometask', ..., '_catch_errors' => true)
 $r.each |$result| {
   $node = $result.target.name
   if $result.ok {
-    notice("${node} returned a value: ${result.value}") 
+    notice("${node} returned a value: ${result.value}")
   } else {
-    notice("${node} errored with a message: ${result.error.message}") 
+    notice("${node} errored with a message: ${result.error.message}")
   }
-}     
-<<<<<<< HEAD
-=======
+}
 ```
 
 ## Passing sensitive data to tasks
@@ -358,12 +319,11 @@ In Puppet the `Sensitive` type can be used to mask data from being output to log
 Since Plans are simply written in Puppet DSL this type can be used freely.
 The `run_task()` function does not allow parameters of `Sensitive` type to be passed.
 If a `Sensitive` vlue needs to be passed to a task, it must be unwrapped prior to
-the `run_task()` function call. 
+the `run_task()` function call.
 
 ```
 $pass = Sensitive('$ecret!')
 run_task('task_with_secrets', ..., password => $pass.unwrap)
->>>>>>> upstream/master
 ```
 
 ## Target objects
@@ -463,11 +423,7 @@ To generate log messages from a plan, use the puppet log function that correspon
 
 ### Default Action Logging
 
-<<<<<<< HEAD
-Bolt logs actions that a plan takes on targets through the  `file_upload`,  `run_command`, `run_script`, or `run_task`  functions. By default it logs a notice level message when an action starts and another when it completes. If you pass a description to the function, that will be used in place of the generic log message.
-=======
 Bolt logs actions that a plan takes on targets through the  `upload_file`,  `run_command`, `run_script`, or `run_task`  functions. By default it logs a notice level message when an action starts and another when it completes. If you pass a description to the function, that will be used in place of the generic log message.
->>>>>>> upstream/master
 
 ```
 run_task(my_task, $targets, "Better description", param1 => "val")
@@ -500,7 +456,7 @@ without_default_logging { run_command('echo hi', $nodes) }
 
 ### puppetdb\_query
 
- 
+
 
 You can use the `puppetdb_query` function in plans to make direct queries to PuppetDB. For example you can discover nodes from PuppetDB and then run tasks on them. You'll have to configure the [puppetdb client](bolt_connect_puppetdb.md)before running it.
 
@@ -514,4 +470,5 @@ plan pdb_discover {
   run_task('my_task', $nodes)
 }
 ```
+
 

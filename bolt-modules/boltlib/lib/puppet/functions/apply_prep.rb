@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'fileutils'
+require 'bolt/task'
 
 Puppet::Functions.create_function(:apply_prep) do
   dispatch :apply_prep do
@@ -12,8 +13,10 @@ Puppet::Functions.create_function(:apply_prep) do
   end
 
   def run_task(executor, targets, name, args = {})
-    task = script_compiler.task_signature(name)&.task
-    raise Bolt::Error.new("#{name} could not be found", 'bolt/apply-prep') unless task
+    tasksig = script_compiler.task_signature(name)
+    raise Bolt::Error.new("#{name} could not be found", 'bolt/apply-prep') unless tasksig
+
+    task = Bolt::Task.new(tasksig.task_hash)
     results = executor.run_task(targets, task, args)
     raise Bolt::RunFailure.new(results, 'run_task', task.name) unless results.ok?
     results
@@ -61,7 +64,8 @@ Puppet::Functions.create_function(:apply_prep) do
         end
 
         task = applicator.custom_facts_task
-        results = executor.run_task(targets, task, 'plugins' => plugins)
+        arguments = { 'plugins' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(plugins) }
+        results = executor.run_task(targets, task, arguments)
         raise Bolt::RunFailure.new(results, 'run_task', task.name) unless results.ok?
 
         results.each do |result|

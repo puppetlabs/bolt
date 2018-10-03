@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
+require 'bolt/applicator'
 require 'bolt/executor'
 require 'bolt/error'
 require 'bolt/plan_result'
 require 'bolt/util'
-require 'bolt/applicator'
 
 module Bolt
   class PAL
-    BOLTLIB_PATH = File.join(__dir__, '../../bolt-modules')
-    MODULES_PATH = File.join(__dir__, '../../modules')
+    BOLTLIB_PATH = File.expand_path('../../bolt-modules', __dir__)
+    MODULES_PATH = File.expand_path('../../modules', __dir__)
 
     # PALError is used to convert errors from executing puppet code into
     # Bolt::Errors
@@ -44,9 +44,15 @@ module Bolt
       # This makes sure we don't accidentally create puppet dirs
       with_puppet_settings { |_| nil }
 
+      @original_modulepath = modulepath
       @modulepath = [BOLTLIB_PATH, *modulepath, MODULES_PATH]
       @hiera_config = hiera_config
       @max_compiles = max_compiles
+
+      @logger = Logging.logger[self]
+      if modulepath && !modulepath.empty?
+        @logger.info("Loading modules from #{@modulepath.join(File::PATH_SEPARATOR)}")
+      end
     end
 
     # Puppet logging is global so this is class method to avoid confusion
@@ -67,7 +73,6 @@ module Bolt
       end
 
       begin
-        require_relative '../../vendored/require_vendored'
         require 'puppet_pal'
       rescue LoadError
         raise Bolt::Error.new("Puppet must be installed to execute tasks", "bolt/puppet-missing")
@@ -123,6 +128,10 @@ module Bolt
           inventory,
           executor,
           @modulepath,
+          # Skip syncing built-in plugins, since we vendor some Puppet 6
+          # versions of "core" types, which are already present on the agent,
+          # but may cause issues on Puppet 5 agents.
+          @original_modulepath,
           pdb_client,
           @hiera_config,
           @max_compiles
@@ -172,7 +181,7 @@ module Bolt
         tasks = compiler.list_tasks
         tasks.map(&:name).sort.map do |task_name|
           task_sig = compiler.task_signature(task_name)
-          [task_name, task_sig.task.description]
+          [task_name, task_sig.task_hash['metadata']['description']]
         end
       end
     end
@@ -180,15 +189,15 @@ module Bolt
     def parse_params(type, object_name, params)
       in_bolt_compiler do |compiler|
         if type == 'task'
-          param_spec = compiler.task_signature(object_name)&.task_hash
+          param_spec = compiler.task_signature(object_name)&.task_hash&.dig('parameters')
         elsif type == 'plan'
           plan = compiler.plan_signature(object_name)
-          param_spec = plan_hash(object_name, plan) if plan
+          param_spec = plan.params_type.elements&.each_with_object({}) { |t, h| h[t.name] = t.value_type } if plan
         end
         param_spec ||= {}
 
         params.each_with_object({}) do |(name, str), acc|
-          type = param_spec.dig('parameters', name, 'type')
+          type = param_spec[name]
           begin
             parsed = JSON.parse(str, quirks_mode: true)
             # The type may not exist if the module is remote on orch or if a task
@@ -217,7 +226,7 @@ module Bolt
         raise Bolt::Error.new(Bolt::Error.unknown_task(task_name), 'bolt/unknown-task')
       end
 
-      task.task_hash
+      task.task_hash.reject { |k, _| k == 'parameters' }
     end
 
     def list_plans
@@ -226,13 +235,17 @@ module Bolt
       end
     end
 
-    # This converts a plan signature object into a format approximating the
-    # task_hash of a task_signature. Must be called from within bolt compiler
-    # to pickup type aliases used in the plan signature.
+    # This converts a plan signature object into a format used by the outputter.
+    # Must be called from within bolt compiler to pickup type aliases used in the plan signature.
     def plan_hash(plan_name, plan)
       elements = plan.params_type.elements || []
       parameters = elements.each_with_object({}) do |param, acc|
-        acc[param.name] = { 'type' => param.value_type }
+        type = if param.value_type.is_a?(Puppet::Pops::Types::PTypeAliasType)
+                 param.value_type.name
+               else
+                 param.value_type.to_s
+               end
+        acc[param.name] = { 'type' => type }
         acc[param.name]['default_value'] = nil if param.key_type.is_a?(Puppet::Pops::Types::POptionalType)
       end
       {
@@ -240,11 +253,14 @@ module Bolt
         'parameters' => parameters
       }
     end
+    private :plan_hash
 
     def get_plan_info(plan_name)
       plan_info = in_bolt_compiler do |compiler|
         plan = compiler.plan_signature(plan_name)
-        plan_hash(plan_name, plan) if plan
+        hash = plan_hash(plan_name, plan) if plan
+        hash['module'] = plan.instance_variable_get(:@plan_func).loader.parent.path if plan
+        hash
       end
 
       if plan_info.nil?

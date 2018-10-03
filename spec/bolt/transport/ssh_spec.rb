@@ -359,6 +359,18 @@ SHELL
       end
     end
 
+    it "can run a task with params containing variable references", ssh: true do
+      contents = <<SHELL
+#!/bin/sh
+cat
+SHELL
+
+      arguments = { message: "$PATH" }
+      with_task_containing('tasks_test_var', contents, 'both') do |task|
+        expect(ssh.run_task(target, task, arguments)['message']).to eq("$PATH")
+      end
+    end
+
     it "can run a task with Sensitive params via environment", ssh: true do
       contents = <<SHELL
 #!/bin/sh
@@ -460,30 +472,37 @@ SHELL
 
       it "runs a task requires 'shell'" do
         with_task_containing('tasks_test', contents, 'environment') do |task|
-          impls = task.implementations.map { |impl| impl.merge('requirements' => ['shell']) }
-          expect(task).to receive(:implementations).and_return(impls)
+          task['metadata']['implementations'] = [{ 'name' => 'tasks_test', 'requirements' => ['shell'] }]
           expect(ssh.run_task(target, task, arguments).message)
+            .to eq('Hello from task Goodbye')
+        end
+      end
+
+      it "runs a task with the implementation's input method" do
+        with_task_containing('tasks_test', contents, 'stdin') do |task|
+          task['metadata']['implementations'] = [{
+            'name' => 'tasks_test', 'requirements' => ['shell'], 'input_method' => 'environment'
+          }]
+          expect(ssh.run_task(target, task, arguments).message.chomp)
             .to eq('Hello from task Goodbye')
         end
       end
 
       it "errors when a task only requires an unsupported requirement" do
         with_task_containing('tasks_test', contents, 'environment') do |task|
-          impls = task.implementations.map { |impl| impl.merge('requirements' => ['powershell']) }
-          expect(task).to receive(:implementations).and_return(impls)
+          task['metadata']['implementations'] = [{ 'name' => 'tasks_test', 'requirements' => ['powershell'] }]
           expect {
             ssh.run_task(target, task, arguments)
-          }.to raise_error("No suitable implementation of #{task.name} for #{target.name}")
+          }.to raise_error("No suitable implementation of #{task['name']} for #{target.name}")
         end
       end
 
       it "errors when a task only requires an unknown requirement" do
         with_task_containing('tasks_test', contents, 'environment') do |task|
-          impls = task.implementations.map { |impl| impl.merge('requirements' => ['foobar']) }
-          expect(task).to receive(:implementations).and_return(impls)
+          task['metadata']['implementations'] = [{ 'name' => 'tasks_test', 'requirements' => ['foobar'] }]
           expect {
             ssh.run_task(target, task, arguments)
-          }.to raise_error("No suitable implementation of #{task.name} for #{target.name}")
+          }.to raise_error("No suitable implementation of #{task['name']} for #{target.name}")
         end
       end
     end
@@ -540,6 +559,18 @@ SHELL
       with_task_containing('tasks_test', contents, 'environment') do |task|
         expect(ssh.run_task(target, task, arguments).message)
           .to eq('Hello from task then Goodbye')
+      end
+    end
+
+    it "can run a task with params containing variable references", ssh: true do
+      contents = <<SHELL
+#!/bin/sh
+cat
+SHELL
+
+      arguments = { message: "$PATH" }
+      with_task_containing('tasks_test_var', contents, 'both') do |task|
+        expect(ssh.run_task(target, task, arguments)['message']).to eq("$PATH")
       end
     end
 

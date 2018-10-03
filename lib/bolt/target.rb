@@ -61,12 +61,6 @@ module Bolt
     end
     private :parse
 
-    def select_impl(task, additional_features = [])
-      available_features = features + additional_features
-      suitable_impl = task.implementations.find { |impl| Set.new(impl['requirements']).subset?(available_features) }
-      return suitable_impl['path'] if suitable_impl
-    end
-
     def features
       if @inventory
         @inventory.features(self)
@@ -107,15 +101,11 @@ module Bolt
     end
 
     def user
-      Addressable::URI.unencode_component(
-        @uri_obj.user || @user
-      )
+      Addressable::URI.unencode_component(@uri_obj.user) || @user
     end
 
     def password
-      Addressable::URI.unencode_component(
-        @uri_obj.password || @password
-      )
+      Addressable::URI.unencode_component(@uri_obj.password) || @password
     end
   end
 end

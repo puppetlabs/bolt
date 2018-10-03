@@ -170,38 +170,7 @@ The Puppet repository for the YUM package management system is [http://yum.puppe
 
 ## Install Bolt as a gem
 
-Install Ruby 2.3 or above and Bolt.
-
-If Ruby is already included in your operating system, verify that it is version 2.3 or above. Run `ruby -v`.
-
-1.   To install the dependencies required to install Bolt, run the command that corresponds to your operating system. 
-    -   For Fedora 27
-
-        ```
-        dnf install -y ruby rubygem-json rubygem-ffi rubygem-bigdecimal rubygem-io-console
-        ```
-
-    -   For Debian 9 or Ubuntu 16.04
-
-        ```
-        apt-get install -y ruby ruby-ffi
-        ```
-
-    -   For Mac OS X 10.13 \(High Sierra\)
-
-        ```
-        xcode-select --install
-        
-        ```
-
-    -   For Windows, you can download Ruby from [https://rubyinstaller.org/](https://rubyinstaller.org/) or the Chocolatey Windows package manager. Run subsequent commands in a Windows PowerShell session.
-2.   To install Bolt, run `gem install bolt` 
-3.   Run a Bolt command and get started. 
-
-    ```
-    bolt --help
-    ```
-
+Installing bolt from a gem is not recommended since core modules will not be available.
 
 ## Analytics data collection
 
@@ -239,5 +208,11 @@ To disable the collection of analytics data add the following line to `~/.puppe
 
 ```
 disabled: true
+```
+## A Note on Kerberos over SSH
+
+We support using Kerberos over SSH for authentication, but due to license incompatibility with other components we are distributing you'll need to install the gem yourself. You can do this with
+```
+gem install net-ssh-krb
 ```
 
