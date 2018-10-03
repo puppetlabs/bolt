@@ -113,18 +113,20 @@ Write a simple task that formats the parameters a user gives it.
     exercise8::great_metadata - An exercise in writing great metadata
 
     USAGE:
-    bolt task run --nodes, -n <node-name> exercise8::great_metadata name=<value> recursive=<value> action=<value> [timeout=<value>] [--noop]
+    bolt task run --nodes <node-name> exercise8::great_metadata name=<value> recursive=<value> action=<value> timeout=<value> [--noop]
 
     PARAMETERS:
     - name: String
         The description for the 'name' parameter
     - recursive: Boolean
         The description for the 'recursive' parameter
-    - action: Enum['restart', 'start', 'stop']
+    - action: Enum[stop, start, restart]
         The description for the 'action' parameter
     - timeout: Optional[Integer]
         The description for the 'timeout' parameter
 
+    MODULE:
+    tasks-hands-on-lab/08-writing-advanced-tasks/modules/exercise8
     ```
 
 # Testing your task's metadata validation
@@ -160,6 +162,11 @@ Bolt can use the types that you have specified in your metadata to validate para
           },
           {
             "type": "unicode",
+            "value": "exercise8::great_metadata",
+            "key": "_task"
+          },
+          {
+            "type": "unicode",
             "value": "poppey",
             "key": "name"
           },
@@ -171,7 +178,7 @@ Bolt can use the types that you have specified in your metadata to validate para
         ]
       }
     Successful on 1 node: node1
-    Ran on 1 node in 0.98 seconds
+    Ran on 1 node in 0.97 seconds
     ```
 
 # Creating a task that supports no-operation mode (noop)
