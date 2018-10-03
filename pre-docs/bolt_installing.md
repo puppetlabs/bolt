@@ -209,4 +209,10 @@ To disable the collection of analytics data add the following line to `~/.puppe
 ```
 disabled: true
 ```
+## A Note on Kerberos over SSH
+
+We support using Kerberos over SSH for authentication, but due to license incompatibility with other components we are distributing you'll need to install the gem yourself. You can do this with
+```
+gem install net-ssh-krb
+```
 

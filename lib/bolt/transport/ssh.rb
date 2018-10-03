@@ -55,7 +55,8 @@ module Bolt
           require 'net/ssh/krb'
         rescue LoadError
           logger.debug {
-            "Authentication method 'gssapi-with-mic' is not available"
+            "Authentication method 'gssapi-with-mic' is not available. "\
+            "Please install the kerberos gem with `gem install net-ssh-krb`"
           }
         end
 
