@@ -53,6 +53,7 @@ module Bolt
       pal_main = request['code_ast'] || request['code_string']
       target = request['target']
       pdb_client = Bolt::PuppetDB::Client.new(Bolt::PuppetDB::Config.new(request['pdb_config']))
+      options = request['puppet_config'] || {}
 
       with_puppet_settings(request['hiera_config']) do
         Puppet[:rich_data] = true
@@ -65,6 +66,10 @@ module Bolt
                           bolt_inventory: setup_inventory(request['inventory'])) do
             Puppet.lookup(:pal_current_node).trusted_data = target['trusted']
             pal.with_catalog_compiler do |compiler|
+              # Configure language strictness in the CatalogCompiler. We want Bolt to be able
+              # to compile most Puppet 4+ manifests, so we default to allowing deprecated functions.
+              Puppet[:strict] = options['strict'] || :warning
+              Puppet[:strict_variables] = options['strict_variables'] || false
               ast = Puppet::Pops::Serialization::FromDataConverter.convert(pal_main)
               compiler.evaluate(ast)
               compiler.compile_additions
