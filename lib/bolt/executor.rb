@@ -119,7 +119,7 @@ module Bolt
       await_results(promises)
     end
 
-    def log_action(description, targets)
+    def log_action(description, detailed, targets)
       # When running a plan, info messages like starting a task are promoted to notice.
       log_method = @plan_logging ? :notice : :info
       target_str = if targets.length > 5
@@ -129,6 +129,8 @@ module Bolt
                    end
 
       @logger.send(log_method, "Starting: #{description} on #{target_str}")
+      # Make sure the full nodes are always logged at info level
+      @logger.info("#{detailed} on #{targets.map(&:uri)}")
 
       start_time = Time.now
       results = yield
@@ -174,23 +176,25 @@ module Bolt
       end
     end
 
-    def with_node_logging(description, batch)
-      @logger.info("#{description} on #{batch.map(&:uri)}")
-      result = yield
-      @logger.info(result.to_json)
-      result
+    def notify_proc(callback)
+      callback ||= proc do |event|
+        if event[:type] == :node_result
+          log.info(event[:result].to_json)
+        end
+      end
+      # CODEREVIEW We shouldn't need to use the notifier with the logger.
+      # Should we always use in until we can refactor this?
+      proc { |event| @notifier.notify(callback, event) if callback }
     end
 
     def run_command(targets, command, options = {}, &callback)
       description = options.fetch('_description', "command '#{command}'")
-      log_action(description, targets) do
-        notify = proc { |event| @notifier.notify(callback, event) if callback }
+      detailed = "Running command '#{command}'"
+      log_action(description, detailed, targets) do
         options = { '_run_as' => run_as }.merge(options) if run_as
 
         results = batch_execute(targets) do |transport, batch|
-          with_node_logging("Running command '#{command}'", batch) do
-            transport.batch_command(batch, command, options, &notify)
-          end
+          transport.batch_command(batch, command, options, &notify_proc(callback))
         end
 
         @notifier.shutdown
@@ -200,14 +204,12 @@ module Bolt
 
     def run_script(targets, script, arguments, options = {}, &callback)
       description = options.fetch('_description', "script #{script}")
-      log_action(description, targets) do
-        notify = proc { |event| @notifier.notify(callback, event) if callback }
+      detailed = "Running script #{script} with '#{arguments}'"
+      log_action(description, detailed, targets) do
         options = { '_run_as' => run_as }.merge(options) if run_as
 
         results = batch_execute(targets) do |transport, batch|
-          with_node_logging("Running script #{script} with '#{arguments}'", batch) do
-            transport.batch_script(batch, script, arguments, options, &notify)
-          end
+          transport.batch_script(batch, script, arguments, options, &notify_proc(callback))
         end
 
         @notifier.shutdown
@@ -217,16 +219,14 @@ module Bolt
 
     def run_task(targets, task, arguments, options = {}, &callback)
       description = options.fetch('_description', "task #{task.name}")
-      log_action(description, targets) do
-        notify = proc { |event| @notifier.notify(callback, event) if callback }
+      detailed = "Running task #{task.name} with '#{arguments}'"
+      log_action(description, detailed, targets) do
         options = { '_run_as' => run_as }.merge(options) if run_as
         options = options.merge('_load_config' => @load_config)
         arguments['_task'] = task.name
 
         results = batch_execute(targets) do |transport, batch|
-          with_node_logging("Running task #{task.name} with '#{arguments}'", batch) do
-            transport.batch_task(batch, task, arguments, options, &notify)
-          end
+          transport.batch_task(batch, task, arguments, options, &notify_proc(callback))
         end
 
         @notifier.shutdown
@@ -236,14 +236,12 @@ module Bolt
 
     def upload_file(targets, source, destination, options = {}, &callback)
       description = options.fetch('_description', "file upload from #{source} to #{destination}")
-      log_action(description, targets) do
-        notify = proc { |event| @notifier.notify(callback, event) if callback }
+      detailed = "Uploading file #{source} to #{destination}"
+      log_action(description, detailed, targets) do
         options = { '_run_as' => run_as }.merge(options) if run_as
 
         results = batch_execute(targets) do |transport, batch|
-          with_node_logging("Uploading file #{source} to #{destination}", batch) do
-            transport.batch_upload(batch, source, destination, options, &notify)
-          end
+          transport.batch_upload(batch, source, destination, options, &notify_proc(callback))
         end
 
         @notifier.shutdown

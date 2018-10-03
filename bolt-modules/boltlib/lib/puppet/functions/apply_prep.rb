@@ -36,7 +36,7 @@ Puppet::Functions.create_function(:apply_prep) do
 
     targets = inventory.get_targets(target_spec)
 
-    executor.log_action('install puppet and gather facts', targets) do
+    executor.log_action('install puppet and gather facts', "Install puppet and gather facts", targets) do
       executor.without_default_logging do
         # Ensure Puppet is installed
         versions = run_task(executor, targets, 'puppet_agent::version')
