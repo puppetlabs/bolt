@@ -12,40 +12,31 @@ require 'tempfile'
 args = JSON.parse(ARGV[0] ? File.read(ARGV[0]) : STDIN.read)
 
 # Create temporary directories for all core Puppet settings so we don't clobber
-# existing state or read from puppet.conf
+# existing state or read from puppet.conf. Also create a temporary modulepath.
+# Additionally include rundir, which gets its own initialization.
 puppet_root = Dir.mktmpdir
 moduledir = File.join(puppet_root, 'modules')
 Dir.mkdir(moduledir)
-cli = Puppet::Settings::REQUIRED_APP_SETTINGS.flat_map { |setting| ["--#{setting}", puppet_root] }
+cli = (Puppet::Settings::REQUIRED_APP_SETTINGS + [:rundir]).flat_map do |setting|
+  ["--#{setting}", File.join(puppet_root, setting.to_s.chomp('dir'))]
+end
 cli << '--modulepath' << moduledir
 Puppet.initialize_settings(cli)
-run_mode = Puppet::Util::RunMode[:user]
-Puppet.settings.initialize_app_defaults(Puppet::Settings.app_defaults_for_run_mode(run_mode))
-
-Puppet::ApplicationSupport.push_application_context(run_mode)
 
 # Avoid extraneous output
-Puppet[:summarize] = false
 Puppet[:report] = false
-Puppet[:graph] = false
 
 # Make sure to apply the catalog
-Puppet[:use_cached_catalog] = false
 Puppet[:noop] = args['_noop'] || false
-Puppet[:strict_environment_mode] = false
-
-# The whole catalog
-Puppet[:tags] = nil
-Puppet[:skip_tags] = nil
-
-# And nothing but the catalog
-Puppet[:prerun_command] = nil
-Puppet[:postrun_command] = nil
 
 Puppet[:default_file_terminus] = :file_server
 
 exit_code = 0
 begin
+  # This happens implicitly when running the Configurer, but we make it explicit here. It creates the
+  # directories we configured earlier.
+  Puppet.settings.use(:main)
+
   Tempfile.open('plugins.tar.gz') do |plugins|
     File.binwrite(plugins, Base64.decode64(args['plugins']))
     Puppet::ModuleTool::Tar.instance.unpack(plugins, moduledir, Etc.getlogin || Etc.getpwuid.name)
