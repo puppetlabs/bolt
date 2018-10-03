@@ -54,20 +54,20 @@ bolt command run <command> --nodes <nodes> --user <user> --password <password>
     ```
     The result:
     ```
-    Started on node2...
     Started on node1...
     Started on node3...
+    Started on node2...
     Finished on node2:
       STDOUT:
-         22:42:55 up 16 min,  0 users,  load average: 0.00, 0.01, 0.02
-    Finished on node1:
-      STDOUT:
-         22:42:55 up 17 min,  0 users,  load average: 0.00, 0.01, 0.03
+         21:03:37 up  2:06,  0 users,  load average: 0.00, 0.01, 0.03
     Finished on node3:
       STDOUT:
-         22:42:55 up 16 min,  0 users,  load average: 0.00, 0.01, 0.04
+         21:03:37 up  2:05,  0 users,  load average: 0.08, 0.03, 0.05
+    Finished on node1:
+      STDOUT:
+         21:03:37 up  2:07,  0 users,  load average: 0.00, 0.01, 0.05
     Successful on 3 nodes: node1,node2,node3
-    Ran on 3 nodes in 0.48 seconds
+    Ran on 3 nodes in 0.52 seconds
     ```
 
 3. Create an inventory file to store information about your nodes and refer to them as a group.  Later exercises will refer to the default group `all`. For more information on how to set up other named groups, see the
@@ -76,18 +76,11 @@ bolt command run <command> --nodes <nodes> --user <user> --password <password>
     For example, if you are using the provided Vagrant configuration file, save the following to `~/.puppetlabs/bolt/inventory.yaml`:
 
     ```yaml
-    nodes: [node1, node2, node3]
-    ```
-
-    If you're accessing nodes using a username and password rather than keys, save the following to `~/.puppetlabs/bolt/inventory.yaml`:
-
-    ```yaml
+    ---
     nodes: [node1, node2, node3]
     config:
-      transports:
-        ssh:
-          user: $user
-          password: $password
+      ssh:
+        host-key-check: false
     ```
 
 # Running PowerShell commands on Windows nodes
@@ -119,7 +112,7 @@ bolt command run <command> --no-ssl --nodes winrm://<node>,winrm://<node> --user
 2.  Run the following command to list all of the processes running on a remote machine.
 
     ```
-    bolt command run "gps | select ProcessName" --nodes $WINNODE
+    bolt command run "gps | select ProcessName" --nodes $WINNODE --no-ssl
     ```
 
     Use following syntax to list all of the processes running on multiple remote machines.

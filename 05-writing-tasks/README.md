@@ -73,7 +73,7 @@ If you're targeting Windows nodes then you might prefer to implement the task in
 2. Run the exercise5 task. 
 
     ```
-    bolt task run exercise5::print message="hello powershell" --nodes $WINNODE --modulepath ./modules
+    bolt task run exercise5::print message="hello powershell" --nodes $WINNODE --modulepath ./modules --no-ssl
     ```
     ```
     The result:
