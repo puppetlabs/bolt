@@ -63,7 +63,6 @@ describe Bolt::Config do
 
   describe "::from_boltdir" do
     let(:default_path) { File.expand_path(File.join('~', '.puppetlabs', 'bolt.yaml')) }
-    let(:alt_path) { File.expand_path(File.join('~', '.puppetlabs', 'bolt.yml')) }
 
     it "loads from the boltdir config file if present" do
       expect(Bolt::Util).to receive(:read_config_file).with(nil, [boltdir.config_file], 'config')
