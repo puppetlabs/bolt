@@ -420,9 +420,11 @@ bar
     end
 
     describe "modulepath" do
-      it "accepts a modulepath directory" do
-        cli = Bolt::CLI.new(%w[command run --modulepath ./modules --nodes foo])
-        expect(cli.parse).to include(modulepath: ['./modules'])
+      it "treats relative modulepath as relative to pwd" do
+        site = File.expand_path('site')
+        modulepath = [site, 'modules'].join(File::PATH_SEPARATOR)
+        cli = Bolt::CLI.new(%W[command run --modulepath #{modulepath} --nodes foo])
+        expect(cli.parse).to include(modulepath: [site, File.expand_path('modules')])
       end
 
       it "generates an error message if no value is given" do
@@ -878,41 +880,45 @@ bar
           }
           cli.execute(options)
           json = JSON.parse(output.string)
-          json.delete('implementations')
+          json.delete("files")
           expect(json).to eq(
             "name" => "sample::params",
-            "description" => "Task with parameters",
-            "input_method" => 'stdin',
-            "parameters" => {
-              "mandatory_string" => {
-                "description" => "Mandatory string parameter",
-                "type" => "String[1, 10]"
+            "module_dir" => File.absolute_path(File.join(__dir__, "..", "fixtures", "modules", "sample")),
+            "metadata" => {
+              "anything" => true,
+              "description" => "Task with parameters",
+              "extensions" => {},
+              "input_method" => 'stdin',
+              "parameters" => {
+                "mandatory_string" => {
+                  "description" => "Mandatory string parameter",
+                  "type" => "String[1, 10]"
+                },
+                "mandatory_integer" => {
+                  "description" => "Mandatory integer parameter",
+                  "type" => "Integer"
+                },
+                "mandatory_boolean" => {
+                  "description" => "Mandatory boolean parameter",
+                  "type" => "Boolean"
+                },
+                "non_empty_string" => {
+                  "type" => "String[1]"
+                },
+                "optional_string" => {
+                  "description" => "Optional string parameter",
+                  "type" => "Optional[String]"
+                },
+                "optional_integer" => {
+                  "description" => "Optional integer parameter",
+                  "type" => "Optional[Integer[-5,5]]"
+                },
+                "no_type" => {
+                  "description" => "A parameter without a type"
+                }
               },
-              "mandatory_integer" => {
-                "description" => "Mandatory integer parameter",
-                "type" => "Integer"
-              },
-              "mandatory_boolean" => {
-                "description" => "Mandatory boolean parameter",
-                "type" => "Boolean"
-              },
-              "non_empty_string" => {
-                "type" => "String[1]"
-              },
-              "optional_string" => {
-                "description" => "Optional string parameter",
-                "type" => "Optional[String]"
-              },
-              "optional_integer" => {
-                "description" => "Optional integer parameter",
-                "type" => "Optional[Integer[-5, 5]]"
-              },
-              "no_type" => {
-                "description" => "A parameter without a type",
-                'type' => 'Any'
-              }
-            },
-            "supports_noop" => true
+              "supports_noop" => true
+            }
           )
         end
       end
@@ -939,7 +945,7 @@ bar
             expect(json).to include(task)
           end
           output = @log_output.readlines.join
-          expect(output).to match(/unexpected token.*params\.json/m)
+          expect(output).to match(/unexpected token/)
         end
       end
 
@@ -996,6 +1002,7 @@ bar
           json = JSON.parse(output.string)
           expect(json).to eq(
             "name" => "sample::optional_params_task",
+            "module_dir" => File.absolute_path(File.join(__dir__, "..", "fixtures", "modules", "sample")),
             "parameters" => {
               "param_mandatory" => {
                 "type" => "String"
@@ -1030,7 +1037,6 @@ bar
                               ["canary"],
                               ["facts"],
                               ["facts::info"],
-                              ["facts::retrieve"],
                               ["puppetdb_fact"],
                               ["sample::ok"]])
 
@@ -1735,8 +1741,9 @@ bar
 
   describe 'configfile' do
     let(:configdir) { File.join(__dir__, '..', 'fixtures', 'configs') }
+    let(:modulepath) { [File.expand_path('/foo/bar'), File.expand_path('/baz/qux')] }
     let(:complete_config) do
-      { 'modulepath' => "/foo/bar#{File::PATH_SEPARATOR}/baz/qux",
+      { 'modulepath' => modulepath.join(File::PATH_SEPARATOR),
         'inventoryfile' => File.join(__dir__, '..', 'fixtures', 'inventory', 'empty.yml'),
         'concurrency' => 14,
         'compile-concurrency' => 2,
@@ -1776,7 +1783,7 @@ bar
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-host-key-check])
         cli.parse
-        expect(cli.config.modulepath).to eq(['/foo/bar', '/baz/qux'])
+        expect(cli.config.modulepath).to eq(modulepath)
       end
     end
 

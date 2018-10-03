@@ -7,6 +7,13 @@ test_name "bolt plan run should apply manifest block on remote hosts via ssh" do
   extend Acceptance::BoltCommandHelper
 
   ssh_nodes = select_hosts(roles: ['ssh'])
+  osx11 = select_hosts(platform: [/osx-10.11/])
+  targets = "ssh_nodes"
+  if osx11.any?
+    ssh_nodes -= osx11
+    targets = ssh_nodes.each_with_object([]) { |node, acc| acc.push(node[:vmhostname]) }.join(",")
+  end
+
   skip_test('no applicable nodes to test on') if ssh_nodes.empty?
 
   dir = bolt.tmpdir('apply_ssh')
@@ -18,7 +25,7 @@ test_name "bolt plan run should apply manifest block on remote hosts via ssh" do
     scp_to(bolt, File.join(fixtures, 'example_apply'), "#{dir}/modules/example_apply")
   end
 
-  bolt_command = "bolt plan run example_apply filepath=#{filepath} nodes=ssh_nodes"
+  bolt_command = "bolt plan run example_apply filepath=#{filepath} nodes=#{targets}"
   flags = {
     '--modulepath' => modulepath(File.join(dir, 'modules')),
     '--format'     => 'json'
@@ -72,7 +79,7 @@ test_name "bolt plan run should apply manifest block on remote hosts via ssh" do
                    "The task did not succeed on #{host}")
 
       # Verify the custom type was invoked
-      logs = result[0]['result']['logs']
+      logs = result[0]['result']['report']['logs']
       warnings = logs.select { |l| l['level'] == 'warning' }
       assert_equal(1, warnings.count)
       assert_equal('Writing a MOTD!', warnings[0]['message'])
@@ -87,7 +94,7 @@ test_name "bolt plan run should apply manifest block on remote hosts via ssh" do
   end
 
   step "puppet service should be stopped" do
-    service_command = 'bolt task run service action=status name=puppet -n ssh_nodes'
+    service_command = "bolt task run service action=status name=puppet -n #{targets}"
     result = bolt_command_on(bolt, service_command, flags)
 
     assert_equal(0, result.exit_code,
@@ -135,7 +142,7 @@ FILE
       end
     end
 
-    bolt_command = "bolt plan run example_apply filepath=#{restricted_filepath} nodes=ssh_nodes"
+    bolt_command = "bolt plan run example_apply filepath=#{restricted_filepath} nodes=#{targets}"
 
     step "execute `bolt plan run run_as=#{user}` via SSH with json output" do
       result = bolt_command_on(bolt, bolt_command + " run_as=#{user}", flags)

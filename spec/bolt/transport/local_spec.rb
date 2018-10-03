@@ -224,8 +224,17 @@ SHELL
 
       it "runs a task requires 'shell'" do
         with_task_containing('tasks_test', contents, 'environment') do |task|
-          impls = task.implementations.map { |impl| impl.merge('requirements' => ['shell']) }
-          expect(task).to receive(:implementations).and_return(impls)
+          task['metadata']['implementations'] = [{ 'name' => 'tasks_test', 'requirements' => ['shell'] }]
+          expect(local.run_task(target, task, arguments).message.chomp)
+            .to eq('Hello from task Goodbye')
+        end
+      end
+
+      it "runs a task with the implementation's input method" do
+        with_task_containing('tasks_test', contents, 'stdin') do |task|
+          task['metadata']['implementations'] = [{
+            'name' => 'tasks_test', 'requirements' => ['shell'], 'input_method' => 'environment'
+          }]
           expect(local.run_task(target, task, arguments).message.chomp)
             .to eq('Hello from task Goodbye')
         end
@@ -233,8 +242,7 @@ SHELL
 
       it "errors when a task only requires an unsupported requirement" do
         with_task_containing('tasks_test', contents, 'environment') do |task|
-          impls = task.implementations.map { |impl| impl.merge('requirements' => ['powershell']) }
-          expect(task).to receive(:implementations).and_return(impls)
+          task['metadata']['implementations'] = [{ 'name' => 'tasks_test', 'requirements' => ['powershell'] }]
           expect {
             local.run_task(target, task, arguments)
           }.to raise_error("No suitable implementation of #{task.name} for #{target.name}")
@@ -243,8 +251,7 @@ SHELL
 
       it "errors when a task only requires an unknown requirement" do
         with_task_containing('tasks_test', contents, 'environment') do |task|
-          impls = task.implementations.map { |impl| impl.merge('requirements' => ['foobar']) }
-          expect(task).to receive(:implementations).and_return(impls)
+          task['metadata']['implementations'] = [{ 'name' => 'tasks_test', 'requirements' => ['foobar'] }]
           expect {
             local.run_task(target, task, arguments)
           }.to raise_error("No suitable implementation of #{task.name} for #{target.name}")

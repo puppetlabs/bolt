@@ -8,14 +8,16 @@ require 'logging'
 require 'minitar'
 require 'open3'
 require 'bolt/task'
+require 'bolt/apply_result'
 require 'bolt/util/puppet_log_level'
 
 module Bolt
   class Applicator
-    def initialize(inventory, executor, modulepath, pdb_client, hiera_config, max_compiles)
+    def initialize(inventory, executor, modulepath, plugin_dirs, pdb_client, hiera_config, max_compiles)
       @inventory = inventory
       @executor = executor
       @modulepath = modulepath
+      @plugin_dirs = plugin_dirs
       @pdb_client = pdb_client
       @hiera_config = hiera_config ? validate_hiera_config(hiera_config) : nil
 
@@ -39,16 +41,18 @@ module Bolt
     def custom_facts_task
       @custom_facts_task ||= begin
         path = File.join(libexec, 'custom_facts.rb')
-        impl = { 'name' => 'custom_facts.rb', 'path' => path, 'requirements' => [], 'supports_noop' => true }
-        Task.new(name: 'custom_facts', implementations: [impl], input_method: 'stdin')
+        file = { 'name' => 'custom_facts.rb', 'path' => path }
+        metadata = { 'supports_noop' => true, 'input_method' => 'stdin' }
+        Bolt::Task.new(name: 'apply_helpers::custom_facts', files: [file], metadata: metadata)
       end
     end
 
     def catalog_apply_task
       @catalog_apply_task ||= begin
         path = File.join(libexec, 'apply_catalog.rb')
-        impl = { 'name' => 'apply_catalog.rb', 'path' => path, 'requirements' => [], 'supports_noop' => true }
-        Task.new(name: 'apply_catalog', implementations: [impl], input_method: 'stdin')
+        file = { 'name' => 'apply_catalog.rb', 'path' => path }
+        metadata = { 'supports_noop' => true, 'input_method' => 'stdin' }
+        Bolt::Task.new(name: 'apply_helpers::apply_catalog', files: [file], metadata: metadata)
       end
     end
 
@@ -102,62 +106,12 @@ module Bolt
 
     def validate_hiera_config(hiera_config)
       if File.exist?(File.path(hiera_config))
-        data = File.open(File.path(hiera_config), "r:UTF-8") { |f| YAML.safe_load(f.read) }
+        data = File.open(File.path(hiera_config), "r:UTF-8") { |f| YAML.safe_load(f.read, [Symbol]) }
         unless data['version'] == 5
           raise Bolt::ParseError, "Hiera v5 is required, found v#{data['version'] || 3} in #{hiera_config}"
         end
         hiera_config
       end
-    end
-
-    def provide_puppet_missing_errors(result)
-      error_hash = result.error_hash
-      exit_code = error_hash['details']['exit_code'] if error_hash && error_hash['details']
-      # If we get exit code 126 or 127 back, it means the shebang command wasn't found; Puppet isn't present
-      if [126, 127].include?(exit_code)
-        Result.new(result.target, error:
-          {
-            'msg' => "Puppet is not installed on the target, please install it to enable 'apply'",
-            'kind' => 'bolt/apply-error'
-          })
-      elsif exit_code == 1 &&
-            (error_hash['msg'] =~ /Could not find executable 'ruby.exe'/ ||
-             error_hash['msg'] =~ /The term 'ruby.exe' is not recognized as the name of a cmdlet/)
-        # Windows does not have Ruby present
-        Result.new(result.target, error:
-          {
-            'msg' => "Puppet is not installed on the target in $env:ProgramFiles, please install it to enable 'apply'",
-            'kind' => 'bolt/apply-error'
-          })
-      elsif exit_code == 1 && error_hash['msg'] =~ /cannot load such file -- puppet \(LoadError\)/
-        # Windows uses a Ruby that doesn't have Puppet installed
-        # TODO: fix so we don't find other Rubies, or point to a known issues URL for more info
-        Result.new(result.target, error:
-          {
-            'msg' => 'Found a Ruby without Puppet present, please install Puppet ' \
-                     "or remove Ruby from $env:Path to enable 'apply'",
-            'kind' => 'bolt/apply-error'
-          })
-      else
-        result
-      end
-    end
-
-    def identify_resource_failures(result)
-      if result.ok? && result.value['status'] == 'failed'
-        resources = result.value['resource_statuses']
-        failed = resources.select { |_, r| r['failed'] }.flat_map do |key, resource|
-          resource['events'].select { |e| e['status'] == 'failure' }.map do |event|
-            "\n  #{key}: #{event['message']}"
-          end
-        end
-
-        result.value['_error'] = {
-          'msg' => "Resources failed to apply for #{result.target.name}#{failed.join}",
-          'kind' => 'bolt/resource-failure'
-        }
-      end
-      result
     end
 
     def apply(args, apply_body, scope)
@@ -194,11 +148,14 @@ module Bolt
         result_promises = targets.zip(futures).flat_map do |target, future|
           @executor.queue_execute([target]) do |transport, batch|
             @executor.with_node_logging("Applying manifest block", batch) do
-              arguments = { 'catalog' => future.value, 'plugins' => plugins, '_noop' => options['_noop'] }
+              arguments = {
+                'catalog' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(future.value),
+                'plugins' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(plugins),
+                '_noop' => options['_noop']
+              }
               raise future.reason if future.rejected?
-              result = transport.batch_task(batch, catalog_apply_task, arguments, options, &notify)
-              result = provide_puppet_missing_errors(result)
-              identify_resource_failures(result)
+              results = transport.batch_task(batch, catalog_apply_task, arguments, options, &notify)
+              Array(results).map { |result| ApplyResult.from_task_result(result) }
             end
           end
         end
@@ -222,7 +179,7 @@ module Bolt
       sio = StringIO.new
       output = Minitar::Output.new(Zlib::GzipWriter.new(sio))
 
-      Puppet.lookup(:current_environment).modules.each do |mod|
+      Puppet.lookup(:current_environment).override_with(modulepath: @plugin_dirs).modules.each do |mod|
         search_dirs = yield mod
 
         parent = Pathname.new(mod.path).parent

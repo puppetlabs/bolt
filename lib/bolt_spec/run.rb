@@ -18,6 +18,7 @@ module BoltSpec
 
     def run_plan(plan_name, params = nil, config: nil, inventory: nil)
       # Users copying code from run_task may forget that targets is not a parameter for run plan
+      params ||= {}
       raise ArgumentError, "params must be a hash" unless params.is_a?(Hash)
 
       result = BoltRunner.with_runner(config, inventory) do |runner|

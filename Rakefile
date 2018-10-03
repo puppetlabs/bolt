@@ -4,7 +4,6 @@ require "bundler/gem_tasks"
 require "rspec/core/rake_task"
 require "rubocop/rake_task"
 
-require_relative 'vendored/require_vendored'
 require "puppet-strings"
 require "fileutils"
 require "json"

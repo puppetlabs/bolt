@@ -21,6 +21,12 @@ describe Bolt::Config do
       config = Bolt::Config.new(boltdir, { 'concurrency' => 200 }, concurrency: 100)
       expect(config.concurrency).to eq(100)
     end
+
+    it "treats relative modulepath as relative to Boltdir" do
+      module_dirs = %w[site modules]
+      config = Bolt::Config.new(boltdir, 'modulepath' => module_dirs.join(File::PATH_SEPARATOR))
+      expect(config.modulepath).to eq(module_dirs.map { |dir| (boltdir.path + dir).to_s })
+    end
   end
 
   describe "deep_clone" do
@@ -60,31 +66,9 @@ describe Bolt::Config do
     let(:alt_path) { File.expand_path(File.join('~', '.puppetlabs', 'bolt.yml')) }
 
     it "loads from the boltdir config file if present" do
-      expect(boltdir.config_file).to receive(:exist?).and_return(true)
       expect(Bolt::Util).to receive(:read_config_file).with(nil, [boltdir.config_file], 'config')
 
       Bolt::Config.from_boltdir(boltdir)
-    end
-
-    it "loads from the old default bolt.yaml with a warning if the boltdir default isn't present" do
-      expect(boltdir.config_file).to receive(:exist?).and_return(false)
-      expect(File).to receive(:exist?).with(default_path).and_return(true)
-      expect(Bolt::Util).to receive(:read_config_file).with(nil, [default_path], 'config')
-
-      Bolt::Config.from_boltdir(boltdir)
-
-      expect(@log_output.readline).to match(/WARN.*Found configfile at deprecated location #{default_path}/)
-    end
-
-    it "loads from the old default bolt.yml with a warning if the boltdir default isn't present" do
-      expect(boltdir.config_file).to receive(:exist?).and_return(false)
-      expect(File).to receive(:exist?).with(default_path).and_return(false)
-      expect(File).to receive(:exist?).with(alt_path).and_return(true)
-      expect(Bolt::Util).to receive(:read_config_file).with(nil, [alt_path], 'config')
-
-      Bolt::Config.from_boltdir(boltdir)
-
-      expect(@log_output.readline).to match(/WARN.*Found configfile at deprecated location #{alt_path}/)
     end
   end
 

@@ -43,11 +43,18 @@ describe "Bolt::Outputter::JSON" do
   it "formats a task" do
     task = {
       'name' => 'cinnamon roll',
-      'description' => 'A delicious sweet bun',
-      'parameters' => {
-        'icing' => {
-          'type' => 'Cream cheese',
-          'description' => 'Rich, tangy, sweet'
+      'module' => '/path/to/cinnamony/goodness',
+      'files' => [{ 'name' => 'cinnamon.rb',
+                    'path' => '/path/to/cinnamony/goodness/tasks/cinnamon.rb' },
+                  { 'name' => 'roll.sh',
+                    'path' => '/path/to/wrong/module/tasks/roll.sh' }],
+      'metadata' => {
+        'description' => 'A delicious sweet bun',
+        'parameters' => {
+          'icing' => {
+            'type' => 'Cream cheese',
+            'description' => 'Rich, tangy, sweet'
+          }
         }
       }
     }
@@ -55,9 +62,24 @@ describe "Bolt::Outputter::JSON" do
     expect(JSON.parse(output.string)).to eq(task)
   end
 
+  it "prints builtin for builtin modules" do
+    task = {
+      'name' => 'monkey bread',
+      'files' => [{ 'name' => 'monkey_bread.rb',
+                    'path' => "#{Bolt::PAL::MODULES_PATH}/monkey/bread" }],
+      'metadata' => {}
+    }
+    outputter.print_task_info(task)
+    task['module_dir'] = 'built-in module'
+    expect(JSON.parse(output.string)).to eq(task)
+  end
+
   it "formats a plan" do
     plan = {
       'name' => 'planity_plan',
+      'module' => 'plan/plan/plan',
+      'files' => [{ 'name' => 'planity',
+                    'path' => 'plan/plan' }],
       'parameters' => [
         {
           'name' => 'foo',

@@ -17,9 +17,8 @@ Gem::Specification.new do |spec|
   spec.license       = "Apache-2.0"
   spec.files         = Dir['exe/*'] +
                        Dir['lib/**/*.rb'] +
+                       Dir['lib/**/*.json'] +
                        Dir['libexec/*'] +
-                       Dir['vendored/*.rb'] +
-                       Dir['vendored/*/lib/**/*.rb'] +
                        Dir['bolt-modules/boltlib/lib/**/*.rb'] +
                        Dir['bolt-modules/boltlib/types/**/*.pp'] +
                        Dir['modules/*/lib/**/*.rb'] +
@@ -34,26 +33,15 @@ Gem::Specification.new do |spec|
   spec.add_dependency "addressable", '~> 2.5'
   spec.add_dependency "concurrent-ruby", "~> 1.0"
   spec.add_dependency "logging", "~> 2.2"
+  spec.add_dependency "minitar", "~> 0.6"
   spec.add_dependency "net-scp", "~> 1.2"
   spec.add_dependency "net-ssh", "~> 4.2"
   spec.add_dependency "orchestrator_client", "~> 0.3.1"
+  spec.add_dependency "puppet", [">= 6.0.1", "< 7"]
   spec.add_dependency "r10k", "~> 2.6"
   spec.add_dependency "terminal-table", "~> 1.8"
   spec.add_dependency "winrm", "~> 2.0"
   spec.add_dependency "winrm-fs", "~> 1.3"
-
-  # Dependencies of our vendored puppet, etc
-  spec.add_dependency "CFPropertyList", "~> 2.2"
-  spec.add_dependency "fast_gettext", "~> 1.1.2"
-  spec.add_dependency "locale", "~> 2.1"
-  spec.add_dependency "minitar", "~> 0.6"
-  spec.add_dependency "semantic_puppet", "~> 1.0"
-  if Gem.win_platform?
-    spec.add_dependency "win32-dir", "= 0.4.9"
-    spec.add_dependency "win32-process", "= 0.7.5"
-    spec.add_dependency "win32-security", "= 0.2.5"
-    spec.add_dependency "win32-service", "= 0.8.8"
-  end
 
   # there is a bug in puppetlabs_spec_helper for modules without fixtures
   spec.add_development_dependency "bundler", "~> 1.14"

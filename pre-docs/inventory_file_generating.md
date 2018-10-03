@@ -1,6 +1,6 @@
 # Generating inventory files
 
-Use the `bolt-inventory-pdb` script to generate inventory files based on PuppetDB queries.
+Use the `bolt-inventory-pdb` script to generate inventory files based on PuppetDB queries. [Learn more about Puppet's query language, PQL](https://puppet.com/docs/puppetdb/latest/api/query/tutorial-pql.html)
 
 ## Usage
 

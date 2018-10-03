@@ -58,10 +58,10 @@ module Bolt
         callback&.call(type: :node_start, target: target)
 
         result = begin
-          yield
-        rescue StandardError => ex
-          Bolt::Result.from_exception(target, ex)
-        end
+                   yield
+                 rescue StandardError => ex
+                   Bolt::Result.from_exception(target, ex)
+                 end
 
         callback&.call(type: :node_result, result: result)
         result
@@ -162,12 +162,7 @@ module Bolt
       end
 
       def from_api?(task)
-        if task.respond_to? :file
-          unless task.file.nil?
-            return true
-          end
-        end
-        false
+        !task.file.nil?
       end
 
       # Transports should override this method with their own implementation of running a command.
