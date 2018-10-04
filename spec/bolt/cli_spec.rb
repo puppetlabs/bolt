@@ -1296,43 +1296,7 @@ bar
             expect(JSON.parse(output.string)).to be
           end
 
-          context "when the pcp transport's local-validation setting is set to true" do
-            let(:task_params) {
-              # these are not legal parameters for the 'sample::params' task
-              # according to the local task definition
-              {
-                'foo' => nil,
-                'bar' => nil
-              }
-            }
-            let(:target) { Bolt::Target.new('pcp://foo') }
-            let(:task_t) { task_type(task_name, /\A\z/, 'both') }
-
-            before :each do
-              cli.config.transports[:pcp]['local-validation'] = true
-            end
-
-            it "errors as usual if the task is not available locally" do
-              task_name.replace 'unknown::task'
-
-              expect { cli.execute(options) }.to raise_error(
-                Bolt::PAL::PALError, /Could not find a task named "unknown::task"/
-              )
-              expect(JSON.parse(output.string)).to be
-            end
-
-            it "errors as usual if invalid (according to the local task definition) parameters are specified" do
-              expect { cli.execute(options) }.to raise_error(
-                Bolt::PAL::PALError,
-                /Task sample::params:\n(?x:
-                 )\s*has no parameter named 'foo'\n(?x:
-                 )\s*has no parameter named 'bar'/
-              )
-              expect(JSON.parse(output.string)).to be
-            end
-          end
-
-          context "when the pcp transport's local-validation setting is false" do
+          context "using the pcp transport with invalid tasks" do
             let(:task_params) {
               # these are not legal parameters for the 'sample::params' task
               # according to the local task definition
@@ -1774,8 +1738,7 @@ bar
           'task-environment' => 'testenv',
           'service-url' => 'http://foo.org',
           'token-file' => '/path/to/token',
-          'cacert' => '/path/to/cacert',
-          'local-validation' => false
+          'cacert' => '/path/to/cacert'
         } }
     end
 
@@ -1901,14 +1864,6 @@ bar
         cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo])
         cli.parse
         expect(cli.config.transports[:pcp]['token-file']).to eql('/path/to/token')
-      end
-    end
-
-    it 'reads local-validation option for pcp' do
-      with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo])
-        cli.parse
-        expect(cli.config.transports[:pcp]['local-validation']).to eql(false)
       end
     end
 

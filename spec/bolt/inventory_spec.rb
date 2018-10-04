@@ -109,27 +109,6 @@ describe Bolt::Inventory do
         Bolt::Inventory.new(data).validate
       }.to raise_error(Bolt::Inventory::ValidationError, /Tried to redefine group group1/)
     end
-
-    it 'fails with deprecated property transport in global config' do
-      data = { 'config' => { 'transports' => {} } }
-      expect {
-        Bolt::Inventory.new(data).validate
-      }.to raise_error(Bolt::Inventory::ValidationError, /Group all contains invalid config/)
-    end
-
-    it 'fails with deprecated property transport in group config' do
-      data = { 'groups' => [{ 'name' => 'group1', 'config' => { 'transports' => {} } }] }
-      expect {
-        Bolt::Inventory.new(data).validate
-      }.to raise_error(Bolt::Inventory::ValidationError, /Group group1 contains invalid config/)
-    end
-
-    it 'fails with deprecated property transport in node config' do
-      data = { 'nodes' => [{ 'name' => 'node1', 'config' => { 'transports' => {} } }] }
-      expect {
-        Bolt::Inventory.new(data).validate
-      }.to raise_error(Bolt::Inventory::ValidationError, /Node node1 contains invalid config/)
-    end
   end
 
   describe :collect_groups do
@@ -474,8 +453,7 @@ describe Bolt::Inventory do
           'service-url' => 'https://master',
           'cacert' => transport + '.pem',
           'token-file' => 'token',
-          'task-environment' => 'prod',
-          'local-validation' => true
+          'task-environment' => 'prod'
         }
       end
 
@@ -553,8 +531,7 @@ describe Bolt::Inventory do
           'tty' => false,
           'service-url' => "https://master",
           'cacert' => "pcp.pem",
-          'token-file' => "token",
-          'local-validation' => true
+          'token-file' => "token"
         )
       end
     end

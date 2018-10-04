@@ -206,19 +206,5 @@ describe Bolt::Config do
       }
       expect { Bolt::Config.new(boltdir, config) }.to raise_error(Bolt::ValidationError)
     end
-
-    it "accepts a boolean for local-validation" do
-      config = {
-        'pcp' => { 'local-validation' => true }
-      }
-      expect { Bolt::Config.new(boltdir, config) }.not_to raise_error
-    end
-
-    it "does not accept local-validation that is not a boolean" do
-      config = {
-        'pcp' => { 'local-validation' => 'false' }
-      }
-      expect { Bolt::Config.new(boltdir, config) }.to raise_error(Bolt::ValidationError)
-    end
   end
 end
