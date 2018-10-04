@@ -1,5 +1,6 @@
 # See https://www.appveyor.com/docs/lang/ruby/
 version: 0.1.0.{build}-{branch}
+image: Visual Studio 2017
 cache:
   - .bundle
 
@@ -13,7 +14,6 @@ environment:
   BOLT_WINRM_SSL_PORT: 5986
   matrix:
     - RUBY_VERSION: 23
-    - RUBY_VERSION: 24
     - RUBY_VERSION: 25
 
 install:
@@ -48,6 +48,9 @@ before_test:
       # configure WinRM to use resources/cert.pfx for SSL
       ($cert = Import-PfxCertificate -FilePath resources/cert.pfx -CertStoreLocation cert:\\LocalMachine\\My -Password (ConvertTo-SecureString -String bolt -Force -AsPlainText)) | Format-List
       New-WSManInstance -ResourceURI winrm/config/Listener -SelectorSet @{Address='*';Transport='HTTPS'} -ValueSet @{Hostname='localhost';CertificateThumbprint=$cert.Thumbprint} | Format-List
+
+      docker run -d -p 35985:5985 microsoft/windowsservercore
+      docker run -d -p 35986:5985 microsoft/windowsservercore
 
 test_script:
   - bundle exec rake appveyor
