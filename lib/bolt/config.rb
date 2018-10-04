@@ -49,8 +49,7 @@ module Bolt
         'ssl-verify' => true
       },
       pcp: {
-        'task-environment' => 'production',
-        'local-validation' => false
+        'task-environment' => 'production'
       },
       local: {}
     }.freeze
