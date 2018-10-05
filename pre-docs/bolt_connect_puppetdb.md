@@ -1,16 +1,12 @@
----
-author: Kate Lopresti <kate.lopresti@puppet.com\>
----
-
-# Connecting Bolt to PuppetDB
+# Connecting Bolt to PuppetDB 
 
 Configure Bolt to connect to PuppetDB.
 
-## PuppetDB authorization
+## PuppetDB Authorization
 
 Bolt can authenticate with PuppetDB through an SSL client certificate or a PE RBAC token.
 
-## Client certificate
+## Client Certificate
 
 Add the certname for the certificate you want to authenticate with to /`etc/puppetlabs/puppetdb/certificate-whitelist`. This certificate has full access to all PuppetDB API endpoints and can read all data, push new data, or run commands on PuppetDB. To test the certificate you run the following curl command.
 
@@ -18,7 +14,7 @@ Add the certname for the certificate you want to authenticate with to /`etc/pup
 curl -X GET $SERVER_URL/pdb/query/v4 --data-urlencode 'query=nodes[certname] {}' --cert $CERT_PATH --key $KEY_PATH --cacert $CACERT_PATH
 ```
 
-## Token-based authentication with PE RBAC token
+## Token-based authentication PE RBAC Token
 
 If you use Puppet Enterprise you can grant more restricted access to PuppetDB with a PE role-based access control \(RBAC\) token.
 
@@ -37,19 +33,19 @@ curl -X GET https://$SERVER_URL/pdb/query/v4 --data-urlencode 'query=nodes[certn
 
 ## Configuration
 
-To configure the BoltPuppetDB client, add a `puppetdb` section to `~/.puppetlabs/bolt/bolt.yaml` with the following values:
+To configure the Bolt PuppetDB client, add a `puppetdb` section to `~/.puppetlabs/bolt.yml` with the following values:
 
--   `server-urls`: An array containing the PuppetDB host to connect to. This should include the protocol `https` and the port is usually `8081`. For example `https://my-master.example.com:8081`
--   `cacert`: The path the ca certificate for puppetdb
+-    `server-urls`: An array containing the PuppetDB host to connect to. This should include the protocol `https` and the port is usually `8081`. For example `https://my-master.example.com:8081` 
+-    `cacert`: The path the ca certificate for puppetdb
 
 If you are using certificate authentication also set:
 
--   `cert`: The path to the client certificate file to use for authentication
--   `key`: The private key for that certificate
+-    `cert`: The path to the client certificate file to use for authentication
+-    `key`: The private key for that certificate
 
 If you are using a PE RBAC token set:
 
--   `token`: The path to the PE RBAC Token.
+-    `token`: The path to the PE RBAC Token.
 
 For example, to use certificate authentication:
 
@@ -83,4 +79,6 @@ plan pdb_test {
   return(puppetdb_query("nodes[certname] {}"))
 }
 ```
+
+**Parent topic:** [Configuring Bolt](configuring_bolt.md)
 

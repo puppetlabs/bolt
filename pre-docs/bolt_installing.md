@@ -1,7 +1,3 @@
----
-author: Jean Bond <jean@puppet.com\>
----
-
 # Installing Bolt
 
 Packaged versions of Bolt are available for many modern Linux distributions, as well as macOS and Windows.
@@ -14,9 +10,9 @@ Packaged versions of Bolt are available for many modern Linux distributions, as 
 
 Install Bolt on Windows systems via an MSI installer package.
 
-1.   Download the Bolt installer package from [https://downloads.puppet.com/windows/puppet6/puppet-bolt-x64-latest.msi](https://downloads.puppet.com/windows/puppet6/puppet-bolt-x64-latest.msi). 
-2.  Double-click the MSI file and run the installation.
-3.  Run a Bolt command and get started. 
+1.   Download the Bolt installer package from [https://downloads.puppet.com/windows/puppet5/puppet-bolt-x64-latest.msi](https://downloads.puppet.com/windows/puppet5/puppet-bolt-x64-latest.msi). 
+2.   Double-click the MSI file and run the installation. 
+3.   Run a Bolt command and get started. 
 
     ```
     bolt --help
@@ -29,14 +25,14 @@ Use the package manager Chocolatey to install Bolt on Windows.
 
 You must have the Chocolatey package manager installed.
 
-1.  Download and install the bolt package. 
+1.   Download and install the bolt package. 
 
     ```
     choco install puppet-bolt
     
     ```
 
-2.  Run a Bolt command and get started. 
+2.   Run a Bolt command and get started. 
 
     ```
     bolt --help
@@ -47,15 +43,15 @@ You must have the Chocolatey package manager installed.
 
 Install Bolt on Mac OS X systems.
 
-1.  Download the Bolt installer package for your macOS version. 
+1.   Download the Bolt installer package for your macOS version. 
 
     **Tip:** To find the macOS version number on your Mac, go to the Apple \(\) menu in the corner of your screen and choose **About This Mac**.
 
-    -   10.11 \(El Capitan\) [https://downloads.puppet.com/mac/puppet6/10.11/x86\_64/puppet-bolt-latest.dmg](https://downloads.puppet.com/mac/puppet6/10.11/x86_64/puppet-bolt-latest.dmg)
-    -   10.12 \(Sierra\) [https://downloads.puppet.com/mac/puppet6/10.12/x86\_64/puppet-bolt-latest.dmg](https://downloads.puppet.com/mac/puppet6/10.12/x86_64/puppet-bolt-latest.dmg)
-    -   10.13 \(High Sierra\) [https://downloads.puppet.com/mac/puppet6/10.13/x86\_64/puppet-bolt-latest.dmg](https://downloads.puppet.com/mac/puppet6/10.13/x86_64/puppet-bolt-latest.dmg)
-2.  Double-click the `puppet-bolt-latest.dmg` file to mount it and then double-click the `puppet-bolt-[version]-installer.pkg` to run the installation.
-3.  Run a Bolt command and get started. 
+    -   10.11 \(El Capitan\) [https://downloads.puppet.com/mac/puppet5/10.11/x86\_64/puppet-bolt-latest.dmg](https://downloads.puppet.com/mac/puppet5/10.11/x86_64/puppet-bolt-latest.dmg)
+    -   10.12 \(Sierra\) [https://downloads.puppet.com/mac/puppet5/10.12/x86\_64/puppet-bolt-latest.dmg](https://downloads.puppet.com/mac/puppet5/10.12/x86_64/puppet-bolt-latest.dmg)
+    -   10.13 \(High Sierra\) [https://downloads.puppet.com/mac/puppet5/10.13/x86\_64/puppet-bolt-latest.dmg](https://downloads.puppet.com/mac/puppet5/10.13/x86_64/puppet-bolt-latest.dmg)
+2.   Double-click the `puppet-bolt-latest.dmg` file to mount it and then double-click the `puppet-bolt-[version]-installer.pkg` to run the installation. 
+3.   Run a Bolt command and get started. 
 
     ```
     bolt --help
@@ -68,14 +64,14 @@ Use the package manager Homebrew to install Bolt on Mac OS X.
 
 You must have the command line tools for Mac OS X and the Homebrew package manager installed.
 
-1.  Download and install the bolt package. 
+1.   Download and install the bolt package. 
 
     ```
     brew cask install puppetlabs/puppet/puppet-bolt
     
     ```
 
-2.  Run a Bolt command and get started. 
+2.   Run a Bolt command and get started. 
 
     ```
     bolt --help
@@ -86,16 +82,16 @@ You must have the command line tools for Mac OS X and the Homebrew package manag
 
 Packaged versions of Bolt are available for Debian 8 and 9 and Ubuntu 14.04 and 16.04.
 
-The Puppet repository for the APT package management system is [https://apt.puppet.com](https://apt.puppet.com). Packages are named using the convention `<PLATFORM_VERSION>-release-<VERSION CODE NAME>.deb`. For example, the release package for Puppet 6 Platform on Debian 8 “Jessie” is `puppet6-release-jessie.deb`.
+The Puppet repository for the APT package management system is [https://apt.puppet.com](https://apt.puppet.com). Packages are named using the convention `<PLATFORM_VERSION>-release-<VERSION CODE NAME>.deb`. For example, the release package for Puppet 5 Platform on Debian 8 “Jessie” is `puppet5-release-jessie.deb`.
 
-**Note:** These packages require you to download the Puppet 6 Platform. To install only the Bolt package you can install the packages directly as well.
+**Note:** These packages require you to download the Puppet 5 Platform. To install only the Bolt package you can install the packages directly as well.
 
-1.  Download and install the software and its dependencies. Use the commands appropriate to your system.
+1.   Download and install the software and its dependencies. Use the commands appropriate to your system. 
     -    Debian 8
 
         ```
-        wget https://apt.puppet.com/puppet6-release-jessie.deb
-        sudo dpkg -i puppet6-release-jessie.deb
+        wget https://apt.puppet.com/puppet5-release-jessie.deb
+        sudo dpkg -i puppet5-release-jessie.deb
         sudo apt-get update 
         sudo apt-get install puppet-bolt
         
@@ -104,8 +100,8 @@ The Puppet repository for the APT package management system is [https://apt.pupp
     -    Debian 9
 
         ```
-        wget https://apt.puppet.com/puppet6-release-stretch.deb
-        sudo dpkg -i puppet6-release-stretch.deb
+        wget https://apt.puppet.com/puppet5-release-stretch.deb
+        sudo dpkg -i puppet5-release-stretch.deb
         sudo apt-get update 
         sudo apt-get install puppet-bolt
         ```
@@ -113,8 +109,8 @@ The Puppet repository for the APT package management system is [https://apt.pupp
     -    Ubuntu 14.04
 
         ```
-        wget https://apt.puppet.com/puppet6-release-trusty.deb
-        sudo dpkg -i puppet6-release-trusty.deb
+        wget https://apt.puppet.com/puppet5-release-trusty.deb
+        sudo dpkg -i puppet5-release-trusty.deb
         sudo apt-get update 
         sudo apt-get install puppet-bolt
         ```
@@ -122,13 +118,13 @@ The Puppet repository for the APT package management system is [https://apt.pupp
     -    Ubuntu 16.04
 
         ```
-        wget https://apt.puppet.com/puppet6-release-xenial.deb
-        sudo dpkg -i puppet6-release-xenial.deb
+        wget https://apt.puppet.com/puppet5-release-xenial.deb
+        sudo dpkg -i puppet5-release-xenial.deb
         sudo apt-get update 
         sudo apt-get install puppet-bolt
         ```
 
-2.  Run a Bolt command and get started. 
+2.   Run a Bolt command and get started. 
 
     ```
     bolt --help
@@ -139,33 +135,33 @@ The Puppet repository for the APT package management system is [https://apt.pupp
 
 Packaged versions of Bolt are available for Red Hat Enterprise Linux 6 and 7, SUSE Linux Enterprise Server 12.
 
-The Puppet repository for the YUM package management system is [http://yum.puppet.com/puppet6/](http://yum.puppet.com/puppet6/) Packages are named using the convention `<PLATFORM_NAME>-release-<OS ABBREVIATION>-<OS VERSION>.noarch.rpm`. For example, the release package for Puppet 6 Platform on Linux 7 is `puppet6-release-el-7.noarch.rpm`.
+The Puppet repository for the YUM package management system is [http://yum.puppet.com/puppet5/](http://yum.puppet.com/puppet5/) Packages are named using the convention `<PLATFORM_NAME>-release-<OS ABBREVIATION>-<OS VERSION>.noarch.rpm`. For example, the release package for Puppet 5 Platform on Linux 7 is `puppet5-release-el-7.noarch.rpm`.
 
-**Note:** These packages require you to download the Puppet 6 Platform. To install only the Bolt package you can install the packages directly as well.
+**Note:** These packages require you to download the Puppet 5 Platform. To install only the Bolt package you can install the packages directly as well.
 
-1.  Download and install the software and its dependencies. Use the commands appropriate to your system.
+1.   Download and install the software and its dependencies. Use the commands appropriate to your system. 
     -   Enterprise Linux 6
 
         ```
-        sudo rpm -Uvh https://yum.puppet.com/puppet6/puppet6-release-el-6.noarch.rpm
+        sudo rpm -Uvh https://yum.puppet.com/puppet5/puppet5-release-el-6.noarch.rpm
         sudo yum install puppet-bolt				
         ```
 
     -   Enterprise Linux 7
 
         ```
-        sudo rpm -Uvh https://yum.puppet.com/puppet6/puppet6-release-el-7.noarch.rpm
+        sudo rpm -Uvh https://yum.puppet.com/puppet5/puppet5-release-el-7.noarch.rpm
         sudo yum install puppet-bolt
         ```
 
     -   SUSE Linux Enterprise Server 12
 
         ```
-        sudo rpm -Uvh https://yum.puppet.com/puppet6/puppet6-release-sles-12.noarch.rpm
+        sudo rpm -Uvh https://yum.puppet.com/puppet5/puppet5-release-sles-12.noarch.rpm
         sudo zypper install puppet-bolt
         ```
 
-2.  Run a Bolt command and get started. 
+2.   Run a Bolt command and get started. 
 
     ```
     bolt --help
@@ -174,9 +170,7 @@ The Puppet repository for the YUM package management system is [http://yum.puppe
 
 ## Install Bolt as a gem
 
-Starting with Bolt 0.20.0, gem installations no longer include core task modules.
-
-To install Bolt reliably and with all dependencies, use one of the Bolt installation packages instead of a gem.
+Installing bolt from a gem is not recommended since core modules will not be available.
 
 ## Analytics data collection
 
@@ -208,17 +202,17 @@ To see the data Bolt collects, add `--debug` to a command.
 
 Bolt collects data to help us understand how it's being used and make decisions about how to improve it.
 
-### How can I opt out of Bolt data collection?
+### How can I opt-out of Bolt data collection?
 
 To disable the collection of analytics data add the following line to `~/.puppetlabs/bolt/analytics.yaml`:
 
 ```
 disabled: true
 ```
+## A Note on Kerberos over SSH
 
-## Using Kerberos over SSH
-
-Bolt supports Kerberos authentication for SSH connections, however you must install the gem yourself to avoid license incompatibilities with other distributed components.
-
-To add Kerberos authentication, run `gem install net-ssh-krb`.
+We support using Kerberos over SSH for authentication, but due to license incompatibility with other components we are distributing you'll need to install the gem yourself. You can do this with
+```
+gem install net-ssh-krb
+```
 

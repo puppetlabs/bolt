@@ -1,7 +1,3 @@
----
-author: Jean Bond <jean@puppet.com\>
----
-
 # Writing tasks
 
 Tasks are similar to scripts, but they are kept in modules and can have metadata. This allows you to reuse and share them more easily.
@@ -46,14 +42,22 @@ rescue Puppet::Error => e
 end
 ```
 
+**Parent topic:** [Tasks and plans](writing_tasks_and_plans.md)
+
 ## Secure coding practices for tasks
 
 Use secure coding practices when you write tasks and help protect your system.
 
 **Note:** The information in this topic covers basic coding practices for writing secure tasks. It is not an exhaustive list.
+<<<<<<< HEAD
 
 One of the methods attackers use to gain access to your systems is remote code execution, where by running an allowed script they gain access to other parts of the system and can make arbitrary changes. Because Puppet Bolt executes scripts across your infrastructure, it is important to be aware of certain vulnerabilities, and to code tasks in a way that guards against remote code execution.
 
+=======
+
+One of the methods attackers use to gain access to your systems is remote code execution, where by running an allowed script they gain access to other parts of the system and can make arbitrary changes. Because Puppet Bolt executes scripts across your infrastructure, it is important to be aware of certain vulnerabilities, and to code tasks in a way that guards against remote code execution.
+
+>>>>>>> upstream/master
 Adding task metadata that validates input is one way to reduce vulnerability. When you require an enumerated \(`enum`\) or other non-string types, you prevent improper data from being entered. An arbitrary string parameter does not have this assurance.
 
 For example, if your task has a parameter that selects from several operational modes that will be passed to a shell command, instead of
@@ -83,6 +87,7 @@ Pattern[/\A[^\/\\]*\z/] $path
 ```
 
 In addition to these task restrictions, different scripting languages each have their own ways to validate user input.
+<<<<<<< HEAD
 
 ###  PowerShell 
 
@@ -96,6 +101,21 @@ For more information, see [PowerShell Scripting](https://docs.microsoft.com/en-u
 
 In Bash and other command shells, shell command injection takes advantage of poor shell implementations. Put quotations marks around arguments to prevent the vulnerable shells from evaluating them.
 
+=======
+
+###  PowerShell 
+
+In PowerShell, code injection exploits calls that specifically evaluate code. Do not call `Invoke-Expression` or `Add-Type` with user input. These commands evaluate strings as C\# code.
+
+Reading sensitive files or overwriting critical files can be less obvious. If you plan to allow users to specify a file name or path, use `Resolve-Path` to verify that the path doesn't go outside the locations you expect the task to access. Use `Split-Path -Parent $path` to check that the resolved path has the desired path as a parent.
+
+For more information, see [PowerShell Scripting](https://docs.microsoft.com/en-us/powershell/scripting/PowerShell-Scripting?view=powershell-6) and [Powershell's Security Guiding Principles](https://blogs.msdn.microsoft.com/powershell/2008/09/30/powershells-security-guiding-principles/).
+
+### Bash
+
+In Bash and other command shells, shell command injection takes advantage of poor shell implementations. Put quotations marks around arguments to prevent the vulnerable shells from evaluating them.
+
+>>>>>>> upstream/master
 Because the `eval` command will evaluate all arguments with string substitution, you should avoid using it with user input; however you can use `eval` with sufficient quoting to prevent substituted variables from being executed.
 
 Instead of
@@ -162,10 +182,17 @@ You can write tasks in any language that will run on the target nodes. Give task
 Task names are composed of one or two name segments, indicating:
 
 -   The name of the module where the task is located.
+<<<<<<< HEAD
 
 -   The name of the task file, without the extension.
 
 
+=======
+
+-   The name of the task file, without the extension.
+
+
+>>>>>>> upstream/master
 For example, the `puppetlabs-mysql` module has the `sql` task in `./mysql/tasks/sql.rb`, so the task name is `mysql::sql`. This name is how you refer to the task when you run tasks.
 
 The task filename `init` is special: the task it defines is referenced using the module name only. For example, in the `puppetlabs-service` module, the task defined in `init.rb` is the `service` task.
@@ -188,7 +215,7 @@ A task can consist of a single executable with or without a corresponding metada
 
 ### Tasks with multiple implementations
 
-A task can also have multiple implementations, with metadata that explains when to use each one. For instance, consider a module with the following files:
+A task can also have multiple implementation, with metadata that explains when to use each implementation. For instance, consider a module with the following files:
 
 ```
 - tasks
@@ -350,9 +377,15 @@ When a task exits non-zero, the task runner checks for an error key \(\`\_error\
 An error object includes the following keys:
 
 -   **msg**
+<<<<<<< HEAD
 
     A human readable string that appears in the UI.
 
+=======
+
+    A human readable string that appears in the UI.
+
+>>>>>>> upstream/master
 -   **kind**
 
     A standard string for machines to handle. You may share kinds between your modules or namespace kinds per module.
@@ -577,8 +610,7 @@ For example, the module `puppetlabs-mysql` includes the `mysql::sql` task with t
     },
     "password": {
       "description": "The password",
-      "type": "Optional[String[1]]",
-      "sensitive": true
+      "type": "Optional[String[1]]"
     },
      "sql": {
       "description": "The SQL you want to execute",
@@ -590,9 +622,9 @@ For example, the module `puppetlabs-mysql` includes the `mysql::sql` task with t
 
 ### Adding parameters to metadata
 
-To document and validate task parameters, add the parameters to the task metadata as JSON object, `parameters`.
+To document and validate task parameters, add the parameters to the task's metadata as JSON object, `parameters`.
 
-If a task includes `parameters` in its metadata, the task runner rejects any parameters input to the task that aren't defined in the metadata.
+If a task includes `parameters` in its metadata, the task runner rejects any parameters input to the task which aren't defined in the metadata.
 
 In the `parameter` object, give each parameter a description and specify its Puppet type. For a complete list of types, see the [types documentation](https://docs.puppet.com/puppet/latest/lang_data_type.html).
 
@@ -605,15 +637,15 @@ For example, the following code in a metadata file describes a `provider` parame
  }
 ```
 
-#### Define sensitive parameters
+<<<<<<< HEAD
+=======
+### Making parameters sensitive
 
-You can define task parameters as sensitive, for example, passwords and API keys. These values are masked when they appear in logs and API responses. When you want to view these values, set the log file to `level: debug`.
-
-To define a parameter as sensitive within the JSON metadata, add the `"sensitive": true` property.
+To prevent a task parameter's value from being written to the Bolt logs in plain-text the `sensitive` property can be associated with the parameter in the task's metadata. This construct should be used for things like passwords, API keys, secrets, etc.
 
 ```
 {
-  "description": "This task has a sensitive property denoted by its metadata",
+  "description": "Task has a sensitive property denoted by metadata",
   "input_method": "stdin",
   "parameters": {
     "user": {
@@ -629,6 +661,14 @@ To define a parameter as sensitive within the JSON metadata, add the `"sensitive
 }
 ```
 
+When a parameter is `sensitive` the only expectation, currently, is that the parameter
+will not be logged (except when passing `--debug`). No other precautions are taken.
+
+It is up to the task author to implement their tasks in such a way that `sensitive`
+parameters are not exposed or logged. Please be mindful when coding your tasks!
+
+
+>>>>>>> upstream/master
 ### Task metadata reference
 
 The following table shows task metadata keys, values, and default values.
@@ -638,27 +678,27 @@ The following table shows task metadata keys, values, and default values.
 |Metadata key|Description|Value|Default|
 |------------|-----------|-----|-------|
 |"description"|A description of what the task does.|A string.|None.|
-|"input\_method"|What input method the task runner should use to pass parameters to the task.| -    `environment` 
+|"puppet\_task\_version"|The version of the spec used.|An integer.|1 \(This is the only valid value.\)|
+|"supports\_noop"|Whether the task supports no-op mode. Required for the task to accept the `--noop` option on the command line.|Boolean.|False.|
+|"input\_method"|What input method the task runner should use to pass parameters to the task.|-   `environment`
 
--    `stdin` 
+-   `stdin`
 
--    `powershell` 
+-   `powershell`
 
 
- | -   both `environment` and `stdin`
+|-   both `environment` and `stdin`
 
 -   for `.ps1` tasks, `powershell`
 
 
- |
-|"parameters"|The parameters or input the task accepts listed with a puppet type string and optional description. See [adding parameters to metadata](writing_tasks.md#) for usage information.| -   String specifying the Puppet data type
+|
+|"parameters"|The parameters or input the task accepts listed with a puppet type string and optional description. See [adding parameters to metadata](writing_tasks.md#) for usage information.|-   String specifying the Puppet data type
 
 -   String describing the parameter
 
 
- |None.|
-|"puppet\_task\_version"|The version of the spec used.|An integer.|1 \(This is the only valid value.\)|
-|"supports\_noop"|Whether the task supports no-op mode. Required for the task to accept the `--noop` option on the command line.|Boolean.|False.|
+|None.|
 
 ### Task metadata types
 
@@ -682,6 +722,10 @@ Some types supported by Puppet can not be represented as JSON, such as `Hash[Int
 | `Hash` |Matches a JSON object.|
 | `Variant[Integer, Pattern[/\A\d+\Z/]]` |Matches an integer or a String of an integer|
 | `Boolean` |Accepts Boolean values.|
+<<<<<<< HEAD
+| `Sensitive` |Identifies data as sensitive. Values are masked when they appear in logs and API responses.|
+=======
+>>>>>>> upstream/master
 
 **Related information**  
 

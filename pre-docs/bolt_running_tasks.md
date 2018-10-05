@@ -1,7 +1,3 @@
----
-author: Jean Bond <jean@puppet.com\>
----
-
 # Running tasks
 
 Bolt can run Puppet tasks on remote nodes without requiring any Puppet infrastructure. 
@@ -31,11 +27,5 @@ To run the main module task defined in `init`, refer to the task by the module n
 bolt task run package action=status name=vim --nodes neptune --modulepath ~/modules
 ```
 
-## Specify the module path
-
-When executing tasks or plans, you must specify the `--modulepath` option as the directory containing the task modules.
-
-Specify this option in the format `--modulepath </PATH/TO/MODULE>` . This path should be only the path the modules directory, such as `~/modules`. Do not specify the module name in this path, as the name is already specified as part of the task or plan name.
-
-To specify multiple module directories to search for modules, separate the paths with a semicolon \(`;`\) on Windows or a colon \(`:`\) on all other platforms.
+**Parent topic:** [Tasks and plans](writing_tasks_and_plans.md)
 
