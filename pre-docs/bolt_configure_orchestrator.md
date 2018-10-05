@@ -1,7 +1,3 @@
----
-author: Kate Lopresti <kate.lopresti@puppet.com\>
----
-
 # Configuring Bolt to use orchestrator
 
 Configure Bolt to use the orchestrator API and perform actions on PE-managed nodes.
@@ -18,7 +14,7 @@ To set up Bolt to use the orchestrator API you must do the following:
 
 -   Install the bolt\_shim module in a PE environment.
 
--   Assign task permissions to a user role.
+-   Set PE RBAC permissions for all tasks.
 
 -   Adjust the orchestrator configuration files, as needed.
 
@@ -41,8 +37,7 @@ Bolt uses a task to execute commands, upload files, and run scripts over orchest
 ```
 mod 'puppetlabs-bolt_shim', '0.1.1'
 ```
-
-In addition to the bolt\_shim module, any task or module content you want to execute over PCP must be present in the PE environment. Download the modules described in [Set up Bolt to download and install modules](installing_tasks_from_the_forge.md#) and make them available in your PE environment. By only allowing content that is present in the PE environment to be executed over PCP you maintain the role based access control over the nodes you manage in PE.
+In addition to the bolt\_shim module, any task or module content intended to be executed over PCP will need to be present in the PE environment. The modules described in the [Installing Modules](https://github.com/puppetlabs/bolt/blob/master/pre-docs/bolt_installing_modules.md#installing-modules) documentation are recommended to be downloaded and made available in the PE environment. By only allowing content that is present in the PE environment to be executed over PCP it is possible to maintain role based access control over nodes managed by PE.   
 
 ## Assign task permissions to a user role
 
@@ -83,5 +78,7 @@ pcp:
 
 ## View available tasks
 
-To view a list of available tasks from the orchestrator API, run the command `puppet task show` \(instead of the command `bolt task show`\).
+To view a list of available tasks from the orchestrator API, run the command `puppet task show` \(instead of the command`bolt task show`\).
+
+**Parent topic:** [Configuring Bolt](configuring_bolt.md)
 

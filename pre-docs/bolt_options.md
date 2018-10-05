@@ -2,6 +2,8 @@
 
 Bolt commands can accept several command line options, some of which are required.
 
+Task commands, such as `bolt run task` and `bolt run plan`, require the `--modules` flag to specify the location of the task or plan module on the workstation you are running the command from.
+
 ## Specify target nodes
 
 Specify the nodes that you want Bolt to target.
@@ -61,13 +63,6 @@ When targeting systems with the `--nodes` flag, you can specify the transport ei
     ```
     cat nodes.txt | bolt command run --nodes -
     ```
-
--   To pass nodes as IP addresses, use `protocol://user:password@host:port` or inventory group name. You can use a domain name or IP address for `host`, which is required. Other parameters are optional.
-
-```
-bolt command run --nodes ssh://user:password@[fe80::34eb:ff1:b584:d7c0]:22,
-ssh://root:password@hostname, pcp://host01, winrm://Administrator:password@hostname
-```
 
 
 ### Specify nodes from an inventory file
@@ -143,4 +138,12 @@ bolt command run 'gpupdate /force' --nodes winrm://pluto --user Administrator --
 ```
 
 To have Bolt securely prompt for a password, use the `--password` or `-p` flag without supplying any value. Bolt will then prompt for the password, so that it does not appear in a process listing or on the console. 
+
+## Specify the module path
+
+When executing tasks or plans, you must specify the `--modulepath` option as the directory containing the task modules.
+
+Specify this option in the format `--modulepath </PATH/TO/MODULE>` . This path should be only the path the modules directory, such as `~/modules`. Do not specify the module name in this path, as the name is already specified as part of the task or plan name.
+
+To specify multiple module directories to search for modules, separate the paths with a semicolon \(`;`\) on Windows or a colon \(`:`\) on all other platforms.
 

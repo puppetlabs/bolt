@@ -1,7 +1,3 @@
----
-author: Jean Bond <jean@puppet.com\>
----
-
 # Welcome to Bolt
 
 Bolt is an open source task runner that automates the manual work that you do to maintain your infrastructure. Use Bolt to automate tasks that you perform on your infrastructure on an as-needed basis, for example, when you troubleshoot a system, deploy an application, or stop and restart services. Bolt connects directly to remote nodes with SSH or WinRM, so you are not required to install any agent software.
@@ -31,9 +27,9 @@ Bolt is an open source task runner that automates the manual work that you do to
 
  -   **Automate your workflow with existing tasks and plans**
 
- [Running tasks](bolt_running_tasks.md#) 
+ [Running tasks](bolt_running_tasks.md) 
 
- [Running plans](bolt_running_plans.md#) 
+ [Running plans](bolt_running_plans.md) 
 
 
  -   **Create your own tasks and plans**
@@ -41,8 +37,6 @@ Bolt is an open source task runner that automates the manual work that you do to
  [Writing tasks](writing_tasks.md#) 
 
  [Writing plans](writing_plans.md#) 
-
- [Applying manifest blocks](applying_manifest_blocks.md#) 
 
 
  | -   **Learn the basics**
@@ -79,7 +73,7 @@ Bolt is an open source task runner that automates the manual work that you do to
 
 [Puppet Forge](https://forge.puppet.com) - Find modules you can use, and contribute modules you've made to the community.
 
- [Open source projects from Puppet on GitHub](https://github.com/puppetlabs/) 
+ [Open source projects from Puppet on Github](https://github.com/puppetlabs/) 
 
 
  |

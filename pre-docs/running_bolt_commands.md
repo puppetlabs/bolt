@@ -1,7 +1,3 @@
----
-author: Jean Bond <jean@puppet.com\>
----
-
 # Running basic Bolt commands
 
 Use Bolt commands to connect directly to the systems where you want to execute commands, run scripts, and upload files.
