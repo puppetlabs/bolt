@@ -78,6 +78,22 @@ describe "passes parsed AST to the apply_catalog task" do
       expect(notify.count).to eq(1)
     end
 
+    it 'allows and warns on language violations (strict=warning)' do
+      result = run_cli_json(%w[plan run basic::strict] + config_flags)
+      notify = get_notifies(result)
+      expect(notify.count).to eq(1)
+      expect(notify[0]['parameters']['message']).to eq('a' => 2)
+      logs = @log_output.readlines
+      expect(logs).to include(/WARN.*The key 'a' is declared more than once/)
+    end
+
+    it 'allows undefined variables (strict_variables=false)' do
+      result = run_cli_json(%w[plan run basic::strict_variables] + config_flags)
+      notify = get_notifies(result)
+      expect(notify.count).to eq(1)
+      expect(notify[0]['parameters']['message']).to eq('hello ')
+    end
+
     it 'applies a complex type from the modulepath' do
       result = run_cli_json(%w[plan run basic::type] + config_flags)
       report = result[0]['result']['report']
