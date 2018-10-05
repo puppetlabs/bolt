@@ -1,6 +1,6 @@
 # Bolt command reference
 
-Reivew the subcommands, actions, and options that are available for Bolt.
+Review the subcommands, actions, and options that are available for Bolt.
 
 ## Common Bolt commands
 
@@ -46,7 +46,7 @@ Bolt commands use the syntax: `bolt <subcommand> <action> [options]`
 
 
  |
-| `bolt task show` | Lists all the tasks on the modulepath. Will note whether a task supports noop.
+| `bolt task show` | Lists all the tasks on the modulepath. Will note whether a task supports no-operation mode.
 
  | -   Adding a specific task name displays details and parameters for the task.
 
@@ -82,7 +82,7 @@ Options are optional unless marked as required. 
  |
 | `--query` `, -q` |Query PuppetDB to determine the targets.|
 | `--noop` |Execute a task that supports it in no-operation mode.|
-| `--description` |Add a description to the run. Used in logging and submitted to Orchestrator with the pcp transport.|
+| `--description` |Add a description to the run. Used in logging and submitted to Orchestrator with the PCP transport.|
 | `--params` | Parameters, passed as a JSON object on the command line, or as a JSON parameter file, prefaced with `@` like `@params.json`. For Windows PowerShell,  add single quotation marks to define the file: `'@params.json'` 
 
  |
@@ -99,12 +99,12 @@ Options are optional unless marked as required. 
  `host-key-check` and `no-host-key-check` are options for the SSH transport.
 
  |
-| `--ssl`, `--no-ssl` | Do not require verification of new hosts in the `known_hosts` file.
+|`--ssl`, `--no-ssl`| Do not require verification of new hosts in the `known_hosts` file.
 
  `ssl` and `no-ssl` are options for WinRM.
 
  |
-| ``--ssl-verify`, `--no-ssl-verify`` | Do not verify remote host SSL certificate with WinRM
+| `--ssl-verify`, `--no-ssl-verify` | Do not verify remote host SSL certificate with WinRM
 
  `ssl-verify` and `no-ssl-verify` are options for WinRM.
 
@@ -127,7 +127,7 @@ Options are optional unless marked as required. 
 | `--boltdir` |Specify what Boltdir to load config from \(default: autodiscovered from current working dir\).|
 | `--inventoryfile` |Specify where to load inventory from \(default: `inventory.yaml` inside the `Boltdir`\).|
 
-## Transport Options
+## Transport options
 
 |Option|Description|
 |------|-----------|

@@ -22,5 +22,11 @@ bolt plan run mymodule::myplan --modulepath ./PATH/TO/MODULES  load_balancer=lb.
 
 Note that, like `--nodes`, you can pass a comma-separated list of node names, wildcard patterns, or group names to a plan parameter that will be passed to a run function or that the plan resolves using `get_targets`.
 
-**Parent topic:** [Tasks and plans](writing_tasks_and_plans.md)
+## Specify the module path
+
+When executing tasks or plans, you must specify the `--modulepath` option as the directory containing the task modules.
+
+Specify this option in the format `--modulepath </PATH/TO/MODULE>` . This path should be only the path the modules directory, such as `~/modules`. Do not specify the module name in this path, as the name is already specified as part of the task or plan name.
+
+To specify multiple module directories to search for modules, separate the paths with a semicolon \(`;`\) on Windows or a colon \(`:`\) on all other platforms.
 

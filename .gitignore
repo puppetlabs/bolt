@@ -1,3 +1,4 @@
+
 *.gem
 *.rbc
 /.config
@@ -42,6 +43,12 @@ modules/puppet_agent
 modules/puppet_conf
 modules/service
 
+<<<<<<< HEAD
+# OS generated files #
+######################
+.DS_Store
+
+=======
 modules/augeas_core/
 modules/cron_core/
 modules/host_core/
@@ -52,3 +59,4 @@ modules/sshkeys_core/
 modules/yumrepo_core/
 modules/zfs_core/
 modules/zone_core/
+>>>>>>> 675d776978e015523b5e7a52800db45004d7e4d1

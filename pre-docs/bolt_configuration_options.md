@@ -26,7 +26,7 @@ ssh:
 
 `color`: Whether to use colored output when printing messages to the console.
 
-## `SSH` transport configuration options
+## SSH transport configuration options
 
 `host-key-check`: Whether to perform host key validation when connecting over SSH. Default is `true`.
 
@@ -34,7 +34,7 @@ ssh:
 
 `connect-timeout`: How long Bolt should wait when establishing connections.
 
-`run-as-command`: The command to elevate permissions. Bolt appends the user and and command strings to the configured run as a command before running it on the target. This command must not require an interactive password prompt, and the `sudo-password` option is ignored when `run-as-command` is specified. The run-as command must be specified as an array.
+`run-as-command`: The command to elevate permissions. Bolt appends the user and command strings to the configured run as a command before running it on the target. This command must not require an interactive password prompt, and the `sudo-password` option is ignored when `run-as-command` is specified. The run-as command must be specified as an array.
 
 `port`: Connection port. Default is `22`.
 
@@ -52,7 +52,7 @@ ssh:
 
 `connect-timeout`: How long Bolt should wait when establishing connections.
 
-`ssl`: When `true`, Bolt will use normal http connections for winrm. Default is `true`.
+`ssl`: When `true`, Bolt will use normal http connections for WinRM. Default is `true`.
 
 `ssl-verify`: When true, verifies the targets certificate matches the `cacert`. Default is `true`.
 
@@ -70,7 +70,7 @@ ssh:
 
 ## PCP transport configuration options
 
-`service-url`: The url of the orchestrator API.
+`service-url`: The URL of the orchestrator API.
 
 `cacert`: The path to the CA certificate.
 
@@ -89,7 +89,7 @@ Capture the results of your plan runs in a log file.
 `log`: the configuration of the log file output. This option includes the following properties:
 
 -   `console` or `path/to.log`: the location of the log output.
--   `level`: the type of information in the log. Your options are `debug`, `info`, `notice`, `warn`, `error`.
+-   `level`: the type of information in the log. Your options are `debug`, `info`, `notice`, `warn`, and `error`.
 
 -   `append` add output to an existing log file. Available for only for logs output to a filepath. Your options are `true` \(default\) and `false`.
 
@@ -102,6 +102,4 @@ log:
     append: false
 
 ```
-
-**Parent topic:** [Configuring Bolt](configuring_bolt.md)
 
