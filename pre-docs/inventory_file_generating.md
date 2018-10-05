@@ -1,6 +1,6 @@
 # Generating inventory files
 
-Use the `bolt-inventory-pdb` script to generate inventory files based on PuppetDB queries. [Learn more about Puppet's query language, PQL](https://puppet.com/docs/puppetdb/latest/api/query/tutorial-pql.html)
+Use the `bolt-inventory-pdb` script to generate inventory files based on PuppetDB queries.
 
 ## Usage
 
@@ -33,7 +33,7 @@ The `bolt-inventory-pdb` script uses the configuration file `puppetdb.conf`, whi
 
 -    `--cacert` The path for the certification authority \(CA\) certificate.
 
-    \*nix sytems - /etc/puppetlabs/puppet/ssl/certs/ca.pem
+    \*nix systems - /etc/puppetlabs/puppet/ssl/certs/ca.pem
 
     Windows - C:\\ProgramData\\PuppetLabs\\puppet\\etc\\ssl\\certs\\ca.pem
 
@@ -46,7 +46,7 @@ $ bolt-inventory-pdb pdb.yaml -o myfile.yaml --token-file ~/mytoken --cacert /et
 
 ## File format
 
-The `bolt-inventory-pdb` tool generates an inventory file from a source yaml file. This file has the same format as the inventory file except instead of nodes keys it has query keys. The query should be a PuppetDB query in either [Puppet Query Language \(PQL\)](https://puppet.com/docs/puppetdb/5.2/api/query/v4/pql.html) or AST syntax. When `bolt-inventory-pdb` runs it makes queries against PuppetDB and creates a nodes item for each group. This is an example of a file that adds all nodes to the top-level group, creates a Windows group configured to use the winrm transport and a basil group for nodes with basil in the certname.
+The `bolt-inventory-pdb` tool generates an inventory file from a source yaml file. This file has the same format as the inventory file except instead of nodes keys it has query keys. The query should be a PuppetDB query in either [Puppet Query Language \(PQL\)](https://puppet.com/docs/puppetdb/5.2/api/query/v4/pql.html) or AST syntax. When `bolt-inventory-pdb` runs it makes queries against PuppetDB and creates a nodes item for each group. This is an example of a file that adds all nodes to the top-level group, creates a Windows group configured to use the WinRM transport and a basil group for nodes with basil in the certname.
 
 ```
 query: "nodes[certname] {}"
@@ -58,6 +58,4 @@ transport: winrm
 - name: basil
 query: "nodes[certname] { certname ~ '^basil' }"
 ```
-
-**Parent topic:** [Inventory file](inventory_file.md)
 
