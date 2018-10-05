@@ -13,7 +13,7 @@ mod 'puppet_agent',
     ref: '319ce44a65e73bcf2712ad17be01f9636f0673c9'
 
 # Core types and providers for Puppet 6
-mod 'puppetlabs-augeas_core', '1.0.2'
+mod 'puppetlabs-augeas_core', '1.0.3'
 mod 'puppetlabs-host_core', '1.0.1'
 mod 'puppetlabs-scheduled_task', '1.0.0'
 mod 'puppetlabs-sshkeys_core', '1.0.1'
