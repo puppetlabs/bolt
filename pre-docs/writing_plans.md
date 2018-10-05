@@ -1,12 +1,14 @@
+---
+author: Jean Bond <jean@puppet.com\>
+---
+
 # Writing plans
 
 Plans allow you to run more than one task with a single command, compute values for the input to a task, process the results of tasks, or make decisions based on the result of running a task.
 
 Write plans in the Puppet language, giving them a `.pp` extension, and place them in the module's `/plans` directory.
 
-**Parent topic:** [Tasks and plans](writing_tasks_and_plans.md)
-
-**Related information**
+**Related information**  
 
 
 [Plan execution functions](plan_functions.md#)
@@ -80,7 +82,7 @@ bolt plan run mymodule::myplan --modulepath ./PATH/TO/MODULES --params load_bala
 
 ```
 
-**Related information**
+**Related information**  
 
 
 [Task metadata types](writing_tasks.md#)
@@ -141,7 +143,7 @@ plan mymodule::myplan {
 
 Indicators that a plan has run successfully or failed.
 
-Any plan that completes execution without an error is considered successful. The `bolt` command exits 0 and any calling plans continue execution. If any calls to `run_` functions fail without `_catch_errors` then the plan will hald execution and be considered a failure. Any calling plans will also halt until a `run_plan` call with `_catch_errors` is reached. If one isn't the `bolt` command will exit 2. When writing a plan if you have reason to believe it has failed you can fail the plan with the `fail_plan` function. This causes the bolt command to exit 2 and prevents calling plans executing any further, unless `run_plan` was called with `_catch_errors`.
+Any plan that completes execution without an error is considered successful. The `bolt` command exits 0 and any calling plans continue execution. If any calls to `run_` functions fail without `_catch_errors` then the plan will halt execution and be considered a failure. Any calling plans will also halt until a `run_plan` call with `_catch_errors` is reached. If one isn't the `bolt` command will exit 2. When writing a plan if you have reason to believe it has failed you can fail the plan with the `fail_plan` function. This causes the bolt command to exit 2 and prevents calling plans executing any further, unless `run_plan` was called with `_catch_errors`.
 
 ### Failing plans
 
@@ -227,7 +229,7 @@ You should be aware of some other Puppet behaviors in plans:
 
 Plan execution functions each return a result object that returns details about the execution.
 
-Each [execution function](./plan_functions.md) returns an object type `ResultSet`. For each node that the execution takes place on, this object contains a `Result` object. The [apply_statement](./applying_manifest_blocks.md) returns a `ResultSet` containing `ApplyResult` objects.
+Each [execution function](plan_functions.md#) returns an object type `ResultSet`. For each node that the execution takes place on, this object contains a `Result` object. The [apply action](applying_manifest_blocks.md#) returns a `ResultSet` containing `ApplyResult` objects.
 
 A `ResultSet` has the following methods:
 
@@ -267,7 +269,7 @@ A `Result` has the following methods:
 
 An `ApplyResult` has the following methods:
 
--   `report()`: The hash containing the puppet report from the application.
+-   `report()`: The hash containing the Puppet report from the application.
 
 -   `target()`: The `Target` object that the `Result` is from.
 
@@ -303,28 +305,28 @@ $r.each |$result| {
 
 ## Passing sensitive data to tasks
 
-Tasks can define parameters to be `sensitive`, meaning the parameter values will not be logged by Bolt.
+Task parameters defined as sensitive are masked when they appear in plans.
 
-If a parameter is declared with `"sensitive": true` within the task's metadata, then the task
-can be run normally. Bolt will automatically ensure that this parameter is not logged using
-the metadata for that parameter.
+You define a task parameter as sensitive with the metadata property `"sensitive": true`. When a task runs, the values for these sensitive parameters are masked.
 
 ```
 run_task('task_with_secrets', ..., password => '$ecret!')
 ```
 
-### Working with the Sensitive type
+### Working with the sensitive function
 
-In Puppet the `Sensitive` type can be used to mask data from being output to logs.
-Since Plans are simply written in Puppet DSL this type can be used freely.
-The `run_task()` function does not allow parameters of `Sensitive` type to be passed.
-If a `Sensitive` vlue needs to be passed to a task, it must be unwrapped prior to
-the `run_task()` function call.
+In Puppet you use the `Sensitive` function to mask data in output logs. Since plans are written in Puppet DSL you can use this type freely. The `run_task()` function does not allow parameters of `Sensitive` function to be passed. When you need to pass a sensitive value to a task, you must unwrap it prior to calling `run_task()`.
 
 ```
 $pass = Sensitive('$ecret!')
 run_task('task_with_secrets', ..., password => $pass.unwrap)
+
 ```
+
+**Related information**  
+
+
+[Adding parameters to metadata](writing_tasks.md#)
 
 ## Target objects
 
@@ -346,11 +348,11 @@ plan loop(TargetSpec $nodes) {
 
 If your plan accepts a single `TargetSpec` parameter you can call that parameter `nodes` so that it can be specified with the `--nodes` flag from the command line.
 
-### Variables and Facts on Targets
+### Variables and facts on targets
 
-When Bolt runs it loads transport config values, variables, and facts from the inventory. These can be accessed with the `$target.facts()` and `$target.vars()` functions. During the course of a plan you can update the facts or vars for any target. In general Facts are observed about the state of a node while `vars` are more general information. Facts will usually come from running `facter` or another fact collection application on the target or be looked up from a fact store like PuppetDB. `vars` are computed externally or assigned directly.
+When Bolt runs, it loads transport config values, variables, and facts from the inventory. These can be accessed with the `$target.facts()` and `$target.vars()` functions. During the course of a plan, you can update the facts or variables for any target. Facts usually come from running `facter` or another fact collection application on the target or from a fact store like PuppetDB. Variables are computed externally or assigned directly.
 
-Set variables in a plan using `$target.set_var`.
+Set variables in a plan using `$target.set_var`:
 
 ```
 plan vars(String $host) {
@@ -377,18 +379,20 @@ groups:
 
 ### Collect facts from the targets
 
-The facts plan will connect to the target and discover facts through a few methods.
+The facts plan connects to the target and discovers facts. It then stores these facts on the targets in the inventory for later use.
 
--   On `ssh` targets it will run a simple bash script.
--   On `winrm` targets it will run a simple powershell script.
--   On `pcp` or targets where it discovered the puppet agent it present it will run facter.
+The methods used to collect facts:
 
-It then stores these facts on the targets in the inventory for later use. This example collects facts with the facts plan and then uses those facts to decide which task to run on the targets.
+-   On `ssh` targets it runs a simple bash script.
+-   On `winrm` targets it runs a simple powershell script.
+-   On `pcp` or targets where the puppet agent is present, it runs facter.
+
+This example collects facts with the facts plan and then uses those facts to decide which task to run on the targets.
 
 ```
 plan run_with_facts(TargetSpec $nodes) {
   # This will collect facts on nodes and update the inventory
-  run_plan(**facts**, nodes => $nodes)
+  run_plan(facts, nodes => $nodes)
 
   $centos_nodes = get_targets($nodes).filter |$n| { $n.facts['os']['name'] == 'CentOS' }
   $ubuntu_nodes = get_targets($nodes).filter |$n| { $n.facts['os']['name'] == 'Ubuntu' }
@@ -399,7 +403,7 @@ plan run_with_facts(TargetSpec $nodes) {
 
 ### Collect facts from PuppetDB
 
-When targets are running a puppet agent and sending facts to PuppetDB the `puppetdb_fact` plan can be used to collect facts for them. This example collects facts with the `puppetdb_fact` plan and then uses those facts to decide which task to run on the targets. You'll have to configure the PuppetDB client bolt\_configure\_puppetdb.md\] before running it.
+When targets are running a Puppet agent and sending facts to PuppetDB, you can use the `puppetdb_fact` plan to collect facts for them. This example collects facts with the `puppetdb_fact` plan, and then uses those facts to decide which task to run on the targets. You must configure the PuppetDB client before you run it.
 
 ```
 plan run_with_facts(TargetSpec $nodes) {
@@ -413,7 +417,12 @@ plan run_with_facts(TargetSpec $nodes) {
 }
 ```
 
-## Plan Logging
+**Related information**  
+
+
+[Connecting Bolt to PuppetDB](bolt_connect_puppetdb.md)
+
+## Plan logging
 
 Set up log files to record certain events that occur when you run plans.
 
@@ -421,7 +430,7 @@ Set up log files to record certain events that occur when you run plans.
 
 To generate log messages from a plan, use the puppet log function that corresponds to the level you want to track: `error`, `warn`, `notice`, `info`, or `debug`. The default log level for Bolt is `notice` but you can set it to `info` with the `--verbose `flag or `debug` with the `--debug` flag.
 
-### Default Action Logging
+### Default action logging
 
 Bolt logs actions that a plan takes on targets through the  `upload_file`,  `run_command`, `run_script`, or `run_task`  functions. By default it logs a notice level message when an action starts and another when it completes. If you pass a description to the function, that will be used in place of the generic log message.
 
@@ -429,7 +438,7 @@ Bolt logs actions that a plan takes on targets through the  `upload_file`,  `r
 run_task(my_task, $targets, "Better description", param1 => "val")
 ```
 
-If your plan contains many small actions you may want to suppress these messages and use explicit calls to the puppet log functions instead. This can be accomplished by wrapping actions in a `without_default_logging` block which will cause the action messages to be logged at info level instead of notice. For example to loop over a series of nodes without logging each action.
+If your plan contains many small actions you may want to suppress these messages and use explicit calls to the Puppet log functions instead. This can be accomplished by wrapping actions in a `without_default_logging` block which will cause the action messages to be logged at info level instead of notice. For example to loop over a series of nodes without logging each action.
 
 ```
 plan deploy( TargetSpec $nodes) {
@@ -442,7 +451,7 @@ plan deploy( TargetSpec $nodes) {
 
 ```
 
-To avoid complications with parser ambiguity always call `without_default_logging` with `()` and empty block args `||`.
+To avoid complications with parser ambiguity, always call `without_default_logging` with `()` and empty block args `||`.
 
 ```
 without_default_logging() || { run_command('echo hi', $nodes) }
@@ -456,7 +465,7 @@ without_default_logging { run_command('echo hi', $nodes) }
 
 ### puppetdb\_query
 
-
+ 
 
 You can use the `puppetdb_query` function in plans to make direct queries to PuppetDB. For example you can discover nodes from PuppetDB and then run tasks on them. You'll have to configure the [puppetdb client](bolt_connect_puppetdb.md)before running it.
 
@@ -470,5 +479,4 @@ plan pdb_discover {
   run_task('my_task', $nodes)
 }
 ```
-
 
