@@ -50,8 +50,7 @@ describe Bolt::Applicator do
             winrm: { 'connect-timeout' => 10, tty: false, ssl: true, "ssl-verify" => true },
             pcp: { 'connect-timeout' => 10,
                    tty: false,
-                   "task-environment" => "production",
-                   "local-validation" => false },
+                   "task-environment" => "production" },
             local: { 'connect-timeout' => 10, tty: false }
           }
         }

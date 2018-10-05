@@ -23,17 +23,12 @@ module Bolt
       attr_writer :plan_context
 
       def self.options
-        %w[service-url cacert token-file task-environment local-validation]
+        %w[service-url cacert token-file task-environment]
       end
 
       PROVIDED_FEATURES = ['puppet-agent'].freeze
 
-      def self.validate(options)
-        validation_flag = options['local-validation']
-        unless !!validation_flag == validation_flag
-          raise Bolt::ValidationError, 'local-validation option must be a Boolean true or false'
-        end
-      end
+      def self.validate(options); end
 
       def initialize(*args)
         @connections = {}

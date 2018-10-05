@@ -98,9 +98,8 @@ Puppet::Functions.create_function(:run_task) do
 
     options['_description'] = description if description
 
-    # Don't bother loading the local task definition if all targets use the 'pcp' transport
-    # and the local-validation option is set to false for all of them
-    if !targets.empty? && targets.all? { |t| t.protocol == 'pcp' && t.options['local-validation'] == false }
+    # Don't bother loading the local task definition if all targets use the 'pcp' transport.
+    if !targets.empty? && targets.all? { |t| t.protocol == 'pcp' }
       # create a fake task
       task = Bolt::Task.new(name: task_name, files: [{ 'name' => '', 'path' => '' }])
     else

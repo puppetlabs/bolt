@@ -78,8 +78,6 @@ ssh:
 
 `task-environment`: The environment orchestrator should load task code from.
 
-`local-validation`: When true, requires a local copy of any tasks being run. Default is `false`.
-
 ## Local transport configuration options
 
 `tmpdir`: The directory to copy and execute temporary files.

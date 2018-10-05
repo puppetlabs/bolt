@@ -59,14 +59,6 @@ module Bolt
         value
       end
 
-      def check_deprecated_config(context, name, config)
-        if config && config['transports']
-          msg = "#{context} #{name} contains invalid config option 'transports', see " \
-                "https://puppet.com/docs/bolt/0.x/inventory_file.html for the updated format"
-          raise ValidationError.new(msg, @name)
-        end
-      end
-
       def validate(used_names = Set.new, node_names = Set.new, depth = 0)
         if used_names.include?(@name)
           raise ValidationError.new("Tried to redefine group #{@name}", @name)
@@ -76,8 +68,6 @@ module Bolt
         if node_names.include?(@name)
           raise ValidationError.new("Group #{@name} conflicts with node of the same name", @name)
         end
-
-        check_deprecated_config('Group', @name, @config)
 
         used_names << @name
 
@@ -94,8 +84,6 @@ module Bolt
           if used_names.include?(n['name'])
             raise ValidationError.new("Group #{n['name']} conflicts with node of the same name", n['name'])
           end
-
-          check_deprecated_config('Node', n['name'], n['config'])
 
           node_names << n['name']
         end
