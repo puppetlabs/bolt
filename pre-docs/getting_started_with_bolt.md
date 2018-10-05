@@ -1,3 +1,7 @@
+---
+author: Kate Lopresti <kate.lopresti@puppet.com\>
+---
+
 # Self-paced training
 
 Using hands-on exercises, discover how Bolt can help you manage your infrastructure.

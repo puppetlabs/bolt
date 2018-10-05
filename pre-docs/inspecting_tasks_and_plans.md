@@ -1,3 +1,7 @@
+---
+author: Michelle Fredette <michelle.fredette@puppet.com\>
+---
+
 # Inspecting tasks and plans
 
 Before you run tasks or plans in your environment, inspect them to determine what effect they will have on your target nodes.
@@ -41,6 +45,4 @@ View parameters and other details for a plan, including whether a plan supports 
 ```
 bolt plan show <PLAN NAME>
 ```
-
-**Parent topic:** [Tasks and plans](writing_tasks_and_plans.md)
 
