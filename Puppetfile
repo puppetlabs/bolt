@@ -10,7 +10,7 @@ mod 'puppetlabs-puppet_conf', '0.3.0'
 mod 'puppetlabs-facts', '0.3.1'
 mod 'puppet_agent',
     git: 'https://github.com/puppetlabs/puppetlabs-puppet_agent',
-    ref: '319ce44a65e73bcf2712ad17be01f9636f0673c9'
+    ref: '74b327229f1f1a55de788c1dd8cd5d50fdaf845a'
 
 # Core types and providers for Puppet 6
 mod 'puppetlabs-augeas_core', '1.0.3'
