@@ -83,14 +83,25 @@ module Bolt
         implementation = task.select_implementation(target, PROVIDED_FEATURES)
         executable = implementation['path']
         input_method = implementation['input_method'] || 'both'
-
-        # unpack any Sensitive data, write it to a separate variable because
-        # we log 'arguments' below
-        unwrapped_arguments = unwrap_sensitive_args(arguments)
-        stdin = STDIN_METHODS.include?(input_method) ? JSON.dump(unwrapped_arguments) : nil
-        env = ENVIRONMENT_METHODS.include?(input_method) ? envify_params(unwrapped_arguments) : nil
+        extra_files = implementation['files']
 
         with_tmpscript(executable, target.options['tmpdir']) do |script, dir|
+          if extra_files
+            installdir = File.join(dir, '_installdir')
+            arguments['_installdir'] = installdir
+            FileUtils.mkdir_p(extra_files.map { |file| File.join(installdir, File.dirname(file['name'])) })
+
+            extra_files.each do |file|
+              copy_file(file['path'], File.join(installdir, file['name']))
+            end
+          end
+
+          # unpack any Sensitive data, write it to a separate variable because
+          # we log 'arguments' below
+          unwrapped_arguments = unwrap_sensitive_args(arguments)
+          stdin = STDIN_METHODS.include?(input_method) ? JSON.dump(unwrapped_arguments) : nil
+          env = ENVIRONMENT_METHODS.include?(input_method) ? envify_params(unwrapped_arguments) : nil
+
           # log the arguments with sensitive data redacted, do NOT log unwrapped_arguments
           logger.debug("Running '#{script}' with #{arguments}")
 
