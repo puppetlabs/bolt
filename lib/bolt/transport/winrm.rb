@@ -116,32 +116,44 @@ catch
           implementation = task.select_implementation(target, PROVIDED_FEATURES)
           executable = implementation['path']
           input_method = implementation['input_method']
+          extra_files = implementation['files']
         end
         input_method ||= powershell_file?(executable) ? 'powershell' : 'both'
 
         # unpack any Sensitive data
         arguments = unwrap_sensitive_args(arguments)
         with_connection(target) do |conn|
-          if STDIN_METHODS.include?(input_method)
-            stdin = JSON.dump(arguments)
-          end
-
-          if ENVIRONMENT_METHODS.include?(input_method)
-            envify_params(arguments).each do |(arg, val)|
-              cmd = "[Environment]::SetEnvironmentVariable('#{arg}', @'\n#{val}\n'@)"
-              result = conn.execute(cmd)
-              if result.exit_code != 0
-                raise Bolt::Node::EnvironmentVarError.new(arg, val)
-              end
-            end
-          end
-
           conn.with_remote_tempdir do |dir|
             remote_task_path = if from_api?(task)
                                  conn.write_executable_from_content(dir, file_content, executable)
                                else
                                  conn.write_remote_executable(dir, executable)
                                end
+
+            if extra_files
+              # TODO: optimize upload of directories
+              installdir = File.join(dir, '_installdir')
+              arguments['_installdir'] = installdir
+              conn.mkdirs(extra_files.map { |file| File.join(installdir, File.dirname(file['name'])) })
+              extra_files.each do |file|
+                conn.write_remote_file(file['path'], File.join(installdir, file['name']))
+              end
+            end
+
+            if STDIN_METHODS.include?(input_method)
+              stdin = JSON.dump(arguments)
+            end
+
+            if ENVIRONMENT_METHODS.include?(input_method)
+              envify_params(arguments).each do |(arg, val)|
+                cmd = "[Environment]::SetEnvironmentVariable('#{arg}', @'\n#{val}\n'@)"
+                result = conn.execute(cmd)
+                if result.exit_code != 0
+                  raise Bolt::Node::EnvironmentVarError.new(arg, val)
+                end
+              end
+            end
+
             conn.shell_init
             output =
               if powershell_file?(remote_task_path) && stdin.nil?
