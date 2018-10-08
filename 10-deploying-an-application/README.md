@@ -78,7 +78,7 @@ Set up an inventory file to more easily map the nodes to their role in the appli
         user: root
     ```
     **Note**: inventory.yaml for nodes provisioned with vagrant
-    ```
+    ```yaml
     ---
     groups:
       - name: lb
