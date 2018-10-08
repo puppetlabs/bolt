@@ -6,7 +6,6 @@ require 'json'
 require 'orchestrator_client'
 require 'bolt/transport/base'
 require 'bolt/transport/orch/connection'
-require 'bolt/result'
 
 module Bolt
   module Transport

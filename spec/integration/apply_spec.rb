@@ -54,7 +54,7 @@ describe "apply" do
 
         # Includes agent facts from apply_prep
         agent_facts = report['resource_statuses']['Notify[agent facts]']['events'][0]['desired_value'].split("\n")
-        expect(agent_facts[0]).to match(/^\w+\./)
+        expect(agent_facts[0]).to match(/^\w+/)
         expect(agent_facts[1]).to eq(agent_facts[0])
         expect(agent_facts[2]).to match(/^\d+\.\d+\.\d+$/)
         expect(agent_facts[3]).to eq(agent_facts[2])

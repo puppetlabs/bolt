@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'bolt/util'
+
 module BoltSpec
   module Conn
     def conn_info(transport)

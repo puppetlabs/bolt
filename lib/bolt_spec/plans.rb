@@ -2,6 +2,8 @@
 
 require 'bolt_spec/plans/mock_executor'
 require 'bolt/config'
+require 'bolt/inventory'
+require 'bolt/pal'
 
 # These helpers are intended to be used for plan unit testing without calling
 # out to target nodes. It accomplishes this by replacing bolt's executor with a

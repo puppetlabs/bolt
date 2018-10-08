@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# Avoid requiring the CLI from other files. It has side-effects - such as loading r10k -
+# that are undesirable when using Bolt as a library.
+
 require 'uri'
 require 'benchmark'
 require 'json'

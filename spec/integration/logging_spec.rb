@@ -3,7 +3,6 @@
 require 'spec_helper'
 require 'bolt_spec/conn'
 require 'bolt_spec/integration'
-require 'bolt/cli'
 require 'logging'
 
 describe "when logging executor activity", ssh: true do

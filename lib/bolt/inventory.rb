@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
 require 'set'
-require 'bolt/util'
-require 'bolt/target'
+require 'bolt/config'
 require 'bolt/inventory/group'
+require 'bolt/target'
+require 'bolt/util'
 
 module Bolt
   class Inventory

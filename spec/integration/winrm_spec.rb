@@ -3,7 +3,6 @@
 require 'bolt_spec/conn'
 require 'bolt_spec/files'
 require 'bolt_spec/integration'
-require 'bolt/cli'
 
 describe "when runnning over the winrm transport", winrm: true do
   include BoltSpec::Conn

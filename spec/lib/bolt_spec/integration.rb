@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'bolt/cli'
+
 module BoltSpec
   module Integration
     def run_cli(arguments, rescue_exec: false, outputter: Bolt::Outputter::JSON)

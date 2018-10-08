@@ -2,6 +2,7 @@
 
 require 'spec_helper'
 require 'bolt/executor'
+require 'bolt/inventory'
 require 'bolt/result'
 require 'bolt/result_set'
 require 'bolt/target'
