@@ -6,6 +6,8 @@ require 'bolt_spec/files'
 require 'bolt_spec/sensitive'
 require 'bolt_spec/task'
 require 'bolt/transport/winrm'
+require 'bolt/config'
+require 'bolt/target'
 require 'httpclient'
 require 'winrm'
 

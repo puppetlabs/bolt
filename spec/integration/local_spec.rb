@@ -4,7 +4,6 @@ require 'spec_helper'
 require 'bolt_spec/conn'
 require 'bolt_spec/files'
 require 'bolt_spec/integration'
-require 'bolt/cli'
 
 describe "when runnning over the local transport", bash: true do
   include BoltSpec::Conn

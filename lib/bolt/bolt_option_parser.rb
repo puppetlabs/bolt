@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# Note this file includes very few 'requires' because it expects to be used from the CLI.
+
 require 'optparse'
 
 module Bolt

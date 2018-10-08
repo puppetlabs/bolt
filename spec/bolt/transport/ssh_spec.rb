@@ -8,6 +8,7 @@ require 'bolt_spec/sensitive'
 require 'bolt_spec/task'
 require 'bolt/transport/ssh'
 require 'bolt/config'
+require 'bolt/target'
 require 'bolt/util'
 
 describe Bolt::Transport::SSH do

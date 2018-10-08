@@ -3,6 +3,9 @@
 require 'spec_helper'
 require 'json'
 require 'bolt/catalog'
+require 'bolt/executor'
+require 'bolt/inventory'
+require 'bolt/puppetdb'
 require 'bolt/target'
 
 describe Bolt::Catalog do

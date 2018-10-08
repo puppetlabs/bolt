@@ -1,7 +1,10 @@
 # frozen_string_literal: true
 
+require 'bolt/config'
+require 'bolt/inventory'
 require 'bolt/pal'
 require 'bolt/puppetdb'
+require 'bolt/util'
 
 Bolt::PAL.load_puppet
 

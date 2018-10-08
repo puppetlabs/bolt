@@ -3,7 +3,6 @@
 require 'bolt_spec/conn'
 require 'bolt_spec/files'
 require 'bolt_spec/integration'
-require 'bolt/cli'
 
 describe "when running a plan that manipulates an execution result", ssh: true do
   include BoltSpec::Conn

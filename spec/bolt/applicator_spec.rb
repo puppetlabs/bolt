@@ -2,6 +2,10 @@
 
 require 'spec_helper'
 require 'bolt/applicator'
+require 'bolt/executor'
+require 'bolt/inventory'
+require 'bolt/pal'
+require 'bolt/puppetdb'
 require 'bolt/target'
 
 describe Bolt::Applicator do

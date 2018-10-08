@@ -5,7 +5,6 @@ require 'bolt_spec/config'
 require 'bolt_spec/conn'
 require 'bolt_spec/integration'
 require 'bolt_spec/run'
-require 'bolt/cli'
 
 describe "running the facts plan" do
   include BoltSpec::Conn

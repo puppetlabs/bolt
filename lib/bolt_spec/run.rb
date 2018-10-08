@@ -1,7 +1,11 @@
 # frozen_string_literal: true
 
-# shorthand for requiring the parts of bolt we need
-require 'bolt/cli'
+require 'bolt/analytics'
+require 'bolt/config'
+require 'bolt/executor'
+require 'bolt/inventory'
+require 'bolt/pal'
+require 'bolt/puppetdb'
 require 'bolt/util'
 
 # This is intended to provide a relatively stable method of executing bolt in process from tests.

@@ -5,7 +5,6 @@ require 'bolt_spec/files'
 require 'bolt_spec/sensitive'
 require 'bolt_spec/task'
 require 'bolt/transport/orch'
-require 'bolt/cli'
 require 'bolt/plan_result'
 require 'open3'
 

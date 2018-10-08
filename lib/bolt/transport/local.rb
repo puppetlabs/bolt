@@ -4,7 +4,6 @@ require 'json'
 require 'fileutils'
 require 'tmpdir'
 require 'bolt/transport/base'
-require 'bolt/result'
 require 'bolt/util'
 
 module Bolt
