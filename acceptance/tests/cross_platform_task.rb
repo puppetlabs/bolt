@@ -7,23 +7,37 @@ test_name "cross-platform tasks run on multiple kinds of nodes" do
 
   dir = bolt.tmpdir('cross_platform_task')
   task_dir = "#{dir}/modules/test/tasks"
+  other_module_dir = "#{dir}/modules/other/files"
 
   step "create a cross-platform task" do
-    on bolt, "mkdir -p #{task_dir}"
+    on bolt, "mkdir -p #{task_dir} #{other_module_dir}"
     create_remote_file(bolt, "#{task_dir}/hostname.sh", <<-FILE)
-    echo "hello from $(hostname)"
+    if [ ! -f $PT__installdir/other/files/windows ]; then
+      echo "hello from $(hostname)"
+    fi
+    cat $PT__installdir/other/files/content
+    cat $PT__installdir/other/files/linux
     FILE
     create_remote_file(bolt, "#{task_dir}/hostname.ps1", <<-FILE)
-    [System.Net.Dns]::GetHostByName(($env:computerName))
+    if (-Not (Test-Path $env:PT__installdir/other/files/linux)) {
+      Write-Host "hello from $([System.Net.Dns]::GetHostByName(($env:computerName)).Hostname)"
+    }
+    cat $env:PT__installdir/other/files/content
+    cat $env:PT__installdir/other/files/windows
     FILE
     create_remote_file(bolt, "#{task_dir}/hostname.json", <<-FILE)
     {
       "implementations": [
-        {"name": "hostname.sh", "requirements": ["shell"]},
-        {"name": "hostname.ps1", "requirements": ["powershell"]}
-      ]
+        {"name": "hostname.sh", "requirements": ["shell"], "files": ["other/files/linux"]},
+        {"name": "hostname.ps1", "requirements": ["powershell"],
+         "files": ["other/files/windows"], "input_method": "environment"}
+      ],
+      "files": ["other/files/content"]
     }
     FILE
+    create_remote_file(bolt, "#{other_module_dir}/content", 'file 1')
+    create_remote_file(bolt, "#{other_module_dir}/linux", 'file 2')
+    create_remote_file(bolt, "#{other_module_dir}/windows", 'file 3')
   end
 
   step "execute `bolt task run` via both SSH and WinRM" do
@@ -40,14 +54,16 @@ test_name "cross-platform tasks run on multiple kinds of nodes" do
 
     ssh_nodes.each do |node|
       message = "Unexpected output from the command:\n#{result.cmd}"
-      regex = /hello from #{node.hostname.split('.')[0]}/
-      assert_match(regex, result.stdout, message)
+      assert_match(/hello from #{node.hostname.split('.')[0]}/, result.stdout, message)
+      assert_match(/file 1/, result.stdout, message)
+      assert_match(/file 2/, result.stdout, message)
     end
 
     winrm_nodes.each do |node|
       message = "Unexpected output from the command:\n#{result.cmd}"
-      assert_match(/#{node.hostname.split('.')[0]}/, result.stdout, message)
-      assert_match(/{#{node.ip}}/, result.stdout, message)
+      assert_match(/hello from #{node.hostname.split('.')[0]}/, result.stdout, message)
+      assert_match(/file 1/, result.stdout, message)
+      assert_match(/file 3/, result.stdout, message)
     end
   end
 end
