@@ -184,7 +184,7 @@ A task can consist of a single executable with or without a corresponding metada
 
 ### Tasks with multiple implementations
 
-A task can also have multiple implementations, with metadata that explains when to use each one. For instance, consider a module with the following files:
+A task can also have multiple implementations, with metadata that explains when to use each one. A primary use case for this is to support different implementations for different target platforms, referred to as `cross-platform tasks`. For instance, consider a module with the following files:
 
 ```
 - tasks
@@ -272,6 +272,120 @@ myservice/tasks/stop.json
     {"name": "init.rb"}
   ]
 }
+```
+
+## Sharing task code
+
+Multiple tasks can share common files between them. Tasks can additionally pull library code from other modules.
+
+To create a task that includes additional files pulled from modules, include the `files` property in your metadata as an array of paths. A path consists of
+- the module name
+- one of `lib`, `files`, or `tasks` for the directory within the module
+- the remaining path to a file or directory; directories must include a trailing slash `/`
+
+All path separators must be forward slashes. An example would be `stdlib/lib/puppet/`.
+
+The `files` property can be included both as a top-level metadata property, and as a property of an implementation, for example
+```
+{
+  "implementations": [
+    {"name": "sql.sh", "requirements": ["shell"], "files": ["mymodule/files/lib.sh"]},
+    {"name": "sql.ps1", "requirements": ["powershell"], "files": ["mymodule/files/lib.ps1"]}
+  ],
+  "files": ["emoji/files/emojis/"]
+}
+```
+
+When a task includes the `files` property, all files listed in the top-level property and in the specific implementation chosen for a target will be copied to a temporary directory on that target. The directory structure of the specified files will be preserved such that paths specified with the `files` metadata option will be available to tasks prefixed with `_installdir`.
+
+### Python Example
+
+#### Metadata
+
+```json
+{
+  "files": ["multi_task/files/py_util/py_helper.py"]
+}
+```
+
+#### Files
+
+`multi_task/files/py_util/py_helper.py`
+
+```python
+def useful_python():
+  return dict(helper="python")
+```
+
+#### Task
+
+```python
+#!/usr/bin/env python
+import sys
+import os
+import json
+
+params = json.load(sys.stdin)
+sys.path.append(os.path.join(params['_installdir'], 'python_helpers', 'files'))
+import py_helper
+
+print(json.dumps(py_helper.useful_python()))
+```
+
+#### Output
+
+```
+Started on localhost...
+Finished on localhost:
+  {
+    "helper": "python"
+  }
+Successful on 1 node: localhost
+Ran on 1 node in 0.12 seconds
+```
+
+### Ruby Example
+
+#### Metadata
+
+```json
+{
+  "files": ["multi_task/files/rb_util/rb_helper.rb"]
+}
+```
+
+#### File Resource
+
+`multi_task/files/rb_util/rb_helper.rb`
+
+```ruby
+def useful_ruby
+  { helper: "ruby" }
+end
+```
+
+#### Task
+
+```ruby
+#!/usr/bin/env ruby
+require 'json'
+
+params = JSON.parse(STDIN.read)
+require_relative File.join(params['_installdir'], '/ruby_helpers/files/rb_helper.rb')
+
+puts useful_ruby.to_json
+```
+
+#### Output
+
+```
+Started on localhost...
+Finished on localhost:
+  {
+    "helper": "ruby"
+  }
+Successful on 1 node: localhost
+Ran on 1 node in 0.12 seconds
 ```
 
 ## Defining parameters in tasks
