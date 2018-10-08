@@ -46,6 +46,28 @@ Vagrant.configure('2') do |config|
     end
   end
 
+  config.vm.define :windows5 do |windows|
+    windows.vm.box = "jacqinthebox/windowsserver2016core"
+    windows.vm.guest = :windows
+    windows.vm.communicator = "winrm"
+    windows.vm.network :forwarded_port, guest: 5985, host: 35985, host_ip: '127.0.0.1', id: 'winrm'
+    windows.vm.provision 'shell', privileged: true, inline: 'slmgr /rearm'
+    windows.vm.provider "virtualbox" do |vb|
+      vb.gui = false
+    end
+  end
+
+  config.vm.define :windows6 do |windows|
+    windows.vm.box = "jacqinthebox/windowsserver2016core"
+    windows.vm.guest = :windows
+    windows.vm.communicator = "winrm"
+    windows.vm.network :forwarded_port, guest: 5985, host: 35986, host_ip: '127.0.0.1', id: 'winrm'
+    windows.vm.provision 'shell', privileged: true, inline: 'slmgr /rearm'
+    windows.vm.provider "virtualbox" do |vb|
+      vb.gui = false
+    end
+  end
+
   if ENV['BOLT_TEST_USE_VAGRANT']
     config.vm.define :linux do |linux|
       linux.vm.box = 'bento/centos-6.7'
