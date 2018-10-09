@@ -1,0 +1,7 @@
+{
+  "implementations": [
+    {"name": "list.sh", "requirements": ["shell"]},
+    {"name": "list.ps1", "requirements": ["powershell"]}
+  ],
+  "files": ["results/lib/puppet/functions/results/make_result.rb/"]
+}
