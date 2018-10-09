@@ -22,6 +22,15 @@ module Bolt
             @path
           end
 
+          def mkdirs(subdirs)
+            abs_subdirs = subdirs.map { |subdir| File.join(@path, subdir) }
+            result = @node.execute(['mkdir', '-p'] + abs_subdirs)
+            if result.exit_code != 0
+              message = "Could not create subdirectories in '#{@path}': #{result.stderr.string}"
+              raise Bolt::Node::FileError.new(message, 'MKDIR_ERROR')
+            end
+          end
+
           def chown(owner)
             return if owner.nil? || owner == @owner
 

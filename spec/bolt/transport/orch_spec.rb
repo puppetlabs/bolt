@@ -6,6 +6,7 @@ require 'bolt_spec/sensitive'
 require 'bolt_spec/task'
 require 'bolt/transport/orch'
 require 'bolt/plan_result'
+require 'bolt/target'
 require 'open3'
 
 describe Bolt::Transport::Orch, orchestrator: true do
@@ -297,6 +298,37 @@ describe Bolt::Transport::Orch, orchestrator: true do
       expect(node_results[1].value).to eq('_output' => 'goodbye')
       expect(node_results[0]).to be_success
       expect(node_results[1]).to be_success
+    end
+
+    context "when implementations are provided" do
+      let(:files) { [{ 'name' => 'tasks_test', 'path' => '/who/cares' }] }
+      let(:implementations) { [{ 'name' => 'tasks_test', 'requirements' => ['shell'] }] }
+      let(:mtask) { Bolt::Task.new(name: 'foo', files: files, metadata: { 'implementations' => implementations }) }
+
+      it "runs a task" do
+        allow(mock_client).to receive(:run_task).and_return(results)
+
+        node_results = orch.batch_task(targets, mtask, params)
+        expect(node_results[0].value).to eq('_output' => 'hello')
+        expect(node_results[1].value).to eq('_output' => 'goodbye')
+        expect(node_results[0]).to be_success
+        expect(node_results[1]).to be_success
+      end
+    end
+
+    context "when files are provided", ssh: true do
+      let(:files) { [{ 'name' => 'tasks_test', 'path' => '/who/cares' }] }
+      let(:mtask) { Bolt::Task.new(name: 'foo', files: files, metadata: { 'files' => %w[a b] }) }
+
+      it "runs a task" do
+        allow(mock_client).to receive(:run_task).and_return(results)
+
+        node_results = orch.batch_task(targets, mtask, params)
+        expect(node_results[0].value).to eq('_output' => 'hello')
+        expect(node_results[1].value).to eq('_output' => 'goodbye')
+        expect(node_results[0]).to be_success
+        expect(node_results[1]).to be_success
+      end
     end
   end
 

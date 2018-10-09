@@ -429,8 +429,11 @@ SHELLWORDS
     it 'errors if environment variables cannot be set', winrm: true do
       contents = 'Write-Host "$env:PT_message"'
       arguments = { message: "it's a hello world" }
-      result = double('result', exit_code: 1)
-      expect_any_instance_of(Bolt::Transport::WinRM::Connection).to receive(:execute).and_return(result)
+      expect_any_instance_of(
+        Bolt::Transport::WinRM::Connection
+      ).to receive(:execute).at_least(:once).and_wrap_original do |m, *args|
+        args.first =~ /SetEnvironmentVariable/ ? double('result', exit_code: 1) : m.call(*args)
+      end
       with_task_containing('task-test-winrm', contents, 'environment', '.ps1') do |task|
         expect { winrm.run_task(target, task, arguments) }.to raise_error(Bolt::Node::EnvironmentVarError)
       end
@@ -650,6 +653,48 @@ PS
           expect {
             winrm.run_task(target, task, arguments)
           }.to raise_error("No suitable implementation of #{task['name']} for #{target.name}")
+        end
+      end
+    end
+
+    context "when files are provided", winrm: true do
+      let(:contents) { 'Get-ChildItem -Path $env:PT__installdir -Recurse -File -Name' }
+      let(:arguments) { {} }
+
+      it "puts files at _installdir" do
+        with_task_containing('tasks_test', contents, 'environment', '.ps1') do |task|
+          task['metadata']['files'] = []
+          expected_files = %w[files/foo files/bar/baz lib/puppet_x/file.rb tasks/init]
+          expected_files.each do |file|
+            task['metadata']['files'] << "tasks_test/#{file}"
+            task['files'] << { 'name' => "tasks_test/#{file}", 'path' => task['files'][0]['path'] }
+          end
+
+          files = winrm.run_task(target, task, arguments).message.split("\n")
+          expect(files.count).to eq(expected_files.count)
+          files.sort.zip(expected_files.sort).each do |file, expected_file|
+            expect(file.strip).to eq("tasks_test\\#{expected_file.gsub(%r{/}, '\\')}")
+          end
+        end
+      end
+
+      it "includes files from the selected implementation" do
+        with_task_containing('tasks_test', contents, 'environment', '.ps1') do |task|
+          task['metadata']['implementations'] = [
+            { 'name' => 'tasks_test.alt', 'requirements' => ['foobar'], 'files' => ['tasks_test/files/no'] },
+            { 'name' => 'tasks_test', 'requirements' => [], 'files' => ['tasks_test/files/yes'] }
+          ]
+          task['metadata']['files'] = ['other_mod/lib/puppet_x/']
+          task['files'] << { 'name' => 'tasks_test/files/yes', 'path' => task['files'][0]['path'] }
+          task['files'] << { 'name' => 'other_mod/lib/puppet_x/a.rb', 'path' => task['files'][0]['path'] }
+          task['files'] << { 'name' => 'other_mod/lib/puppet_x/b.rb', 'path' => task['files'][0]['path'] }
+          task['files'] << { 'name' => 'tasks_test/files/no', 'path' => task['files'][0]['path'] }
+
+          files = winrm.run_task(target, task, arguments).message.split("\n").sort
+          expect(files.count).to eq(3)
+          expect(files[0].strip).to eq("other_mod\\lib\\puppet_x\\a.rb")
+          expect(files[1].strip).to eq("other_mod\\lib\\puppet_x\\b.rb")
+          expect(files[2].strip).to eq("tasks_test\\files\\yes")
         end
       end
     end

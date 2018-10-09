@@ -126,10 +126,12 @@ module Bolt
           executable = task.file['filename']
           file_content = Base64.decode64(task.file['file_content'])
           input_method = task.metadata['input_method']
+          extra_files = []
         else
           implementation = task.select_implementation(target, PROVIDED_FEATURES)
           executable = implementation['path']
           input_method = implementation['input_method']
+          extra_files = implementation['files']
         end
         input_method ||= 'both'
 
@@ -138,17 +140,8 @@ module Bolt
         with_connection(target, options.fetch('_load_config', true)) do |conn|
           conn.running_as(options['_run_as']) do
             stdin, output = nil
-
             command = []
             execute_options = {}
-
-            if STDIN_METHODS.include?(input_method)
-              stdin = JSON.dump(arguments)
-            end
-
-            if ENVIRONMENT_METHODS.include?(input_method)
-              execute_options[:environment] = envify_params(arguments)
-            end
 
             conn.with_remote_tempdir do |dir|
               remote_task_path = if from_api?(task)
@@ -156,6 +149,24 @@ module Bolt
                                  else
                                    conn.write_remote_executable(dir, executable)
                                  end
+
+              unless extra_files.empty?
+                # TODO: optimize upload of directories
+                installdir = File.join(dir.to_s, '_installdir')
+                arguments['_installdir'] = installdir
+                dir.mkdirs(extra_files.map { |file| File.join('_installdir', File.dirname(file['name'])) })
+                extra_files.each do |file|
+                  conn.write_remote_file(file['path'], File.join(installdir, file['name']))
+                end
+              end
+
+              if STDIN_METHODS.include?(input_method)
+                stdin = JSON.dump(arguments)
+              end
+
+              if ENVIRONMENT_METHODS.include?(input_method)
+                execute_options[:environment] = envify_params(arguments)
+              end
 
               if conn.run_as && stdin
                 wrapper = make_wrapper_stringio(remote_task_path, stdin)

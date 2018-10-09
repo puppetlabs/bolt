@@ -334,6 +334,14 @@ exit $LASTEXITCODE
 PS
         end
 
+        def mkdirs(dirs)
+          result = execute("mkdir -Force #{dirs.uniq.sort.join(',')}")
+          if result.exit_code != 0
+            message = "Could not create directories: #{result.stderr}"
+            raise Bolt::Node::FileError.new(message, 'MKDIR_ERROR')
+          end
+        end
+
         def write_remote_file(source, destination)
           fs = ::WinRM::FS::FileManager.new(@connection)
           fs.upload(source, destination)

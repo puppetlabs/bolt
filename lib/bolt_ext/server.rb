@@ -2,6 +2,7 @@
 
 require 'sinatra'
 require 'bolt'
+require 'bolt/target'
 require 'bolt/task'
 require 'json'
 require 'json-schema'

@@ -7,6 +7,7 @@ require 'bolt_spec/sensitive'
 require 'bolt_spec/task'
 require 'bolt/transport/local'
 require 'bolt/config'
+require 'bolt/target'
 
 describe Bolt::Transport::Local do
   include BoltSpec::Errors
@@ -255,6 +256,48 @@ SHELL
           expect {
             local.run_task(target, task, arguments)
           }.to raise_error("No suitable implementation of #{task.name} for #{target.name}")
+        end
+      end
+    end
+
+    context "when files are provided", bash: true do
+      let(:contents) { "#!/bin/sh\nfind ${PT__installdir} -type f" }
+      let(:arguments) { {} }
+
+      it "puts files at _installdir" do
+        with_task_containing('tasks_test', contents, 'environment') do |task|
+          task['metadata']['files'] = []
+          expected_files = %w[files/foo files/bar/baz lib/puppet_x/file.rb tasks/init]
+          expected_files.each do |file|
+            task['metadata']['files'] << "tasks_test/#{file}"
+            task['files'] << { 'name' => "tasks_test/#{file}", 'path' => task['files'][0]['path'] }
+          end
+
+          files = local.run_task(target, task, arguments).message.split("\n")
+          expect(files.count).to eq(expected_files.count)
+          files.sort.zip(expected_files.sort).each do |file, expected_file|
+            expect(file).to match(%r{_installdir/tasks_test/#{expected_file}$})
+          end
+        end
+      end
+
+      it "includes files from the selected implementation" do
+        with_task_containing('tasks_test', contents, 'environment') do |task|
+          task['metadata']['implementations'] = [
+            { 'name' => 'tasks_test.alt', 'requirements' => ['foobar'], 'files' => ['tasks_test/files/no'] },
+            { 'name' => 'tasks_test', 'requirements' => [], 'files' => ['tasks_test/files/yes'] }
+          ]
+          task['metadata']['files'] = ['other_mod/lib/puppet_x/']
+          task['files'] << { 'name' => 'tasks_test/files/yes', 'path' => task['files'][0]['path'] }
+          task['files'] << { 'name' => 'other_mod/lib/puppet_x/a.rb', 'path' => task['files'][0]['path'] }
+          task['files'] << { 'name' => 'other_mod/lib/puppet_x/b.rb', 'path' => task['files'][0]['path'] }
+          task['files'] << { 'name' => 'tasks_test/files/no', 'path' => task['files'][0]['path'] }
+
+          files = local.run_task(target, task, arguments).message.split("\n").sort
+          expect(files.count).to eq(3)
+          expect(files[0]).to match(%r{_installdir/other_mod/lib/puppet_x/a.rb$})
+          expect(files[1]).to match(%r{_installdir/other_mod/lib/puppet_x/b.rb$})
+          expect(files[2]).to match(%r{_installdir/tasks_test/files/yes$})
         end
       end
     end

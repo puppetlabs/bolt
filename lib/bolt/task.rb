@@ -58,7 +58,20 @@ module Bolt
       impl['input_method'] = inmethod unless inmethod.nil?
 
       mfiles = impl.fetch('files', []) + metadata.fetch('files', [])
-      impl['files'] = mfiles.map { |file| { 'name' => file, 'path' => file_map[file] } } unless mfiles.empty?
+      dirnames, filenames = mfiles.partition { |file| file.end_with?('/') }
+      impl['files'] = filenames.map do |file|
+        path = file_map[file]
+        raise "No file found for reference #{file}" if path.nil?
+        { 'name' => file, 'path' => path }
+      end
+
+      unless dirnames.empty?
+        files.each do |file|
+          if dirnames.any? { |dirname| file['name'].start_with?(dirname) }
+            impl['files'] << file
+          end
+        end
+      end
 
       impl
     end
