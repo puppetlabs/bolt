@@ -25,7 +25,7 @@ describe "Bolt::CLI" do
   end
 
   def stub_file(path)
-    stat = double('stat', readable?: true, file?: true)
+    stat = double('stat', readable?: true, file?: true, directory?: false)
 
     allow(cli).to receive(:file_stat).with(path).and_return(stat)
   end
@@ -1528,6 +1528,7 @@ bar
 
         it "uploads a directory via scp" do
           stub_directory(source)
+          allow(Dir).to receive(:foreach).with(source)
 
           expect(executor)
             .to receive(:upload_file)
@@ -1563,6 +1564,18 @@ bar
 
           expect { cli.execute(options) }.to raise_error(
             Bolt::FileError, /The source file '#{source}' is unreadable/
+          )
+          expect(JSON.parse(output.string)).to be
+        end
+
+        it "errors if a file in a subdirectory is unreadable" do
+          child_file = File.join(source, 'afile')
+          stub_directory(source)
+          stub_unreadable_file(child_file)
+          allow(Dir).to receive(:foreach).with(source).and_yield('afile')
+
+          expect { cli.execute(options) }.to raise_error(
+            Bolt::FileError, /The source file '#{child_file}' is unreadable/
           )
           expect(JSON.parse(output.string)).to be
         end
