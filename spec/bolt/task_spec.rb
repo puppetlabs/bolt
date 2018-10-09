@@ -25,20 +25,22 @@ describe Bolt::Task do
     context 'with input_method in metadata' do
       let(:implementations) { [{ 'name' => 'foo.sh', 'requirements' => [] }] }
       let(:metadata) { { 'input_method' => 'stdin', 'implementations' => implementations } }
+      let(:expected) { files.first.merge('input_method' => 'stdin', 'files' => []) }
 
-      it { expect(task.select_implementation(target)).to eq(files.first.merge('input_method' => 'stdin')) }
+      it { expect(task.select_implementation(target)).to eq(expected) }
 
       context 'with input_method in implementation' do
         let(:implementations) { [{ 'name' => 'foo.sh', 'requirements' => [], 'input_method' => 'environment' }] }
+        let(:expected) { files.first.merge('input_method' => 'environment', 'files' => []) }
 
-        it { expect(task.select_implementation(target)).to eq(files.first.merge('input_method' => 'environment')) }
+        it { expect(task.select_implementation(target)).to eq(expected) }
       end
     end
 
     context 'no metadata present' do
       let(:metadata) { {} }
 
-      it { expect(task.select_implementation(target)).to eq(files.first) }
+      it { expect(task.select_implementation(target)).to eq(files.first.merge('files' => [])) }
     end
 
     context 'implementations have no requirements' do
@@ -47,7 +49,7 @@ describe Bolt::Task do
          { 'name' => 'foo.ps1', 'requirements' => [] }]
       }
 
-      it { expect(task.select_implementation(target)).to eq(files.first) }
+      it { expect(task.select_implementation(target)).to eq(files.first.merge('files' => [])) }
     end
 
     context 'second implementation matches available feature' do
@@ -56,7 +58,7 @@ describe Bolt::Task do
          { 'name' => 'foo.ps1', 'requirements' => ['powershell'] }]
       }
 
-      it { expect(task.select_implementation(target)).to eq(files[1]) }
+      it { expect(task.select_implementation(target)).to eq(files[1].merge('files' => [])) }
     end
 
     context 'first implementation requires extra features' do
@@ -65,10 +67,10 @@ describe Bolt::Task do
          { 'name' => 'foo.ps1', 'requirements' => ['powershell'] }]
       }
 
-      it { expect(task.select_implementation(target)).to eq(files[1]) }
+      it { expect(task.select_implementation(target)).to eq(files[1].merge('files' => [])) }
 
       it 'uses additional features passed as arguments' do
-        expect(task.select_implementation(target, ['puppet-agent'])).to eq(files[2])
+        expect(task.select_implementation(target, ['puppet-agent'])).to eq(files[2].merge('files' => []))
       end
     end
 

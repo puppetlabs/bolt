@@ -86,7 +86,7 @@ module Bolt
         extra_files = implementation['files']
 
         with_tmpscript(executable, target.options['tmpdir']) do |script, dir|
-          if extra_files
+          unless extra_files.empty?
             installdir = File.join(dir, '_installdir')
             arguments['_installdir'] = installdir
             FileUtils.mkdir_p(extra_files.map { |file| File.join(installdir, File.dirname(file['name'])) })

@@ -112,6 +112,7 @@ catch
           executable = task.file['filename']
           file_content = StringIO.new(Base64.decode64(task.file['file_content']))
           input_method = task.metadata['input_method']
+          extra_files = []
         else
           implementation = task.select_implementation(target, PROVIDED_FEATURES)
           executable = implementation['path']
@@ -130,7 +131,7 @@ catch
                                  conn.write_remote_executable(dir, executable)
                                end
 
-            if extra_files
+            unless extra_files.empty?
               # TODO: optimize upload of directories
               installdir = File.join(dir, '_installdir')
               arguments['_installdir'] = installdir
