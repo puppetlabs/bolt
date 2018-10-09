@@ -682,7 +682,7 @@ Some types supported by Puppet can not be represented as JSON, such as `Hash[Int
 **Related information**  
 
 
-[Data type syntax](https://puppet.com/docs/puppet/5.5/lang_data_type.html)
+[Data type syntax](https://puppet.com/docs/puppet/latest/lang_data_type.html)
 
 ## Specifying parameters
 

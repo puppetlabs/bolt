@@ -2,8 +2,6 @@
 
 Bolt is an open source task runner that automates the manual work that you do to maintain your infrastructure. Use Bolt to automate tasks that you perform on your infrastructure on an as-needed basis, for example, when you troubleshoot a system, deploy an application, or stop and restart services. Bolt connects directly to remote nodes with SSH or WinRM, so you are not required to install any agent software.
 
-**Note:** Bolt is a pre-1.0 release in development. For details on frequent changes and feature iteration, see [Bolt release notes](bolt_release_notes.md).
-
 |Helpful Bolt docs links|Other useful places|
 |-----------------------|-------------------|
 | -   **Before you install**
@@ -55,7 +53,7 @@ Bolt is an open source task runner that automates the manual work that you do to
 
  -   **Docs for related Puppet products**
 
- [Open source Puppet](https://puppet.com/docs/puppet/5.5/index.html) 
+ [Open source Puppet](https://puppet.com/docs/puppet/latest/index.html) 
 
  [ Puppet Enterprise ](https://puppet.com/docs/pe/2018.1/pe_user_guide.html) 
 
