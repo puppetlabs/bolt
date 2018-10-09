@@ -12,6 +12,10 @@ require 'bolt/catalog/logging'
 
 module Bolt
   class Catalog
+    def initialize(log_level = 'debug')
+      @log_level = log_level
+    end
+
     def with_puppet_settings(hiera_config = {})
       Dir.mktmpdir('bolt') do |dir|
         cli = []
@@ -24,7 +28,7 @@ module Bolt
 
         # Use a special logdest that serializes all log messages and their level to stderr.
         Puppet::Util::Log.newdestination(:stderr)
-        Puppet.settings[:log_level] = 'debug'
+        Puppet.settings[:log_level] = @log_level
         yield
       end
     end
