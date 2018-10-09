@@ -20,7 +20,7 @@ describe Bolt::Catalog do
                                'key'          => '/path/to/key',
                                'token'        => 'token')
   end
-  let(:catalog) { Bolt::Catalog.new }
+  let(:catalog) { Bolt::Catalog.new('warning') }
   let(:notify) { "notify { \"trusted ${trusted}\": }" }
   let(:files) {
     <<-CODE
