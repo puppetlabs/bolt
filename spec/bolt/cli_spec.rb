@@ -871,6 +871,35 @@ bar
           end
         end
 
+        it "does not list a private task" do
+          options = {
+            subcommand: 'task',
+            action: 'show'
+          }
+          cli.execute(options)
+          tasks = JSON.parse(output.string)
+          expect(tasks).not_to include(['sample::private', 'Do not list this task'])
+        end
+
+        it "shows invidual private task" do
+          task_name = 'sample::private'
+          options = {
+            subcommand: 'task',
+            action: 'show',
+            object: task_name
+          }
+          cli.execute(options)
+          json = JSON.parse(output.string)
+          json.delete("files")
+          expect(json).to eq(
+            "name" => "sample::private",
+            "metadata" => { "name" => "Private Task",
+                            "description" => "Do not list this task",
+                            "private" => true },
+            "module_dir" => File.absolute_path(File.join(__dir__, "..", "fixtures", "modules", "sample"))
+          )
+        end
+
         it "shows an individual task data" do
           task_name = 'sample::params'
           options = {

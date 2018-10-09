@@ -633,28 +633,12 @@ The following table shows task metadata keys, values, and default values.
 
 |Metadata key|Description|Value|Default|
 |------------|-----------|-----|-------|
-|"description"|A description of what the task does.|A string.|None.|
-|"input\_method"|What input method the task runner should use to pass parameters to the task.| -    `environment` 
-
--    `stdin` 
-
--    `powershell` 
-
-
- | -   both `environment` and `stdin`
-
--   for `.ps1` tasks, `powershell`
-
-
- |
-|"parameters"|The parameters or input the task accepts listed with a puppet type string and optional description. See [adding parameters to metadata](writing_tasks.md#) for usage information.| -   String specifying the Puppet data type
-
--   String describing the parameter
-
-
- |None.|
-|"puppet\_task\_version"|The version of the spec used.|An integer.|1 \(This is the only valid value.\)|
-|"supports\_noop"|Whether the task supports no-op mode. Required for the task to accept the `--noop` option on the command line.|Boolean.|False.|
+|"description"|A description of what the task does.|String|None|
+|"input\_method"|What input method the task runner should use to pass parameters to the task.| `environment`, `stdin`, `powershell`| Both `environment` and `stdin` unless `.ps1` tasks in which case `powershell`. |
+|"parameters"|The parameters or input the task accepts listed with a puppet type string and optional description. See [adding parameters to metadata](writing_tasks.md#) for usage information.|String describing the parameter |None|
+|"puppet\_task\_version"|The version of the spec used.|Integer|1 \(This is the only valid value.\)|
+|"supports\_noop"|Whether the task supports no-op mode. Required for the task to accept the `--noop` option on the command line.|Boolean|False|
+|"private"|Do not display task by default when listing for UI.|Boolean|False|
 
 ### Task metadata types
 

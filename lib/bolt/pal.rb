@@ -179,9 +179,11 @@ module Bolt
     def list_tasks
       in_bolt_compiler do |compiler|
         tasks = compiler.list_tasks
-        tasks.map(&:name).sort.map do |task_name|
+        tasks.map(&:name).sort.each_with_object([]) do |task_name, data|
           task_sig = compiler.task_signature(task_name)
-          [task_name, task_sig.task_hash['metadata']['description']]
+          unless task_sig.task_hash['metadata']['private']
+            data << [task_name, task_sig.task_hash['metadata']['description']]
+          end
         end
       end
     end
