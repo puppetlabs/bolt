@@ -48,11 +48,11 @@ This list of packaged modules is available in a Puppetfile in the [Bolt reposito
 
 ### Bolt specific modules that are not available on the Forge
 
--   - \[aggregate\]\(https://github.com/puppetlabs/bolt/tree/master/modules/aggregate\): Aggregate task, script or command results.
+-   [aggregate](https://github.com/puppetlabs/bolt/tree/master/modules/aggregate): Aggregate task, script or command results.
 
--   - \[canary\]\(https://github.com/puppetlabs/bolt/tree/master/modules/canary\): Run action against a small number of nodes and only if it succeeds will it run on the rest.
+-   [canary](https://github.com/puppetlabs/bolt/tree/master/modules/canary): Run action against a small number of nodes and only if it succeeds will it run on the rest.
 
--   - \[puppetdb\_fact\]\(https://github.com/puppetlabs/bolt/tree/master/modules/puppetdb\_fact\): Collect facts for the specified nodes from the configured PuppetDB connection and stores the collected facts on the Targets.
+-   [puppetdb\_fact](https://github.com/puppetlabs/bolt/tree/master/modules/puppetdb_fact): Collect facts for the specified nodes from the configured PuppetDB connection and stores the collected facts on the Targets.
 
 
 **Tip:** To override a packaged module with another version, download the version you want and configure your modulepath to point to it.
@@ -69,6 +69,8 @@ This list of packaged modules is available in a Puppetfile in the [Bolt reposito
 ## Set up Bolt to download and install modules
 
 Before you can use Bolt to install modules, you must first create a Puppetfile. A Puppetfile is a formatted text file that contains a list of modules and their versions. It can include modules from the Puppet Forge or a Git repository.
+
+For modules that require Ruby gems, see [Install gems with Bolt packages](bolt_installing.md#)
 
 For more details about specifying modules in a Puppetfile, see the [Puppetfile documentation](https://puppet.com/docs/pe/2018.1/puppetfile.html).
 

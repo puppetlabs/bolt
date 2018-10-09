@@ -167,11 +167,15 @@ The Puppet repository for the YUM package management system is [http://yum.puppe
     bolt --help
     ```
 
-## Installing Gems with Bolt Packages
 
-Bolt packages include their own copy of Ruby. To install a gem for use with Bolt,
-- on Windows with the default install location, `"C:/Program Files/Puppet Labs/Bolt/bin/gem.bat" install <gem>`
-- on other platforms, `/opt/puppetlabs/bolt/bin/gem install <gem>`
+## Install gems with Bolt packages
+
+Bolt packages include their own copy of Ruby.
+
+To install a gem for use with Bolt:
+
+-   On Windows with the default install location, `"C:/Program Files/Puppet Labs/Bolt/bin/gem.bat" install <gem>`
+-   On other platforms, `/opt/puppetlabs/bolt/bin/gem install <gem>`
 
 ## Install Bolt as a gem
 
@@ -222,3 +226,4 @@ disabled: true
 Bolt supports Kerberos authentication for SSH connections, however you must install the gem yourself to avoid license incompatibilities with other distributed components.
 
 To add Kerberos authentication, run `gem install net-ssh-krb`.
+
