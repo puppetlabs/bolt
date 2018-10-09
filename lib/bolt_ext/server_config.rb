@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'hocon'
+require 'bolt/error'
 
 class TransportConfig
   attr_accessor :host, :port, :ssl_cert, :ssl_key, :ssl_ca_cert, :ssl_cipher_suites,

@@ -174,61 +174,61 @@ For example:
 If the task runs the response will have status 200.
 The response will be a standard bolt Result JSON object.
 
-## Install from Source
+## Running from source
 
-The following example walks through the setup to get the bolt-server running on an Ubuntu 16.04 vmpooler node.
+From your checkout of bolt run
 
-1. Download and install puppet6 and puppetserver (for certs). The latest release can be found at http://nightlies.puppet.com/
 ```
-curl -O http://nightlies.puppet.com/apt/puppet6-nightly-release-xenial.deb
-dpkg -i ./puppet6-nightly-release-xenial.deb
-apt-get update
-apt-get install puppetserver
-export PATH=$PATH:/opt/puppetlabs/bin
-puppet resource service puppetserver ensure=running
+BOLT_SERVER_CONF=config/local.conf bundle exec puma -C puppet_config.rb
 ```
-2. Get certs (Error messages OK here, as long as certs are generated)
-```
-puppet agent -t
-puppet cert list -a
-puppet cert sign [host reported from command above]
-```
-Check that the following certs have been generated
-```
-/etc/puppetlabs/puppet/ssl/certs/$HOSTNAME.pem
-/etc/puppetlabs/puppet/ssl/private_keys/$HOSTNAME.pem
-```
-3. Download and install bolt-server. The latest release can be found at http://builds.delivery.puppetlabs.net/pe-bolt-server
-```
-curl -O http://builds.delivery.puppetlabs.net/pe-bolt-server/0.21.8/repos/deb/xenial/pe-bolt-server_0.21.8-1xenial_amd64.deb
-dpkg -i pe-bolt-server_0.21.8-1xenial_amd64.deb
-```
-4. Copy over certs to bolt-server directory
 
-- `cp /etc/puppetlabs/puppet/ssl/certs/$HOSTNAME.pem /etc/puppetlabs/bolt-server/ssl/$HOSTNAME.cert.pem`
-- `cp /etc/puppetlabs/puppet/ssl/private_keys/$HOSTNAME.pem /etc/puppetlabs/bolt-server/ssl/$HOSTNAME.key.pem`
-- `cp /etc/puppetlabs/puppet/ssl/certs/ca.pem /etc/puppetlabs/bolt-server/ssl/ca.pem`
-5. Write config file
-Save following as `/etc/puppetlabs/bolt-server/conf.d/bolt-server.conf`
-```
-bolt-server: {
-  ssl-cert: "/etc/puppetlabs/bolt-server/ssl/$HOSTNAME.cert.pem"
-  ssl-key: "/etc/puppetlabs/bolt-server/ssl/$HOSTNAME.key.pem"
-  ssl-ca-cert: "/etc/puppetlabs/bolt-server/ssl/ca.pem"
-}
-```
-6. Grant permissions to bolt-server
 
-`chown -R pe-bolt-server:pe-bolt-server /etc/puppetlabs/bolt-server/*`
+setup your environment for running commands with
 
-7. Start bolt-server
-`service pe-bolt-server start`
-8. Build a request
-Save the following JSON to `~/request.json`
+```
+export BOLT_CACERT=spec/fixtures/ssl/ca.pem
+export BOLT_CERT=spec/fixtures/ssl/cert.pem
+export BOLT_KEY=spec/fixtures/ssl/key.pem
+export BOLT_ROOT=https://localhost:62658
+```
+
+you can now make a curl request to bolt which should have an empty response
+
+```
+curl -v --cacert $BOLT_CACERT --cert $BOLT_CERT --key $BOLT_KEY $BOLT_ROOT
+```
+
+## Running in a container
+
+from your checkout of bolt build and run the container with
+
+```
+docker run --rm -p 62658:62658 `docker build -q ./`
+```
+
+setup your environment for running commands with
+
+```
+export BOLT_CACERT=spec/fixtures/ssl/ca.pem
+export BOLT_CERT=spec/fixtures/ssl/cert.pem
+export BOLT_KEY=spec/fixtures/ssl/key.pem
+export BOLT_ROOT=https://localhost:62658
+```
+
+you can now make a curl request to bolt which should have an empty response
+
+```
+curl -v --cacert $BOLT_CACERT --cert $BOLT_CERT --key $BOLT_KEY $BOLT_ROOT
+```
+
+## Making requests
+
+The following is an example request body update it and save it to request.json
+
 ```
 {
   "target": {
-    "hostname": "xlr5bknywm58t94.delivery.puppetlabs.net",
+    "hostname": [hostname of target],
     "user": "root",
     "private-key-content": [Contents of ssh private key as a string],
     "host-key-check": false
@@ -251,11 +251,12 @@ Save the following JSON to `~/request.json`
   }
 }
 ```
-9. Make request
+You should then be able to post it with:
+
 ```
-curl -X POST -H "Content-Type: application/json" -d @request.json --cert /etc/puppetlabs/bolt-server/ssl/cert.pem --key /etc/puppetlabs/bolt-server/ssl/key.pem -k https://xlr5bknywm58t94.delivery.puppetlabs.net:62658/ssh/run_task
+curl -X POST -H "Content-Type: application/json" -d @request.json --cacert $BOLT_CACERT --cert $BOLT_CERT --key $BOLT_KEY $BOLT_ROOT $BOLT_ROOT/ssh/run_task
 ```
-10. Expected Output
+expected output
 ```
 {"node":"xlr5bknywm58t94.delivery.puppetlabs.net",
 "status":"success",

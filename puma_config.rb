@@ -13,8 +13,10 @@ require 'bolt/logger'
 
 Bolt::Logger.initialize_logging
 
-config = if ENV['RACK_ENV'] == 'test'
-           TransportConfig.new(File.join(__FILE__, 'spec', 'fixtures', 'configs', 'emptyconfig'))
+config = if ENV['BOLT_SERVER_CONF']
+           TransportConfig.new(ENV['BOLT_SERVER_CONF'])
+         elsif ENV['RACK_ENV'] == 'test'
+           TransportConfig.new(File.join(__dir__, 'spec', 'fixtures', 'configs', 'required-bolt-server.conf'))
          else
            TransportConfig.new
          end
@@ -29,6 +31,7 @@ if config.logfile
   stdout_redirect config.logfile, config.logfile, true
 end
 
+# TODO: use ssl_bind
 bind_addr = +"ssl://#{config.host}:#{config.port}?"
 bind_addr << "cert=#{config.ssl_cert}"
 bind_addr << "&key=#{config.ssl_key}"
