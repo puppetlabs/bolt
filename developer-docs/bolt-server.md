@@ -1,4 +1,4 @@
-# Bolt Server 
+# Bolt Server
 
 ## Overview
 Bolt server provides a service to run bolt tasks over SSH and WinRM. This service is exposed via an API as described in this document. Bolt server works as a standalone service, and is available in PE Johnson and greater as `pe-bolt-server`.
@@ -44,7 +44,7 @@ bolt-server: {
     ssl-cert: /etc/puppetlabs/bolt-server/ssl/cert.pem
     ssl-key: /etc/puppetlabs/bolt-server/ssl/private_key.pem
     ssl-ca-cert: /etc/puppetlabs/bolt-server/ssl/ca.pem
-} 
+}
 ```
 
 ## API Endpoints
@@ -119,32 +119,10 @@ For example, the following runs 'echo' task on localhost:
 ```
 
 ### SSH Target Object
-The Target be a JSON object. The following keys are available:
-- `hostname`: String, *required* - Target identifier.
-- `user`: String, *required* - Login user.
-- *Require one and only one of*
-  - `password`: String - Password for SSH transport authentication.
-  - `private-key-content`: String - Contents of private key for SSH.
-- `port`: Integer, *optional* - Connection port (Default: `22`).
-- `connect-timeout`: Integer, *optional* - Number of seconds Bolt should wait when establishing connections before failing.
-- `tmpdir`: String, *optional* - The directory to upload and execute temporary files on the target.
-- `run-as-command`: Array, *optional* - Command elevate permissions. Bolt appends the user and command strings to the configured `run-as` command before running it on the target. This command must not require an interactive password prompt, and the `sudo-password` option is ignored when `run-as-command` is specified.
-- `run-as`: String, *optional* - A different user to run commands as after login.
-- `host-key-check`: Bool, *optional* - Whether to perform host key validation when connecting over SSH (Default: `true`).
-- `sudo-password`: String, *optional* - Password to use when changing users via `run-as`.
+The Target is a JSON object. See the [schema](../lib/bolt_ext/schemas/ssh-run_task.json)
 
 ### WinRM Target Object
-The Target be a JSON object. The following keys are available:
-- `hostname`: String, *required* - Target identifier.
-- `user`: String, *required* - Login user.
-- `password`: String, *required* - Password for WinRM transport authentication.
-- `port`: Integer, *optional* - Connection port (Default: `5986`, or `5985` if `ssl: false`.)
-- `connect-timeout`: Integer, *optional* - Number of seconds Bolt should wait when establishing connections before failing.
-- `tmpdir`: String, *optional* - The directory to upload and execute temporary files on the target.
-- `ssl`: Boolean, *optional* - When true, Bolt will use https connections for WinRM (Default: `true`).
-- `ssl-verify`: Boolean, *optional* - When true, verifies the targets certificate matches the cacert (Default: `true`).
-- `cacert`: String, *optional* - The path to the CA certificate.
-- `extensions`: Array, *optional* - List of file extensions that are accepted for scripts or tasks. Scripts with these file extensions rely on the target node's file type association to run. For example, if Python is installed on the system, a .py script should run with python.exe. The extensions .ps1, .rb, and .pp are always allowed and run via hard-coded executables.
+The Target is a JSON object. See the [schema](../lib/bolt_ext/schemas/winrm-run_task.json)
 
 ### Task Object
 This is nearly identical to the [task detail JSON
@@ -192,18 +170,18 @@ For example:
 }
 ```
 
-### Response 
+### Response
 If the task runs the response will have status 200.
 The response will be a standard bolt Result JSON object.
 
 ## Install from Source
 
-The following example walks through the setup to get the bolt-server running on an Ubuntu 16.04 vmpooler node. 
+The following example walks through the setup to get the bolt-server running on an Ubuntu 16.04 vmpooler node.
 
 1. Download and install puppet6 and puppetserver (for certs). The latest release can be found at http://nightlies.puppet.com/
 ```
 curl -O http://nightlies.puppet.com/apt/puppet6-nightly-release-xenial.deb
-dpkg -i ./puppet6-nightly-release-xenial.deb 
+dpkg -i ./puppet6-nightly-release-xenial.deb
 apt-get update
 apt-get install puppetserver
 export PATH=$PATH:/opt/puppetlabs/bin

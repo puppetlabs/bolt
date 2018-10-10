@@ -51,8 +51,10 @@ class TransportAPI < Sinatra::Base
     schema_error = JSON::Validator.fully_validate(@schemas["ssh-run_task"], body)
     return [400, schema_error.join] if schema_error.any?
 
-    keys = %w[user password port ssh-key-content connect-timeout run-as-command run-as
-              tmpdir host-key-check known-hosts-content private-key-content sudo-password]
+    # CODEREVIEW: the schema is additionalProperties false do we need this?
+    keys = %w[user password port connect-timeout run-as-command run-as
+              tmpdir host-key-check known-hosts-content private-key-content sudo-password
+              tty]
     opts = body['target'].select { |k, _| keys.include? k }
 
     if opts['private-key-content']
