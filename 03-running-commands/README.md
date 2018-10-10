@@ -71,7 +71,7 @@ bolt command run <command> --nodes <nodes> --user <user> --password <password>
     ```
 
 3. Create an inventory file to store information about your nodes and refer to them as a group.  Later exercises will refer to the default group `all`. For more information on how to set up other named groups, see the
-    [Inventory File docs](https://puppet.com/docs/bolt/0.x/inventory_file.html).
+    [Inventory File docs](https://puppet.com/docs/bolt/latest/inventory_file.html).
 
     For example, if you are using the provided Vagrant configuration file, save the following to `~/.puppetlabs/bolt/inventory.yaml`:
 
