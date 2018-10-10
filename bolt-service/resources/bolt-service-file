@@ -1,0 +1,3 @@
+#!/bin/sh
+
+GEM_PATH=/opt/puppetlabs/server/apps/bolt-server/lib/ruby:/opt/puppetlabs/puppet/lib/ruby/gems/2.5.0:/opt/puppetlabs/puppet/lib/ruby/vendor_gems /opt/puppetlabs/server/apps/bolt-server/bin/bolt-server -C /opt/puppetlabs/server/apps/bolt-server/puma_config.rb -e production
