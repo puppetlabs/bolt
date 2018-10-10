@@ -62,7 +62,7 @@ BASH
         .with(anything,
               anything,
               hash_including(
-                verify_host_key: instance_of(Net::SSH::Verifiers::Secure)
+                verify_host_key: instance_of(Net::SSH::Verifiers::Always)
               ))
       ssh.with_connection(target) {}
     end
@@ -73,7 +73,7 @@ BASH
         .with(anything,
               anything,
               hash_including(
-                verify_host_key: instance_of(Net::SSH::Verifiers::Null)
+                verify_host_key: instance_of(Net::SSH::Verifiers::Never)
               ))
       ssh.with_connection(make_target(conf: no_host_key_check)) {}
     end
