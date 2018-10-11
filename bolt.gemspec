@@ -35,7 +35,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "logging", "~> 2.2"
   spec.add_dependency "minitar", "~> 0.6"
   spec.add_dependency "net-scp", "~> 1.2"
-  spec.add_dependency "net-ssh", "~> 5.0"
+  spec.add_dependency "net-ssh", ">= 4.0"
   spec.add_dependency "orchestrator_client", "~> 0.3.1"
   spec.add_dependency "puppet", [">= 6.0.1", "< 7"]
   spec.add_dependency "r10k", "~> 2.6"
