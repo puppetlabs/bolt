@@ -15,10 +15,7 @@ environment:
   BOLT_WINRM_HOST: localhost
   BOLT_WINRM_PORT: 5985
   BOLT_WINRM_SSL_PORT: 5986
-  matrix:
-    - RUBY_VERSION: 23
-    - RUBY_VERSION: 24
-    - RUBY_VERSION: 25
+  RUBY_VERSION: 25
 
 install:
   - set PATH=C:\Ruby%RUBY_VERSION%\bin;%PATH%
@@ -30,7 +27,7 @@ build: off
 for:
   -
     matrix:
-      only: 
+      only:
         - configuration: Agentless
 
     before_test:
@@ -117,6 +114,6 @@ for:
           # configure WinRM to use resources/cert.pfx for SSL
           ($cert = Import-PfxCertificate -FilePath resources/cert.pfx -CertStoreLocation cert:\\LocalMachine\\My -Password (ConvertTo-SecureString -String bolt -Force -AsPlainText)) | Format-List
           New-WSManInstance -ResourceURI winrm/config/Listener -SelectorSet @{Address='*';Transport='HTTPS'} -ValueSet @{Hostname='localhost';CertificateThumbprint=$cert.Thumbprint} | Format-List
-          
+
     test_script:
       - bundle exec rake integration:appveyor_agents
