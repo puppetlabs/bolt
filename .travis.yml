@@ -11,7 +11,9 @@ before_script:
 - eval `ssh-agent`
 - cat Gemfile.lock
 - bundle exec r10k puppetfile install
+- pushd spec
 - docker-compose up -d --build
+- popd
 
 script:
 - bundle exec rake travisci
