@@ -102,9 +102,9 @@ module Bolt
           options[:port] = target.port if target.port
           options[:password] = target.password if target.password
           options[:verify_host_key] = if target.options['host-key-check']
-                                        Net::SSH::Verifiers::Secure.new
+                                        Net::SSH::Verifiers::Always.new
                                       else
-                                        Net::SSH::Verifiers::Null.new
+                                        Net::SSH::Verifiers::Never.new
                                       end
           options[:timeout] = target.options['connect-timeout'] if target.options['connect-timeout']
 
