@@ -60,7 +60,7 @@ module Bolt
 
         result = begin
                    yield
-                 rescue StandardError => ex
+                 rescue StandardError, NotImplementedError => ex
                    Bolt::Result.from_exception(target, ex)
                  end
 

@@ -79,9 +79,14 @@ module Bolt
               Array(results).each do |result|
                 result_promises[result.target].set(result)
               end
-            # NotImplementedError can be thrown if the transport is implemented improperly
+            # NotImplementedError can be thrown if the transport is not implemented improperly
             rescue StandardError, NotImplementedError => e
               result_promises.each do |target, promise|
+                # If an exception happens while running, the result won't be logged
+                # by the CLI. Log a warning, as this is probably a problem with the transport.
+                # If batch_* commands are used from the Base transport, then exceptions
+                # normally shouldn't reach here.
+                @logger.warn(e)
                 promise.set(Bolt::Result.from_exception(target, e))
               end
             ensure

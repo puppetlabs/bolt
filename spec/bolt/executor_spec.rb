@@ -3,6 +3,7 @@
 require 'spec_helper'
 require 'bolt_spec/task'
 require 'bolt/executor'
+require 'bolt/target'
 
 describe "Bolt::Executor" do
   include BoltSpec::Task
@@ -309,7 +310,7 @@ describe "Bolt::Executor" do
     end
   end
 
-  it "returns an error result" do
+  it "returns and notifies an error result" do
     node_results.each_key do |_target|
       expect(ssh)
         .to receive(:with_connection)
@@ -318,10 +319,58 @@ describe "Bolt::Executor" do
         )
     end
 
-    results = executor.run_command(targets, command)
+    notices = []
+    results = executor.run_command(targets, command) { |notice| notices << notice }
+
     results.each do |result|
       expect(result.error_hash['kind']).to eq('puppetlabs.tasks/connect-error')
+      expect(result.error_hash['msg']).to eq('Authentication failed')
     end
+
+    expect(notices.count).to eq(4)
+    result_notices = notices.select { |notice| notice[:type] == :node_result }.map { |notice| notice[:result] }
+    expect(results).to eq(Bolt::ResultSet.new(result_notices))
+  end
+
+  it "returns and notifies an error result for NotImplementedError" do
+    node_results.each_key do |_target|
+      expect(ssh)
+        .to receive(:with_connection)
+        .and_raise(
+          NotImplementedError.new('ed25519 is not supported')
+        )
+    end
+
+    notices = []
+    results = executor.run_command(targets, command) { |notice| notices << notice }
+
+    results.each do |result|
+      expect(result.error_hash['kind']).to eq('puppetlabs.tasks/exception-error')
+      expect(result.error_hash['msg']).to eq('ed25519 is not supported')
+    end
+
+    expect(notices.count).to eq(4)
+    result_notices = notices.select { |notice| notice[:type] == :node_result }.map { |notice| notice[:result] }
+    expect(results).to eq(Bolt::ResultSet.new(result_notices))
+  end
+
+  it "logs an error and does not notify if the transport incorrectly implements batch_execute" do
+    node_results.each_key do |_target|
+      expect(ssh)
+        .to receive(:batch_command)
+        .and_raise(
+          NotImplementedError.new("I don't know what I'm doing")
+        )
+    end
+
+    results = executor.run_command(targets, command) { |_| expect(false) }
+    results.each do |result|
+      expect(result.error_hash['kind']).to eq('puppetlabs.tasks/exception-error')
+      expect(result.error_hash['msg']).to eq("I don't know what I'm doing")
+    end
+
+    logs = @log_output.readlines
+    expect(logs).to include(/WARN .*I don't know what I'm doing/)
   end
 
   context "targets with different protocols" do
