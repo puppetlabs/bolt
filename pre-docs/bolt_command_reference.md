@@ -46,7 +46,7 @@ Bolt commands use the syntax: `bolt <subcommand> <action> [options]`
 
 
  |
-| `bolt task show` | Lists all the tasks on the modulepath. Will note whether a task supports no-operation mode.
+| `bolt task show` | Lists all the tasks on the modulepath that have not been marked `private`. Will note whether a task supports no-operation mode.
 
  | -   Adding a specific task name displays details and parameters for the task.
 
