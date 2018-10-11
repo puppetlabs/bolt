@@ -2,8 +2,12 @@
 
 require 'base64'
 require 'concurrent'
+require 'find'
 require 'json'
+require 'minitar'
 require 'orchestrator_client'
+require 'pathname'
+require 'zlib'
 require 'bolt/transport/base'
 require 'bolt/transport/orch/connection'
 
@@ -114,14 +118,50 @@ module Bolt
         end
       end
 
+      def pack(directory)
+        start_time = Time.now
+        io = StringIO.new
+        output = Minitar::Output.new(Zlib::GzipWriter.new(io))
+        Find.find(directory) do |file|
+          next unless File.file?(file)
+
+          tar_path = Pathname.new(file).relative_path_from(Pathname.new(directory))
+          @logger.debug("Packing #{file} to #{tar_path}")
+          stat = File.stat(file)
+          content = File.binread(file)
+          output.tar.add_file_simple(
+            tar_path.to_s,
+            data: content,
+            size: content.size,
+            mode: stat.mode & 0o777,
+            mtime: stat.mtime
+          )
+        end
+
+        duration = Time.now - start_time
+        @logger.debug("Packed upload in #{duration * 1000} ms")
+
+        output.close
+        io.string
+      ensure
+        # Closes both tar and sgz.
+        output&.close
+      end
+
       def batch_upload(targets, source, destination, options = {}, &callback)
-        content = File.open(source, &:read)
+        stat = File.stat(source)
+        content = if stat.directory?
+                    pack(source)
+                  else
+                    File.open(source, &:read)
+                  end
         content = Base64.encode64(content)
         mode = File.stat(source).mode
         params = {
           'path' => destination,
           'content' => content,
-          'mode' => mode
+          'mode' => mode,
+          'directory' => stat.directory?
         }
         callback ||= proc {}
         results = run_task_job(targets, BOLT_UPLOAD_TASK, params, options, &callback)

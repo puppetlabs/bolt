@@ -25,7 +25,7 @@ describe "Bolt::CLI" do
   end
 
   def stub_file(path)
-    stat = double('stat', readable?: true, file?: true)
+    stat = double('stat', readable?: true, file?: true, directory?: false)
 
     allow(cli).to receive(:file_stat).with(path).and_return(stat)
   end
@@ -43,7 +43,7 @@ describe "Bolt::CLI" do
   end
 
   def stub_directory(path)
-    stat = double('stat', readable?: true, file?: false)
+    stat = double('stat', readable?: true, file?: false, directory?: true)
 
     allow(cli).to receive(:file_stat).with(path).and_return(stat)
   end
@@ -1526,6 +1526,19 @@ bar
           expect(JSON.parse(output.string)).to be
         end
 
+        it "uploads a directory via scp" do
+          stub_directory(source)
+          allow(Dir).to receive(:foreach).with(source)
+
+          expect(executor)
+            .to receive(:upload_file)
+            .with(targets, source, dest, kind_of(Hash))
+            .and_return(Bolt::ResultSet.new([]))
+
+          cli.execute(options)
+          expect(JSON.parse(output.string)).to be
+        end
+
         it "returns 2 if any node fails" do
           stub_file(source)
 
@@ -1555,11 +1568,14 @@ bar
           expect(JSON.parse(output.string)).to be
         end
 
-        it "errors if the local file is a directory" do
+        it "errors if a file in a subdirectory is unreadable" do
+          child_file = File.join(source, 'afile')
           stub_directory(source)
+          stub_unreadable_file(child_file)
+          allow(Dir).to receive(:foreach).with(source).and_yield('afile')
 
           expect { cli.execute(options) }.to raise_error(
-            Bolt::FileError, /The source file '#{source}' is not a file/
+            Bolt::FileError, /The source file '#{child_file}' is unreadable/
           )
           expect(JSON.parse(output.string)).to be
         end

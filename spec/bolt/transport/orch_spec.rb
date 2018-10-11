@@ -398,14 +398,14 @@ describe Bolt::Transport::Orch, orchestrator: true do
 
   describe :batch_upload do
     let(:source_path) { File.join(base_path, 'spec', 'fixtures', 'scripts', 'success.sh') }
-    let(:dest_path) { +'success.sh' } # to be prepended with a temp dir in the 'around(:each)' block
+    let(:dest_path) { 'success.sh' }
     let(:body) {
       content = Base64.encode64(File.read(source_path))
       mode = File.stat(source_path).mode
 
       {
         task: 'bolt_shim::upload',
-        params: { 'path' => dest_path, 'content' => content, 'mode' => mode }
+        params: { 'path' => dest_path, 'content' => content, 'mode' => mode, 'directory' => false }
       }
     }
 
@@ -439,6 +439,27 @@ describe Bolt::Transport::Orch, orchestrator: true do
       results.each do |result|
         expect(events).to include(type: :node_start, target: result.target)
         expect(events).to include(type: :node_result, result: result)
+      end
+    end
+
+    context 'with a directory' do
+      let(:source_path) { File.join(base_path, 'spec', 'fixtures', 'scripts') }
+      let(:dest_path) { 'scripts' }
+      let(:body) {
+        mode = File.stat(source_path).mode
+
+        {
+          task: 'bolt_shim::upload',
+          params: { 'path' => dest_path, 'content' => anything, 'mode' => mode, 'directory' => true }
+        }
+      }
+
+      it 'should upload a directory' do
+        results = orch.batch_upload(targets, source_path, dest_path)
+        expect(results[0]).to be_success
+        expect(results[1]).to be_success
+        expect(results[0].message).to match(/Uploaded '#{source_path}' to '#{targets[0].host}:#{dest_path}/)
+        expect(results[1].message).to match(/Uploaded '#{source_path}' to '#{targets[1].host}:#{dest_path}/)
       end
     end
   end

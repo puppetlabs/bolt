@@ -241,6 +241,28 @@ PS
       end
     end
 
+    it "can upload a directory to a host", winrm: true do
+      Dir.mktmpdir do |dir|
+        subdir = File.join(dir, 'subdir')
+        File.write(File.join(dir, 'content'), 'hello world')
+        Dir.mkdir(subdir)
+        File.write(File.join(subdir, 'more'), 'lorem ipsum')
+
+        target_dir = 'C:\Windows\Temp\directory-test'
+        winrm.upload(target, dir, target_dir)
+
+        expect(
+          winrm.run_command(target, "Get-ChildItem -Name #{target_dir}")['stdout'].split("\r\n")
+        ).to eq(%w[subdir content])
+
+        expect(
+          winrm.run_command(target, "Get-ChildItem -Name #{File.join(target_dir, 'subdir')}")['stdout'].split("\r\n")
+        ).to eq(%w[more])
+
+        winrm.run_command(target, "rm -r #{target_dir}")
+      end
+    end
+
     it "can run a PowerShell script remotely", winrm: true do
       contents = "Write-Output \"hellote\""
       with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|

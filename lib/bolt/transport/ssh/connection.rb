@@ -290,7 +290,7 @@ module Bolt
         end
 
         def write_remote_file(source, destination)
-          @session.scp.upload!(source, destination)
+          @session.scp.upload!(source, destination, recursive: true)
         rescue StandardError => e
           raise Bolt::Node::FileError.new(e.message, 'WRITE_ERROR')
         end

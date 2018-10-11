@@ -56,6 +56,28 @@ BASH
       end
     end
 
+    it "can upload a directory to a host" do
+      Dir.mktmpdir do |dir|
+        subdir = File.join(dir, 'subdir')
+        File.write(File.join(dir, 'content'), 'hello world')
+        Dir.mkdir(subdir)
+        File.write(File.join(subdir, 'more'), 'lorem ipsum')
+
+        target_dir = "/tmp/directory-test"
+        local.upload(target, dir, target_dir)
+
+        expect(
+          local.run_command(target, "ls #{target_dir}")['stdout'].split("\n")
+        ).to eq(%w[content subdir])
+
+        expect(
+          local.run_command(target, "ls #{File.join(target_dir, 'subdir')}")['stdout'].split("\n")
+        ).to eq(%w[more])
+
+        local.run_command(target, "rm -r #{target_dir}")
+      end
+    end
+
     it "can run a script remotely" do
       contents = "#!/bin/sh\necho hellote"
       with_tempfile_containing('script test', contents) do |file|
@@ -260,7 +282,7 @@ SHELL
       end
     end
 
-    context "when files are provided", bash: true do
+    context "when files are provided" do
       let(:contents) { "#!/bin/sh\nfind ${PT__installdir} -type f" }
       let(:arguments) { {} }
 
@@ -314,7 +336,7 @@ SHELL
 
       it 'returns an error result for run_script' do
         contents = "#!/bin/sh\necho hellote"
-        expect(FileUtils).to receive(:copy_file).and_raise('no write')
+        expect(FileUtils).to receive(:cp_r).and_raise('no write')
         with_tempfile_containing('script test', contents) do |file|
           expect {
             local.run_script(target, file.path, [])
@@ -325,7 +347,7 @@ SHELL
       it 'returns an error result for run_task' do
         contents = "#!/bin/sh\necho -n ${PT_message_one} ${PT_message_two}"
         arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-        expect(FileUtils).to receive(:copy_file).and_raise('no write')
+        expect(FileUtils).to receive(:cp_r).and_raise('no write')
         with_task_containing('tasks_test', contents, 'environment') do |task|
           expect {
             local.run_task(target, task, arguments)
