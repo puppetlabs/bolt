@@ -2,6 +2,10 @@
 
 require 'spec_helper'
 require 'bolt/applicator'
+require 'bolt/executor'
+require 'bolt/inventory'
+require 'bolt/pal'
+require 'bolt/puppetdb'
 require 'bolt/target'
 
 describe Bolt::Applicator do
@@ -15,12 +19,13 @@ describe Bolt::Applicator do
                                'token' => 'token')
   end
   let(:pdb_client) { Bolt::PuppetDB::Client.new(config) }
-  let(:applicator) { Bolt::Applicator.new(inventory, executor, :mod, pdb_client, nil, 2) }
+  let(:modulepath) { [Bolt::PAL::BOLTLIB_PATH, Bolt::PAL::MODULES_PATH] }
+  let(:applicator) { Bolt::Applicator.new(inventory, executor, modulepath, [], pdb_client, nil, 2) }
 
   let(:input) {
     {
       code_ast: :ast,
-      modulepath: :mod,
+      modulepath: modulepath,
       pdb_config: config.to_hash,
       hiera_config: nil,
       target: {
@@ -33,6 +38,25 @@ describe Bolt::Applicator do
           extensions: {},
           hostname: uri,
           domain: nil
+        }
+      },
+      inventory: {
+        data: {},
+        target_hash: {
+          target_vars: {},
+          target_facts: {},
+          target_features: {}
+        },
+        config: {
+          transport: "ssh",
+          transports: {
+            ssh: { 'connect-timeout' => 10, tty: false, "host-key-check" => true },
+            winrm: { 'connect-timeout' => 10, tty: false, ssl: true, "ssl-verify" => true },
+            pcp: { 'connect-timeout' => 10,
+                   tty: false,
+                   "task-environment" => "production" },
+            local: { 'connect-timeout' => 10, tty: false }
+          }
         }
       }
     }
@@ -68,64 +92,21 @@ describe Bolt::Applicator do
     )
   end
 
-  describe '#provide_puppet_missing_errors' do
-    it 'returns the result if no identifiable errors are found' do
-      result = Bolt::Result.for_task(:target, '', 'blah', 1)
-      expect(applicator.provide_puppet_missing_errors(result)).to eq(result)
-    end
-
-    it 'returns the result if no errors are present' do
-      result = Bolt::Result.for_task(:target, 'hello', '', 0)
-      expect(applicator.provide_puppet_missing_errors(result)).to eq(result)
-    end
-
-    it 'errors if /opt/puppetlabs/puppet/bin/ruby not found on Linux' do
-      orig_result = Bolt::Result.for_task(:target, '', 'blah', 127)
-      new_result = applicator.provide_puppet_missing_errors(orig_result)
-      expect(new_result.error_hash['kind']).to eq('bolt/apply-error')
-      expect(new_result.error_hash['msg'])
-        .to eq("Puppet is not installed on the target, please install it to enable 'apply'")
-    end
-
-    it 'errors if /opt/puppetlabs/puppet/bin/ruby not found on macOS' do
-      orig_result = Bolt::Result.for_task(:target, '', 'blah', 126)
-      new_result = applicator.provide_puppet_missing_errors(orig_result)
-      expect(new_result.error_hash['kind']).to eq('bolt/apply-error')
-      expect(new_result.error_hash['msg'])
-        .to eq("Puppet is not installed on the target, please install it to enable 'apply'")
-    end
-
-    it 'errors if Ruby cannot be found on Windows' do
-      orig_result = Bolt::Result.for_task(:target, '', "Could not find executable 'ruby.exe'", 1)
-      new_result = applicator.provide_puppet_missing_errors(orig_result)
-      expect(new_result.error_hash['kind']).to eq('bolt/apply-error')
-      expect(new_result.error_hash['msg'])
-        .to eq("Puppet is not installed on the target in $env:ProgramFiles, please install it to enable 'apply'")
-    end
-
-    it 'errors if Puppet cannot be found on Windows' do
-      orig_result = Bolt::Result.for_task(:target, '', 'cannot load such file -- puppet (LoadError)', 1)
-      new_result = applicator.provide_puppet_missing_errors(orig_result)
-      expect(new_result.error_hash['kind']).to eq('bolt/apply-error')
-      expect(new_result.error_hash['msg'])
-        .to eq('Found a Ruby without Puppet present, please install Puppet ' \
-              "or remove Ruby from $env:Path to enable 'apply'")
-    end
-  end
-
   context 'with Puppet mocked' do
     before(:each) do
-      allow(Puppet).to receive(:lookup).and_return(double(:type, type: nil))
+      env = Puppet::Node::Environment.create(:testing, modulepath)
+      allow(Puppet).to receive(:lookup).with(:pal_script_compiler).and_return(double(:script_compiler, type: nil))
+      allow(Puppet).to receive(:lookup).with(:current_environment).and_return(env)
       allow(Puppet::Pal).to receive(:assert_type)
       allow(Puppet::Pops::Serialization::ToDataConverter).to receive(:convert).and_return(:ast)
     end
 
     it 'replaces failures to find Puppet' do
       expect(applicator).to receive(:compile).and_return(:ast)
-      allow_any_instance_of(Bolt::Transport::SSH).to receive(:batch_task).and_return(:result)
-
       result = Bolt::Result.new(target)
-      expect(applicator).to receive(:provide_puppet_missing_errors).with(:result).and_return(result)
+      allow_any_instance_of(Bolt::Transport::SSH).to receive(:batch_task).and_return(result)
+
+      expect(Bolt::ApplyResult).to receive(:puppet_missing_error).with(result).and_return(nil)
 
       applicator.apply([target], :body, {})
     end
@@ -207,7 +188,7 @@ MSG
       t = Thread.new {
         applicator.apply([targets], :body, {})
       }
-      sleep(0.1)
+      sleep(0.2)
 
       expect(running.value).to eq(2)
 

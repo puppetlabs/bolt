@@ -8,6 +8,8 @@ test_name "Install Bolt via git" do
   sha = ''
   version = ''
   step "Clone repo" do
+    # Cleanup previous runs
+    on(bolt, "rm -rf bolt")
     on(bolt, "git clone #{git_server}/#{git_fork} bolt")
     if git_sha.empty?
       on(bolt, "cd bolt && git checkout #{git_branch}")

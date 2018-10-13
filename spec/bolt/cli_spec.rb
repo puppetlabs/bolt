@@ -25,7 +25,7 @@ describe "Bolt::CLI" do
   end
 
   def stub_file(path)
-    stat = double('stat', readable?: true, file?: true)
+    stat = double('stat', readable?: true, file?: true, directory?: false)
 
     allow(cli).to receive(:file_stat).with(path).and_return(stat)
   end
@@ -43,7 +43,7 @@ describe "Bolt::CLI" do
   end
 
   def stub_directory(path)
-    stat = double('stat', readable?: true, file?: false)
+    stat = double('stat', readable?: true, file?: false, directory?: true)
 
     allow(cli).to receive(:file_stat).with(path).and_return(stat)
   end
@@ -208,6 +208,13 @@ bar
           extra_targets = [Bolt::Target.new('baz'), Bolt::Target.new('qux')]
           expect(result[:targets]).to eq(targets + extra_targets)
         end
+      end
+
+      it "expands tilde to a user directory when --nodes starts with @" do
+        expect(File).to receive(:read).with(File.join(Dir.home, 'nodes.txt')).and_return("foo\nbar\n")
+        cli = Bolt::CLI.new(%w[command run --nodes @~/nodes.txt])
+        result = cli.parse
+        expect(result[:targets]).to eq(targets)
       end
 
       it "generates an error message if no nodes given" do
@@ -413,9 +420,11 @@ bar
     end
 
     describe "modulepath" do
-      it "accepts a modulepath directory" do
-        cli = Bolt::CLI.new(%w[command run --modulepath ./modules --nodes foo])
-        expect(cli.parse).to include(modulepath: ['./modules'])
+      it "treats relative modulepath as relative to pwd" do
+        site = File.expand_path('site')
+        modulepath = [site, 'modules'].join(File::PATH_SEPARATOR)
+        cli = Bolt::CLI.new(%W[command run --modulepath #{modulepath} --nodes foo])
+        expect(cli.parse).to include(modulepath: [site, File.expand_path('modules')])
       end
 
       it "generates an error message if no value is given" do
@@ -686,6 +695,7 @@ bar
 
       before :each do
         allow(Bolt::Executor).to receive(:new).and_return(executor)
+        allow(executor).to receive(:log_plan) { |_plan_name, &block| block.call }
 
         outputter = Bolt::Outputter::JSON.new(false, false, output)
 
@@ -861,6 +871,35 @@ bar
           end
         end
 
+        it "does not list a private task" do
+          options = {
+            subcommand: 'task',
+            action: 'show'
+          }
+          cli.execute(options)
+          tasks = JSON.parse(output.string)
+          expect(tasks).not_to include(['sample::private', 'Do not list this task'])
+        end
+
+        it "shows invidual private task" do
+          task_name = 'sample::private'
+          options = {
+            subcommand: 'task',
+            action: 'show',
+            object: task_name
+          }
+          cli.execute(options)
+          json = JSON.parse(output.string)
+          json.delete("files")
+          expect(json).to eq(
+            "name" => "sample::private",
+            "metadata" => { "name" => "Private Task",
+                            "description" => "Do not list this task",
+                            "private" => true },
+            "module_dir" => File.absolute_path(File.join(__dir__, "..", "fixtures", "modules", "sample"))
+          )
+        end
+
         it "shows an individual task data" do
           task_name = 'sample::params'
           options = {
@@ -870,41 +909,45 @@ bar
           }
           cli.execute(options)
           json = JSON.parse(output.string)
-          json.delete('implementations')
+          json.delete("files")
           expect(json).to eq(
             "name" => "sample::params",
-            "description" => "Task with parameters",
-            "input_method" => 'stdin',
-            "parameters" => {
-              "mandatory_string" => {
-                "description" => "Mandatory string parameter",
-                "type" => "String[1, 10]"
+            "module_dir" => File.absolute_path(File.join(__dir__, "..", "fixtures", "modules", "sample")),
+            "metadata" => {
+              "anything" => true,
+              "description" => "Task with parameters",
+              "extensions" => {},
+              "input_method" => 'stdin',
+              "parameters" => {
+                "mandatory_string" => {
+                  "description" => "Mandatory string parameter",
+                  "type" => "String[1, 10]"
+                },
+                "mandatory_integer" => {
+                  "description" => "Mandatory integer parameter",
+                  "type" => "Integer"
+                },
+                "mandatory_boolean" => {
+                  "description" => "Mandatory boolean parameter",
+                  "type" => "Boolean"
+                },
+                "non_empty_string" => {
+                  "type" => "String[1]"
+                },
+                "optional_string" => {
+                  "description" => "Optional string parameter",
+                  "type" => "Optional[String]"
+                },
+                "optional_integer" => {
+                  "description" => "Optional integer parameter",
+                  "type" => "Optional[Integer[-5,5]]"
+                },
+                "no_type" => {
+                  "description" => "A parameter without a type"
+                }
               },
-              "mandatory_integer" => {
-                "description" => "Mandatory integer parameter",
-                "type" => "Integer"
-              },
-              "mandatory_boolean" => {
-                "description" => "Mandatory boolean parameter",
-                "type" => "Boolean"
-              },
-              "non_empty_string" => {
-                "type" => "String[1]"
-              },
-              "optional_string" => {
-                "description" => "Optional string parameter",
-                "type" => "Optional[String]"
-              },
-              "optional_integer" => {
-                "description" => "Optional integer parameter",
-                "type" => "Optional[Integer[-5, 5]]"
-              },
-              "no_type" => {
-                "description" => "A parameter without a type",
-                'type' => 'Any'
-              }
-            },
-            "supports_noop" => true
+              "supports_noop" => true
+            }
           )
         end
       end
@@ -921,20 +964,17 @@ bar
           }
           cli.execute(options)
           json = JSON.parse(output.string)
-          expect(json).to eq([["apply::resource", "Apply a single Puppet resource"],
-                              ["facts", "Gather system facts"],
-                              ["facts::bash", "Gather system facts using bash"],
-                              ["facts::powershell", "Gather system facts using powershell"],
-                              ["facts::ruby", "Gather system facts using ruby and facter"],
-                              ["package", "Manage and inspect the state of packages"],
-                              ["puppet_conf", "Inspect puppet agent configuration settings"],
-                              ["sample::ok", nil],
-                              ["service", "Manage and inspect the state of services"],
-                              ["service::linux", "Manage the state of services (without a puppet agent)"],
-                              ["service::windows",
-                               "Manage the state of Windows services (without a puppet agent)"]])
+          tasks = [
+            ["package", "Manage and inspect the state of packages"],
+            ["service", "Manage and inspect the state of services"],
+            ["service::linux", "Manage the state of services (without a puppet agent)"],
+            ["service::windows", "Manage the state of Windows services (without a puppet agent)"]
+          ]
+          tasks.each do |task|
+            expect(json).to include(task)
+          end
           output = @log_output.readlines.join
-          expect(output).to match(/unexpected token.*params\.json/m)
+          expect(output).to match(/unexpected token/)
         end
       end
 
@@ -991,6 +1031,7 @@ bar
           json = JSON.parse(output.string)
           expect(json).to eq(
             "name" => "sample::optional_params_task",
+            "module_dir" => File.absolute_path(File.join(__dir__, "..", "fixtures", "modules", "sample")),
             "parameters" => {
               "param_mandatory" => {
                 "type" => "String"
@@ -1025,7 +1066,6 @@ bar
                               ["canary"],
                               ["facts"],
                               ["facts::info"],
-                              ["facts::retrieve"],
                               ["puppetdb_fact"],
                               ["sample::ok"]])
 
@@ -1285,43 +1325,7 @@ bar
             expect(JSON.parse(output.string)).to be
           end
 
-          context "when the pcp transport's local-validation setting is set to true" do
-            let(:task_params) {
-              # these are not legal parameters for the 'sample::params' task
-              # according to the local task definition
-              {
-                'foo' => nil,
-                'bar' => nil
-              }
-            }
-            let(:target) { Bolt::Target.new('pcp://foo') }
-            let(:task_t) { task_type(task_name, /\A\z/, 'both') }
-
-            before :each do
-              cli.config.transports[:pcp]['local-validation'] = true
-            end
-
-            it "errors as usual if the task is not available locally" do
-              task_name.replace 'unknown::task'
-
-              expect { cli.execute(options) }.to raise_error(
-                Bolt::PAL::PALError, /Could not find a task named "unknown::task"/
-              )
-              expect(JSON.parse(output.string)).to be
-            end
-
-            it "errors as usual if invalid (according to the local task definition) parameters are specified" do
-              expect { cli.execute(options) }.to raise_error(
-                Bolt::PAL::PALError,
-                /Task sample::params:\n(?x:
-                 )\s*has no parameter named 'foo'\n(?x:
-                 )\s*has no parameter named 'bar'/
-              )
-              expect(JSON.parse(output.string)).to be
-            end
-          end
-
-          context "when the pcp transport's local-validation setting is false" do
+          context "using the pcp transport with invalid tasks" do
             let(:task_params) {
               # these are not legal parameters for the 'sample::params' task
               # according to the local task definition
@@ -1412,6 +1416,7 @@ bar
             .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0)]))
 
           expect(executor).to receive(:start_plan)
+          expect(executor).to receive(:log_plan)
           expect(executor).to receive(:finish_plan)
 
           cli.execute(options)
@@ -1437,6 +1442,7 @@ bar
             .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0)]))
 
           expect(executor).to receive(:start_plan)
+          expect(executor).to receive(:log_plan)
           expect(executor).to receive(:finish_plan)
 
           cli.execute(options)
@@ -1452,6 +1458,7 @@ bar
             .and_raise("Could not connect to target")
 
           expect(executor).to receive(:start_plan)
+          expect(executor).to receive(:log_plan)
           expect(executor).to receive(:finish_plan)
 
           expect(cli.execute(options)).to eq(1)
@@ -1465,6 +1472,7 @@ bar
             .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'no', '', 1)]))
 
           expect(executor).to receive(:start_plan)
+          expect(executor).to receive(:log_plan)
           expect(executor).to receive(:finish_plan)
 
           cli.execute(options)
@@ -1507,6 +1515,7 @@ bar
             end
 
           expect(executor).to receive(:start_plan)
+          expect(executor).to receive(:log_plan)
           expect(executor).to receive(:finish_plan)
 
           expect(cli).to receive(:exit!) do
@@ -1538,7 +1547,20 @@ bar
           stub_file(source)
 
           expect(executor)
-            .to receive(:file_upload)
+            .to receive(:upload_file)
+            .with(targets, source, dest, kind_of(Hash))
+            .and_return(Bolt::ResultSet.new([]))
+
+          cli.execute(options)
+          expect(JSON.parse(output.string)).to be
+        end
+
+        it "uploads a directory via scp" do
+          stub_directory(source)
+          allow(Dir).to receive(:foreach).with(source)
+
+          expect(executor)
+            .to receive(:upload_file)
             .with(targets, source, dest, kind_of(Hash))
             .and_return(Bolt::ResultSet.new([]))
 
@@ -1550,7 +1572,7 @@ bar
           stub_file(source)
 
           expect(executor)
-            .to receive(:file_upload)
+            .to receive(:upload_file)
             .with(targets, source, dest, kind_of(Hash))
             .and_return(fail_set)
 
@@ -1575,11 +1597,14 @@ bar
           expect(JSON.parse(output.string)).to be
         end
 
-        it "errors if the local file is a directory" do
+        it "errors if a file in a subdirectory is unreadable" do
+          child_file = File.join(source, 'afile')
           stub_directory(source)
+          stub_unreadable_file(child_file)
+          allow(Dir).to receive(:foreach).with(source).and_yield('afile')
 
           expect { cli.execute(options) }.to raise_error(
-            Bolt::FileError, /The source file '#{source}' is not a file/
+            Bolt::FileError, /The source file '#{child_file}' is unreadable/
           )
           expect(JSON.parse(output.string)).to be
         end
@@ -1725,8 +1750,9 @@ bar
 
   describe 'configfile' do
     let(:configdir) { File.join(__dir__, '..', 'fixtures', 'configs') }
+    let(:modulepath) { [File.expand_path('/foo/bar'), File.expand_path('/baz/qux')] }
     let(:complete_config) do
-      { 'modulepath' => "/foo/bar#{File::PATH_SEPARATOR}/baz/qux",
+      { 'modulepath' => modulepath.join(File::PATH_SEPARATOR),
         'inventoryfile' => File.join(__dir__, '..', 'fixtures', 'inventory', 'empty.yml'),
         'concurrency' => 14,
         'compile-concurrency' => 2,
@@ -1757,8 +1783,7 @@ bar
           'task-environment' => 'testenv',
           'service-url' => 'http://foo.org',
           'token-file' => '/path/to/token',
-          'cacert' => '/path/to/cacert',
-          'local-validation' => false
+          'cacert' => '/path/to/cacert'
         } }
     end
 
@@ -1766,7 +1791,7 @@ bar
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-host-key-check])
         cli.parse
-        expect(cli.config.modulepath).to eq(['/foo/bar', '/baz/qux'])
+        expect(cli.config.modulepath).to eq(modulepath)
       end
     end
 
@@ -1884,14 +1909,6 @@ bar
         cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo])
         cli.parse
         expect(cli.config.transports[:pcp]['token-file']).to eql('/path/to/token')
-      end
-    end
-
-    it 'reads local-validation option for pcp' do
-      with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo])
-        cli.parse
-        expect(cli.config.transports[:pcp]['local-validation']).to eql(false)
       end
     end
 

@@ -47,7 +47,7 @@ module Bolt
     end
   end
 
-  class RunFailure < Error
+  class RunFailure < Bolt::Error
     attr_reader :result_set
 
     def initialize(result_set, action, object)

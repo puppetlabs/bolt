@@ -4,13 +4,16 @@ cache: bundler
 services:
 - docker
 rvm:
+- 2.5
 - 2.4
 - 2.3
 before_script:
 - eval `ssh-agent`
 - cat Gemfile.lock
 - bundle exec r10k puppetfile install
+- pushd spec
 - docker-compose up -d --build
+- popd
 
 script:
 - bundle exec rake travisci
@@ -42,7 +45,8 @@ notifications:
   email: false
   hipchat:
     rooms:
-      secure: g7ViGa4EwzqVmbiu2RXk6BXJi3nfLIAMwCojJkD7d2OZ6hmButPP15jB4KaZ/3WTDKNO0elo1wcIdVCJBnZpELPAC32xdcQ43Ft6W5NVDaJwxO4xl836OLboIStSd+7W8raVcarCh5UTDvZbm/9B13o6uaL+GaP2Lpilr2GKZRAABw2hjC58vUBFMZvUN6q7oQ96up1NG6vpsZ3uCitPEvVemGn4kqC9dkLOWGZGRx21fTyL10ttQ5R21kQsp9efdlxyHqU3m96CNItw2yDHOKH3Z6FUtFwKyD+xzqOOAESt5ZgtT/g3XJK8koW2oKALSXwq+9eCfAisHQpotRciZY4pGoalVu3Zp000w26dJm0kDBdAmJ7LWVL3QK/qBxw00S+ODh1Du2WKLm+zAFYZ1O79LlnKQeDeqvL/Z+It8kMJrA/JUoQuyRrMouy5NAzjlGzZlC9kr2HUYzK2eBcxHfF8gJN0bnzalLnsR36RBgyDtLyuuIKouXo5GUkD/wDL+WbSuwejvWTDUxBATby5xq/VNwvgGJnXrAgs2HOR+k+V/dBeYjW5Ow4eqpGsnDT2EN4o6kmJDRubAMu6NIkJus5WKdyl/Q6BCvt7Gathzz1vUvhwhCt0elrkpeXYrq/g+MIHuLGl3IRbjTOy9gpcgbjRapRhwp/AzXY2EDqoGJM=
+      secure: j1c64TomsD45XGBnv+0AaLPBFacg3hWAs7p2Qo+AYRrXXT2lLyqYlOCUo4oek9r7+SQ4nHbGjxC59o6g3YTF5obsQosLpb9EdgmVaS14khnBlb2Mvo2fKoRZ3YiKQQ6L+TFE9NiQ3XC4ccvfXrwSjXZsByVJiPaDieXQr83qE6xdsNGN9jSW2fJ+Qt90TXd3TBabu2pTxiAZVVmZYa409jmTsDRpeZXic7Om4jj4MYaFkHWl1sakktIijgN5vvscqxe9cn0JgtcX5ZQo7UoZ1tH+8dko5IB1s04CF1K2AJytb8Jt/tIx1z8khwaGiPNGHJby9lndKGrU1lm1jA9IkqaY8L2iHNN4mivpf5PpvV82QfJcc+JQgVA6xCMYOO/RimeyNGeHcMzd7dQuOneSzMkeLarLZ1k6ayYDxuDwzgjl4P/sM7V0rCsyDfNL/fTNdt9Ix7GBWHyL7aQLeSxksD7RA3et6q8OcwklMVVVt4+xyYR2Ui8hyRc7KTHEH5Ff/NpgpAQmwl47BKMz9nwf6wey8HqWXuoyA+xkwq3fXM6Ifh+RFw12MwoylcKo3TB8hH66hpn19XltHkvfvDNxo+Xc4aScZqZhPPN0dJ6h6P65jUbPM+PdfrZ3V/Nuz59LQ93CmlcQOwcP0a7KUGRq38iqWHDgoauQvp44iGwAHOc=
     template:
-      - '<a href="https://github.com/%{repository_slug}">%{repository_name}</a>#<a href="%{build_url}">%{build_number}</a> (<a href="%{compare_url}">%{branch} - %{commit} : %{author}</a>): %{message}'
+    - '<a href="https://github.com/%{repository_slug}">%{repository_name}</a>#<a href="%{build_url}">%{build_number}</a>
+      (<a href="%{compare_url}">%{branch} - %{commit} : %{author}</a>): %{message}'
     format: html

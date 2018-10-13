@@ -16,16 +16,20 @@ require 'bolt/puppetdb'
 module Bolt
   class Executor
     attr_reader :noop, :transports
-    attr_accessor :run_as, :plan_logging
+    attr_accessor :run_as
 
+    # FIXME: There must be a better way
+    # https://makandracards.com/makandra/36011-ruby-do-not-mix-optional-and-keyword-arguments
     def initialize(concurrency = 1,
                    analytics = Bolt::Analytics::NoopClient.new,
                    noop = nil,
-                   bundled_content: nil)
+                   bundled_content: nil,
+                   load_config: true)
       @analytics = analytics
       @bundled_content = bundled_content
       @logger = Logging.logger[self]
       @plan_logging = false
+      @load_config = load_config
 
       @transports = Bolt::TRANSPORTS.each_with_object({}) do |(key, val), coll|
         coll[key.to_s] = Concurrent::Delay.new do
@@ -36,7 +40,11 @@ module Bolt
 
       @noop = noop
       @run_as = nil
-      @pool = Concurrent::ThreadPoolExecutor.new(max_threads: concurrency)
+      @pool = if concurrency > 0
+                Concurrent::ThreadPoolExecutor.new(max_threads: concurrency)
+              else
+                Concurrent.global_immediate_executor
+              end
       @logger.debug { "Started with #{concurrency} max thread(s)" }
       @notifier = Bolt::Notifier.new
     end
@@ -71,9 +79,14 @@ module Bolt
               Array(results).each do |result|
                 result_promises[result.target].set(result)
               end
-            # NotImplementedError can be thrown if the transport is implemented improperly
+            # NotImplementedError can be thrown if the transport is not implemented improperly
             rescue StandardError, NotImplementedError => e
               result_promises.each do |target, promise|
+                # If an exception happens while running, the result won't be logged
+                # by the CLI. Log a warning, as this is probably a problem with the transport.
+                # If batch_* commands are used from the Base transport, then exceptions
+                # normally shouldn't reach here.
+                @logger.warn(e)
                 promise.set(Bolt::Result.from_exception(target, e))
               end
             ensure
@@ -130,6 +143,22 @@ module Bolt
       plural = failures == 1 ? '' : 's'
 
       @logger.send(log_method, "Finished: #{description} with #{failures} failure#{plural} in #{duration.round(2)} sec")
+
+      results
+    end
+
+    def log_plan(plan_name)
+      log_method = @plan_logging ? :notice : :info
+      @logger.send(log_method, "Starting: plan #{plan_name}")
+      start_time = Time.now
+
+      results = nil
+      begin
+        results = yield
+      ensure
+        duration = Time.now - start_time
+        @logger.send(log_method, "Finished: plan #{plan_name} in #{duration.round(2)} sec")
+      end
 
       results
     end
@@ -196,10 +225,11 @@ module Bolt
       log_action(description, targets) do
         notify = proc { |event| @notifier.notify(callback, event) if callback }
         options = { '_run_as' => run_as }.merge(options) if run_as
+        options = options.merge('_load_config' => @load_config)
         arguments['_task'] = task.name
 
         results = batch_execute(targets) do |transport, batch|
-          with_node_logging("Running task #{task.name} with '#{arguments}' via #{task.input_method}", batch) do
+          with_node_logging("Running task #{task.name} with '#{arguments}'", batch) do
             transport.batch_task(batch, task, arguments, options, &notify)
           end
         end
@@ -209,7 +239,7 @@ module Bolt
       end
     end
 
-    def file_upload(targets, source, destination, options = {}, &callback)
+    def upload_file(targets, source, destination, options = {}, &callback)
       description = options.fetch('_description', "file upload from #{source} to #{destination}")
       log_action(description, targets) do
         notify = proc { |event| @notifier.notify(callback, event) if callback }
@@ -243,6 +273,14 @@ module Bolt
 
     def finish_plan(plan_result)
       transport('pcp').finish_plan(plan_result)
+    end
+
+    def without_default_logging
+      old_log = @plan_logging
+      @plan_logging = false
+      yield
+    ensure
+      @plan_logging = old_log
     end
   end
 end

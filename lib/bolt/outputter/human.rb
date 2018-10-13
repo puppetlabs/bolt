@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require 'terminal-table'
+require 'bolt/pal'
+
 module Bolt
   class Outputter
     class Human < Bolt::Outputter
@@ -73,7 +75,7 @@ module Bolt
         end
       end
 
-      def print_summary(results, elapsed_time)
+      def print_summary(results, elapsed_time = nil)
         ok_set = results.ok_set
         unless ok_set.empty?
           @stream.puts format('Successful on %<size>d node%<plural>s: %<names>s',
@@ -91,10 +93,11 @@ module Bolt
                                        names: error_set.names.join(',')))
         end
 
-        @stream.puts format('Ran on %<size>d node%<plural>s in %<elapsed>.2f seconds',
-                            size: results.size,
-                            plural: results.size == 1 ? '' : 's',
-                            elapsed: elapsed_time)
+        total_msg = format('Ran on %<size>d node%<plural>s',
+                           size: results.size,
+                           plural: results.size == 1 ? '' : 's')
+        total_msg += format(' in %<elapsed>.2f seconds', elapsed: elapsed_time) unless elapsed_time.nil?
+        @stream.puts total_msg
       end
 
       def print_table(results)
@@ -119,26 +122,31 @@ module Bolt
         task_info = +""
         usage = +"bolt task run --nodes <node-name> #{task['name']}"
 
-        if task['parameters']
-          replace_data_type(task['parameters'])
-          task['parameters'].each do |k, v|
-            pretty_params << "- #{k}: #{v['type']}\n"
-            pretty_params << "    #{v['description']}\n" if v['description']
-            usage << if v['type'].is_a?(Puppet::Pops::Types::POptionalType)
-                       " [#{k}=<value>]"
-                     else
-                       " #{k}=<value>"
-                     end
-          end
+        task['metadata']['parameters']&.each do |k, v|
+          pretty_params << "- #{k}: #{v['type'] || 'Any'}\n"
+          pretty_params << "    #{v['description']}\n" if v['description']
+          usage << if v['type'].is_a?(Puppet::Pops::Types::POptionalType)
+                     " [#{k}=<value>]"
+                   else
+                     " #{k}=<value>"
+                   end
         end
 
-        usage << " [--noop]" if task['supports_noop']
+        usage << " [--noop]" if task['metadata']['supports_noop']
 
         task_info << "\n#{task['name']}"
-        task_info << " - #{task['description']}" if task['description']
+        task_info << " - #{task['metadata']['description']}" if task['metadata']['description']
         task_info << "\n\n"
         task_info << "USAGE:\n#{usage}\n\n"
-        task_info << "PARAMETERS:\n#{pretty_params}\n" if task['parameters']
+        task_info << "PARAMETERS:\n#{pretty_params}\n" unless pretty_params.empty?
+        task_info << "MODULE:\n"
+
+        path = task['files'][0]['path'].chomp("/tasks/#{task['files'][0]['name']}")
+        task_info << if path.start_with?(Bolt::PAL::MODULES_PATH)
+                       "built-in module"
+                     else
+                       path
+                     end
         @stream.puts(task_info)
       end
 
@@ -158,15 +166,27 @@ module Bolt
         plan_info << "\n\n"
         plan_info << "USAGE:\n#{usage}\n\n"
         plan_info << "PARAMETERS:\n#{pretty_params}\n" if plan['parameters']
+        plan_info << "MODULE:\n"
+
+        path = plan['module']
+        plan_info << if path.start_with?(Bolt::PAL::MODULES_PATH)
+                       "built-in module"
+                     else
+                       path
+                     end
         @stream.puts(plan_info)
       end
 
       # @param [Bolt::PlanResult] plan_result A PlanResult object
       def print_plan_result(plan_result)
-        if plan_result.value.nil?
+        value = plan_result.value
+        if value.nil?
           @stream.puts("Plan completed successfully with no result")
-        elsif plan_result.value.is_a? Bolt::ApplyFailure
-          @stream.puts(colorize(:red, plan_result.value.message))
+        elsif value.is_a? Bolt::ApplyFailure
+          @stream.puts(colorize(:red, value.message))
+        elsif value.is_a? Bolt::ResultSet
+          value.each { |result| print_result(result) }
+          print_summary(value)
         else
           @stream.puts(::JSON.pretty_generate(plan_result, quirks_mode: true))
         end

@@ -1,0 +1,7 @@
+{
+  "implementations": [
+    {"name": "list.sh", "requirements": ["shell"], "files": ["shareable/tasks/unknown_file.json"]},
+    {"name": "list.ps1", "requirements": ["powershell"], "files": ["shareable/tasks/unknown_module.json"], "input_method": "environment"}
+  ],
+  "files": ["results/lib/", "error/tasks/fail.sh"]
+}

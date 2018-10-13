@@ -2,14 +2,16 @@
 
 require 'spec_helper'
 require 'bolt_spec/files'
+require 'bolt_spec/sensitive'
 require 'bolt_spec/task'
 require 'bolt/transport/orch'
-require 'bolt/cli'
 require 'bolt/plan_result'
+require 'bolt/target'
 require 'open3'
 
 describe Bolt::Transport::Orch, orchestrator: true do
   include BoltSpec::Files
+  include BoltSpec::Sensitive
   include BoltSpec::Task
 
   let(:hostname) { "localhost" }
@@ -283,6 +285,51 @@ describe Bolt::Transport::Orch, orchestrator: true do
 
       orch.batch_task(targets, mtask, params, '_description' => 'test message')
     end
+
+    it "unwraps Sensitive parameters" do
+      allow(mock_client).to receive(:run_task).and_return(results)
+      sensitive_params = { 'sensitive_string' => make_sensitive('$ecret!') }
+      expect(mock_client).to receive(:run_task)
+        .with(hash_including(params: { "sensitive_string" => "$ecret!" }))
+
+      node_results = orch.batch_task(targets, mtask, sensitive_params)
+
+      expect(node_results[0].value).to eq('_output' => 'hello')
+      expect(node_results[1].value).to eq('_output' => 'goodbye')
+      expect(node_results[0]).to be_success
+      expect(node_results[1]).to be_success
+    end
+
+    context "when implementations are provided" do
+      let(:files) { [{ 'name' => 'tasks_test', 'path' => '/who/cares' }] }
+      let(:implementations) { [{ 'name' => 'tasks_test', 'requirements' => ['shell'] }] }
+      let(:mtask) { Bolt::Task.new(name: 'foo', files: files, metadata: { 'implementations' => implementations }) }
+
+      it "runs a task" do
+        allow(mock_client).to receive(:run_task).and_return(results)
+
+        node_results = orch.batch_task(targets, mtask, params)
+        expect(node_results[0].value).to eq('_output' => 'hello')
+        expect(node_results[1].value).to eq('_output' => 'goodbye')
+        expect(node_results[0]).to be_success
+        expect(node_results[1]).to be_success
+      end
+    end
+
+    context "when files are provided", ssh: true do
+      let(:files) { [{ 'name' => 'tasks_test', 'path' => '/who/cares' }] }
+      let(:mtask) { Bolt::Task.new(name: 'foo', files: files, metadata: { 'files' => %w[a b] }) }
+
+      it "runs a task" do
+        allow(mock_client).to receive(:run_task).and_return(results)
+
+        node_results = orch.batch_task(targets, mtask, params)
+        expect(node_results[0].value).to eq('_output' => 'hello')
+        expect(node_results[1].value).to eq('_output' => 'goodbye')
+        expect(node_results[0]).to be_success
+        expect(node_results[1]).to be_success
+      end
+    end
   end
 
   describe :batch_command do
@@ -351,14 +398,14 @@ describe Bolt::Transport::Orch, orchestrator: true do
 
   describe :batch_upload do
     let(:source_path) { File.join(base_path, 'spec', 'fixtures', 'scripts', 'success.sh') }
-    let(:dest_path) { +'success.sh' } # to be prepended with a temp dir in the 'around(:each)' block
+    let(:dest_path) { 'success.sh' }
     let(:body) {
       content = Base64.encode64(File.read(source_path))
       mode = File.stat(source_path).mode
 
       {
         task: 'bolt_shim::upload',
-        params: { 'path' => dest_path, 'content' => content, 'mode' => mode }
+        params: { 'path' => dest_path, 'content' => content, 'mode' => mode, 'directory' => false }
       }
     }
 
@@ -394,6 +441,27 @@ describe Bolt::Transport::Orch, orchestrator: true do
         expect(events).to include(type: :node_result, result: result)
       end
     end
+
+    context 'with a directory' do
+      let(:source_path) { File.join(base_path, 'spec', 'fixtures', 'scripts') }
+      let(:dest_path) { 'scripts' }
+      let(:body) {
+        mode = File.stat(source_path).mode
+
+        {
+          task: 'bolt_shim::upload',
+          params: { 'path' => dest_path, 'content' => anything, 'mode' => mode, 'directory' => true }
+        }
+      }
+
+      it 'should upload a directory' do
+        results = orch.batch_upload(targets, source_path, dest_path)
+        expect(results[0]).to be_success
+        expect(results[1]).to be_success
+        expect(results[0].message).to match(/Uploaded '#{source_path}' to '#{targets[0].host}:#{dest_path}/)
+        expect(results[1].message).to match(/Uploaded '#{source_path}' to '#{targets[1].host}:#{dest_path}/)
+      end
+    end
   end
 
   describe :batch_script do
@@ -414,8 +482,10 @@ describe Bolt::Transport::Orch, orchestrator: true do
        { 'name' => 'node2', 'state' => 'finished', 'result' => { '_output' => '', 'exit_code' => 0 } }]
     }
 
-    before(:each) do
-      expect(mock_client).to receive(:run_task).with(include(body)).and_return(results)
+    before(:each) do |test|
+      unless test.metadata[:skip_before]
+        expect(mock_client).to receive(:run_task).with(include(body)).and_return(results)
+      end
     end
 
     it 'returns a success' do
@@ -434,6 +504,20 @@ describe Bolt::Transport::Orch, orchestrator: true do
         expect(events).to include(type: :node_start, target: result.target)
         expect(events).to include(type: :node_result, result: result)
       end
+    end
+
+    it "unwraps Sensitive parameters", skip_before: true do
+      allow(mock_client).to receive(:run_task).and_return(results)
+      sensitive_params = { 'sensitive_string' => make_sensitive('$ecret!') }
+      expect(mock_client).to receive(:run_task)
+        .with(hash_including(params:
+                hash_including("arguments" =>
+                  hash_including('sensitive_string' => '$ecret!'))))
+
+      results = orch.batch_script(targets, script_path, sensitive_params)
+
+      expect(results[0]).to be_success
+      expect(results[1]).to be_success
     end
 
     context "when the script succeeds" do

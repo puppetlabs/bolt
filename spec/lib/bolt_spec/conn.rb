@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'bolt/util'
+
 module BoltSpec
   module Conn
     def conn_info(transport)
@@ -19,12 +21,14 @@ module BoltSpec
         raise Error, "The transport must be either 'ssh' or 'winrm'"
       end
 
+      port = ENV["BOLT_#{tu}_PORT"] || default_port
+
       {
         protocol: transport,
         host: ENV["BOLT_#{tu}_HOST"] || "localhost",
         user: ENV["BOLT_#{tu}_USER"] || default_user,
         password: ENV["BOLT_#{tu}_PASSWORD"] || default_password,
-        port: ENV["BOLT_#{tu}_PORT"] || default_port,
+        port: port.to_i,
         key: ENV["BOLT_#{tu}_KEY"] || default_key
       }
     end
@@ -34,6 +38,17 @@ module BoltSpec
       passwd = include_password ? ":#{conn[:password]}" : ''
       port = override_port || conn[:port]
       "#{conn[:protocol]}://#{conn[:user]}#{passwd}@#{conn[:host]}:#{port}"
+    end
+
+    def conn_inventory
+      groups = %w[ssh winrm].map do |transport|
+        { "name" => transport,
+          "nodes" => [conn_uri(transport)],
+          "config" => {
+            transport => Bolt::Util.walk_keys(conn_info(transport), &:to_s)
+          } }
+      end
+      { "groups" => groups }
     end
   end
 end

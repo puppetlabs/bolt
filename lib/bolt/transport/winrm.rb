@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'bolt/node/errors'
 require 'bolt/transport/base'
 
 module Bolt
@@ -37,10 +38,13 @@ module Bolt
         super
         require 'winrm'
         require 'winrm-fs'
+
+        @transport_logger = Logging.logger[::WinRM]
+        @transport_logger.level = :warn
       end
 
       def with_connection(target)
-        conn = Connection.new(target)
+        conn = Connection.new(target, @transport_logger)
         conn.connect
         yield conn
       ensure
@@ -66,8 +70,12 @@ module Bolt
       end
 
       def run_script(target, script, arguments, _options = {})
+        # unpack any Sensitive data
+        arguments = unwrap_sensitive_args(arguments)
+
         with_connection(target) do |conn|
-          conn.with_remote_file(script) do |remote_path|
+          conn.with_remote_tempdir do |dir|
+            remote_path = conn.write_remote_executable(dir, script)
             if powershell_file?(remote_path)
               mapped_args = arguments.map do |a|
                 "$invokeArgs.ArgumentList += @'\n#{a}\n'@"
@@ -100,30 +108,56 @@ catch
       end
 
       def run_task(target, task, arguments, _options = {})
-        executable = target.select_impl(task, PROVIDED_FEATURES)
-        raise "No suitable implementation of #{task.name} for #{target.name}" unless executable
-
-        input_method = task.input_method
+        if from_api?(task)
+          executable = task.file['filename']
+          file_content = StringIO.new(Base64.decode64(task.file['file_content']))
+          input_method = task.metadata['input_method']
+          extra_files = []
+        else
+          implementation = task.select_implementation(target, PROVIDED_FEATURES)
+          executable = implementation['path']
+          input_method = implementation['input_method']
+          extra_files = implementation['files']
+        end
         input_method ||= powershell_file?(executable) ? 'powershell' : 'both'
-        with_connection(target) do |conn|
-          if STDIN_METHODS.include?(input_method)
-            stdin = JSON.dump(arguments)
-          end
 
-          if ENVIRONMENT_METHODS.include?(input_method)
-            arguments.each do |(arg, val)|
-              val = val.to_json unless val.is_a?(String)
-              cmd = "[Environment]::SetEnvironmentVariable('PT_#{arg}', @'\n#{val}\n'@)"
-              result = conn.execute(cmd)
-              if result.exit_code != 0
-                raise EnvironmentVarError(var, value)
+        # unpack any Sensitive data
+        arguments = unwrap_sensitive_args(arguments)
+        with_connection(target) do |conn|
+          conn.with_remote_tempdir do |dir|
+            remote_task_path = if from_api?(task)
+                                 conn.write_executable_from_content(dir, file_content, executable)
+                               else
+                                 conn.write_remote_executable(dir, executable)
+                               end
+
+            unless extra_files.empty?
+              # TODO: optimize upload of directories
+              installdir = File.join(dir, '_installdir')
+              arguments['_installdir'] = installdir
+              conn.mkdirs(extra_files.map { |file| File.join(installdir, File.dirname(file['name'])) })
+              extra_files.each do |file|
+                conn.write_remote_file(file['path'], File.join(installdir, file['name']))
               end
             end
-          end
 
-          conn.with_remote_file(executable) do |remote_path|
+            if STDIN_METHODS.include?(input_method)
+              stdin = JSON.dump(arguments)
+            end
+
+            if ENVIRONMENT_METHODS.include?(input_method)
+              envify_params(arguments).each do |(arg, val)|
+                cmd = "[Environment]::SetEnvironmentVariable('#{arg}', @'\n#{val}\n'@)"
+                result = conn.execute(cmd)
+                if result.exit_code != 0
+                  raise Bolt::Node::EnvironmentVarError.new(arg, val)
+                end
+              end
+            end
+
+            conn.shell_init
             output =
-              if powershell_file?(remote_path) && stdin.nil?
+              if powershell_file?(remote_task_path) && stdin.nil?
                 # NOTE: cannot redirect STDIN to a .ps1 script inside of PowerShell
                 # must create new powershell.exe process like other interpreters
                 # fortunately, using PS with stdin input_method should never happen
@@ -132,18 +166,19 @@ catch
 $private:tempArgs = Get-ContentAsJson (
   $utf8.GetString([System.Convert]::FromBase64String('#{Base64.encode64(JSON.dump(arguments))}'))
 )
-$allowedArgs = (Get-Command "#{remote_path}").Parameters.Keys
+$allowedArgs = (Get-Command "#{remote_task_path}").Parameters.Keys
 $private:taskArgs = @{}
 $private:tempArgs.Keys | ? { $allowedArgs -contains $_ } | % { $private:taskArgs[$_] = $private:tempArgs[$_] }
-try { & "#{remote_path}" @taskArgs } catch { Write-Error $_.Exception; exit 1 }
+try { & "#{remote_task_path}" @taskArgs } catch { Write-Error $_.Exception; exit 1 }
               PS
                 else
-                  conn.execute(%(try { & "#{remote_path}" } catch { Write-Error $_.Exception; exit 1 }))
+                  conn.execute(%(try { & "#{remote_task_path}" } catch { Write-Error $_.Exception; exit 1 }))
                 end
               else
-                path, args = *process_from_extension(remote_path)
+                path, args = *process_from_extension(remote_task_path)
                 conn.execute_process(path, args, stdin)
               end
+
             Bolt::Result.for_task(target, output.stdout.string,
                                   output.stderr.string,
                                   output.exit_code)

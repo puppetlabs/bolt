@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require 'bolt/error'
+require 'bolt/pal'
+require 'bolt/task'
 
 # Runs a given instance of a `Task` on the given set of targets and returns the result from each.
 # This function does nothing if the list of targets is empty.
@@ -96,15 +98,10 @@ Puppet::Functions.create_function(:run_task) do
 
     options['_description'] = description if description
 
-    # Don't bother loading the local task definition if all targets use the 'pcp' transport
-    # and the local-validation option is set to false for all of them
-    if !targets.empty? && targets.all? { |t| t.protocol == 'pcp' && t.options['local-validation'] == false }
+    # Don't bother loading the local task definition if all targets use the 'pcp' transport.
+    if !targets.empty? && targets.all? { |t| t.protocol == 'pcp' }
       # create a fake task
-      task = Puppet::Pops::Types::TypeFactory.task.from_hash(
-        'name'            => task_name,
-        'implementations' => [{ 'name' => '', 'path' => '' }],
-        'supports_noop'   => true
-      )
+      task = Bolt::Task.new(name: task_name, files: [{ 'name' => '', 'path' => '' }])
     else
       # TODO: use the compiler injection once PUP-8237 lands
       task_signature = Puppet::Pal::ScriptCompiler.new(closure_scope.compiler).task_signature(task_name)
@@ -116,11 +113,28 @@ Puppet::Functions.create_function(:run_task) do
         raise with_stack(:TYPE_MISMATCH, mismatch_message)
       end || (raise with_stack(:TYPE_MISMATCH, 'Task parameters do not match'))
 
-      task = task_signature.task
+      task = Bolt::Task.new(task_signature.task_hash)
     end
 
     unless Puppet::Pops::Types::TypeFactory.data.instance?(use_args)
-      raise with_stack(:TYPE_NOT_DATA, 'Task parameters is not of type Data')
+      # generate a helpful error message about the type-mismatch between the type Data
+      # and the actual type of use_args
+      use_args_t = Puppet::Pops::Types::TypeCalculator.infer_set(use_args)
+      desc = Puppet::Pops::Types::TypeMismatchDescriber.singleton.describe_mismatch(
+        'Task parameters are not of type Data. run_task()',
+        Puppet::Pops::Types::TypeFactory.data, use_args_t
+      )
+      raise with_stack(:TYPE_NOT_DATA, desc)
+    end
+
+    # Wrap parameters marked with '"sensitive": true' in the task metadata with a
+    # Sensitive wrapper type. This way it's not shown in logs.
+    if (params = task.parameters)
+      use_args.each do |k, v|
+        if params[k] && params[k]['sensitive']
+          use_args[k] = Puppet::Pops::Types::PSensitiveType::Sensitive.new(v)
+        end
+      end
     end
 
     if executor.noop

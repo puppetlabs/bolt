@@ -29,5 +29,7 @@
     "no_type": {
       "description": "A parameter without a type"
     }
-  }
+  },
+  "extensions": {},
+  "anything": true
 }

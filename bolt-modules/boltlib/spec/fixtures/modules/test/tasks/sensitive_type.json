@@ -1,0 +1,17 @@
+{
+  "description": "Task with sensitive parameters",
+  "parameters": {
+    "sensitive_string": {
+      "description": "Sensitive string parameter",
+      "type": "Sensitive[String]"
+    },
+    "sensitive_array": {
+      "description": "Sensitive array parameter",
+      "type": "Sensitive[Array]"
+    },
+    "sensitive_hash": {
+      "description": "Sensitive hash parameter",
+      "type": "Sensitive[Hash]"
+    }
+  }
+}

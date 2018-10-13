@@ -3,7 +3,6 @@
 require 'bolt_spec/conn'
 require 'bolt_spec/files'
 require 'bolt_spec/integration'
-require 'bolt/cli'
 
 describe "when runnning over the winrm transport", winrm: true do
   include BoltSpec::Conn
@@ -91,24 +90,30 @@ describe "when runnning over the winrm transport", winrm: true do
       {
         'format' => 'json',
         'modulepath' => modulepath,
-        'winrm' => { 'ssl' => false,
-                     'ssl-verify' => false }
+        'winrm' => {
+          'user' => user,
+          'password' => password,
+          'ssl' => false,
+          'ssl-verify' => false
+        }
       }
     }
-    let(:config_flags) { %W[--nodes #{uri} --password #{password}] }
+    let(:uri) { (1..2).map { |i| "#{conn_uri('winrm')}?id=#{i}" }.join(',') }
+    let(:config_flags) { %W[--nodes #{uri}] }
 
-    it 'runs a command' do
+    it 'runs multiple commands' do
       with_tempfile_containing('conf', YAML.dump(config)) do |conf|
-        result = run_one_node(%W[command run #{whoami} --configfile #{conf.path}] + config_flags)
-        expect(result['stdout'].strip).to eq(user)
+        result = run_nodes(%W[command run #{whoami} --configfile #{conf.path}] + config_flags)
+        expect(result.map { |r| r['stdout'].strip }).to eq([user, user])
       end
     end
 
-    it 'runs a task', :reset_puppet_settings do
+    it 'runs multiple tasks', :reset_puppet_settings do
       with_tempfile_containing('conf', YAML.dump(config)) do |conf|
-        cmd = %W[task run sample::winstdin message=somemessage --configfile #{conf.path}] + config_flags
-        result = run_one_node(cmd)
-        expect(result['_output'].strip).to match(/STDIN: {"messa/)
+        results = run_nodes(%W[task run sample::winstdin message=somemessage --configfile #{conf.path}] + config_flags)
+        results.each do |result|
+          expect(result['_output'].strip).to match(/STDIN: {"messa/)
+        end
       end
     end
   end

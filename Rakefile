@@ -4,7 +4,6 @@ require "bundler/gem_tasks"
 require "rspec/core/rake_task"
 require "rubocop/rake_task"
 
-require_relative 'vendored/require_vendored'
 require "puppet-strings"
 require "fileutils"
 require "json"
@@ -15,17 +14,17 @@ RSpec::Core::RakeTask.new(:spec)
 
 desc "Run RSpec tests that don't require VM fixtures or a particular shell"
 RSpec::Core::RakeTask.new(:unit) do |t|
-  t.rspec_opts = '--tag ~ssh --tag ~bash --tag ~winrm'
+  t.rspec_opts = '--tag ~ssh --tag ~bash --tag ~winrm --tag ~appveyor_agents'
 end
 
-desc "Run RSpec tests for AppVeyor that don't require SSH, Bash, or orchestrator"
+desc "Run RSpec tests for AppVeyor that don't require SSH, Bash, Appveyor Puppet Agents, or orchestrator"
 RSpec::Core::RakeTask.new(:appveyor) do |t|
-  t.rspec_opts = '--tag ~ssh --tag ~bash --tag ~orchestrator'
+  t.rspec_opts = '--tag ~ssh --tag ~bash --tag ~appveyor_agents --tag ~orchestrator'
 end
 
 desc "Run RSpec tests for TravisCI that don't require WinRM"
 RSpec::Core::RakeTask.new(:travisci) do |t|
-  t.rspec_opts = '--tag ~winrm'
+  t.rspec_opts = '--tag ~winrm --tag ~appveyor_agents'
 end
 
 RuboCop::RakeTask.new(:rubocop) do |t|
@@ -116,6 +115,11 @@ namespace :integration do
   desc 'Run tests that require Bash on the local host'
   RSpec::Core::RakeTask.new(:bash) do |t|
     t.rspec_opts = '--tag bash'
+  end
+
+  desc 'Run tests that require Puppet Agents configured with Appveyor'
+  RSpec::Core::RakeTask.new(:appveyor_agents) do |t|
+    t.rspec_opts = '--tag appveyor_agents'
   end
 
   task ssh: :update_submodules

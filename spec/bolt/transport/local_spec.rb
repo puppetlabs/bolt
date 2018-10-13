@@ -3,13 +3,16 @@
 require 'spec_helper'
 require 'bolt_spec/errors'
 require 'bolt_spec/files'
+require 'bolt_spec/sensitive'
 require 'bolt_spec/task'
 require 'bolt/transport/local'
 require 'bolt/config'
+require 'bolt/target'
 
 describe Bolt::Transport::Local do
   include BoltSpec::Errors
   include BoltSpec::Files
+  include BoltSpec::Sensitive
   include BoltSpec::Task
 
   let(:local) { Bolt::Transport::Local.new }
@@ -53,6 +56,28 @@ BASH
       end
     end
 
+    it "can upload a directory to a host" do
+      Dir.mktmpdir do |dir|
+        subdir = File.join(dir, 'subdir')
+        File.write(File.join(dir, 'content'), 'hello world')
+        Dir.mkdir(subdir)
+        File.write(File.join(subdir, 'more'), 'lorem ipsum')
+
+        target_dir = "/tmp/directory-test"
+        local.upload(target, dir, target_dir)
+
+        expect(
+          local.run_command(target, "ls #{target_dir}")['stdout'].split("\n")
+        ).to eq(%w[content subdir])
+
+        expect(
+          local.run_command(target, "ls #{File.join(target_dir, 'subdir')}")['stdout'].split("\n")
+        ).to eq(%w[more])
+
+        local.run_command(target, "rm -r #{target_dir}")
+      end
+    end
+
     it "can run a script remotely" do
       contents = "#!/bin/sh\necho hellote"
       with_tempfile_containing('script test', contents) do |file|
@@ -92,6 +117,17 @@ QUOTED
       end
     end
 
+    it "can run a script with Sensitive arguments" do
+      contents = "#!/bin/sh\necho $1\necho $2"
+      arguments = ['non-sensitive-arg',
+                   make_sensitive('$ecret!')]
+      with_tempfile_containing('sensitive_test', contents) do |file|
+        expect(
+          local.run_script(target, file.path, arguments)['stdout']
+        ).to eq("non-sensitive-arg\n$ecret!\n")
+      end
+    end
+
     it "escapes unsafe shellwords in arguments" do
       with_tempfile_containing('script-test-ssh-escape', echo_script) do |file|
         expect(
@@ -119,6 +155,15 @@ SHELLWORDS
       with_task_containing('tasks_test_stdin', contents, 'stdin') do |task|
         expect(local.run_task(target, task, arguments).value)
           .to eq("message_one" => "Hello from task", "message_two" => "Goodbye")
+      end
+    end
+
+    it "serializes hashes as json in environment input" do
+      contents = "#!/bin/sh\nprintenv PT_message"
+      arguments = { message: { key: 'val' } }
+      with_task_containing('tasks_test_hash', contents, 'environment') do |task|
+        expect(local.run_task(target, task, arguments).value)
+          .to eq('key' => 'val')
       end
     end
 
@@ -164,14 +209,55 @@ SHELL
       end
     end
 
+    it "can run a task with Sensitive params via environment" do
+      contents = <<SHELL
+#!/bin/sh
+echo ${PT_sensitive_string}
+echo ${PT_sensitive_array}
+echo ${PT_sensitive_hash}
+SHELL
+      deep_hash = { 'k' => make_sensitive('v') }
+      arguments = { 'sensitive_string' => make_sensitive('$ecret!'),
+                    'sensitive_array'  => make_sensitive([1, 2, make_sensitive(3)]),
+                    'sensitive_hash'   => make_sensitive(deep_hash) }
+      with_task_containing('tasks_test_sensitive', contents, 'both') do |task|
+        expect(local.run_task(target, task, arguments).message.strip).to eq(<<SHELL.strip)
+$ecret!
+[1,2,3]
+{"k":"v"}
+SHELL
+      end
+    end
+
+    it "can run a task with Sensitive params via stdin" do
+      contents = <<SHELL
+#!/bin/sh
+cat -
+SHELL
+      arguments = { 'sensitive_string' => make_sensitive('$ecret!') }
+      with_task_containing('tasks_test_sensitive', contents, 'stdin') do |task|
+        expect(local.run_task(target, task, arguments).value)
+          .to eq("sensitive_string" => "$ecret!")
+      end
+    end
+
     context "when implementations are provided" do
       let(:contents) { "#!/bin/sh\necho ${PT_message_one} ${PT_message_two}" }
       let(:arguments) { { message_one: 'Hello from task', message_two: 'Goodbye' } }
 
       it "runs a task requires 'shell'" do
         with_task_containing('tasks_test', contents, 'environment') do |task|
-          impls = task.implementations.map { |impl| impl.merge('requirements' => ['shell']) }
-          expect(task).to receive(:implementations).and_return(impls)
+          task['metadata']['implementations'] = [{ 'name' => 'tasks_test', 'requirements' => ['shell'] }]
+          expect(local.run_task(target, task, arguments).message.chomp)
+            .to eq('Hello from task Goodbye')
+        end
+      end
+
+      it "runs a task with the implementation's input method" do
+        with_task_containing('tasks_test', contents, 'stdin') do |task|
+          task['metadata']['implementations'] = [{
+            'name' => 'tasks_test', 'requirements' => ['shell'], 'input_method' => 'environment'
+          }]
           expect(local.run_task(target, task, arguments).message.chomp)
             .to eq('Hello from task Goodbye')
         end
@@ -179,8 +265,7 @@ SHELL
 
       it "errors when a task only requires an unsupported requirement" do
         with_task_containing('tasks_test', contents, 'environment') do |task|
-          impls = task.implementations.map { |impl| impl.merge('requirements' => ['powershell']) }
-          expect(task).to receive(:implementations).and_return(impls)
+          task['metadata']['implementations'] = [{ 'name' => 'tasks_test', 'requirements' => ['powershell'] }]
           expect {
             local.run_task(target, task, arguments)
           }.to raise_error("No suitable implementation of #{task.name} for #{target.name}")
@@ -189,11 +274,52 @@ SHELL
 
       it "errors when a task only requires an unknown requirement" do
         with_task_containing('tasks_test', contents, 'environment') do |task|
-          impls = task.implementations.map { |impl| impl.merge('requirements' => ['foobar']) }
-          expect(task).to receive(:implementations).and_return(impls)
+          task['metadata']['implementations'] = [{ 'name' => 'tasks_test', 'requirements' => ['foobar'] }]
           expect {
             local.run_task(target, task, arguments)
           }.to raise_error("No suitable implementation of #{task.name} for #{target.name}")
+        end
+      end
+    end
+
+    context "when files are provided" do
+      let(:contents) { "#!/bin/sh\nfind ${PT__installdir} -type f" }
+      let(:arguments) { {} }
+
+      it "puts files at _installdir" do
+        with_task_containing('tasks_test', contents, 'environment') do |task|
+          task['metadata']['files'] = []
+          expected_files = %w[files/foo files/bar/baz lib/puppet_x/file.rb tasks/init]
+          expected_files.each do |file|
+            task['metadata']['files'] << "tasks_test/#{file}"
+            task['files'] << { 'name' => "tasks_test/#{file}", 'path' => task['files'][0]['path'] }
+          end
+
+          files = local.run_task(target, task, arguments).message.split("\n")
+          expect(files.count).to eq(expected_files.count)
+          files.sort.zip(expected_files.sort).each do |file, expected_file|
+            expect(file).to match(%r{_installdir/tasks_test/#{expected_file}$})
+          end
+        end
+      end
+
+      it "includes files from the selected implementation" do
+        with_task_containing('tasks_test', contents, 'environment') do |task|
+          task['metadata']['implementations'] = [
+            { 'name' => 'tasks_test.alt', 'requirements' => ['foobar'], 'files' => ['tasks_test/files/no'] },
+            { 'name' => 'tasks_test', 'requirements' => [], 'files' => ['tasks_test/files/yes'] }
+          ]
+          task['metadata']['files'] = ['other_mod/lib/puppet_x/']
+          task['files'] << { 'name' => 'tasks_test/files/yes', 'path' => task['files'][0]['path'] }
+          task['files'] << { 'name' => 'other_mod/lib/puppet_x/a.rb', 'path' => task['files'][0]['path'] }
+          task['files'] << { 'name' => 'other_mod/lib/puppet_x/b.rb', 'path' => task['files'][0]['path'] }
+          task['files'] << { 'name' => 'tasks_test/files/no', 'path' => task['files'][0]['path'] }
+
+          files = local.run_task(target, task, arguments).message.split("\n").sort
+          expect(files.count).to eq(3)
+          expect(files[0]).to match(%r{_installdir/other_mod/lib/puppet_x/a.rb$})
+          expect(files[1]).to match(%r{_installdir/other_mod/lib/puppet_x/b.rb$})
+          expect(files[2]).to match(%r{_installdir/tasks_test/files/yes$})
         end
       end
     end
@@ -210,7 +336,7 @@ SHELL
 
       it 'returns an error result for run_script' do
         contents = "#!/bin/sh\necho hellote"
-        expect(FileUtils).to receive(:copy_file).and_raise('no write')
+        expect(FileUtils).to receive(:cp_r).and_raise('no write')
         with_tempfile_containing('script test', contents) do |file|
           expect {
             local.run_script(target, file.path, [])
@@ -221,7 +347,7 @@ SHELL
       it 'returns an error result for run_task' do
         contents = "#!/bin/sh\necho -n ${PT_message_one} ${PT_message_two}"
         arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-        expect(FileUtils).to receive(:copy_file).and_raise('no write')
+        expect(FileUtils).to receive(:cp_r).and_raise('no write')
         with_task_containing('tasks_test', contents, 'environment') do |task|
           expect {
             local.run_task(target, task, arguments)

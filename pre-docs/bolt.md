@@ -1,54 +1,82 @@
-# Bolt
+# Welcome to Bolt
 
-Puppet Bolt is an open source task runner that executes ad hoc tasks, scripts,
-and commands across your infrastructure and applications.
+Bolt is an open source task runner that automates the manual work that you do to maintain your infrastructure. Use Bolt to automate tasks that you perform on your infrastructure on an as-needed basis, for example, when you troubleshoot a system, deploy an application, or stop and restart services. Bolt connects directly to remote nodes with SSH or WinRM, so you are not required to install any agent software.
 
-Bolt is great for troubleshooting, deploying on-demand changes, distributing
-scripts to run across your infrastructure, or automating changes that need to
-happen in a particular order as part of an application deployment.
+|Helpful Bolt docs links|Other useful places|
+|-----------------------|-------------------|
+| -   **Before you install**
 
-Bolt has a command line interface and connects to remote systems with SSH and
-WinRM, so it doesn't require you to install any agent software. Tasks are
-reusable and shareable in modules on the Forge, and can be written in any
-scripting or programming language.
-
-- With Bolt you can:
-- Execute commands on remote systems.
-- Distribute and execute scripts written in Bash, PowerShell, Python, and other languages.
-- Run Puppet tasks or task plans on remote systems that don't have Puppet installed.
-- Use authentication methods such as passwords and public keys.
-
-> Tip: Bolt uses an internal version of Puppet that supports executing tasks and
-> plans, so you do not need to install Puppet. If you use Bolt on a machine that
-> has Puppet installed, then Bolt uses its internal version of Puppet and does
-> not conflict with the Puppet version you have installed.
+[Release notes](bolt_release_notes.md) - What's new, what's removed, what's resolved.
 
 
-## Bolt is in development
+ -   **Install Bolt**
 
-Puppet Bolt is in a pre-1.0 release. This means, per the Semantic Versioning
-guidelines, that Bolt is still in development and is subject to frequent
-change, ongoing feature iteration, and improvements. You should expect to
-upgrade frequently and read the release notes for each version. For more
-information about semantic versioning guidelines, see the Semantic Versioning
-specifications.
+ [Installing Bolt](bolt_installing.md#) - Follow the installation instructions for your operating system: \*nix, macOS, or Windows.
 
 
-## Bolt release notes
-Release notes for the Bolt 0.x release series.
+ -   **Make one-time changes to your remote nodes**
 
-- Installing Bolt
-  Install Bolt and any dependencies for your operating system, such as Ruby, a
-  GNU Compiler Collection (GCC) compiler and the Bolt gem.
+ [Run a command](running_bolt_commands.md#) 
 
-- Configuring Bolt
-  Create a config file to store and automate the CLI flags you use every time you run Bolt.
+ [Run a script](running_bolt_commands.md#) 
 
-- Running Bolt commands
-  Bolt executes ad hoc commands, runs scripts, uploads files, and runs Puppet tasks or task plans on remote nodes from a controller node, such as your laptop or workstation.
+ [Upload files](running_bolt_commands.md#) 
 
-- Running tasks and plans with Bolt
-  Bolt can run Puppet tasks and plans on remote nodes without requiring any pre-existing Puppet infrastructure.
 
-- Bolt command options
-  Bolt commands can accept several command line options, some of which are required to run certain bolt commands.
+ -   **Automate your workflow with existing tasks and plans**
+
+ [Running tasks](bolt_running_tasks.md#) 
+
+ [Running plans](bolt_running_plans.md#) 
+
+
+ -   **Create your own tasks and plans**
+
+ [Writing tasks](writing_tasks.md#) 
+
+ [Writing plans](writing_plans.md#) 
+
+ [Applying manifest blocks](applying_manifest_blocks.md#) 
+
+
+ | -   **Learn the basics**
+
+[Hands-on lab](https://github.com/puppetlabs/tasks-hands-on-lab#puppet-tasks-hands-on-lab) - Using a GitHub repository with sample files and code examples, install and run Bolt in a safe environment.
+
+[Online training](https://learn.puppet.com/course/puppet-orchestration-bolt-and-tasks?_ga=2.158319738.1526297716.1533055277-261802629.1531434605) - Learn how to use Bolt to run a command, a script, and a task.
+
+
+ -   **Watch Bolt development**
+
+ [Bolt project on GitHub](https://github.com/puppetlabs/bolt) 
+
+
+ -   **Docs for related Puppet products**
+
+ [Open source Puppet](https://puppet.com/docs/puppet/latest/index.html) 
+
+ [ Puppet Enterprise ](https://puppet.com/docs/pe/2018.1/pe_user_guide.html) 
+
+ [Puppet Development Kit](https://puppet.com/docs/pdk/1.x/pdk.html) 
+
+
+ -   **Why and how people are using Bolt**
+
+ [Product Spotlight Webinar: Puppet Tasks](https://puppet.com/resources/webinar/product-spotlight-webinar-puppet-taskstm) 
+
+ [Combining PowerShell, Bolt and Puppet Tasks](https://puppet.com/blog/combining-powershell-bolt-and-puppet-tasks-part-1) 
+
+
+ -   **Share and contribute**
+
+[Engage with the Puppet community](https://puppet.com/community) - Share what you know and get help from other users and employees.
+
+[Puppet Forge](https://forge.puppet.com) - Find modules you can use, and contribute modules you've made to the community.
+
+ [Open source projects from Puppet on GitHub](https://github.com/puppetlabs/) 
+
+
+ |
+
+To send us feedback or let us know about a docs error, [open a ticket](https://tickets.puppetlabs.com/browse/DOCUMENT/?selectedTab=com.atlassian.jira.jira-projects-plugin:summary-panel) \(you'll need a Jira account\) or [email the docs team](mailto:docs@puppet.com).
+

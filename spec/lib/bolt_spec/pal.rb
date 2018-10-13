@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require 'bolt_spec/files'
+require 'bolt/config'
+require 'bolt/pal'
 
 module BoltSpec
   module PAL

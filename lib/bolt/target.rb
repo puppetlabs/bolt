@@ -18,6 +18,22 @@ module Bolt
       @uri_obj = parse(uri)
       @options = options || {}
       @options.freeze
+
+      if @options['user']
+        @user = @options['user']
+      end
+
+      if @options['password']
+        @password = @options['password']
+      end
+
+      if @options['port']
+        @port = @options['port']
+      end
+
+      if @options['protocol']
+        @protocol = @options['protocol']
+      end
     end
 
     def update_conf(conf)
@@ -44,12 +60,6 @@ module Bolt
       end
     end
     private :parse
-
-    def select_impl(task, additional_features = [])
-      available_features = features + additional_features
-      suitable_impl = task.implementations.find { |impl| Set.new(impl['requirements']).subset?(available_features) }
-      return suitable_impl['path'] if suitable_impl
-    end
 
     def features
       if @inventory
@@ -91,15 +101,11 @@ module Bolt
     end
 
     def user
-      Addressable::URI.unencode_component(
-        @uri_obj.user || @user
-      )
+      Addressable::URI.unencode_component(@uri_obj.user) || @user
     end
 
     def password
-      Addressable::URI.unencode_component(
-        @uri_obj.password || @password
-      )
+      Addressable::URI.unencode_component(@uri_obj.password) || @password
     end
   end
 end

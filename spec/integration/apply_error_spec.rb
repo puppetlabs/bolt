@@ -4,7 +4,6 @@ require 'spec_helper'
 require 'bolt_spec/conn'
 require 'bolt_spec/files'
 require 'bolt_spec/integration'
-require 'bolt/catalog'
 
 describe "errors gracefully attempting to apply a manifest block" do
   include BoltSpec::Conn
@@ -23,6 +22,15 @@ describe "errors gracefully attempting to apply a manifest block" do
       error = result['details']['result_set'][0]['result']['_error']
       expect(error['kind']).to eq('bolt/apply-error')
       expect(error['msg']).to eq("Puppet is not installed on the target, please install it to enable 'apply'")
+    end
+
+    context 'when it cannot connect to the target' do
+      let(:password) { 'incorrect_password' }
+      it 'displays a connection error' do
+        result = run_cli_json(%w[plan run basic::class] + config_flags)
+        error = result['details']['result_set'][0]['result']['_error']
+        expect(error['kind']).to eq('puppetlabs.tasks/connect-error')
+      end
     end
   end
 

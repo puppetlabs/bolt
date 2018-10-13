@@ -1,35 +1,58 @@
 # frozen_string_literal: true
 
+require 'base64'
+require 'concurrent'
+require 'find'
 require 'json'
 require 'logging'
+require 'minitar'
 require 'open3'
-require 'concurrent'
+require 'bolt/task'
+require 'bolt/apply_result'
 require 'bolt/util/puppet_log_level'
 
 module Bolt
-  Task = Struct.new(:name, :implementations, :input_method)
-
   class Applicator
-    def initialize(inventory, executor, modulepath, pdb_client, hiera_config, max_compiles)
+    def initialize(inventory, executor, modulepath, plugin_dirs, pdb_client, hiera_config, max_compiles)
       @inventory = inventory
       @executor = executor
       @modulepath = modulepath
+      @plugin_dirs = plugin_dirs
       @pdb_client = pdb_client
       @hiera_config = hiera_config ? validate_hiera_config(hiera_config) : nil
 
       @pool = Concurrent::ThreadPoolExecutor.new(max_threads: max_compiles)
       @logger = Logging.logger[self]
+      @plugin_tarball = Concurrent::Delay.new do
+        build_plugin_tarball do |mod|
+          search_dirs = []
+          search_dirs << mod.plugins if mod.plugins?
+          search_dirs << mod.pluginfacts if mod.pluginfacts?
+          search_dirs << mod.files if mod.files?
+          search_dirs
+        end
+      end
     end
 
     private def libexec
       @libexec ||= File.join(Gem::Specification.find_by_name('bolt').gem_dir, 'libexec')
     end
 
+    def custom_facts_task
+      @custom_facts_task ||= begin
+        path = File.join(libexec, 'custom_facts.rb')
+        file = { 'name' => 'custom_facts.rb', 'path' => path }
+        metadata = { 'supports_noop' => true, 'input_method' => 'stdin' }
+        Bolt::Task.new(name: 'apply_helpers::custom_facts', files: [file], metadata: metadata)
+      end
+    end
+
     def catalog_apply_task
       @catalog_apply_task ||= begin
         path = File.join(libexec, 'apply_catalog.rb')
-        impl = { 'name' => 'apply_catalog.rb', 'path' => path, 'requirements' => [], 'supports_noop' => true }
-        Task.new('apply_catalog', [impl], 'stdin')
+        file = { 'name' => 'apply_catalog.rb', 'path' => path }
+        metadata = { 'supports_noop' => true, 'input_method' => 'stdin' }
+        Bolt::Task.new(name: 'apply_helpers::apply_catalog', files: [file], metadata: metadata)
       end
     end
 
@@ -46,11 +69,11 @@ module Bolt
           facts: @inventory.facts(target),
           variables: @inventory.vars(target).merge(plan_vars),
           trusted: trusted.to_h
-        }
+        },
+        inventory: @inventory.data_hash
       }
 
       bolt_catalog_exe = File.join(libexec, 'bolt_catalog')
-
       old_path = ENV['PATH']
       ENV['PATH'] = "#{RbConfig::CONFIG['bindir']}#{File::PATH_SEPARATOR}#{old_path}"
       out, err, stat = Open3.capture3('ruby', bolt_catalog_exe, 'compile', stdin_data: catalog_input.to_json)
@@ -83,7 +106,7 @@ module Bolt
 
     def validate_hiera_config(hiera_config)
       if File.exist?(File.path(hiera_config))
-        data = File.open(File.path(hiera_config), "r:UTF-8") { |f| YAML.safe_load(f.read) }
+        data = File.open(File.path(hiera_config), "r:UTF-8") { |f| YAML.safe_load(f.read, [Symbol]) }
         unless data['version'] == 5
           raise Bolt::ParseError, "Hiera v5 is required, found v#{data['version'] || 3} in #{hiera_config}"
         end
@@ -91,58 +114,12 @@ module Bolt
       end
     end
 
-    def provide_puppet_missing_errors(result)
-      error_hash = result.error_hash
-      exit_code = error_hash['details']['exit_code'] if error_hash && error_hash['details']
-      # If we get exit code 126 or 127 back, it means the shebang command wasn't found; Puppet isn't present
-      if [126, 127].include?(exit_code)
-        Result.new(result.target, error:
-          {
-            'msg' => "Puppet is not installed on the target, please install it to enable 'apply'",
-            'kind' => 'bolt/apply-error'
-          })
-      elsif exit_code == 1 && error_hash['msg'] =~ /Could not find executable 'ruby.exe'/
-        # Windows does not have Ruby present
-        Result.new(result.target, error:
-          {
-            'msg' => "Puppet is not installed on the target in $env:ProgramFiles, please install it to enable 'apply'",
-            'kind' => 'bolt/apply-error'
-          })
-      elsif exit_code == 1 && error_hash['msg'] =~ /cannot load such file -- puppet \(LoadError\)/
-        # Windows uses a Ruby that doesn't have Puppet installed
-        # TODO: fix so we don't find other Rubies, or point to a known issues URL for more info
-        Result.new(result.target, error:
-          {
-            'msg' => 'Found a Ruby without Puppet present, please install Puppet ' \
-                     "or remove Ruby from $env:Path to enable 'apply'",
-            'kind' => 'bolt/apply-error'
-          })
-      else
-        result
-      end
-    end
-
-    def identify_resource_failures(result)
-      if result.ok? && result.value['status'] == 'failed'
-        resources = result.value['resource_statuses']
-        failed = resources.select { |_, r| r['failed'] }.flat_map do |key, resource|
-          resource['events'].select { |e| e['status'] == 'failure' }.map do |event|
-            "\n  #{key}: #{event['message']}"
-          end
-        end
-
-        result.value['_error'] = {
-          'msg' => "Resources failed to apply for #{result.target.name}#{failed.join}",
-          'kind' => 'bolt/resource-failure'
-        }
-      end
-      result
-    end
-
     def apply(args, apply_body, scope)
       raise(ArgumentError, 'apply requires a TargetSpec') if args.empty?
       type0 = Puppet.lookup(:pal_script_compiler).type('TargetSpec')
       Puppet::Pal.assert_type(type0, args[0], 'apply targets')
+
+      @executor.report_function_call('apply')
 
       options = {}
       if args.count > 1
@@ -171,11 +148,14 @@ module Bolt
         result_promises = targets.zip(futures).flat_map do |target, future|
           @executor.queue_execute([target]) do |transport, batch|
             @executor.with_node_logging("Applying manifest block", batch) do
-              arguments = { 'catalog' => future.value, '_noop' => options['_noop'] }
+              arguments = {
+                'catalog' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(future.value),
+                'plugins' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(plugins),
+                '_noop' => options['_noop']
+              }
               raise future.reason if future.rejected?
-              result = transport.batch_task(batch, catalog_apply_task, arguments, options, &notify)
-              result = provide_puppet_missing_errors(result)
-              identify_resource_failures(result)
+              results = transport.batch_task(batch, catalog_apply_task, arguments, options, &notify)
+              Array(results).map { |result| ApplyResult.from_task_result(result) }
             end
           end
         end
@@ -187,6 +167,46 @@ module Bolt
         raise Bolt::ApplyFailure, r
       end
       r
+    end
+
+    def plugins
+      @plugin_tarball.value ||
+        raise(Bolt::Error.new("Failed to pack module plugins: #{@plugin_tarball.reason}", 'bolt/plugin-error'))
+    end
+
+    def build_plugin_tarball
+      start_time = Time.now
+      sio = StringIO.new
+      output = Minitar::Output.new(Zlib::GzipWriter.new(sio))
+
+      Puppet.lookup(:current_environment).override_with(modulepath: @plugin_dirs).modules.each do |mod|
+        search_dirs = yield mod
+
+        parent = Pathname.new(mod.path).parent
+        files = Find.find(*search_dirs).select { |file| File.file?(file) }
+
+        files.each do |file|
+          tar_path = Pathname.new(file).relative_path_from(parent)
+          @logger.debug("Packing plugin #{file} to #{tar_path}")
+          stat = File.stat(file)
+          content = File.binread(file)
+          output.tar.add_file_simple(
+            tar_path.to_s,
+            data: content,
+            size: content.size,
+            mode: stat.mode & 0o777,
+            mtime: stat.mtime
+          )
+        end
+      end
+
+      duration = Time.now - start_time
+      @logger.debug("Packed plugins in #{duration * 1000} ms")
+
+      output.close
+      Base64.encode64(sio.string)
+    ensure
+      output&.close
     end
   end
 end

@@ -13,7 +13,7 @@ Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFuncti
   # @example Run a local script on Linux targets as 'root'
   #   run_script('/var/tmp/myscript', $targets, '_run_as' => 'root')
   # @example Run a module-provided script with arguments
-  #   file_upload('iis/setup.ps1', $target, 'arguments' => ['/u', 'Administrator'])
+  #   run_script('iis/setup.ps1', $target, 'arguments' => ['/u', 'Administrator'])
   dispatch :run_script do
     scope_param
     param 'String[1]', :script
@@ -31,7 +31,7 @@ Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFuncti
   #                Additional options: '_catch_errors', '_run_as'.
   # @return A list of results, one entry per target.
   # @example Run a script
-  #   file_upload('/var/tmp/myscript', $targets, 'Downloading my application')
+  #   run_script('/var/tmp/myscript', $targets, 'Downloading my application')
   dispatch :run_script_with_description do
     scope_param
     param 'String[1]', :script

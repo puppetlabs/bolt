@@ -5,8 +5,6 @@ require 'bolt_spec/files'
 require 'bolt_spec/pal'
 
 require 'bolt/pal'
-# TODO: clean this up
-require 'bolt/cli'
 
 describe 'ResultSet DataType' do
   include BoltSpec::Files

@@ -55,13 +55,17 @@ module Bolt
           require 'net/ssh/krb'
         rescue LoadError
           logger.debug {
-            "Authentication method 'gssapi-with-mic' is not available"
+            "Authentication method 'gssapi-with-mic' is not available. "\
+            "Please install the kerberos gem with `gem install net-ssh-krb`"
           }
         end
+
+        @transport_logger = Logging.logger[Net::SSH]
+        @transport_logger.level = :warn
       end
 
-      def with_connection(target)
-        conn = Connection.new(target)
+      def with_connection(target, load_config = true)
+        conn = Connection.new(target, @transport_logger, load_config)
         conn.connect
         yield conn
       ensure
@@ -102,6 +106,9 @@ module Bolt
       end
 
       def run_script(target, script, arguments, options = {})
+        # unpack any Sensitive data
+        arguments = unwrap_sensitive_args(arguments)
+
         with_connection(target) do |conn|
           conn.running_as(options['_run_as']) do
             conn.with_remote_tempdir do |dir|
@@ -115,31 +122,52 @@ module Bolt
       end
 
       def run_task(target, task, arguments, options = {})
-        executable = target.select_impl(task, PROVIDED_FEATURES)
-        raise "No suitable implementation of #{task.name} for #{target.name}" unless executable
+        if from_api?(task)
+          executable = task.file['filename']
+          file_content = Base64.decode64(task.file['file_content'])
+          input_method = task.metadata['input_method']
+          extra_files = []
+        else
+          implementation = task.select_implementation(target, PROVIDED_FEATURES)
+          executable = implementation['path']
+          input_method = implementation['input_method']
+          extra_files = implementation['files']
+        end
+        input_method ||= 'both'
 
-        input_method = task.input_method || "both"
-        with_connection(target) do |conn|
+        # unpack any Sensitive data
+        arguments = unwrap_sensitive_args(arguments)
+        with_connection(target, options.fetch('_load_config', true)) do |conn|
           conn.running_as(options['_run_as']) do
             stdin, output = nil
-
             command = []
             execute_options = {}
 
-            if STDIN_METHODS.include?(input_method)
-              stdin = JSON.dump(arguments)
-            end
-
-            if ENVIRONMENT_METHODS.include?(input_method)
-              environment = arguments.inject({}) do |env, (param, val)|
-                val = val.to_json unless val.is_a?(String)
-                env.merge("PT_#{param}" => val)
-              end
-              execute_options[:environment] = environment
-            end
-
             conn.with_remote_tempdir do |dir|
-              remote_task_path = conn.write_remote_executable(dir, executable)
+              remote_task_path = if from_api?(task)
+                                   conn.write_executable_from_content(dir, file_content, executable)
+                                 else
+                                   conn.write_remote_executable(dir, executable)
+                                 end
+
+              unless extra_files.empty?
+                # TODO: optimize upload of directories
+                installdir = File.join(dir.to_s, '_installdir')
+                arguments['_installdir'] = installdir
+                dir.mkdirs(extra_files.map { |file| File.join('_installdir', File.dirname(file['name'])) })
+                extra_files.each do |file|
+                  conn.write_remote_file(file['path'], File.join(installdir, file['name']))
+                end
+              end
+
+              if STDIN_METHODS.include?(input_method)
+                stdin = JSON.dump(arguments)
+              end
+
+              if ENVIRONMENT_METHODS.include?(input_method)
+                execute_options[:environment] = envify_params(arguments)
+              end
+
               if conn.run_as && stdin
                 wrapper = make_wrapper_stringio(remote_task_path, stdin)
                 remote_wrapper_path = conn.write_remote_executable(dir, wrapper, 'wrapper.sh')
@@ -163,7 +191,7 @@ module Bolt
       def make_wrapper_stringio(task_path, stdin)
         StringIO.new(<<-SCRIPT)
 #!/bin/sh
-'#{task_path}' <<EOF
+'#{task_path}' <<'EOF'
 #{stdin}
 EOF
 SCRIPT

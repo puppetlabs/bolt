@@ -3,6 +3,7 @@
 require 'spec_helper'
 require 'bolt_spec/task'
 require 'bolt/executor'
+require 'bolt/target'
 
 describe "Bolt::Executor" do
   include BoltSpec::Task
@@ -14,6 +15,7 @@ describe "Bolt::Executor" do
   let(:dest) { '/tmp/upload' }
   let(:task) { 'service::restart' }
   let(:task_arguments) { { 'name' => 'apache' } }
+  let(:task_options) { { '_load_config' => true } }
   let(:transport) { double('holodeck', initialize_transport: nil) }
 
   def start_event(target)
@@ -176,11 +178,11 @@ describe "Bolt::Executor" do
       node_results.each do |target, result|
         expect(ssh)
           .to receive(:run_task)
-          .with(target, task_type(task), task_arguments, {})
+          .with(target, task_type(task), task_arguments, task_options)
           .and_return(result)
       end
 
-      results = executor.run_task(targets, mock_task(task), task_arguments, {})
+      results = executor.run_task(targets, mock_task(task), task_arguments, task_options)
       results.each do |result|
         expect(result).to be_instance_of(Bolt::Result)
         expect(result).to be_success
@@ -192,11 +194,11 @@ describe "Bolt::Executor" do
       node_results.each do |target, result|
         expect(ssh)
           .to receive(:run_task)
-          .with(target, task_type(task), task_arguments, '_run_as' => 'foo')
+          .with(target, task_type(task), task_arguments, { '_run_as' => 'foo' }.merge(task_options))
           .and_return(result)
       end
 
-      results = executor.run_task(targets, mock_task(task), task_arguments, {})
+      results = executor.run_task(targets, mock_task(task), task_arguments, task_options)
       results.each do |result|
         expect(result).to be_instance_of(Bolt::Result)
       end
@@ -212,15 +214,15 @@ describe "Bolt::Executor" do
         executor.run_as = 'bar'
         expect(ssh)
           .to receive(:run_task)
-          .with(targets[0], task_type(task), task_arguments, {})
+          .with(targets[0], task_type(task), task_arguments, task_options)
           .and_return(node_results[targets[0]])
 
         expect(ssh)
           .to receive(:run_task)
-          .with(targets[1], task_type(task), task_arguments, '_run_as' => 'bar')
+          .with(targets[1], task_type(task), task_arguments, { '_run_as' => 'bar' }.merge(task_options))
           .and_return(node_results[targets[1]])
 
-        results = executor.run_task(targets, mock_task(task), task_arguments, {})
+        results = executor.run_task(targets, mock_task(task), task_arguments, task_options)
         results.each do |result|
           expect(result).to be_instance_of(Bolt::Result)
         end
@@ -231,12 +233,12 @@ describe "Bolt::Executor" do
       node_results.each do |target, result|
         expect(ssh)
           .to receive(:run_task)
-          .with(target, task_type(task), task_arguments, {})
+          .with(target, task_type(task), task_arguments, task_options)
           .and_return(result)
       end
 
       results = []
-      executor.run_task(targets, mock_task(task), task_arguments) do |result|
+      executor.run_task(targets, mock_task(task), task_arguments, task_options) do |result|
         results << result
       end
       node_results.each do |target, result|
@@ -249,11 +251,11 @@ describe "Bolt::Executor" do
       node_results.each_key do |target|
         expect(ssh)
           .to receive(:run_task)
-          .with(target, task_type(task), task_arguments, {})
+          .with(target, task_type(task), task_arguments, task_options)
           .and_raise(Bolt::Error, 'failed', 'my-exception')
       end
 
-      executor.run_task(targets, mock_task(task), task_arguments) do |result|
+      executor.run_task(targets, mock_task(task), task_arguments, task_options) do |result|
         expect(result.error_hash['msg']).to eq('failed')
         expect(result.error_hash['kind']).to eq('my-exception')
       end
@@ -269,7 +271,7 @@ describe "Bolt::Executor" do
           .and_return(result)
       end
 
-      results = executor.file_upload(targets, script, dest)
+      results = executor.upload_file(targets, script, dest)
       results.each do |result|
         expect(result).to be_instance_of(Bolt::Result)
       end
@@ -284,7 +286,7 @@ describe "Bolt::Executor" do
       end
 
       results = []
-      executor.file_upload(targets, script, dest) do |result|
+      executor.upload_file(targets, script, dest) do |result|
         results << result
       end
       node_results.each do |target, result|
@@ -301,14 +303,14 @@ describe "Bolt::Executor" do
           .and_raise(Bolt::Error, 'failed', 'my-exception')
       end
 
-      executor.file_upload(targets, script, dest) do |result|
+      executor.upload_file(targets, script, dest) do |result|
         expect(result.error_hash['msg']).to eq('failed')
         expect(result.error_hash['kind']).to eq('my-exception')
       end
     end
   end
 
-  it "returns an error result" do
+  it "returns and notifies an error result" do
     node_results.each_key do |_target|
       expect(ssh)
         .to receive(:with_connection)
@@ -317,10 +319,58 @@ describe "Bolt::Executor" do
         )
     end
 
-    results = executor.run_command(targets, command)
+    notices = []
+    results = executor.run_command(targets, command) { |notice| notices << notice }
+
     results.each do |result|
       expect(result.error_hash['kind']).to eq('puppetlabs.tasks/connect-error')
+      expect(result.error_hash['msg']).to eq('Authentication failed')
     end
+
+    expect(notices.count).to eq(4)
+    result_notices = notices.select { |notice| notice[:type] == :node_result }.map { |notice| notice[:result] }
+    expect(results).to eq(Bolt::ResultSet.new(result_notices))
+  end
+
+  it "returns and notifies an error result for NotImplementedError" do
+    node_results.each_key do |_target|
+      expect(ssh)
+        .to receive(:with_connection)
+        .and_raise(
+          NotImplementedError.new('ed25519 is not supported')
+        )
+    end
+
+    notices = []
+    results = executor.run_command(targets, command) { |notice| notices << notice }
+
+    results.each do |result|
+      expect(result.error_hash['kind']).to eq('puppetlabs.tasks/exception-error')
+      expect(result.error_hash['msg']).to eq('ed25519 is not supported')
+    end
+
+    expect(notices.count).to eq(4)
+    result_notices = notices.select { |notice| notice[:type] == :node_result }.map { |notice| notice[:result] }
+    expect(results).to eq(Bolt::ResultSet.new(result_notices))
+  end
+
+  it "logs an error and does not notify if the transport incorrectly implements batch_execute" do
+    node_results.each_key do |_target|
+      expect(ssh)
+        .to receive(:batch_command)
+        .and_raise(
+          NotImplementedError.new("I don't know what I'm doing")
+        )
+    end
+
+    results = executor.run_command(targets, command) { |_| expect(false) }
+    results.each do |result|
+      expect(result.error_hash['kind']).to eq('puppetlabs.tasks/exception-error')
+      expect(result.error_hash['msg']).to eq("I don't know what I'm doing")
+    end
+
+    logs = @log_output.readlines
+    expect(logs).to include(/WARN .*I don't know what I'm doing/)
   end
 
   context "targets with different protocols" do
@@ -365,18 +415,41 @@ describe "Bolt::Executor" do
           result
         end
       }
-      # without pausing here running seems to evaluate to 0
-      sleep(0.1)
 
-      running = state.reduce(0) do |acc, (_k, v)|
-        acc += 1 if v[:running]
-        acc
+      running = 0
+      time = 0
+      timer = Time.now
+
+      while (time < 5) && (running != 2)
+        sleep(0.1)
+        running = state.reduce(0) do |acc, (_k, v)|
+          acc += 1 if v[:running]
+          acc
+        end
+        time = Time.now - timer
       end
 
       expect(running).to eq(2)
       # execute all the promises to release the threads
-      state.keys.each { |k| state[k][:promise].execute }
+      state.each_key { |k| state[k][:promise].execute }
       t.join
+    end
+  end
+
+  context "with concurrency 0" do
+    let(:targets) {
+      [Bolt::Target.new('node1'), Bolt::Target.new('node2')]
+    }
+
+    let(:executor) { Bolt::Executor.new(0) }
+
+    it "batch_execute runs sequentially" do
+      targs = []
+      executor.batch_execute(targets) do |_transport, batch|
+        targs.concat(batch)
+      end
+
+      expect(targs).to eq(targets)
     end
   end
 
@@ -490,12 +563,12 @@ describe "Bolt::Executor" do
       node_results.each do |target, result|
         expect(ssh)
           .to receive(:run_task)
-          .with(target, task_type(task), task_arguments, {})
+          .with(target, task_type(task), task_arguments, task_options)
           .and_return(result)
       end
 
       executor.start_plan(plan_context)
-      executor.run_task(targets, mock_task(task), task_arguments)
+      executor.run_task(targets, mock_task(task), task_arguments, task_options)
 
       expect(@log_output.readline).to match(/NOTICE.*Starting: task service::restart on .*/)
       expect(@log_output.readline).to match(/NOTICE.*Finished: task service::restart with 0 failures/)
@@ -510,7 +583,7 @@ describe "Bolt::Executor" do
       end
 
       executor.start_plan(plan_context)
-      executor.file_upload(targets, script, dest)
+      executor.upload_file(targets, script, dest)
 
       expect(@log_output.readline).to match(/NOTICE.*Starting: file upload from .* to .* on .*/)
       expect(@log_output.readline).to match(/NOTICE.*Finished: file upload from .* to .* with 0 failures/)

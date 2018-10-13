@@ -7,6 +7,7 @@ describe Bolt::Target do
   describe "when parsing userinfo" do
     let(:user)     { 'günther' }
     let(:password) { 'foobar' }
+    let(:complex)  { '~%F3/-w@ho!#$%^* ' }
 
     it "accepts userinfo when a port is specified" do
       uri = Bolt::Target.new("ssh://#{user}:#{password}@neptune:2222")
@@ -24,6 +25,21 @@ describe Bolt::Target do
       uri = Bolt::Target.new("#{user}:#{password}@neptune")
       expect(uri.user).to eq(user)
       expect(uri.password).to eq(password)
+    end
+
+    it "defaults user from options" do
+      uri = Bolt::Target.new("neptune", 'user' => complex)
+      expect(uri.user).to eq(complex)
+    end
+
+    it "defaults password from options" do
+      uri = Bolt::Target.new("neptune", 'password' => complex)
+      expect(uri.password).to eq(complex)
+    end
+
+    it "defaults port from options" do
+      uri = Bolt::Target.new("neptune", 'port' => 1234)
+      expect(uri.port).to eq(1234)
     end
 
     it "rejects unescaped special characters" do
@@ -152,53 +168,5 @@ describe Bolt::Target do
     uri1 = Bolt::Target.new('http://pluto:666')
     uri2 = Bolt::Target.new(uri1.uri)
     expect(uri1).to eq(uri2)
-  end
-
-  describe "#select_impl" do
-    let(:target) { Bolt::Target.new('example') }
-
-    before :each do
-      allow(target).to receive(:features).and_return(Set.new(['powershell']))
-    end
-
-    it "returns the first implementation if there are no requirements" do
-      impls = [{ 'name' => 'foo.sh', 'path' => '/path/to/foo.sh', 'requirements' => [] },
-               { 'name' => 'foo.ps1', 'path' => '/path/to/foo.ps1', 'requirements' => [] }]
-      task = double('task', implementations: impls)
-
-      expect(target.select_impl(task)).to eq('/path/to/foo.sh')
-    end
-
-    it "returns the first implementation that matches its features" do
-      impls = [{ 'name' => 'foo.sh', 'path' => '/path/to/foo.sh', 'requirements' => ['shell'] },
-               { 'name' => 'foo.ps1', 'path' => '/path/to/foo.ps1', 'requirements' => ['powershell'] }]
-      task = double('task', implementations: impls)
-
-      expect(target.select_impl(task)).to eq('/path/to/foo.ps1')
-    end
-
-    it "only matches if all required features are present" do
-      impls = [{ 'name' => 'foo.rb', 'path' => '/path/to/foo.rb', 'requirements' => ['powershell', 'puppet-agent'] },
-               { 'name' => 'foo.ps1', 'path' => '/path/to/foo.ps1', 'requirements' => ['powershell'] }]
-      task = double('task', implementations: impls)
-
-      expect(target.select_impl(task)).to eq('/path/to/foo.ps1')
-    end
-
-    it "uses additional features passed in when deciding which implementation to use" do
-      impls = [{ 'name' => 'foo.rb', 'path' => '/path/to/foo.rb', 'requirements' => ['powershell', 'puppet-agent'] },
-               { 'name' => 'foo.ps1', 'path' => '/path/to/foo.ps1', 'requirements' => ['powershell'] }]
-      task = double('task', implementations: impls)
-
-      expect(target.select_impl(task, ['puppet-agent'])).to eq('/path/to/foo.rb')
-    end
-
-    it "returns nil if no implementation is suitable" do
-      impls = [{ 'name' => 'foo.rb', 'path' => '/path/to/foo.rb', 'requirements' => ['powershell', 'puppet-agent'] },
-               { 'name' => 'foo.ps1', 'path' => '/path/to/foo.ps1', 'requirements' => %w[powershell foobar] }]
-      task = double('task', implementations: impls)
-
-      expect(target.select_impl(task)).to be_nil
-    end
   end
 end

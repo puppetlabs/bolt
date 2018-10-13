@@ -2,16 +2,23 @@
 
 require 'base64'
 require 'concurrent'
+require 'find'
 require 'json'
+require 'minitar'
 require 'orchestrator_client'
+require 'pathname'
+require 'zlib'
 require 'bolt/transport/base'
 require 'bolt/transport/orch/connection'
-require 'bolt/result'
 
 module Bolt
   module Transport
     class Orch < Base
-      CONF_FILE = File.expand_path('~/.puppetlabs/client-tools/orchestrator.conf')
+      CONF_FILE = if !ENV['HOME'].nil?
+                    File.expand_path('~/.puppetlabs/client-tools/orchestrator.conf')
+                  else
+                    '/etc/puppetlabs/client-tools/orchestrator.conf'
+                  end
       BOLT_COMMAND_TASK = Struct.new(:name).new('bolt_shim::command').freeze
       BOLT_SCRIPT_TASK = Struct.new(:name).new('bolt_shim::script').freeze
       BOLT_UPLOAD_TASK = Struct.new(:name).new('bolt_shim::upload').freeze
@@ -19,17 +26,12 @@ module Bolt
       attr_writer :plan_context
 
       def self.options
-        %w[service-url cacert token-file task-environment local-validation]
+        %w[service-url cacert token-file task-environment]
       end
 
       PROVIDED_FEATURES = ['puppet-agent'].freeze
 
-      def self.validate(options)
-        validation_flag = options['local-validation']
-        unless !!validation_flag == validation_flag
-          raise Bolt::ValidationError, 'local-validation option must be a Boolean true or false'
-        end
-      end
+      def self.validate(options); end
 
       def initialize(*args)
         @connections = {}
@@ -116,14 +118,50 @@ module Bolt
         end
       end
 
+      def pack(directory)
+        start_time = Time.now
+        io = StringIO.new
+        output = Minitar::Output.new(Zlib::GzipWriter.new(io))
+        Find.find(directory) do |file|
+          next unless File.file?(file)
+
+          tar_path = Pathname.new(file).relative_path_from(Pathname.new(directory))
+          @logger.debug("Packing #{file} to #{tar_path}")
+          stat = File.stat(file)
+          content = File.binread(file)
+          output.tar.add_file_simple(
+            tar_path.to_s,
+            data: content,
+            size: content.size,
+            mode: stat.mode & 0o777,
+            mtime: stat.mtime
+          )
+        end
+
+        duration = Time.now - start_time
+        @logger.debug("Packed upload in #{duration * 1000} ms")
+
+        output.close
+        io.string
+      ensure
+        # Closes both tar and sgz.
+        output&.close
+      end
+
       def batch_upload(targets, source, destination, options = {}, &callback)
-        content = File.open(source, &:read)
+        stat = File.stat(source)
+        content = if stat.directory?
+                    pack(source)
+                  else
+                    File.open(source, &:read)
+                  end
         content = Base64.encode64(content)
         mode = File.stat(source).mode
         params = {
           'path' => destination,
           'content' => content,
-          'mode' => mode
+          'mode' => mode,
+          'directory' => stat.directory?
         }
         callback ||= proc {}
         results = run_task_job(targets, BOLT_UPLOAD_TASK, params, options, &callback)
@@ -149,6 +187,8 @@ module Bolt
         end
 
         begin
+          # unpack any Sensitive data
+          arguments = unwrap_sensitive_args(arguments)
           results = get_connection(targets.first.options).run_task(targets, task, arguments, options)
 
           process_run_results(targets, results)

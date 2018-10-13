@@ -1,0 +1,20 @@
+{
+  "description": "Task with sensitive parameters defined in metadata",
+  "parameters": {
+    "sensitive_string": {
+      "description": "string parameter with senstitive metadata",
+      "type": "String",
+      "sensitive": true
+    },
+    "sensitive_array": {
+      "description": "array parameter with senstitive metadata",
+      "type": "Array",
+      "sensitive": true
+    },
+    "sensitive_hash": {
+      "description": "hash parameter with senstitive metadata",
+      "type": "Hash",
+      "sensitive": true
+    }
+  }
+}

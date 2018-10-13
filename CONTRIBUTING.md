@@ -68,7 +68,7 @@ To change external modules (to add a new module or bump the version), update the
 
 ## Testing
 
-Some tests require a Windows VMs or Linux containers. For Linux tests (recommended, if you're not sure) `docker-compose up -d --build` to bring these up with the `docker-compose.yaml` included with the `bolt` gem. For windows tests, execute `vagrant up` to bring these up with the provided Vagrantfile. Any tests that require this are tagged with `:winrm` or `:ssh` in rspec.
+Some tests require a Windows VMs or Linux containers. For Linux tests (recommended, if you're not sure) run `docker-compose up -d --build` from `spec/` directory. For windows tests, execute `vagrant up` from the root of the bolt repo to bring these up with the provided Vagrantfile. Any tests that require this are tagged with `:winrm` or `:ssh` in rspec.
 
 Additional tests may run in a local environment and require certain shell capabilities. Currently the only case is a Bash-like environment and is tagged with `:bash` in rspec.
 

@@ -109,46 +109,22 @@ describe Bolt::Inventory do
         Bolt::Inventory.new(data).validate
       }.to raise_error(Bolt::Inventory::ValidationError, /Tried to redefine group group1/)
     end
-
-    it 'fails with deprecated property transport in global config' do
-      data = { 'config' => { 'transports' => {} } }
-      expect {
-        Bolt::Inventory.new(data).validate
-      }.to raise_error(Bolt::Inventory::ValidationError, /Group all contains invalid config/)
-    end
-
-    it 'fails with deprecated property transport in group config' do
-      data = { 'groups' => [{ 'name' => 'group1', 'config' => { 'transports' => {} } }] }
-      expect {
-        Bolt::Inventory.new(data).validate
-      }.to raise_error(Bolt::Inventory::ValidationError, /Group group1 contains invalid config/)
-    end
-
-    it 'fails with deprecated property transport in node config' do
-      data = { 'nodes' => [{ 'name' => 'node1', 'config' => { 'transports' => {} } }] }
-      expect {
-        Bolt::Inventory.new(data).validate
-      }.to raise_error(Bolt::Inventory::ValidationError, /Node node1 contains invalid config/)
-    end
   end
 
   describe :collect_groups do
     it 'finds the all group with an empty inventory' do
       inventory = Bolt::Inventory.new({})
-      inventory.collect_groups
       expect(inventory.get_targets('all')).to eq([])
     end
 
     it 'finds the all group with a non-empty inventory' do
       inventory = Bolt::Inventory.new(data)
-      inventory.collect_groups
       targets = inventory.get_targets('all')
       expect(targets.size).to eq(9)
     end
 
     it 'finds nodes in a subgroup' do
       inventory = Bolt::Inventory.new(data)
-      inventory.collect_groups
       targets = inventory.get_targets('group2')
       expect(targets).to eq(targets(%w[node6 node7 ssh://node8 node9]))
     end
@@ -248,7 +224,6 @@ describe Bolt::Inventory do
     context 'non-empty inventory' do
       let(:inventory) {
         inv = Bolt::Inventory.new(data)
-        inv.collect_groups
         inv
       }
 
@@ -478,8 +453,7 @@ describe Bolt::Inventory do
           'service-url' => 'https://master',
           'cacert' => transport + '.pem',
           'token-file' => 'token',
-          'task-environment' => 'prod',
-          'local-validation' => true
+          'task-environment' => 'prod'
         }
       end
 
@@ -557,8 +531,7 @@ describe Bolt::Inventory do
           'tty' => false,
           'service-url' => "https://master",
           'cacert' => "pcp.pem",
-          'token-file' => "token",
-          'local-validation' => true
+          'token-file' => "token"
         )
       end
     end

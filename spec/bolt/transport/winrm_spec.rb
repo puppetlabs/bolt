@@ -3,14 +3,18 @@
 require 'spec_helper'
 require 'bolt_spec/errors'
 require 'bolt_spec/files'
+require 'bolt_spec/sensitive'
 require 'bolt_spec/task'
 require 'bolt/transport/winrm'
+require 'bolt/config'
+require 'bolt/target'
 require 'httpclient'
 require 'winrm'
 
 describe Bolt::Transport::WinRM do
   include BoltSpec::Errors
   include BoltSpec::Files
+  include BoltSpec::Sensitive
   include BoltSpec::Task
 
   let(:boltdir) { Bolt::Boltdir.new('.') }
@@ -229,6 +233,36 @@ PS
       end
     end
 
+    it "catches winrm-fs upload error", winrm: true do
+      expect_node_error(Bolt::Node::FileError,
+                        'WRITE_ERROR',
+                        /No such file or directory/) do
+        winrm.run_script(target, 'fake.ps1', [])
+      end
+    end
+
+    it "can upload a directory to a host", winrm: true do
+      Dir.mktmpdir do |dir|
+        subdir = File.join(dir, 'subdir')
+        File.write(File.join(dir, 'content'), 'hello world')
+        Dir.mkdir(subdir)
+        File.write(File.join(subdir, 'more'), 'lorem ipsum')
+
+        target_dir = 'C:\Windows\Temp\directory-test'
+        winrm.upload(target, dir, target_dir)
+
+        expect(
+          winrm.run_command(target, "Get-ChildItem -Name #{target_dir}")['stdout'].split("\r\n")
+        ).to eq(%w[subdir content])
+
+        expect(
+          winrm.run_command(target, "Get-ChildItem -Name #{File.join(target_dir, 'subdir')}")['stdout'].split("\r\n")
+        ).to eq(%w[more])
+
+        winrm.run_command(target, "rm -r #{target_dir}")
+      end
+    end
+
     it "can run a PowerShell script remotely", winrm: true do
       contents = "Write-Output \"hellote\""
       with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
@@ -327,6 +361,19 @@ QUOTED
       end
     end
 
+    it "can run a script with Sensitive arguments", winrm: true do
+      arguments = ['non-sensitive-arg',
+                   make_sensitive('$ecret!')]
+      with_tempfile_containing('script-sensitive-winrm', echo_script, '.ps1') do |file|
+        expect(
+          winrm.run_script(target, file.path, arguments)['stdout']
+        ).to eq(<<QUOTED)
+non-sensitive-arg\r
+$ecret!\r
+QUOTED
+      end
+    end
+
     it "escapes unsafe shellwords", winrm: true do
       with_tempfile_containing('script-test-winrm-escape', echo_script, '.ps1') do |file|
         expect(
@@ -398,6 +445,19 @@ SHELLWORDS
       with_task_containing('task-test-winrm', contents, 'environment', '.ps1') do |task|
         expect(winrm.run_task(target, task, arguments).message)
           .to eq("it's a hello world\r\n")
+      end
+    end
+
+    it 'errors if environment variables cannot be set', winrm: true do
+      contents = 'Write-Host "$env:PT_message"'
+      arguments = { message: "it's a hello world" }
+      expect_any_instance_of(
+        Bolt::Transport::WinRM::Connection
+      ).to receive(:execute).at_least(:once).and_wrap_original do |m, *args|
+        args.first =~ /SetEnvironmentVariable/ ? double('result', exit_code: 1) : m.call(*args)
+      end
+      with_task_containing('task-test-winrm', contents, 'environment', '.ps1') do |task|
+        expect { winrm.run_task(target, task, arguments) }.to raise_error(Bolt::Node::EnvironmentVarError)
       end
     end
 
@@ -534,6 +594,37 @@ PS
       end
     end
 
+    it "can run a task with Sensitive params via environment", winrm: true do
+      contents = <<PS
+Write-Host "$env:PT_sensitive_string"
+Write-Host "$env:PT_sensitive_array"
+Write-Host "$env:PT_sensitive_hash"
+PS
+      deep_hash = { 'k' => make_sensitive('v') }
+      arguments = { 'sensitive_string' => make_sensitive('$ecret!'),
+                    'sensitive_array'  => make_sensitive([1, 2, make_sensitive(3)]),
+                    'sensitive_hash'   => make_sensitive(deep_hash) }
+      with_task_containing('tasks_test_sensitive', contents, 'both', '.ps1') do |task|
+        expect(winrm.run_task(target, task, arguments).message).to eq(<<QUOTED)
+$ecret!\r
+[1,2,3]\r
+{"k":"v"}\r
+QUOTED
+      end
+    end
+
+    it "can run a task with Sensitive params via stdin", winrm: true do
+      contents = <<PS
+$line = [Console]::In.ReadLine()
+Write-Host $line
+PS
+      arguments = { 'sensitive_string' => make_sensitive('$ecret!') }
+      with_task_containing('tasks_test_sensitive', contents, 'stdin', '.ps1') do |task|
+        expect(winrm.run_task(target, task, arguments).value)
+          .to eq("sensitive_string" => "$ecret!")
+      end
+    end
+
     it "defaults to powershell input method when executing .ps1", winrm: true do
       contents = <<PS
 param ($message_one, $message_two)
@@ -553,8 +644,17 @@ PS
 
       it "runs a task requires 'shell'" do
         with_task_containing('tasks_test', contents, 'environment', '.ps1') do |task|
-          impls = task.implementations.map { |impl| impl.merge('requirements' => ['powershell']) }
-          expect(task).to receive(:implementations).and_return(impls)
+          task['metadata']['implementations'] = [{ 'name' => 'tasks_test', 'requirements' => ['powershell'] }]
+          expect(winrm.run_task(target, task, arguments).message.chomp)
+            .to eq('Hello from task Goodbye')
+        end
+      end
+
+      it "runs a task with the implementation's input method" do
+        with_task_containing('tasks_test', contents, 'stdin', '.ps1') do |task|
+          task['metadata']['implementations'] = [{
+            'name' => 'tasks_test', 'requirements' => ['powershell'], 'input_method' => 'environment'
+          }]
           expect(winrm.run_task(target, task, arguments).message.chomp)
             .to eq('Hello from task Goodbye')
         end
@@ -562,21 +662,61 @@ PS
 
       it "errors when a task only requires an unsupported requirement" do
         with_task_containing('tasks_test', contents, 'environment', '.ps1') do |task|
-          impls = task.implementations.map { |impl| impl.merge('requirements' => ['shell']) }
-          expect(task).to receive(:implementations).and_return(impls)
+          task['metadata']['implementations'] = [{ 'name' => 'tasks_test', 'requirements' => ['shell'] }]
           expect {
             winrm.run_task(target, task, arguments)
-          }.to raise_error("No suitable implementation of #{task.name} for #{target.name}")
+          }.to raise_error("No suitable implementation of #{task['name']} for #{target.name}")
         end
       end
 
       it "errors when a task only requires an unknown requirement" do
         with_task_containing('tasks_test', contents, 'environment', '.ps1') do |task|
-          impls = task.implementations.map { |impl| impl.merge('requirements' => ['foobar']) }
-          expect(task).to receive(:implementations).and_return(impls)
+          task['metadata']['implementations'] = [{ 'name' => 'tasks_test', 'requirements' => ['foobar'] }]
           expect {
             winrm.run_task(target, task, arguments)
-          }.to raise_error("No suitable implementation of #{task.name} for #{target.name}")
+          }.to raise_error("No suitable implementation of #{task['name']} for #{target.name}")
+        end
+      end
+    end
+
+    context "when files are provided", winrm: true do
+      let(:contents) { 'Get-ChildItem -Path $env:PT__installdir -Recurse -File -Name' }
+      let(:arguments) { {} }
+
+      it "puts files at _installdir" do
+        with_task_containing('tasks_test', contents, 'environment', '.ps1') do |task|
+          task['metadata']['files'] = []
+          expected_files = %w[files/foo files/bar/baz lib/puppet_x/file.rb tasks/init]
+          expected_files.each do |file|
+            task['metadata']['files'] << "tasks_test/#{file}"
+            task['files'] << { 'name' => "tasks_test/#{file}", 'path' => task['files'][0]['path'] }
+          end
+
+          files = winrm.run_task(target, task, arguments).message.split("\n")
+          expect(files.count).to eq(expected_files.count)
+          files.sort.zip(expected_files.sort).each do |file, expected_file|
+            expect(file.strip).to eq("tasks_test\\#{expected_file.gsub(%r{/}, '\\')}")
+          end
+        end
+      end
+
+      it "includes files from the selected implementation" do
+        with_task_containing('tasks_test', contents, 'environment', '.ps1') do |task|
+          task['metadata']['implementations'] = [
+            { 'name' => 'tasks_test.alt', 'requirements' => ['foobar'], 'files' => ['tasks_test/files/no'] },
+            { 'name' => 'tasks_test', 'requirements' => [], 'files' => ['tasks_test/files/yes'] }
+          ]
+          task['metadata']['files'] = ['other_mod/lib/puppet_x/']
+          task['files'] << { 'name' => 'tasks_test/files/yes', 'path' => task['files'][0]['path'] }
+          task['files'] << { 'name' => 'other_mod/lib/puppet_x/a.rb', 'path' => task['files'][0]['path'] }
+          task['files'] << { 'name' => 'other_mod/lib/puppet_x/b.rb', 'path' => task['files'][0]['path'] }
+          task['files'] << { 'name' => 'tasks_test/files/no', 'path' => task['files'][0]['path'] }
+
+          files = winrm.run_task(target, task, arguments).message.split("\n").sort
+          expect(files.count).to eq(3)
+          expect(files[0].strip).to eq("other_mod\\lib\\puppet_x\\a.rb")
+          expect(files[1].strip).to eq("other_mod\\lib\\puppet_x\\b.rb")
+          expect(files[2].strip).to eq("tasks_test\\files\\yes")
         end
       end
     end
