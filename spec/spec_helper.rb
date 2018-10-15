@@ -35,6 +35,8 @@ RSpec.configure do |config|
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true
   end
 
+  config.filter_run_excluding appveyor_agents: true unless ENV['APPVEYOR_AGENTS']
+
   # rspec-mocks config
   config.mock_with :rspec do |mocks|
     # Prevents you from mocking or stubbing a method that does not exist on
