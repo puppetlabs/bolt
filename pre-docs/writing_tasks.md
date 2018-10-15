@@ -188,23 +188,37 @@ A task can also have multiple implementations, with metadata that explains when 
 
 ```
 - tasks
-  - sql.sh
-  - sql.ps1
+  - sql_linux.sh
+  - sql_linux.json
+  - sql_windows.ps1
+  - sql_windows.json
   - sql.json
 ```
 
-This task has two executables \(sql.sh and sql.ps1\) with a metadata file. The metadata file contains an implementations section:
+This task has two executables \(sql_linux.sh and sql_windows.ps1\), each with an implementation metadata file, and a task metadata file. The executables have distinct names, so that they can be used with older task runners such as Puppet Enterprise before 2019. Each implementation should have it's own metadata which either documents how to use the implementation directly or marks it as private to hide it from UI lists.
+
+An implementation metadata example:
+
+```
+{
+  "name": "SQL Linux",
+  "description": "A task to perform sql operations on linux targets",
+  "private": true
+}
+```
+
+The task metadata file contains an implementations section:
 
 ```
 {
   "implementations": [
-    {"name": "sql.sh", "requirements": ["shell"]},
-    {"name": "sql.ps1", "requirements": ["powershell"]}
+    {"name": "sql_linux.sh", "requirements": ["shell"]},
+    {"name": "sql_windows.ps1", "requirements": ["powershell"]}
   ]
 }
 ```
 
-Each implementations has a `name` and a list of `requirements`. The requirements are the set of *features* which must be available on the target in order for that implementation to be used. In this case, the `sql.sh` implementation requires the `shell` feature, and the `sql.ps1` implementations requires the powershell feature.
+Each implementations has a `name` and a list of `requirements`. The requirements are the set of *features* which must be available on the target in order for that implementation to be used. In this case, the `sql_linux.sh` implementation requires the `shell` feature, and the `sql_windows.ps1` implementations requires the powershell feature.
 
 The set of features available on the target is determined by the task runner. You can specify additional features for a target via `set_feature` or by adding `features` in the inventory. The task runner will choose the *first *implementation whose requirements are satisfied.
 
@@ -289,8 +303,8 @@ The `files` property can be included both as a top-level metadata property, and 
 ```
 {
   "implementations": [
-    {"name": "sql.sh", "requirements": ["shell"], "files": ["mymodule/files/lib.sh"]},
-    {"name": "sql.ps1", "requirements": ["powershell"], "files": ["mymodule/files/lib.ps1"]}
+    {"name": "sql_linux.sh", "requirements": ["shell"], "files": ["mymodule/files/lib.sh"]},
+    {"name": "sql_windows.ps1", "requirements": ["powershell"], "files": ["mymodule/files/lib.ps1"]}
   ],
   "files": ["emoji/files/emojis/"]
 }
