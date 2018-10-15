@@ -83,6 +83,9 @@ for:
           RUBY_VERSION: 23
         - configuration: Agentfull
           RUBY_VERSION: 24
+    
+    environment:
+      APPVEYOR_AGENTS: true
 
     before_test:
       - ps: |
