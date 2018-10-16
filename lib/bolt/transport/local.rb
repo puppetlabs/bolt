@@ -85,16 +85,24 @@ module Bolt
         input_method = implementation['input_method'] || 'both'
         extra_files = implementation['files']
 
-        with_tmpscript(executable, target.options['tmpdir']) do |script, dir|
-          unless extra_files.empty?
-            installdir = File.join(dir, '_installdir')
-            arguments['_installdir'] = installdir
-            FileUtils.mkdir_p(extra_files.map { |file| File.join(installdir, File.dirname(file['name'])) })
+        in_tmpdir(target.options['tmpdir']) do |dir|
+          if extra_files.empty?
+            script = File.join(dir, File.basename(executable))
+          else
+            arguments['_installdir'] = dir
+            script_dest = File.join(dir, task.tasks_dir)
+            FileUtils.mkdir_p([script_dest] + extra_files.map { |file| File.join(dir, File.dirname(file['name'])) })
 
+            script = File.join(script_dest, File.basename(executable))
             extra_files.each do |file|
-              copy_file(file['path'], File.join(installdir, file['name']))
+              dest = File.join(dir, file['name'])
+              copy_file(file['path'], dest)
+              File.chmod(0o750, dest)
             end
           end
+
+          copy_file(executable, script)
+          File.chmod(0o750, script)
 
           # unpack any Sensitive data, write it to a separate variable because
           # we log 'arguments' below

@@ -113,11 +113,13 @@ catch
           file_content = StringIO.new(Base64.decode64(task.file['file_content']))
           input_method = task.metadata['input_method']
           extra_files = []
+          write_executable = proc { |conn, dir| conn.write_executable_from_content(dir, file_content, executable) }
         else
           implementation = task.select_implementation(target, PROVIDED_FEATURES)
           executable = implementation['path']
           input_method = implementation['input_method']
           extra_files = implementation['files']
+          write_executable = proc { |conn, dir| conn.write_remote_executable(dir, executable) }
         end
         input_method ||= powershell_file?(executable) ? 'powershell' : 'both'
 
@@ -125,21 +127,19 @@ catch
         arguments = unwrap_sensitive_args(arguments)
         with_connection(target) do |conn|
           conn.with_remote_tempdir do |dir|
-            remote_task_path = if from_api?(task)
-                                 conn.write_executable_from_content(dir, file_content, executable)
-                               else
-                                 conn.write_remote_executable(dir, executable)
-                               end
-
-            unless extra_files.empty?
+            if extra_files.empty?
+              task_dir = dir
+            else
               # TODO: optimize upload of directories
-              installdir = File.join(dir, '_installdir')
-              arguments['_installdir'] = installdir
-              conn.mkdirs(extra_files.map { |file| File.join(installdir, File.dirname(file['name'])) })
+              arguments['_installdir'] = dir
+              task_dir = File.join(dir, task.tasks_dir)
+              conn.mkdirs([task_dir] + extra_files.map { |file| File.join(dir, File.dirname(file['name'])) })
               extra_files.each do |file|
-                conn.write_remote_file(file['path'], File.join(installdir, file['name']))
+                conn.write_remote_file(file['path'], File.join(dir, file['name']))
               end
             end
+
+            remote_task_path = write_executable.call(conn, task_dir)
 
             if STDIN_METHODS.include?(input_method)
               stdin = JSON.dump(arguments)
