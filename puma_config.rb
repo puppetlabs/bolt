@@ -6,20 +6,16 @@
 ## to configure the sinatra server                          ##
 ##############################################################
 
-require 'bolt_ext/server'
-require 'bolt_ext/server_acl'
-require 'bolt_ext/server_config'
+require 'bolt_server/transport_app'
+require 'bolt_server/acl'
+require 'bolt_server/config'
 require 'bolt/logger'
 
 Bolt::Logger.initialize_logging
 
-config = if ENV['BOLT_SERVER_CONF']
-           TransportConfig.new(ENV['BOLT_SERVER_CONF'])
-         elsif ENV['RACK_ENV'] == 'test'
-           TransportConfig.new(File.join(__dir__, 'spec', 'fixtures', 'configs', 'required-bolt-server.conf'))
-         else
-           TransportConfig.new
-         end
+config_path = ENV['BOLT_SERVER_CONF'] || '/etc/puppetlabs/bolt-server/conf.d/bolt-server.conf'
+
+config = BoltServer::Config.new.load_config(config_path)
 
 Logging.logger[:root].add_appenders Logging.appenders.stderr(
   'console',
@@ -42,9 +38,9 @@ bind bind_addr
 
 threads 0, config.concurrency
 
-impl = TransportAPI.new
+impl = BoltServer::TransportApp.new(config)
 unless config.whitelist.nil?
-  impl = TransportACL.new(impl, config.whitelist)
+  impl = BoltServer::ACL.new(impl, config.whitelist)
 end
 
 app impl

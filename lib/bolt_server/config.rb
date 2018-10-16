@@ -3,86 +3,95 @@
 require 'hocon'
 require 'bolt/error'
 
-class TransportConfig
-  attr_accessor :host, :port, :ssl_cert, :ssl_key, :ssl_ca_cert, :ssl_cipher_suites,
-                :loglevel, :logfile, :whitelist, :concurrency
+module BoltServer
+  class Config
+    CONFIG_KEYS = ['host', 'port', 'ssl-cert', 'ssl-key', 'ssl-ca-cert',
+                   'ssl-cipher-suites', 'loglevel', 'logfile', 'whitelist', 'concurrency',
+                   'cache-dir', 'file-server-uri'].freeze
 
-  def initialize(global = nil, local = nil)
-    @host = '127.0.0.1'
-    @port = 62658
-    @ssl_cert = nil
-    @ssl_key = nil
-    @ssl_ca_cert = nil
-    @ssl_cipher_suites = ['ECDHE-ECDSA-AES256-GCM-SHA384',
-                          'ECDHE-RSA-AES256-GCM-SHA384',
-                          'ECDHE-ECDSA-CHACHA20-POLY1305',
-                          'ECDHE-RSA-CHACHA20-POLY1305',
-                          'ECDHE-ECDSA-AES128-GCM-SHA256',
-                          'ECDHE-RSA-AES128-GCM-SHA256',
-                          'ECDHE-ECDSA-AES256-SHA384',
-                          'ECDHE-RSA-AES256-SHA384',
-                          'ECDHE-ECDSA-AES128-SHA256',
-                          'ECDHE-RSA-AES128-SHA256']
+    DEFAULTS = {
+      'host' => '127.0.0.1',
+      'port' => 62658,
+      'ssl-cipher-suites' => ['ECDHE-ECDSA-AES256-GCM-SHA384',
+                              'ECDHE-RSA-AES256-GCM-SHA384',
+                              'ECDHE-ECDSA-CHACHA20-POLY1305',
+                              'ECDHE-RSA-CHACHA20-POLY1305',
+                              'ECDHE-ECDSA-AES128-GCM-SHA256',
+                              'ECDHE-RSA-AES128-GCM-SHA256',
+                              'ECDHE-ECDSA-AES256-SHA384',
+                              'ECDHE-RSA-AES256-SHA384',
+                              'ECDHE-ECDSA-AES128-SHA256',
+                              'ECDHE-RSA-AES128-SHA256'],
+      'loglevel' => 'notice',
+      'concurrency' => 100,
+      'cache-dir' => "/opt/puppetlabs/server/data/bolt-server/cache"
+    }.freeze
 
-    @loglevel = 'notice'
-    @logfile = nil
-    @whitelist = nil
-    @concurrency = 100
-
-    global_path = global || '/etc/puppetlabs/bolt-server/conf.d/bolt-server.conf'
-    local_path = local || File.join(ENV['HOME'].to_s, ".puppetlabs", "bolt-server.conf")
-
-    load_config(global_path)
-    load_config(local_path)
-    validate
-  end
-
-  def load_config(path)
-    begin
-      parsed_hocon = Hocon.load(path)['bolt-server']
-    rescue Hocon::ConfigError => e
-      raise "Hocon data in '#{path}' failed to load.\n Error: '#{e.message}'"
-    rescue Errno::EACCES
-      raise "Your user doesn't have permission to read #{path}"
-    end
-
-    unless parsed_hocon.nil?
-      %w[host port ssl-cert ssl-key ssl-ca-cert ssl-cipher-suites loglevel logfile whitelist concurrency].each do |key|
-        varname = '@' + key.tr('-', '_')
-        instance_variable_set(varname, parsed_hocon[key]) if parsed_hocon.key?(key)
-      end
-    end
-  end
-
-  def validate
-    required_keys = %w[ssl_cert ssl_key ssl_ca_cert]
-    ssl_keys = %w[ssl_cert ssl_key ssl_ca_cert]
-    required_keys.each do |k|
-      next unless send(k).nil?
-      raise Bolt::ValidationError, <<-MSG
-You must configure #{k} in either /etc/puppetlabs/bolt-server/conf.d/bolt-server.conf or ~/.puppetlabs/bolt-server.conf
-      MSG
-    end
-
-    unless @port.is_a?(Integer) && @port > 0
-      raise Bolt::ValidationError, "Configured 'port' must be a valid integer greater than 0"
-    end
-    ssl_keys.each do |sk|
-      unless File.file?(send(sk)) && File.readable?(send(sk))
-        raise Bolt::ValidationError, "Configured #{sk} must be a valid filepath"
+    CONFIG_KEYS.each do |key|
+      define_method(key.tr('-', '_').to_sym) do
+        @data[key]
       end
     end
 
-    unless @ssl_cipher_suites.is_a?(Array)
-      raise Bolt::ValidationError, "Configured 'ssl-cipher-suites' must be an array of cipher suite names"
+    def initialize(config = nil)
+      @data = DEFAULTS.clone
+      @data = @data.merge(config.select { |key, _| CONFIG_KEYS.include?(key) }) if config
+      @config_path = nil
     end
 
-    unless @whitelist.nil? || @whitelist.is_a?(Array)
-      raise Bolt::ValidationError, "Configured 'whitelist' must be an array of names"
+    def load_config(path)
+      @config_path = path
+      begin
+        parsed_hocon = Hocon.load(path)['bolt-server']
+      rescue Hocon::ConfigError => e
+        raise "Hocon data in '#{path}' failed to load.\n Error: '#{e.message}'"
+      rescue Errno::EACCES
+        raise "Your user doesn't have permission to read #{path}"
+      end
+
+      raise "Could not find bolt-server config at #{path}" if parsed_hocon.nil?
+
+      parsed_hocon = parsed_hocon.select { |key, _| CONFIG_KEYS.include?(key) }
+      @data = @data.merge(parsed_hocon)
+
+      validate
+      self
     end
 
-    unless @concurrency.is_a?(Integer) && @concurrency.positive?
-      raise Bolt::ValidationError, "Configured 'concurrency' must be a positive integer"
+    def validate
+      # TODO: require file_server_uri once pl-pe code is in place
+      required_keys = ['ssl-cert', 'ssl-key', 'ssl-ca-cert']
+      ssl_keys = required_keys
+
+      required_keys.each do |k|
+        next unless @data[k].nil?
+        raise Bolt::ValidationError, "You must configure #{k} in #{@config_path}"
+      end
+
+      unless port.is_a?(Integer) && port > 0
+        raise Bolt::ValidationError, "Configured 'port' must be a valid integer greater than 0"
+      end
+      ssl_keys.each do |sk|
+        unless File.file?(@data[sk]) && File.readable?(@data[sk])
+          raise Bolt::ValidationError, "Configured #{sk} must be a valid filepath"
+        end
+      end
+
+      unless ssl_cipher_suites.is_a?(Array)
+        raise Bolt::ValidationError, "Configured 'ssl-cipher-suites' must be an array of cipher suite names"
+      end
+
+      unless whitelist.nil? || whitelist.is_a?(Array)
+        raise Bolt::ValidationError, "Configured 'whitelist' must be an array of names"
+      end
+
+      unless concurrency.is_a?(Integer) && concurrency.positive?
+        raise Bolt::ValidationError, "Configured 'concurrency' must be a positive integer"
+      end
+    end
+
+    def [](key)
+      @data[key]
     end
   end
 end

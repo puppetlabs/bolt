@@ -6,12 +6,10 @@ services:
 rvm:
 - 2.5
 before_script:
+- docker-compose -f spec/docker-compose.yml up -d --build
 - eval `ssh-agent`
 - cat Gemfile.lock
 - bundle exec r10k puppetfile install
-- pushd spec
-- docker-compose up -d --build
-- popd
 
 script:
 - bundle exec rake travisci
@@ -39,6 +37,9 @@ script:
   if [ $status -eq 1 ]; then
     false
   fi
+- bundle exec rake puppetserver
+after_script:
+- docker-compose -f spec/docker-compose.yml logs
 notifications:
   email: false
   hipchat:

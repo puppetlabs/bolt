@@ -1,0 +1,21 @@
+FROM puppet/puppetserver-standalone
+
+ARG hostname="bolt-server"
+ENV PUPPETSERVER_HOSTNAME "$hostname"
+
+
+# Use our own certs and disable the CA
+COPY fixtures/ssl/ca.pem /etc/puppetlabs/puppet/ssl/certs/ca.pem
+COPY fixtures/ssl/cert.pem /etc/puppetlabs/puppet/ssl/certs/"$hostname".pem
+COPY fixtures/ssl/key.pem /etc/puppetlabs/puppet/ssl/private_keys/"$hostname".pem
+COPY fixtures/ssl/crl.pem /etc/puppetlabs/puppet/ssl/ca/ca_crl.pem
+COPY fixtures/ssl/ca.cfg /etc/puppetlabs/puppetserver/services.d/ca.cfg
+
+RUN chown -R puppet:puppet /etc/puppetlabs/puppet/ssl
+
+RUN /opt/puppetlabs/bin/puppet config set certname "$hostname"
+RUN /opt/puppetlabs/bin/puppet config set server "$hostname"
+
+# Skip the normal bootstrapping and just run puppet-server
+ENTRYPOINT ["/opt/puppetlabs/bin/puppetserver"]
+CMD ["foreground"]

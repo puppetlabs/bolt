@@ -200,10 +200,13 @@ curl -v --cacert $BOLT_CACERT --cert $BOLT_CERT --key $BOLT_KEY $BOLT_ROOT
 
 ## Running in a container
 
-from your checkout of bolt build and run the container with
+From your checkout of bolt start the spec docker-compose to run
+puppet-server and some targets then run the top level compose to start
+bolt-server connected to that network.
 
 ```
-docker run --rm -p 62658:62658 `docker build -q ./`
+docker-compose -f spec/docker-compose.yml up -d --build
+docker-compose up --build
 ```
 
 setup your environment for running commands with
@@ -223,6 +226,19 @@ curl -v --cacert $BOLT_CACERT --cert $BOLT_CERT --key $BOLT_KEY $BOLT_ROOT
 
 ## Making requests
 
+### With the ruby client
+
+There is a simple ruby client that can be used to make requests to a local
+bolt_server during development at `scripts/server_client.rb`. This server
+expects to use the puppet-server container and target nodes from bolts spec
+environment so run `docker-compose up -d --build` from the spec directory before
+trying to use it.
+
+```
+bundle exec scripts/server_client.rb sample::echo ssh '{"message": "hey"}'
+```
+
+### With cURL
 The following is an example request body update it and save it to request.json
 
 ```

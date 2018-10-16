@@ -1,0 +1,11 @@
+version: "3"
+services:
+  boltserver:
+    build: .
+    ports:
+      - "62658:62658"
+networks:
+  default:
+    external:
+      name: spec_default
+
