@@ -26,7 +26,7 @@ describe "BoltSpec::Run", ssh: true do
     end
 
     it 'should accept _catch_errors' do
-      result = run_task('sample::echo', 'non_existent_ndoe', { '_catch_errors' => true },
+      result = run_task('sample::echo', 'non_existent_node', { '_catch_errors' => true },
                         config: config_data, inventory: inventory_data)
 
       expect(result[0]['status']).to eq('failure')
@@ -41,8 +41,26 @@ describe "BoltSpec::Run", ssh: true do
     end
 
     it 'should accept _catch_errors' do
-      result = run_command('echo hello', 'non_existent_ndoe', { '_catch_errors' => true },
+      result = run_command('echo hello', 'non_existent_node', { '_catch_errors' => true },
                            config: config_data, inventory: inventory_data)
+
+      expect(result[0]['status']).to eq('failure')
+      expect(result[0]['result']['_error']['kind']).to eq('puppetlabs.tasks/connect-error')
+    end
+  end
+
+  describe 'run_script' do
+    let(:script) { File.join(config_data['modulepath'], '..', 'scripts', 'success.sh') }
+
+    it 'should run a command on a node with an argument', ssh: true do
+      result = run_script(script, 'ssh', ['hi'], config: config_data, inventory: inventory_data)
+      expect(result[0]['status']).to eq('success')
+      expect(result[0]['result']['stdout']).to match(/arg: hi/)
+    end
+
+    it 'should accept _catch_errors' do
+      result = run_script('missing.sh', 'non_existent_node', nil, { '_catch_errors' => true },
+                          config: config_data, inventory: inventory_data)
 
       expect(result[0]['status']).to eq('failure')
       expect(result[0]['result']['_error']['kind']).to eq('puppetlabs.tasks/connect-error')

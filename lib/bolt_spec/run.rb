@@ -9,7 +9,7 @@ require 'bolt/puppetdb'
 require 'bolt/util'
 
 # This is intended to provide a relatively stable method of executing bolt in process from tests.
-# Currently it provides run_task, run_plan and run_command helpers.
+# Currently it provides run_task, run_plan, run_script and run_command helpers.
 module BoltSpec
   module Run
     def run_task(task_name, targets, params = nil, config: nil, inventory: nil)
@@ -36,6 +36,14 @@ module BoltSpec
     def run_command(command, targets, params = nil, config: nil, inventory: nil)
       result = BoltRunner.with_runner(config, inventory) do |runner|
         runner.run_command(command, targets, params)
+      end
+      result = result.to_a
+      Bolt::Util.walk_keys(result, &:to_s)
+    end
+
+    def run_script(script, targets, arguments = nil, options = {}, config: nil, inventory: nil)
+      result = BoltRunner.with_runner(config, inventory) do |runner|
+        runner.run_script(script, targets, arguments, options)
       end
       result = result.to_a
       Bolt::Util.walk_keys(result, &:to_s)
@@ -92,6 +100,12 @@ module BoltSpec
         executor = Bolt::Executor.new(config.concurrency, @analytics)
         targets = inventory.get_targets(targets)
         executor.run_command(targets, command, params || {})
+      end
+
+      def run_script(script, targets, arguments = nil, options = {})
+        executor = Bolt::Executor.new(config.concurrency, @analytics)
+        targets = inventory.get_targets(targets)
+        executor.run_script(targets, script, arguments, options)
       end
     end
   end
