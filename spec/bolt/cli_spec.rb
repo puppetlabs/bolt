@@ -81,6 +81,13 @@ describe "Bolt::CLI" do
       }.to raise_error(Bolt::CLIError, /Expected action 'oops' to be one of/)
     end
 
+    it "generates an error message is no action is given and one is expected" do
+      cli = Bolt::CLI.new(%w[-n bolt1 command])
+      expect {
+        cli.parse
+      }.to raise_error(Bolt::CLIError, /Expected an action/)
+    end
+
     describe "help" do
       it "generates help when no arguments are specified" do
         cli = Bolt::CLI.new([])

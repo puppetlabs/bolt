@@ -78,7 +78,10 @@ module Bolt
 
       # This section handles parsing non-flag options which are
       # subcommand specific rather then part of the config
-      options[:action] = remaining.shift
+      actions = COMMANDS[options[:subcommand]]
+      if actions && !actions.empty?
+        options[:action] = remaining.shift
+      end
       options[:object] = remaining.shift
 
       task_options, remaining = remaining.partition { |s| s =~ /.+=/ }
@@ -138,16 +141,18 @@ module Bolt
               "#{COMMANDS.keys.join(', ')}"
       end
 
-      if options[:action].nil?
-        raise Bolt::CLIError,
-              "Expected an action of the form 'bolt #{options[:subcommand]} <action>'"
-      end
-
       actions = COMMANDS[options[:subcommand]]
-      unless actions.include?(options[:action])
-        raise Bolt::CLIError,
-              "Expected action '#{options[:action]}' to be one of " \
-              "#{actions.join(', ')}"
+      if actions.any?
+        if options[:action].nil?
+          raise Bolt::CLIError,
+                "Expected an action of the form 'bolt #{options[:subcommand]} <action>'"
+        end
+
+        unless actions.include?(options[:action])
+          raise Bolt::CLIError,
+                "Expected action '#{options[:action]}' to be one of " \
+                "#{actions.join(', ')}"
+        end
       end
 
       if options[:subcommand] != 'file' && options[:subcommand] != 'script' &&
