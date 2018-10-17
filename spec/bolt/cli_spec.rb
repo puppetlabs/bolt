@@ -88,6 +88,13 @@ describe "Bolt::CLI" do
       }.to raise_error(Bolt::CLIError, /Expected an action/)
     end
 
+    it "works without an action if no action is expected" do
+      cli = Bolt::CLI.new(%w[-n bolt1 apply file.pp])
+      expect {
+        cli.parse
+      }.not_to raise_error
+    end
+
     describe "help" do
       it "generates help when no arguments are specified" do
         cli = Bolt::CLI.new([])

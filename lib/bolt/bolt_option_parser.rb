@@ -30,6 +30,7 @@ Available subcommands:
   bolt plan show                   Show list of available plans
   bolt plan show <plan>            Show details for plan
   bolt plan run <plan> [params]    Run a Puppet task plan
+  bolt apply <manifest>            Apply Puppet manifest code
   bolt puppetfile install          Install modules from a Puppetfile into a Boltdir
 
 Run `bolt <subcommand> --help` to view specific examples.
@@ -105,6 +106,13 @@ Install modules into the local Boltdir
   bolt puppetfile install
 
 Available options are:
+    HELP
+
+    APPLY_HELP = <<-HELP
+Usage: bolt apply <manifest.pp> [options]
+
+#{examples('apply site.pp', 'apply a manifest on')}
+  bolt apply site.pp --nodes foo.example.com,bar.example.com
     HELP
 
     # A helper mixin for OptionParser::Switch instances which will allow
@@ -287,6 +295,8 @@ Available options are:
                       FILE_HELP
                     when 'puppetfile'
                       PUPPETFILE_HELP
+                    when 'apply'
+                      APPLY_HELP
                     else
                       BANNER
                     end

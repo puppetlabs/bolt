@@ -63,6 +63,10 @@ module Bolt
         @stream.puts plan.to_json
       end
 
+      def print_apply_result(apply_result)
+        @stream.puts apply_result.to_json
+      end
+
       def print_plan_result(result)
         # Ruby JSON patches most objects to have a to_json method.
         @stream.puts result.to_json

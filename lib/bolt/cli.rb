@@ -30,7 +30,8 @@ module Bolt
                  'task' => %w[show run],
                  'plan' => %w[show run],
                  'file' => %w[upload],
-                 'puppetfile' => %w[install] }.freeze
+                 'puppetfile' => %w[install],
+                 'apply' => %w[] }.freeze
 
     attr_reader :config, :options
 
@@ -257,10 +258,13 @@ module Bolt
         options[:task_options] = pal.parse_params(options[:subcommand], options[:object], options[:task_options])
       end
 
-      if options[:subcommand] == 'plan'
+      case options[:subcommand]
+      when 'plan'
         code = run_plan(options[:object], options[:task_options], options[:nodes], options)
-      elsif options[:subcommand] == 'puppetfile'
+      when 'puppetfile'
         code = install_puppetfile(@config.puppetfile, @config.modulepath)
+      when 'apply'
+        code = apply_manifest(options[:object], options[:targets])
       else
         executor = Bolt::Executor.new(config.concurrency, @analytics, options[:noop], bundled_content: bundled_content)
         targets = options[:targets]
@@ -365,6 +369,28 @@ module Bolt
       executor.finish_plan(result)
       outputter.print_plan_result(result)
       result.ok? ? 0 : 1
+    end
+
+    def apply_manifest(manifest, targets)
+      require 'bolt/catalog'
+      code = File.read(File.expand_path(manifest))
+      ast = Bolt::Catalog.new('err').generate_ast(code)
+
+      executor = Bolt::Executor.new(config.concurrency, @analytics, options[:noop], bundled_content: bundled_content)
+      # Call start_plan just to enable plan_logging
+      executor.start_plan(nil)
+
+      pal.in_plan_compiler(executor, inventory, puppetdb_client) do |compiler|
+        compiler.call_function('apply_prep', targets)
+      end
+
+      results = pal.with_bolt_executor(executor, inventory, puppetdb_client) do
+        Puppet.lookup(:apply_executor).apply_ast(ast, targets, '_catch_errors' => true)
+      end
+
+      outputter.print_apply_result(results)
+
+      results.ok ? 0 : 1
     end
 
     def install_puppetfile(puppetfile, modulepath)

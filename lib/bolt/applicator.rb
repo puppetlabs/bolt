@@ -133,7 +133,13 @@ module Bolt
       %w[trusted server_facts facts].each { |k| plan_vars.delete(k) }
 
       targets = @inventory.get_targets(args[0])
+
       ast = Puppet::Pops::Serialization::ToDataConverter.convert(apply_body, rich_data: true, symbol_to_string: true)
+
+      apply_ast(ast, targets, options, plan_vars)
+    end
+
+    def apply_ast(ast, targets, options, plan_vars = {})
       notify = proc { |_| nil }
 
       r = @executor.log_action('apply catalog', targets) do

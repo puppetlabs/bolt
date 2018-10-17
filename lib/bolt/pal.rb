@@ -57,6 +57,7 @@ module Bolt
 
     # Puppet logging is global so this is class method to avoid confusion
     def self.configure_logging
+      Puppet::Util::Log.destinations.clear
       Puppet::Util::Log.newdestination(Logging.logger['Puppet'])
       # Defer all log level decisions to the Logging library by telling Puppet
       # to log everything
