@@ -112,5 +112,16 @@ describe "when runnning over the ssh transport", ssh: true do
         expect(result.map { |r| r['stdout'].strip }).to eq([user, user])
       end
     end
+
+    it 'runs task with run-as-command', :reset_puppet_settings do
+      config['ssh']['run-as-command'] = ["sudo", "su", "-"]
+
+      with_tempfile_containing('conf', YAML.dump(config)) do |conf|
+        result = run_nodes(%W[command run #{whoami} --configfile #{conf.path}
+                           --tty --sudo-password #{password}] + config_flags)
+        puts result
+        expect(result.map { |r| r['stdout'].strip }).to eq(['root', 'root'])
+      end
+    end
   end
 end
