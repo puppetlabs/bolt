@@ -9,7 +9,6 @@ require 'json'
 require 'io/console'
 require 'logging'
 require 'optparse'
-require 'r10k/action/puppetfile/install'
 require 'bolt/analytics'
 require 'bolt/bolt_option_parser'
 require 'bolt/config'
@@ -20,7 +19,6 @@ require 'bolt/logger'
 require 'bolt/outputter'
 require 'bolt/puppetdb'
 require 'bolt/pal'
-require 'bolt/r10k_log_proxy'
 require 'bolt/target'
 require 'bolt/version'
 
@@ -365,6 +363,9 @@ module Bolt
     end
 
     def install_puppetfile(puppetfile, modulepath)
+      require 'r10k/action/puppetfile/install'
+      require 'bolt/r10k_log_proxy'
+
       if puppetfile.exist?
         moduledir = modulepath.first.to_s
         r10k_config = {

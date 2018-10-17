@@ -6,6 +6,7 @@ require 'bolt_spec/files'
 require 'bolt_spec/task'
 require 'bolt/cli'
 require 'bolt/util'
+require 'r10k/action/puppetfile/install'
 
 describe "Bolt::CLI" do
   include BoltSpec::Files
