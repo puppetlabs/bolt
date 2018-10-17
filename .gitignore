@@ -11,6 +11,7 @@
 /test/tmp/
 /test/version_tmp/
 /tmp/
+/spec/tmp/
 
 ## Documentation cache and generated files:
 .yardoc/

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'bolt_ext/server_acl'
+require 'bolt_server/acl'
 require 'json'
 require 'rack/test'
 
@@ -11,7 +11,7 @@ def x509_certificate(name)
   cert
 end
 
-describe TransportACL do
+describe BoltServer::ACL do
   include Rack::Test::Methods
 
   let(:yes_app) { ->(_) { [200, { 'Content-Type' => 'text/plain' }, ['OK']] } }

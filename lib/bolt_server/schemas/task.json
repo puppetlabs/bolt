@@ -42,6 +42,31 @@
         }
       }
     },
+    "files": {
+      "type": "array",
+      "description": "Description of task files",
+      "items": {
+        "type": "object",
+        "properties": {
+          "uri": {
+            "type": "object",
+            "description": "Where is the file"
+          },
+          "sha256": {
+            "type": "string",
+            "description": "checksum of file"
+          },
+          "filename": {
+            "type": "string",
+            "description": "Name of file"
+          },
+          "size": {
+            "type": "number",
+            "description": "Size of file"
+          }
+        }
+      }
+    },
     "file": {
       "type": "object",
       "description": "File name and content",
@@ -59,6 +84,6 @@
       "additionalProperties": false
     }
   },
-  "required": ["name", "file"],
+  "required": ["name"],
   "additionalProperties": false
 }

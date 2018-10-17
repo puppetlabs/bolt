@@ -212,7 +212,7 @@ describe "apply" do
         result = run_task('puppet_agent::install', conn_uri('winrm'),
                           { 'collection' => 'puppet5' }, config: config)
         expect(result.count).to eq(1)
-        expect(result[0]['status']).to eq('success')
+        expect(result[0]).to include('status' => 'success')
 
         result = run_task('puppet_agent::version', conn_uri('winrm'), config: config)
         expect(result.count).to eq(1)
@@ -225,7 +225,7 @@ describe "apply" do
           results = run_cli_json(%W[task run basic::ruby_task --nodes #{uri}
                                     --configfile #{conf.path}])
           results['items'].each do |result|
-            expect(result['status']).to eq('success')
+            expect(result).to include('status' => 'success')
             expect(result['result']).to eq('ruby' => 'Hi')
           end
         end
@@ -236,7 +236,7 @@ describe "apply" do
           results = run_cli_json(%W[plan run basic::notify --nodes #{uri}
                                     --configfile #{conf.path}])
           results.each do |result|
-            expect(result['status']).to eq('success')
+            expect(result).to include('status' => 'success')
             report = result['result']['report']
             expect(report['resource_statuses']).to include("Notify[Apply: Hi!]")
           end
@@ -247,7 +247,7 @@ describe "apply" do
         is_boltdir = "if (!(Test-Path ~/.puppetlabs)) {echo 'not found'}"
         results = run_command(is_boltdir, conn_uri('winrm'), config: config)
         results.each do |result|
-          expect(result['status']).to eq('success')
+          expect(result).to include('status' => 'success')
           expect(result['result']['stdout']).to match(/not found/)
         end
       end
@@ -262,7 +262,7 @@ describe "apply" do
 
         result = run_task('puppet_agent::version', conn_uri('winrm'), config: config)
         expect(result.count).to eq(1)
-        expect(result[0]['status']).to eq('success')
+        expect(result[0]).to include('status' => 'success')
         expect(result[0]['result']['version']).to match(/^6/)
       end
 
@@ -271,7 +271,7 @@ describe "apply" do
           results = run_cli_json(%W[task run basic::ruby_task --nodes #{uri}
                                     --configfile #{conf.path}])
           results['items'].each do |result|
-            expect(result['status']).to eq('success')
+            expect(result).to include('status' => 'success')
             expect(result['result']).to eq('ruby' => 'Hi')
           end
         end
@@ -282,7 +282,7 @@ describe "apply" do
           results = run_cli_json(%W[plan run basic::notify --nodes #{uri}
                                     --configfile #{conf.path}])
           results.each do |result|
-            expect(result['status']).to eq('success')
+            expect(result).to include('status' => 'success')
             report = result['result']['report']
             expect(report['resource_statuses']).to include("Notify[Apply: Hi!]")
           end
@@ -293,7 +293,7 @@ describe "apply" do
         is_boltdir = "if (!(Test-Path ~/.puppetlabs)) {echo 'not found'}"
         results = run_command(is_boltdir, conn_uri('winrm'), config: config)
         results.each do |result|
-          expect(result['status']).to eq('success')
+          expect(result).to include('status' => 'success')
           expect(result['result']['stdout']).to match(/not found/)
         end
       end

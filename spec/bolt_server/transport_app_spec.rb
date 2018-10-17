@@ -2,16 +2,29 @@
 
 require 'spec_helper'
 require 'bolt_spec/conn'
-require 'bolt_ext/server'
+require 'bolt_server/config'
+require 'bolt_server/transport_app'
 require 'json'
 require 'rack/test'
 
-describe "TransportAPI" do
+describe "BoltServer::TransportApp" do
   include BoltSpec::Conn
   include Rack::Test::Methods
 
   def app
-    TransportAPI
+    config_path = File.join(__dir__, '..', 'fixtures', 'server_configs', 'required-bolt-server.conf')
+    config = BoltServer::Config.new.load_config(config_path)
+    BoltServer::TransportApp.new(config)
+  end
+
+  def file_data(file)
+    { 'uri' => {
+      'path' => "/tasks/#{File.basename(file)}",
+      'params' => { 'param' => 'val' }
+    },
+      'filename' => File.basename(file),
+      'sha256' =>  Digest::SHA256.file(file),
+      'size' => File.size(file) }
   end
 
   it 'responds ok' do
@@ -90,7 +103,7 @@ describe "TransportAPI" do
       expect(last_response).to be_ok
       expect(last_response.status).to eq(200)
       result = JSON.parse(last_response.body)
-      expect(result['status']).to eq('success')
+      expect(result).to include('status' => 'success')
       expect(result['result']['_output'].chomp).to eq('Hello!')
     end
 
@@ -114,7 +127,7 @@ describe "TransportAPI" do
       expect(last_response).to be_ok
       expect(last_response.status).to eq(200)
       result = JSON.parse(last_response.body)
-      expect(result['status']).to eq('success')
+      expect(result).to include('status' => 'success')
       expect(result['result']['_output'].chomp).to eq('Hello!')
     end
   end
@@ -193,7 +206,26 @@ describe "TransportAPI" do
       expect(last_response).to be_ok
       expect(last_response.status).to eq(200)
       result = JSON.parse(last_response.body)
-      expect(result['status']).to eq('success')
+      expect(result).to include('status' => 'success')
+      expect(result['result']['_output'].chomp).to eq('Hello!')
+    end
+    it 'runs an echo task with a file' do
+      body = {
+        'task': echo_task,
+        'target': {
+          'hostname': target[:host],
+          'user': target[:user],
+          'password': target[:password],
+          'port': target[:port]
+        },
+        'parameters': { "message": "Hello!" }
+      }
+
+      post path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json'
+      expect(last_response).to be_ok
+      expect(last_response.status).to eq(200)
+      result = JSON.parse(last_response.body)
+      expect(result).to include('status' => 'success')
       expect(result['result']['_output'].chomp).to eq('Hello!')
     end
   end

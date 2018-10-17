@@ -33,13 +33,20 @@ module Bolt
     end
 
     def file_map
-      @file_map ||= files.each_with_object({}) { |file, hsh| hsh[file['name']] = file['path'] }
+      @file_map ||= files.each_with_object({}) { |file, hsh| hsh[file['name']] = file }
     end
     private :file_map
+
+    # This provides a method we can override in subclasses if the 'path' needs
+    # to be fetched or computed.
+    def file_path(file_name)
+      file_map[file_name]['path']
+    end
 
     # Returns a hash of implementation name, path to executable, input method (if defined),
     # and any additional files (name and path)
     def select_implementation(target, additional_features = [])
+      # TODO: This message isn't correct and this check is probably api only remove it once we require files.
       raise 'select_implementation only supported with multiple files' if files.nil? || files.empty?
 
       impl = if (impls = metadata['implementations'])
@@ -47,7 +54,7 @@ module Bolt
                impl = impls.find { |imp| Set.new(imp['requirements']).subset?(available_features) }
                raise "No suitable implementation of #{name} for #{target.name}" unless impl
                impl = impl.dup
-               impl['path'] = file_map[impl['name']]
+               impl['path'] = file_path(impl['name'])
                impl.delete('requirements')
                impl
              else
@@ -60,15 +67,16 @@ module Bolt
       mfiles = impl.fetch('files', []) + metadata.fetch('files', [])
       dirnames, filenames = mfiles.partition { |file| file.end_with?('/') }
       impl['files'] = filenames.map do |file|
-        path = file_map[file]
+        path = file_path(file)
         raise "No file found for reference #{file}" if path.nil?
         { 'name' => file, 'path' => path }
       end
 
       unless dirnames.empty?
         files.each do |file|
-          if dirnames.any? { |dirname| file['name'].start_with?(dirname) }
-            impl['files'] << file
+          name = file['name']
+          if dirnames.any? { |dirname| name.start_with?(dirname) }
+            impl['files'] << { 'name' => name, 'path' => file_path(name) }
           end
         end
       end

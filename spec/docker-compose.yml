@@ -8,13 +8,22 @@ services:
     container_name: ubuntu_node
   puppet_5_node:
     image:  bolt-spec
-    depends_on: 
+    depends_on:
       - ubuntu_node
     ports:
       - "20023:22"
   puppet_6_node:
     image:  bolt-spec
-    depends_on: 
+    depends_on:
       - ubuntu_node
     ports:
       - "20024:22"
+  puppetserver:
+    build:
+      context: .
+      dockerfile: Dockerfile.puppetserver
+    image: puppet-server
+    ports:
+      - "8140:8140"
+    volumes:
+      - ./fixtures/modules:/etc/puppetlabs/code/modules

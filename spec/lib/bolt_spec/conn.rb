@@ -40,6 +40,10 @@ module BoltSpec
       "#{conn[:protocol]}://#{conn[:user]}#{passwd}@#{conn[:host]}:#{port}"
     end
 
+    def conn_target(transport, include_password: false, options: nil)
+      Bolt::Target.new(conn_uri(transport, include_password: include_password), options)
+    end
+
     def conn_inventory
       groups = %w[ssh winrm].map do |transport|
         { "name" => transport,

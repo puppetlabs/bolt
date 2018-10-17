@@ -162,6 +162,8 @@ module Bolt
         targets.map { |target| [target] }
       end
 
+      # Deprecated this no longer verifies the task is from the API
+      # it instead determines whether the task should use file or files
       def from_api?(task)
         !task.file.nil?
       end
