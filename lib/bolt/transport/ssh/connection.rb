@@ -221,8 +221,9 @@ module Bolt
         def execute(command, sudoable: false, **options)
           result_output = Bolt::Node::Output.new
           run_as = options[:run_as] || self.run_as
-          escalate = sudoable && run_as && @user != run_as
-          use_sudo = escalate && @target.options['run-as-command'].nil?
+          run_as_cmd = @target.options['run-as-command']
+          escalate = sudoable && (run_as || run_as_cmd) && @user != run_as
+          use_sudo = escalate && run_as_cmd.nil?
 
           command_str = command.is_a?(String) ? command : Shellwords.shelljoin(command)
           if escalate
@@ -232,8 +233,7 @@ module Bolt
               sudo_str = Shellwords.shelljoin(sudo_flags)
               command_str = "#{sudo_str} #{command_str}"
             else
-              run_as_str = Shellwords.shelljoin(@target.options['run-as-command'] + [run_as])
-              command_str = "#{run_as_str} #{command_str}"
+              command_str = "#{run_as_cmd} #{command_str}"
             end
           end
 
