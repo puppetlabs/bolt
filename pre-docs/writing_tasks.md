@@ -310,7 +310,7 @@ The `files` property can be included both as a top-level metadata property, and 
 }
 ```
 
-When a task includes the `files` property, all files listed in the top-level property and in the specific implementation chosen for a target will be copied to a temporary directory on that target. The directory structure of the specified files will be preserved such that paths specified with the `files` metadata option will be available to tasks prefixed with `_installdir`.
+When a task includes the `files` property, all files listed in the top-level property and in the specific implementation chosen for a target will be copied to a temporary directory on that target. The directory structure of the specified files will be preserved such that paths specified with the `files` metadata option will be available to tasks prefixed when with the `_installdir` parameter passed to tasks. The task executable itself will be located in its module location under the `_installdir` as well, so other files can be found at `../../mymodule/files/` relatve to the task executable's location.
 
 ### Python Example
 
@@ -318,13 +318,13 @@ When a task includes the `files` property, all files listed in the top-level pro
 
 ```json
 {
-  "files": ["multi_task/files/py_util/py_helper.py"]
+  "files": ["multi_task/files/py_helper.py"]
 }
 ```
 
 #### Files
 
-`multi_task/files/py_util/py_helper.py`
+`multi_task/files/py_helper.py`
 
 ```python
 def useful_python():
@@ -340,7 +340,9 @@ import os
 import json
 
 params = json.load(sys.stdin)
-sys.path.append(os.path.join(params['_installdir'], 'python_helpers', 'files'))
+sys.path.append(os.path.join(params['_installdir'], 'multi_task', 'files'))
+# Alternatively use relative path
+# sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'multi_task', 'files'))
 import py_helper
 
 print(json.dumps(py_helper.useful_python()))
@@ -364,13 +366,13 @@ Ran on 1 node in 0.12 seconds
 
 ```json
 {
-  "files": ["multi_task/files/rb_util/rb_helper.rb"]
+  "files": ["multi_task/files/rb_helper.rb"]
 }
 ```
 
 #### File Resource
 
-`multi_task/files/rb_util/rb_helper.rb`
+`multi_task/files/rb_helper.rb`
 
 ```ruby
 def useful_ruby
@@ -385,7 +387,9 @@ end
 require 'json'
 
 params = JSON.parse(STDIN.read)
-require_relative File.join(params['_installdir'], '/ruby_helpers/files/rb_helper.rb')
+require_relative File.join(params['_installdir'], 'multi_task', 'files', 'rb_helper.rb')
+# Alternatively use relative path
+# require_relative File.join(__dir__, '..', '..', 'multi_task', 'files', 'rb_helper.rb')
 
 puts useful_ruby.to_json
 ```
