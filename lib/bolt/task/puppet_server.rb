@@ -11,18 +11,16 @@ module Bolt
         super(task_data)
       end
 
-      # TODO: currently this both converts filename -> name and fetches files to generate the path
-      # In the future we should not generate paths until after the implementation is selected to avoid
-      # unecessary fetching of files
+      # puppetserver file entries have 'filename' rather then 'name'
       def update_file_data(task_data)
-        if task_data['files']
-          task_data['files'] = task_data['files'].map do |f|
-            { 'name' => f['filename'],
-              'path' => @file_cache.update_file(f) }
-          end
-        end
-
+        task_data['files'].each { |f| f['name'] = f['filename'] }
         task_data
+      end
+
+      # Compute local path and download files from puppetserver as needed
+      def file_path(file_name)
+        file = file_map[file_name]
+        file['path'] ||= @file_cache.update_file(file)
       end
     end
   end

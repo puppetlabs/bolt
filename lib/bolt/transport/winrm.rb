@@ -108,19 +108,10 @@ catch
       end
 
       def run_task(target, task, arguments, _options = {})
-        if from_api?(task)
-          executable = task.file['filename']
-          file_content = StringIO.new(Base64.decode64(task.file['file_content']))
-          input_method = task.metadata['input_method']
-          extra_files = []
-          write_executable = proc { |conn, dir| conn.write_executable_from_content(dir, file_content, executable) }
-        else
-          implementation = task.select_implementation(target, PROVIDED_FEATURES)
-          executable = implementation['path']
-          input_method = implementation['input_method']
-          extra_files = implementation['files']
-          write_executable = proc { |conn, dir| conn.write_remote_executable(dir, executable) }
-        end
+        implementation = task.select_implementation(target, PROVIDED_FEATURES)
+        executable = implementation['path']
+        input_method = implementation['input_method']
+        extra_files = implementation['files']
         input_method ||= powershell_file?(executable) ? 'powershell' : 'both'
 
         # unpack any Sensitive data
@@ -139,7 +130,7 @@ catch
               end
             end
 
-            remote_task_path = write_executable.call(conn, task_dir)
+            remote_task_path = conn.write_remote_executable(task_dir, executable)
 
             if STDIN_METHODS.include?(input_method)
               stdin = JSON.dump(arguments)
