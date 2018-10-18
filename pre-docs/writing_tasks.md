@@ -174,7 +174,7 @@ Each task or plan name segment must begin with a lowercase letter and:
 
 -   May include underscores.
 
--   Namespace segments must match the following regular expression `\A[a-z][a-z0-9_]*\Z` 
+-   Namespace segments must match the following regular expression `\A[a-z][a-z0-9_]*\Z`
 
 -   The file extension must not use the reserved extensions .md or .json.
 
@@ -195,7 +195,7 @@ A task can also have multiple implementations, with metadata that explains when 
   - sql.json
 ```
 
-This task has two executables \(sql_linux.sh and sql_windows.ps1\), each with an implementation metadata file, and a task metadata file. The executables have distinct names, so that they can be used with older task runners such as Puppet Enterprise before 2019. Each implementation should have it's own metadata which either documents how to use the implementation directly or marks it as private to hide it from UI lists.
+This task has two executables \(`sql_linux.sh` and `sql_windows.ps1`\), each with an implementation metadata file and a task metadata file. The executables have distinct names and are compatible with older task runners such as Puppet Enterprise 2018.1 and earlier. Each implementation has it's own metadata which documents how to use the implementation directly or marks it as private to hide it from UI lists.
 
 An implementation metadata example:
 
@@ -207,7 +207,7 @@ An implementation metadata example:
 }
 ```
 
-The task metadata file contains an implementations section:
+The task metadata file contains an implementations section:
 
 ```
 {
@@ -218,15 +218,15 @@ The task metadata file contains an implementations section:
 }
 ```
 
-Each implementations has a `name` and a list of `requirements`. The requirements are the set of *features* which must be available on the target in order for that implementation to be used. In this case, the `sql_linux.sh` implementation requires the `shell` feature, and the `sql_windows.ps1` implementations requires the powershell feature.
+Each implementations has a `name` and a list of `requirements`. The requirements are the set of *features* which must be available on the target in order for that implementation to be used. In this case, the `sql_linux.sh` implementation requires the `shell` feature, and the `sql_windows.ps1` implementations requires the PowerShell feature.
 
 The set of features available on the target is determined by the task runner. You can specify additional features for a target via `set_feature` or by adding `features` in the inventory. The task runner will choose the *first *implementation whose requirements are satisfied.
 
 The following features are defined by default:
 
--    `puppet-agent`: present if the target has the puppet agent package installed
--    `shell`: present if the target has a posix shell
--    `powershell`: present if the target has powershell
+-   `puppet-agent`: present if the target has the puppet agent package installed
+-   `shell`: present if the target has a posix shell
+-   `powershell`: present if the target has powershell
 
 ## Sharing executables
 
@@ -292,14 +292,16 @@ myservice/tasks/stop.json
 
 Multiple tasks can share common files between them. Tasks can additionally pull library code from other modules.
 
-To create a task that includes additional files pulled from modules, include the `files` property in your metadata as an array of paths. A path consists of
-- the module name
-- one of `lib`, `files`, or `tasks` for the directory within the module
-- the remaining path to a file or directory; directories must include a trailing slash `/`
+To create a task that includes additional files pulled from modules, include the files property in your metadata as an array of paths. A path consists of:
 
-All path separators must be forward slashes. An example would be `stdlib/lib/puppet/`.
+-   the module name
+-   one of `lib`, `files`, or `tasks` for the directory within the module
+-   the remaining path to a file or directory; directories must include a trailing slash `/` 
 
-The `files` property can be included both as a top-level metadata property, and as a property of an implementation, for example
+All path separators must be forward slashes. An example would be `stdlib/lib/puppet/`.
+
+The `files` property can be included both as a top-level metadata property, and as a property of an implementation, for example:
+
 ```
 {
   "implementations": [
@@ -310,30 +312,30 @@ The `files` property can be included both as a top-level metadata property, and 
 }
 ```
 
-When a task includes the `files` property, all files listed in the top-level property and in the specific implementation chosen for a target will be copied to a temporary directory on that target. The directory structure of the specified files will be preserved such that paths specified with the `files` metadata option will be available to tasks prefixed when with the `_installdir` parameter passed to tasks. The task executable itself will be located in its module location under the `_installdir` as well, so other files can be found at `../../mymodule/files/` relatve to the task executable's location.
+When a task includes the `files` property, all files listed in the top-level property and in the specific implementation chosen for a target will be copied to a temporary directory on that target. The directory structure of the specified files will be preserved such that paths specified with the `files` metadata option will be available to tasks prefixed with `_installdir`. The task executable itself will be located in its module location under the `_installdir` as well, so other files can be found at `../../mymodule/files/` relatve to the task executable's location.
 
 ### Python Example
 
-#### Metadata
+ **Metadata** 
 
-```json
+```
 {
   "files": ["multi_task/files/py_helper.py"]
 }
 ```
 
-#### Files
+ **File Resource** 
 
 `multi_task/files/py_helper.py`
 
-```python
+```
 def useful_python():
   return dict(helper="python")
 ```
 
-#### Task
+ **Task** 
 
-```python
+```
 #!/usr/bin/env python
 import sys
 import os
@@ -348,7 +350,7 @@ import py_helper
 print(json.dumps(py_helper.useful_python()))
 ```
 
-#### Output
+ **Output** 
 
 ```
 Started on localhost...
@@ -362,27 +364,27 @@ Ran on 1 node in 0.12 seconds
 
 ### Ruby Example
 
-#### Metadata
+ **Metadata** 
 
-```json
+```
 {
   "files": ["multi_task/files/rb_helper.rb"]
 }
 ```
 
-#### File Resource
+ **File Resource** 
 
 `multi_task/files/rb_helper.rb`
 
-```ruby
+```
 def useful_ruby
   { helper: "ruby" }
 end
 ```
 
-#### Task
+ **Task** 
 
-```ruby
+```
 #!/usr/bin/env ruby
 require 'json'
 
@@ -394,7 +396,7 @@ require_relative File.join(params['_installdir'], 'multi_task', 'files', 'rb_hel
 puts useful_ruby.to_json
 ```
 
-#### Output
+ **Output** 
 
 ```
 Started on localhost...
@@ -766,8 +768,17 @@ The following table shows task metadata keys, values, and default values.
 |Metadata key|Description|Value|Default|
 |------------|-----------|-----|-------|
 |"description"|A description of what the task does.|String|None|
-|"input\_method"|What input method the task runner should use to pass parameters to the task.| `environment`, `stdin`, `powershell`| Both `environment` and `stdin` unless `.ps1` tasks in which case `powershell`. |
-|"parameters"|The parameters or input the task accepts listed with a puppet type string and optional description. See [adding parameters to metadata](writing_tasks.md#) for usage information.|String describing the parameter |None|
+|"input\_method"|What input method the task runner should use to pass parameters to the task.| -    `environment` 
+
+-    `stdin` 
+
+-    `powershell` 
+
+
+ | Both `environment` and `stdin` unless `.ps1` tasks, in which case `powershell`
+
+ |
+|"parameters"|The parameters or input the task accepts listed with a puppet type string and optional description. See [adding parameters to metadata](writing_tasks.md#) for usage information.|String describing the parameter|None|
 |"puppet\_task\_version"|The version of the spec used.|Integer|1 \(This is the only valid value.\)|
 |"supports\_noop"|Whether the task supports no-op mode. Required for the task to accept the `--noop` option on the command line.|Boolean|False|
 |"private"|Do not display task by default when listing for UI.|Boolean|False|

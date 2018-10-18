@@ -2,7 +2,15 @@
 
 Security and bug fixes in the Bolt 1.x release series.
 
-## Loading bolt/executor is "breaking" gettext setup in spec tests
+## Error when puppet\_agent task not run as root \(1.1.0\)
+
+The puppet\_agent task now checks that it is run as root. When run as another user, it prints and fails with a helpful message. \([BOLT-878](https://tickets.puppetlabs.com/browse/BOLT-914)\)
+
+## Bolt suppresses errors from transport \(1.1.0\)
+
+Previously, Bolt suppressed some exception errors thrown by transports. For example, when the ed25519 gem was not present for an Net::SSH process, the NotImplementedError for ed25519 keys would not appear. These errors are now identified and displayed. \([BOLT-922](https://tickets.puppetlabs.com/browse/BOLT-922)\)
+
+## Loading bolt/executor is "breaking" gettext setup in spec tests \(1.0.0\)
 
 When Bolt is used as a library, it no longer loads code from r10k unless you explicitly `require 'bolt/cli'`.\([BOLT-914](https://tickets.puppetlabs.com/browse/BOLT-914)\)
 
