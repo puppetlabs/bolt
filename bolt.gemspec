@@ -31,6 +31,7 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = "~> 2.3"
 
   spec.add_dependency "addressable", '~> 2.5'
+  spec.add_dependency "CFPropertyList", "~> 2.2"
   spec.add_dependency "concurrent-ruby", "~> 1.0"
   spec.add_dependency "logging", "~> 2.2"
   spec.add_dependency "minitar", "~> 0.6"

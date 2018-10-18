@@ -693,6 +693,7 @@ PS
           end
 
           files = winrm.run_task(target, task, arguments).message.split("\n")
+          expected_files = ["tasks/#{File.basename(task['files'][0]['path'])}"] + expected_files
           expect(files.count).to eq(expected_files.count)
           files.sort.zip(expected_files.sort).each do |file, expected_file|
             expect(file.strip).to eq("tasks_test\\#{expected_file.gsub(%r{/}, '\\')}")
@@ -713,10 +714,11 @@ PS
           task['files'] << { 'name' => 'tasks_test/files/no', 'path' => task['files'][0]['path'] }
 
           files = winrm.run_task(target, task, arguments).message.split("\n").sort
-          expect(files.count).to eq(3)
+          expect(files.count).to eq(4)
           expect(files[0].strip).to eq("other_mod\\lib\\puppet_x\\a.rb")
           expect(files[1].strip).to eq("other_mod\\lib\\puppet_x\\b.rb")
           expect(files[2].strip).to eq("tasks_test\\files\\yes")
+          expect(files[3].strip).to eq("tasks_test\\tasks\\#{File.basename(task['files'][0]['path'])}")
         end
       end
     end

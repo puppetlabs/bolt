@@ -32,6 +32,14 @@ module Bolt
       metadata['supports_noop']
     end
 
+    def module_name
+      name.split('::').first
+    end
+
+    def tasks_dir
+      File.join(module_name, 'tasks')
+    end
+
     def file_map
       @file_map ||= files.each_with_object({}) { |file, hsh| hsh[file['name']] = file }
     end
