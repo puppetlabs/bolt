@@ -316,47 +316,44 @@ When a task includes the `files` property, all files listed in the top-level p
 
 ### Python Example
 
+Bolt includes [python_task_helper](https://github.com/puppetlabs/puppetlabs-python_task_helper) to simplify writing tasks. It also makes a useful demonstration of including code from another module.
+
+Create task and metadata in a new module at `~/.puppetlabs/bolt/site/mymodule/tasks/task.{json,py}`.
+
  **Metadata** 
 
 ```
 {
-  "files": ["multi_task/files/py_helper.py"]
+  "files": ["python_task_helper/lib/task_helper.py"],
+  "input_method": "stdin"
 }
-```
-
- **File Resource** 
-
-`multi_task/files/py_helper.py`
-
-```
-def useful_python():
-  return dict(helper="python")
 ```
 
  **Task** 
 
 ```
 #!/usr/bin/env python
-import sys
-import os
-import json
 
-params = json.load(sys.stdin)
-sys.path.append(os.path.join(params['_installdir'], 'multi_task', 'files'))
-# Alternatively use relative path
-# sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'multi_task', 'files'))
-import py_helper
+import os, sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'python_task_helper', 'lib'))
+from task_helper import TaskHelper
 
-print(json.dumps(py_helper.useful_python()))
+class MyTask(TaskHelper):
+    def task(self, args):
+        return {'greeting': 'Hi, my name is '+args['name']}
+
+if __name__ == '__main__':
+    MyTask().run()
 ```
 
  **Output** 
 
 ```
+$ bolt task run mymodule::task -n localhost name='Julia'
 Started on localhost...
 Finished on localhost:
   {
-    "helper": "python"
+    "greeting": "Hi, my name is Julia"
   }
 Successful on 1 node: localhost
 Ran on 1 node in 0.12 seconds
