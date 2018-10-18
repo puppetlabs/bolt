@@ -86,7 +86,7 @@ The Puppet repository for the APT package management system is [https://apt.pupp
 
 **Note:** These packages require you to download the Puppet 6 Platform. To install only the Bolt package you can install the packages directly as well.
 
-1.  Download and install the software and its dependencies. Use the commands appropriate to your system.
+1.   Download and install the software and its dependencies. Use the commands appropriate to your system. 
     -    Debian 8
 
         ```
@@ -120,6 +120,15 @@ The Puppet repository for the APT package management system is [https://apt.pupp
         ```
         wget https://apt.puppet.com/puppet6-release-xenial.deb
         sudo dpkg -i puppet6-release-xenial.deb
+        sudo apt-get update 
+        sudo apt-get install puppet-bolt
+        ```
+
+    -    Ubuntu 18.04
+
+        ```
+        wget https://apt.puppet.com/puppet6-release-bionic.deb
+        sudo dpkg -i puppet6-release-bionic.deb
         sudo apt-get update 
         sudo apt-get install puppet-bolt
         ```
