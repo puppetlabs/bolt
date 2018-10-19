@@ -1,19 +1,24 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'bolt_spec/bolt_server'
 require 'bolt_spec/conn'
+require 'bolt_spec/file_cache'
 require 'bolt_server/config'
 require 'bolt_server/transport_app'
 require 'json'
 require 'rack/test'
 
 describe "BoltServer::TransportApp" do
+  include BoltSpec::BoltServer
   include BoltSpec::Conn
+  include BoltSpec::FileCache
   include Rack::Test::Methods
 
   def app
-    config_path = File.join(__dir__, '..', 'fixtures', 'server_configs', 'required-bolt-server.conf')
-    config = BoltServer::Config.new.load_config(config_path)
+    moduledir = File.join(__dir__, '..', 'fixtures', 'modules')
+    mock_file_cache(moduledir)
+    config = BoltServer::Config.new(default_config)
     BoltServer::TransportApp.new(config)
   end
 
@@ -38,15 +43,16 @@ describe "BoltServer::TransportApp" do
     let(:path) { '/ssh/run_task' }
     let(:echo_task) {
       {
-        'name': 'echo',
+        'name': 'sample::echo',
         'metadata': {
           'description': 'Echo a message',
           'parameters': { 'message': 'Default message' }
         },
-        'file': {
-          'file_content': Base64.encode64("#!/usr/bin/env bash\necho $PT_message"),
-          'filename': "echo.sh"
-        }
+        files: [{
+          filename: "echo.sh",
+          sha256: "foo",
+          uri: {}
+        }]
       }
     }
 
@@ -98,19 +104,17 @@ describe "BoltServer::TransportApp" do
         },
         'parameters': { "message": "Hello!" }
       }
-
       post path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json'
       expect(last_response).to be_ok
       expect(last_response.status).to eq(200)
       result = JSON.parse(last_response.body)
       expect(result).to include('status' => 'success')
-      expect(result['result']['_output'].chomp).to eq('Hello!')
+      expect(result['result']['_output']).to match(/got passed the message: Hello!/)
     end
 
     it 'runs an echo task using a private key' do
       private_key = ENV['BOLT_SSH_KEY'] || Dir["spec/fixtures/keys/id_rsa"][0]
       private_key_content = File.read(private_key)
-
       body = {
         'task': echo_task,
         'target': {
@@ -122,13 +126,12 @@ describe "BoltServer::TransportApp" do
         },
         'parameters': { "message": "Hello!" }
       }
-
       post path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json'
       expect(last_response).to be_ok
       expect(last_response.status).to eq(200)
       result = JSON.parse(last_response.body)
       expect(result).to include('status' => 'success')
-      expect(result['result']['_output'].chomp).to eq('Hello!')
+      expect(result['result']['_output']).to match(/got passed the message: Hello!/)
     end
   end
 
@@ -137,15 +140,17 @@ describe "BoltServer::TransportApp" do
     let(:path) { '/winrm/run_task' }
     let(:echo_task) {
       {
-        'name': 'echo',
-        'metadata': {
-          'description': 'Echo a message',
-          'parameters': { 'message': 'Default message' }
+        name: 'sample::wininput',
+        metadata: {
+          description: 'Echo a message',
+          input_method: 'stdin'
         },
-        'file': {
-          'file_content': Base64.encode64("param ($message)\nWrite-Output \"$message\""),
-          'filename': "echo.ps1"
-        }
+        files: [{
+          filename: "wininput.ps1",
+          sha256: "foo",
+          uri: {}
+        }]
+
       }
     }
 
@@ -156,8 +161,7 @@ describe "BoltServer::TransportApp" do
           'hostname': target[:host],
           'user': target[:user],
           'port': target[:port]
-        },
-        'parameters': { "message": "Hello!" }
+        }
       }
 
       post path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json'
@@ -177,7 +181,7 @@ describe "BoltServer::TransportApp" do
           'port': "port",
           'connect-timeout': "timeout"
         },
-        'parameters': { "message": "Hello!" }
+        'parameters': { "input": "Hello!" }
       }
 
       post path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json'
@@ -199,34 +203,14 @@ describe "BoltServer::TransportApp" do
           'password': target[:password],
           'port': target[:port]
         },
-        'parameters': { "message": "Hello!" }
+        'parameters': { "input": "Hello!" }
       }
-
       post path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json'
       expect(last_response).to be_ok
       expect(last_response.status).to eq(200)
       result = JSON.parse(last_response.body)
       expect(result).to include('status' => 'success')
-      expect(result['result']['_output'].chomp).to eq('Hello!')
-    end
-    it 'runs an echo task with a file' do
-      body = {
-        'task': echo_task,
-        'target': {
-          'hostname': target[:host],
-          'user': target[:user],
-          'password': target[:password],
-          'port': target[:port]
-        },
-        'parameters': { "message": "Hello!" }
-      }
-
-      post path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json'
-      expect(last_response).to be_ok
-      expect(last_response.status).to eq(200)
-      result = JSON.parse(last_response.body)
-      expect(result).to include('status' => 'success')
-      expect(result['result']['_output'].chomp).to eq('Hello!')
+      expect(result['result']['_output']).to match(/INPUT.*Hello!/)
     end
   end
 

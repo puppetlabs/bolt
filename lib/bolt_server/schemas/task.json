@@ -65,25 +65,10 @@
             "description": "Size of file"
           }
         }
-      }
-    },
-    "file": {
-      "type": "object",
-      "description": "File name and content",
-      "properties": {
-        "filename": {
-          "type": "string",
-          "description": "Name of the task file"
-        },
-        "file_content": {
-          "type": "string",
-          "description": "Task's base64 encoded file content"
-        }
       },
-      "required": ["filename", "file_content"],
-      "additionalProperties": false
+      "required": ["filename", "uri", "sha256"]
     }
   },
-  "required": ["name"],
+  "required": ["name", "files"],
   "additionalProperties": false
 }

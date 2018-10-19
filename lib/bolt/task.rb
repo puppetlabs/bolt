@@ -54,9 +54,6 @@ module Bolt
     # Returns a hash of implementation name, path to executable, input method (if defined),
     # and any additional files (name and path)
     def select_implementation(target, additional_features = [])
-      # TODO: This message isn't correct and this check is probably api only remove it once we require files.
-      raise 'select_implementation only supported with multiple files' if files.nil? || files.empty?
-
       impl = if (impls = metadata['implementations'])
                available_features = target.features + additional_features
                impl = impls.find { |imp| Set.new(imp['requirements']).subset?(available_features) }
@@ -66,7 +63,8 @@ module Bolt
                impl.delete('requirements')
                impl
              else
-               files.first.dup
+               name = files.first['name']
+               { 'name' => name, 'path' => file_path(name) }
              end
 
       inmethod = impl['input_method'] || metadata['input_method']

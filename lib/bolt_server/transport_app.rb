@@ -25,11 +25,7 @@ module BoltServer
 
       @executor = Bolt::Executor.new(0, load_config: false)
 
-      # TODO: remove conditional one we require config
-      if config.file_server_uri
-        @file_cache = BoltServer::FileCache.new(@config)
-        @file_cache.setup
-      end
+      @file_cache = BoltServer::FileCache.new(@config).setup
 
       super(nil)
     end
@@ -68,12 +64,7 @@ module BoltServer
 
       target = [Bolt::Target.new(body['target']['hostname'], opts)]
 
-      # Remove once orchestrator is updated to always send files
-      task = if body['task']['files']
-               Bolt::Task::PuppetServer.new(body['task'], @file_cache)
-             else
-               Bolt::Task.new(body['task'])
-             end
+      task = Bolt::Task::PuppetServer.new(body['task'], @file_cache)
 
       parameters = body['parameters'] || {}
 
@@ -93,12 +84,7 @@ module BoltServer
 
       target = [Bolt::Target.new(body['target']['hostname'], opts)]
 
-      # Remove once orchestrator is updated to always send files
-      task = if body['task']['files']
-               Bolt::Task::PuppetServer.new(body['task'], @file_cache)
-             else
-               Bolt::Task.new(body['task'])
-             end
+      task = Bolt::Task::PuppetServer.new(body['task'], @file_cache)
 
       parameters = body['parameters'] || {}
 

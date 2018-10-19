@@ -162,12 +162,6 @@ module Bolt
         targets.map { |target| [target] }
       end
 
-      # Deprecated this no longer verifies the task is from the API
-      # it instead determines whether the task should use file or files
-      def from_api?(task)
-        !task.file.nil?
-      end
-
       # Transports should override this method with their own implementation of running a command.
       def run_command(*_args)
         raise NotImplementedError, "run_command() must be implemented by the transport class"

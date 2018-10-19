@@ -7,7 +7,7 @@ module BoltServer
   class Config
     CONFIG_KEYS = ['host', 'port', 'ssl-cert', 'ssl-key', 'ssl-ca-cert',
                    'ssl-cipher-suites', 'loglevel', 'logfile', 'whitelist', 'concurrency',
-                   'cache-dir', 'file-server-uri'].freeze
+                   'cache-dir', 'file-server-conn-timeout', 'file-server-uri'].freeze
 
     DEFAULTS = {
       'host' => '127.0.0.1',
@@ -24,7 +24,8 @@ module BoltServer
                               'ECDHE-RSA-AES128-SHA256'],
       'loglevel' => 'notice',
       'concurrency' => 100,
-      'cache-dir' => "/opt/puppetlabs/server/data/bolt-server/cache"
+      'cache-dir' => "/opt/puppetlabs/server/data/bolt-server/cache",
+      'file-server-conn-timeout' => 120
     }.freeze
 
     CONFIG_KEYS.each do |key|
@@ -58,17 +59,20 @@ module BoltServer
       self
     end
 
+    def natural?(num)
+      num.is_a?(Integer) && num.positive?
+    end
+
     def validate
-      # TODO: require file_server_uri once pl-pe code is in place
-      required_keys = ['ssl-cert', 'ssl-key', 'ssl-ca-cert']
-      ssl_keys = required_keys
+      ssl_keys = ['ssl-cert', 'ssl-key', 'ssl-ca-cert']
+      required_keys = ssl_keys + ['file-server-uri']
 
       required_keys.each do |k|
         next unless @data[k].nil?
         raise Bolt::ValidationError, "You must configure #{k} in #{@config_path}"
       end
 
-      unless port.is_a?(Integer) && port > 0
+      unless natural?(port)
         raise Bolt::ValidationError, "Configured 'port' must be a valid integer greater than 0"
       end
       ssl_keys.each do |sk|
@@ -85,8 +89,12 @@ module BoltServer
         raise Bolt::ValidationError, "Configured 'whitelist' must be an array of names"
       end
 
-      unless concurrency.is_a?(Integer) && concurrency.positive?
+      unless natural?(concurrency)
         raise Bolt::ValidationError, "Configured 'concurrency' must be a positive integer"
+      end
+
+      unless natural?(file_server_conn_timeout)
+        raise Bolt::ValidationError, "Configured 'file-server-conn-timeout' must be a positive integer"
       end
     end
 
