@@ -33,11 +33,11 @@ module Bolt
       end
     end
 
-    def generate_ast(code)
+    def generate_ast(code, filename = nil)
       with_puppet_settings do
         Puppet::Pal.in_tmp_environment("bolt_parse") do |pal|
           pal.with_catalog_compiler do |compiler|
-            ast = compiler.parse_string(code)
+            ast = compiler.parse_string(code, filename)
             Puppet::Pops::Serialization::ToDataConverter.convert(ast,
                                                                  rich_data: true,
                                                                  symbol_to_string: true)

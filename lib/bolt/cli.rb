@@ -189,6 +189,10 @@ module Bolt
         raise Bolt::CLIError,
               "Option '--noop' may only be specified when running a task"
       end
+
+      if options[:subcommand] == 'apply' && (options[:object] && options[:code])
+        raise Bolt::CLIError, "--execute is unsupported when specifying a manifest file"
+      end
     end
 
     def handle_parser_errors
@@ -264,7 +268,11 @@ module Bolt
       when 'puppetfile'
         code = install_puppetfile(@config.puppetfile, @config.modulepath)
       when 'apply'
-        code = apply_manifest(options[:object], options[:targets])
+        if options[:object]
+          validate_file('manifest', options[:object])
+          options[:code] = File.read(File.expand_path(options[:object]))
+        end
+        code = apply_manifest(options[:code], options[:targets], options[:object])
       else
         executor = Bolt::Executor.new(config.concurrency, @analytics, options[:noop], bundled_content: bundled_content)
         targets = options[:targets]
@@ -371,10 +379,13 @@ module Bolt
       result.ok? ? 0 : 1
     end
 
-    def apply_manifest(manifest, targets)
+    def apply_manifest(code, targets, filename = nil)
       require 'bolt/catalog'
-      code = File.read(File.expand_path(manifest))
-      ast = Bolt::Catalog.new('err').generate_ast(code)
+      begin
+        ast = Bolt::Catalog.new('crit').generate_ast(code, filename)
+      rescue Puppet::Error => e
+        raise Bolt::PAL::PALError, "Failed to parse manifest: #{e}"
+      end
 
       executor = Bolt::Executor.new(config.concurrency, @analytics, options[:noop], bundled_content: bundled_content)
       # Call start_plan just to enable plan_logging

@@ -158,6 +158,10 @@ Usage: bolt apply <manifest.pp> [options]
              "Parameters to a task or plan as json, a json file '@<file>', or on stdin '-'") do |params|
         @options[:task_options] = parse_params(params)
       end
+      @execute = define('-e', '--execute CODE',
+                        "Puppet manifest code to apply to the targets") do |code|
+        @options[:code] = code
+      end.extend(SwitchHider)
 
       separator 'Authentication:'
       define('-u', '--user USER', 'User to authenticate as') do |user|
@@ -278,6 +282,8 @@ Usage: bolt apply <manifest.pp> [options]
     def update
       # show the --nodes and --query switches by default
       @nodes.hide = @query.hide = false
+      # Don't show the --execute switch except for `apply`
+      @execute.hide = true
 
       # Update the banner according to the subcommand
       self.banner = case @options[:subcommand]
@@ -296,6 +302,7 @@ Usage: bolt apply <manifest.pp> [options]
                     when 'puppetfile'
                       PUPPETFILE_HELP
                     when 'apply'
+                      @execute.hide = false
                       APPLY_HELP
                     else
                       BANNER

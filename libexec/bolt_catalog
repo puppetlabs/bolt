@@ -34,7 +34,7 @@ require 'json'
 command = ARGV[0]
 if command == "parse"
   code = File.open(ARGV[1], &:read)
-  puts JSON.pretty_generate(Bolt::Catalog.new.generate_ast(code))
+  puts JSON.pretty_generate(Bolt::Catalog.new.generate_ast(code, ARGV[1]))
 elsif command == "compile"
   request = if ARGV[1]
               File.open(ARGV[1]) { |fh| JSON.parse(fh.read) }
