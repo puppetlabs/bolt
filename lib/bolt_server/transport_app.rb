@@ -89,11 +89,17 @@ module BoltServer
       schema_error = JSON::Validator.fully_validate(@schemas["winrm-run_task"], body)
       return [400, schema_error.join] if schema_error.any?
 
-      keys = %w[user password port connect-timeout ssl ssl-verify tmpdir cacert extensions]
-      opts = body['target'].select { |k, _| keys.include? k }
-      opts['protocol'] = 'winrm'
+      opts = body['target'].merge('protocol' => 'winrm')
+
       target = [Bolt::Target.new(body['target']['hostname'], opts)]
-      task = Bolt::Task.new(body['task'])
+
+      # Remove once orchestrator is updated to always send files
+      task = if body['task']['files']
+               Bolt::Task::PuppetServer.new(body['task'], @file_cache)
+             else
+               Bolt::Task.new(body['task'])
+             end
+
       parameters = body['parameters'] || {}
 
       # Since this will only be on one node we can just return the first result
