@@ -29,7 +29,7 @@ module BoltServer
       @cache_dir = config.cache_dir
       @config = config
       @logger = Logging.logger[self]
-      @cache_dir_mutex = Mutex.new
+      @cache_dir_mutex = Concurrent::ReadWriteLock.new
 
       @purge = Concurrent::TimerTask.new(execution_interval: purge_interval,
                                          timeout_interval: purge_timeout,
@@ -116,7 +116,7 @@ module BoltServer
     # mtime in a single place than with a file in a directory that may not exist.
     def create_cache_dir(sha)
       file_dir = File.join(@cache_dir, sha)
-      @cache_dir_mutex.synchronize do
+      @cache_dir_mutex.with_read_lock do
         # mkdir_p doesn't error if the file exists
         FileUtils.mkdir_p(file_dir, mode: 0o750)
         FileUtils.touch(file_dir)
@@ -164,7 +164,7 @@ module BoltServer
 
     def expire(purge_ttl)
       expired_time = Time.now - purge_ttl
-      @cache_dir_mutex.synchronize do
+      @cache_dir_mutex.with_write_lock do
         Dir.glob(File.join(@cache_dir, '*')).select { |f| File.directory?(f) }.each do |dir|
           if (mtime = File.mtime(dir)) < expired_time
             @logger.debug("Removing #{dir}, last used at #{mtime}")
