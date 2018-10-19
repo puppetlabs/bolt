@@ -775,9 +775,11 @@ The following table shows task metadata keys, values, and default values.
  | Both `environment` and `stdin` unless `.ps1` tasks, in which case `powershell`
 
  |
-|"parameters"|The parameters or input the task accepts listed with a puppet type string and optional description. See [adding parameters to metadata](writing_tasks.md#) for usage information.|String describing the parameter|None|
+|"parameters"|The parameters or input the task accepts listed with a puppet type string and optional description. See [adding parameters to metadata](writing_tasks.md#) for usage information.|Array of Objects describing each parameter|None|
 |"puppet\_task\_version"|The version of the spec used.|Integer|1 \(This is the only valid value.\)|
 |"supports\_noop"|Whether the task supports no-op mode. Required for the task to accept the `--noop` option on the command line.|Boolean|False|
+|"implementations"|A list of task implementations and the requirements used to select one to run. See [tasks with multiple implementations](writing_tasks.md#) for usage information.|Array of Objects describing each implementation|None|
+|"files"|A list of files to be provided when running the task, addressed by module. See [sharing task code](writing_tasks.md#) for usage information.|Array of Strings|None|
 |"private"|Do not display task by default when listing for UI.|Boolean|False|
 
 ### Task metadata types
