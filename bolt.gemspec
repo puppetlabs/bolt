@@ -41,7 +41,18 @@ Gem::Specification.new do |spec|
   spec.add_dependency "puppet", [">= 6.0.1", "< 7"]
   spec.add_dependency "r10k", "~> 2.6"
   spec.add_dependency "terminal-table", "~> 1.8"
-  spec.add_dependency "winrm", "~> 2.0"
+
+  # Winrm 2.3.x requires Ruby 2.2.0 or greater, so require an earlier version for lesser rubies
+  begin
+    if RUBY_VERSION < "2.2.0"
+      spec.add_dependency "winrm", "= 2.2.3"
+    else
+      spec.add_dependency "winrm", "~> 2.0"
+    end
+  rescue
+    exit(1)
+  end
+
   spec.add_dependency "winrm-fs", "~> 1.3"
 
   # there is a bug in puppetlabs_spec_helper for modules without fixtures
