@@ -89,7 +89,7 @@ module BoltServer
           end
         end
       rescue StandardError => e
-        if e.is_a(Bolt::Error)
+        if e.is_a?(Bolt::Error)
           raise e
         else
           @logger.warn e
