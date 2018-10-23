@@ -380,12 +380,7 @@ module Bolt
     end
 
     def apply_manifest(code, targets, filename = nil)
-      require 'bolt/catalog'
-      begin
-        ast = Bolt::Catalog.new('crit').generate_ast(code, filename)
-      rescue Puppet::Error => e
-        raise Bolt::PAL::PALError, "Failed to parse manifest: #{e}"
-      end
+      ast = pal.parse_manifest(code, filename)
 
       executor = Bolt::Executor.new(config.concurrency, @analytics, options[:noop], bundled_content: bundled_content)
       # Call start_plan just to enable plan_logging

@@ -177,6 +177,15 @@ module Bolt
       end
     end
 
+    # Parses a snippet of Puppet manifest code and returns the AST represented
+    # in JSON.
+    def parse_manifest(code, filename)
+      raw_ast = Puppet::Pops::Parser::EvaluatingParser.new.parse_string(code, filename)
+      Puppet::Pops::Serialization::ToDataConverter.convert(raw_ast, rich_data: true, symbol_to_string: true)
+    rescue Puppet::Error => e
+      raise Bolt::PAL::PALError, "Failed to parse manifest: #{e}"
+    end
+
     def list_tasks
       in_bolt_compiler do |compiler|
         tasks = compiler.list_tasks

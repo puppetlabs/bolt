@@ -12,6 +12,21 @@ describe Bolt::PAL do
   end
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
 
+  describe :parse_manifest do
+    let(:pal) { Bolt::PAL.new(nil, nil) }
+
+    it "should parse a manifest string" do
+      ast = pal.parse_manifest('notify { "hello world": }', 'test.pp')
+      expect(ast).to be_a(Hash)
+      expect(ast['__ptype']).to eq('Puppet::AST::Program')
+    end
+
+    it "should convert puppet errors to pal errors" do
+      expect { pal.parse_manifest('notify { "hello world" }', 'test.pp') }
+        .to raise_error(Bolt::PAL::PALError, /Failed to parse manifest.*test.pp/)
+    end
+  end
+
   describe :parse_param do
     let(:metadata) do
       { parameters: {
