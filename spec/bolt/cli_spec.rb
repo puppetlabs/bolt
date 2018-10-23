@@ -1761,6 +1761,29 @@ bar
         expect(output.string).to be_empty
       end
     end
+
+    describe "applying Puppet code" do
+      let(:options) {
+        {
+          subcommand: 'apply'
+        }
+      }
+      let(:output) { StringIO.new }
+      let(:cli) { Bolt::CLI.new([]) }
+
+      before :each do
+        allow(cli).to receive(:outputter).and_return(Bolt::Outputter::JSON.new(false, false, output))
+      end
+
+      it 'fails if the code file does not exist' do
+        manifest = Tempfile.new
+        options[:object] = manifest.path
+        manifest.close
+        manifest.delete
+        expect(cli).not_to receive(:apply_manifest)
+        expect { cli.execute(options) }.to raise_error(Bolt::FileError)
+      end
+    end
   end
 
   describe 'configfile' do
