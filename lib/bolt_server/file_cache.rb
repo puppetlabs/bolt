@@ -105,7 +105,7 @@ module BoltServer
     end
 
     def serial_execute(&block)
-      promise = Concurrent::Promise.new(exector: @executor, &block).execute.wait
+      promise = Concurrent::Promise.new(executor: @executor, &block).execute.wait
       raise promise.reason if promise.state == :rejected
       promise.value
     end
