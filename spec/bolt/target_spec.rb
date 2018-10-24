@@ -102,6 +102,16 @@ describe Bolt::Target do
     expect(uri.port).to be_nil
   end
 
+  it "does not print password when converted to string" do
+    opts = { 'user' => 'person',
+             'password' => 'secret',
+             'host' => 'machine',
+             'protocol' => 'ssh' }
+    target = Bolt::Target.new('example.com', opts)
+    expect(target.to_s).to eq("Target('example.com', "\
+                              "#{opts.reject { |k, _| k == 'password' }})")
+  end
+
   describe "with winrm" do
     it "accepts 'winrm://host:port'" do
       uri = Bolt::Target.new('winrm://neptune:55985')

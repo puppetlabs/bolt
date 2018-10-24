@@ -8,6 +8,8 @@ module Bolt
     attr_reader :uri, :options
     attr_writer :inventory
 
+    PRINT_OPTS ||= %w[host user port protocol].freeze
+
     # Satisfies the Puppet datatypes API
     def self.from_asserted_hash(hash)
       new(hash['uri'], hash['options'])
@@ -79,7 +81,8 @@ module Bolt
     end
 
     def to_s
-      "Target('#{@uri}', #{@options})"
+      opts = @options.select { |k, _| PRINT_OPTS.include? k }
+      "Target('#{@uri}', #{opts})"
     end
 
     def host
