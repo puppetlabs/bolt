@@ -11,9 +11,9 @@ plan basic::inventory_lookup(TargetSpec $nodes) {
     notify { "Target 1 Facts: ${$t[1].facts}": }
     # Vars from target
     notify { "Target 1 Vars: ${$t[1].vars}": }
-    # Prove config is respected (tty set to 11 in config)
-    notify { "Target 0 Config: ${t[0]}": }
+    # Prove config is respected (tty set to 11 in config) 
+    notify { "Target 0 Config: ${$t[0].options}": }
     # Prove inventory config is respected (password set to 'secret' in inventoryfile)
-    notify { "Target 1 Password: ${t[1].password}": }
+    notify { "Target 1 Password: ${$t[1].password}": }
   }
 }
