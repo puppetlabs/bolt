@@ -8,9 +8,13 @@ Packaged versions of Bolt are available for many modern Linux distributions, as 
 
 ## Install Bolt on Windows
 
-Install Bolt on Windows systems via an MSI installer package.
+Use one of the supported Windows installation methods to install Bolt.
 
-1.   Download the Bolt installer package from [https://downloads.puppet.com/windows/puppet6/puppet-bolt-x64-latest.msi](https://downloads.puppet.com/windows/puppet6/puppet-bolt-x64-latest.msi). 
+### Install Bolt with MSI 
+
+Use the MSI installer package to install Bolt on Windows.
+
+1.  Download the Bolt installer package from [https://downloads.puppet.com/windows/puppet6/puppet-bolt-x64-latest.msi](https://downloads.puppet.com/windows/puppet6/puppet-bolt-x64-latest.msi).
 2.  Double-click the MSI file and run the installation.
 3.  Run a Bolt command and get started. 
 
@@ -19,7 +23,7 @@ Install Bolt on Windows systems via an MSI installer package.
     ```
 
 
-## Install Bolt with Chocolatey
+### Install Bolt with Chocolatey
 
 Use the package manager Chocolatey to install Bolt on Windows.
 
@@ -39,9 +43,13 @@ You must have the Chocolatey package manager installed.
     ```
 
 
-## Install Bolt on Mac OS X
+## Install Bolt on macOS
 
-Install Bolt on Mac OS X systems.
+Use one of the supported macOS installation methods to install Bolt.
+
+### Install Bolt with macOS installer 
+
+Use the Apple Disk Image \(DMG\) to install Bolt on macOS.
 
 1.  Download the Bolt installer package for your macOS version. 
 
@@ -58,11 +66,11 @@ Install Bolt on Mac OS X systems.
     ```
 
 
-## Install Bolt with Homebrew
+### Install Bolt with Homebrew
 
-Use the package manager Homebrew to install Bolt on Mac OS X.
+Use the package manager Homebrew to install Bolt on macOS.
 
-You must have the command line tools for Mac OS X and the Homebrew package manager installed.
+You must have the command line tools for macOS and the Homebrew package manager installed.
 
 1.  Download and install the bolt package. 
 
@@ -78,9 +86,13 @@ You must have the command line tools for Mac OS X and the Homebrew package manag
     ```
 
 
-## Install Bolt from apt repositories on Debian or Ubuntu
+## Install Bolt on \*nix
 
-Packaged versions of Bolt are available for Debian 8 and 9 and Ubuntu 14.04 and 16.04.
+Use one of the supported \*nix installation methods to install Bolt.
+
+### Install Bolt on Debian or Ubuntu 
+
+Packaged versions of Bolt are available for Debian 8 and 9 and Ubuntu 14.04, 16.04 and 18.04.
 
 The Puppet repository for the APT package management system is [https://apt.puppet.com](https://apt.puppet.com). Packages are named using the convention `<PLATFORM_VERSION>-release-<VERSION CODE NAME>.deb`. For example, the release package for Puppet 6 Platform on Debian 8 “Jessie” is `puppet6-release-jessie.deb`.
 
@@ -140,7 +152,7 @@ The Puppet repository for the APT package management system is [https://apt.pupp
     ```
 
 
-## Install Bolt from yum repositories on RHEL or SLES
+### Install Bolt on RHEL or SLES
 
 Packaged versions of Bolt are available for Red Hat Enterprise Linux 6 and 7, SUSE Linux Enterprise Server 12.
 
