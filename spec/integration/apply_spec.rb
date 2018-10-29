@@ -157,37 +157,72 @@ describe "apply" do
         run_task('puppet_agent::install', uri, config: config_data, inventory: inventory_data)
       end
 
-      it 'errors when there are resource failures' do
-        result = run_cli_json(%w[plan run basic::failure] + config_flags, rescue_exec: true)
-        expect(result).to include('kind' => 'bolt/apply-failure')
-        error = result['details']['result_set'][0]['result']['_error']
-        expect(error['kind']).to eq('bolt/resource-failure')
-        expect(error['msg']).to match(/Resources failed to apply/)
+      context "apply() function" do
+        it 'errors when there are resource failures' do
+          result = run_cli_json(%w[plan run basic::failure] + config_flags, rescue_exec: true)
+          expect(result).to include('kind' => 'bolt/apply-failure')
+          error = result['details']['result_set'][0]['result']['_error']
+          expect(error['kind']).to eq('bolt/resource-failure')
+          expect(error['msg']).to match(/Resources failed to apply/)
+        end
+
+        it 'applies a notify and ignores local settings' do
+          run_command('echo environment=doesnotexist > /etc/puppetlabs/puppet/puppet.conf',
+                      uri, config: root_config, inventory: conn_inventory)
+
+          result = run_cli_json(%w[plan run basic::class] + config_flags)
+          expect(result).not_to include('kind')
+          expect(result[0]).to include('status' => 'success')
+          expect(result[0]['result']['_output']).to eq('changed: 1, failed: 0, unchanged: 0 skipped: 0, noop: 0')
+          resources = result[0]['result']['report']['resource_statuses']
+          expect(resources).to include('Notify[hello world]')
+        end
+
+        it 'applies the deferred type' do
+          result = run_cli_json(%w[plan run basic::defer] + config_flags)
+          expect(result).not_to include('kind')
+          expect(result[0]['status']).to eq('success')
+          resources = result[0]['result']['report']['resource_statuses']
+
+          local_pid = resources['Notify[local pid]']['events'][0]['desired_value'][/(\d+)/, 1]
+          raise 'local pid was not found' if local_pid.nil?
+          remote_pid = resources['Notify[remote pid]']['events'][0]['desired_value'][/(\d+)/, 1]
+          raise 'remote pid was not found' if remote_pid.nil?
+          expect(local_pid).not_to eq(remote_pid)
+        end
       end
 
-      it 'applies a notify and ignores local settings' do
-        run_command('echo environment=doesnotexist > /etc/puppetlabs/puppet/puppet.conf',
-                    uri, config: root_config, inventory: conn_inventory)
+      context "bolt apply command" do
+        it "applies a manifest" do
+          with_tempfile_containing('manifest', 'include basic', '.pp') do |manifest|
+            results = run_cli_json(['apply', manifest.path] + config_flags)
+            result = results[0]['result']
+            expect(result).not_to include('kind')
+            expect(result['report']).to include('status' => 'changed')
+            expect(result['report']['resource_statuses']).to include('Notify[hello world]')
+          end
+        end
 
-        result = run_cli_json(%w[plan run basic::class] + config_flags)
-        expect(result).not_to include('kind')
-        expect(result[0]).to include('status' => 'success')
-        expect(result[0]['result']['_output']).to eq('changed: 1, failed: 0, unchanged: 0 skipped: 0, noop: 0')
-        resources = result[0]['result']['report']['resource_statuses']
-        expect(resources).to include('Notify[hello world]')
-      end
+        it "applies a snippet of code" do
+          results = run_cli_json(['apply', '-e', 'include basic'] + config_flags)
+          result = results[0]['result']
+          expect(result).not_to include('kind')
+          expect(result['report']).to include('status' => 'changed')
+          expect(result['report']['resource_statuses']).to include('Notify[hello world]')
+        end
 
-      it 'applies the deferred type' do
-        result = run_cli_json(%w[plan run basic::defer] + config_flags)
-        expect(result).not_to include('kind')
-        expect(result[0]['status']).to eq('success')
-        resources = result[0]['result']['report']['resource_statuses']
+        it "fails if the manifest doesn't parse" do
+          expect { run_cli_json(['apply', '-e', 'include(basic'] + config_flags) }
+            .to raise_error(/Syntax error/)
+        end
 
-        local_pid = resources['Notify[local pid]']['events'][0]['desired_value'][/(\d+)/, 1]
-        raise 'local pid was not found' if local_pid.nil?
-        remote_pid = resources['Notify[remote pid]']['events'][0]['desired_value'][/(\d+)/, 1]
-        raise 'remote pid was not found' if remote_pid.nil?
-        expect(local_pid).not_to eq(remote_pid)
+        it "fails if the manifest doesn't compile" do
+          results = run_cli_json(['apply', '-e', 'include shmasic'] + config_flags)
+          result = results[0]['result']
+          expect(result).to include('_error')
+          expect(result['_error']['kind']).to eq('bolt/apply-error')
+          expect(result['_error']['msg']).to match(/failed to compile/)
+        end
       end
     end
   end

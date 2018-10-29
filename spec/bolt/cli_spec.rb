@@ -81,6 +81,20 @@ describe "Bolt::CLI" do
       }.to raise_error(Bolt::CLIError, /Expected action 'oops' to be one of/)
     end
 
+    it "generates an error message is no action is given and one is expected" do
+      cli = Bolt::CLI.new(%w[-n bolt1 command])
+      expect {
+        cli.parse
+      }.to raise_error(Bolt::CLIError, /Expected an action/)
+    end
+
+    it "works without an action if no action is expected" do
+      cli = Bolt::CLI.new(%w[-n bolt1 apply file.pp])
+      expect {
+        cli.parse
+      }.not_to raise_error
+    end
+
     describe "help" do
       it "generates help when no arguments are specified" do
         cli = Bolt::CLI.new([])
@@ -1745,6 +1759,29 @@ bar
         end.to raise_error(Bolt::PuppetfileError, /everything is terrible/)
 
         expect(output.string).to be_empty
+      end
+    end
+
+    describe "applying Puppet code" do
+      let(:options) {
+        {
+          subcommand: 'apply'
+        }
+      }
+      let(:output) { StringIO.new }
+      let(:cli) { Bolt::CLI.new([]) }
+
+      before :each do
+        allow(cli).to receive(:outputter).and_return(Bolt::Outputter::JSON.new(false, false, output))
+      end
+
+      it 'fails if the code file does not exist' do
+        manifest = Tempfile.new
+        options[:object] = manifest.path
+        manifest.close
+        manifest.delete
+        expect(cli).not_to receive(:apply_manifest)
+        expect { cli.execute(options) }.to raise_error(Bolt::FileError)
       end
     end
   end

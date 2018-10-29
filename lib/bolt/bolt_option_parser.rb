@@ -30,6 +30,7 @@ Available subcommands:
   bolt plan show                   Show list of available plans
   bolt plan show <plan>            Show details for plan
   bolt plan run <plan> [params]    Run a Puppet task plan
+  bolt apply <manifest>            Apply Puppet manifest code
   bolt puppetfile install          Install modules from a Puppetfile into a Boltdir
 
 Run `bolt <subcommand> --help` to view specific examples.
@@ -107,6 +108,13 @@ Install modules into the local Boltdir
 Available options are:
     HELP
 
+    APPLY_HELP = <<-HELP
+Usage: bolt apply <manifest.pp> [options]
+
+#{examples('apply site.pp', 'apply a manifest on')}
+  bolt apply site.pp --nodes foo.example.com,bar.example.com
+    HELP
+
     # A helper mixin for OptionParser::Switch instances which will allow
     # us to show/hide particular switch in the help message produced by
     # the OptionParser#help method on demand.
@@ -150,6 +158,10 @@ Available options are:
              "Parameters to a task or plan as json, a json file '@<file>', or on stdin '-'") do |params|
         @options[:task_options] = parse_params(params)
       end
+      @execute = define('-e', '--execute CODE',
+                        "Puppet manifest code to apply to the targets") do |code|
+        @options[:code] = code
+      end.extend(SwitchHider)
 
       separator 'Authentication:'
       define('-u', '--user USER', 'User to authenticate as') do |user|
@@ -270,6 +282,8 @@ Available options are:
     def update
       # show the --nodes and --query switches by default
       @nodes.hide = @query.hide = false
+      # Don't show the --execute switch except for `apply`
+      @execute.hide = true
 
       # Update the banner according to the subcommand
       self.banner = case @options[:subcommand]
@@ -287,6 +301,9 @@ Available options are:
                       FILE_HELP
                     when 'puppetfile'
                       PUPPETFILE_HELP
+                    when 'apply'
+                      @execute.hide = false
+                      APPLY_HELP
                     else
                       BANNER
                     end

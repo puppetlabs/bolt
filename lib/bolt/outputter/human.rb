@@ -177,6 +177,12 @@ module Bolt
         @stream.puts(plan_info)
       end
 
+      # @param [Bolt::ResultSet] apply_result A ResultSet object representing the result of a `bolt apply`
+      def print_apply_result(apply_result)
+        apply_result.each { |result| print_result(result) }
+        print_summary(apply_result)
+      end
+
       # @param [Bolt::PlanResult] plan_result A PlanResult object
       def print_plan_result(plan_result)
         value = plan_result.value

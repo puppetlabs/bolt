@@ -30,7 +30,8 @@ module Bolt
                  'task' => %w[show run],
                  'plan' => %w[show run],
                  'file' => %w[upload],
-                 'puppetfile' => %w[install] }.freeze
+                 'puppetfile' => %w[install],
+                 'apply' => %w[] }.freeze
 
     attr_reader :config, :options
 
@@ -78,7 +79,10 @@ module Bolt
 
       # This section handles parsing non-flag options which are
       # subcommand specific rather then part of the config
-      options[:action] = remaining.shift
+      actions = COMMANDS[options[:subcommand]]
+      if actions && !actions.empty?
+        options[:action] = remaining.shift
+      end
       options[:object] = remaining.shift
 
       task_options, remaining = remaining.partition { |s| s =~ /.+=/ }
@@ -138,16 +142,18 @@ module Bolt
               "#{COMMANDS.keys.join(', ')}"
       end
 
-      if options[:action].nil?
-        raise Bolt::CLIError,
-              "Expected an action of the form 'bolt #{options[:subcommand]} <action>'"
-      end
-
       actions = COMMANDS[options[:subcommand]]
-      unless actions.include?(options[:action])
-        raise Bolt::CLIError,
-              "Expected action '#{options[:action]}' to be one of " \
-              "#{actions.join(', ')}"
+      if actions.any?
+        if options[:action].nil?
+          raise Bolt::CLIError,
+                "Expected an action of the form 'bolt #{options[:subcommand]} <action>'"
+        end
+
+        unless actions.include?(options[:action])
+          raise Bolt::CLIError,
+                "Expected action '#{options[:action]}' to be one of " \
+                "#{actions.join(', ')}"
+        end
       end
 
       if options[:subcommand] != 'file' && options[:subcommand] != 'script' &&
@@ -182,6 +188,10 @@ module Bolt
       if options[:noop] && (options[:subcommand] != 'task' || options[:action] != 'run')
         raise Bolt::CLIError,
               "Option '--noop' may only be specified when running a task"
+      end
+
+      if options[:subcommand] == 'apply' && (options[:object] && options[:code])
+        raise Bolt::CLIError, "--execute is unsupported when specifying a manifest file"
       end
     end
 
@@ -252,10 +262,17 @@ module Bolt
         options[:task_options] = pal.parse_params(options[:subcommand], options[:object], options[:task_options])
       end
 
-      if options[:subcommand] == 'plan'
+      case options[:subcommand]
+      when 'plan'
         code = run_plan(options[:object], options[:task_options], options[:nodes], options)
-      elsif options[:subcommand] == 'puppetfile'
+      when 'puppetfile'
         code = install_puppetfile(@config.puppetfile, @config.modulepath)
+      when 'apply'
+        if options[:object]
+          validate_file('manifest', options[:object])
+          options[:code] = File.read(File.expand_path(options[:object]))
+        end
+        code = apply_manifest(options[:code], options[:targets], options[:object])
       else
         executor = Bolt::Executor.new(config.concurrency, @analytics, options[:noop], bundled_content: bundled_content)
         targets = options[:targets]
@@ -360,6 +377,26 @@ module Bolt
       executor.finish_plan(result)
       outputter.print_plan_result(result)
       result.ok? ? 0 : 1
+    end
+
+    def apply_manifest(code, targets, filename = nil)
+      ast = pal.parse_manifest(code, filename)
+
+      executor = Bolt::Executor.new(config.concurrency, @analytics, options[:noop], bundled_content: bundled_content)
+      # Call start_plan just to enable plan_logging
+      executor.start_plan(nil)
+
+      pal.in_plan_compiler(executor, inventory, puppetdb_client) do |compiler|
+        compiler.call_function('apply_prep', targets)
+      end
+
+      results = pal.with_bolt_executor(executor, inventory, puppetdb_client) do
+        Puppet.lookup(:apply_executor).apply_ast(ast, targets, '_catch_errors' => true)
+      end
+
+      outputter.print_apply_result(results)
+
+      results.ok ? 0 : 1
     end
 
     def install_puppetfile(puppetfile, modulepath)
