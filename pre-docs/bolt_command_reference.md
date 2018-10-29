@@ -8,62 +8,14 @@ Bolt commands use the syntax: `bolt <subcommand> <action> [options]`
 
 |Command|Description|Arguments|
 |-------|-----------|---------|
-| `bolt command run` `<COMMAND>` |Runs a command on remote nodes.| -   The command, single quoted if it contains spaces or special characters.
-
--   The nodes on which to run the command.
-
-
- |
-| `bolt script run` |Runs a script in any language that will run on the remote system.| -   A path to a local script to run on the remote nodes.
-
--   Optionally, arguments to pass to the script.
-
--   The nodes on which to run the script.
-
-
- |
-| `bolt task run` |Runs a task on a remote system, passing any specified parameters.| -   The task name, in the format `modulename::taskname`.
-
--   The module path to the module containing the task.
-
--   The nodes on which to run the task.
-
-
- |
-| `bolt plan run` |Runs a task plan.| -   The plan name, in the format `modulename::planname`.
-
--   The module path to the module containing the plan.
-
--   The nodes on which to run the plan.
-
-
- |
-| `bolt file upload` |Uploads a local file to a remote node.| -   The path to the source file.
-
--   The path to the remote location.
-
--   The nodes on which to upload the file.
-
-
- |
-| `bolt task show` | Lists all the tasks on the modulepath that have not been marked `private`. Will note whether a task supports no-operation mode.
-
- | -   Adding a specific task name displays details and parameters for the task.
-
--   The module path to the module containing the task.
-
--   Optionally, the name of a task you want details for: `bolt task show <TASK NAME>` 
-
-
- |
-| `bolt plan show` | Lists the plans that are installed on the current module path.
-
- | -   Adding a specific plan name displays details and parameters for the plan.
-
--   The module path to the module containing the plan.
-
-
- |
+| `bolt command run` `<COMMAND>` | Runs a command on remote nodes. |- The command, single quoted if it contains spaces or special characters.<br>- The nodes on which to run the command.
+| `bolt script run` | Runs a script in any language that will run on the remote system. |- A path to a local script to run on the remote nodes.<br>- Optionally, arguments to pass to the script.<br>- The nodes on which to run the script.
+| `bolt task run` | Runs a task on a remote system, passing any specified parameters. | - The task name, in the format `modulename::taskname`.<br>- The nodes on which to run the task.
+| `bolt plan run` | Runs a task plan. | - The plan name, in the format `modulename::planname`.<br>- The nodes on which to run the plan.
+| `bolt apply` | Applies a Puppet manifest file. | - The path to the manifest file.<br>- The nodes on which to run the plan.
+| `bolt file upload` | Uploads a local file to a remote node. | - The path to the source file.<br>- The path to the remote location.<br>- The nodes on which to upload the file.
+| `bolt task show` | Lists all the tasks on the modulepath that have not been marked `private`. Will note whether a task supports no-operation mode. | - Adding a specific task name displays details and parameters for the task.<br>- Optionally, the name of a task you want details for: `bolt task show <TASK NAME>` 
+| `bolt plan show` | Lists the plans that are installed on the current module path. | - Adding a specific plan name displays details and parameters for the plan.
 
 ## Command options
 
