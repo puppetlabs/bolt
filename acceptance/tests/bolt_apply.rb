@@ -21,7 +21,7 @@ test_name "bolt apply should apply manifest block on remote hosts via ssh and wi
 
     begin
       json = JSON.parse(result.stdout)
-    rescue JSON.ParserError
+    rescue JSON::ParserError
       assert_equal("Output should be JSON", result.string,
                    "Output should be JSON")
     end
@@ -39,7 +39,7 @@ test_name "bolt apply should apply manifest block on remote hosts via ssh and wi
   end
 
   step "execute `bolt apply -e <code>` with json output" do
-    bolt_command = "bolt apply -e 'notify { \"hello world\": }' --nodes #{targets.join(',')}"
+    bolt_command = "bolt apply -e \"notify { 'hello world': }\" --nodes #{targets.join(',')}"
     flags = {
       '--format' => 'json'
     }

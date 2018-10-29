@@ -38,7 +38,7 @@ test_name "bolt plan run should apply manifest block on remote hosts via winrm" 
 
     begin
       json = JSON.parse(result.stdout)
-    rescue JSON.ParserError
+    rescue JSON::ParserError
       assert_equal("Output should be JSON", result.string,
                    "Output should be JSON")
     end
@@ -62,7 +62,7 @@ test_name "bolt plan run should apply manifest block on remote hosts via winrm" 
 
     begin
       json = JSON.parse(result.stdout)
-    rescue JSON.ParserError
+    rescue JSON::ParserError
       assert_equal("Output should be JSON", result.string,
                    "Output should be JSON")
     end
@@ -99,7 +99,7 @@ test_name "bolt plan run should apply manifest block on remote hosts via winrm" 
 
     begin
       json = JSON.parse(result.stdout)
-    rescue JSON.ParserError
+    rescue JSON::ParserError
       assert_equal("Output should be JSON", result.string,
                    "Output should be JSON")
     end

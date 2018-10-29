@@ -60,7 +60,7 @@ plan test::winrm_retry_plan($nodes) {
 
     begin
       json = JSON.parse(result.stdout)
-    rescue JSON.ParserError
+    rescue JSON::ParserError
       assert_equal("Output should be JSON", result.string,
                    "Output should be JSON")
     end
