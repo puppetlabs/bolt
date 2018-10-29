@@ -258,14 +258,14 @@ describe 'run_task' do
         executable = File.join(tasks_root, 'sensitive_meta.sh')
         input_params = {
           'sensitive_string' => sensitive_string,
-          'sensitive_array'  => sensitive_array,
-          'sensitive_hash'   => sensitive_hash
+          'sensitive_array' => sensitive_array,
+          'sensitive_hash' => sensitive_hash
         }
 
         expected_params = {
           'sensitive_string' => Sensitive.new(sensitive_string),
-          'sensitive_array'  => Sensitive.new(sensitive_array),
-          'sensitive_hash'   => Sensitive.new(sensitive_hash)
+          'sensitive_array' => Sensitive.new(sensitive_array),
+          'sensitive_hash' => Sensitive.new(sensitive_hash)
         }
 
         Sensitive.expects(:new).with(input_params['sensitive_string'])
@@ -321,10 +321,10 @@ describe 'run_task' do
 
     it "errors when the specified parameter values don't match the expected data types" do
       task_params.merge!(
-        'mandatory_string'  => 'str',
+        'mandatory_string' => 'str',
         'mandatory_integer' => 10,
         'mandatory_boolean' => 'str',
-        'optional_string'   => 10
+        'optional_string' => 10
       )
 
       is_expected.to run.with_params(task_name, hostname, task_params).and_raise_error(
@@ -338,10 +338,10 @@ describe 'run_task' do
 
     it 'errors when the specified parameter values are outside of the expected ranges' do
       task_params.merge!(
-        'mandatory_string'  => '0123456789a',
+        'mandatory_string' => '0123456789a',
         'mandatory_integer' => 10,
         'mandatory_boolean' => true,
-        'optional_integer'  => 10
+        'optional_integer' => 10
       )
 
       is_expected.to run.with_params(task_name, hostname, task_params).and_raise_error(
@@ -355,10 +355,10 @@ describe 'run_task' do
 
     it "errors when a specified parameter value is not Data" do
       task_params.merge!(
-        'mandatory_string'  => 'str',
+        'mandatory_string' => 'str',
         'mandatory_integer' => 10,
         'mandatory_boolean' => true,
-        'optional_hash'     => { now: Time.now }
+        'optional_hash' => { now: Time.now }
       )
 
       is_expected.to run.with_params(task_name, hostname, task_params).and_raise_error(

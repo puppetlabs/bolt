@@ -118,19 +118,19 @@ module Bolt
       end
 
       def group_data
-        { 'config'   => @config,
-          'vars'     => @vars,
-          'facts'    => @facts,
+        { 'config' => @config,
+          'vars' => @vars,
+          'facts' => @facts,
           'features' => @features,
-          'groups'   => [@name] }
+          'groups' => [@name] }
       end
 
       def empty_data
-        { 'config'   => {},
-          'vars'     => {},
-          'facts'    => {},
+        { 'config' => {},
+          'vars' => {},
+          'facts' => {},
           'features' => [],
-          'groups'   => [] }
+          'groups' => [] }
       end
 
       def data_merge(data1, data2)
@@ -143,8 +143,8 @@ module Bolt
           # Shallow merge instead of deep merge so that vars with a hash value
           # are assigned a new hash, rather than merging the existing value
           # with the value meant to replace it
-          'vars'   => data1['vars'].merge(data2['vars']),
-          'facts'  => Bolt::Util.deep_merge(data1['facts'], data2['facts']),
+          'vars' => data1['vars'].merge(data2['vars']),
+          'facts' => Bolt::Util.deep_merge(data1['facts'], data2['facts']),
           'features' => data1['features'] | data2['features'],
           'groups' => data2['groups'] + data1['groups']
         }

@@ -22,8 +22,8 @@ describe Bolt::Inventory do
     {
       'nodes' => [
         'node1',
-        { 'name' =>  'node2' },
-        { 'name' =>  'node3',
+        { 'name' => 'node2' },
+        { 'name' => 'node3',
           'config' => {
             'ssh' => {
               'user' => 'me'
@@ -288,8 +288,8 @@ describe Bolt::Inventory do
           'name' => 'group1',
           'nodes' => [
             'node1',
-            { 'name' =>  'node2' },
-            { 'name' =>  'node3',
+            { 'name' => 'node2' },
+            { 'name' => 'node3',
               'config' => {
                 'ssh' => {
                   'data' => true,
@@ -329,8 +329,8 @@ describe Bolt::Inventory do
         {
           'nodes' => [
             'node1',
-            { 'name' =>  'node2' },
-            { 'name' =>  'node3',
+            { 'name' => 'node2' },
+            { 'name' => 'node3',
               'config' => {
                 'ssh' => {
                   'user' => 'me'
@@ -343,7 +343,8 @@ describe Bolt::Inventory do
               'host-key-check' => false
             }
           }
-        } }
+        }
+      }
       let(:inventory) { Bolt::Inventory.new(data) }
 
       it 'should return group config for string nodes' do

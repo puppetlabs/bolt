@@ -218,8 +218,8 @@ echo ${PT_sensitive_hash}
 SHELL
       deep_hash = { 'k' => make_sensitive('v') }
       arguments = { 'sensitive_string' => make_sensitive('$ecret!'),
-                    'sensitive_array'  => make_sensitive([1, 2, make_sensitive(3)]),
-                    'sensitive_hash'   => make_sensitive(deep_hash) }
+                    'sensitive_array' => make_sensitive([1, 2, make_sensitive(3)]),
+                    'sensitive_hash' => make_sensitive(deep_hash) }
       with_task_containing('tasks_test_sensitive', contents, 'both') do |task|
         expect(local.run_task(target, task, arguments).message.strip).to eq(<<SHELL.strip)
 $ecret!

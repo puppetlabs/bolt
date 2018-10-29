@@ -526,7 +526,7 @@ bar
                                --modulepath .])
         result = cli.parse
         expect(result[:params_parsed]).to eq(false)
-        expect(result[:task_options]).to eq('kj'   => '2hv',
+        expect(result[:task_options]).to eq('kj' => '2hv',
                                             'iuhg' => 'iube',
                                             '2whf' => 'lcv')
       end
@@ -537,7 +537,7 @@ bar
                              '--modulepath', '.'])
         result = cli.parse
         expect(result[:params_parsed]).to eq(true)
-        expect(result[:task_options]).to eq('kj'   => '2hv',
+        expect(result[:task_options]).to eq('kj' => '2hv',
                                             'iuhg' => 'iube',
                                             '2whf' => 'lcv')
       end
@@ -564,7 +564,7 @@ bar
           cli = Bolt::CLI.new(%W[plan run my::plan --params @#{file.path}
                                  --modulepath .])
           result = cli.parse
-          expect(result[:task_options]).to eq('kj'   => '2hv',
+          expect(result[:task_options]).to eq('kj' => '2hv',
                                               'iuhg' => 'iube',
                                               '2whf' => 'lcv')
         end
@@ -585,7 +585,7 @@ bar
         cli = Bolt::CLI.new(%w[plan run my::plan --params - --modulepath .])
         allow(STDIN).to receive(:read).and_return(json_args)
         result = cli.parse
-        expect(result[:task_options]).to eq('kj'   => '2hv',
+        expect(result[:task_options]).to eq('kj' => '2hv',
                                             'iuhg' => 'iube',
                                             '2whf' => 'lcv')
       end
@@ -1274,11 +1274,11 @@ bar
 
           it "errors when the specified parameter values don't match the expected data types" do
             task_params.merge!(
-              'mandatory_string'  => 'str',
+              'mandatory_string' => 'str',
               'mandatory_integer' => 10,
               'mandatory_boolean' => 'str',
-              'non_empty_string'  => 'foo',
-              'optional_string'   => 10
+              'non_empty_string' => 'foo',
+              'optional_string' => 10
             )
 
             expect { cli.execute(options) }.to raise_error(
@@ -1293,11 +1293,11 @@ bar
 
           it "errors when the specified parameter values are outside of the expected ranges" do
             task_params.merge!(
-              'mandatory_string'  => '0123456789a',
+              'mandatory_string' => '0123456789a',
               'mandatory_integer' => 10,
               'mandatory_boolean' => true,
-              'non_empty_string'  => 'foo',
-              'optional_integer'  => 10
+              'non_empty_string' => 'foo',
+              'optional_integer' => 10
             )
 
             expect { cli.execute(options) }.to raise_error(
@@ -1316,10 +1316,10 @@ bar
               .with(targets, task_t, task_params, '_bolt_api_call' => true)
               .and_return(Bolt::ResultSet.new([]))
             task_params.merge!(
-              'mandatory_string'  => ' ',
+              'mandatory_string' => ' ',
               'mandatory_integer' => 0,
               'mandatory_boolean' => false,
-              'non_empty_string'  => 'foo'
+              'non_empty_string' => 'foo'
             )
 
             cli.execute(options)

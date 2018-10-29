@@ -17,7 +17,7 @@ module Bolt
     end
 
     def to_h
-      h = { 'kind' =>  kind,
+      h = { 'kind' => kind,
             'msg' => message,
             'details' => details }
       h['issue_code'] = issue_code if issue_code
@@ -53,7 +53,7 @@ module Bolt
     def initialize(result_set, action, object)
       details = {
         'action' => action,
-        'object' =>  object,
+        'object' => object,
         'result_set' => result_set
       }
       message = "Plan aborted: #{action} '#{object}' failed on #{result_set.error_set.length} nodes"

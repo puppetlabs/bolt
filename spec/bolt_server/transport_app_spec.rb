@@ -28,7 +28,7 @@ describe "BoltServer::TransportApp" do
       'params' => { 'param' => 'val' }
     },
       'filename' => File.basename(file),
-      'sha256' =>  Digest::SHA256.file(file),
+      'sha256' => Digest::SHA256.file(file),
       'size' => File.size(file) }
   end
 
