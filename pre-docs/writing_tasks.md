@@ -312,54 +312,10 @@ The `files` property can be included both as a top-level metadata property, an
 }
 ```
 
-When a task includes the `files` property, all files listed in the top-level property and in the specific implementation chosen for a target will be copied to a temporary directory on that target. The directory structure of the specified files will be preserved such that paths specified with the `files` metadata option will be available to tasks prefixed with `_installdir`. The task executable itself will be located in its module location under the `_installdir` as well, so other files can be found at `../../mymodule/files/` relatve to the task executable's location.
+When a task includes the `files` property, all files listed in the top-level property and in the specific implementation chosen for a target will be copied to a temporary directory on that target. The directory structure of the specified files will be preserved such that paths specified with the `files` metadata option will be available to tasks prefixed with `_installdir`. The task executable itself will be located in its module location under the `_installdir` as well, so other files can be found at `../../mymodule/files/` relative to the task executable's location.
 
-### Python Example
 
-Bolt includes [python_task_helper](https://github.com/puppetlabs/puppetlabs-python_task_helper) to simplify writing tasks. It also makes a useful demonstration of including code from another module.
-
-Create task and metadata in a new module at `~/.puppetlabs/bolt/site/mymodule/tasks/task.{json,py}`.
-
- **Metadata** 
-
-```
-{
-  "files": ["python_task_helper/lib/task_helper.py"],
-  "input_method": "stdin"
-}
-```
-
- **Task** 
-
-```
-#!/usr/bin/env python
-
-import os, sys
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'python_task_helper', 'lib'))
-from task_helper import TaskHelper
-
-class MyTask(TaskHelper):
-    def task(self, args):
-        return {'greeting': 'Hi, my name is '+args['name']}
-
-if __name__ == '__main__':
-    MyTask().run()
-```
-
- **Output** 
-
-```
-$ bolt task run mymodule::task -n localhost name='Julia'
-Started on localhost...
-Finished on localhost:
-  {
-    "greeting": "Hi, my name is Julia"
-  }
-Successful on 1 node: localhost
-Ran on 1 node in 0.12 seconds
-```
-
-### Ruby Example
+For example, you can create a task and metadata in a new module at `~/.puppetlabs/bolt/site/mymodule/tasks/task.{json,rb}`.
 
  **Metadata** 
 
@@ -404,6 +360,95 @@ Finished on localhost:
 Successful on 1 node: localhost
 Ran on 1 node in 0.12 seconds
 ```
+
+### Task Helpers
+
+Bolt includes [python_task_helper](https://github.com/puppetlabs/puppetlabs-python_task_helper) and [ruby_task_helper](https://github.com/puppetlabs/puppetlabs-ruby_task_helper) to simplify writing tasks. It also makes a useful demonstration of including code from another module.
+
+#### Python Example 
+
+Create task and metadata in a new module at `~/.puppetlabs/bolt/site/mymodule/tasks/task.{json,py}`.
+
+ **Metadata** 
+
+```
+{
+  "files": ["python_task_helper/lib/task_helper.py"],
+  "input_method": "stdin"
+}
+```
+
+ **Task** 
+
+```
+#!/usr/bin/env python
+
+import os, sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'python_task_helper', 'lib'))
+from task_helper import TaskHelper
+
+class MyTask(TaskHelper):
+    def task(self, args):
+        return {'greeting': 'Hi, my name is '+args['name']}
+
+if __name__ == '__main__':
+    MyTask().run()
+```
+
+ **Output** 
+
+```
+$ bolt task run mymodule::task -n localhost name='Julia'
+Started on localhost...
+Finished on localhost:
+  {
+    "greeting": "Hi, my name is Julia"
+  }
+Successful on 1 node: localhost
+Ran on 1 node in 0.12 seconds
+```
+
+#### Ruby Example
+
+Create task and metadata in a new module at `~/.puppetlabs/bolt/site/mymodule/tasks/mytask.{json,rb}`.
+
+ **Metadata** 
+
+```
+{
+  "files": ["python_task_helper/lib/task_helper.py"],
+  "input_method": "stdin"
+}
+```
+
+ **Task** 
+
+```
+#!/usr/bin/env ruby
+require_relative '../lib/task_helper.rb'
+
+class MyTask < TaskHelper
+  def task(name: nil, **kwargs)
+    { greeting: "Hi, my name is #{name}" }
+  end 
+end
+
+MyTask.run if __FILE__ == $0
+```
+
+ **Output** 
+
+```
+$ bolt task run mymodule::mytask -n localhost name="Robert'); DROP TABLE Students;--"
+Started on localhost...
+Finished on localhost:
+  {
+    "greeting": "Hi, my name is Robert'); DROP TABLE Students;--"
+  }
+Successful on 1 node: localhost
+Ran on 1 node in 0.12 seconds
+```
+
 
 ## Defining parameters in tasks
 

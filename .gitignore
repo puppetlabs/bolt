@@ -42,6 +42,7 @@ modules/package
 modules/puppet_agent
 modules/puppet_conf
 modules/python_task_helper
+modules/ruby_task_helper
 modules/service
 
 modules/augeas_core/
