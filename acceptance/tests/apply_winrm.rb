@@ -24,7 +24,7 @@ test_name "bolt plan run should apply manifest block on remote hosts via winrm" 
   bolt_command = "bolt plan run example_apply filepath=#{filepath} nodes=winrm_nodes"
   flags = {
     '--modulepath' => modulepath(File.join(dir, 'modules')),
-    '--format'     => 'json'
+    '--format' => 'json'
   }
 
   teardown do

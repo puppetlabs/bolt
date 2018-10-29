@@ -28,7 +28,7 @@ test_name "bolt plan run should apply manifest block on remote hosts via ssh" do
   bolt_command = "bolt plan run example_apply filepath=#{filepath} nodes=#{targets}"
   flags = {
     '--modulepath' => modulepath(File.join(dir, 'modules')),
-    '--format'     => 'json'
+    '--format' => 'json'
   }
 
   teardown do

@@ -25,11 +25,11 @@ require 'bolt/version'
 module Bolt
   class CLIExit < StandardError; end
   class CLI
-    COMMANDS = { 'command'    => %w[run],
-                 'script'     => %w[run],
-                 'task'       => %w[show run],
-                 'plan'       => %w[show run],
-                 'file'       => %w[upload],
+    COMMANDS = { 'command' => %w[run],
+                 'script' => %w[run],
+                 'task' => %w[show run],
+                 'plan' => %w[show run],
+                 'file' => %w[upload],
                  'puppetfile' => %w[install] }.freeze
 
     attr_reader :config, :options

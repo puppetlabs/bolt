@@ -14,7 +14,7 @@ describe "BoltSpec::Run", ssh: true do
   let(:modulepath) { File.join(__dir__, '../fixtures/modules') }
   let(:config_data) {
     { "modulepath" => modulepath,
-      "ssh" =>  { "host-key-check" => false },
+      "ssh" => { "host-key-check" => false },
       "winrm" => { "ssl" => false } }
   }
   let(:inventory_data) { conn_inventory }

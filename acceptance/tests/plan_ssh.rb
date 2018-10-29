@@ -44,7 +44,7 @@ plan test::ssh_retry_plan($nodes) {
     bolt_command = "bolt plan run test::ssh_retry_plan nodes=ssh_nodes"
     flags = {
       '--modulepath' => "#{dir}/modules",
-      '--format'     => 'json'
+      '--format' => 'json'
     }
 
     result = bolt_command_on(bolt, bolt_command, flags)
@@ -89,7 +89,7 @@ plan test::ssh_retry_plan($nodes) {
     bolt_command = "bolt plan run test::ssh_retry_plan nodes=ssh_nodes"
     flags = {
       '--modulepath' => "#{dir}/modules",
-      '--verbose'    => nil
+      '--verbose' => nil
     }
 
     result = bolt_command_on(bolt, bolt_command, flags)

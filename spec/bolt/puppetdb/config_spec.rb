@@ -13,10 +13,10 @@ describe Bolt::PuppetDB::Config do
     let(:options) do
       {
         'server_urls' => ['https://puppetdb:8081'],
-        'cacert'      => cacert,
-        'token'       => token,
-        'cert'        => cert,
-        'key'         => key
+        'cacert' => cacert,
+        'token' => token,
+        'cert' => cert,
+        'key' => key
       }
     end
 

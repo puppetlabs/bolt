@@ -22,7 +22,7 @@ test_name "C100551: \
     bolt_command = "bolt task run test::hostname_win"
 
     flags = {
-      '--nodes'      => 'winrm_nodes',
+      '--nodes' => 'winrm_nodes',
       '--modulepath' => "#{dir}/modules"
     }
 
