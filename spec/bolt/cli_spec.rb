@@ -619,6 +619,14 @@ bar
           cli.parse
         }.to raise_error(Bolt::CLIError, /Invalid task/)
       end
+
+      it "fails show with --noop" do
+        expected = "Option '--noop' may only be specified when running a task or applying manifest code"
+        expect {
+          cli = Bolt::CLI.new(%w[task show foo --nodes bar --noop])
+          cli.parse
+        }.to raise_error(Bolt::CLIError, expected)
+      end
     end
 
     describe 'plan' do
@@ -652,6 +660,30 @@ bar
           cli = Bolt::CLI.new(%w[plan run foo --query nodes{} --nodes bar])
           cli.parse
         }.to raise_error(Bolt::CLIError, /'--nodes' or '--query'/)
+      end
+
+      it "fails with --noop" do
+        expected = "Option '--noop' may only be specified when running a task or applying manifest code"
+        expect {
+          cli = Bolt::CLI.new(%w[plan run foo --nodes bar --noop])
+          cli.parse
+        }.to raise_error(Bolt::CLIError, expected)
+      end
+    end
+
+    describe 'apply' do
+      it "errors without an object or inline code" do
+        expect {
+          cli = Bolt::CLI.new(%w[apply --nodes bar])
+          cli.parse
+        }.to raise_error(Bolt::CLIError, 'a manifest file or --execute is required')
+      end
+
+      it "errors with both an object and inline code" do
+        expect {
+          cli = Bolt::CLI.new(%w[apply foo.pp --execute hello --nodes bar])
+          cli.parse
+        }.to raise_error(Bolt::CLIError, '--execute is unsupported when specifying a manifest file')
       end
     end
 

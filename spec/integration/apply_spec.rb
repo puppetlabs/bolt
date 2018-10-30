@@ -203,6 +203,16 @@ describe "apply" do
           end
         end
 
+        it "applies with noop" do
+          with_tempfile_containing('manifest', 'include basic', '.pp') do |manifest|
+            results = run_cli_json(['apply', manifest.path, '--noop'] + config_flags)
+            result = results[0]['result']
+            expect(result).not_to include('kind')
+            expect(result['report']).to include('status' => 'unchanged', 'noop' => true)
+            expect(result['report']['resource_statuses']).to include('Notify[hello world]')
+          end
+        end
+
         it "applies a snippet of code" do
           results = run_cli_json(['apply', '-e', 'include basic'] + config_flags)
           result = results[0]['result']
