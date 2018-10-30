@@ -2,6 +2,7 @@
 
 require 'sinatra'
 require 'bolt'
+require 'bolt/error'
 require 'bolt/target'
 require 'bolt/task/puppet_server'
 require 'bolt_server/file_cache'
@@ -37,6 +38,15 @@ module BoltServer
       result
     end
 
+    def validate_schema(schema, body)
+      schema_error = JSON::Validator.fully_validate(schema, body)
+      if schema_error.any?
+        Bolt::Error.new("There was an error validating the request body.",
+                        'boltserver/schema-error',
+                        schema_error)
+      end
+    end
+
     get '/' do
       200
     end
@@ -60,8 +70,8 @@ module BoltServer
       content_type :json
 
       body = JSON.parse(request.body.read)
-      schema_error = JSON::Validator.fully_validate(@schemas["ssh-run_task"], body)
-      return [400, schema_error.join] if schema_error.any?
+      error = validate_schema(@schemas["ssh-run_task"], body)
+      return [400, error.to_json] unless error.nil?
 
       opts = body['target']
       if opts['private-key-content']
@@ -85,8 +95,8 @@ module BoltServer
       content_type :json
 
       body = JSON.parse(request.body.read)
-      schema_error = JSON::Validator.fully_validate(@schemas["winrm-run_task"], body)
-      return [400, schema_error.join] if schema_error.any?
+      error = validate_schema(@schemas["winrm-run_task"], body)
+      return [400, error.to_json] unless error.nil?
 
       opts = body['target'].merge('protocol' => 'winrm')
 
@@ -103,12 +113,16 @@ module BoltServer
     end
 
     error 404 do
-      [404, "Could not find route #{request.path}"]
+      err = Bolt::Error.new("Could not find route #{request.path}",
+                            'boltserver/not-found')
+      [404, err.to_json]
     end
 
     error 500 do
       e = env['sinatra.error']
-      [500, "500: Unknown error: #{e.message}"]
+      err = Bolt::Error.new("500: Unknown error: #{e.message}",
+                            'boltserver/server-error')
+      [500, err.to_json]
     end
   end
 end

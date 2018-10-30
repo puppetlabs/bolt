@@ -69,8 +69,9 @@ describe "BoltServer::TransportApp" do
       post path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json'
       expect(last_response).not_to be_ok
       expect(last_response.status).to eq(400)
-      result = last_response.body
-      expect(result).to match(%r{The property '#/target' of type object matched more than one of the required schemas})
+      result = JSON.parse(last_response.body)
+      regex = %r{The property '#/target' of type object matched more than one of the required schemas}
+      expect(result['details'].join).to match(regex)
     end
 
     it 'fails if no authorization is present' do
@@ -307,14 +308,18 @@ describe "BoltServer::TransportApp" do
       post '/ssh/run_tasksss', JSON.generate(body), 'CONTENT_TYPE' => 'text/json'
       expect(last_response).not_to be_ok
       expect(last_response.status).to eq(404)
-      expect(last_response.body).to eq("Could not find route /ssh/run_tasksss")
+      r = JSON.parse(last_response.body)
+      expect(r['msg']).to eq("Could not find route /ssh/run_tasksss")
+      expect(r['kind']).to eq("boltserver/not-found")
     end
 
     it 'returns non-html 500 when the request times out' do
       get '/500_error'
       expect(last_response).not_to be_ok
       expect(last_response.status).to eq(500)
-      expect(last_response.body).to eq('500: Unknown error: Unexpected error')
+      r = JSON.parse(last_response.body)
+      expect(r['msg']).to eq('500: Unknown error: Unexpected error')
+      expect(r['kind']).to eq('boltserver/server-error')
     end
   end
 end
