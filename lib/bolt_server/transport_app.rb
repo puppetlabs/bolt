@@ -30,6 +30,13 @@ module BoltServer
       super(nil)
     end
 
+    def scrub_stack_trace(result)
+      if result.dig(:result, '_error', 'details', 'stack_trace')
+        result[:result]['_error']['details'].reject! { |k| k == 'stack_trace' }
+      end
+      result
+    end
+
     get '/' do
       200
     end
@@ -70,7 +77,8 @@ module BoltServer
 
       # Since this will only be on one node we can just return the first result
       results = @executor.run_task(target, task, parameters)
-      [200, results.first.to_json]
+      result = scrub_stack_trace(results.first.status_hash)
+      [200, result.to_json]
     end
 
     post '/winrm/run_task' do
@@ -90,7 +98,8 @@ module BoltServer
 
       # Since this will only be on one node we can just return the first result
       results = @executor.run_task(target, task, parameters)
-      [200, results.first.to_json]
+      result = scrub_stack_trace(results.first.status_hash)
+      [200, result.to_json]
     end
 
     error 404 do
