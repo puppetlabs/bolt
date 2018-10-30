@@ -185,13 +185,18 @@ module Bolt
         raise Bolt::CLIError, "Only one of '--boltdir' or '--configfile' may be specified"
       end
 
-      if options[:noop] && (options[:subcommand] != 'task' || options[:action] != 'run')
+      if options[:noop] &&
+         !(options[:subcommand] == 'task' && options[:action] == 'run') && options[:subcommand] != 'apply'
         raise Bolt::CLIError,
-              "Option '--noop' may only be specified when running a task"
+              "Option '--noop' may only be specified when running a task or applying manifest code"
       end
 
       if options[:subcommand] == 'apply' && (options[:object] && options[:code])
         raise Bolt::CLIError, "--execute is unsupported when specifying a manifest file"
+      end
+
+      if options[:subcommand] == 'apply' && (!options[:object] && !options[:code])
+        raise Bolt::CLIError, "a manifest file or --execute is required"
       end
     end
 
@@ -272,7 +277,7 @@ module Bolt
           validate_file('manifest', options[:object])
           options[:code] = File.read(File.expand_path(options[:object]))
         end
-        code = apply_manifest(options[:code], options[:targets], options[:object])
+        code = apply_manifest(options[:code], options[:targets], options[:object], options[:noop])
       else
         executor = Bolt::Executor.new(config.concurrency, @analytics, options[:noop], bundled_content: bundled_content)
         targets = options[:targets]
@@ -379,10 +384,10 @@ module Bolt
       result.ok? ? 0 : 1
     end
 
-    def apply_manifest(code, targets, filename = nil)
+    def apply_manifest(code, targets, filename = nil, noop = false)
       ast = pal.parse_manifest(code, filename)
 
-      executor = Bolt::Executor.new(config.concurrency, @analytics, options[:noop], bundled_content: bundled_content)
+      executor = Bolt::Executor.new(config.concurrency, @analytics, noop, bundled_content: bundled_content)
       # Call start_plan just to enable plan_logging
       executor.start_plan(nil)
 
@@ -391,7 +396,7 @@ module Bolt
       end
 
       results = pal.with_bolt_executor(executor, inventory, puppetdb_client) do
-        Puppet.lookup(:apply_executor).apply_ast(ast, targets, '_catch_errors' => true)
+        Puppet.lookup(:apply_executor).apply_ast(ast, targets, '_catch_errors' => true, '_noop' => noop)
       end
 
       outputter.print_apply_result(results)
