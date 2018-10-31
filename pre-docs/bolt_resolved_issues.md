@@ -2,6 +2,10 @@
 
 Security and bug fixes in the Bolt 1.x release series.
 
+## Task implementation not located relative to other files in installdir \(1.2.0\)
+
+When you use tasks that include shared code, the task executable is located alongside shared code at `_installdir/MODULE/tasks/TASK`. \([BOLT-931](https://tickets.puppetlabs.com/browse/BOLT-931)\)
+
 ## Error when puppet\_agent task not run as root \(1.1.0\)
 
 The puppet\_agent task now checks that it is run as root. When run as another user, it prints and fails with a helpful message. \([BOLT-878](https://tickets.puppetlabs.com/browse/BOLT-914)\)
@@ -20,7 +24,7 @@ Manifest blocks will now allow use of deprecated functions from stdlib, and lang
 
 ## Bolt apply does not provide clientcert fact \(1.0.0\)
 
-`apply_prep` has been updated to collect agent facts as listed in [Puppet agent facts](https://puppet.com/docs/puppet/6.0/lang_facts_and_builtin_vars.html#puppet-agent-facts). \([BOLT-898](https://tickets.puppetlabs.com/browse/BOLT-898)\)
+`apply_prep` has been updated to collect agent facts as listed in [Puppet agent facts](https://puppet.com/docs/puppet/latest/lang_facts_and_builtin_vars.html#puppet-agent-facts). \([BOLT-898](https://tickets.puppetlabs.com/browse/BOLT-898)\)
 
 ## C:\\Program Files\\Puppet Labs\\Bolt\\bin\\bolt.bat is non-functional \(1.0.0\)
 
