@@ -2,6 +2,25 @@
 
 New features added to Bolt in the 1.x release series. 
 
+## Apply Puppet manifest code with bolt apply command \(1.2.0\)
+
+The command `bolt apply` has been added to apply Puppet manifest code on targets without wrapping them in an `apply()` block in a plan. [\(BOLT-858](https://tickets.puppetlabs.com/browse/BOLT-858)\)
+
+## Python and Ruby helper libraries for tasks \(1.2.0\)
+
+Two new libraries have been added to help you write tasks in Ruby and Python:
+
+-    [https://github.com/puppetlabs/puppetlabs-ruby\_task\_helper](https://github.com/puppetlabs/puppetlabs-ruby_task_helper) 
+
+-    [https://github.com/puppetlabs/puppetlabs-python\_task\_helper](https://github.com/puppetlabs/puppetlabs-python_task_helper) 
+
+
+Use these libraries to parse task input, catch errors, and produce task output. For details, see [writing\_tasks.md\#title-1540855491676](writing_tasks.md#title-1540855491676). \([BOLT-906](https://tickets.puppetlabs.com/browse/BOLT-906) and [BOLT-907](https://tickets.puppetlabs.com/browse/BOLT-907)\)
+
+## Redacted passwords for printed Target objects \(1.2.0\)
+
+When the `Target` object in a Bolt plan is printed, it includes only the host, user, port, and protocol used. The values for `password` and `sudo-password` are redacted. [\(BOLT-944](https://tickets.puppetlabs.com/browse/BOLT-944)\)
+
 ## Share code between tasks \(1.1.0\)
 
 Bolt includes the ability to share code between tasks. A task can include a list of files that it requires, from any module, that it copies over and makes available via a \_installdir parameter. This feature is also supported in Puppet Enterprise 2019.0. For more information see, [Sharing task code](writing_tasks.md#). \([BOLT-755](https://tickets.puppetlabs.com/browse/BOLT-755)\)

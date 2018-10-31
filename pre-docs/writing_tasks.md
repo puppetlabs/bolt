@@ -363,11 +363,11 @@ Ran on 1 node in 0.12 seconds
 
 ### Task Helpers
 
-Bolt includes [python_task_helper](https://github.com/puppetlabs/puppetlabs-python_task_helper) and [ruby_task_helper](https://github.com/puppetlabs/puppetlabs-ruby_task_helper) to simplify writing tasks. It also makes a useful demonstration of including code from another module.
+To simplify writing tasks, Bolt includes [python\_task\_helper](https://github.com/puppetlabs/puppetlabs-python_task_helper) and [ruby\_task\_helper](https://github.com/puppetlabs/puppetlabs-ruby_task_helper). It also makes a useful demonstration of including code from another module.
 
-#### Python Example 
+#### Python Example
 
-Create task and metadata in a new module at `~/.puppetlabs/bolt/site/mymodule/tasks/task.{json,py}`.
+Create task and metadata in a module at `~/.puppetlabs/bolt/site/mymodule/tasks/task.{json,py}`.
 
  **Metadata** 
 
@@ -416,7 +416,7 @@ Create task and metadata in a new module at `~/.puppetlabs/bolt/site/mymodule/ta
 
 ```
 {
-  "files": ["python_task_helper/lib/task_helper.py"],
+  "files": ["ruby_task_helper/lib/task_helper.rb"],
   "input_method": "stdin"
 }
 ```
