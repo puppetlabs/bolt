@@ -187,6 +187,12 @@ module Bolt
 EOF
 SCRIPT
       end
+
+      def connected?(target)
+        with_connection(target) { true }
+      rescue Bolt::Node::ConnectError
+        false
+      end
     end
   end
 end

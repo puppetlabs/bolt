@@ -216,6 +216,12 @@ try { & "#{remote_task_path}" @taskArgs } catch { Write-Error $_.Exception; exit
           end
         end
       end
+
+      def connected?(target)
+        with_connection(target) { true }
+      rescue Bolt::Node::ConnectError
+        false
+      end
     end
   end
 end
