@@ -52,7 +52,7 @@ module Bolt
           if @plan_job
             @client.command.plan_finish(
               plan_job: @plan_job,
-              result: plan_result.value,
+              result: plan_result.value || '',
               status: plan_result.status
             )
           end
