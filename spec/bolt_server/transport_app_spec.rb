@@ -133,6 +133,37 @@ describe "BoltServer::TransportApp" do
       expect(result).to include('status' => 'success')
       expect(result['result']['_output']).to match(/got passed the message: Hello!/)
     end
+
+    context 'with Bolt::Error that contains a stack trace' do
+      let(:error_result) do
+        ex = RuntimeError.new("oops")
+        ex.set_backtrace('/path/to/bolt/code.rb:42')
+        Bolt::Result.from_exception(conn_target('ssh'), ex)
+      end
+
+      it 'scrubs stack trace from result' do
+        allow_any_instance_of(Bolt::Executor).to receive(:batch_execute).and_return(Bolt::ResultSet.new([error_result]))
+        body = {
+          'task': echo_task,
+          'target': {
+            'hostname': target[:host],
+            'user': target[:user],
+            'password': target[:password],
+            'port': target[:port],
+            'host-key-check': false
+          },
+          'parameters': { "message": "Hello!" }
+        }
+
+        post path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json'
+        expect(last_response).to be_ok
+        expect(last_response.status).to eq(200)
+        result = JSON.parse(last_response.body)
+        expect(result).to include('status' => 'failure')
+        expect(result['result']['_error']).to include('msg' => 'oops', 'details' => { 'class' => 'RuntimeError' })
+        expect(result['result']['_error']).not_to include('stack_trace')
+      end
+    end
   end
 
   context 'with winrm target', winrm: true do
@@ -211,6 +242,36 @@ describe "BoltServer::TransportApp" do
       result = JSON.parse(last_response.body)
       expect(result).to include('status' => 'success')
       expect(result['result']['_output']).to match(/INPUT.*Hello!/)
+    end
+
+    context 'with Bolt::Error that contains a stack trace' do
+      let(:error_result) do
+        ex = RuntimeError.new("oops")
+        ex.set_backtrace('/path/to/bolt/code.rb:42')
+        Bolt::Result.from_exception(conn_target('winrm'), ex)
+      end
+
+      it 'scrubs stack trace from result' do
+        allow_any_instance_of(Bolt::Executor).to receive(:batch_execute).and_return(Bolt::ResultSet.new([error_result]))
+        body = {
+          'task': echo_task,
+          'target': {
+            'hostname': target[:host],
+            'user': target[:user],
+            'password': target[:password],
+            'port': target[:port]
+          },
+          'parameters': { "input": "Hello!" }
+        }
+
+        post path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json'
+        expect(last_response).to be_ok
+        expect(last_response.status).to eq(200)
+        result = JSON.parse(last_response.body)
+        expect(result).to include('status' => 'failure')
+        expect(result['result']['_error']).to include('msg' => 'oops', 'details' => { 'class' => 'RuntimeError' })
+        expect(result['result']['_error']).not_to include('stack_trace')
+      end
     end
   end
 
