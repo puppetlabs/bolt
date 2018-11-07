@@ -9,13 +9,15 @@ require 'bolt/transport/ssh'
 require 'bolt/transport/winrm'
 require 'bolt/transport/orch'
 require 'bolt/transport/local'
+require 'bolt/transport/docker'
 
 module Bolt
   TRANSPORTS = {
     ssh: Bolt::Transport::SSH,
     winrm: Bolt::Transport::WinRM,
     pcp: Bolt::Transport::Orch,
-    local: Bolt::Transport::Local
+    local: Bolt::Transport::Local,
+    docker: Bolt::Transport::Docker
   }.freeze
 
   class UnknownTransportError < Bolt::Error
@@ -50,7 +52,8 @@ module Bolt
       pcp: {
         'task-environment' => 'production'
       },
-      local: {}
+      local: {},
+      docker: {}
     }.freeze
 
     def self.default

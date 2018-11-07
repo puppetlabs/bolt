@@ -82,6 +82,16 @@ ssh:
 
 `tmpdir`: The directory to copy and execute temporary files.
 
+## Docker transport configuration options
+
+*The Docker transport is experimental as the capabilities and role of the Docker API may change*
+
+`tmpdir`: The directory to upload and execute temporary files on the target.
+
+`service-url`: URL of the Docker host used for API requests. Defaults to local via a unix socket at `unix:///var/docker.sock`.
+
+`service-options`: A hash of options to configure the Docker connection. Only necessary if using a non-default URL. See https://github.com/swipely/docker-api for supported options.
+
 ## Log file configuration options
 
 Capture the results of your plan runs in a log file.

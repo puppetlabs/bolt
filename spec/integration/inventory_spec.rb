@@ -159,6 +159,13 @@ describe 'running with an inventory file', reset_puppet_settings: true do
     include_examples 'basic inventory'
   end
 
+  context 'when running over docker', docker: true do
+    let(:conn) { conn_info('docker') }
+    let(:shell_cmd) { "whoami" }
+
+    include_examples 'basic inventory'
+  end
+
   context 'when running over local', bash: true do
     let(:shell_cmd) { "whoami" }
 

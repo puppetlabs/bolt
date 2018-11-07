@@ -17,6 +17,10 @@ module BoltSpec
         default_port = 20022
       when 'winrm'
         default_port = 25985
+      when 'docker'
+        default_user = ''
+        default_password = ''
+        default_host = 'ubuntu_node'
       else
         raise Error, "The transport must be either 'ssh' or 'winrm'"
       end
@@ -34,8 +38,8 @@ module BoltSpec
     def conn_uri(transport, include_password: false, override_port: nil)
       conn = conn_info(transport)
       passwd = include_password ? ":#{conn[:password]}" : ''
-      port = override_port || conn[:port]
-      "#{conn[:protocol]}://#{conn[:user]}#{passwd}@#{conn[:host]}:#{port}"
+      port = ":#{override_port || conn[:port]}"
+      "#{conn[:protocol]}://#{conn[:user]}#{passwd}@#{conn[:host]}#{port}"
     end
 
     def conn_target(transport, include_password: false, options: nil)
