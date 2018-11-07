@@ -5,6 +5,11 @@ services:
 - docker
 rvm:
 - 2.5
+env:
+  global:
+    - REGISTRY_HOST=pcr-internal.puppet.net
+    - DOCKER_REGISTRY=pe-and-platform
+    - secure: "KF0rqrducC1oom9XpWsOsO/opdvYn9oXmYoavJbqJ3FcwkjmBD3//vGyDaguZ62p8BwUxK5xX99/HnrPbBC/KxBPIoUZsAPoVp9FK4wOlu0UkrvXLMJKeQ8XTxihtEy1kpXfp6+G98R+a1GoQYsZ4u6h9+cOMM2Ml7UesqP9PfSeN9hxJEHkKsaiAoYR8QWiXSBp00mvN11grp+sWDxCOB5wPvc1E5qhCZcaYDPYAIDiGBENCo7YW/GBqIjrV3ZNeNxbsFUT9mP6WVnh+X206u98ajEs1JYYAKEdntkb3DF4t1rSzov0t3YS2C1L+1PntZ5QhrKlW4DoO92p0qv3TitUA4F+6+5eaeGMk9FFL88Zc+Qr240u8Or1K+RDxm7HzerqW5CUYQ6omvdPzQRJ1qYQMDO3rT/Hgxst5hc5x9wDyosPCyndaJezwEg8iAz6C9xpXSmmGILZuZCVf0xSVT0PlgJtwM+zEYLITFgdlm03Xb+aYeWXqMBtvsnZNZQu+kjpjyJ+CxCt/+UA+row4/wgA/rcnf4UBiRGNrd1vd7ar03Jb8btO1ti2iEuNzRPkP0ZX9yOSt5/pmRCrSnIJCEIwCWFnowFMNvlz70oKPkCkcpXHLUY2g4DJVXzmTfXu9XQZzXPd9YSpRHga5YsaxxYO6obaoROr6GTlvVtfD8="
 before_script:
 - docker-compose -f spec/docker-compose.yml up -d --build
 - eval `ssh-agent`
@@ -40,6 +45,12 @@ script:
 - bundle exec rake puppetserver
 after_script:
 - docker-compose -f spec/docker-compose.yml logs
+deploy:
+  provider: script
+  on:
+    # deploy the master branch or tag pushes
+    condition: $TRAVIS_BRANCH == "master" || -n $TRAVIS_TAG
+  script: bash scripts/deploy.sh
 notifications:
   email: false
   hipchat:
