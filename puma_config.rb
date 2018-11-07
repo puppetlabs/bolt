@@ -15,7 +15,10 @@ Bolt::Logger.initialize_logging
 
 config_path = ENV['BOLT_SERVER_CONF'] || '/etc/puppetlabs/bolt-server/conf.d/bolt-server.conf'
 
-config = BoltServer::Config.new.load_config(config_path)
+config = BoltServer::Config.new
+config.load_file_config(config_path)
+config.load_env_config
+config.validate
 
 Logging.logger[:root].add_appenders Logging.appenders.stderr(
   'console',

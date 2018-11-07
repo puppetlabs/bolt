@@ -9,11 +9,18 @@ describe BoltServer::Config do
   let(:emptyconfig) { File.join(configdir, 'empty-bolt-server.conf') }
   let(:globalconfig) { File.join(configdir, 'global-bolt-server.conf') }
   let(:requiredconfig) { File.join(configdir, 'required-bolt-server.conf') }
-
   let(:base_config) { Hocon.load(requiredconfig)['bolt-server'] }
 
+  def build_config(config_file, from_env = false)
+    config = BoltServer::Config.new
+    config.load_file_config(config_file)
+    config.load_env_config if from_env
+    config.validate
+    config
+  end
+
   context 'with full config' do
-    let(:config) { BoltServer::Config.new.load_config(globalconfig) }
+    let(:config) { build_config(globalconfig) }
 
     it 'reads host' do
       expect(config.host).to eq('10.0.0.1')
@@ -44,8 +51,62 @@ describe BoltServer::Config do
     end
   end
 
+  context 'with configuation parameters set in environment variables' do
+    def transform_key(key)
+      "BOLT_#{key.tr('-', '_').upcase}"
+    end
+
+    before(:context) do
+      BoltServer::Config::ENV_KEYS.each do |key|
+        transformed_key = transform_key(key)
+        ENV[transformed_key] = if ['concurrency', 'file-server-conn-timeout'].include?(key)
+                                 '23'
+                               else
+                                 __FILE__
+                               end
+      end
+    end
+
+    let(:fake_env_config) { __FILE__ }
+    let(:config) { build_config(globalconfig, true) }
+
+    after(:context) do
+      BoltServer::Config::ENV_KEYS.each do |key|
+        ENV.delete(transform_key(key))
+      end
+    end
+
+    it 'reads ssl-cert ' do
+      expect(config.ssl_cert).to eq(fake_env_config)
+    end
+
+    it 'reads ssl-key' do
+      expect(config.ssl_key).to eq(fake_env_config)
+    end
+
+    it 'reads ssl-ca-cert' do
+      expect(config.ssl_ca_cert).to eq(fake_env_config)
+    end
+
+    it 'reads loglevel' do
+      expect(config.loglevel).to eq(fake_env_config)
+    end
+
+    it 'reads concurrency' do
+      expect(config.concurrency).to eq(23)
+    end
+
+    it 'reads file-server-conn-timeout' do
+      expect(config.file_server_conn_timeout).to eq(23)
+    end
+
+    it 'reads file-server-uri' do
+      expect(config.file_server_uri).to eq(fake_env_config)
+    end
+  end
+
   it "accepts only required config" do
-    config = BoltServer::Config.new.load_config(requiredconfig)
+    config = build_config(requiredconfig)
     expect(config.host).to eq('127.0.0.1')
     expect(config.port).to be(62658)
     expect(config.loglevel).to eq('notice')
@@ -56,7 +117,7 @@ describe BoltServer::Config do
   end
 
   it "reads ssl keys from config" do
-    config = BoltServer::Config.new.load_config(globalconfig)
+    config = build_config(globalconfig)
     expect(config.ssl_cert).to eq('spec/fixtures/ssl/cert.pem')
     expect(config.ssl_key).to eq('spec/fixtures/ssl/key.pem')
     expect(config.ssl_ca_cert).to eq('spec/fixtures/ssl/ca.pem')
@@ -64,7 +125,7 @@ describe BoltServer::Config do
 
   it "errors when the config file is missing" do
     expect {
-      BoltServer::Config.new.load_config("/non-existent/configfile.conf")
+      build_config("/non-existent/configfile.conf")
     }.to raise_error(/Could not find bolt-server config at/)
   end
 

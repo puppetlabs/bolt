@@ -9,6 +9,9 @@ module BoltServer
                    'ssl-cipher-suites', 'loglevel', 'logfile', 'whitelist', 'concurrency',
                    'cache-dir', 'file-server-conn-timeout', 'file-server-uri'].freeze
 
+    ENV_KEYS = ['ssl-cert', 'ssl-key', 'ssl-ca-cert', 'loglevel',
+                'concurrency', 'file-server-conn-timeout', 'file-server-uri'].freeze
+
     DEFAULTS = {
       'host' => '127.0.0.1',
       'port' => 62658,
@@ -40,7 +43,7 @@ module BoltServer
       @config_path = nil
     end
 
-    def load_config(path)
+    def load_file_config(path)
       @config_path = path
       begin
         parsed_hocon = Hocon.load(path)['bolt-server']
@@ -53,10 +56,20 @@ module BoltServer
       raise "Could not find bolt-server config at #{path}" if parsed_hocon.nil?
 
       parsed_hocon = parsed_hocon.select { |key, _| CONFIG_KEYS.include?(key) }
-      @data = @data.merge(parsed_hocon)
 
-      validate
-      self
+      @data = @data.merge(parsed_hocon)
+    end
+
+    def load_env_config
+      ENV_KEYS.each do |key|
+        transformed_key = "BOLT_#{key.tr('-', '_').upcase}"
+        next unless ENV.key?(transformed_key)
+        @data[key] = if ['concurrency', 'file-server-conn-timeout'].include?(key)
+                       ENV[transformed_key].to_i
+                     else
+                       ENV[transformed_key]
+                     end
+      end
     end
 
     def natural?(num)
