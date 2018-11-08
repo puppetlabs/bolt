@@ -258,7 +258,7 @@ describe Bolt::Inventory do
       end
 
       it 'should use values from the lowest group' do
-        expect(get_target(inventory, 'node4').options).to eq(ssh_target_option_defaults.merge('host-key-check' => true))
+        expect(get_target(inventory, 'node4').options).to include('host-key-check' => true)
       end
 
       it 'should include values from parents' do
@@ -266,7 +266,7 @@ describe Bolt::Inventory do
       end
 
       it 'should use values from the first group' do
-        expect(get_target(inventory, 'node6').options).to eq(ssh_target_option_defaults.merge('host-key-check' => true))
+        expect(get_target(inventory, 'node6').options).to include('host-key-check' => true)
       end
 
       it 'should prefer values from a node over an earlier group' do
@@ -315,7 +315,7 @@ describe Bolt::Inventory do
 
       it 'should return config for the node' do
         target = get_target(inventory, 'node3')
-        expect(target.options).to eq(ssh_target_option_defaults)
+        expect(target.options).to eq(ssh_target_option_defaults.merge('port' => '2224'))
         expect(target.port).to eq('2224')
       end
 
@@ -349,19 +349,19 @@ describe Bolt::Inventory do
 
       it 'should return group config for string nodes' do
         target = get_target(inventory, 'node1')
-        expect(target.options).to eq(ssh_target_option_defaults.merge('host-key-check' => false))
+        expect(target.options).to include('host-key-check' => false)
         expect(target.user).to eq('you')
       end
 
       it 'should return group config for array nodes' do
         target = get_target(inventory, 'node2')
-        expect(target.options).to eq(ssh_target_option_defaults.merge('host-key-check' => false))
+        expect(target.options).to include('host-key-check' => false)
         expect(target.user).to eq('you')
       end
 
       it 'should merge config for from nodes' do
         target = get_target(inventory, 'node3')
-        expect(target.options).to eq(ssh_target_option_defaults.merge('host-key-check' => false))
+        expect(target.options).to include('host-key-check' => false)
         expect(target.user).to eq('me')
       end
     end
@@ -499,7 +499,10 @@ describe Bolt::Inventory do
           'private-key' => "anything",
           'tmpdir' => "/ssh",
           'run-as' => "root",
-          'sudo-password' => "nothing"
+          'sudo-password' => "nothing",
+          'password' => 'youssh',
+          'port' => '12345ssh',
+          'user' => 'messh'
         )
       end
 
@@ -516,7 +519,10 @@ describe Bolt::Inventory do
           'ssl-verify' => false,
           'tmpdir' => "/winrm",
           'cacert' => "winrm.pem",
-          'extensions' => ".py"
+          'extensions' => ".py",
+          'password' => 'youwinrm',
+          'port' => '12345winrm',
+          'user' => 'mewinrm'
         )
       end
 
