@@ -2,6 +2,7 @@
 
 require 'spec_helper'
 require 'net/ssh'
+require 'bolt_spec/conn'
 require 'bolt_spec/errors'
 require 'bolt_spec/files'
 require 'bolt_spec/sensitive'
@@ -12,6 +13,7 @@ require 'bolt/target'
 require 'bolt/util'
 
 describe Bolt::Transport::SSH do
+  include BoltSpec::Conn
   include BoltSpec::Errors
   include BoltSpec::Files
   include BoltSpec::Sensitive
@@ -24,13 +26,13 @@ describe Bolt::Transport::SSH do
     Bolt::Config.new(boltdir, 'ssh' => conf)
   end
 
-  let(:hostname) { ENV['BOLT_SSH_HOST'] || "localhost" }
-  let(:user) { ENV['BOLT_SSH_USER'] || "bolt" }
-  let(:password) { ENV['BOLT_SSH_PASSWORD'] || "bolt" }
+  let(:hostname) { conn_info('ssh')[:host] }
+  let(:user) { conn_info('ssh')[:user] }
+  let(:password) { conn_info('ssh')[:password] }
   let(:bash_user) { 'test' }
   let(:bash_password) { 'test' }
-  let(:port) { ENV['BOLT_SSH_PORT'] || 20022 }
-  let(:key) { ENV['BOLT_SSH_KEY'] || Dir["spec/fixtures/keys/id_rsa"][0] }
+  let(:port) { conn_info('ssh')[:port] }
+  let(:key) { conn_info('ssh')[:key] }
   let(:command) { "pwd" }
   let(:config) { mk_config(user: user, password: password) }
   let(:no_host_key_check) { mk_config('host-key-check' => false, user: user, password: password) }

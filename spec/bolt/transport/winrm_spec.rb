@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'bolt_spec/conn'
 require 'bolt_spec/errors'
 require 'bolt_spec/files'
 require 'bolt_spec/sensitive'
@@ -12,6 +13,7 @@ require 'httpclient'
 require 'winrm'
 
 describe Bolt::Transport::WinRM do
+  include BoltSpec::Conn
   include BoltSpec::Errors
   include BoltSpec::Files
   include BoltSpec::Sensitive
@@ -26,11 +28,11 @@ describe Bolt::Transport::WinRM do
     Bolt::Config.new(boltdir, 'transport' => 'winrm', 'winrm' => stringified)
   end
 
-  let(:host) { ENV['BOLT_WINRM_HOST'] || 'localhost' }
-  let(:port) { ENV['BOLT_WINRM_PORT'] || 25985 }
+  let(:host) { conn_info('winrm')[:host] }
+  let(:port) { conn_info('winrm')[:port] }
   let(:ssl_port) { ENV['BOLT_WINRM_SSL_PORT'] || 25986 }
-  let(:user) { ENV['BOLT_WINRM_USER'] || "bolt" }
-  let(:password) { ENV['BOLT_WINRM_PASSWORD'] || "bolt" }
+  let(:user) { conn_info('winrm')[:user] }
+  let(:password) { conn_info('winrm')[:password] }
   let(:command) { "echo $env:UserName" }
   let(:config) { mk_config(ssl: false, user: user, password: password) }
   let(:ssl_config) { mk_config(cacert: 'resources/ca.pem', user: user, password: password) }

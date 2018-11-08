@@ -5,30 +5,28 @@ require 'bolt/util'
 module BoltSpec
   module Conn
     def conn_info(transport)
+      default_host = 'localhost'
+      default_user = 'bolt'
+      default_password = 'bolt'
+      default_key = Dir["spec/fixtures/keys/id_rsa"][0]
+      default_port = 0
+
       tu = transport.upcase
       case transport
       when 'ssh'
         default_port = 20022
-        default_user = 'bolt'
-        default_password = 'bolt'
-        default_key = Dir["spec/fixtures/keys/id_rsa"]
       when 'winrm'
         default_port = 25985
-        default_user = 'bolt'
-        default_password = 'bolt'
-        default_key = Dir["spec/fixtures/keys/id_rsa"]
       else
         raise Error, "The transport must be either 'ssh' or 'winrm'"
       end
 
-      port = ENV["BOLT_#{tu}_PORT"] || default_port
-
       {
         protocol: transport,
-        host: ENV["BOLT_#{tu}_HOST"] || "localhost",
+        host: ENV["BOLT_#{tu}_HOST"] || default_host,
         user: ENV["BOLT_#{tu}_USER"] || default_user,
         password: ENV["BOLT_#{tu}_PASSWORD"] || default_password,
-        port: port.to_i,
+        port: (ENV["BOLT_#{tu}_PORT"] || default_port).to_i,
         key: ENV["BOLT_#{tu}_KEY"] || default_key
       }
     end
