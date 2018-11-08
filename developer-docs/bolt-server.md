@@ -22,6 +22,18 @@ Bolt server can be configured by defining content in HOCON format at one of the 
 - `whitelist`: Array, *optional* - A list of hosts which can connect to pe-bolt-server.
 - `concurrency`: Integer, *optional* - The maximum number of server threads (default `100`).
 
+**Environmnet Variable Options**
+The following configuration options can be set with environment variables. 
+- `BOLT_SSL_CERT`
+- `BOLT_SSL_KEY`
+- `BOLT_SSL_CA_CERT`
+- `BOLT_LOGLEVEL`
+- `BOLT_CONCURRENCY`
+- `BOLT_FILE_SERVER_CONN_TIMEOUT`
+- `BOLT_FILE_SERVER_URI`
+
+**Note**: Configuration options set with environment variables will override those defined in `bolt-server.conf`
+
 ### Default SSL Cipher Suites
 Based on https://wiki.mozilla.org/Security/Server_Side_TLS#Modern_compatibility
 ```
