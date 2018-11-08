@@ -61,9 +61,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
     end
   end
 
-  context 'when running over ssh', ssh: true do
-    let(:shell_cmd) { "whoami" }
-
+  shared_examples 'basic inventory' do
     it 'connects to run a command' do
       result = run_one_node(run_command)
       expect(result).to be
@@ -84,6 +82,12 @@ describe 'running with an inventory file', reset_puppet_settings: true do
         expect(run_cli_json(run_plan)[0]['status']).to eq('success')
       end
     end
+  end
+
+  context 'when running over ssh', ssh: true do
+    let(:shell_cmd) { "whoami" }
+
+    include_examples 'basic inventory'
 
     context 'with variables set' do
       let(:output) { "Vars for localhost: {daffy => duck, bugs => bunny}" }
@@ -152,25 +156,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
     let(:conn) { conn_info('winrm') }
     let(:shell_cmd) { "echo $env:UserName" }
 
-    it 'connects to run a command' do
-      expect(run_one_node(run_command)).to be
-    end
-
-    it 'connects to run a plan' do
-      expect(run_cli_json(run_plan)[0]['status']).to eq('success')
-    end
-
-    context 'with a group' do
-      let(:target) { 'all' }
-
-      it 'connects to run a command' do
-        expect(run_one_node(run_command)).to be
-      end
-
-      it 'connects to run a plan' do
-        expect(run_cli_json(run_plan)[0]['status']).to eq('success')
-      end
-    end
+    include_examples 'basic inventory'
   end
 
   context 'when running over local', bash: true do
