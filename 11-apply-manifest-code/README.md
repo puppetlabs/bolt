@@ -153,7 +153,7 @@ class profiles::server(String $site_content) {
 
 Now we will write a Plan to utilize the server class. 
 
-As we have seen in the lab, plan code belongs in the `plans` subdirectory. Save the following to `Boltdir/site/profiles/manifests/nginx_install.pp`. 
+As we have seen in the lab, plan code belongs in the `plans` subdirectory. Save the following to `Boltdir/site/profiles/plans/nginx_install.pp`.
 
 Take note of the following features of the plan:
 
@@ -214,7 +214,7 @@ puppetdb_fact
 
 Now you are ready to execute the plan. 
 
-`bolt plan run bolt plan run profiles::nginx_install servers=servers lb=lb`
+`bolt plan run profiles::nginx_install servers=servers lb=lb`
 
 Expected output
 ```
@@ -246,4 +246,4 @@ hello! from 127.0.0.1
 
 # Next steps
 
-Now that you have learned about applying existing module content you can harness the power of the Puppet forge to manage infrastructure and deploy great applications! 
+Now that you have learned about applying existing module content you can harness the power of the Puppet forge to manage infrastructure and deploy great applications!
