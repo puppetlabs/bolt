@@ -1,0 +1,48 @@
+{"task":{
+  "metadata":{},
+  "name":"sample::complex_params",
+  "files":[{
+    "filename":"complex_params.ps1",
+    "sha256":"e070a96387e0d339bf12fe3e00da74c6bfb3b7ebc54bd506d6bc2831030ccf5d",
+    "size_bytes":2016,
+    "uri":{
+      "path":"/puppet/v3/file_content/tasks/sample/complex_params.ps1",
+      "params":{
+        "environment":"production"}
+    }
+  }
+  ]
+},
+"target":{
+  "hostname":"vmpoolerhostname",
+  "user":"Administrator",
+  "password":"SECRET",
+  "ssl":false
+},
+"parameters":{
+  "argstring": "hello all",
+  "argint32": 5,
+  "argfloat": 42.42,
+  "arghashtable": {
+    "key": "value",
+    "key2": 2,
+    "key3": true
+  },  
+  "argarray": [0, "foo", true, { "key": "value" }], 
+  "argarrayofhashes": [
+    {   
+      "name": "puppet",
+      "version_requirement": ">= 3.7.0 < 6.0.0"
+    },  
+    {   
+      "name": "pe",
+      "version_requirement": ">= 5.0.0"
+    }   
+  ],  
+  "argfileinfo": "/Users/foo/source/puppet/Gemfile",
+  "argbool": false,
+  "argtimespan": "12:34:56",
+  "argguid": "74be6039-e777-45fe-aa56-3d356443e096",
+  "argregex": "^http:\\/\\/",
+  "argswitch": true
+}}
