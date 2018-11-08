@@ -1,12 +1,10 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'bolt_spec/conn'
 require 'bolt_spec/files'
 require 'bolt_spec/integration'
 
-describe "when runnning over the local transport", bash: true do
-  include BoltSpec::Conn
+describe "when running over the local transport", bash: true do
   include BoltSpec::Files
   include BoltSpec::Integration
 

@@ -4,26 +4,22 @@ require 'spec_helper'
 require 'net/ssh'
 require 'bolt_spec/conn'
 require 'bolt_spec/errors'
-require 'bolt_spec/files'
-require 'bolt_spec/sensitive'
-require 'bolt_spec/task'
 require 'bolt/transport/ssh'
 require 'bolt/config'
 require 'bolt/target'
 require 'bolt/util'
 
+require_relative 'shared_examples'
+
 describe Bolt::Transport::SSH do
   include BoltSpec::Conn
   include BoltSpec::Errors
   include BoltSpec::Files
-  include BoltSpec::Sensitive
   include BoltSpec::Task
-
-  let(:boltdir) { Bolt::Boltdir.new('.') }
 
   def mk_config(conf)
     conf = Bolt::Util.walk_keys(conf, &:to_s)
-    Bolt::Config.new(boltdir, 'ssh' => conf)
+    Bolt::Config.new(Bolt::Boltdir.new('.'), 'ssh' => conf)
   end
 
   let(:hostname) { conn_info('ssh')[:host] }
@@ -38,23 +34,33 @@ describe Bolt::Transport::SSH do
   let(:no_host_key_check) { mk_config('host-key-check' => false, user: user, password: password) }
   let(:no_user_config) { mk_config('host-key-check' => false, user: nil, password: password) }
   let(:ssh) { Bolt::Transport::SSH.new }
-  let(:echo_script) { <<BASH }
-for var in "$@"
-do
-    echo $var
-done
-BASH
 
+  let(:transport_conf) { {} }
   def make_target(host_: hostname, port_: port, conf: config)
-    Bolt::Target.new("#{host_}:#{port_}").update_conf(conf.transport_conf)
+    Bolt::Target.new("#{host_}:#{port_}", transport_conf).update_conf(conf.transport_conf)
   end
 
   let(:target) { make_target }
 
-  def result_value(stdout = nil, stderr = nil, exit_code = 0)
-    { 'stdout' => stdout || '',
-      'stderr' => stderr || '',
-      'exit_code' => exit_code }
+  context 'with ssh', ssh: true do
+    let(:target) { make_target(conf: no_host_key_check) }
+    let(:runner) { ssh }
+    let(:os_context) { posix_context }
+
+    include_examples 'transport api'
+
+    context 'file errors' do
+      before(:each) do
+        allow_any_instance_of(Bolt::Transport::SSH::Connection).to receive(:write_remote_file).and_raise(
+          Bolt::Node::FileError.new("no write", "WRITE_ERROR")
+        )
+        allow_any_instance_of(Bolt::Transport::SSH::Connection).to receive(:make_tempdir).and_raise(
+          Bolt::Node::FileError.new("no tmpdir", "TEMDIR_ERROR")
+        )
+      end
+
+      include_examples 'transport failures'
+    end
   end
 
   context "when connecting", ssh: true do
@@ -184,7 +190,7 @@ BASH
         expect(
           ssh.upload(target, file.path, remote_path).value
         ).to eq(
-          '_output' => "Uploaded '#{file.path}' to '#{hostname}:#{remote_path}'"
+          '_output' => "Uploaded '#{file.path}' to '#{target.host}:#{remote_path}'"
         )
 
         expect(
@@ -212,18 +218,6 @@ BASH
   context "when executing" do
     let(:target) { make_target(conf: no_host_key_check) }
 
-    it "executes a command on a host", ssh: true do
-      expect(ssh.run_command(target, command).value).to eq(result_value("/home/#{user}\n"))
-    end
-
-    it "captures stderr from a host", ssh: true do
-      expect(ssh.run_command(target, "ssh -V").value['stderr']).to match(/OpenSSH/)
-    end
-
-    it "can execute a command containing quotes", ssh: true do
-      expect(ssh.run_command(target, "echo 'hello \" world'").value).to eq(result_value("hello \" world\n"))
-    end
-
     it "can test whether the target is available", ssh: true do
       expect(ssh.connected?(target)).to eq(true)
     end
@@ -232,381 +226,12 @@ BASH
       expect(ssh.connected?(Bolt::Target.new('unknownfoo'))).to eq(false)
     end
 
-    it "can upload a file to a host", ssh: true do
-      contents = "kljhdfg"
-      with_tempfile_containing('upload-test', contents) do |file|
-        ssh.upload(target, file.path, "/home/#{user}/upload-test")
-
-        expect(
-          ssh.run_command(target, "cat /home/#{user}/upload-test")['stdout']
-        ).to eq(contents)
-
-        ssh.run_command(target, "rm /home/#{user}/upload-test")
-      end
-    end
-
-    it "can upload a directory to a host", ssh: true do
-      Dir.mktmpdir do |dir|
-        subdir = File.join(dir, 'subdir')
-        File.write(File.join(dir, 'content'), 'hello world')
-        Dir.mkdir(subdir)
-        File.write(File.join(subdir, 'more'), 'lorem ipsum')
-
-        target_dir = "/home/#{user}/directory-test"
-        ssh.upload(target, dir, target_dir)
-
-        expect(
-          ssh.run_command(target, "ls #{target_dir}")['stdout'].split("\n")
-        ).to eq(%w[content subdir])
-
-        expect(
-          ssh.run_command(target, "ls #{File.join(target_dir, 'subdir')}")['stdout'].split("\n")
-        ).to eq(%w[more])
-
-        ssh.run_command(target, "rm -r #{target_dir}")
-      end
-    end
-
-    it "can run a script remotely", ssh: true do
-      contents = "#!/bin/sh\necho hellote"
-      with_tempfile_containing('script test', contents) do |file|
-        expect(
-          ssh.run_script(target, file.path, [])['stdout']
-        ).to eq("hellote\n")
-      end
-    end
-
-    it "can run a script remotely with quoted arguments", ssh: true do
-      with_tempfile_containing('script-test-ssh-quotes', echo_script) do |file|
-        expect(
-          ssh.run_script(target,
-                         file.path,
-                         ['nospaces',
-                          'with spaces',
-                          "\"double double\"",
-                          "'double single'",
-                          '\'single single\'',
-                          '"single double"',
-                          "double \"double\" double",
-                          "double 'single' double",
-                          'single "double" single',
-                          'single \'single\' single'])['stdout']
-        ).to eq(<<QUOTED)
-nospaces
-with spaces
-"double double"
-'double single'
-'single single'
-"single double"
-double "double" double
-double 'single' double
-single "double" single
-single 'single' single
-QUOTED
-      end
-    end
-
-    it "can run a script with Sensitive arguments", ssh: true do
-      contents = "#!/bin/sh\necho $1\necho $2"
-      arguments = ['non-sensitive-arg',
-                   make_sensitive('$ecret!')]
-      with_tempfile_containing('sensitive_test', contents) do |file|
-        expect(
-          ssh.run_script(target, file.path, arguments)['stdout']
-        ).to eq("non-sensitive-arg\n$ecret!\n")
-      end
-    end
-
-    it "escapes unsafe shellwords in arguments", ssh: true do
-      with_tempfile_containing('script-test-ssh-escape', echo_script) do |file|
-        expect(
-          ssh.run_script(target,
-                         file.path,
-                         ['echo $HOME; cat /etc/passwd'])['stdout']
-        ).to eq(<<SHELLWORDS)
-echo $HOME; cat /etc/passwd
-SHELLWORDS
-      end
-    end
-
-    it "can run a task", ssh: true do
-      contents = "#!/bin/sh\necho -n ${PT_message_one} ${PT_message_two}"
-      arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-      with_task_containing('tasks_test', contents, 'environment') do |task|
-        expect(ssh.run_task(target, task, arguments).message)
-          .to eq('Hello from task Goodbye')
-      end
-    end
-
     it "doesn't generate a task wrapper when not needed", ssh: true do
       contents = "#!/bin/sh\necho -n ${PT_message_one} ${PT_message_two}"
       arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
       expect(ssh).not_to receive(:make_wrapper_stringio)
       with_task_containing('tasks_test', contents, 'environment') do |task|
         ssh.run_task(target, task, arguments)
-      end
-    end
-
-    it "can run a task passing input on stdin", ssh: true do
-      contents = "#!/bin/sh\ngrep 'message_one'"
-      arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-      with_task_containing('tasks_test_stdin', contents, 'stdin') do |task|
-        expect(ssh.run_task(target, task, arguments).value)
-          .to eq("message_one" => "Hello from task", "message_two" => "Goodbye")
-      end
-    end
-
-    it "serializes hashes as json in environment input", ssh: true do
-      contents = "#!/bin/sh\nprintenv PT_message"
-      arguments = { message: { key: 'val' } }
-      with_task_containing('tasks_test_hash', contents, 'environment') do |task|
-        expect(ssh.run_task(target, task, arguments).value)
-          .to eq('key' => 'val')
-      end
-    end
-
-    it "can run a task passing input on stdin and environment", ssh: true do
-      contents = <<SHELL
-#!/bin/sh
-echo -n ${PT_message_one} ${PT_message_two}
-grep 'message_one'
-SHELL
-      arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-      with_task_containing('tasks-test-both', contents, 'both') do |task|
-        expect(ssh.run_task(target, task, arguments).message).to eq(<<SHELL)
-Hello from task Goodbye{\"message_one\":\
-\"Hello from task\",\"message_two\":\"Goodbye\"}
-SHELL
-      end
-    end
-
-    it "can run a task with params containing quotes", ssh: true do
-      contents = <<SHELL
-#!/bin/sh
-echo -n ${PT_message}
-SHELL
-
-      arguments = { message: "foo ' bar ' baz" }
-      with_task_containing('tasks_test_quotes', contents, 'both') do |task|
-        expect(ssh.run_task(target, task, arguments).message).to eq "foo ' bar ' baz"
-      end
-    end
-
-    it "can run a task with params containing variable references", ssh: true do
-      contents = <<SHELL
-#!/bin/sh
-cat
-SHELL
-
-      arguments = { message: "$PATH" }
-      with_task_containing('tasks_test_var', contents, 'both') do |task|
-        expect(ssh.run_task(target, task, arguments)['message']).to eq("$PATH")
-      end
-    end
-
-    it "can run a task with Sensitive params via environment", ssh: true do
-      contents = <<SHELL
-#!/bin/sh
-echo ${PT_sensitive_string}
-echo ${PT_sensitive_array}
-echo -n ${PT_sensitive_hash}
-SHELL
-      deep_hash = { 'k' => make_sensitive('v') }
-      arguments = { 'sensitive_string' => make_sensitive('$ecret!'),
-                    'sensitive_array' => make_sensitive([1, 2, make_sensitive(3)]),
-                    'sensitive_hash' => make_sensitive(deep_hash) }
-      with_task_containing('tasks_test_sensitive', contents, 'both') do |task|
-        expect(ssh.run_task(target, task, arguments).message).to eq(<<SHELL.strip)
-$ecret!
-[1,2,3]
-{"k":"v"}
-SHELL
-      end
-    end
-
-    it "can run a task with Sensitive params via stdin", ssh: true do
-      contents = <<SHELL
-#!/bin/sh
-cat -
-SHELL
-      arguments = { 'sensitive_string' => make_sensitive('$ecret!') }
-      with_task_containing('tasks_test_sensitive', contents, 'stdin') do |task|
-        expect(ssh.run_task(target, task, arguments).value)
-          .to eq("sensitive_string" => "$ecret!")
-      end
-    end
-
-    context "when it can't upload a file" do
-      before(:each) do
-        allow_any_instance_of(Bolt::Transport::SSH::Connection).to receive(:write_remote_file).and_raise(
-          Bolt::Node::FileError.new("no write", "WRITE_ERROR")
-        )
-      end
-
-      it 'returns an error result for upload', ssh: true do
-        contents = "kljhdfg"
-        with_tempfile_containing('upload-test', contents) do |file|
-          expect {
-            ssh.upload(target, file.path, "/home/#{user}/upload-test")
-          }.to raise_error(Bolt::Node::FileError, 'no write')
-        end
-      end
-
-      it 'returns an error result for run_script', ssh: true do
-        contents = "#!/bin/sh\necho hellote"
-        with_tempfile_containing('script test', contents) do |file|
-          expect {
-            ssh.run_script(target, file.path, [])
-          }.to raise_error(Bolt::Node::FileError, 'no write')
-        end
-      end
-
-      it 'returns an error result for run_task', ssh: true do
-        contents = "#!/bin/sh\necho -n ${PT_message_one} ${PT_message_two}"
-        arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-        with_task_containing('tasks_test', contents, 'environment') do |task|
-          expect {
-            ssh.run_task(target, task, arguments)
-          }.to raise_error(Bolt::Node::FileError, 'no write')
-        end
-      end
-    end
-
-    context "when it can't create a tempfile" do
-      before(:each) do
-        allow_any_instance_of(Bolt::Transport::SSH::Connection).to receive(:make_tempdir).and_raise(
-          Bolt::Node::FileError.new("no tmpdir", "TEMDIR_ERROR")
-        )
-      end
-
-      it 'errors when it tries to run a script', ssh: true do
-        contents = "#!/bin/sh\necho hellote"
-        with_tempfile_containing('script test', contents) do |file|
-          expect {
-            ssh.run_script(target, file.path, []).error_hash['msg']
-          }.to raise_error(Bolt::Node::FileError, 'no tmpdir')
-        end
-      end
-
-      it "errors when it tries to run a task", ssh: true do
-        contents = "#!/bin/sh\necho -n ${PT_message_one} ${PT_message_two}"
-        arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-        with_task_containing('tasks_test', contents, 'environment') do |task|
-          expect {
-            ssh.run_task(target, task, arguments)
-          }.to raise_error(Bolt::Node::FileError, 'no tmpdir')
-        end
-      end
-    end
-
-    context "when implementations are provided", ssh: true do
-      let(:contents) { "#!/bin/sh\necho -n ${PT_message_one} ${PT_message_two}" }
-      let(:arguments) { { message_one: 'Hello from task', message_two: 'Goodbye' } }
-
-      it "runs a task requires 'shell'" do
-        with_task_containing('tasks_test', contents, 'environment') do |task|
-          task['metadata']['implementations'] = [{ 'name' => 'tasks_test', 'requirements' => ['shell'] }]
-          expect(ssh.run_task(target, task, arguments).message)
-            .to eq('Hello from task Goodbye')
-        end
-      end
-
-      it "runs a task with the implementation's input method" do
-        with_task_containing('tasks_test', contents, 'stdin') do |task|
-          task['metadata']['implementations'] = [{
-            'name' => 'tasks_test', 'requirements' => ['shell'], 'input_method' => 'environment'
-          }]
-          expect(ssh.run_task(target, task, arguments).message.chomp)
-            .to eq('Hello from task Goodbye')
-        end
-      end
-
-      it "errors when a task only requires an unsupported requirement" do
-        with_task_containing('tasks_test', contents, 'environment') do |task|
-          task['metadata']['implementations'] = [{ 'name' => 'tasks_test', 'requirements' => ['powershell'] }]
-          expect {
-            ssh.run_task(target, task, arguments)
-          }.to raise_error("No suitable implementation of #{task['name']} for #{target.name}")
-        end
-      end
-
-      it "errors when a task only requires an unknown requirement" do
-        with_task_containing('tasks_test', contents, 'environment') do |task|
-          task['metadata']['implementations'] = [{ 'name' => 'tasks_test', 'requirements' => ['foobar'] }]
-          expect {
-            ssh.run_task(target, task, arguments)
-          }.to raise_error("No suitable implementation of #{task['name']} for #{target.name}")
-        end
-      end
-    end
-
-    context "when files are provided", ssh: true do
-      let(:contents) { "#!/bin/sh\nfind ${PT__installdir} -type f" }
-      let(:arguments) { {} }
-
-      it "puts files at _installdir" do
-        with_task_containing('tasks_test', contents, 'environment') do |task|
-          task['metadata']['files'] = []
-          expected_files = %w[files/foo files/bar/baz lib/puppet_x/file.rb tasks/init]
-          expected_files.each do |file|
-            task['metadata']['files'] << "tasks_test/#{file}"
-            task['files'] << { 'name' => "tasks_test/#{file}", 'path' => task['files'][0]['path'] }
-          end
-
-          files = ssh.run_task(target, task, arguments).message.split("\n")
-          expected_files = ["tasks/#{File.basename(task['files'][0]['path'])}"] + expected_files
-          expect(files.count).to eq(expected_files.count)
-          files.sort.zip(expected_files.sort).each do |file, expected_file|
-            expect(file).to match(%r{/tasks_test/#{expected_file}$})
-          end
-        end
-      end
-
-      it "includes files from the selected implementation" do
-        with_task_containing('tasks_test', contents, 'environment') do |task|
-          task['metadata']['implementations'] = [
-            { 'name' => 'tasks_test.alt', 'requirements' => ['foobar'], 'files' => ['tasks_test/files/no'] },
-            { 'name' => 'tasks_test', 'requirements' => [], 'files' => ['tasks_test/files/yes'] }
-          ]
-          task['metadata']['files'] = ['other_mod/lib/puppet_x/']
-          task['files'] << { 'name' => 'tasks_test/files/yes', 'path' => task['files'][0]['path'] }
-          task['files'] << { 'name' => 'other_mod/lib/puppet_x/a.rb', 'path' => task['files'][0]['path'] }
-          task['files'] << { 'name' => 'other_mod/lib/puppet_x/b.rb', 'path' => task['files'][0]['path'] }
-          task['files'] << { 'name' => 'tasks_test/files/no', 'path' => task['files'][0]['path'] }
-
-          files = ssh.run_task(target, task, arguments).message.split("\n").sort
-          expect(files.count).to eq(4)
-          expect(files[0]).to match(%r{/other_mod/lib/puppet_x/a.rb$})
-          expect(files[1]).to match(%r{/other_mod/lib/puppet_x/b.rb$})
-          expect(files[2]).to match(%r{/tasks_test/files/yes$})
-          expect(files[3]).to match(%r{/tasks_test/tasks/#{File.basename(task['files'][0]['path'])}$})
-        end
-      end
-    end
-  end
-
-  context 'when tmpdir is specified' do
-    let(:tmpdir) { '/tmp/mytempdir' }
-    let(:config) { mk_config('host-key-check' => false, tmpdir: tmpdir, user: user, password: password) }
-
-    after(:each) do
-      ssh.run_command(target, "rm -rf #{tmpdir}")
-    end
-
-    it "errors when tmpdir doesn't exist", ssh: true do
-      contents = "#!/bin/sh\n echo $0"
-      with_tempfile_containing('script dir', contents) do |file|
-        expect {
-          ssh.run_script(target, file.path, [])
-        }.to raise_error(Bolt::Node::FileError, /Could not make tempdir.*#{Regexp.escape(tmpdir)}/)
-      end
-    end
-
-    it 'uploads a script to the specified tmpdir', ssh: true do
-      ssh.run_command(target, "mkdir #{tmpdir}")
-      contents = "#!/bin/sh\n echo $0"
-      with_tempfile_containing('script dir', contents) do |file|
-        expect(ssh.run_script(target, file.path, [])['stdout']).to match(/#{Regexp.escape(tmpdir)}/)
       end
     end
   end
