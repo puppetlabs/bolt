@@ -50,13 +50,14 @@ module Bolt
   class RunFailure < Bolt::Error
     attr_reader :result_set
 
-    def initialize(result_set, action, object)
+    def initialize(result_set, action, object = nil)
       details = {
         'action' => action,
         'object' => object,
         'result_set' => result_set
       }
-      message = "Plan aborted: #{action} '#{object}' failed on #{result_set.error_set.length} nodes"
+      object_msg = " '#{object}'" if object
+      message = "Plan aborted: #{action}#{object_msg} failed on #{result_set.error_set.length} nodes"
       super(message, 'bolt/run-failure', details)
       @result_set = result_set
       @error_code = 2

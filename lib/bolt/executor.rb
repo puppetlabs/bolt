@@ -256,6 +256,39 @@ module Bolt
       end
     end
 
+    class TimeoutError < RuntimeError; end
+
+    def wait_until_available(targets,
+                             description: 'wait until available',
+                             wait_time: 120,
+                             retry_interval: 1)
+      log_action(description, targets) do
+        batch_execute(targets) do |transport, batch|
+          with_node_logging('Waiting until available', batch) do
+            begin
+              wait_until(wait_time, retry_interval) { transport.batch_connected?(batch) }
+              batch.map { |target| Result.new(target) }
+            rescue TimeoutError => e
+              batch.map { |target| Result.from_exception(target, e) }
+            end
+          end
+        end
+      end
+    end
+
+    # Used to simplify unit testing, to avoid having to mock other calls to Time.now.
+    private def wait_now
+      Time.now
+    end
+
+    def wait_until(timeout, retry_interval)
+      start = wait_now
+      until yield
+        raise(TimeoutError, 'Timed out waiting for target') if (wait_now - start).to_i >= timeout
+        sleep(retry_interval)
+      end
+    end
+
     # Plan context doesn't make sense for most transports but it is tightly
     # coupled with the orchestrator transport since the transport behaves
     # differently when a plan is running. In order to limit how much this

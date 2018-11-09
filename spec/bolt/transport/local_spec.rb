@@ -31,6 +31,10 @@ BASH
   end
 
   context "when executing", bash: true do
+    it 'is always connected' do
+      expect(local.connected?(target)).to eq(true)
+    end
+
     it "executes a command" do
       expect(local.run_command(target, 'echo $HOME').value['stdout'].strip).to eq(ENV['HOME'])
     end

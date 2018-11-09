@@ -75,6 +75,10 @@ module Bolt
           body = build_request(targets, task, arguments, options['_description'])
           @client.run_task(body)
         end
+
+        def query_inventory(targets)
+          @client.post('inventory', nodes: targets.map(&:host))
+        end
       end
     end
   end

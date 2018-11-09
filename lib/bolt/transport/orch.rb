@@ -211,6 +211,11 @@ module Bolt
         end
       end
 
+      def batch_connected?(targets)
+        resp = get_connection(targets.first.options).query_inventory(targets)
+        resp['items'].all? { |node| node['connected'] }
+      end
+
       # run_task generates a result that makes sense for a generic task which
       # needs to be unwrapped to extract stdout/stderr/exitcode.
       #

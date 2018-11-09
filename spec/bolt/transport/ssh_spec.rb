@@ -222,6 +222,14 @@ BASH
       expect(ssh.run_command(target, "echo 'hello \" world'").value).to eq(result_value("hello \" world\n"))
     end
 
+    it "can test whether the target is available", ssh: true do
+      expect(ssh.connected?(target)).to eq(true)
+    end
+
+    it "returns false if the target is not available", ssh: true do
+      expect(ssh.connected?(Bolt::Target.new('unknownfoo'))).to eq(false)
+    end
+
     it "can upload a file to a host", ssh: true do
       contents = "kljhdfg"
       with_tempfile_containing('upload-test', contents) do |file|

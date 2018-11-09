@@ -153,6 +153,11 @@ module Bolt
         end
       end
 
+      def batch_connected?(targets)
+        assert_batch_size_one("connected?()", targets)
+        connected?(targets.first)
+      end
+
       # Split the given list of targets into a list of batches. The default
       # implementation returns single-node batches.
       #
@@ -180,6 +185,11 @@ module Bolt
       # Transports should override this method with their own implementation of file upload.
       def upload(*_args)
         raise NotImplementedError, "upload() must be implemented by the transport class"
+      end
+
+      # Transports should override this method with their own implementation of a connection test.
+      def connected?(_targets)
+        raise NotImplementedError, "connected?() must be implemented by the transport class"
       end
 
       # Unwraps any Sensitive data in an arguments Hash, so the plain-text is passed

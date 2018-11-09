@@ -310,6 +310,55 @@ describe "Bolt::Executor" do
     end
   end
 
+  context 'waiting until targets are available' do
+    it 'waits on all nodes' do
+      node_results.each do |target, _|
+        expect(ssh)
+          .to receive(:connected?)
+          .with(target)
+          .and_return(true)
+      end
+
+      results = executor.wait_until_available(targets)
+      results.each do |result|
+        expect(result).to be_instance_of(Bolt::Result)
+      end
+    end
+
+    it 'errors after timeout' do
+      allow(ssh).to receive(:connected?).and_return(false)
+
+      results = executor.wait_until_available(targets, wait_time: 0, retry_interval: 0)
+      results.each do |result|
+        expect(result.error_hash['msg']).to eq('Timed out waiting for target')
+        expect(result.error_hash['kind']).to eq('puppetlabs.tasks/exception-error')
+      end
+    end
+
+    it 'errors after a short timeout' do
+      allow(ssh).to receive(:connected?).and_return(false)
+      expect(executor).to receive(:wait_now).and_return(Time.now - 1, Time.now, Time.now + 1)
+      expect(executor).to receive(:sleep).with(1)
+
+      results = executor.wait_until_available([targets[0]], wait_time: 2, retry_interval: 1)
+      results.each do |result|
+        expect(result.error_hash['msg']).to eq('Timed out waiting for target')
+        expect(result.error_hash['kind']).to eq('puppetlabs.tasks/exception-error')
+      end
+    end
+
+    it 'errors after default timeout' do
+      allow(ssh).to receive(:connected?).and_return(false)
+      expect(executor).to receive(:wait_now).and_return(Time.now - 121, Time.now)
+
+      results = executor.wait_until_available([targets[0]])
+      results.each do |result|
+        expect(result.error_hash['msg']).to eq('Timed out waiting for target')
+        expect(result.error_hash['kind']).to eq('puppetlabs.tasks/exception-error')
+      end
+    end
+  end
+
   it "returns and notifies an error result" do
     node_results.each_key do |_target|
       expect(ssh)

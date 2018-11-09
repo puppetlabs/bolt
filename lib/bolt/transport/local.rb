@@ -117,6 +117,10 @@ module Bolt
           Bolt::Result.for_task(target, output.stdout.string, output.stderr.string, output.exit_code)
         end
       end
+
+      def connected?(_targets)
+        true
+      end
     end
   end
 end

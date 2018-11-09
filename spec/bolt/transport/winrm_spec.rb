@@ -143,6 +143,10 @@ PS
   context "connecting over SSL", winrm: true do
     let(:target) { make_target(port_: ssl_port, conf: ssl_config) }
 
+    it "can test whether the target is available", winrm: true do
+      expect(winrm.connected?(target)).to eq(true)
+    end
+
     it "executes a command on a host" do
       expect(winrm.run_command(target, command)['stdout']).to eq("#{user}\r\n")
     end
@@ -174,6 +178,14 @@ PS
   end
 
   context "with an open connection" do
+    it "can test whether the target is available", winrm: true do
+      expect(winrm.connected?(target)).to eq(true)
+    end
+
+    it "returns false if the target is not available", winrm: true do
+      expect(winrm.connected?(Bolt::Target.new('winrm://unknownfoo'))).to eq(false)
+    end
+
     it "executes a command on a host", winrm: true do
       expect(winrm.run_command(target, command)['stdout']).to eq("#{user}\r\n")
     end

@@ -562,4 +562,25 @@ describe Bolt::Transport::Orch, orchestrator: true do
       end
     end
   end
+
+  describe 'batch_connected?' do
+    it 'returns true if all targets are connected' do
+      result = { 'items' => targets.map { |_| { 'connected' => true } } }
+      expect(mock_client).to receive(:post).with('inventory', nodes: targets.map(&:host)).and_return(result)
+      expect(orch.batch_connected?(targets)).to eq(true)
+    end
+
+    it 'returns false if all targets are not connected' do
+      result = { 'items' => targets.map { |_| { 'connected' => false } } }
+      expect(mock_client).to receive(:post).with('inventory', nodes: targets.map(&:host)).and_return(result)
+      expect(orch.batch_connected?(targets)).to eq(false)
+    end
+
+    it 'returns false if any targets are not connected' do
+      result = { 'items' => targets.map { |_| { 'connected' => true } } }
+      result['items'][0]['connected'] = false
+      expect(mock_client).to receive(:post).with('inventory', nodes: targets.map(&:host)).and_return(result)
+      expect(orch.batch_connected?(targets)).to eq(false)
+    end
+  end
 end

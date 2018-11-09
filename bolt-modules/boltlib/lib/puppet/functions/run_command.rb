@@ -26,7 +26,7 @@ Puppet::Functions.create_function(:run_command) do
   # @param options Additional options: '_catch_errors', '_run_as'.
   # @return A list of results, one entry per target.
   # @example Run a command on targets
-  #   run_command('hostname', $targets, '_catch_errors' => true)
+  #   run_command('hostname', $targets, 'Get hostname')
   dispatch :run_command_with_description do
     param 'String[1]', :command
     param 'Boltlib::TargetSpec', :targets
