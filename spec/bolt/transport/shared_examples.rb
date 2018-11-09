@@ -22,7 +22,7 @@ def posix_context
     ls_cmd: 'ls',
     env_task: "#!/bin/sh\nprintenv PT_message_one\nprintenv PT_message_two",
     stdin_task: "#!/bin/sh\ncat",
-    find_task: "#!/bin/sh\nfind ${PT__installdir} -type f",
+    find_task: "#!/bin/sh\nfind ${PT__installdir} -type f -exec wc -c {} \\;",
     identity_script: "#!/bin/sh\n echo $0",
     echo_script: <<BASH
 #!/bin/sh
@@ -311,17 +311,18 @@ QUOTED
           { 'name' => 'tasks_test', 'requirements' => [], 'files' => ['tasks_test/files/yes'] }
         ]
         task['metadata']['files'] = ['other_mod/lib/puppet_x/']
-        task['files'] << { 'name' => 'tasks_test/files/yes', 'path' => task['files'][0]['path'] }
-        task['files'] << { 'name' => 'other_mod/lib/puppet_x/a.rb', 'path' => task['files'][0]['path'] }
-        task['files'] << { 'name' => 'other_mod/lib/puppet_x/b.rb', 'path' => task['files'][0]['path'] }
-        task['files'] << { 'name' => 'tasks_test/files/no', 'path' => task['files'][0]['path'] }
+        task_path = task['files'][0]['path']
+        task['files'] << { 'name' => 'tasks_test/files/yes', 'path' => task_path }
+        task['files'] << { 'name' => 'other_mod/lib/puppet_x/a.rb', 'path' => task_path }
+        task['files'] << { 'name' => 'other_mod/lib/puppet_x/b.rb', 'path' => task_path }
+        task['files'] << { 'name' => 'tasks_test/files/no', 'path' => task_path }
 
         files = runner.run_task(target, task, arguments).message.split("\n").sort
         expect(files.count).to eq(4)
-        expect(files[0]).to match(%r{/other_mod/lib/puppet_x/a.rb$})
-        expect(files[1]).to match(%r{/other_mod/lib/puppet_x/b.rb$})
-        expect(files[2]).to match(%r{/tasks_test/files/yes$})
-        expect(files[3]).to match(%r{/tasks_test/tasks/#{File.basename(task['files'][0]['path'])}$})
+        expect(files[0]).to match(%r{#{contents.size} [^ ]+/other_mod/lib/puppet_x/a.rb$})
+        expect(files[1]).to match(%r{#{contents.size} [^ ]+/other_mod/lib/puppet_x/b.rb$})
+        expect(files[2]).to match(%r{#{contents.size} [^ ]+/tasks_test/files/yes$})
+        expect(files[3]).to match(%r{#{contents.size} [^ ]+/tasks_test/tasks/#{File.basename(task_path)}$})
       end
     end
   end

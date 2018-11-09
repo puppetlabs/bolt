@@ -2,10 +2,24 @@
 
 require 'spec_helper'
 require 'bolt_spec/integration'
-require 'bolt_spec/conn'
 require 'bolt/util'
 
-shared_examples "invalid metadata" do
+describe "Shareable tasks with files", bash: true do
+  include BoltSpec::Integration
+
+  let(:modulepath) { File.join(__dir__, '../fixtures/modules') }
+  let(:config_flags) { %W[--format json --nodes localhost --modulepath #{modulepath}] }
+
+  it 'runs a task with multiple files' do
+    result = run_cli_json(%w[task run shareable] + config_flags)
+    files = result['items'][0]['result']['_output'].split("\n").map(&:strip).sort
+    expect(files.count).to eq(4)
+    expect(files[0]).to match(%r{^174 .*/shareable/tasks/unknown_file.json$})
+    expect(files[1]).to match(%r{^236 .*/shareable/tasks/list.sh})
+    expect(files[2]).to match(%r{^310 .*/results/lib/puppet/functions/results/make_result.rb$})
+    expect(files[3]).to match(%r{^43 .*/error/tasks/fail.sh$})
+  end
+
   it 'fails with an unknown file' do
     expect {
       run_cli_json(%w[task run shareable::unknown_file] + config_flags)
@@ -42,60 +56,5 @@ shared_examples "invalid metadata" do
     expect {
       run_cli_json(%w[task run shareable::not_a_file] + config_flags)
     }.to raise_error(Bolt::PAL::PALError, msg)
-  end
-end
-
-describe "Shareable tasks with files" do
-  include BoltSpec::Integration
-  include BoltSpec::Conn
-
-  let(:modulepath) { File.join(__dir__, '../fixtures/modules') }
-  let(:config_flags) { %W[--format json --nodes #{target} --modulepath #{modulepath}] + options }
-
-  describe 'over ssh', ssh: true do
-    let(:target) { conn_uri('ssh', include_password: true) }
-    let(:options) { %w[--no-host-key-check] }
-
-    it 'runs a task with multiple files' do
-      result = run_cli_json(%w[task run shareable] + config_flags)
-      files = result['items'][0]['result']['_output'].split("\n").map(&:strip).sort
-      expect(files.count).to eq(4)
-      expect(files[0]).to match(%r{^174 .*/shareable/tasks/unknown_file.json$})
-      expect(files[1]).to match(%r{^236 .*/shareable/tasks/list.sh})
-      expect(files[2]).to match(%r{^310 .*/results/lib/puppet/functions/results/make_result.rb$})
-      expect(files[3]).to match(%r{^43 .*/error/tasks/fail.sh$})
-    end
-
-    include_examples "invalid metadata"
-  end
-
-  describe 'over winrm', winrm: true do
-    let(:target) { conn_uri('winrm') }
-    let(:options) { %W[--no-ssl --password #{conn_info('winrm')[:password]}] }
-
-    it 'runs a task with multiple files' do
-      result = run_cli_json(%w[task run shareable] + config_flags)
-      files = result['items'][0]['result']['_output'].split("\n").map(&:strip).sort
-      expect(files).to eq(%w[178 284 310 43])
-    end
-
-    include_examples "invalid metadata"
-  end
-
-  describe 'over local:bash', bash: true do
-    let(:target) { 'localhost' }
-    let(:options) { [] }
-
-    it 'runs a task with multiple files' do
-      result = run_cli_json(%w[task run shareable] + config_flags)
-      files = result['items'][0]['result']['_output'].split("\n").map(&:strip).sort
-      expect(files.count).to eq(4)
-      expect(files[0]).to match(%r{^174 .*/shareable/tasks/unknown_file.json$})
-      expect(files[1]).to match(%r{^236 .*/shareable/tasks/list.sh})
-      expect(files[2]).to match(%r{^310 .*/results/lib/puppet/functions/results/make_result.rb$})
-      expect(files[3]).to match(%r{^43 .*/error/tasks/fail.sh$})
-    end
-
-    include_examples "invalid metadata"
   end
 end

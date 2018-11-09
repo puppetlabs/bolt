@@ -694,7 +694,9 @@ PS
     end
 
     context "when files are provided", winrm: true do
-      let(:contents) { 'Get-ChildItem -Path $env:PT__installdir -Recurse -File -Name' }
+      let(:contents) {
+        'Get-ChildItem -Path $env:PT__installdir -Recurse -File | Select-Object Length, FullName | ft -hidetableheaders'
+      }
       let(:arguments) { {} }
 
       it "puts files at _installdir" do
@@ -706,11 +708,11 @@ PS
             task['files'] << { 'name' => "tasks_test/#{file}", 'path' => task['files'][0]['path'] }
           end
 
-          files = winrm.run_task(target, task, arguments).message.split("\n")
+          files = winrm.run_task(target, task, arguments).message.split("\n").map(&:strip).reject(&:empty?)
           expected_files = ["tasks/#{File.basename(task['files'][0]['path'])}"] + expected_files
           expect(files.count).to eq(expected_files.count)
           files.sort.zip(expected_files.sort).each do |file, expected_file|
-            expect(file.strip).to eq("tasks_test\\#{expected_file.gsub(%r{/}, '\\')}")
+            expect(file).to match(/\\tasks_test\\#{expected_file.gsub(%r{/}, '\\\\\\')}$/)
           end
         end
       end
@@ -722,17 +724,18 @@ PS
             { 'name' => 'tasks_test', 'requirements' => [], 'files' => ['tasks_test/files/yes'] }
           ]
           task['metadata']['files'] = ['other_mod/lib/puppet_x/']
-          task['files'] << { 'name' => 'tasks_test/files/yes', 'path' => task['files'][0]['path'] }
-          task['files'] << { 'name' => 'other_mod/lib/puppet_x/a.rb', 'path' => task['files'][0]['path'] }
-          task['files'] << { 'name' => 'other_mod/lib/puppet_x/b.rb', 'path' => task['files'][0]['path'] }
-          task['files'] << { 'name' => 'tasks_test/files/no', 'path' => task['files'][0]['path'] }
+          task_path = task['files'][0]['path']
+          task['files'] << { 'name' => 'tasks_test/files/yes', 'path' => task_path }
+          task['files'] << { 'name' => 'other_mod/lib/puppet_x/a.rb', 'path' => task_path }
+          task['files'] << { 'name' => 'other_mod/lib/puppet_x/b.rb', 'path' => task_path }
+          task['files'] << { 'name' => 'tasks_test/files/no', 'path' => task_path }
 
-          files = winrm.run_task(target, task, arguments).message.split("\n").sort
+          files = winrm.run_task(target, task, arguments).message.split("\n").map(&:strip).reject(&:empty?).sort
           expect(files.count).to eq(4)
-          expect(files[0].strip).to eq("other_mod\\lib\\puppet_x\\a.rb")
-          expect(files[1].strip).to eq("other_mod\\lib\\puppet_x\\b.rb")
-          expect(files[2].strip).to eq("tasks_test\\files\\yes")
-          expect(files[3].strip).to eq("tasks_test\\tasks\\#{File.basename(task['files'][0]['path'])}")
+          expect(files[0]).to match(/#{contents.size} [^ ]+\\other_mod\\lib\\puppet_x\\a.rb$/)
+          expect(files[1]).to match(/#{contents.size} [^ ]+\\other_mod\\lib\\puppet_x\\b.rb$/)
+          expect(files[2]).to match(/#{contents.size} [^ ]+\\tasks_test\\files\\yes$/)
+          expect(files[3]).to match(/#{contents.size} [^ ]+\\tasks_test\\tasks\\#{File.basename(task_path)}$/)
         end
       end
     end
