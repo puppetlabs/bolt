@@ -1,0 +1,19 @@
+{"task":{
+  "metadata":{},
+  "name":"sample::echo",
+  "files":[{
+    "filename":"echo.sh",
+    "sha256":"c5abefbdecee006bd65ef6f625e73f0ebdd1ef3f1b8802f22a1b9644a516ce40",
+    "size_bytes":64,
+    "uri":{
+      "path":"/puppet/v3/file_content/tasks/sample/echo.sh",
+      "params":{
+        "environment":"production"}}}]},
+        "target":{
+          "hostname":"172.20.0.1",
+          "user":"bolt",
+          "password":"bolt",
+          "port": 20022,
+          "host-key-check":false},
+          "parameters":{
+            "message":"hey"}}

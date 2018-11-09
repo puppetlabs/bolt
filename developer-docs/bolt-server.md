@@ -186,31 +186,8 @@ For example:
 If the task runs the response will have status 200.
 The response will be a standard bolt Result JSON object.
 
-## Running from source
-
-From your checkout of bolt run
-
-```
-BOLT_SERVER_CONF=config/local.conf bundle exec puma -C puppet_config.rb
-```
-
-
-setup your environment for running commands with
-
-```
-export BOLT_CACERT=spec/fixtures/ssl/ca.pem
-export BOLT_CERT=spec/fixtures/ssl/cert.pem
-export BOLT_KEY=spec/fixtures/ssl/key.pem
-export BOLT_ROOT=https://localhost:62658
-```
-
-you can now make a curl request to bolt which should have an empty response
-
-```
-curl -v --cacert $BOLT_CACERT --cert $BOLT_CERT --key $BOLT_KEY $BOLT_ROOT
-```
-
 ## Running in a container
+*Recommended*
 
 From your checkout of bolt start the spec docker-compose to run
 puppet-server and some targets then run the top level compose to start
@@ -221,8 +198,7 @@ docker-compose -f spec/docker-compose.yml up -d --build
 docker-compose up --build
 ```
 
-setup your environment for running commands with
-
+Setup your environment for running commands with
 ```
 export BOLT_CACERT=spec/fixtures/ssl/ca.pem
 export BOLT_CERT=spec/fixtures/ssl/cert.pem
@@ -230,8 +206,28 @@ export BOLT_KEY=spec/fixtures/ssl/key.pem
 export BOLT_ROOT=https://localhost:62658
 ```
 
-you can now make a curl request to bolt which should have an empty response
+You can now make a curl request to bolt which should have an empty response
+```
+curl -v --cacert $BOLT_CACERT --cert $BOLT_CERT --key $BOLT_KEY $BOLT_ROOT
+```
 
+## Running from source
+
+From your checkout of bolt run
+
+```
+BOLT_SERVER_CONF=config/local.conf bundle exec puma -C puppet_config.rb
+```
+
+Setup your environment for running commands with
+```
+export BOLT_CACERT=spec/fixtures/ssl/ca.pem
+export BOLT_CERT=spec/fixtures/ssl/cert.pem
+export BOLT_KEY=spec/fixtures/ssl/key.pem
+export BOLT_ROOT=https://localhost:62658
+```
+
+You can now make a curl request to bolt which should have an empty response
 ```
 curl -v --cacert $BOLT_CACERT --cert $BOLT_CERT --key $BOLT_KEY $BOLT_ROOT
 ```
@@ -241,52 +237,68 @@ curl -v --cacert $BOLT_CACERT --cert $BOLT_CERT --key $BOLT_KEY $BOLT_ROOT
 ### With the ruby client
 
 There is a simple ruby client that can be used to make requests to a local
-bolt_server during development at `scripts/server_client.rb`. This server
+bolt server during development at `scripts/server_client.rb`. This server
 expects to use the puppet-server container and target nodes from bolts spec
-environment so run `docker-compose up -d --build` from the spec directory before
-trying to use it.
+environment so follow instructions in the [running in a
+container](#running-in-a-container) section first!
 
 ```
-bundle exec scripts/server_client.rb sample::echo ssh '{"message": "hey"}'
+bundle exec scripts/server_client.rb sample::echo <TARGET> '{"message": "hey"}'
 ```
+
+Where `<TARGET>` is either:
+* A vmpooler VM. To use this, replace `<TARGET>` above with the hostname.
+* One of the containers brought up by the `docker-compose` in the `spec` directory. To use these, you'll want to:
+
+    * get the IP of the **bolt-server container** (not the target container):
+      ```
+      docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' bolt_boltserver_1
+      # Should return an IP such as 172.20.0.1
+      ```
+    * Append the port of one of the 3 containers to that IP: `20022` (for an ubuntu node with no agent), `20023` (for a puppet 5 agent), or `20024` (for a puppet 6 agent). It's also helpful to include the protocol (`ssh`), user (`bolt`), and password (`bolt`) in the URI.
+
+So your request will be something like:
+```
+bundle exec scripts/server_client.rb sample::echo ssh://bolt:bolt@172.20.0.1:20022 '{"message": "hey"}'
+```
+
+**Note**: All tasks in the `bolt/spec/fixtures/modules` directory will be available from the puppetserver container to run.
 
 ### With cURL
-The following is an example request body update it and save it to request.json
+
+The following is an example request body. There are other request examples in the `developer-docs/examples` directory. Note that all tasks in the `bolt/spec/fixtures/modules` are available from the puppetserver container, so a json request can be constructed using those tasks and the json structure below.
 
 ```
-{
-  "target": {
-    "hostname": [hostname of target],
-    "user": "root",
-    "private-key-content": [Contents of ssh private key as a string],
-    "host-key-check": false
-  },
-  "task": {
-    "name": "echo",
-    "metadata": {
-      "description": "Echo a message",
-      "parameters": {
-        "message": "Default string"
-      }
-    },
-    "file": {
-      "filename": "echo.sh",
-      "file_content": "IyEvdXNyL2Jpbi9lbnYgYmFzaAplY2hvICRQVF9tZXNzYWdlCg==\n"
-    }
-  },
-  "parameters": {
-    "message": "Hello world"
-  }
-}
+{"task":{
+  "metadata":{},
+  "name":"sample::echo",
+  "files":[{
+    "filename":"echo.sh",
+    "sha256":"c5abefbdecee006bd65ef6f625e73f0ebdd1ef3f1b8802f22a1b9644a516ce40",
+    "size_bytes":64,
+    "uri":{
+      "path":"/puppet/v3/file_content/tasks/sample/echo.sh",
+      "params":{
+        "environment":"production"}}}]},
+"target":{
+  "hostname":"172.20.0.1",
+  "user":"bolt",
+  "password":"bolt",
+  "port": 20022,
+  "host-key-check":false},
+"parameters":{
+  "message":"hey"}}
 ```
+**Verify that the target information** is correct, and change it if you want to use a different target. You can find other example requests in the `examples` directory.
+
 You should then be able to post it with:
-
 ```
-curl -X POST -H "Content-Type: application/json" -d @request.json --cacert $BOLT_CACERT --cert $BOLT_CERT --key $BOLT_KEY $BOLT_ROOT $BOLT_ROOT/ssh/run_task
+curl -X POST -H "Content-Type: application/json" -d @developer-docs/examples/ssh-echo.json --cacert $BOLT_CACERT --cert $BOLT_CERT --key $BOLT_KEY $BOLT_ROOT/ssh/run_task
 ```
 expected output
 ```
-{"node":"xlr5bknywm58t94.delivery.puppetlabs.net",
+{"node":"172.18.0.1",
 "status":"success",
-"result":{"_output":"Hello world\n"}}
+"result":{"_output":"ac80223bd3b4 got passed the message: hey\n"}}
 ```
+
