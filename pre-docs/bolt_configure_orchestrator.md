@@ -23,11 +23,11 @@ To set up Bolt to use the orchestrator API you must do the following:
 
 **Note:** For more information on setting up orchestrator, see the PE pages:
 
--    [Installing PE client tools](https://puppet.com/docs/pe/2018.1/installing/installing_pe_client_tools.html) 
+-    [Installing PE client tools](https://puppet.com/docs/pe/latest/installing/installing_pe_client_tools.html) 
 
--    [Token-based authentication](https://puppet.com/docs/pe/2018.1/rbac/rbac_token_auth_intro.html#token-based-authentication) 
+-    [Token-based authentication](https://puppet.com/docs/pe/latest/rbac/rbac_token_auth_intro.html#token-based-authentication) 
 
--    [Configuring Puppet orchestrator](https://puppet.com/docs/pe/2018.1/orchestrator/configuring_puppet_orchestrator.html) 
+-    [Configuring Puppet orchestrator](https://puppet.com/docs/pe/latest/orchestrator/configuring_puppet_orchestrator.html) 
 
 
 ## Install the Bolt module in a PE environment
@@ -68,9 +68,7 @@ Set up the orchestrator API for Bolt in the same user-specified configuration fi
 
 **Tip:** You can also configure orchestrator in the Bolt configuration file \(`~/.puppetlabs/bolt/bolt.yaml`\) or the configuration section of the inventory file \(`~/.puppetlabs/bolt/inventory.yaml`\).
 
-Bolt can be configured to connect to Orchestrator in the `pcp` section of the bolt config file as well. This configuration will not be shared with `puppet task`.
-
-By default Bolt uses the production environment in PE when running tasks. To use a different environment change the `task-environment` setting in bolt config.
+Bolt can be configured to connect to Orchestrator in the `pcp` section of the Bolt configuration file as well. This configuration will not be shared with `puppet task`. By default Bolt uses the production environment in PE when running tasks. To use a different environment change the `task-environment` setting.
 
 ```
 pcp:

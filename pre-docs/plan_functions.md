@@ -173,7 +173,7 @@ puppetdb_fact(['app.example.com', 'db.example.com'])
 
 ### puppetdb\_query
 
-Makes a query to puppetdb using Bolt's PuppetDB client.
+Makes a query to PuppetDB using Bolt's PuppetDB client.
 
 ```
 puppetdb_query(Variant[String, Array[Data]] $query)

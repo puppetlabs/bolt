@@ -4,7 +4,11 @@ New features added to Bolt in the 1.x release series. 
 
 ## Apply Puppet manifest code with bolt apply command \(1.2.0\)
 
-The command `bolt apply` has been added to apply Puppet manifest code on targets without wrapping them in an `apply()` block in a plan. [\(BOLT-858](https://tickets.puppetlabs.com/browse/BOLT-858)\)
+The command `bolt apply` has been added to apply Puppet manifest code on targets without wrapping them in an `apply()` block in a plan.
+
+**Note:** This command is in development and subject to change.
+
+[\(BOLT-858](https://tickets.puppetlabs.com/browse/BOLT-858)\)
 
 ## Python and Ruby helper libraries for tasks \(1.2.0\)
 

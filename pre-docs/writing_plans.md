@@ -51,7 +51,7 @@ You can specify parameters in your plan.
 
 Specify each parameter in your plan with its data type. For example, you might want parameters to specify which nodes to run different parts of your plan on.
 
-The following example shows node parameters specified as data type `TargetSpec`. This allows this parameter to be passed as a single url, comma-separated url list, Target data type or Array of either. For more information about these data types, see the common data types table in the related metadata type topic.
+The following example shows node parameters specified as data type `TargetSpec`. This allows this parameter to be passed as a single URL, comma-separated URL list, Target data type or Array of either. For more information about these data types, see the common data types table in the related metadata type topic.
 
 This allows the user to pass, for each parameter, either a simple node name or a URI that describes the protocol to use, the hostname, username and password.
 
@@ -71,7 +71,7 @@ plan mymodule::my_plan(
 }
 ```
 
-To execute this plan from the command line, pass the parameters as `parameter=value`. The `Targetspec` will accept either an array as json or a comma seperated string of target names.
+To execute this plan from the command line, pass the parameters as `parameter=value`. The `Targetspec` will accept either an array as json or a comma separated string of target names.
 
 ```
 bolt plan run mymodule::myplan --modulepath ./PATH/TO/MODULES --params load_balancer=lb.myorg.com frontends='["kermit.myorg.com","gonzo.myorg.com"]' backends=waldorf.myorg.com,statler.myorg.com
@@ -241,7 +241,7 @@ A `ResultSet` has the following methods:
 
 -   `error_set()`: A `ResultSet`containing only the results of failed nodes.
 
--   `ok_set()`: A `ResultSet` containing only the sucessful results.
+-   `ok_set()`: A `ResultSet` containing only the successful results.
 
 -   `targets()`: An array of all the `Target` objects from every `Result`in the set.
 
@@ -380,7 +380,7 @@ The facts plan connects to the target and discovers facts. It then stores these 
 The methods used to collect facts:
 
 -   On `ssh` targets it runs a simple bash script.
--   On `winrm` targets it runs a simple powershell script.
+-   On `winrm` targets it runs a simple PowerShell script.
 -   On `pcp` or targets where the puppet agent is present, it runs facter.
 
 This example collects facts with the facts plan and then uses those facts to decide which task to run on the targets.
@@ -424,7 +424,7 @@ Set up log files to record certain events that occur when you run plans.
 
 ### Puppet log functions
 
-To generate log messages from a plan, use the puppet log function that corresponds to the level you want to track: `error`, `warn`, `notice`, `info`, or `debug`. The default log level for Bolt is `notice` but you can set it to `info` with the `--verbose `flag or `debug` with the `--debug` flag.
+To generate log messages from a plan, use the Puppet log function that corresponds to the level you want to track: `error`, `warn`, `notice`, `info`, or `debug`. The default log level for Bolt is `notice` but you can set it to `info` with the `--verbose `flag or `debug` with the `--debug` flag.
 
 ### Default action logging
 

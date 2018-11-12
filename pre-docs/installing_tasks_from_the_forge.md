@@ -52,7 +52,7 @@ This list of packaged modules is available in a Puppetfile in the [Bolt reposito
 
 -   [canary](https://github.com/puppetlabs/bolt/tree/master/modules/canary): Run action against a small number of nodes and only if it succeeds will it run on the rest.
 
--   [puppetdb\_fact](https://github.com/puppetlabs/bolt/tree/master/modules/puppetdb_fact): Collect facts for the specified nodes from the configured PuppetDB connection and stores the collected facts on the Targets.
+-   [puppetdb\_fact](https://github.com/puppetlabs/bolt/tree/master/modules/puppetdb_fact): Collect facts for the specified nodes from the configured PuppetDB connection and use those facts to update the Target data types in a plan. 
 
 
 **Tip:** To override a packaged module with another version, download the version you want and configure your modulepath to point to it.
@@ -72,7 +72,7 @@ Before you can use Bolt to install modules, you must first create a Puppetfile. 
 
 For modules that require Ruby gems, see [Install gems with Bolt packages](bolt_installing.md#)
 
-For more details about specifying modules in a Puppetfile, see the [Puppetfile documentation](https://puppet.com/docs/pe/2018.1/puppetfile.html).
+For more details about specifying modules in a Puppetfile, see the [Puppetfile documentation](https://puppet.com/docs/pe/latest/puppetfile.html).
 
 1.  Create a file named Puppetfile and store it in the Boltdir, which can be a directory named Boltdir at the root of your project or a global directory in `$HOME/.puppetlabs/bolt`.
 2.  Open the Puppetfile in a text editor and add the modules and versions that you want to install. If the modules have dependencies, list those as well. 
@@ -103,6 +103,6 @@ For more details about specifying modules in a Puppetfile, see the [Puppetfile d
 
 4.  From a terminal, install the modules listed in the Puppetfile: `bolt puppetfile install`. 
 
-    By default, Bolt installs modules to the modules subdirectory inside the Boltdir. To override this location, update the modulepath setting in the Bolt config file.
+    By default, Bolt installs modules to the modules subdirectory inside the Boltdir. To override this location, update the modulepath setting in the Bolt configuration file.
 
 

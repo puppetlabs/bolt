@@ -1,8 +1,8 @@
 # Bolt configuration options
 
-Your Bolt config file can contain global and transport options.
+Your Bolt configuration file can contain global and transport options.
 
-## Sample Bolt config file
+## Sample Bolt configuration file
 
 ```
 modulepath: "~/.puppetlabs/bolt-code/modules:~/.puppetlabs/bolt-code/site"

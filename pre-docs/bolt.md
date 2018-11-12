@@ -55,9 +55,9 @@ Bolt is an open source task runner that automates the manual work that you do to
 
  [Open source Puppet](https://puppet.com/docs/puppet/latest/index.html) 
 
- [ Puppet Enterprise ](https://puppet.com/docs/pe/2018.1/pe_user_guide.html) 
+ [ Puppet Enterprise ](https://puppet.com/docs/pe/latest/pe_user_guide.html) 
 
- [Puppet Development Kit](https://puppet.com/docs/pdk/1.x/pdk.html) 
+ [Puppet Development Kit](https://puppet.com/docs/pdk/latest/pdk.html) 
 
 
  -   **Why and how people are using Bolt**
