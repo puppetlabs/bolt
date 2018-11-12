@@ -83,7 +83,7 @@ echo hello
 
 ### Requirements for scripts run on remote Windows systems
 
-Bolt supports the extensions `.ps1`, `.rb`, and `.pp`. To enable other file extensions, add them to your Bolt config, as follows:
+Bolt supports the extensions `.ps1`, `.rb`, and `.pp`. To enable other file extensions, add them to your Bolt configuration file, as follows:
 
 ```
 winrm:
