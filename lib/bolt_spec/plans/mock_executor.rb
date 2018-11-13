@@ -177,9 +177,11 @@ module BoltSpec
     # Nothing on the executor is 'public'
     class MockExecutor
       attr_reader :noop, :error_message
+      attr_accessor :run_as
 
       def initialize
         @noop = false
+        @run_as = nil
         @task_doubles = {}
         @allow_any_task = true
         @error_message = nil
