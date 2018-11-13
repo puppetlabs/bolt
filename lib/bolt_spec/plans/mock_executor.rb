@@ -209,7 +209,15 @@ module BoltSpec
         @task_doubles[task_name] ||= TaskDouble.new
       end
 
+      def wait_until_available(targets, _options)
+        targets.map { |target| Bolt::Result.new(target) }
+      end
+
       def log_plan(_plan_name)
+        yield
+      end
+
+      def without_default_logging
         yield
       end
 

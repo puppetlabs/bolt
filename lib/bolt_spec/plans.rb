@@ -91,6 +91,16 @@ require 'bolt/pal'
 #
 module BoltSpec
   module Plans
+    def self.init
+      # Ensure tasks are enabled when rspec-puppet sets up an environment so we get task loaders.
+      # Note that this is probably not safe to do in modules that also test Puppet manifest code.
+      Bolt::PAL.load_puppet
+      Puppet[:tasks] = true
+
+      # Ensure logger is initialized with Puppet levels so 'notice' works when running plan specs.
+      Logging.init :debug, :info, :notice, :warn, :error, :fatal, :any
+    end
+
     # Override in your tests if needed
     def modulepath
       [RSpec.configuration.module_path]
