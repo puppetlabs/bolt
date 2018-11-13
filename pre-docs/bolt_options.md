@@ -110,7 +110,11 @@ groups:
 
 ### Set a default transport
 
-To set a default transport protocol, pass it with the command with the `--transport` option.
+To set a default transport protocol, pass it with the command with the `--transport` option. Available transports are
+- `ssh`
+- `winrm`
+- `local`
+- `docker`
 
 Pass the `--transport` option after the nodes list:
 

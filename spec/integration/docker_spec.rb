@@ -1,18 +1,20 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'bolt_spec/conn'
 require 'bolt_spec/files'
 require 'bolt_spec/integration'
 
-describe "when running over the local transport", bash: true do
+describe "when running over the docker transport", docker: true do
+  include BoltSpec::Conn
   include BoltSpec::Files
   include BoltSpec::Integration
 
   let(:whoami) { "whoami" }
   let(:modulepath) { File.join(__dir__, '../fixtures/modules') }
   let(:stdin_task) { "sample::stdin" }
-  let(:uri) { 'localhost,local://foo' }
-  let(:user) { ENV['USER'] }
+  let(:uri) { (1..2).map { |i| "#{conn_uri('docker')}?id=#{i}" }.join(',') }
+  let(:user) { 'root' }
 
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
 

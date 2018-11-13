@@ -14,17 +14,17 @@ RSpec::Core::RakeTask.new(:spec)
 
 desc "Run RSpec tests that don't require VM fixtures or a particular shell"
 RSpec::Core::RakeTask.new(:unit) do |t|
-  t.rspec_opts = '--tag ~ssh --tag ~bash --tag ~winrm --tag ~appveyor_agents --tag ~puppetserver'
+  t.rspec_opts = '--tag ~ssh --tag ~docker --tag ~bash --tag ~winrm --tag ~appveyor_agents --tag ~puppetserver'
 end
 
 desc "Run RSpec tests for AppVeyor that don't require SSH, Bash, Appveyor Puppet Agents, or orchestrator"
 RSpec::Core::RakeTask.new(:appveyor) do |t|
-  t.rspec_opts = '--tag ~ssh --tag ~bash --tag ~appveyor_agents --tag ~orchestrator --tag ~puppetserver'
+  t.rspec_opts = '--tag ~ssh --tag ~docker --tag ~bash --tag ~appveyor_agents --tag ~orchestrator --tag ~puppetserver'
 end
 
 desc "Run RSpec tests for TravisCI that don't require WinRM"
 RSpec::Core::RakeTask.new(:travisci) do |t|
-  t.rspec_opts = '--tag ~winrm --tag ~appveyor_agents  --tag ~puppetserver'
+  t.rspec_opts = '--tag ~winrm --tag ~appveyor_agents --tag ~puppetserver'
 end
 
 desc "Run RSpec tests that require pupperserver"
@@ -115,6 +115,11 @@ namespace :integration do
   desc 'Run tests that require a host System Under Test configured with SSH'
   RSpec::Core::RakeTask.new(:ssh) do |t|
     t.rspec_opts = '--tag ssh'
+  end
+
+  desc 'Run tests that require a host System Under Test configured with Docker'
+  RSpec::Core::RakeTask.new(:docker) do |t|
+    t.rspec_opts = '--tag docker'
   end
 
   desc 'Run tests that require Bash on the local host'

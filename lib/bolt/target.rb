@@ -47,8 +47,8 @@ module Bolt
       @password = t_conf['password']
       @port = t_conf['port']
 
-      url_keys = %w[user password port]
-      @options = t_conf.reject { |k, _| url_keys.include?(k) }.merge(@options)
+      # Preserve everything in options so we can easily create copies of a Target.
+      @options = t_conf.merge(@options)
 
       self
     end

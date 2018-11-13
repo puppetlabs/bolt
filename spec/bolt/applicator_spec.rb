@@ -55,7 +55,8 @@ describe Bolt::Applicator do
             pcp: { 'connect-timeout' => 10,
                    tty: false,
                    "task-environment" => "production" },
-            local: { 'connect-timeout' => 10, tty: false }
+            local: { 'connect-timeout' => 10, tty: false },
+            docker: { 'connect-timeout' => 10, tty: false }
           }
         }
       }
