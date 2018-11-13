@@ -212,7 +212,7 @@ module BoltSpec
       end
 
       def wait_until_available(targets, _options)
-        targets.map { |target| Bolt::Result.new(target) }
+        Bolt::ResultSet.new(targets.map { |target| Bolt::Result.new(target) })
       end
 
       def log_plan(_plan_name)
