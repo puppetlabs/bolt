@@ -22,8 +22,6 @@ module Bolt
 
         if Bolt::Util.windows?
           raise NotImplementedError, "The local transport is not yet implemented on Windows"
-        else
-          @conn = Shell.new
         end
       end
 
@@ -60,7 +58,7 @@ module Bolt
 
       def run_command(target, command, _options = {})
         in_tmpdir(target.options['tmpdir']) do |dir|
-          output = @conn.execute(command, dir: dir)
+          output = Shell.new(target).execute(command, dir: dir)
           Bolt::Result.for_command(target, output.stdout.string, output.stderr.string, output.exit_code)
         end
       end
@@ -76,7 +74,7 @@ module Bolt
             # argument as the entire command string for script paths containing spaces.
             arguments = ['']
           end
-          output = @conn.execute(file, *arguments, dir: dir)
+          output = Shell.new(target).execute(file, *arguments, dir: dir)
           Bolt::Result.for_command(target, output.stdout.string, output.stderr.string, output.exit_code)
         end
       end
@@ -115,7 +113,7 @@ module Bolt
           # log the arguments with sensitive data redacted, do NOT log unwrapped_arguments
           logger.debug("Running '#{script}' with #{arguments}")
 
-          output = @conn.execute(script, stdin: stdin, env: env, dir: dir)
+          output = Shell.new(target).execute(script, stdin: stdin, env: env, dir: dir)
           Bolt::Result.for_task(target, output.stdout.string, output.stderr.string, output.exit_code)
         end
       end
