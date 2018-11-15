@@ -15,7 +15,7 @@ Bolt is a Ruby command-line tool for executing commands, scripts, and tasks on r
 
 Additionally the Bolt project includes:
 
-* [bolt-server](developer-documentation/bolt-server.md), an experimental HTTP API for executing tasks over SSH and WinRM.
+* [bolt-server](developer-docs/bolt-server.md), an experimental HTTP API for executing tasks over SSH and WinRM.
 * bolt-inventory-pdb, a command-line tool for generating an inventory file from a template containing PuppetDB queries.
 
 > Installing bolt from a gem is not recommended since core modules will not be available. Please [install bolt](https://puppet.com/docs/bolt/latest/bolt_installing.md) as a package
