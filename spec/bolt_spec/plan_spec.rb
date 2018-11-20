@@ -46,6 +46,10 @@ shared_examples 'action tests' do
     result = run_plan(plan_name, 'nodes' => targets)
     expect(result).not_to be_ok
   end
+
+  it 'fails when not stubbed' do
+    expect { run_plan(plan_name, 'nodes' => targets) }.to raise_error(RuntimeError, /Unexpected call to/)
+  end
 end
 
 describe "BoltSpec::Plans" do
@@ -120,5 +124,35 @@ describe "BoltSpec::Plans" do
     end
 
     include_examples 'action tests'
+  end
+
+  context 'with apply_preps' do
+    let(:plan_name) { 'plans::apply_prep' }
+
+    it 'runs' do
+      allow_apply_prep
+      result = run_plan(plan_name, 'nodes' => targets)
+      expect(result).to be_ok
+    end
+
+    it 'fails' do
+      expect { run_plan(plan_name, 'nodes' => targets) }.to raise_error(RuntimeError, /Unexpected call to/)
+    end
+  end
+
+  context 'with applies' do
+    let(:plan_name) { 'plans::apply' }
+
+    it 'runs' do
+      allow_apply
+      result = run_plan(plan_name, 'nodes' => targets)
+      expect(result).to be_ok
+      expect(result.value.class).to eq(Bolt::ResultSet)
+    end
+
+    it 'fails' do
+      result = run_plan(plan_name, 'nodes' => targets)
+      expect(result).not_to be_ok
+    end
   end
 end

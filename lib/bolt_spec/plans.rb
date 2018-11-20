@@ -56,6 +56,8 @@ require 'bolt/pal'
 # - allow_script(script), expect_script(script): expect the script as <module>/path/to/file
 # - allow_task(task), expect_task(task): expect the named task
 # - allow_upload(file), expect_upload(file): expect the identified source file
+# - allow_apply_prep: allows `apply_prep` to be invoked in the plan but does not allow modifiers
+# - allow_apply: allows `apply` to be invoked in the plan but does not allow modifiers
 #
 # Stub modifiers:
 # - be_called_times(n): if allowed, fail if the action is called more than 'n' times
@@ -143,7 +145,7 @@ module BoltSpec
     def config
       @config ||= begin
         conf = Bolt::Config.new(Bolt::Boltdir.new('.'), {})
-        conf.modulepath = modulepath
+        conf.modulepath = [modulepath].flatten
         conf
       end
     end
@@ -193,6 +195,17 @@ module BoltSpec
       define_method :"allow_any_#{action}" do
         executor.send(:"stub_#{action}", :default).add_stub
       end
+    end
+
+    def allow_apply_prep
+      allow_task('puppet_agent::version').always_return('version' => '6.0')
+      allow_task('apply_helpers::custom_facts')
+      nil
+    end
+
+    def allow_apply
+      executor.stub_apply
+      nil
     end
 
     # Example helpers to mock other run functions

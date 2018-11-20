@@ -22,6 +22,7 @@ module BoltSpec
         @noop = false
         @run_as = nil
         @error_message = nil
+        @allow_apply = false
         @modulepath = [modulepath].flatten.map { |path| File.absolute_path(path) }
         MOCKED_ACTIONS.each { |action| instance_variable_set(:"@#{action}_doubles", {}) }
       end
@@ -106,8 +107,16 @@ module BoltSpec
         end
       end
 
+      def stub_apply
+        @allow_apply = true
+      end
+
       def wait_until_available(targets, _options)
         Bolt::ResultSet.new(targets.map { |target| Bolt::Result.new(target) })
+      end
+
+      def log_action(*_args)
+        yield
       end
 
       def log_plan(_plan_name)
@@ -123,6 +132,21 @@ module BoltSpec
       def report_bundled_content(_mode, _name); end
 
       def analytics; end
+
+      # Mocked for Apply so it does not compile and execute.
+      def with_node_logging(_description, targets)
+        raise "Unexpected call to apply(#{targets})" unless @allow_apply
+      end
+
+      def queue_execute(targets)
+        raise "Unexpected call to apply(#{targets})" unless @allow_apply
+        targets
+      end
+
+      def await_results(promises)
+        raise "Unexpected call to apply(#{targets})" unless @allow_apply
+        Bolt::ResultSet.new(promises.map { |target| Bolt::Result.new(target) })
+      end
     end
   end
 end
