@@ -32,13 +32,25 @@ To set up Bolt to use the orchestrator API you must do the following:
 
 ## Install the Bolt module in a PE environment
 
-Bolt uses a task to execute commands, upload files, and run scripts over orchestrator. To install this task, install the `puppetlabs-bolt_shim` module from the Forge. Install the code in the same environment as the other tasks you want to run. Use the following Puppetfile line:
+Bolt uses a task to execute commands, upload files, and run scripts over orchestrator. To install this task, install the [puppetlabs-bolt_shim](https://forge.puppet.com/puppetlabs/bolt_shim) module from the Forge. Install the code in the same environment as the other tasks you want to run. Use the following Puppetfile line:
 
 ```
-mod 'puppetlabs-bolt_shim', '0.1.1'
+mod 'puppetlabs-bolt_shim', '0.2.0'
 ```
 
 In addition to the bolt\_shim module, any task or module content you want to execute over PCP must be present in the PE environment. Download the modules described in [Set up Bolt to download and install modules](installing_tasks_from_the_forge.md#) and make them available in your PE environment. By only allowing content that is present in the PE environment to be executed over PCP you maintain the role based access control over the nodes you manage in PE.
+
+### Apply Support
+
+The Bolt `apply` action can be enabled by installing the [puppetlabs-apply_helpers](https://forge.puppet.com/puppetlabs/apply_helpers) module. Use the following Puppetfile line:
+
+```
+mod 'puppetlabs-apply_helpers', '0.1.0'
+```
+
+Additionally the `apply_prep` helper function requires the `puppetlabs-puppet_agent` module version described in [Set up Bolt to download and install modules](installing_tasks_from_the_forge.md#).
+
+Note that Bolt over Orchestrator can require a large amount of memory to convey large messages, such as the plugins and catalogs sent by `apply`. The default settings may be insufficient.
 
 ## Assign task permissions to a user role
 
