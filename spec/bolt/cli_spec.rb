@@ -720,7 +720,7 @@ bar
     end
 
     describe "execute" do
-      let(:executor) { double('executor', noop: false) }
+      let(:executor) { double('executor', noop: false, analytics: nil) }
       let(:cli) { Bolt::CLI.new({}) }
       let(:targets) { [target] }
       let(:output) { StringIO.new }
@@ -1659,7 +1659,7 @@ bar
     end
 
     describe "execute with noop" do
-      let(:executor) { double('executor', noop: true) }
+      let(:executor) { double('executor', noop: true, analytics: nil) }
       let(:cli) { Bolt::CLI.new({}) }
       let(:targets) { [target] }
       let(:output) { StringIO.new }
