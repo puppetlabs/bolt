@@ -136,6 +136,17 @@ module Bolt
       }
     end
 
+    # TODO: This does two things because the applicator bypasses run_task
+    # It would probably be cleaner to give the exectutor access to inventory
+    # and handle this there.
+    def run_on_target(target, params)
+      if target.remote?
+        [get_target(target.run_on || 'localhost'), params.merge('_target' => target.hash)]
+      else
+        [target, params]
+      end
+    end
+
     #### PRIVATE ####
     #
     # For debugging only now

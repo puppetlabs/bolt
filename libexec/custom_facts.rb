@@ -4,6 +4,7 @@
 require 'json'
 require 'puppet'
 require 'puppet/module_tool/tar'
+require 'puppet/util/network_device'
 require 'tempfile'
 
 args = JSON.parse(STDIN.read)
@@ -19,6 +20,19 @@ Dir.mktmpdir do |puppet_root|
   cli << '--modulepath' << moduledir
   Puppet.initialize_settings(cli)
 
+  if (conn_info = args['_target'])
+    special_keys = ['type', 'debug']
+    connection  = conn_info.reject { |k, _| special_keys.include?(k) }
+    device = OpenStruct.new(connection)
+    device.provider = conn_info['type']
+    device.options[:debug] = true if conn_info['debug']
+    Puppet[:facts_terminus] = :network_device
+    Puppet[:certname] = device.name
+    Puppet::Util::NetworkDevice.init(device)
+    puts "device: #{device}"
+    exit 1
+  end
+
   Tempfile.open('plugins.tar.gz') do |plugins|
     File.binwrite(plugins, Base64.decode64(args['plugins']))
     Puppet::ModuleTool::Tar.instance.unpack(plugins, moduledir, Etc.getlogin || Etc.getpwuid.name)
@@ -30,6 +44,8 @@ Dir.mktmpdir do |puppet_root|
   end
 
   facts = Puppet::Node::Facts.indirection.find(SecureRandom.uuid, environment: env)
+  # TODO: the device command does this should we?
+  facts.name = facts.values['clientcert']
   puts(facts.values.to_json)
 end
 

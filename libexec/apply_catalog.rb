@@ -31,6 +31,23 @@ Puppet[:noop] = args['_noop'] || false
 
 Puppet[:default_file_terminus] = :file_server
 
+if args['_target']
+  # TODO: move some of this logic to puppet
+  special_keys = ['type', 'debug']
+  connection  = conn_info.reject { |k, _| special_keys.include?(k) }
+  device = OpenStruct.new(connection)
+  device.provider = conn_info['type']
+  device.options[:debug] = true if conn_info['debug']
+  Puppet[:certname] = device.name
+  Puppet::Util::NetworkDevice.init(device)
+
+  Puppet[:facts_terminus] = :network_device
+  Puppet[:node_terminus] = :plain
+  Puppet[:catalog_terminus] = :compiler
+  # TODO this shouldn't be device speciifc
+  Puppet[:catalog_cache_terminus] = nil
+end
+
 exit_code = 0
 begin
   # This happens implicitly when running the Configurer, but we make it explicit here. It creates the
@@ -49,6 +66,7 @@ begin
   end
 
   # Ensure custom facts are available for provider suitability tests
+  # TODO: skip this for devices?
   facts = Puppet::Node::Facts.indirection.find(SecureRandom.uuid, environment: env)
 
   report = if Puppet::Util::Package.versioncmp(Puppet.version, '5.0.0') > 0
@@ -57,8 +75,11 @@ begin
              Puppet::Transaction::Report.new('apply')
            end
 
-  Puppet.override(current_environment: env,
-                  loaders: Puppet::Pops::Loaders.new(env)) do
+  overrides = { current_environment: env,
+                loaders: Puppet::Pops::Loaders.new(env) }
+  ovierrides[:network_device] = true if args['_target']
+
+  Puppet.override(overrides) do
     catalog = Puppet::Resource::Catalog.from_data_hash(args['catalog'])
     catalog.environment = env.name.to_s
     catalog.environment_instance = env

@@ -60,29 +60,29 @@ describe "apply" do
     end
 
     context "when running against puppet 5 or puppet 6" do
-      before(:all) do
-        # install puppet5
-        result = run_task('puppet_agent::install', 'puppet_5', { 'collection' => 'puppet5' },
-                          config: root_config, inventory: agent_version_inventory)
-        expect(result.count).to eq(1)
-        expect(result[0]['status']).to eq('success')
+      #before(:all) do
+      #  # install puppet5
+      #  result = run_task('puppet_agent::install', 'puppet_5', { 'collection' => 'puppet5' },
+      #                    config: root_config, inventory: agent_version_inventory)
+      #  expect(result.count).to eq(1)
+      #  expect(result[0]).to include('status' => 'success')
 
-        result = run_task('puppet_agent::version', 'puppet_5', inventory: agent_version_inventory)
-        expect(result.count).to eq(1)
-        expect(result[0]['status']).to eq('success')
-        expect(result[0]['result']['version']).to match(/^5/)
+      #  result = run_task('puppet_agent::version', 'puppet_5', inventory: agent_version_inventory)
+      #  expect(result.count).to eq(1)
+      #  expect(result[0]['status']).to eq('success')
+      #  expect(result[0]['result']['version']).to match(/^5/)
 
-        # install puppet6
-        result = run_task('puppet_agent::install', 'puppet_6', { 'collection' => 'puppet6' },
-                          config: root_config, inventory: agent_version_inventory)
-        expect(result.count).to eq(1)
-        expect(result[0]['status']).to eq('success')
+      #  # install puppet6
+      #  result = run_task('puppet_agent::install', 'puppet_6', { 'collection' => 'puppet6' },
+      #                    config: root_config, inventory: agent_version_inventory)
+      #  expect(result.count).to eq(1)
+      #  expect(result[0]['status']).to eq('success')
 
-        result = run_task('puppet_agent::version', 'puppet_6', inventory: agent_version_inventory)
-        expect(result.count).to eq(1)
-        expect(result[0]['status']).to eq('success')
-        expect(result[0]['result']['version']).to match(/^6/)
-      end
+      #  result = run_task('puppet_agent::version', 'puppet_6', inventory: agent_version_inventory)
+      #  expect(result.count).to eq(1)
+      #  expect(result[0]['status']).to eq('success')
+      #  expect(result[0]['result']['version']).to match(/^6/)
+      #end
 
       it 'runs a ruby task' do
         with_tempfile_containing('inventory', YAML.dump(agent_version_inventory), '.yaml') do |inv|
@@ -114,6 +114,47 @@ describe "apply" do
         results.each do |result|
           expect(result['status']).to eq('success')
           expect(result['result']['stdout']).to match(/not found/)
+        end
+      end
+
+      context "when running against device targets" do
+        let(:device_url) { "file:///tmp/#{SecureRandom.uuid}.json" }
+        let(:device_inventory) do
+          device_group = { 'name' => 'device_targets',
+                'nodes' => [
+                  { 'name' => "puppet5_device",
+                    'config' => { 'remote' => { 'run-on' => 'puppet_5' }},
+                  },
+                  { 'name' => "puppet6_device",
+                    'config' => { 'remote' => { 'run-on' => 'puppet_6' }},
+                  },
+                ],
+                'config' => {
+                  'transport' => 'remote',
+                  'remote' => {
+                    'device-type' => 'fake',
+                    'url' => device_url,
+                  }
+                }
+              }
+          inv = agent_version_inventory
+          inv['groups'] << device_group
+          inv
+        end
+
+        it 'gathers facts from devices' do
+          with_tempfile_containing('inventory', YAML.dump(device_inventory), '.yaml') do |inv|
+            results = run_cli_json(%W[plan run device_test::facts --nodes device_targets
+                                      --modulepath #{modulepath} --inventoryfile #{inv.path}])
+
+            require 'pry'; binding.pry
+            expect(result).to eq([])
+            results.each do |result|
+              expect(result['status']).to eq('success')
+              report = result['result']['report']
+              expect(report['resource_statuses']).to include("Notify[Apply: Hi!]")
+            end
+          end
         end
       end
     end
@@ -303,7 +344,7 @@ describe "apply" do
         result = run_task('puppet_agent::install', conn_uri('winrm'),
                           { 'collection' => 'puppet6' }, config: config)
         expect(result.count).to eq(1)
-        expect(result[0]['status']).to eq('success')
+        expect(result[0]).to include('status' => 'success')
 
         result = run_task('puppet_agent::version', conn_uri('winrm'), config: config)
         expect(result.count).to eq(1)
