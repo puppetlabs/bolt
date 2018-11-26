@@ -85,6 +85,18 @@ module Bolt
       "Target('#{@uri}', #{opts})"
     end
 
+    def to_h
+      options.merge({
+        'name' => name,
+        'uri' => uri,
+        'protocol' => protocol,
+        'user' => user,
+        'password' => password,
+        'host' => host,
+        'port' => port,
+      })
+    end
+
     def host
       @uri_obj.hostname
     end

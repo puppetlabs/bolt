@@ -39,6 +39,7 @@ module Bolt
     class Base
       STDIN_METHODS       = %w[both stdin].freeze
       ENVIRONMENT_METHODS = %w[both environment].freeze
+      DEFAULT_INPUT_METHOD = 'both'
 
       attr_reader :logger
 
@@ -66,6 +67,33 @@ module Bolt
 
         callback&.call(type: :node_result, result: result)
         result
+      end
+
+      def provided_features
+        []
+      end
+
+      def default_input_method
+        'both'
+      end
+
+      def select_implementation(target, task)
+        impl =task.select_implementation(target, provided_features)
+        impl['input_method'] ||= default_input_method
+        impl
+      end
+
+      def add_target_param(target, task, params)
+        # TODO: How should metadata impact this?
+        #if target.remote? && !task.remote?
+        #  raise Bolt::Node::RemoteError.new('Remote targets can only run Remotable tasks')
+        #end
+        #if !target.remote? && task.remote?
+        #  raise Bolt::Node::RemoteError.new('Remote tasks can only be run on remote targets')
+        #end
+
+        # TODO: wrap sensitive values
+        target.remote? ? params.merge('_target' => target.to_h) : params
       end
 
       def filter_options(target, options)

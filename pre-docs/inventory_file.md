@@ -61,9 +61,9 @@ groups:
 ## Override a user for a specific node
 
 ```
-nodes: 
+nodes:
   - name: linux1.example.com
-    config: 
+    config:
       ssh:
         user: me
 ```
@@ -195,10 +195,24 @@ nodes:
           run-as: root
 ```
 
--   **[Generating inventory files](inventory_file_generating.md)**  
+Configure a remote target
+
+```yaml
+nodes:
+  - host1.example.com
+  - name: remote.example.com
+    config:
+      transport: remote
+      remote:
+        run-on: host1.example.com
+        conn-info:
+          url: https://user1:secret@remote.example.com
+```
+
+-   **[Generating inventory files](inventory_file_generating.md)**
  Use the `bolt-inventory-pdb` script to generate inventory files based on PuppetDB queries.
 
-**Related information**  
+**Related information**
 
 
 [Naming tasks](writing_tasks.md#)

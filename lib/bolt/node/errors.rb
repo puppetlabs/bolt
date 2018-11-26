@@ -7,7 +7,8 @@ module Bolt
     class BaseError < Bolt::Error
       attr_reader :issue_code
 
-      def initialize(message, issue_code)
+      # TODO can we just drop issue code here?
+      def initialize(message, issue_code = nil)
         super(message, kind, nil, issue_code)
       end
 
@@ -31,6 +32,12 @@ module Bolt
     class FileError < BaseError
       def kind
         'puppetlabs.tasks/task_file_error'
+      end
+    end
+
+    class RemoteError < BaseError
+      def kind
+        'puppetlabs.tasks/remote-task-error'
       end
     end
 

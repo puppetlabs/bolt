@@ -12,7 +12,9 @@ module Bolt
         %w[port user password sudo-password private-key host-key-check connect-timeout tmpdir run-as tty run-as-command]
       end
 
-      PROVIDED_FEATURES = ['shell'].freeze
+      def provided_features
+        ['shell']
+      end
 
       def self.validate(options)
         logger = Logging.logger[self]
@@ -122,11 +124,10 @@ module Bolt
       end
 
       def run_task(target, task, arguments, options = {})
-        implementation = task.select_implementation(target, PROVIDED_FEATURES)
+        implementation = select_implementation(target, task)
         executable = implementation['path']
         input_method = implementation['input_method']
         extra_files = implementation['files']
-        input_method ||= 'both'
 
         # unpack any Sensitive data
         arguments = unwrap_sensitive_args(arguments)

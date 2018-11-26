@@ -92,6 +92,15 @@ ssh:
 
 `service-options`: A hash of options to configure the Docker connection. Only necessary if using a non-default URL. See https://github.com/swipely/docker-api for supported options.
 
+## Remote transport configuration options
+
+*The remote transport is a new feature and currently experimental. It's configuration options and behavior may change between y releases*
+
+`run-on`: The proxy target the task should execute on. Default is `localhost`
+
+`conn-info`: A hash of connection info that will be passed to the device as `_target`.
+
+
 ## Log file configuration options
 
 Capture the results of your plan runs in a log file.

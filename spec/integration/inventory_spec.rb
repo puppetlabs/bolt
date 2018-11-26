@@ -125,7 +125,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
         "foo => bar}, kernel => Linux}"
       }
 
-      def fact_plan(name = 'facts')
+      def fact_plan(name = 'facts_test')
         ['plan', 'run', name, "host=#{target}"] + config_flags
       end
 
@@ -142,7 +142,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
         let(:inventory) { {} }
 
         it 'does not error when facts are retrieved' do
-          expect(run_cli_json(fact_plan('facts::emit'))).to eq("Facts for localhost: {}")
+          expect(run_cli_json(fact_plan('facts_test::emit'))).to eq("Facts for localhost: {}")
         end
 
         it 'does not error when facts are added' do

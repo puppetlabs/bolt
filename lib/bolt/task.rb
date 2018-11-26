@@ -36,6 +36,10 @@ module Bolt
       name.split('::').first
     end
 
+    def remote?
+      !!metadata['remote']
+    end
+
     def tasks_dir
       File.join(module_name, 'tasks')
     end

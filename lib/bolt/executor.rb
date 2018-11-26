@@ -32,8 +32,14 @@ module Bolt
       @load_config = load_config
 
       @transports = Bolt::TRANSPORTS.each_with_object({}) do |(key, val), coll|
-        coll[key.to_s] = Concurrent::Delay.new do
-          val.new
+        if key == :remote
+          coll[key.to_s] = Concurrent::Delay.new do
+            val.new(self)
+          end
+        else
+          coll[key.to_s] = Concurrent::Delay.new do
+            val.new
+          end
         end
       end
       @reported_transports = Set.new

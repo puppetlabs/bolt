@@ -10,6 +10,7 @@ require 'bolt/transport/winrm'
 require 'bolt/transport/orch'
 require 'bolt/transport/local'
 require 'bolt/transport/docker'
+require 'bolt/transport/remote'
 
 module Bolt
   TRANSPORTS = {
@@ -17,7 +18,8 @@ module Bolt
     winrm: Bolt::Transport::WinRM,
     pcp: Bolt::Transport::Orch,
     local: Bolt::Transport::Local,
-    docker: Bolt::Transport::Docker
+    docker: Bolt::Transport::Docker,
+    remote: Bolt::Transport::Remote,
   }.freeze
 
   class UnknownTransportError < Bolt::Error
@@ -41,6 +43,7 @@ module Bolt
       'tty' => false
     }.freeze
 
+    # TODO: move these to the transport themselves
     TRANSPORT_SPECIFIC_DEFAULTS = {
       ssh: {
         'host-key-check' => true
@@ -53,7 +56,10 @@ module Bolt
         'task-environment' => 'production'
       },
       local: {},
-      docker: {}
+      docker: {},
+      remote: {
+        'run-on' => 'localhost'
+      }
     }.freeze
 
     def self.default

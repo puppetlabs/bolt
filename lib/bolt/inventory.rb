@@ -207,6 +207,7 @@ module Bolt
     private :resolve_name
 
     def expand_targets(targets)
+      # TODO: inventory may not be set in this case?
       if targets.is_a? Bolt::Target
         targets
       elsif targets.is_a? Array
