@@ -44,7 +44,12 @@ module Bolt
 
       # Returns options this transport supports
       def self.options
-        raise NotImplementedError, "self.options() must be implemented by the transport class"
+        raise NotImplementedError,
+              "self.options() or self.filter_options(unfiltered) must be implemented by the transport class"
+      end
+
+      def self.filter_options(unfiltered)
+        unfiltered.select { |k| options.include?(k) }
       end
 
       def self.validate(_options)
@@ -72,13 +77,24 @@ module Bolt
         []
       end
 
-      def filter_options(target, options)
+      def default_input_method
+        'both'
+      end
+
+      def select_implementation(target, task)
+        impl = task.select_implementation(target, provided_features)
+        impl['input_method'] ||= default_input_method
+        impl
+      end
+
+      def reject_transport_options(target, options)
         if target.options['run-as']
           options.reject { |k, _v| k == '_run_as' }
         else
           options
         end
       end
+      private :reject_transport_options
 
       # Transform a parameter map to an environment variable map, with parameter names prefixed
       # with 'PT_' and values transformed to JSON unless they're strings.
@@ -111,7 +127,7 @@ module Bolt
         target = targets.first
         with_events(target, callback) do
           @logger.debug { "Running task run '#{task}' on #{target.uri}" }
-          run_task(target, task, arguments, filter_options(target, options))
+          run_task(target, task, arguments, reject_transport_options(target, options))
         end
       end
 
@@ -125,7 +141,7 @@ module Bolt
         target = targets.first
         with_events(target, callback) do
           @logger.debug("Running command '#{command}' on #{target.uri}")
-          run_command(target, command, filter_options(target, options))
+          run_command(target, command, reject_transport_options(target, options))
         end
       end
 
@@ -139,7 +155,7 @@ module Bolt
         target = targets.first
         with_events(target, callback) do
           @logger.debug { "Running script '#{script}' on #{target.uri}" }
-          run_script(target, script, arguments, filter_options(target, options))
+          run_script(target, script, arguments, reject_transport_options(target, options))
         end
       end
 
@@ -153,7 +169,7 @@ module Bolt
         target = targets.first
         with_events(target, callback) do
           @logger.debug { "Uploading: '#{source}' to #{destination} on #{target.uri}" }
-          upload(target, source, destination, filter_options(target, options))
+          upload(target, source, destination, reject_transport_options(target, options))
         end
       end
 

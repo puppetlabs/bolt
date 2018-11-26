@@ -6,7 +6,9 @@ require 'bolt/error'
 module Bolt
   class Target
     attr_reader :uri, :options
-    attr_writer :inventory
+    # CODEREVIEW: this feels wrong. The altertative is threading inventory through the
+    # executor to the RemoteTransport
+    attr_accessor :inventory
 
     PRINT_OPTS ||= %w[host user port protocol].freeze
 
@@ -41,7 +43,7 @@ module Bolt
     def update_conf(conf)
       @protocol = conf[:transport]
 
-      t_conf = conf[:transports][protocol.to_sym]
+      t_conf = conf[:transports][transport.to_sym] || {}
       # Override url methods
       @user = t_conf['user']
       @password = t_conf['password']
@@ -85,6 +87,18 @@ module Bolt
       "Target('#{@uri}', #{opts})"
     end
 
+    def to_h
+      options.merge(
+        'name' => name,
+        'uri' => uri,
+        'protocol' => protocol,
+        'user' => user,
+        'password' => password,
+        'host' => host,
+        'port' => port
+      )
+    end
+
     def host
       @uri_obj.hostname
     end
@@ -95,8 +109,17 @@ module Bolt
       uri
     end
 
+    def remote?
+      @uri_obj.scheme == 'remote' || @protocol == 'remote'
+    end
+
     def port
       @uri_obj.port || @port
+    end
+
+    # transport is separate from protocol for remote targets.
+    def transport
+      remote? ? 'remote' : protocol
     end
 
     def protocol

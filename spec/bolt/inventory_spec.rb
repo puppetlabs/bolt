@@ -566,7 +566,6 @@ describe Bolt::Inventory do
         expect(target.port).to eq('12345winrm')
         expect(target.options).to eq(
           'connect-timeout' => 5,
-          'tty' => false,
           'ssl' => false,
           'ssl-verify' => false,
           'tmpdir' => "/winrm",
@@ -585,9 +584,7 @@ describe Bolt::Inventory do
         expect(target.password).to be nil
         expect(target.port).to be nil
         expect(target.options).to eq(
-          'connect-timeout' => 10,
           'task-environment' => "prod",
-          'tty' => false,
           'service-url' => "https://master",
           'cacert' => "pcp.pem",
           'token-file' => "token"

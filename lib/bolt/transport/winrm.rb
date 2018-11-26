@@ -18,6 +18,10 @@ module Bolt
         ['powershell']
       end
 
+      def default_input_method
+        'powershell'
+      end
+
       def self.validate(options)
         ssl_flag = options['ssl']
         unless !!ssl_flag == ssl_flag
@@ -110,7 +114,7 @@ catch
       end
 
       def run_task(target, task, arguments, _options = {})
-        implementation = task.select_implementation(target, provided_features)
+        implementation = select_implementation(target, task)
         executable = implementation['path']
         input_method = implementation['input_method']
         extra_files = implementation['files']

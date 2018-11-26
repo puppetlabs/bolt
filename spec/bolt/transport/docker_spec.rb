@@ -2,6 +2,7 @@
 
 require 'spec_helper'
 require 'bolt_spec/conn'
+require 'bolt_spec/transport'
 require 'bolt/transport/docker'
 require 'bolt/target'
 
@@ -9,13 +10,14 @@ require_relative 'shared_examples'
 
 describe Bolt::Transport::Docker, docker: true do
   include BoltSpec::Conn
+  include BoltSpec::Transport
+
   let(:hostname) { conn_info('docker')[:host] }
   let(:docker) { Bolt::Transport::Docker.new }
-  let(:transport_conf) { {} }
-  let(:target) { Bolt::Target.new(hostname, transport_conf) }
+  let(:target) { Bolt::Target.new("docker://#{hostname}", transport_conf) }
 
   context 'with docker' do
-    let(:runner) { docker }
+    let(:transport) { :docker }
     let(:os_context) { posix_context }
 
     it "can test whether the target is available" do

@@ -4,6 +4,8 @@ require 'bolt_spec/files'
 require 'bolt_spec/task'
 require 'bolt_spec/sensitive'
 
+require 'bolt/inventory'
+
 def result_value(stdout = nil, stderr = nil, exit_code = 0)
   { 'stdout' => stdout || '',
     'stderr' => stderr || '',
@@ -268,7 +270,8 @@ QUOTED
         task['metadata']['implementations'] = [{ 'name' => 'tasks_test', 'requirements' => reqs }]
         expect {
           runner.run_task(target, task, arguments)
-        }.to raise_error("No suitable implementation of #{task['name']} for #{target.name}")
+        }.to raise_error(Bolt::NoImplementationError,
+                         "No suitable implementation of #{task['name']} for #{target.name}")
       end
     end
 
@@ -323,6 +326,67 @@ QUOTED
         expect(files[1]).to match(%r{#{contents.size} [^ ]+/other_mod/lib/puppet_x/b.rb$})
         expect(files[2]).to match(%r{#{contents.size} [^ ]+/tasks_test/files/yes$})
         expect(files[3]).to match(%r{#{contents.size} [^ ]+/tasks_test/tasks/#{File.basename(task_path)}$})
+      end
+    end
+  end
+
+  context 'when used by the remote transport' do
+    let(:remote_target) do
+      # TODO: remove the config here. it is a workaround for BOLT-943
+      inventory = Bolt::Inventory.new('config' => { transport.to_s => target.options })
+      inventory.add_to_group([target], 'all')
+      remote_target = Bolt::Target.new('foo://user:pass@example.com/path/to?query=hey',
+                                       'run-on' => target.name, 'type' => 'adevice')
+      remote_target.inventory = inventory
+      remote_target
+    end
+
+    let(:remote_runner) do
+      executor = Bolt::Executor.new(load_config: false)
+      executor.transports[transport.to_s] = Concurrent::Delay.new { runner }
+      executor.transports['remote'].value
+    end
+
+    it 'passes the correct _target' do
+      arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
+      with_task_containing('tasks_test_stdin', os_context[:stdin_task], 'stdin') do |task|
+        task['metadata']['remote'] = true
+        result = remote_runner.run_task(remote_target, task, arguments).value
+        expect(result).to include('message_one' => 'Hello from task')
+        expect(result['_target']).to include("name" => "foo://user:pass@example.com/path/to?query=hey")
+        expect(result['_target']).to include('type' => 'adevice')
+        expect(result['_target']).to include('host' => 'example.com')
+      end
+    end
+
+    it 'runs when there is a remote implementation' do
+      arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
+      with_task_containing('tasks_test_stdin', os_context[:stdin_task], 'stdin') do |task|
+        task['metadata']['implementations'] = [{ 'name' => 'tasks_test_stdin', 'remote' => true }]
+        result = remote_runner.run_task(remote_target, task, arguments).value
+        expect(result).to include('message_one' => 'Hello from task')
+        expect(result['_target']).to include("name" => "foo://user:pass@example.com/path/to?query=hey")
+        expect(result['_target']).to include('type' => 'adevice')
+        expect(result['_target']).to include('host' => 'example.com')
+      end
+    end
+
+    it "errors when the task is not remote" do
+      with_task_containing('tasks_test_stdin', os_context[:stdin_task], 'stdin') do |task|
+        expect {
+          remote_runner.run_task(remote_target, task, {})
+        }.to raise_error(Bolt::NoImplementationError,
+                         "No suitable implementation of #{task['name']} for #{target.name}")
+      end
+    end
+
+    it "errors when there is no remote implementation" do
+      with_task_containing('tasks_test_stdin', os_context[:stdin_task], 'stdin') do |task|
+        task['metadata']['implementations'] = [{ 'name' => 'tasks_test_stdin' }]
+        expect {
+          remote_runner.run_task(remote_target, task, {})
+        }.to raise_error(Bolt::NoImplementationError,
+                         "No suitable implementation of #{task['name']} for #{target.name}")
       end
     end
   end

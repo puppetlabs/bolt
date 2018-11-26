@@ -32,9 +32,15 @@ module Bolt
       @load_config = load_config
 
       @transports = Bolt::TRANSPORTS.each_with_object({}) do |(key, val), coll|
-        coll[key.to_s] = Concurrent::Delay.new do
-          val.new
-        end
+        coll[key.to_s] = if key == :remote
+                           Concurrent::Delay.new do
+                             val.new(self)
+                           end
+                         else
+                           Concurrent::Delay.new do
+                             val.new
+                           end
+                         end
       end
       @reported_transports = Set.new
 
@@ -64,7 +70,7 @@ module Bolt
     # defined by the transport. Yields each batch, along with the corresponding
     # transport, to the block in turn and returns an array of result promises.
     def queue_execute(targets)
-      targets.group_by(&:protocol).flat_map do |protocol, protocol_targets|
+      targets.group_by(&:transport).flat_map do |protocol, protocol_targets|
         transport = transport(protocol)
         report_transport(transport, protocol_targets.count)
         transport.batches(protocol_targets).flat_map do |batch|

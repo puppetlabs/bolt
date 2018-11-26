@@ -10,6 +10,7 @@ require 'bolt/transport/winrm'
 require 'bolt/transport/orch'
 require 'bolt/transport/local'
 require 'bolt/transport/docker'
+require 'bolt/transport/remote'
 
 module Bolt
   TRANSPORTS = {
@@ -17,7 +18,8 @@ module Bolt
     winrm: Bolt::Transport::WinRM,
     pcp: Bolt::Transport::Orch,
     local: Bolt::Transport::Local,
-    docker: Bolt::Transport::Docker
+    docker: Bolt::Transport::Docker,
+    remote: Bolt::Transport::Remote
   }.freeze
 
   class UnknownTransportError < Bolt::Error
@@ -36,16 +38,15 @@ module Bolt
                            private-key tty tmpdir user connect-timeout
                            cacert token-file service-url].freeze
 
-    TRANSPORT_DEFAULTS = {
-      'connect-timeout' => 10,
-      'tty' => false
-    }.freeze
-
+    # TODO: move these to the transport themselves
     TRANSPORT_SPECIFIC_DEFAULTS = {
       ssh: {
-        'host-key-check' => true
+        'connect-timeout' => 10,
+        'host-key-check' => true,
+        'tty' => false
       },
       winrm: {
+        'connect-timeout' => 10,
         'ssl' => true,
         'ssl-verify' => true
       },
@@ -53,7 +54,10 @@ module Bolt
         'task-environment' => 'production'
       },
       local: {},
-      docker: {}
+      docker: {},
+      remote: {
+        'run-on' => 'localhost'
+      }
     }.freeze
 
     def self.default
@@ -88,7 +92,7 @@ module Bolt
 
       @transports = {}
       TRANSPORTS.each_key do |transport|
-        @transports[transport] = TRANSPORT_DEFAULTS.merge(TRANSPORT_SPECIFIC_DEFAULTS[transport])
+        @transports[transport] = TRANSPORT_SPECIFIC_DEFAULTS[transport].dup
       end
 
       update_from_file(config_data)
@@ -158,7 +162,7 @@ module Bolt
 
       TRANSPORTS.each do |key, impl|
         if data[key.to_s]
-          selected = data[key.to_s].select { |k| impl.options.include?(k) }
+          selected = impl.filter_options(data[key.to_s])
           @transports[key].merge!(selected)
         end
       end

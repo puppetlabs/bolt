@@ -51,13 +51,14 @@ describe Bolt::Applicator do
         config: {
           transport: "ssh",
           transports: {
-            ssh: { 'connect-timeout' => 10, tty: false, "host-key-check" => true },
-            winrm: { 'connect-timeout' => 10, tty: false, ssl: true, "ssl-verify" => true },
-            pcp: { 'connect-timeout' => 10,
-                   tty: false,
-                   "task-environment" => "production" },
-            local: { 'connect-timeout' => 10, tty: false },
-            docker: { 'connect-timeout' => 10, tty: false }
+            ssh: { 'connect-timeout' => 10, "host-key-check" => true, tty: false },
+            winrm: { 'connect-timeout' => 10, ssl: true, "ssl-verify" => true },
+            pcp: {
+              "task-environment" => "production"
+            },
+            local: {},
+            docker: {},
+            remote: { 'run-on': 'localhost' }
           }
         }
       }
