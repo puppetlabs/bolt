@@ -93,6 +93,19 @@ module Bolt
       targets.map { |t| update_target(t) }
     end
 
+    def add_to_group(targets, desired_group)
+      if group_names.include?(desired_group)
+        targets.each do |target|
+          if group_names.include?(target.name)
+            raise ValidationError.new("Group #{target.name} conflicts with node of the same name", target.name)
+          end
+          add_node(@groups, target, desired_group)
+        end
+      else
+        raise ValidationError.new("Group #{desired_group} does not exist in inventory", nil)
+      end
+    end
+
     def set_var(target, key, value)
       data = { key => value }
       set_vars_from_hash(target.name, data)
@@ -243,5 +256,40 @@ module Bolt
       end
     end
     private :set_facts
+
+    def add_node(current_group, target, desired_group, track = { 'all' => nil })
+      if current_group.name == desired_group
+        # Group to add to is found
+        t_name = target.name
+        # Add target to nodes hash
+        current_group.nodes[t_name] = { 'name' => t_name }.merge(target.options)
+        # Inherit facts, vars, and features from hierarchy
+        current_group_data = { facts: current_group.facts, vars: current_group.vars, features: current_group.features }
+        data = inherit_data(track, current_group.name, current_group_data)
+        set_facts(t_name, @target_facts[t_name] ? data[:facts].merge(@target_facts[t_name]) : data[:facts])
+        set_vars_from_hash(t_name, @target_vars[t_name] ? data[:vars].merge(@target_vars[t_name]) : data[:vars])
+        data[:features].each do |feature|
+          set_feature(target, feature)
+        end
+        return true
+      end
+      # Recurse on children Groups if not desired_group
+      current_group.groups.each do |child_group|
+        track[child_group.name] = current_group
+        add_node(child_group, target, desired_group, track)
+      end
+    end
+    private :add_node
+
+    def inherit_data(track, name, data)
+      unless track[name].nil?
+        data[:facts] = track[name].facts.merge(data[:facts])
+        data[:vars] = track[name].vars.merge(data[:vars])
+        data[:features].concat(track[name].features)
+        inherit_data(track, track[name].name, data)
+      end
+      data
+    end
+    private :inherit_data
   end
 end

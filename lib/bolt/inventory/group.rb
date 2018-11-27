@@ -5,7 +5,7 @@ module Bolt
     # Group is a specific implementation of Inventory based on nested
     # structured data.
     class Group
-      attr_accessor :name, :nodes, :groups, :config, :rest
+      attr_accessor :name, :nodes, :groups, :config, :rest, :facts, :vars, :features
 
       def initialize(data)
         @logger = Logging.logger[self]

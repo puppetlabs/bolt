@@ -152,6 +152,120 @@ describe 'running with an inventory file', reset_puppet_settings: true do
     end
   end
 
+  context 'when adding targets to a group in a plan', ssh: true do
+    let(:conn) { conn_info('ssh') }
+    let(:inventory) do
+      {
+        groups: [
+          {
+            name: 'foo',
+            nodes: [
+              {
+                name: 'foo_1'
+              }
+            ],
+            config: {
+              transport: 'local'
+            },
+            facts: {
+              parent: 'keep',
+              preserve_hierarchy: 'keep',
+              override_parent: 'discard'
+            },
+            vars: {
+              parent: 'keep',
+              preserve_hierarchy: 'keep',
+              override_parent: 'discard'
+            },
+            groups: [
+              {
+                name: 'add_me',
+                nodes: [
+                  {
+                    name: conn[:host]
+                  }
+                ],
+                config: {
+                  transport: conn[:protocol],
+                  conn[:protocol] => {
+                    user: conn[:user],
+                    port: conn[:port]
+                  }
+                },
+                facts: {
+                  added_group: 'keep'
+                },
+                vars: {
+                  added_group: 'keep'
+                }
+              }
+            ]
+          },
+          {
+            name: 'bar',
+            nodes: [
+              {
+                name: 'bar_1'
+              }
+            ],
+            config: {
+              transport: 'local'
+            },
+            facts: {
+              exclude: 'dont_inherit'
+            },
+            vars: {
+              exclude: 'dont_inherit'
+            }
+          }
+        ],
+        facts: {
+          top_level: 'keep',
+          preserve_hierarchy: 'discard'
+        },
+        vars: {
+          top_level: 'keep',
+          preserve_hierarchy: 'discard'
+        }
+      }
+    end
+
+    it 'computes facts and vars based on group hierarchy' do
+      plan = ['plan', 'run', 'add_group', '--nodes', 'add_me'] + config_flags
+      expected_hash_pre = { 'top_level' => 'keep',
+                            'preserve_hierarchy' => 'keep',
+                            'parent' => 'keep',
+                            'override_parent' => 'discard',
+                            'added_group' => 'keep' }
+      expected_hash_post = expected_hash_pre.merge('override_parent' => 'keep', 'plan_context' => 'keep')
+      result = run_cli_json(plan)
+      expect(result['addme_group'])
+        .to eq(["Target('#{conn[:host]}', {\"user\"=>\"#{conn[:user]}\", \"port\"=>#{conn[:port]}})",
+                "Target('0.0.0.0:20024', {\"user\"=>\"bolt\", \"port\"=>20022})"])
+      expect(result['existing_facts']).to eq(expected_hash_pre)
+      expect(result['existing_vars']).to eq(expected_hash_pre)
+      expect(result['added_facts']).to eq(expected_hash_post)
+      expect(result['added_vars']).to eq(expected_hash_post)
+      expect(result['target_from_string']).to eq(["Target('bar_1', {})"])
+      expect(result['target_to_all_group']).to include("Target('add_to_all', {})")
+    end
+
+    it 'errors when trying to add to non-existent group' do
+      plan = ['plan', 'run', 'add_group::x_fail_non_existent_group', '--nodes', 'add_me'] + config_flags
+      result = run_cli_json(plan)
+      expect(result['kind']).to eq('bolt.inventory/validation-error')
+      expect(result['msg']).to match(/Group does_not_exist does not exist in inventory/)
+    end
+
+    it 'errors when trying to add new target with name that conflicts with group name' do
+      plan = ['plan', 'run', 'add_group::x_fail_group_name_exists', '--nodes', 'add_me'] + config_flags
+      result = run_cli_json(plan)
+      expect(result['kind']).to eq('bolt.inventory/validation-error')
+      expect(result['msg']).to match(/Group foo conflicts with node of the same name for group/)
+      expect(result['details']).to eq("path" => ["foo"])
+    end
+  end
+
   context 'when running over winrm', winrm: true do
     let(:conn) { conn_info('winrm') }
     let(:shell_cmd) { "echo $env:UserName" }
