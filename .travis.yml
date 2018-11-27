@@ -9,13 +9,12 @@ env:
   global:
     - REGISTRY_HOST=pcr-internal.puppet.net
     - DOCKER_REGISTRY=pe-and-platform
-    - secure: "OhHop3VS4oDV4fGLDXGJF7l/IHM2bVfSWITrYoiMQAPLtSmx8xHg//+gS7cpWlVXdUnBU5vgkixuC16j2J3b0exyeguya2MTMOYKzCBVOcVXU6mNfbSRLyCNHN7Na3nwWouYF4P5M+ujEt7NcHNn03OutzkvvhUskS5AW4OrSNLHevE0BIwPfq0NRH37zrdEhZysvvuuugkxs3PZhkXFNIRgL0AaznUgQBDMIRA4LJggy/s39eH0QSHv3EHhV5WH67DZSx7JaFbMnNjC9iI0aVKpUX4jzoBSjRQa1BWzzGZ2oMaTZEKso7g+bXxnMYV41mrVUVkg+X54twtSgTsTAyRsxHbX295/JzYKihXj2nakzCE7dL7HPvuebRlkZnNMsIt3GCNftLFJVTHZhjBYfwLh8ZTc5hFjcTndlU3WQ+PDbN1YNwMQqG50GA3oQ415gh50JJZeYtol4CQbTywKCQzrZxPf+T967inSrJZB01o3Et5e8M8xEzlx7wGJSMYYb+hnlOP0FMuoi4FJslpbVZ6MHAjnTMMpoZYxy+f20zT2/8pibbX5DZFeD3Y6yx1NhZubqg+sK7AmllXLcAuxh8WGzEo7QhGkDLWlHcHvKic2PnyjLB3Sf82e2j3YnzKP1JtSRI5m0LFBoOokvTBALWbczNAKbgfZa9FFXjAxiHA="
+    - secure: Gk8LaACXYEVpv5LIWEMOuH3sJP4CzB2aSvE1BUcfDWkI+Hdgr2by3w/nGbKpyVD+v2H8r0zXyVrbCJ/qzx2gCRxqKJ2GKJEsrStT+8z3BXRRRzwkThIBVyWKk9b9bTt8AE0G94I3BE4gJyIPfbX5XxnKcg7nJZGOmubZpUPQX+2SXSfy9EbtY9iismwK7LGtWv6l90cK2eSLZGvdsSKPo7cylOldXfdYIyeBtvsIL1juBaiINX52Zgt371+nX53fDSYOKdIDLuhNqX3zpNOuIJ9DUj4E7IJA7+XhHy77zL98VjHtPo5H4fmKyZ2k+xbYqOydc5OPGguKequsnyDo5npktDrkbswnjWMXNDu+wImAd+IwHG2lTamsAnOGQ+E6g2oK0R5fUL26XJ3lBnTRrsLDnlrvqYqFxt3MCR+o5+DnTirSVQJfrRVsIKTucWHlYLTOUWkVDrLavJqIbWHytEbMf/BXUcovlQzSgfu5/Y1GkUJBnthtbiZfTImmBLcrqKDD4PnDmvC1v9Z5KR78MYu7lFTe5C4STj2aR6bwvqjiPKm6kYG5etOFEyRJ+CbqD2QsdF2N6Ww/RFWovqVqQIWuGdhumDUTdmQAiiPxl12M0+kIH6NugpBD3gt4RT0sni/T+booDw6b3Ts4WJ8FW1/LPWdy7gVo9yOCL4FhjOw=
 before_script:
 - docker-compose -f spec/docker-compose.yml up -d --build
 - eval `ssh-agent`
 - cat Gemfile.lock
 - bundle exec r10k puppetfile install
-
 script:
 - bundle exec rake travisci
 - bundle exec rubocop
@@ -48,6 +47,7 @@ after_script:
 deploy:
   provider: script
   on:
+    repo: puppetlabs/bolt
     # deploy the master branch or tag pushes
     condition: $TRAVIS_BRANCH == "master" || -n $TRAVIS_TAG
   script: bash scripts/deploy.sh
