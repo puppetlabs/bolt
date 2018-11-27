@@ -210,21 +210,17 @@ Bolt collects data about how you use it. You can opt out of providing this data.
 
 ### What data does Bolt collect?
 
--   Version of Bolt
--   The Bolt command executed \(for example, `bolt task run` or `bolt plan show`\), excluding arguments
--   The functions called from a plan, excluding arguments
-
--   User locale
--   Operating system and version
--   Transports used \(SSH, WinRM, PCP\) and number of targets
--   The number of nodes and groups defined in the Bolt inventory file
-
--   The number of nodes targeted with a Bolt command
-
--   The output format selected \(human-readable, JSON\) 
-
--   The number of times Bolt tasks and plans are run \(This does not include user-defined tasks or plans.\)
-
+- Version of Bolt
+- The Bolt command executed \(for example, `bolt task run` or `bolt plan show`\), excluding arguments
+- The functions called from a plan, excluding arguments
+- User locale
+- Operating system and version
+- Transports used \(SSH, WinRM, PCP\) and number of targets
+- The number of nodes and groups defined in the Bolt inventory file
+- The number of nodes targeted with a Bolt command
+- The output format selected \(human-readable, JSON\) 
+- The number of times Bolt tasks and plans are run \(This does not include user-defined tasks or plans.\)
+- Number of statements in an apply block, and how many resources that produces for each target.
 
 This data is associated with a random, non-identifiable user UUID.
 
