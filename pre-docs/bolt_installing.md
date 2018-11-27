@@ -241,10 +241,3 @@ To disable the collection of analytics data add the following line to `~/.puppe
 ```
 disabled: true
 ```
-
-## Using Kerberos over SSH
-
-Bolt supports Kerberos authentication for SSH connections, however you must install the gem yourself to avoid license incompatibilities with other distributed components.
-
-To add Kerberos authentication, run `gem install net-ssh-krb`.
-
