@@ -22,15 +22,15 @@ module BoltSpec
       def call(targets, source, destination, options)
         @calls += 1
         if @return_block
-          result_set = @return_block.call(targets: targets, source: source, destination: destination, params: options)
-          unless result_set.is_a?(Bolt::ResultSet)
-            raise "Return block for #{source} did not return a Bolt::ResultSet"
-          end
-          result_set
+          results = @return_block.call(targets: targets, source: source, destination: destination, params: options)
+          check_resultset(results, source)
         else
           results = targets.map do |target|
-            val = @data[target.name] || @data[:default]
-            Bolt::Result.new(target, value: val)
+            if @data[:default].is_a?(Bolt::Error)
+              default_for(target)
+            else
+              Bolt::Result.for_upload(target, source, destination)
+            end
           end
           Bolt::ResultSet.new(results)
         end
@@ -40,7 +40,15 @@ module BoltSpec
         @invocation[:options]
       end
 
+      def result_for(_target, _data)
+        raise 'Upload result cannot be changed'
+      end
+
       # Public methods
+
+      def always_return(_data)
+        raise 'Upload result cannot be changed'
+      end
 
       def with_destination(destination)
         @invocation[:destination] = destination

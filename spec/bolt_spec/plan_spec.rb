@@ -3,29 +3,14 @@
 require 'spec_helper'
 require 'bolt_spec/plans'
 
-# Expect targets, plan_name, return_expects to be set.
-# Expect expect_action to be defined.
+# Requires targets, plan_name, return_expects to be set.
+# Requires expect_action to be defined.
 shared_examples 'action tests' do
   it 'runs' do
-    expect_action.always_return('status' => 'done')
+    expect_action
     result = run_plan(plan_name, 'nodes' => targets)
     expect(result).to be_ok
     expect(result.value.class).to eq(Bolt::ResultSet)
-    results = result.value.result_hash
-    targets.each { |target| expect(results[target]['status']).to eq('done') }
-  end
-
-  it 'returns different values' do
-    expect_action.return_for_targets(
-      targets[0] => { 'status' => 'done' },
-      targets[1] => { 'status' => 'running' }
-    )
-    result = run_plan(plan_name, 'nodes' => targets)
-    expect(result).to be_ok
-    expect(result.value.class).to eq(Bolt::ResultSet)
-    results = result.value.result_hash
-    expect(results[targets[0]]['status']).to eq('done')
-    expect(results[targets[1]]['status']).to eq('running')
   end
 
   it 'returns from a block' do
@@ -42,7 +27,7 @@ shared_examples 'action tests' do
   end
 
   it 'errors' do
-    expect_action.error_with('kind' => 'mine', 'msg' => 'failed')
+    expect_action.error_with('msg' => 'failed', 'kind' => 'min')
     result = run_plan(plan_name, 'nodes' => targets)
     expect(result).not_to be_ok
   end
@@ -79,6 +64,29 @@ describe "BoltSpec::Plans" do
     end
 
     include_examples 'action tests'
+
+    it 'returns a default value' do
+      expect_action.always_return(stdout: 'done')
+      result = run_plan(plan_name, 'nodes' => targets)
+      expect(result).to be_ok
+      expect(result.value.class).to eq(Bolt::ResultSet)
+      results = result.value.result_hash
+      expected_result = { 'stdout' => 'done', 'stderr' => '', 'exit_code' => 0 }
+      targets.each { |target| expect(results[target].value).to eq(expected_result) }
+    end
+
+    it 'returns different values' do
+      expect_action.return_for_targets(
+        targets[0] => { 'stdout' => 'done' },
+        targets[1] => { 'stderr' => 'running' }
+      )
+      result = run_plan(plan_name, 'nodes' => targets)
+      expect(result).to be_ok
+      expect(result.value.class).to eq(Bolt::ResultSet)
+      results = result.value.result_hash
+      expect(results[targets[0]]['stdout']).to eq('done')
+      expect(results[targets[1]]['stderr']).to eq('running')
+    end
   end
 
   context 'with scripts' do
@@ -109,6 +117,28 @@ describe "BoltSpec::Plans" do
     end
 
     include_examples 'action tests'
+
+    it 'returns a default value' do
+      expect_action.always_return('status' => 'done')
+      result = run_plan(plan_name, 'nodes' => targets)
+      expect(result).to be_ok
+      expect(result.value.class).to eq(Bolt::ResultSet)
+      results = result.value.result_hash
+      targets.each { |target| expect(results[target].value).to eq('status' => 'done') }
+    end
+
+    it 'returns different values' do
+      expect_action.return_for_targets(
+        targets[0] => { 'status' => 'done' },
+        targets[1] => { 'status' => 'running' }
+      )
+      result = run_plan(plan_name, 'nodes' => targets)
+      expect(result).to be_ok
+      expect(result.value.class).to eq(Bolt::ResultSet)
+      results = result.value.result_hash
+      expect(results[targets[0]]['status']).to eq('done')
+      expect(results[targets[1]]['status']).to eq('running')
+    end
   end
 
   context 'with uploads' do
@@ -124,6 +154,22 @@ describe "BoltSpec::Plans" do
     end
 
     include_examples 'action tests'
+
+    # always_return and return_for_targets are not supported with upload
+    it 'rejects always_return' do
+      expect {
+        expect_action.always_return('status' => 'done')
+      }.to raise_error('Upload result cannot be changed')
+    end
+
+    it 'rejects return_for_targets' do
+      expect {
+        expect_action.return_for_targets(
+          targets[0] => { 'status' => 'done' },
+          targets[1] => { 'status' => 'running' }
+        )
+      }.to raise_error('Upload result cannot be changed')
+    end
   end
 
   context 'with apply_preps' do

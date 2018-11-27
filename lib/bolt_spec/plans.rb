@@ -67,9 +67,13 @@ require 'bolt/pal'
 # - with_params(params): list of params and metaparams (or options) that you expect to be passed to the action.
 #                        Corresponds to the action's last argument.
 # - with_destination(dest): for upload_file, the expected destination path
-# - always_return(value): return a Bolt::ResultSet of Bolt::Result objects with the specified value
-# - return_for_targets(targets_to_values): return a Bolt::ResultSet of Bolt::Result objects from the hash mapping
-#                                          targets to their values
+# - always_return(value): return a Bolt::ResultSet of Bolt::Result objects with the specified value Hash
+#                         command and script: only accept 'stdout' and 'stderr' keys
+#                         upload: does not support this modifier
+# - return_for_targets(targets_to_values): return a Bolt::ResultSet of Bolt::Result objects from the Hash mapping
+#                                          targets to their value Hashes
+#                                          command and script: only accept 'stdout' and 'stderr' keys
+#                                          upload: does not support this modifier
 # - return(&block): invoke the block to construct a Bolt::ResultSet. The blocks parameters differ based on action
 #                   command: `{ |targets:, command:, params:| ... }`
 #                   script: `{ |targets:, script:, params:| ... }`

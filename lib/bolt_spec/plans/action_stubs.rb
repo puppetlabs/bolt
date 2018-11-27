@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require 'bolt/result'
+require 'bolt/util'
+
 module BoltSpec
   module Plans
     # Nothing in the ActionDouble is 'public'
@@ -64,6 +67,25 @@ module BoltSpec
         self
       end
 
+      # Used to create a valid Bolt::Result object from result data.
+      def default_for(target)
+        case @data[:default]
+        when Bolt::Error
+          Bolt::Result.from_exception(target, @data[:default])
+        when Hash
+          result_for(target, Bolt::Util.walk_keys(@data[:default], &:to_sym))
+        else
+          raise 'Default result must be a Hash'
+        end
+      end
+
+      def check_resultset(result_set, object)
+        unless result_set.is_a?(Bolt::ResultSet)
+          raise "Return block for #{object} did not return a Bolt::ResultSet"
+        end
+        result_set
+      end
+
       # Below here are the intended 'public' methods of the stub
 
       # Restricts the stub to only match invocations with
@@ -99,25 +121,38 @@ module BoltSpec
         self
       end
 
-      # Set different result values for each target
+      # Set different result values for each target. May use string or symbol keys, but allowed key names
+      # are restricted based on action.
       def return_for_targets(data)
-        data.each do |target, result|
+        data.each_with_object(@data) do |(target, result), hsh|
           raise "Mocked results must be hashes: #{target}: #{result}" unless result.is_a? Hash
+          hsh[target] = result_for(Bolt::Target.new(target), Bolt::Util.walk_keys(result, &:to_sym))
         end
         raise "Cannot set return values and return block." if @return_block
-        @data = data
         @data_set = true
         self
       end
 
-      # Set a default return value for all targets, specific targets may be overridden with return_for_targets
-      def always_return(default_data)
-        return_for_targets(default: default_data)
+      # Set a default return value for all targets, specific targets may be overridden with return_for_targets.
+      # Follows the same rules for data as return_for_targets.
+      def always_return(data)
+        @data[:default] = data
+        @data_set = true
+        self
       end
 
       # Set a default error result for all targets.
-      def error_with(error_data)
-        always_return("_error" => error_data)
+      def error_with(data)
+        data = Bolt::Util.walk_keys(data, &:to_s)
+        if data['msg'] && data['kind'] && (data.keys - %w[msg kind details issue_code]).empty?
+          @data[:default] = Bolt::Error.new(data['msg'], data['kind'], data['details'], data['issue_code'])
+        else
+          STDERR.puts "In the future 'error_with()' may require msg and kind, and " \
+                      "optionally accept only details and issue_code."
+          @data[:default] = data
+        end
+        @data_set = true
+        self
       end
     end
   end

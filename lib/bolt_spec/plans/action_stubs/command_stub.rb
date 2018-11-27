@@ -18,22 +18,18 @@ module BoltSpec
       def call(targets, command, options)
         @calls += 1
         if @return_block
-          result_set = @return_block.call(targets: targets, command: command, params: options)
-          unless result_set.is_a?(Bolt::ResultSet)
-            raise "Return block for #{command} did not return a Bolt::ResultSet"
-          end
-          result_set
+          check_resultset(@return_block.call(targets: targets, command: command, params: options), command)
         else
-          results = targets.map do |target|
-            val = @data[target.name] || @data[:default]
-            Bolt::Result.new(target, value: val)
-          end
-          Bolt::ResultSet.new(results)
+          Bolt::ResultSet.new(targets.map { |target| @data[target.name] || default_for(target) })
         end
       end
 
       def parameters
         @invocation[:options]
+      end
+
+      def result_for(target, stdout: '', stderr: '')
+        Bolt::Result.for_command(target, stdout, stderr, 0)
       end
 
       # Public methods

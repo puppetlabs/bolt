@@ -24,22 +24,18 @@ module BoltSpec
         if @return_block
           # Merge arguments and options into params to match puppet function signature.
           params = options.merge('arguments' => arguments)
-          result_set = @return_block.call(targets: targets, script: script, params: params)
-          unless result_set.is_a?(Bolt::ResultSet)
-            raise "Return block for #{script} did not return a Bolt::ResultSet"
-          end
-          result_set
+          check_resultset(@return_block.call(targets: targets, script: script, params: params), script)
         else
-          results = targets.map do |target|
-            val = @data[target.name] || @data[:default]
-            Bolt::Result.new(target, value: val)
-          end
-          Bolt::ResultSet.new(results)
+          Bolt::ResultSet.new(targets.map { |target| @data[target.name] || default_for(target) })
         end
       end
 
       def parameters
         @invocation[:arguments] + @invocation[:options]
+      end
+
+      def result_for(target, stdout: '', stderr: '')
+        Bolt::Result.for_command(target, stdout, stderr, 0)
       end
 
       # Public methods
