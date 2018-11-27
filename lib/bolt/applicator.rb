@@ -20,6 +20,7 @@ module Bolt
       @plugin_dirs = plugin_dirs
       @pdb_client = pdb_client
       @hiera_config = hiera_config ? validate_hiera_config(hiera_config) : nil
+      @analytics = executor&.analytics
 
       @pool = Concurrent::ThreadPoolExecutor.new(max_threads: max_compiles)
       @logger = Logging.logger[self]
@@ -134,12 +135,26 @@ module Bolt
 
       targets = @inventory.get_targets(args[0])
 
-      ast = Puppet::Pops::Serialization::ToDataConverter.convert(apply_body, rich_data: true, symbol_to_string: true)
-
-      apply_ast(ast, targets, options, plan_vars)
+      apply_ast(apply_body, targets, options, plan_vars)
     end
 
-    def apply_ast(ast, targets, options, plan_vars = {})
+    # Count the number of top-level statements in the AST.
+    def count_statements(ast)
+      case ast
+      when Puppet::Pops::Model::Program
+        count_statements(ast.body)
+      when Puppet::Pops::Model::BlockExpression
+        ast.statements.count
+      else
+        1
+      end
+    end
+
+    def apply_ast(raw_ast, targets, options, plan_vars = {})
+      @analytics&.event('Apply', 'ast', 'statements', count_statements(raw_ast))
+
+      ast = Puppet::Pops::Serialization::ToDataConverter.convert(raw_ast, rich_data: true, symbol_to_string: true)
+
       notify = proc { |_| nil }
 
       r = @executor.log_action('apply catalog', targets) do
@@ -154,12 +169,16 @@ module Bolt
         result_promises = targets.zip(futures).flat_map do |target, future|
           @executor.queue_execute([target]) do |transport, batch|
             @executor.with_node_logging("Applying manifest block", batch) do
+              catalog = future.value
+              raise future.reason if future.rejected?
+
               arguments = {
-                'catalog' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(future.value),
+                'catalog' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(catalog),
                 'plugins' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(plugins),
                 '_noop' => options['_noop']
               }
-              raise future.reason if future.rejected?
+
+              @analytics&.event('Apply', 'ast', 'resources', catalog['resources'].size)
               results = transport.batch_task(batch, catalog_apply_task, arguments, options, &notify)
               Array(results).map { |result| ApplyResult.from_task_result(result) }
             end

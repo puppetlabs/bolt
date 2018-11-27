@@ -15,7 +15,7 @@ require 'bolt/puppetdb'
 
 module Bolt
   class Executor
-    attr_reader :noop, :transports
+    attr_reader :noop, :transports, :analytics
     attr_accessor :run_as
 
     # FIXME: There must be a better way

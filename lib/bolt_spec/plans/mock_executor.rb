@@ -224,6 +224,8 @@ module BoltSpec
       def report_function_call(_function); end
 
       def report_bundled_content(_mode, _name); end
+
+      def analytics; end
     end
   end
 end

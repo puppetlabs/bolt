@@ -17,8 +17,7 @@ describe Bolt::PAL do
 
     it "should parse a manifest string" do
       ast = pal.parse_manifest('notify { "hello world": }', 'test.pp')
-      expect(ast).to be_a(Hash)
-      expect(ast['__ptype']).to eq('Puppet::AST::Program')
+      expect(ast).to be_a(Puppet::Pops::Model::Program)
     end
 
     it "should convert puppet errors to pal errors" do
