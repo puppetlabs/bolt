@@ -17,7 +17,6 @@
     -   [Install gems with Bolt packages](bolt_installing.md#task-2023)
     -   [Install Bolt as a gem](bolt_installing.md#task-4877)
     -   [Analytics data collection](bolt_installing.md#concept-8242)
-    -   [Using Kerberos over SSH](bolt_installing.md#concept-7683)
 -   [Using Bolt to perform frequent tasks](running_bolt.md)
     -   [Running basic Bolt commands](running_bolt_commands.md#concept-3531)
         -   [Run a command on remote nodes](running_bolt_commands.md#concept-4161)
