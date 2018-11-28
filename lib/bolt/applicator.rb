@@ -20,7 +20,6 @@ module Bolt
       @plugin_dirs = plugin_dirs
       @pdb_client = pdb_client
       @hiera_config = hiera_config ? validate_hiera_config(hiera_config) : nil
-      @analytics = executor&.analytics
 
       @pool = Concurrent::ThreadPoolExecutor.new(max_threads: max_compiles)
       @logger = Logging.logger[self]
@@ -151,8 +150,6 @@ module Bolt
     end
 
     def apply_ast(raw_ast, targets, options, plan_vars = {})
-      @analytics&.event('Apply', 'ast', 'statements', count_statements(raw_ast))
-
       ast = Puppet::Pops::Serialization::ToDataConverter.convert(raw_ast, rich_data: true, symbol_to_string: true)
 
       notify = proc { |_| nil }
@@ -178,7 +175,6 @@ module Bolt
                 '_noop' => options['_noop']
               }
 
-              @analytics&.event('Apply', 'ast', 'resources', catalog['resources'].size)
               results = transport.batch_task(batch, catalog_apply_task, arguments, options, &notify)
               Array(results).map { |result| ApplyResult.from_task_result(result) }
             end
@@ -187,6 +183,10 @@ module Bolt
 
         @executor.await_results(result_promises)
       end
+
+      # Allow for report to exclude event metrics (apply_result doesn't require it to be present)
+      resource_counts = r.ok_set.map { |result| result.event_metrics&.fetch('total') }.compact
+      @executor.report_apply(count_statements(raw_ast), resource_counts)
 
       if !r.ok && !options['_catch_errors']
         raise Bolt::ApplyFailure, r
