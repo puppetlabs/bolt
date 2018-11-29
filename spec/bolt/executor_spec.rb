@@ -522,9 +522,9 @@ describe "Bolt::Executor" do
     }
 
     it 'reports one event for each transport used' do
-      expect(analytics).to receive(:event).with('Transport', 'initialize', 'ssh', 2).once
-      expect(analytics).to receive(:event).with('Transport', 'initialize', 'winrm', 1).once
-      expect(analytics).to receive(:event).with('Transport', 'initialize', 'orch', 1).once
+      expect(analytics).to receive(:event).with('Transport', 'initialize', label: 'ssh', value: 2).once
+      expect(analytics).to receive(:event).with('Transport', 'initialize', label: 'winrm', value: 1).once
+      expect(analytics).to receive(:event).with('Transport', 'initialize', label: 'orch', value: 1).once
 
       executor.batch_execute(targets) {}
       executor.batch_execute(targets) {}
@@ -532,7 +532,7 @@ describe "Bolt::Executor" do
 
     context "#report_function_call" do
       it 'reports an event for the given function' do
-        expect(analytics).to receive(:event).with('Plan', 'call_function', 'add_facts')
+        expect(analytics).to receive(:event).with('Plan', 'call_function', label: 'add_facts')
 
         executor.report_function_call('add_facts')
       end
@@ -542,13 +542,13 @@ describe "Bolt::Executor" do
       let(:executor) { Bolt::Executor.new(2, analytics, bundled_content: %w[canary facts]) }
 
       it 'reports an event when bundled plan is used' do
-        expect(analytics).to receive(:event).with('Bundled Content', 'Plan', 'canary')
+        expect(analytics).to receive(:event).with('Bundled Content', 'Plan', label: 'canary')
 
         executor.report_bundled_content('Plan', 'canary')
       end
 
       it 'reports an event when bundled task is used' do
-        expect(analytics).to receive(:event).with('Bundled Content', 'Task', 'facts')
+        expect(analytics).to receive(:event).with('Bundled Content', 'Task', label: 'facts')
 
         executor.report_bundled_content('Task', 'facts')
       end

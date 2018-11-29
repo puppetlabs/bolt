@@ -131,7 +131,7 @@ module BoltSpec
 
       def report_bundled_content(_mode, _name); end
 
-      def analytics; end
+      def report_apply(_statements, _resources); end
 
       # Mocked for Apply so it does not compile and execute.
       def with_node_logging(_description, targets)
@@ -145,8 +145,9 @@ module BoltSpec
 
       def await_results(promises)
         raise "Unexpected call to apply(#{targets})" unless @allow_apply
-        Bolt::ResultSet.new(promises.map { |target| Bolt::Result.new(target) })
+        Bolt::ResultSet.new(promises.map { |target| Bolt::ApplyResult.new(target) })
       end
+      # End Apply mocking
     end
   end
 end
