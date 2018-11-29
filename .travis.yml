@@ -41,6 +41,10 @@ script:
   if [ $status -eq 1 ]; then
     false
   fi
+- |
+  if ! bundle exec rake docs; then
+    false
+  fi
 - bundle exec rake puppetserver
 after_script:
 - docker-compose -f spec/docker-compose.yml logs
