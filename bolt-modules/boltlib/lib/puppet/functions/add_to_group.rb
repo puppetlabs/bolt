@@ -5,7 +5,7 @@ require 'bolt/error'
 # Adds a target to specified inventory group.
 Puppet::Functions.create_function(:add_to_group) do
   # @param targets A pattern or array of patterns identifying a set of targets.
-  # @param The name of the group to add targets to.
+  # @param group The name of the group to add targets to.
   # @example Add new Target to group.
   #   Target.new('foo@example.com', 'password' => 'secret').add_to_group('group1')
   # @example Add new target to group by name.
