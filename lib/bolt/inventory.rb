@@ -198,25 +198,26 @@ module Bolt
     private :update_target
 
     # If target is a group name, expand it to the members of that group.
-    # If a wildcard string, match against nodes in inventory (or error if none found).
-    # Else return [target].
+    # Else match against nodes in inventory by name or alias.
+    # If a wildcard string, error if no matches are found.
+    # Else fall back to [target] if no matches are found.
     def resolve_name(target)
       if (group = @group_lookup[target])
         group.node_names
-      elsif target.include?('*')
+      else
         # Try to wildcard match nodes in inventory
         # Ignore case because hostnames are generally case-insensitive
         regexp = Regexp.new("^#{Regexp.escape(target).gsub('\*', '.*?')}$", Regexp::IGNORECASE)
 
-        nodes = []
-        @groups.node_names.each do |node|
-          nodes << node if node =~ regexp
-        end
+        nodes = @groups.node_names.select { |node| node =~ regexp }
+        nodes += @groups.node_aliases.select { |target_alias, _node| target_alias =~ regexp }.values
 
-        raise(WildcardError, target) if nodes.empty?
-        nodes
-      else
-        [target]
+        if nodes.empty?
+          raise(WildcardError, target) if target.include?('*')
+          [target]
+        else
+          nodes
+        end
       end
     end
     private :resolve_name

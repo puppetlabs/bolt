@@ -5,9 +5,9 @@ module Bolt
     # Group is a specific implementation of Inventory based on nested
     # structured data.
     class Group
-      attr_accessor :name, :nodes, :groups, :config, :rest, :facts, :vars, :features
+      attr_accessor :name, :nodes, :aliases, :groups, :config, :rest, :facts, :vars, :features
 
-      # Regex used to validate group names.
+      # Regex used to validate group names and target aliases.
       NAME_REGEX = /\A[a-z0-9_]+\Z/.freeze
 
       def initialize(data)
@@ -29,6 +29,7 @@ module Bolt
         groups = fetch_value(data, 'groups', Array)
 
         @nodes = {}
+        @aliases = {}
         nodes.each do |node|
           node = { 'name' => node } if node.is_a?(String)
           unless node.is_a?(Hash)
@@ -42,6 +43,24 @@ module Bolt
 
           raise ValidationError.new("Node #{node} does not have a name", @name) unless node['name']
           @nodes[node['name']] = node
+
+          next unless node.include?('alias')
+
+          aliases = node['alias']
+          aliases = [aliases] if aliases.is_a?(String)
+          unless aliases.is_a?(Array)
+            msg = "Alias entry on #{node['name']} must be a String or Array, not #{aliases.class}"
+            raise ValidationError.new(msg, @name)
+          end
+
+          aliases.each do |alia|
+            raise ValidationError.new("Invalid alias #{alia}", @name) unless alia =~ NAME_REGEX
+
+            if (found = @aliases[alia])
+              raise ValidationError.new(alias_conflict(alia, found, node['name']), @name)
+            end
+            @aliases[alia] = node['name']
+          end
         end
 
         @groups = groups.map { |g| Group.new(g) }
@@ -58,15 +77,32 @@ module Bolt
         value
       end
 
-      def validate(used_names = Set.new, node_names = Set.new, depth = 0)
-        raise ValidationError.new("Tried to redefine group #{@name}", @name) if used_names.include?(@name)
+      private def alias_conflict(name, node1, node2)
+        "Alias #{name} refers to multiple targets: #{node1} and #{node2}"
+      end
 
-        if node_names.include?(@name)
-          raise ValidationError.new("Group #{@name} conflicts with node of the same name", @name)
-        end
+      private def group_alias_conflict(name)
+        "Group #{name} conflicts with alias of the same name"
+      end
+
+      private def group_node_conflict(name)
+        "Group #{name} conflicts with node of the same name"
+      end
+
+      private def alias_node_conflict(name)
+        "Node name #{name} conflicts with alias of the same name"
+      end
+
+      def validate(used_names = Set.new, node_names = Set.new, aliased = {}, depth = 0)
+        # Test if this group name conflicts with anything used before.
+        raise ValidationError.new("Tried to redefine group #{@name}", @name) if used_names.include?(@name)
+        raise ValidationError.new(group_node_conflict(@name), @name) if node_names.include?(@name)
+        raise ValidationError.new(group_alias_conflict(@name), @name) if aliased.include?(@name)
 
         used_names << @name
 
+        # Collect node names and aliases into a list used to validate that subgroups don't conflict.
+        # Used names validate that previously used group names don't conflict with new node names/aliases.
         @nodes.each_key do |n|
           # Require nodes to be parseable as a Target.
           begin
@@ -76,14 +112,26 @@ module Bolt
             raise ValidationError.new("Invalid node name #{n}", @name)
           end
 
-          raise ValidationError.new("Group #{n} conflicts with node of the same name", @name) if used_names.include?(n)
+          raise ValidationError.new(group_node_conflict(n), @name) if used_names.include?(n)
+          raise ValidationError.new(alias_node_conflict(n), @name) if aliased.include?(n)
 
           node_names << n
         end
 
+        @aliases.each do |n, target|
+          raise ValidationError.new(group_alias_conflict(n), @name) if used_names.include?(n)
+          raise ValidationError.new(alias_node_conflict(n), @name) if node_names.include?(n)
+
+          if aliased.include?(n) && aliased[n] != target
+            raise ValidationError.new(alias_conflict(n, target, aliased[n]), @name)
+          end
+
+          aliased[n] = target
+        end
+
         @groups.each do |g|
           begin
-            g.validate(used_names, node_names, depth + 1)
+            g.validate(used_names, node_names, aliased, depth + 1)
           rescue ValidationError => e
             e.add_parent(@name)
             raise e
@@ -147,6 +195,13 @@ module Bolt
       def node_names
         @groups.inject(local_node_names) do |acc, g|
           acc.merge(g.node_names)
+        end
+      end
+
+      # Returns a mapping of aliases to nodes contained within the group, which includes subgroups.
+      def node_aliases
+        @groups.inject(@aliases) do |acc, g|
+          acc.merge(g.node_aliases)
         end
       end
 
