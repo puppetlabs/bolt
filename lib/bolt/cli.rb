@@ -378,7 +378,7 @@ module Bolt
       executor.start_plan(plan_context)
       result = pal.run_plan(plan_name, plan_arguments, executor, inventory, puppetdb_client)
 
-      # If a non-bolt exeception bubbles up the plan won't get finished
+      # If a non-bolt exception bubbles up the plan won't get finished
       executor.finish_plan(result)
       outputter.print_plan_result(result)
       result.ok? ? 0 : 1
