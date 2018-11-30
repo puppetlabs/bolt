@@ -6,28 +6,35 @@ require 'bolt/error'
 require 'bolt/executor'
 require 'bolt/inventory'
 require 'bolt/pal'
+require 'bolt/puppetdb'
 require 'concurrent'
 require 'json'
 require 'json-schema'
 
-module BoltServer
-  class PlanApp < Sinatra::Base
+module PlanExecutor
+  class App < Sinatra::Base
     # This disables Sinatra's error page generation
     set :show_exceptions, false
+    # Global var to capture output for testing
+    result = nil
 
-    def initialize(modulepath)
+    helpers do
+      def puppetdb_client
+        return @puppetdb_client if @puppetdb_client
+        @puppetdb_client = Bolt::PuppetDB::Client.new({})
+      end
+    end
+
+    def initialize(modulepath, executor = nil)
       @schema = JSON.parse(File.read(File.join(__dir__, 'schemas', 'run_plan.json')))
       @worker = Concurrent::SingleThreadExecutor.new
 
       # Create a basic executor, leave concurrency up to Orchestrator.
-      @executor = Bolt::Executor.new(0)
+      @executor = executor || Bolt::Executor.new(0, load_config: false)
       # Use an empty inventory until we figure out where this data comes from.
       @inventory = Bolt::Inventory.new(nil)
       # TODO: what should max compiles be set to for apply?
       @pal = Bolt::PAL.new(modulepath, nil)
-
-      @last_result = Concurrent::Promise.new(executor: @worker) { nil }
-      @last_result.execute
 
       super(nil)
     end
@@ -50,10 +57,10 @@ module BoltServer
         GC.start
         200
       end
-    end
 
-    get '/admin/gc_stat' do
-      [200, GC.stat.to_json]
+      get '/admin/gc_stat' do
+        [200, GC.stat.to_json]
+      end
     end
 
     get '/500_error' do
@@ -72,21 +79,25 @@ module BoltServer
       @pal.get_plan_info(name)
 
       params = body['params']
-      @last_result = Concurrent::Promise.new(executor: @worker) do
-        # TODO: setup pdb client
-        # Stores result in @last_result for testing. We don't have another way to get at the output.
-        @pal.run_plan(name, params, @executor, @inventory)
+      # This provides a wait function, which promise doesn't
+      result = Concurrent::Future.execute(executor: @worker) do
+        # Stores result in result for testing
+        @pal.run_plan(name, params, @executor, @inventory, puppetdb_client)
       end
-      @last_result.execute
 
-      [200, { 'status' => 'running' }.to_json]
+      [200, { status: 'running' }.to_json]
     end
 
     # Provided for testing
     get '/plan/result' do
-      @last_result.wait
-      raise @last_result.reason if @last_result.rejected?
-      @last_result.value
+      result.wait_or_cancel(20)
+      if result.fulfilled?
+        return [200, result.value.to_json]
+      elsif result.rejected?
+        raise result.reason.to_s
+      else
+        return [200, result.state.to_s]
+      end
     end
 
     error 404 do

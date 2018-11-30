@@ -22,7 +22,7 @@
     },
     "params": {
       "type": "object",
-      "description": "JSON formatted parameters to be provided to task"
+      "description": "JSON formatted parameters to be provided to plan"
     }
   },
   "required": ["plan_name", "job_id", "params"]
