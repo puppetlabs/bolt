@@ -40,7 +40,7 @@ module Bolt
             next
           end
 
-          raise ValidationError.new("Node #{node} does not have a name", node) unless node['name']
+          raise ValidationError.new("Node #{node} does not have a name", @name) unless node['name']
           @nodes[node['name']] = node
         end
 
@@ -73,10 +73,10 @@ module Bolt
             Target.new(n)
           rescue Addressable::URI::InvalidURIError => e
             @logger.debug(e)
-            raise ValidationError.new("Invalid node name #{n}", n)
+            raise ValidationError.new("Invalid node name #{n}", @name)
           end
 
-          raise ValidationError.new("Group #{n} conflicts with node of the same name", n) if used_names.include?(n)
+          raise ValidationError.new("Group #{n} conflicts with node of the same name", @name) if used_names.include?(n)
 
           node_names << n
         end

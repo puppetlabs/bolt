@@ -13,9 +13,9 @@ module Bolt
     class ValidationError < Bolt::Error
       attr_accessor :path
       def initialize(message, offending_group)
-        super(msg, 'bolt.inventory/validation-error')
+        super(message, 'bolt.inventory/validation-error')
         @_message = message
-        @path = offending_group ? [offending_group] : []
+        @path = [offending_group].compact
       end
 
       def details
@@ -27,7 +27,11 @@ module Bolt
       end
 
       def message
-        "#{@_message} for group at #{path}"
+        if path.empty?
+          @_message
+        else
+          "#{@_message} for group at #{path}"
+        end
       end
     end
 
