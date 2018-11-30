@@ -23,6 +23,10 @@ module Bolt
           cli << "--#{setting}" << dir
         end
         Puppet.settings.send(:clear_everything_for_tests)
+        # Override module locations, Bolt includes vendored modules in its internal modulepath.
+        Puppet.settings.override_default(:basemodulepath, '')
+        Puppet.settings.override_default(:vendormoduledir, '')
+
         Puppet.initialize_settings(cli)
         Puppet.settings[:hiera_config] = hiera_config
 
