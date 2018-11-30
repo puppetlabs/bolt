@@ -101,7 +101,7 @@ describe Bolt::Analytics::Client do
 
       expect(subject).to receive(:submit).with params
 
-      subject.event('run', 'task', 'happy')
+      subject.event('run', 'task', label: 'happy')
     end
 
     it 'sends the event metric if supplied' do
@@ -109,7 +109,7 @@ describe Bolt::Analytics::Client do
 
       expect(subject).to receive(:submit).with params
 
-      subject.event('run', 'task', nil, 12)
+      subject.event('run', 'task', value: 12)
     end
   end
 end
@@ -127,11 +127,11 @@ describe Bolt::Analytics::NoopClient do
     end
 
     it 'succeeds with a label' do
-      subject.event('run', 'task', 'happy')
+      subject.event('run', 'task', label: 'happy')
     end
 
     it 'succeeds with a metric' do
-      subject.event('run', 'task', nil, 12)
+      subject.event('run', 'task', value: 12)
     end
   end
 end

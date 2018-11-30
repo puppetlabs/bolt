@@ -15,7 +15,7 @@ require 'bolt/puppetdb'
 
 module Bolt
   class Executor
-    attr_reader :noop, :transports, :analytics
+    attr_reader :noop, :transports
     attr_accessor :run_as
 
     # FIXME: There must be a better way
@@ -165,18 +165,32 @@ module Bolt
 
     def report_transport(transport, count)
       name = transport.class.name.split('::').last.downcase
-      @analytics&.event('Transport', 'initialize', name, count) unless @reported_transports.include?(name)
+      unless @reported_transports.include?(name)
+        @analytics&.event('Transport', 'initialize', label: name, value: count)
+      end
       @reported_transports.add(name)
     end
 
     def report_function_call(function)
-      @analytics&.event('Plan', 'call_function', function)
+      @analytics&.event('Plan', 'call_function', label: function)
     end
 
     def report_bundled_content(mode, name)
       if @bundled_content&.include?(name)
-        @analytics&.event('Bundled Content', mode, name)
+        @analytics&.event('Bundled Content', mode, label: name)
       end
+    end
+
+    def report_apply(statement_count, resource_counts)
+      data = { statement_count: statement_count }
+
+      unless resource_counts.empty?
+        sum = resource_counts.inject(0) { |accum, i| accum + i }
+        # Intentionally rounded to an integer. High precision isn't useful.
+        data[:resource_mean] = sum / resource_counts.length
+      end
+
+      @analytics&.event('Apply', 'ast', data)
     end
 
     def with_node_logging(description, batch)

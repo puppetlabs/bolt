@@ -19,7 +19,9 @@ module Bolt
       inventory_nodes: :cd2,
       inventory_groups: :cd3,
       target_nodes: :cd4,
-      output_format: :cd5
+      output_format: :cd5,
+      statement_count: :cd6,
+      resource_mean: :cd7
     }.freeze
 
     def self.build_client
@@ -82,7 +84,11 @@ module Bolt
         submit(base_params.merge(screen_view_params))
       end
 
-      def event(category, action, label = nil, value = nil)
+      def event(category, action, label: nil, value: nil, **kwargs)
+        custom_dimensions = Bolt::Util.walk_keys(kwargs) do |k|
+          CUSTOM_DIMENSIONS[k] || raise("Unknown analytics key '#{k}'")
+        end
+
         event_params = {
           # Type
           t: 'event',
@@ -90,7 +96,7 @@ module Bolt
           ec: category,
           # Event Action
           ea: action
-        }
+        }.merge(custom_dimensions)
 
         # Event Label
         event_params[:el] = label if label
@@ -160,7 +166,7 @@ module Bolt
         @logger.debug "Skipping submission of '#{screen}' screenview because analytics is disabled"
       end
 
-      def event(category, action, _label = nil, _value = nil)
+      def event(category, action, **_kwargs)
         @logger.debug "Skipping submission of '#{category} #{action}' event because analytics is disabled"
       end
 

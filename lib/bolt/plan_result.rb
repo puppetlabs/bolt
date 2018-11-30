@@ -36,5 +36,9 @@ module Bolt
     def to_json(*args)
       @value.to_json(*args)
     end
+
+    def to_s
+      to_json
+    end
   end
 end

@@ -185,7 +185,7 @@ MSG
 
       targets = [Bolt::Target.new('node1'), Bolt::Target.new('node2'), Bolt::Target.new('node3')]
       allow_any_instance_of(Bolt::Transport::SSH).to receive(:batch_task) do |_, batch|
-        Bolt::Result.new(batch.first)
+        Bolt::ApplyResult.new(batch.first)
       end
 
       t = Thread.new {
