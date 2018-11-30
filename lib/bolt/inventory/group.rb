@@ -5,7 +5,7 @@ module Bolt
     # Group is a specific implementation of Inventory based on nested
     # structured data.
     class Group
-      attr_accessor :name, :nodes, :aliases, :groups, :config, :rest, :facts, :vars, :features
+      attr_accessor :name, :nodes, :aliases, :name_or_alias, :groups, :config, :rest, :facts, :vars, :features
 
       # Regex used to validate group names and target aliases.
       NAME_REGEX = /\A[a-z0-9_]+\Z/.freeze
@@ -30,8 +30,7 @@ module Bolt
 
         @nodes = {}
         @aliases = {}
-        nodes.each do |node|
-          node = { 'name' => node } if node.is_a?(String)
+        nodes.reject { |node| node.is_a?(String) }.each do |node|
           unless node.is_a?(Hash)
             raise ValidationError.new("Node entry must be a String or Hash, not #{node.class}", @name)
           end
@@ -63,18 +62,37 @@ module Bolt
           end
         end
 
+        # If node is a string, it can refer to either a node name or alias. Which can't be determined
+        # until all groups have been resolved, and requires a depth-first traversal to categorize them.
+        @name_or_alias = nodes.select { |node| node.is_a?(String) }
+
         @groups = groups.map { |g| Group.new(g) }
 
         # this allows arbitrary info for the top level
         @rest = data.reject { |k, _| %w[name nodes config groups vars facts features].include? k }
       end
 
-      def fetch_value(data, key, type)
+      private def fetch_value(data, key, type)
         value = data.fetch(key, type.new)
         unless value.is_a?(type)
           raise ValidationError.new("Expected #{key} to be of type #{type}, not #{value.class}", @name)
         end
         value
+      end
+
+      def resolve_aliases(aliases)
+        @name_or_alias.each do |name_or_alias|
+          # If an alias is found, insert the name into this group. Otherwise use the name as a new node.
+          node_name = aliases[name_or_alias] || name_or_alias
+
+          if @nodes.include?(node_name)
+            @logger.warn("Ignoring duplicate node in #{@name}: #{node_name}")
+          else
+            @nodes[node_name] = { 'name' => node_name }
+          end
+        end
+
+        @groups.each { |g| g.resolve_aliases(aliases) }
       end
 
       private def alias_conflict(name, node1, node2)

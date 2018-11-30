@@ -7,7 +7,14 @@ require 'bolt/inventory/group'
 # This is largely internal and probably shouldn't be tested
 describe Bolt::Inventory::Group do
   let(:data) { { 'name' => 'all' } }
-  let(:group) { Bolt::Inventory::Group.new(data) }
+  let(:group) {
+    # Inventory always resolves unknown labels to names or aliases from the top-down when constructed,
+    # passing the collection of all aliases in it. Do that manually here to ensure plain node strings
+    # are included as nodes.
+    g = Bolt::Inventory::Group.new(data)
+    g.resolve_aliases({})
+    g
+  }
   let(:node1_ssh) { group.data_for('node1')['config']['ssh']['user'] }
 
   it 'returns nil' do
@@ -46,7 +53,7 @@ describe Bolt::Inventory::Group do
     end
 
     it 'should find three nodes' do
-      expect(group.node_names.to_a).to eq(%w[node1 node2 node3])
+      expect(group.node_names.to_a.sort).to eq(%w[node1 node2 node3])
     end
 
     it 'should collect one group' do
@@ -659,7 +666,7 @@ describe Bolt::Inventory::Group do
       end
 
       it { expect(group.node_names.to_a).to eq(%w[node1]) }
-      it { expect(group.node_aliases).to eq({}) }
+      it { expect(group.node_aliases).to eq('alias1' => 'node1') }
     end
 
     context 'alias to a node in parent group' do

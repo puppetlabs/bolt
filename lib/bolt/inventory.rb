@@ -67,6 +67,8 @@ module Bolt
       @target_vars = target_vars
       @target_facts = target_facts
       @target_features = target_features
+
+      @groups.resolve_aliases(@groups.node_aliases)
       collect_groups
     end
 

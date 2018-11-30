@@ -240,7 +240,7 @@ describe Bolt::Inventory do
 
       it 'should match wildcard selectors' do
         targets = inventory.get_targets('node*')
-        expect(targets).to eq(targets(%w[node1 node2 node3 node4 node5 node6 node7 node9]))
+        expect(targets.map(&:name).sort).to eq(%w[node1 node2 node3 node4 node5 node6 node7 node9])
       end
 
       it 'should fail if wildcard selector matches nothing' do
@@ -449,6 +449,9 @@ describe Bolt::Inventory do
                 }
               } }
           ],
+          'groups' => [
+            { 'name' => 'group1', 'nodes' => %w[node1 alias1 node4] }
+          ],
           'config' => {
             'ssh' => {
               'user' => 'you',
@@ -475,6 +478,12 @@ describe Bolt::Inventory do
         targets = inventory.get_targets(%w[node1 alias1 alias2])
         expect(targets.count).to eq(3)
         expect(targets.map(&:name)).to eq(%w[node1 node2 node3])
+      end
+
+      it 'should resolve node labels' do
+        targets = inventory.get_targets('group1')
+        expect(targets.count).to eq(3)
+        expect(targets.map(&:name)).to eq(%w[node1 node2 node4])
       end
     end
 
