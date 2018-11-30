@@ -206,9 +206,7 @@ module Bolt
 
         nodes = []
         @groups.node_names.each do |node|
-          if node =~ regexp
-            nodes << node
-          end
+          nodes << node if node =~ regexp
         end
 
         raise(WildcardError, target) if nodes.empty?

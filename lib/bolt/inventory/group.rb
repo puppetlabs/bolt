@@ -7,22 +7,18 @@ module Bolt
     class Group
       attr_accessor :name, :nodes, :groups, :config, :rest, :facts, :vars, :features
 
+      # Regex used to validate group names.
+      NAME_REGEX = /\A[a-z0-9_]+\Z/.freeze
+
       def initialize(data)
         @logger = Logging.logger[self]
 
-        unless data.is_a?(Hash)
-          raise ValidationError.new("Expected group to be a Hash, not #{data.class}", nil)
-        end
+        raise ValidationError.new("Expected group to be a Hash, not #{data.class}", nil) unless data.is_a?(Hash)
+        raise ValidationError.new("Group does not have a name", nil) unless data.key?('name')
 
-        if data.key?('name')
-          if data['name'].is_a?(String)
-            @name = data['name']
-          else
-            raise ValidationError.new("Group name must be a String, not #{data['name'].inspect}", nil)
-          end
-        else
-          raise ValidationError.new("Group does not have a name", nil)
-        end
+        @name = data['name']
+        raise ValidationError.new("Group name must be a String, not #{@name.inspect}", nil) unless @name.is_a?(String)
+        raise ValidationError.new("Invalid group name #{@name}", @name) unless @name =~ NAME_REGEX
 
         @vars = fetch_value(data, 'vars', Hash)
         @facts = fetch_value(data, 'facts', Hash)
@@ -34,15 +30,18 @@ module Bolt
 
         @nodes = {}
         nodes.each do |node|
-          node = { 'name' => node } if node.is_a? String
+          node = { 'name' => node } if node.is_a?(String)
           unless node.is_a?(Hash)
             raise ValidationError.new("Node entry must be a String or Hash, not #{node.class}", @name)
           end
-          if @nodes.include? node['name']
+
+          if @nodes.include?(node['name'])
             @logger.warn("Ignoring duplicate node in #{@name}: #{node}")
-          else
-            @nodes[node['name']] = node
+            next
           end
+
+          raise ValidationError.new("Node #{node} does not have a name", node) unless node['name']
+          @nodes[node['name']] = node
         end
 
         @groups = groups.map { |g| Group.new(g) }
@@ -60,10 +59,7 @@ module Bolt
       end
 
       def validate(used_names = Set.new, node_names = Set.new, depth = 0)
-        if used_names.include?(@name)
-          raise ValidationError.new("Tried to redefine group #{@name}", @name)
-        end
-        raise ValidationError.new("Invalid group name #{@name}", @name) unless @name =~ /\A[a-z0-9_]+\Z/
+        raise ValidationError.new("Tried to redefine group #{@name}", @name) if used_names.include?(@name)
 
         if node_names.include?(@name)
           raise ValidationError.new("Group #{@name} conflicts with node of the same name", @name)
@@ -71,21 +67,18 @@ module Bolt
 
         used_names << @name
 
-        @nodes.each_value do |n|
+        @nodes.each_key do |n|
           # Require nodes to be parseable as a Target.
           begin
-            Target.new(n['name'])
+            Target.new(n)
           rescue Addressable::URI::InvalidURIError => e
             @logger.debug(e)
-            raise ValidationError.new("Invalid node name #{n['name']}", n['name'])
+            raise ValidationError.new("Invalid node name #{n}", n)
           end
 
-          raise ValidationError.new("Node #{n['name']} does not have a name", n['name']) unless n['name']
-          if used_names.include?(n['name'])
-            raise ValidationError.new("Group #{n['name']} conflicts with node of the same name", n['name'])
-          end
+          raise ValidationError.new("Group #{n} conflicts with node of the same name", n) if used_names.include?(n)
 
-          node_names << n['name']
+          node_names << n
         end
 
         @groups.each do |g|
