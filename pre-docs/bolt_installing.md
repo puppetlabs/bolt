@@ -195,8 +195,10 @@ Bolt packages include their own copy of Ruby.
 
 To install a gem for use with Bolt:
 
--   On Windows with the default install location, `"C:/Program Files/Puppet Labs/Bolt/bin/gem.bat" install <gem>`
--   On other platforms, `/opt/puppetlabs/bolt/bin/gem install <gem>`
+-   On Windows with the default install location, `"C:/Program Files/Puppet Labs/Bolt/bin/gem.bat" install --user-install <gem>`
+-   On other platforms, `/opt/puppetlabs/bolt/bin/gem install --user-install <gem>`
+
+The `--user-install` flag is recommended to avoid requiring privileged access to add functionality to Bolt. It also allows sharing gem content with Puppet installations (such as when running `apply` on `localhost`) that use the same Ruby version (currently Puppet 6).
 
 ## Install Bolt as a gem
 
