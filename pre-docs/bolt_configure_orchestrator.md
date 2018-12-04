@@ -46,8 +46,6 @@ The Bolt `apply` action can be enabled by installing the [puppetlabs-apply_helpe
 mod 'puppetlabs-apply_helpers', '0.1.0'
 ```
 
-The `apply_prep` helper function requires the `puppetlabs-puppet_agent` module version described in [Set up Bolt to download and install modules](installing_tasks_from_the_forge.md#).
-
 **Note:** Bolt over orchestrator can require a large amount of memory to convey large messages, such as the plugins and catalogs sent by `apply`. The default settings might be insufficient.
 
 ## Assign task permissions to a user role

@@ -6,6 +6,8 @@ require 'bolt/task'
 # Installs the puppet-agent package on targets if needed then collects facts, including any custom
 # facts found in Bolt's modulepath.
 #
+# Agent detection will be skipped if the target uses the PCP transport.
+#
 # If no agent is detected on the target using the 'puppet_agent::version' task, it's installed
 # using 'puppet_agent::install' and the puppet service is stopped/disabled using the 'service' task.
 Puppet::Functions.create_function(:apply_prep) do
@@ -46,20 +48,25 @@ Puppet::Functions.create_function(:apply_prep) do
 
     executor.log_action('install puppet and gather facts', targets) do
       executor.without_default_logging do
-        # Ensure Puppet is installed
-        versions = run_task(executor, targets, 'puppet_agent::version')
-        need_install, installed = versions.partition { |r| r['version'].nil? }
-        installed.each do |r|
-          Puppet.info "Puppet Agent #{r['version']} installed on #{r.target.name}"
-        end
+        # Skip targets run over PCP, as we know an agent will be available.
+        agent_targets, unknown_targets = targets.partitian { |target| target.protocol == 'pcp' }
+        agent_targets.each { |target| Puppet.debug "Puppet Agent feature declared for #{target.name}" }
+        unless unknown_targets.empty?
+          # Ensure Puppet is installed
+          versions = run_task(executor, unknown_targets, 'puppet_agent::version')
+          need_install, installed = versions.partition { |r| r['version'].nil? }
+          installed.each do |r|
+            Puppet.debug "Puppet Agent #{r['version']} installed on #{r.target.name}"
+          end
 
-        unless need_install.empty?
-          need_install_targets = need_install.map(&:target)
-          run_task(executor, need_install_targets, 'puppet_agent::install')
+          unless need_install.empty?
+            need_install_targets = need_install.map(&:target)
+            run_task(executor, need_install_targets, 'puppet_agent::install')
 
-          # Ensure the Puppet service is stopped after new install
-          run_task(executor, need_install_targets, 'service', 'action' => 'stop', 'name' => 'puppet')
-          run_task(executor, need_install_targets, 'service', 'action' => 'disable', 'name' => 'puppet')
+            # Ensure the Puppet service is stopped after new install
+            run_task(executor, need_install_targets, 'service', 'action' => 'stop', 'name' => 'puppet')
+            run_task(executor, need_install_targets, 'service', 'action' => 'disable', 'name' => 'puppet')
+          end
         end
         targets.each { |target| inventory.set_feature(target, 'puppet-agent') }
 
