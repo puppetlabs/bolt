@@ -17,6 +17,10 @@ Complete the following before you start this lesson:
 1. [Setting up test nodes](../02-acquiring-nodes)
 1. [Writing plans](../07-writing-plans)
 
+# About Bolt's Plan Language
+
+The Bolt Plan language is built on [Puppet language functions](https://puppet.com/docs/puppet/6.0/lang_write_functions_in_puppet.html), meaning plans can make use of [Puppet's built-in functions](https://puppet.com/docs/puppet/6.0/function.html) and [data types](https://puppet.com/docs/puppet/6.0/lang_data.html). Additionally the Bolt Plan language adds [its own functions](https://puppet.com/docs/bolt/1.x/plan_functions.html) and data types (described in [Writing plans](https://puppet.com/docs/bolt/1.x/writing_plans.html)). Additionally the language can be extended with [custom functions implemented in Puppet or Ruby](https://puppet.com/docs/puppet/6.0/writing_custom_functions.html). These concepts will be demonstrated in the following examples.
+
 # Write a plan which uses input and output
 
 In the previous exercise you ran tasks and commands within the context of a plan. Now you will create a task that captures the return values and uses those values in subsequent steps. The ability to use the output of a task as the input to another task allows for creating much more complex and powerful plans. Real-world uses for this might include:
@@ -66,6 +70,9 @@ In the previous exercise you ran tasks and commands within the context of a plan
       run_command('uptime', $nodes_subset)
     }
     ```
+
+    Data types used in this example: [TargetSpec](https://puppet.com/docs/bolt/1.x/writing_plans.html#targetspec), [ResultSet and Result](https://puppet.com/docs/bolt/1.x/writing_plans.html#concept-2722)
+    Functions used in this example:  [run_task](https://puppet.com/docs/bolt/1.x/plan_functions.html#run-task), [filter](https://puppet.com/docs/puppet/6.0/function.html#filter), [map](https://puppet.com/docs/puppet/6.0/function.html#map), [run_command](https://puppet.com/docs/bolt/1.x/plan_functions.html#run-command)
 
 4. Run the plan. 
 
