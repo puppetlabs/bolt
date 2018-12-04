@@ -68,6 +68,10 @@ module Bolt
         result
       end
 
+      def provided_features
+        []
+      end
+
       def filter_options(target, options)
         if target.options['run-as']
           options.reject { |k, _v| k == '_run_as' }

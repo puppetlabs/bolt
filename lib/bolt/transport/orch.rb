@@ -29,7 +29,9 @@ module Bolt
         %w[service-url cacert token-file task-environment]
       end
 
-      PROVIDED_FEATURES = ['puppet-agent'].freeze
+      def provided_features
+        ['puppet-agent']
+      end
 
       def self.validate(options); end
 

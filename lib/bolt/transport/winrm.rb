@@ -14,7 +14,9 @@ module Bolt
         %w[port user password connect-timeout ssl ssl-verify tmpdir cacert extensions]
       end
 
-      PROVIDED_FEATURES = ['powershell'].freeze
+      def provided_features
+        ['powershell']
+      end
 
       def self.validate(options)
         ssl_flag = options['ssl']
@@ -108,7 +110,7 @@ catch
       end
 
       def run_task(target, task, arguments, _options = {})
-        implementation = task.select_implementation(target, PROVIDED_FEATURES)
+        implementation = task.select_implementation(target, provided_features)
         executable = implementation['path']
         input_method = implementation['input_method']
         extra_files = implementation['files']

@@ -13,7 +13,9 @@ module Bolt
         %w[tmpdir]
       end
 
-      PROVIDED_FEATURES = ['shell'].freeze
+      def provided_features
+        ['shell']
+      end
 
       def self.validate(_options); end
 
@@ -82,7 +84,7 @@ module Bolt
       end
 
       def run_task(target, task, arguments, _options = {})
-        implementation = task.select_implementation(target, PROVIDED_FEATURES)
+        implementation = task.select_implementation(target, provided_features)
         executable = implementation['path']
         input_method = implementation['input_method'] || 'both'
         extra_files = implementation['files']

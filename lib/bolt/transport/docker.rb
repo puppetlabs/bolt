@@ -11,7 +11,9 @@ module Bolt
         %w[service-url service-options tmpdir]
       end
 
-      PROVIDED_FEATURES = ['shell'].freeze
+      def provided_features
+        ['shell']
+      end
 
       def self.validate(options)
         if (url = options['service-url'])
@@ -75,7 +77,7 @@ module Bolt
       end
 
       def run_task(target, task, arguments, _options = {})
-        implementation = task.select_implementation(target, PROVIDED_FEATURES)
+        implementation = task.select_implementation(target, provided_features)
         executable = implementation['path']
         input_method = implementation['input_method']
         extra_files = implementation['files']
