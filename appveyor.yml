@@ -18,6 +18,7 @@ environment:
   RUBY_VERSION: 25
 
 install:
+  - ps: Get-Item WSMan:\localhost\Shell\MaxMemoryPerShellMB
   - set PATH=C:\Ruby%RUBY_VERSION%\bin;%PATH%
   - bundle config --local path .bundle
   - bundle install --jobs 3 --retry 3
