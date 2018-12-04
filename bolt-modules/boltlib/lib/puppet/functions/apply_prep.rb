@@ -3,7 +3,15 @@
 require 'fileutils'
 require 'bolt/task'
 
+# Installs the puppet-agent package on targets if needed then collects facts, including any custom
+# facts found in Bolt's modulepath.
+#
+# If no agent is detected on the target using the 'puppet_agent::version' task, it's installed
+# using 'puppet_agent::install' and the puppet service is stopped/disabled using the 'service' task.
 Puppet::Functions.create_function(:apply_prep) do
+  # @param targets A pattern or array of patterns identifying a set of targets.
+  # @example Prepare targets by name.
+  #   apply_prep('target1,target2')
   dispatch :apply_prep do
     param 'Boltlib::TargetSpec', :targets
   end
