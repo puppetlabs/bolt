@@ -7,7 +7,14 @@ require 'bolt/inventory/group'
 # This is largely internal and probably shouldn't be tested
 describe Bolt::Inventory::Group do
   let(:data) { { 'name' => 'all' } }
-  let(:group) { Bolt::Inventory::Group.new(data) }
+  let(:group) {
+    # Inventory always resolves unknown labels to names or aliases from the top-down when constructed,
+    # passing the collection of all aliases in it. Do that manually here to ensure plain node strings
+    # are included as nodes.
+    g = Bolt::Inventory::Group.new(data)
+    g.resolve_aliases({})
+    g
+  }
   let(:node1_ssh) { group.data_for('node1')['config']['ssh']['user'] }
 
   it 'returns nil' do
@@ -46,7 +53,7 @@ describe Bolt::Inventory::Group do
     end
 
     it 'should find three nodes' do
-      expect(group.node_names.to_a).to eq(%w[node1 node2 node3])
+      expect(group.node_names.to_a.sort).to eq(%w[node1 node2 node3])
     end
 
     it 'should collect one group' do
@@ -612,6 +619,224 @@ describe Bolt::Inventory::Group do
     it 'fails if config is not a hash' do
       data['config'] = 'transport=ssh'
       expect { Bolt::Inventory::Group.new(data) }.to raise_error(/Expected config to be of type Hash/)
+    end
+  end
+
+  describe 'with aliases' do
+    context 'has an alias' do
+      let(:data) do
+        {
+          'name' => 'root',
+          'nodes' => [
+            { 'name' => 'node1', 'alias' => 'alias1' }
+          ]
+        }
+      end
+
+      it { expect(group.node_names.to_a).to eq(%w[node1]) }
+      it { expect(group.node_aliases).to eq('alias1' => 'node1') }
+    end
+
+    context 'multiple aliases' do
+      let(:data) do
+        {
+          'name' => 'root',
+          'nodes' => [
+            { 'name' => 'node1', 'alias' => %w[alias1 alias2] }
+          ],
+          'groups' => [
+            { 'name' => 'group1', 'nodes' => [{ 'name' => 'node2', 'alias' => 'alias3' }] }
+          ]
+        }
+      end
+
+      it { expect(group.node_names.to_a).to eq(%w[node1 node2]) }
+      it { expect(group.node_aliases).to eq('alias1' => 'node1', 'alias2' => 'node1', 'alias3' => 'node2') }
+    end
+
+    context 'redundant nodes' do
+      let(:data) do
+        {
+          'name' => 'root',
+          'nodes' => [
+            'node1',
+            { 'name' => 'node1', 'alias' => 'alias1' }
+          ]
+        }
+      end
+
+      it { expect(group.node_names.to_a).to eq(%w[node1]) }
+      it { expect(group.node_aliases).to eq('alias1' => 'node1') }
+    end
+
+    context 'alias to a node in parent group' do
+      let(:data) do
+        {
+          'name' => 'root',
+          'nodes' => [
+            { 'name' => 'node1', 'alias' => 'alias1' }
+          ],
+          'groups' => [
+            { 'name' => 'group1', 'nodes' => ['node1'] }
+          ]
+        }
+      end
+
+      it { expect(group.node_names.to_a).to eq(%w[node1]) }
+      it { expect(group.node_aliases).to eq('alias1' => 'node1') }
+    end
+
+    context 'alias to a node in sibling groups' do
+      let(:data) do
+        {
+          'name' => 'root',
+          'groups' => [
+            { 'name' => 'group1', 'nodes' => ['node1'] },
+            { 'name' => 'group2', 'nodes' => [{ 'name' => 'node1', 'alias' => 'alias1' }] }
+          ]
+        }
+      end
+
+      it { expect(group.node_names.to_a).to eq(%w[node1]) }
+      it { expect(group.node_aliases).to eq('alias1' => 'node1') }
+    end
+
+    context 'non-string alias' do
+      let(:data) do
+        {
+          'name' => 'root',
+          'nodes' => [
+            { 'name' => 'node1', 'alias' => 42 }
+          ]
+        }
+      end
+
+      it { expect { group }.to raise_error(/Alias entry on node1 must be a String or Array/) }
+    end
+
+    context 'invalid alias name' do
+      let(:data) do
+        {
+          'name' => 'root',
+          'nodes' => [
+            { 'name' => 'node1', 'alias' => 'not a valid alias' }
+          ]
+        }
+      end
+
+      it { expect { group }.to raise_error(/Invalid alias not a valid alias/) }
+    end
+
+    context 'conflicting alias' do
+      let(:data) do
+        {
+          'name' => 'root',
+          'nodes' => [
+            { 'name' => 'node1', 'alias' => 'alias1' },
+            { 'name' => 'node2', 'alias' => 'alias1' }
+          ]
+        }
+      end
+
+      it { expect { group }.to raise_error(/Alias alias1 refers to multiple targets: node1 and node2/) }
+    end
+
+    context 'conflict with a prior node name' do
+      let(:data) do
+        {
+          'name' => 'root',
+          'nodes' => [
+            'node1',
+            { 'name' => 'node2', 'alias' => 'node1' }
+          ]
+        }
+      end
+
+      it { expect { group.validate }.to raise_error(/Node name node1 conflicts with alias of the same name/) }
+    end
+
+    context 'conflict with a later node name' do
+      let(:data) do
+        {
+          'name' => 'root',
+          'groups' => [
+            { 'name' => 'group1', 'nodes' => [{ 'name' => 'node1', 'alias' => 'node2' }] },
+            { 'name' => 'group2', 'nodes' => ['node2'] }
+          ]
+        }
+      end
+
+      it { expect { group.validate }.to raise_error(/Node name node2 conflicts with alias of the same name/) }
+    end
+
+    context 'conflict with its own node name' do
+      let(:data) do
+        {
+          'name' => 'root',
+          'nodes' => [
+            { 'name' => 'node1', 'alias' => 'node1' }
+          ]
+        }
+      end
+
+      it { expect { group.validate }.to raise_error(/Node name node1 conflicts with alias of the same name/) }
+    end
+
+    context 'conflict with a later group name' do
+      let(:data) do
+        {
+          'name' => 'root',
+          'nodes' => [
+            { 'name' => 'node1', 'alias' => 'group1' }
+          ],
+          'groups' => [
+            { 'name' => 'group1' }
+          ]
+        }
+      end
+
+      it { expect { group.validate }.to raise_error(/Group group1 conflicts with alias of the same name/) }
+    end
+
+    context 'conflict with a prior group name' do
+      let(:data) do
+        {
+          'name' => 'root',
+          'groups' => [
+            { 'name' => 'group1' },
+            { 'name' => 'group2', 'nodes' => [{ 'name' => 'node1', 'alias' => 'group1' }] }
+          ]
+        }
+      end
+
+      it { expect { group.validate }.to raise_error(/Group group1 conflicts with alias of the same name/) }
+    end
+
+    context 'conflict with its own group name' do
+      let(:data) do
+        {
+          'name' => 'root',
+          'nodes' => [
+            { 'name' => 'node1', 'alias' => 'root' }
+          ]
+        }
+      end
+
+      it { expect { group.validate }.to raise_error(/Group root conflicts with alias of the same name/) }
+    end
+
+    context 'conflicting alias across groups' do
+      let(:data) do
+        {
+          'name' => 'root',
+          'groups' => [
+            { 'name' => 'group1', 'nodes' => [{ 'name' => 'node2', 'alias' => 'alias1' }] },
+            { 'name' => 'group2', 'nodes' => [{ 'name' => 'node1', 'alias' => 'alias1' }] }
+          ]
+        }
+      end
+
+      it { expect { group.validate }.to raise_error(/Alias alias1 refers to multiple targets: node1 and node2/) }
     end
   end
 end
