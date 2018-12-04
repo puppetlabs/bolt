@@ -193,10 +193,13 @@ The Puppet repository for the YUM package management system is [http://yum.puppe
 
 Bolt packages include their own copy of Ruby.
 
-To install a gem for use with Bolt:
+When you install gems for use with Bolt, use the `--user-install` flag to avoid requiring privileged access for installation. This option also enables sharing gem content with Puppet installations — such as when running `apply` on `​localhost` — that use the same Ruby version.​
 
--   On Windows with the default install location, `"C:/Program Files/Puppet Labs/Bolt/bin/gem.bat" install <gem>`
--   On other platforms, `/opt/puppetlabs/bolt/bin/gem install <gem>`
+To install a gem for use with Bolt, use the command appropriate to your operating system: 
+
+-   On Windows with the default install location, `"C:/Program Files/Puppet Labs/Bolt/bin/gem.bat" install --user-install <gem>`
+-   On other platforms, `/opt/puppetlabs/bolt/bin/gem install --user-install <gem>`
+
 
 ## Install Bolt as a gem
 
