@@ -46,20 +46,26 @@ In the previous exercise you ran tasks and commands within the context of a plan
 3. Create a plan and save it as `modules/exercise9/plans/yesorno.pp`:
 
     ```puppet
+    # TargetSpec accepts a comma-separated list of nodes
     plan exercise9::yesorno (TargetSpec $nodes) {
+      # Run the 'exercise9::yesorno' task on the nodes you specify.
       $results = run_task('exercise9::yesorno', $nodes)
-      $subset = $results.filter |$result| { $result[answer] == true }.map |$result| { $result.target }
-      run_command("uptime", $subset)
+
+      # Puppet uses immutable variables. That means we have to operate on data, in
+      # this case a ResultSet containing a list of Results. Those are documented in
+      # Bolt's docs, but effectively its a list of result data parsed from JSON
+      # objects returned by the task. Select - "filter" - only the Result objects
+      # where the task printed '{"answer": true}'.
+      $answered_true = $results.filter |$result| { $result[answer] == true }
+
+      # Result objects also include a reference to the target they came from. Get a
+      # list of the targets that answered 'true'.
+      $nodes_subset = $answered_true.map |$result| { $result.target }
+
+      # Run the 'uptime' command on the list of targets that answered 'true'.
+      run_command('uptime', $nodes_subset)
     }
     ```
-    
-    This plan: 
-    
-    * Accepts a comma-separated list of nodes
-    * Runs the `exercise9::yesorno` task from above on all of your nodes
-    * Stores the results of running the task in the variable `$results`. This will contain a `ResultSet` containing a list of `Result` objects for each node and the data parsed from the JSON response from the task.
-    * Filters the list of results to get the node names for only those that answered `true`, stored in the `$subset` variable.
-    * Runs the `uptime` command on the filtered list of nodes.
 
 4. Run the plan. 
 
