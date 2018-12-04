@@ -58,7 +58,7 @@ groups:
 
 ```
 
-## Override a user for a specific node
+### Override a user for a specific node
 
 ```
 nodes: 
@@ -66,6 +66,29 @@ nodes:
     config: 
       ssh:
         user: me
+```
+
+### Provide an alias to a node
+
+The inventory can be used to create aliases to refer to a target. This can be useful to refer to nodes with long or complicated names - `db.uswest.acme.example.com` - or for targets that include protocol and/or port for uniqueness - `127.0.0.1:2222` and `127.0.0.1:2223`. It can also be useful when generating nodes in a dynamic environment to give generated targets stable names to refer to.
+
+An alias can be a single name or list of names. Each alias must match the regex `/[a-zA-Z]\w+/`. When using Bolt, you may refer to a node by its alias anywhere the node name would be applicable, such as the `--nodes` command-line argument or a `TargetSpec`.
+
+```
+nodes:
+  - name: linux1.example.com
+    alias: linux1
+    config:
+      ssh:
+        port: 2222
+```
+
+Aliases must be unique across the entire inventory. You can use the same alias multiple places, but they must all refer to the same target. Alias names must not match any group or target names used in the inventory.
+
+A list of nodes may refer to a node by its alias, as in:
+```
+nodes:
+  - linux1
 ```
 
 ## Inventory facts, vars, and features
@@ -123,7 +146,7 @@ The inventory file uses the following objects.
 
     A map of fact names and values. values may include arrays or nested maps.
 
--   **Features**
+-   **Feature**
 
     A string describing a feature of the target.
 
@@ -144,6 +167,13 @@ The inventory file uses the following objects.
     config:
       transport: "ssh"
     ```
+
+    If the node entry is a map, it may contain any of:
+    - `alias` : `String` or `Array[String]`
+    - `config` : Config object
+    - `facts` : Facts object
+    - `vars` : Vars object
+    - `features` : `Array[Feature]`
 
 -   **Node name**
 
