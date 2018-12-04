@@ -6,7 +6,8 @@ require 'bolt/task'
 # Installs the puppet-agent package on targets if needed then collects facts, including any custom
 # facts found in Bolt's modulepath.
 #
-# Agent detection will be skipped if the target uses the PCP transport.
+# Agent detection will be skipped if the target includes the 'puppet-agent' feature, either as a
+# property of its transport (PCP) or by explicitly setting it as a feature in Bolt's inventory.
 #
 # If no agent is detected on the target using the 'puppet_agent::version' task, it's installed
 # using 'puppet_agent::install' and the puppet service is stopped/disabled using the 'service' task.
@@ -32,6 +33,12 @@ Puppet::Functions.create_function(:apply_prep) do
     results
   end
 
+  # Returns true if the target has the puppet-agent feature defined, either from inventory or transport.
+  def agent?(target, executor, inventory)
+    inventory.features(target).include?('puppet-agent') ||
+      executor.transport(target.protocol).provided_features.include?('puppet-agent')
+  end
+
   def apply_prep(target_spec)
     applicator = Puppet.lookup(:apply_executor) { nil }
     executor = Puppet.lookup(:bolt_executor) { nil }
@@ -48,8 +55,8 @@ Puppet::Functions.create_function(:apply_prep) do
 
     executor.log_action('install puppet and gather facts', targets) do
       executor.without_default_logging do
-        # Skip targets run over PCP, as we know an agent will be available.
-        agent_targets, unknown_targets = targets.partitian { |target| target.protocol == 'pcp' }
+        # Skip targets that include the puppet-agent feature, as we know an agent will be available.
+        agent_targets, unknown_targets = targets.partition { |target| agent?(target, executor, inventory) }
         agent_targets.each { |target| Puppet.debug "Puppet Agent feature declared for #{target.name}" }
         unless unknown_targets.empty?
           # Ensure Puppet is installed

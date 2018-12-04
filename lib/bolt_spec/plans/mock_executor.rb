@@ -148,6 +148,17 @@ module BoltSpec
         Bolt::ResultSet.new(promises.map { |target| Bolt::ApplyResult.new(target) })
       end
       # End Apply mocking
+
+      # Mocked for apply_prep
+      def transport(_protocol)
+        # Always return a transport that includes the puppet-agent feature so version/install are skipped.
+        Class.new do
+          def provided_features
+            ['puppet-agent']
+          end
+        end.new
+      end
+      # End apply_prep mocking
     end
   end
 end

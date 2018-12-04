@@ -162,4 +162,28 @@ describe 'apply_prep' do
       end
     end
   end
+
+  context 'with targets assigned the puppet-agent feature' do
+    let(:hostnames) { %w[foo bar] }
+    let(:targets) { hostnames.map { |h| Bolt::Target.new(h) } }
+    let(:fact) { { 'osfamily' => 'none' } }
+    let(:custom_facts_task) { Bolt::Task.new(name: 'custom_facts_task') }
+
+    before(:each) do
+      applicator.stubs(:build_plugin_tarball).returns(:tarball)
+      applicator.stubs(:custom_facts_task).returns(custom_facts_task)
+      targets.each { |target| inventory.set_feature(target, 'puppet-agent') }
+    end
+
+    it 'sets feature and gathers facts' do
+      facts = Bolt::ResultSet.new(targets.map { |t| Bolt::Result.new(t, value: fact) })
+      executor.expects(:run_task).with(targets, custom_facts_task, includes('plugins')).returns(facts)
+
+      is_expected.to run.with_params(hostnames.join(',')).and_return(nil)
+      targets.each do |target|
+        expect(inventory.features(target)).to include('puppet-agent')
+        expect(inventory.facts(target)).to eq(fact)
+      end
+    end
+  end
 end
