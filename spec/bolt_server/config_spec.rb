@@ -4,7 +4,7 @@ require 'spec_helper'
 require 'bolt_server/config'
 
 describe BoltServer::Config do
-  let(:configdir) { File.join(__dir__, '..', 'fixtures', 'server_configs') }
+  let(:configdir) { File.join(__dir__, '..', 'fixtures', 'api_server_configs') }
   let(:missingconfig) { File.join(configdir, 'non-existent.conf') }
   let(:emptyconfig) { File.join(configdir, 'empty-bolt-server.conf') }
   let(:globalconfig) { File.join(configdir, 'global-bolt-server.conf') }
@@ -57,7 +57,7 @@ describe BoltServer::Config do
     end
 
     before(:context) do
-      BoltServer::Config::ENV_KEYS.each do |key|
+      BoltServer::Config.new.env_keys.each do |key|
         transformed_key = transform_key(key)
         ENV[transformed_key] = if ['concurrency', 'file-server-conn-timeout'].include?(key)
                                  '23'
@@ -71,7 +71,7 @@ describe BoltServer::Config do
     let(:config) { build_config(globalconfig, true) }
 
     after(:context) do
-      BoltServer::Config::ENV_KEYS.each do |key|
+      BoltServer::Config.new.env_keys.each do |key|
         ENV.delete(transform_key(key))
       end
     end
@@ -126,7 +126,7 @@ describe BoltServer::Config do
   it "errors when the config file is missing" do
     expect {
       build_config("/non-existent/configfile.conf")
-    }.to raise_error(/Could not find bolt-server config at/)
+    }.to raise_error(/Could not find service config at/)
   end
 
   it "errors when a required key is not present" do

@@ -1,16 +1,17 @@
-# Bolt Server
+# Bolt API Servers
 
 ## Overview
-Bolt server provides a service to run bolt tasks over SSH and WinRM. This service is exposed via an API as described in this document. Bolt server works as a standalone service, and is available in PE Johnson and greater as `pe-bolt-server`.
+Bolt has 2 API servers which provide services to run bolt tasks and plans over SSH and WinRM. Services are exposed via APIs as described in this document. Both servers work as a standalone service - the API server for tasks is available in PE Johnson and greater as `pe-bolt-server`, while the server for plans is still in the works as the `plan-executor`. The tasks server is referred to as 'bolt server', while the plan server is referred to as 'plan executor'
 
 ## Configuration
 Bolt server can be configured by defining content in HOCON format at one of the following expected configuration file path locations.
 
-**Global Config**: `/etc/puppetlabs/bolt-server/conf.d/bolt-server.conf`
+**Bolt Server Config**: `/etc/puppetlabs/bolt-server/conf.d/bolt-server.conf`
 
-**Local Config**: `~/.puppetlabs/bolt-server.conf`
+**Plan Executor Config**: `/etc/puppetlabs/plan-executor/conf.d/plan-executor.conf`
 
-**Options**
+**Shared Options**
+Most options are shared by the bolt server and plan executor applications
 - `host`: String, *optional* - Hostname for server (default "127.0.0.1").
 - `port`: Integer, *optional* - The port the bolt server will run on (default 62658).
 - `ssl-cert`: String, *required* - Path to the cert file.
@@ -20,7 +21,13 @@ Bolt server can be configured by defining content in HOCON format at one of the 
 - `loglevel`: String, *optional* - Bolt log level, acceptable values are `debug`, `info`, `notice`, `warn`, `error` (default `notice`).
 - `logfile`: String, *optional* - Path to log file.
 - `whitelist`: Array, *optional* - A list of hosts which can connect to pe-bolt-server.
+
+**Bolt Server Only Options**
 - `concurrency`: Integer, *optional* - The maximum number of server threads (default `100`).
+
+**Plan Executor Only Options**
+- `modulepath`: String, *required* - The path to modules to read plans from
+- `workers`: Integer, *optional* - The number of worker processes to create (default `1`).
 
 **Environmnet Variable Options**
 The following configuration options can be set with environment variables. 
@@ -59,15 +66,15 @@ bolt-server: {
 }
 ```
 
-## API Endpoints
+## Bolt Server API Endpoints
 Each API endpoint accepts a request as described below. The request body must be a JSON object.
 
-## POST /ssh/run_task
+### POST /ssh/run_task
 - `target`: [SSH Target Object](#ssh-target-object), *required* - Target information to run task on.
 - `task`: [Task Object](#task-object), *required* - Task to run on target.
 - `parameters`: Object, *optional* - JSON formatted parameters to be provided to task.
 
-For example, the following runs the 'echo' task on localhost:
+For example, the following runs the 'echo' task on linux_target.net:
 ```
 {
   "target": {
@@ -78,17 +85,18 @@ For example, the following runs the 'echo' task on localhost:
     "run-as": "george_weasley"
   },
   "task": {
-    "name": "echo",
-    "metadata": {
-      "description": "Echo a message",
-      "parameters": {
-        "message": "Default string"
+    "metadata":{},
+    "name":"sample::echo",
+    "files":[{
+      "filename":"echo.sh",
+      "sha256":"c5abefbdecee006bd65ef6f625e73f0ebdd1ef3f1b8802f22a1b9644a516ce40",
+      "size_bytes":64,
+      "uri":{
+        "path":"/puppet/v3/file_content/tasks/sample/echo.sh",
+        "params":{
+          "environment":"production"}
       }
-    },
-    "file": {
-      "filename": "echo.sh",
-      "file_content": "IyEvdXNyL2Jpbi9lbnYgYmFzaAplY2hvICRQVF9tZXNzYWdlCg==\n"
-    }
+    }]
   },
   "parameters": {
     "message": "Hello world"
@@ -96,12 +104,12 @@ For example, the following runs the 'echo' task on localhost:
 }
 ```
 
-## POST /winrm/run_task
+### POST /winrm/run_task
 - `target`: [WinRM Target Object](#winrm-target-object), *required* - Target information to run task on.
 - `task`: [Task Object](#task-object), *required* - Task to run on target.
 - `parameters`: Object, *optional* - JSON formatted parameters to be provided to task.
 
-For example, the following runs 'echo' task on localhost:
+For example, the following runs 'sample::complex_params' task on localhost:
 ```
 {
   "target": {
@@ -112,17 +120,18 @@ For example, the following runs 'echo' task on localhost:
     "ssl-verify": false
   },
   "task": {
-    "name": "echo",
-    "metadata": {
-      "description": "Echo a message",
-      "parameters": {
-        "message": "Default string"
-      }
-    },
-    "file": {
-      "filename": "echo.ps1",
-      "file_content": "cGFyYW0gKCRtZXNzYWdlKQpXcml0ZS1PdXRwdXQgIiRtZXNzYWdlIg==\n"
-    }
+    "metadata":{},
+    "name":"sample::complex_params",
+    "files":[{
+      "filename":"complex_params.ps1",
+      "sha256":"e070a96387e0d339bf12fe3e00da74c6bfb3b7ebc54bd506d6bc2831030ccf5d",
+      "size_bytes":2016,
+      "uri":{
+        "path":"/puppet/v3/file_content/tasks/sample/complex_params.ps1",
+        "params":{
+          "environment":"production"}
+      }   
+    }]
   },
   "parameters": {
     "message": "Hello world"
@@ -156,37 +165,45 @@ The metadata object is optional, and contains metadata about the task being run.
     - `description`: String, *optional* - The parameter description.
     - `type`: String, *optional* - The type the parameter should accept.
 
-#### File
-**NOTE**: We plan to eventually get this information directly from puppetserver
-
-The task file and it's metadata. This is a JSON object that includes the following keys:
-- `filename`: String, *required* - The name of the file the task is in. Note: Will reject any string that contains `/` if using SSH transport, and any string that contains `\` if using WinRM.
-- `file_content`: String, *required* - Task's base64 encoded file content.
-
-For example:
-```
-{
-  "task": {
-    "name": "echo",
-    "metadata": {
-      "description": "Echo a message",
-      "parameters": {
-        "message": "Default string"
-      }
-    },
-    "file": {
-      "filename": "echo.sh",
-      "file_content": "IyEvdXNyL2Jpbi9lbnYgYmFzaAplY2hvICRQVF9tZXNzYWdlCg==\n"
-    }
-  }
-}
-```
+#### Files
+# TODO
 
 ### Response
 If the task runs the response will have status 200.
 The response will be a standard bolt Result JSON object.
 
-## Running in a container
+## Plan Executor API Endpoints
+Each API endpoint accepts a request as described below. The request body must be a JSON object.
+
+### POST /plan/run
+- `plan_name`: String, *required* - The plan to run
+- `environment`: String, *optional* - The environment the plan runs in (default: `production`)
+- `job_id`: String, *required* - The ID of the plan_job this plan runs as, from the Orchestrator database.
+- `description`: String, *optional* - A description of the plan job being run
+- `params`: Hash, *required* - Key-value pairs of parameters to pass to the plan.
+
+For example, the following runs the `canary` plan:
+```
+{
+  "plan_name" : "canary",
+  "environment": "production",
+  "job_id": "123842",
+  "description" : "Start the canary plan on node1 and node2",
+  "params" : {
+  "nodes" : ["node1.example.com", "node2.example.com"],
+  "command" : "whoami",
+  "canary" : 1
+  }
+}
+```
+#### Response
+
+If successful, this will return
+```
+{"status": "running"}
+```
+
+## Running Bolt Server in a container
 *Recommended*
 
 From your checkout of bolt start the spec docker-compose to run
@@ -301,4 +318,3 @@ expected output
 "status":"success",
 "result":{"_output":"ac80223bd3b4 got passed the message: hey\n"}}
 ```
-
