@@ -202,7 +202,6 @@ module BoltSpec
     end
 
     def allow_apply_prep
-      allow_task('puppet_agent::version').always_return('version' => '6.0')
       allow_task('apply_helpers::custom_facts')
       nil
     end

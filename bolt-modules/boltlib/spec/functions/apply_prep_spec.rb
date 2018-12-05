@@ -26,8 +26,9 @@ describe 'apply_prep' do
   end
 
   context 'with targets' do
-    let(:hostnames) { %w[a.b.com x.y.com] }
+    let(:hostnames) { %w[a.b.com winrm://x.y.com pcp://foo] }
     let(:targets) { hostnames.map { |h| Bolt::Target.new(h) } }
+    let(:unknown_targets) { targets.reject { |target| target.protocol == 'pcp' } }
     let(:fact) { { 'osfamily' => 'none' } }
     let(:custom_facts_task) { Bolt::Task.new(name: 'custom_facts_task') }
     let(:version_task) { Bolt::Task.new(name: 'puppet_agent::version') }
@@ -50,8 +51,8 @@ describe 'apply_prep' do
     end
 
     it 'sets feature and gathers facts' do
-      versions = Bolt::ResultSet.new(targets.map { |t| Bolt::Result.new(t, value: { 'version' => '5.0.0' }) })
-      executor.expects(:run_task).with(targets, version_task, anything, anything).returns(versions)
+      versions = Bolt::ResultSet.new(unknown_targets.map { |t| Bolt::Result.new(t, value: { 'version' => '5.0.0' }) })
+      executor.expects(:run_task).with(unknown_targets, version_task, anything, anything).returns(versions)
 
       facts = Bolt::ResultSet.new(targets.map { |t| Bolt::Result.new(t, value: fact) })
       executor.expects(:run_task).with(targets, custom_facts_task, includes('plugins')).returns(facts)
@@ -65,9 +66,9 @@ describe 'apply_prep' do
 
     it 'installs the agent if not present' do
       versions = Bolt::ResultSet.new(
-        targets.zip(['yes', nil]).map { |t, v| Bolt::Result.new(t, value: { 'version' => v }) }
+        unknown_targets.zip(['yes', nil]).map { |t, v| Bolt::Result.new(t, value: { 'version' => v }) }
       )
-      executor.expects(:run_task).with(targets, version_task, anything, anything).returns(versions)
+      executor.expects(:run_task).with(unknown_targets, version_task, anything, anything).returns(versions)
       ok_result = Bolt::ResultSet.new([])
       executor.expects(:run_task).with(targets[1..1], install_task, anything, anything).returns(ok_result)
       executor.expects(:run_task).with(targets[1..1], service_task, anything, anything).returns(ok_result).twice
@@ -91,9 +92,9 @@ describe 'apply_prep' do
 
     it 'fails if version check fails' do
       failed_results = Bolt::ResultSet.new(
-        targets.map { |t| Bolt::Result.new(t, error: { 'msg' => 'could not get version' }) }
+        unknown_targets.map { |t| Bolt::Result.new(t, error: { 'msg' => 'could not get version' }) }
       )
-      executor.expects(:run_task).with(targets, version_task, anything, anything).returns(failed_results)
+      executor.expects(:run_task).with(unknown_targets, version_task, anything, anything).returns(failed_results)
 
       is_expected.to run.with_params(hostnames).and_raise_error(
         Bolt::RunFailure, "Plan aborted: run_task 'puppet_agent::version' failed on 2 nodes"
@@ -101,8 +102,8 @@ describe 'apply_prep' do
     end
 
     it 'fails if install task is not found' do
-      versions = Bolt::ResultSet.new(targets.map { |t| Bolt::Result.new(t, value: {}) })
-      executor.expects(:run_task).with(targets, version_task, anything, anything).returns(versions)
+      versions = Bolt::ResultSet.new(unknown_targets.map { |t| Bolt::Result.new(t, value: {}) })
+      executor.expects(:run_task).with(unknown_targets, version_task, anything, anything).returns(versions)
 
       Puppet::Pal::ScriptCompiler.any_instance.expects(:task_signature).with('puppet_agent::install')
       is_expected.to run.with_params(hostnames).and_raise_error(
@@ -111,13 +112,13 @@ describe 'apply_prep' do
     end
 
     it 'fails if install fails' do
-      versions = Bolt::ResultSet.new(targets.map { |t| Bolt::Result.new(t, value: {}) })
-      executor.expects(:run_task).with(targets, version_task, anything, anything).returns(versions)
+      versions = Bolt::ResultSet.new(unknown_targets.map { |t| Bolt::Result.new(t, value: {}) })
+      executor.expects(:run_task).with(unknown_targets, version_task, anything, anything).returns(versions)
 
       failed_results = Bolt::ResultSet.new(
-        targets.map { |t| Bolt::Result.new(t, error: { 'msg' => 'could not install package' }) }
+        unknown_targets.map { |t| Bolt::Result.new(t, error: { 'msg' => 'could not install package' }) }
       )
-      executor.expects(:run_task).with(targets, install_task, anything, anything).returns(failed_results)
+      executor.expects(:run_task).with(unknown_targets, install_task, anything, anything).returns(failed_results)
 
       is_expected.to run.with_params(hostnames).and_raise_error(
         Bolt::RunFailure, "Plan aborted: run_task 'puppet_agent::install' failed on 2 nodes"
@@ -125,8 +126,8 @@ describe 'apply_prep' do
     end
 
     it 'fails if fact gathering fails' do
-      versions = Bolt::ResultSet.new(targets.map { |t| Bolt::Result.new(t, value: { 'version' => '5.0.0' }) })
-      executor.expects(:run_task).with(targets, version_task, anything, anything).returns(versions)
+      versions = Bolt::ResultSet.new(unknown_targets.map { |t| Bolt::Result.new(t, value: { 'version' => '5.0.0' }) })
+      executor.expects(:run_task).with(unknown_targets, version_task, anything, anything).returns(versions)
 
       results = Bolt::ResultSet.new(
         targets.map { |t| Bolt::Result.new(t, error: { 'msg' => 'could not gather facts' }) }
@@ -134,8 +135,55 @@ describe 'apply_prep' do
       executor.expects(:run_task).with(targets, custom_facts_task, includes('plugins')).returns(results)
 
       is_expected.to run.with_params(hostnames).and_raise_error(
-        Bolt::RunFailure, "Plan aborted: run_task 'custom_facts_task' failed on 2 nodes"
+        Bolt::RunFailure, "Plan aborted: run_task 'custom_facts_task' failed on #{targets.count} nodes"
       )
+    end
+  end
+
+  context 'with only pcp targets' do
+    let(:hostnames) { %w[pcp://foo pcp://bar] }
+    let(:targets) { hostnames.map { |h| Bolt::Target.new(h) } }
+    let(:fact) { { 'osfamily' => 'none' } }
+    let(:custom_facts_task) { Bolt::Task.new(name: 'custom_facts_task') }
+
+    before(:each) do
+      applicator.stubs(:build_plugin_tarball).returns(:tarball)
+      applicator.stubs(:custom_facts_task).returns(custom_facts_task)
+    end
+
+    it 'sets feature and gathers facts' do
+      facts = Bolt::ResultSet.new(targets.map { |t| Bolt::Result.new(t, value: fact) })
+      executor.expects(:run_task).with(targets, custom_facts_task, includes('plugins')).returns(facts)
+
+      is_expected.to run.with_params(hostnames.join(',')).and_return(nil)
+      targets.each do |target|
+        expect(inventory.features(target)).to include('puppet-agent')
+        expect(inventory.facts(target)).to eq(fact)
+      end
+    end
+  end
+
+  context 'with targets assigned the puppet-agent feature' do
+    let(:hostnames) { %w[foo bar] }
+    let(:targets) { hostnames.map { |h| Bolt::Target.new(h) } }
+    let(:fact) { { 'osfamily' => 'none' } }
+    let(:custom_facts_task) { Bolt::Task.new(name: 'custom_facts_task') }
+
+    before(:each) do
+      applicator.stubs(:build_plugin_tarball).returns(:tarball)
+      applicator.stubs(:custom_facts_task).returns(custom_facts_task)
+      targets.each { |target| inventory.set_feature(target, 'puppet-agent') }
+    end
+
+    it 'sets feature and gathers facts' do
+      facts = Bolt::ResultSet.new(targets.map { |t| Bolt::Result.new(t, value: fact) })
+      executor.expects(:run_task).with(targets, custom_facts_task, includes('plugins')).returns(facts)
+
+      is_expected.to run.with_params(hostnames.join(',')).and_return(nil)
+      targets.each do |target|
+        expect(inventory.features(target)).to include('puppet-agent')
+        expect(inventory.facts(target)).to eq(fact)
+      end
     end
   end
 end

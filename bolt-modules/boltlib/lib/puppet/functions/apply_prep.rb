@@ -3,7 +3,18 @@
 require 'fileutils'
 require 'bolt/task'
 
+# Installs the puppet-agent package on targets if needed then collects facts, including any custom
+# facts found in Bolt's modulepath.
+#
+# Agent detection will be skipped if the target includes the 'puppet-agent' feature, either as a
+# property of its transport (PCP) or by explicitly setting it as a feature in Bolt's inventory.
+#
+# If no agent is detected on the target using the 'puppet_agent::version' task, it's installed
+# using 'puppet_agent::install' and the puppet service is stopped/disabled using the 'service' task.
 Puppet::Functions.create_function(:apply_prep) do
+  # @param targets A pattern or array of patterns identifying a set of targets.
+  # @example Prepare targets by name.
+  #   apply_prep('target1,target2')
   dispatch :apply_prep do
     param 'Boltlib::TargetSpec', :targets
   end
@@ -22,6 +33,12 @@ Puppet::Functions.create_function(:apply_prep) do
     results
   end
 
+  # Returns true if the target has the puppet-agent feature defined, either from inventory or transport.
+  def agent?(target, executor, inventory)
+    inventory.features(target).include?('puppet-agent') ||
+      executor.transport(target.protocol).provided_features.include?('puppet-agent')
+  end
+
   def apply_prep(target_spec)
     applicator = Puppet.lookup(:apply_executor) { nil }
     executor = Puppet.lookup(:bolt_executor) { nil }
@@ -38,20 +55,25 @@ Puppet::Functions.create_function(:apply_prep) do
 
     executor.log_action('install puppet and gather facts', targets) do
       executor.without_default_logging do
-        # Ensure Puppet is installed
-        versions = run_task(executor, targets, 'puppet_agent::version')
-        need_install, installed = versions.partition { |r| r['version'].nil? }
-        installed.each do |r|
-          Puppet.info "Puppet Agent #{r['version']} installed on #{r.target.name}"
-        end
+        # Skip targets that include the puppet-agent feature, as we know an agent will be available.
+        agent_targets, unknown_targets = targets.partition { |target| agent?(target, executor, inventory) }
+        agent_targets.each { |target| Puppet.debug "Puppet Agent feature declared for #{target.name}" }
+        unless unknown_targets.empty?
+          # Ensure Puppet is installed
+          versions = run_task(executor, unknown_targets, 'puppet_agent::version')
+          need_install, installed = versions.partition { |r| r['version'].nil? }
+          installed.each do |r|
+            Puppet.debug "Puppet Agent #{r['version']} installed on #{r.target.name}"
+          end
 
-        unless need_install.empty?
-          need_install_targets = need_install.map(&:target)
-          run_task(executor, need_install_targets, 'puppet_agent::install')
+          unless need_install.empty?
+            need_install_targets = need_install.map(&:target)
+            run_task(executor, need_install_targets, 'puppet_agent::install')
 
-          # Ensure the Puppet service is stopped after new install
-          run_task(executor, need_install_targets, 'service', 'action' => 'stop', 'name' => 'puppet')
-          run_task(executor, need_install_targets, 'service', 'action' => 'disable', 'name' => 'puppet')
+            # Ensure the Puppet service is stopped after new install
+            run_task(executor, need_install_targets, 'service', 'action' => 'stop', 'name' => 'puppet')
+            run_task(executor, need_install_targets, 'service', 'action' => 'disable', 'name' => 'puppet')
+          end
         end
         targets.each { |target| inventory.set_feature(target, 'puppet-agent') }
 
