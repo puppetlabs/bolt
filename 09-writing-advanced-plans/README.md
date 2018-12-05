@@ -17,6 +17,10 @@ Complete the following before you start this lesson:
 1. [Setting up test nodes](../02-acquiring-nodes)
 1. [Writing plans](../07-writing-plans)
 
+# About Bolt's Plan Language
+
+The Bolt Plan language is built on [Puppet language functions](https://puppet.com/docs/puppet/6.0/lang_write_functions_in_puppet.html), meaning plans can make use of [Puppet's built-in functions](https://puppet.com/docs/puppet/6.0/function.html) and [data types](https://puppet.com/docs/puppet/6.0/lang_data.html). Additionally the Bolt Plan language adds [its own functions](https://puppet.com/docs/bolt/1.x/plan_functions.html) and data types (described in [Writing plans](https://puppet.com/docs/bolt/1.x/writing_plans.html)). Additionally the language can be extended with [custom functions implemented in Puppet or Ruby](https://puppet.com/docs/puppet/6.0/writing_custom_functions.html). These concepts will be demonstrated in the following examples.
+
 # Write a plan which uses input and output
 
 In the previous exercise you ran tasks and commands within the context of a plan. Now you will create a task that captures the return values and uses those values in subsequent steps. The ability to use the output of a task as the input to another task allows for creating much more complex and powerful plans. Real-world uses for this might include:
@@ -46,20 +50,29 @@ In the previous exercise you ran tasks and commands within the context of a plan
 3. Create a plan and save it as `modules/exercise9/plans/yesorno.pp`:
 
     ```puppet
+    # TargetSpec accepts a comma-separated list of nodes
     plan exercise9::yesorno (TargetSpec $nodes) {
+      # Run the 'exercise9::yesorno' task on the nodes you specify.
       $results = run_task('exercise9::yesorno', $nodes)
-      $subset = $results.filter |$result| { $result[answer] == true }.map |$result| { $result.target }
-      run_command("uptime", $subset)
+
+      # Puppet uses immutable variables. That means we have to operate on data, in
+      # this case a ResultSet containing a list of Results. Those are documented in
+      # Bolt's docs, but effectively its a list of result data parsed from JSON
+      # objects returned by the task. Select - "filter" - only the Result objects
+      # where the task printed '{"answer": true}'.
+      $answered_true = $results.filter |$result| { $result[answer] == true }
+
+      # Result objects also include a reference to the target they came from. Get a
+      # list of the targets that answered 'true'.
+      $nodes_subset = $answered_true.map |$result| { $result.target }
+
+      # Run the 'uptime' command on the list of targets that answered 'true'.
+      run_command('uptime', $nodes_subset)
     }
     ```
-    
-    This plan: 
-    
-    * Accepts a comma-separated list of nodes
-    * Runs the `exercise9::yesorno` task from above on all of your nodes
-    * Stores the results of running the task in the variable `$results`. This will contain a `ResultSet` containing a list of `Result` objects for each node and the data parsed from the JSON response from the task.
-    * Filters the list of results to get the node names for only those that answered `true`, stored in the `$subset` variable.
-    * Runs the `uptime` command on the filtered list of nodes.
+
+    Data types used in this example: [TargetSpec](https://puppet.com/docs/bolt/1.x/writing_plans.html#targetspec), [ResultSet and Result](https://puppet.com/docs/bolt/1.x/writing_plans.html#concept-2722)
+    Functions used in this example:  [run_task](https://puppet.com/docs/bolt/1.x/plan_functions.html#run-task), [filter](https://puppet.com/docs/puppet/6.0/function.html#filter), [map](https://puppet.com/docs/puppet/6.0/function.html#map), [run_command](https://puppet.com/docs/bolt/1.x/plan_functions.html#run-command)
 
 4. Run the plan. 
 
