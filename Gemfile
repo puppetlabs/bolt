@@ -26,7 +26,7 @@ group(:test) do
   gem "gettext-setup", '~> 0.28', require: false
   gem "mocha", '~> 1.4.0'
   gem "rack-test", '~> 1.0'
-  gem "rubocop", '~> 0.50', require: false
+  gem "rubocop", '0.60.0', require: false
 end
 
 group(:development) do
