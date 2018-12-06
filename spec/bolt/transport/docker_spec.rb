@@ -18,6 +18,14 @@ describe Bolt::Transport::Docker, docker: true do
     let(:runner) { docker }
     let(:os_context) { posix_context }
 
+    it "can test whether the target is available" do
+      expect(runner.connected?(target)).to eq(true)
+    end
+
+    it "returns false if the target is not available" do
+      expect(runner.connected?(Bolt::Target.new('unknownfoo'))).to eq(false)
+    end
+
     include_examples 'transport api'
 
     context 'file errors' do
