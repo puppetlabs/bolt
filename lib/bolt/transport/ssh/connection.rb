@@ -99,7 +99,7 @@ module Bolt
             end
           end
 
-          options[:port] = target.port ? target.port : 22
+          options[:port] = target.port || 22
           options[:password] = target.password if target.password
           # Support both net-ssh 4 and 5. We use 5 in packaging, but Beaker pins to 4 so we
           # want the gem to be compatible with version 4.
