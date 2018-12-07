@@ -166,7 +166,7 @@ module BoltServer
       expired_time = Time.now - purge_ttl
       @cache_dir_mutex.with_write_lock do
         Dir.glob(File.join(@cache_dir, '*')).select { |f| File.directory?(f) }.each do |dir|
-          if (mtime = File.mtime(dir)) < expired_time
+          if (mtime = File.mtime(dir)) < expired_time && dir != tmppath
             @logger.debug("Removing #{dir}, last used at #{mtime}")
             FileUtils.remove_dir(dir)
           end
