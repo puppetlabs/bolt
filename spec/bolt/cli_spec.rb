@@ -1108,13 +1108,13 @@ bar
 
           cli.execute(options)
           json = JSON.parse(output.string)
-          expect(json).to eq([["aggregate::count"],
-                              ["aggregate::nodes"],
-                              ["canary"],
-                              ["facts"],
-                              ["facts::info"],
-                              ["puppetdb_fact"],
-                              ["sample::ok"]])
+          expect(json).to include(["aggregate::count"],
+                                  ["aggregate::nodes"],
+                                  ["canary"],
+                                  ["facts"],
+                                  ["facts::info"],
+                                  ["puppetdb_fact"],
+                                  ["sample::ok"])
 
           expect(@log_output.readlines.join).to match(/Syntax error at.*single_task.pp/m)
         end
