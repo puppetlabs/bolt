@@ -77,13 +77,13 @@ module Bolt
         []
       end
 
-      def default_input_method
+      def default_input_method(_executable)
         'both'
       end
 
       def select_implementation(target, task)
         impl = task.select_implementation(target, provided_features)
-        impl['input_method'] ||= default_input_method
+        impl['input_method'] ||= default_input_method(impl['path'])
         impl
       end
 

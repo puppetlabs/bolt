@@ -4,6 +4,7 @@ require 'json'
 require 'fileutils'
 require 'tmpdir'
 require 'bolt/transport/base'
+require 'bolt/transport/powershell'
 require 'bolt/util'
 
 module Bolt
@@ -17,16 +18,16 @@ module Bolt
         ['shell']
       end
 
+      def default_input_method(executable)
+        input_method ||= Powershell.powershell_file?(executable) ? 'powershell' : 'both'
+        input_method
+      end
+
       def self.validate(_options); end
 
       def initialize
         super
-
-        if Bolt::Util.windows?
-          raise NotImplementedError, "The local transport is not yet implemented on Windows"
-        else
-          @conn = Shell.new
-        end
+        @conn = Shell.new
       end
 
       def in_tmpdir(base)
@@ -73,12 +74,24 @@ module Bolt
 
           # unpack any Sensitive data AFTER we log
           arguments = unwrap_sensitive_args(arguments)
-          if arguments.empty?
-            # We will always provide separated arguments, so work-around Open3's handling of a single
-            # argument as the entire command string for script paths containing spaces.
-            arguments = ['']
+          if Bolt::Util.windows?
+            if Powershell.powershell_file?(file)
+              command = Powershell.run_script(arguments, file)
+              output = @conn.execute(command, dir: dir, env: "powershell.exe")
+            else
+              path, args = *Powershell.process_from_extension(file)
+              args += Powershell.escape_arguments(arguments)
+              command = args.unshift(path).join(' ')
+              output = @conn.execute(command, dir: dir)
+            end
+          else
+            if arguments.empty?
+              # We will always provide separated arguments, so work-around Open3's handling of a single
+              # argument as the entire command string for script paths containing spaces.
+              arguments = ['']
+            end
+            output = @conn.execute(file, *arguments, dir: dir)
           end
-          output = @conn.execute(file, *arguments, dir: dir)
           Bolt::Result.for_command(target, output.stdout.string, output.stderr.string, output.exit_code)
         end
       end
@@ -108,16 +121,43 @@ module Bolt
           copy_file(executable, script)
           File.chmod(0o750, script)
 
-          # unpack any Sensitive data, write it to a separate variable because
-          # we log 'arguments' below
-          unwrapped_arguments = unwrap_sensitive_args(arguments)
-          stdin = STDIN_METHODS.include?(input_method) ? JSON.dump(unwrapped_arguments) : nil
-          env = ENVIRONMENT_METHODS.include?(input_method) ? envify_params(unwrapped_arguments) : nil
-
           # log the arguments with sensitive data redacted, do NOT log unwrapped_arguments
           logger.debug("Running '#{script}' with #{arguments}")
+          unwrapped_arguments = unwrap_sensitive_args(arguments)
 
-          output = @conn.execute(script, stdin: stdin, env: env, dir: dir)
+          stdin = STDIN_METHODS.include?(input_method) ? JSON.dump(unwrapped_arguments) : nil
+
+          if Bolt::Util.windows?
+            # WINDOWS
+            if ENVIRONMENT_METHODS.include?(input_method)
+              environment_params = envify_params(unwrapped_arguments).each_with_object([]) do |(arg, val), list|
+                list << Powershell.set_env(arg, val)
+              end
+              environment_params = environment_params.join("\n") + "\n"
+            else
+              environment_params = ""
+            end
+
+            output =
+              if Powershell.powershell_file?(script) && stdin.nil?
+                command = Powershell.run_ps_task(arguments, script, input_method)
+                command = environment_params + Powershell.shell_init + command
+                if input_method == 'powershell'
+                  @conn.execute(command, dir: dir, env: "powershell.exe")
+                else
+                  @conn.execute(command, dir: dir, stdin: stdin, env: "powershell.exe")
+                end
+              else
+                path, args = *Powershell.process_from_extension(script)
+                command = args.unshift(path).join(' ')
+                command = environment_params + Powershell.shell_init + command
+                @conn.execute(command, dir: dir, stdin: stdin, env: "powershell.exe")
+              end
+          else
+            # POSIX
+            env = ENVIRONMENT_METHODS.include?(input_method) ? envify_params(unwrapped_arguments) : nil
+            output = @conn.execute(script, stdin: stdin, env: env, dir: dir)
+          end
           Bolt::Result.for_task(target, output.stdout.string, output.stderr.string, output.exit_code)
         end
       end

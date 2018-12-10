@@ -24,7 +24,7 @@ end
 
 desc "Run RSpec tests for TravisCI that don't require WinRM"
 RSpec::Core::RakeTask.new(:travisci) do |t|
-  t.rspec_opts = '--tag ~winrm --tag ~appveyor_agents --tag ~puppetserver'
+  t.rspec_opts = '--tag ~winrm --tag ~appveyor_agents --tag ~puppetserver --tag ~windows'
 end
 
 desc "Run RSpec tests that require pupperserver"
@@ -125,6 +125,11 @@ namespace :integration do
   desc 'Run tests that require Bash on the local host'
   RSpec::Core::RakeTask.new(:bash) do |t|
     t.rspec_opts = '--tag bash'
+  end
+
+  desc 'Run tests that require windows OS on the local host'
+  RSpec::Core::RakeTask.new(:windows) do |t|
+    t.rspec_opts = '--tag windows'
   end
 
   desc 'Run tests that require Puppet Agents configured with Appveyor'

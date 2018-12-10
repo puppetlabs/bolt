@@ -130,7 +130,7 @@ This is useful on Windows, so that you do not have to include the `winrm` transp
 bolt command run facter --nodes win1,ssh://linux --transport winrm
 ```
 
-If `localhost` is passed to `--nodes` when invoking Bolt on a non-Windows operating system the `local` transport is used automatically. To avoid this behavior prepend the target with the desired transport, for example `ssh://localhost`.
+If `localhost` is passed to `--nodes` when invoking Bolt the `local` transport is used automatically. To avoid this behavior prepend the target with the desired transport, for example `ssh://localhost`.
 
 ## Specify connection credentials
 
