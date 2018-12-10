@@ -99,7 +99,7 @@ Puppet::Functions.create_function(:run_task) do
     options['_description'] = description if description
 
     # Don't bother loading the local task definition if all targets use the 'pcp' transport.
-    if !targets.empty? && targets.all? { |t| t.protocol == 'pcp' }
+    if !targets.empty? && targets.all? { |t| t.transport == 'pcp' }
       # create a fake task
       task = Bolt::Task.new(name: task_name, files: [{ 'name' => '', 'path' => '' }])
     else

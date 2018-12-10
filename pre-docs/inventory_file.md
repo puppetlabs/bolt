@@ -61,9 +61,9 @@ groups:
 ### Override a user for a specific node
 
 ```
-nodes: 
+nodes:
   - name: linux1.example.com
-    config: 
+    config:
       ssh:
         user: me
 ```
@@ -225,10 +225,30 @@ nodes:
           run-as: root
 ```
 
--   **[Generating inventory files](inventory_file_generating.md)**  
+## Remote Targets
+
+Configure a remote target. When using the remote transport the protocol of the
+node name does not have to map to the transport if you set the transport config
+option. This is useful if the target is an http API as in the following example.
+
+```yaml
+nodes:
+  - host1.example.com
+  - name: https://user1:secret@remote.example.com
+    config:
+      transport: remote
+      remote:
+        # The remote transport will use the host1.example.com target from
+        # inventory to proxy tasks execution on.
+        run-on: host1.example.com
+  # This will execute on localhost.
+  - remote://my_aws_account
+```
+
+-   **[Generating inventory files](inventory_file_generating.md)**
  Use the `bolt-inventory-pdb` script to generate inventory files based on PuppetDB queries.
 
-**Related information**  
+**Related information**
 
 
 [Naming tasks](writing_tasks.md#)

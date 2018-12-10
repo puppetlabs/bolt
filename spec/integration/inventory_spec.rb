@@ -68,7 +68,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
     end
 
     it 'connects to run a plan' do
-      expect(run_cli_json(run_plan)[0]['status']).to eq('success')
+      expect(run_cli_json(run_plan)[0]).to include('status' => 'success')
     end
 
     context 'with a group' do

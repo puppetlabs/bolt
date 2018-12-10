@@ -1,6 +1,13 @@
 # frozen_string_literal: true
 
 module Bolt
+  class NoImplementationError < Bolt::Error
+    def initialize(target, task)
+      msg = "No suitable implementation of #{task.name} for #{target.name}"
+      super(msg, 'bolt/no-implementation')
+    end
+  end
+
   # Represents a Task.
   # @file and @files are mutually exclusive.
   # @name [String] name of the task
@@ -51,13 +58,17 @@ module Bolt
       file_map[file_name]['path']
     end
 
+    def implementations
+      metadata['implementations']
+    end
+
     # Returns a hash of implementation name, path to executable, input method (if defined),
     # and any additional files (name and path)
     def select_implementation(target, additional_features = [])
-      impl = if (impls = metadata['implementations'])
+      impl = if (impls = implementations)
                available_features = target.features + additional_features
                impl = impls.find { |imp| Set.new(imp['requirements']).subset?(available_features) }
-               raise "No suitable implementation of #{name} for #{target.name}" unless impl
+               raise NoImplementationError.new(target, self) unless impl
                impl = impl.dup
                impl['path'] = file_path(impl['name'])
                impl.delete('requirements')

@@ -84,9 +84,9 @@ module Bolt
       end
 
       def run_task(target, task, arguments, _options = {})
-        implementation = task.select_implementation(target, provided_features)
+        implementation = select_implementation(target, task)
         executable = implementation['path']
-        input_method = implementation['input_method'] || 'both'
+        input_method = implementation['input_method']
         extra_files = implementation['files']
 
         in_tmpdir(target.options['tmpdir']) do |dir|

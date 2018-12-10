@@ -4,6 +4,7 @@ require 'spec_helper'
 require 'net/ssh'
 require 'bolt_spec/conn'
 require 'bolt_spec/errors'
+require 'bolt_spec/transport'
 require 'bolt/transport/ssh'
 require 'bolt/config'
 require 'bolt/target'
@@ -44,8 +45,10 @@ describe Bolt::Transport::SSH do
 
   context 'with ssh', ssh: true do
     let(:target) { make_target(conf: no_host_key_check) }
-    let(:runner) { ssh }
+    let(:transport) { :ssh }
     let(:os_context) { posix_context }
+
+    include BoltSpec::Transport
 
     include_examples 'transport api'
 

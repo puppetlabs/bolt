@@ -80,7 +80,7 @@ Pattern[/\A[^\/\\]*\z/] $path
 
 In addition to these task restrictions, different scripting languages each have their own ways to validate user input.
 
-###  PowerShell 
+###  PowerShell
 
 In PowerShell, code injection exploits calls that specifically evaluate code. Do not call `Invoke-Expression` or `Add-Type` with user input. These commands evaluate strings as C\# code.
 
@@ -129,7 +129,7 @@ Resolve file paths with `os.realpath` and confirm them to be within another path
 
 For more information on the vulnerabilities of Python or how to escape variables, see Kevin London's blog post on [Dangerous Python Functions](https://www.kevinlondon.com/2015/07/26/dangerous-python-functions.html).
 
-###  Ruby 
+###  Ruby
 
 In Ruby, command injection is introduced through commands like `eval`, `exec`, `system`, backtick \(\`\`\) or `%x()` execution, or the Open3 module. You can safely call these functions with user input by passing the input as additional arguments instead of a single string.
 
@@ -296,7 +296,7 @@ To create a task that includes additional files pulled from modules, include the
 
 -   the module name
 -   one of `lib`, `files`, or `tasks` for the directory within the module
--   the remaining path to a file or directory; directories must include a trailing slash `/` 
+-   the remaining path to a file or directory; directories must include a trailing slash `/`
 
 All path separators must be forward slashes. An example would be `stdlib/lib/puppet/`.
 
@@ -317,7 +317,7 @@ When a task includes the `files` property, all files listed in the top-level p
 
 For example, you can create a task and metadata in a new module at `~/.puppetlabs/bolt/site/mymodule/tasks/task.{json,rb}`.
 
- **Metadata** 
+ **Metadata**
 
 ```
 {
@@ -325,7 +325,7 @@ For example, you can create a task and metadata in a new module at `~/.puppetlab
 }
 ```
 
- **File Resource** 
+ **File Resource**
 
 `multi_task/files/rb_helper.rb`
 
@@ -335,7 +335,7 @@ def useful_ruby
 end
 ```
 
- **Task** 
+ **Task**
 
 ```
 #!/usr/bin/env ruby
@@ -349,7 +349,7 @@ require_relative File.join(params['_installdir'], 'multi_task', 'files', 'rb_hel
 puts useful_ruby.to_json
 ```
 
- **Output** 
+ **Output**
 
 ```
 Started on localhost...
@@ -361,6 +361,72 @@ Successful on 1 node: localhost
 Ran on 1 node in 0.12 seconds
 ```
 
+### Remote Tasks
+
+Some targets are hard or impossible to execute tasks on directly. For example a
+network device may have a limited shell environment or a cloud service may be
+driven only by HTTP APIs. In these cases it makes sense to write a task that
+runs on a proxy target and remotely interacts with the real target. By writing a
+remote task Bolt allows users to specify connection information for remote
+targets in their inventory file and injects them into the `_target` metaparam.
+
+The following example shows how to write a task that posts messages to slack
+and reads connection information from inventory.yaml
+
+```ruby
+#!/usr/bin/env ruby
+# modules/slack/tasks/message.rb
+
+require 'json'
+require 'net/http'
+
+params = JSON.parse(STDIN.read)
+# the slack API token is passed in from inventory
+token = params['_target']['token']
+
+uri = URI('https://slack.com/api/chat.postMessage')
+http = Net::HTTP.new(uri.host, uri.port)
+http.use_ssl = true
+
+req = Net::HTTP::Post.new(uri, 'Content-type' => 'application/json')
+req['Authorization'] = "Bearer #{params['_target']['token']}"
+req.body = { channel: params['channel'], text: params['message'] }.to_json
+
+resp = http.request(req)
+
+puts resp.body
+```
+
+Bolt will refuse to run the task on a remote target unless it's metadata
+defines it as remote. This prevents accidentally running a normal task on a
+remote target and breaking its configuration.
+
+```json
+{
+  "remote": true
+}
+```
+
+In order to use this you'll have to add a slack as a remote target in your
+inventory file.
+
+```yaml
+---
+nodes:
+  - name: my_slack
+    config:
+      transport: remote
+      remote:
+        token: <slack API token goes here>
+```
+
+This make `my_slack` a target that can run the `slack::message`
+
+```bash
+bolt task run slack::message --nodes my_slack message="hello" channel=<slack channel id>
+```
+
+
 ### Task Helpers
 
 To simplify writing tasks, Bolt includes [python\_task\_helper](https://github.com/puppetlabs/puppetlabs-python_task_helper) and [ruby\_task\_helper](https://github.com/puppetlabs/puppetlabs-ruby_task_helper). It also makes a useful demonstration of including code from another module.
@@ -369,7 +435,7 @@ To simplify writing tasks, Bolt includes [python\_task\_helper](https://github.c
 
 Create task and metadata in a module at `~/.puppetlabs/bolt/site/mymodule/tasks/task.{json,py}`.
 
- **Metadata** 
+ **Metadata**
 
 ```
 {
@@ -378,7 +444,7 @@ Create task and metadata in a module at `~/.puppetlabs/bolt/site/mymodule/tasks/
 }
 ```
 
- **Task** 
+ **Task**
 
 ```
 #!/usr/bin/env python
@@ -395,7 +461,7 @@ if __name__ == '__main__':
     MyTask().run()
 ```
 
- **Output** 
+ **Output**
 
 ```
 $ bolt task run mymodule::task -n localhost name='Julia'
@@ -412,7 +478,7 @@ Ran on 1 node in 0.12 seconds
 
 Create task and metadata in a new module at `~/.puppetlabs/bolt/site/mymodule/tasks/mytask.{json,rb}`.
 
- **Metadata** 
+ **Metadata**
 
 ```
 {
@@ -421,7 +487,7 @@ Create task and metadata in a new module at `~/.puppetlabs/bolt/site/mymodule/ta
 }
 ```
 
- **Task** 
+ **Task**
 
 ```
 #!/usr/bin/env ruby
@@ -430,13 +496,13 @@ require_relative '../lib/task_helper.rb'
 class MyTask < TaskHelper
   def task(name: nil, **kwargs)
     { greeting: "Hi, my name is #{name}" }
-  end 
+  end
 end
 
 MyTask.run if __FILE__ == $0
 ```
 
- **Output** 
+ **Output**
 
 ```
 $ bolt task run mymodule::mytask -n localhost name="Robert'); DROP TABLE Students;--"
@@ -469,7 +535,7 @@ For example, to add a `message` parameter to your task, read it from the environ
 echo your message is $PT_message
 ```
 
-### Defining parameters in Windows 
+### Defining parameters in Windows
 
 For Windows tasks, you can pass parameters as environment variables, but it's easier to write your task in PowerShell and use named arguments. By default tasks with a `.ps1` extension use PowerShell standard argument handling.
 
@@ -805,16 +871,16 @@ To define a parameter as sensitive within the JSON metadata, add the `"sensitive
 
 The following table shows task metadata keys, values, and default values.
 
-####  **Task metadata** 
+####  **Task metadata**
 
 |Metadata key|Description|Value|Default|
 |------------|-----------|-----|-------|
 |"description"|A description of what the task does.|String|None|
-|"input\_method"|What input method the task runner should use to pass parameters to the task.| -    `environment` 
+|"input\_method"|What input method the task runner should use to pass parameters to the task.| -    `environment`
 
--    `stdin` 
+-    `stdin`
 
--    `powershell` 
+-    `powershell`
 
 
  | Both `environment` and `stdin` unless `.ps1` tasks, in which case `powershell`
@@ -833,7 +899,7 @@ Task metadata can accept most Puppet data types.
 
 #### Common task data types
 
-**Restriction:** 
+**Restriction:**
 
 Some types supported by Puppet can not be represented as JSON, such as `Hash[Integer, String]`, `Object`, or `Resource`. These should not be used in tasks, because they can never be matched.
 
@@ -850,7 +916,7 @@ Some types supported by Puppet can not be represented as JSON, such as `Hash[Int
 | `Variant[Integer, Pattern[/\A\d+\Z/]]` |Matches an integer or a String of an integer|
 | `Boolean` |Accepts Boolean values.|
 
-**Related information**  
+**Related information**
 
 
 [Data type syntax](https://puppet.com/docs/puppet/latest/lang_data_type.html)

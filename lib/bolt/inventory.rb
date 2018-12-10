@@ -167,17 +167,15 @@ module Bolt
     # Should this reconfigure configured targets?
     def update_target(target)
       data = @groups.data_for(target.name)
-
-      unless data
-        data = {}
-        unless Bolt::Util.windows?
-          data['config'] = { 'transport' => 'local' } if target.name == 'localhost'
-        end
-      end
+      data ||= {}
 
       unless data['config']
         @logger.debug("Did not find config for #{target.name} in inventory")
         data['config'] = {}
+      end
+
+      unless Bolt::Util.windows? || data['config']['transport']
+        data['config']['transport'] = 'local' if target.name == 'localhost'
       end
 
       # These should only get set from the inventory if they have not yet
@@ -191,11 +189,13 @@ module Bolt
       conf.update_from_inventory(data['config'])
       conf.validate
 
-      unless target.protocol.nil? || Bolt::TRANSPORTS.include?(target.protocol.to_sym)
-        raise Bolt::UnknownTransportError.new(target.protocol, target.uri)
+      target.update_conf(conf.transport_conf)
+
+      unless target.transport.nil? || Bolt::TRANSPORTS.include?(target.transport.to_sym)
+        raise Bolt::UnknownTransportError.new(target.transport, target.uri)
       end
 
-      target.update_conf(conf.transport_conf)
+      target
     end
     private :update_target
 
@@ -226,6 +226,7 @@ module Bolt
 
     def expand_targets(targets)
       if targets.is_a? Bolt::Target
+        targets.inventory = self
         targets
       elsif targets.is_a? Array
         targets.map { |tish| expand_targets(tish) }
