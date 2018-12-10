@@ -26,10 +26,15 @@ module Bolt
       end
 
       def get_proxy(target)
-        # TODO: This needs to have access to the inventory
         inventory = target.inventory
         raise "Target was created without inventory? Not get_targets?" unless inventory
-        inventory.get_targets(target.options['run-on'] || 'localhost').first
+        proxy = inventory.get_targets(target.options['run-on'] || 'localhost').first
+
+        if proxy.transport == 'remote'
+          msg = "#{proxy.name} is not a valid run-on target for #{target.name} since is also remote."
+          raise Bolt::Error.new(msg, 'bolt/invalid-remote-target')
+        end
+        proxy
       end
 
       # Cannot batch because arugments differ
