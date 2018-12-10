@@ -15,8 +15,9 @@ module Bolt
         ['powershell']
       end
 
-      def default_input_method
-        'powershell'
+      def default_input_method(executable)
+        input_method ||= Powershell.powershell_file?(executable) ? 'powershell' : 'both'
+        input_method
       end
 
       def self.validate(options)

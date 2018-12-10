@@ -18,6 +18,11 @@ module Bolt
         ['shell']
       end
 
+      def default_input_method(executable)
+        input_method ||= Powershell.powershell_file?(executable) ? 'powershell' : 'both'
+        input_method
+      end
+
       def self.validate(_options); end
 
       def initialize
@@ -96,7 +101,6 @@ module Bolt
         executable = implementation['path']
         input_method = implementation['input_method']
         extra_files = implementation['files']
-        input_method ||= Powershell.powershell_file?(executable) ? 'powershell' : 'both'
 
         in_tmpdir(target.options['tmpdir']) do |dir|
           if extra_files.empty?
