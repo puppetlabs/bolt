@@ -77,6 +77,7 @@ describe BoltServer::FileCache, puppetserver: true do
     FileUtils.mkdir_p(expected_dir)
     File.write(File.join(expected_dir, 'task'), file_content)
     FileUtils.touch(expected_dir, mtime: Time.now - (BoltServer::FileCache::PURGE_TTL + 1))
+    FileUtils.touch(file_cache.tmppath, mtime: Time.now - (BoltServer::FileCache::PURGE_TTL + 1))
 
     expect(file_cache).to be
     gone = 10.times do
@@ -84,6 +85,7 @@ describe BoltServer::FileCache, puppetserver: true do
       break true unless File.exist?(expected_dir)
     end
     expect(gone).to eq(true)
+    expect(File.exist?(file_cache.tmppath)).to eq(true)
   end
 
   it 'purges old files after the purge_interval' do
@@ -97,11 +99,13 @@ describe BoltServer::FileCache, puppetserver: true do
     cache.setup
 
     FileUtils.touch(expected_dir, mtime: Time.now - (BoltServer::FileCache::PURGE_TTL + 1))
+    FileUtils.touch(file_cache.tmppath, mtime: Time.now - (BoltServer::FileCache::PURGE_TTL + 1))
     gone = 10.times do
       sleep 0.5
       break true unless File.exist?(expected_dir)
     end
     expect(gone).to eq(true)
+    expect(File.exist?(file_cache.tmppath)).to eq(true)
   end
 
   it 'fails when the downloaded file is invalid' do
