@@ -19,6 +19,14 @@ describe Bolt::Transport::Local, bash: true do
     expect(runner.connected?(target)).to eq(true)
   end
 
+  it 'provides platform specific features' do
+    if Bolt::Util.windows?
+      expect(runner.provided_features).to eq(['powershell'])
+    else
+      expect(runner.provided_features).to eq(['shell'])
+    end
+  end
+
   include_examples 'transport api'
 
   context 'file errors' do

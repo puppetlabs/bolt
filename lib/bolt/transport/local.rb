@@ -15,7 +15,11 @@ module Bolt
       end
 
       def provided_features
-        ['shell']
+        if Bolt::Util.windows?
+          ['powershell']
+        else
+          ['shell']
+        end
       end
 
       def default_input_method(executable)
