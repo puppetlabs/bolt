@@ -26,6 +26,8 @@ ssh:
 
 `color`: Whether to use colored output when printing messages to the console.
 
+`hiera-config`: Specify the path to your Hiera config. The default path for the Hiera config file is `hiera.yaml` inside the `Boltdir`.
+
 ## SSH transport configuration options
 
 `host-key-check`: Whether to perform host key validation when connecting over SSH. Default is `true`.
