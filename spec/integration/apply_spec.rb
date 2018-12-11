@@ -52,11 +52,9 @@ describe "apply" do
 
     after(:all) do
       # TODO: Extract into test helper if needed in more files
-      uri = conn_uri('ssh')
-      inventory_data = conn_inventory
-      config_data = root_config
+      ssh_node = conn_uri('ssh', include_password: true)
       uninstall = '/opt/puppetlabs/bin/puppet resource package puppet-agent ensure=absent'
-      run_command(uninstall, uri, config: config_data, inventory: inventory_data)
+      run_command(uninstall, [ssh_node, 'agent_targets'], config: root_config, inventory: agent_version_inventory)
     end
 
     context "when running against puppet 5 or puppet 6" do
@@ -65,22 +63,22 @@ describe "apply" do
         result = run_task('puppet_agent::install', 'puppet_5', { 'collection' => 'puppet5' },
                           config: root_config, inventory: agent_version_inventory)
         expect(result.count).to eq(1)
-        expect(result[0]['status']).to eq('success')
+        expect(result[0]).to include('status' => 'success')
 
         result = run_task('puppet_agent::version', 'puppet_5', inventory: agent_version_inventory)
         expect(result.count).to eq(1)
-        expect(result[0]['status']).to eq('success')
+        expect(result[0]).to include('status' => 'success')
         expect(result[0]['result']['version']).to match(/^5/)
 
         # install puppet6
         result = run_task('puppet_agent::install', 'puppet_6', { 'collection' => 'puppet6' },
                           config: root_config, inventory: agent_version_inventory)
         expect(result.count).to eq(1)
-        expect(result[0]['status']).to eq('success')
+        expect(result[0]).to include('status' => 'success')
 
         result = run_task('puppet_agent::version', 'puppet_6', inventory: agent_version_inventory)
         expect(result.count).to eq(1)
-        expect(result[0]['status']).to eq('success')
+        expect(result[0]).to include('status' => 'success')
         expect(result[0]['result']['version']).to match(/^6/)
       end
 
