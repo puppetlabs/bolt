@@ -8,11 +8,11 @@ require 'bolt_spec/transport'
 
 require_relative 'shared_examples'
 
-describe Bolt::Transport::Local, bash: true do
+describe Bolt::Transport::Local do
   include BoltSpec::Transport
 
   let(:transport) { :local }
-  let(:os_context) { posix_context }
+  let(:os_context) { Bolt::Util.windows? ? windows_context : posix_context }
   let(:target) { Bolt::Target.new('local://localhost', transport_conf) }
 
   it 'is always connected' do
