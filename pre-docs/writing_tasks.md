@@ -564,7 +564,7 @@ if ($Name -eq $null -or $Name -eq "") {
   if ($result.Count -eq 1) {
     ConvertTo-Json -InputObject $result[0] -Compress
   } elseif ($result.Count -gt 1) {
-    ConvertTo-Json -InputObject @{"_items" = $result} -Compress
+    ConvertTo-Json -InputObject @{"items" = $result} -Compress
   }
 }
 ```
