@@ -30,6 +30,9 @@ for:
       only:
         - configuration: Agentless
 
+    environment:
+      BOLT_WINDOWS: true
+
     before_test:
       - ps: |
           ruby -v
