@@ -8,15 +8,23 @@ require 'bolt_spec/transport'
 
 require_relative 'shared_examples'
 
-describe Bolt::Transport::Local, bash: true do
+describe Bolt::Transport::Local do
   include BoltSpec::Transport
 
   let(:transport) { :local }
-  let(:os_context) { posix_context }
+  let(:os_context) { Bolt::Util.windows? ? windows_context : posix_context }
   let(:target) { Bolt::Target.new('local://localhost', transport_conf) }
 
   it 'is always connected' do
     expect(runner.connected?(target)).to eq(true)
+  end
+
+  it 'provides platform specific features' do
+    if Bolt::Util.windows?
+      expect(runner.provided_features).to eq(['powershell'])
+    else
+      expect(runner.provided_features).to eq(['shell'])
+    end
   end
 
   include_examples 'transport api'

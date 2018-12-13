@@ -18,6 +18,7 @@ def posix_context
     stderr_command: ['ssh -V', /OpenSSH/],
     destination_dir: '/tmp',
     supported_req: 'shell',
+    extension: '.sh',
     unsupported_req: 'powershell',
     cat_cmd: 'cat',
     rm_cmd: 'rm -rf',
@@ -36,6 +37,25 @@ BASH
   }
 end
 
+def windows_context
+  {
+    stdout_command: ['echo hello', /^hello$/],
+    stderr_command: ['echo oops 1>&2', /oops/],
+    destination_dir: 'C:/mytmp',
+    supported_req: 'powershell',
+    extension: '.ps1',
+    unsupported_req: 'shell',
+    cat_cmd: 'cat',
+    rm_cmd: 'rm -rf',
+    ls_cmd: 'ls',
+    env_task: "Write-Output \"${env:PT_message_one}\n${env:PT_message_two}\"",
+    stdin_task: "$line = [Console]::In.ReadLine()\nWrite-Output \"$line\"",
+    find_task: 'Get-ChildItem -Path $env:PT__installdir -Recurse -File | % { Write-Host $_.Length $_.FullName  }',
+    identity_script: "echo $PSScriptRoot",
+    echo_script: "$args | ForEach-Object { Write-Output $_ }"
+  }
+end
+
 # Shared examples for Transports.
 #
 # Requires the following variables
@@ -47,6 +67,14 @@ shared_examples 'transport api' do
   include BoltSpec::Files
   include BoltSpec::Sensitive
   include BoltSpec::Task
+
+  before(:all) do
+    Dir.mkdir('C:\mytmp') if Bolt::Util.windows?
+  end
+
+  after(:all) do
+    Dir.rmdir('C:\mytmp') if Bolt::Util.windows?
+  end
 
   context 'run_command' do
     it "executes a command on a host" do
@@ -60,7 +88,10 @@ shared_examples 'transport api' do
     end
 
     it "can execute a command containing quotes" do
-      expect(runner.run_command(target, "echo 'hello \" world'").value).to eq(result_value("hello \" world\n"))
+      result = runner.run_command(target, "echo 'hello \" world'").value
+      expect(result['exit_code']).to eq(0)
+      expect(result['stderr']).to eq('')
+      expect(result['stdout']).to match(/hello " world/)
     end
   end
 
@@ -116,7 +147,7 @@ shared_examples 'transport api' do
     end
 
     it "can run a script remotely with quoted arguments" do
-      with_tempfile_containing('script-test-docker-quotes', os_context[:echo_script]) do |file|
+      with_tempfile_containing('script-test-docker-quotes', os_context[:echo_script], os_context[:extension]) do |file|
         expect(
           runner.run_script(target,
                             file.path,
@@ -148,7 +179,7 @@ QUOTED
     it "can run a script with Sensitive arguments" do
       arguments = ['non-sensitive-arg',
                    make_sensitive('$ecret!')]
-      with_tempfile_containing('sensitive_test', os_context[:echo_script]) do |file|
+      with_tempfile_containing('sensitive_test', os_context[:echo_script], os_context[:extension]) do |file|
         expect(
           runner.run_script(target, file.path, arguments)['stdout']
         ).to eq("non-sensitive-arg\n$ecret!\n")
@@ -156,7 +187,7 @@ QUOTED
     end
 
     it "escapes unsafe shellwords in arguments" do
-      with_tempfile_containing('script-test-docker-escape', os_context[:echo_script]) do |file|
+      with_tempfile_containing('script-test-docker-escape', os_context[:echo_script], os_context[:extension]) do |file|
         expect(
           runner.run_script(target,
                             file.path,
@@ -171,7 +202,7 @@ QUOTED
   context 'run_task' do
     it "can run a task" do
       arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-      with_task_containing('tasks_test', os_context[:env_task], 'environment') do |task|
+      with_task_containing('tasks_test', os_context[:env_task], 'environment', os_context[:extension]) do |task|
         expect(runner.run_task(target, task, arguments).message)
           .to eq("Hello from task\nGoodbye\n")
       end
@@ -179,7 +210,7 @@ QUOTED
 
     it "can run a task passing input on stdin" do
       arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-      with_task_containing('tasks_test_stdin', os_context[:stdin_task], 'stdin') do |task|
+      with_task_containing('tasks_test_stdin', os_context[:stdin_task], 'stdin', os_context[:extension]) do |task|
         expect(runner.run_task(target, task, arguments).value)
           .to eq("message_one" => "Hello from task", "message_two" => "Goodbye")
       end
@@ -187,7 +218,7 @@ QUOTED
 
     it "serializes hashes as json in environment input" do
       arguments = { message_one: { key: 'val' }, message_two: '' }
-      with_task_containing('tasks_test_hash', os_context[:env_task], 'environment') do |task|
+      with_task_containing('tasks_test_hash', os_context[:env_task], 'environment', os_context[:extension]) do |task|
         expect(runner.run_task(target, task, arguments).value)
           .to eq('key' => 'val')
       end
@@ -196,8 +227,8 @@ QUOTED
     it "can run a task passing input on stdin and environment" do
       content = "#{os_context[:env_task]}\n#{os_context[:stdin_task]}"
       arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-      with_task_containing('tasks-test-both', content, 'both') do |task|
-        expect(runner.run_task(target, task, arguments).message).to eq(<<~OUTPUT.strip)
+      with_task_containing('tasks-test-both', content, 'both', os_context[:extension]) do |task|
+        expect(runner.run_task(target, task, arguments).message.strip).to eq(<<~OUTPUT.strip)
           Hello from task
           Goodbye
           {"message_one":"Hello from task","message_two":"Goodbye"}
@@ -207,14 +238,14 @@ QUOTED
 
     it "can run a task with params containing quotes" do
       arguments = { message_one: "foo ' bar ' baz", message_two: '' }
-      with_task_containing('tasks_test_quotes', os_context[:env_task], 'both') do |task|
+      with_task_containing('tasks_test_quotes', os_context[:env_task], 'both', os_context[:extension]) do |task|
         expect(runner.run_task(target, task, arguments).message.strip).to eq("foo ' bar ' baz")
       end
     end
 
     it "can run a task with params containing variable references" do
       arguments = { message: "$PATH" }
-      with_task_containing('tasks_test_var', os_context[:stdin_task], 'both') do |task|
+      with_task_containing('tasks_test_var', os_context[:stdin_task], 'both', os_context[:extension]) do |task|
         expect(runner.run_task(target, task, arguments)['message']).to eq("$PATH")
       end
     end
@@ -223,7 +254,7 @@ QUOTED
       deep_hash = { 'k' => make_sensitive('v'), 'arr' => make_sensitive([1, 2, make_sensitive(3)]) }
       arguments = { 'message_one' => make_sensitive('$ecret!'),
                     'message_two' => make_sensitive(deep_hash) }
-      with_task_containing('tasks_test_sensitive', os_context[:env_task], 'both') do |task|
+      with_task_containing('tasks_test_sensitive', os_context[:env_task], 'both', os_context[:extension]) do |task|
         expect(runner.run_task(target, task, arguments).message).to eq(<<~SHELL)
           $ecret!
           {"k":"v","arr":[1,2,3]}
@@ -233,7 +264,7 @@ QUOTED
 
     it "can run a task with Sensitive params via stdin" do
       arguments = { 'sensitive_string' => make_sensitive('$ecret!') }
-      with_task_containing('tasks_test_sensitive', os_context[:stdin_task], 'stdin') do |task|
+      with_task_containing('tasks_test_sensitive', os_context[:stdin_task], 'stdin', os_context[:extension]) do |task|
         expect(runner.run_task(target, task, arguments).value)
           .to eq("sensitive_string" => "$ecret!")
       end
@@ -245,7 +276,7 @@ QUOTED
     let(:arguments) { { message_one: 'Hello from task', message_two: 'Goodbye' } }
 
     it "runs a task requires 'shell'" do
-      with_task_containing('tasks_test', contents, 'environment') do |task|
+      with_task_containing('tasks_test', contents, 'environment', os_context[:extension]) do |task|
         reqs = [os_context[:supported_req]]
         task['metadata']['implementations'] = [{ 'name' => 'tasks_test', 'requirements' => reqs }]
         expect(runner.run_task(target, task, arguments).message)
@@ -254,7 +285,7 @@ QUOTED
     end
 
     it "runs a task with the implementation's input method" do
-      with_task_containing('tasks_test', contents, 'stdin') do |task|
+      with_task_containing('tasks_test', contents, 'stdin', os_context[:extension]) do |task|
         reqs = [os_context[:supported_req]]
         task['metadata']['implementations'] = [{
           'name' => 'tasks_test', 'requirements' => reqs, 'input_method' => 'environment'
@@ -265,7 +296,7 @@ QUOTED
     end
 
     it "errors when a task only requires an unsupported requirement" do
-      with_task_containing('tasks_test', contents, 'environment') do |task|
+      with_task_containing('tasks_test', contents, 'environment', os_context[:extension]) do |task|
         reqs = [os_context[:unsupported_req]]
         task['metadata']['implementations'] = [{ 'name' => 'tasks_test', 'requirements' => reqs }]
         expect {
@@ -276,7 +307,7 @@ QUOTED
     end
 
     it "errors when a task only requires an unknown requirement" do
-      with_task_containing('tasks_test', contents, 'environment') do |task|
+      with_task_containing('tasks_test', contents, 'environment', os_context[:extension]) do |task|
         task['metadata']['implementations'] = [{ 'name' => 'tasks_test', 'requirements' => ['foobar'] }]
         expect {
           runner.run_task(target, task, arguments)
@@ -290,7 +321,7 @@ QUOTED
     let(:arguments) { {} }
 
     it "puts files at _installdir" do
-      with_task_containing('tasks_test', contents, 'environment') do |task|
+      with_task_containing('tasks_test', contents, 'environment', os_context[:extension]) do |task|
         task['metadata']['files'] = []
         expected_files = %w[files/foo files/bar/baz lib/puppet_x/file.rb tasks/init]
         expected_files.each do |file|
@@ -299,6 +330,8 @@ QUOTED
         end
 
         files = runner.run_task(target, task, arguments).message.split("\n")
+        files = files.each_with_object([]) { |file, acc| acc << file.gsub(/\\\\?/, "/") } if Bolt::Util.windows?
+
         expected_files = ["tasks/#{File.basename(task['files'][0]['path'])}"] + expected_files
         expect(files.count).to eq(expected_files.count)
         files.sort.zip(expected_files.sort).each do |file, expected_file|
@@ -308,7 +341,7 @@ QUOTED
     end
 
     it "includes files from the selected implementation" do
-      with_task_containing('tasks_test', contents, 'environment') do |task|
+      with_task_containing('tasks_test', contents, 'environment', os_context[:extension]) do |task|
         task['metadata']['implementations'] = [
           { 'name' => 'tasks_test.alt', 'requirements' => ['foobar'], 'files' => ['tasks_test/files/no'] },
           { 'name' => 'tasks_test', 'requirements' => [], 'files' => ['tasks_test/files/yes'] }
@@ -321,6 +354,8 @@ QUOTED
         task['files'] << { 'name' => 'tasks_test/files/no', 'path' => task_path }
 
         files = runner.run_task(target, task, arguments).message.split("\n").sort
+        files = files.each_with_object([]) { |file, acc| acc << file.gsub(/\\\\?/, "/") } if Bolt::Util.windows?
+
         expect(files.count).to eq(4)
         expect(files[0]).to match(%r{#{contents.size} [^ ]+/other_mod/lib/puppet_x/a.rb$})
         expect(files[1]).to match(%r{#{contents.size} [^ ]+/other_mod/lib/puppet_x/b.rb$})
@@ -349,7 +384,7 @@ QUOTED
 
     it 'passes the correct _target' do
       arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-      with_task_containing('tasks_test_stdin', os_context[:stdin_task], 'stdin') do |task|
+      with_task_containing('tasks_test_stdin', os_context[:stdin_task], 'stdin', os_context[:extension]) do |task|
         task['metadata']['remote'] = true
         result = remote_runner.run_task(remote_target, task, arguments).value
         expect(result).to include('message_one' => 'Hello from task')
@@ -361,7 +396,7 @@ QUOTED
 
     it 'runs when there is a remote implementation' do
       arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-      with_task_containing('tasks_test_stdin', os_context[:stdin_task], 'stdin') do |task|
+      with_task_containing('tasks_test_stdin', os_context[:stdin_task], 'stdin', os_context[:extension]) do |task|
         task['metadata']['implementations'] = [{ 'name' => 'tasks_test_stdin', 'remote' => true }]
         result = remote_runner.run_task(remote_target, task, arguments).value
         expect(result).to include('message_one' => 'Hello from task')
@@ -407,14 +442,23 @@ QUOTED
       around(:each) do |example|
         # Required because the Local transport changes to the tmpdir before running commands.
         safe_target = Bolt::Target.new(target.uri, target.options.reject { |opt| opt == 'tmpdir' })
-        runner.run_command(safe_target, "mkdir #{tmpdir}")
+        if Bolt::Util.windows?
+          mkdir = "powershell.exe new-item #{tmpdir} -itemtype directory"
+          rmdir = "powershell.exe remove-item #{tmpdir} -Recurse -Force"
+        else
+          mkdir = "mkdir #{tmpdir}"
+          rmdir = "#{os_context[:rm_cmd]} #{tmpdir}"
+        end
+        runner.run_command(safe_target, mkdir)
         example.run
-        runner.run_command(safe_target, "#{os_context[:rm_cmd]} #{tmpdir}")
+        runner.run_command(safe_target, rmdir)
       end
 
       it 'uploads a script to the specified tmpdir' do
-        with_tempfile_containing('script dir', os_context[:identity_script]) do |file|
-          expect(runner.run_script(target, file.path, [])['stdout']).to match(/#{Regexp.escape(tmpdir)}/)
+        with_tempfile_containing('script dir', os_context[:identity_script], os_context[:extension]) do |file|
+          output = runner.run_script(target, file.path, [])['stdout']
+          output = output.gsub(/\\\\?/, "/") if Bolt::Util.windows?
+          expect(output).to match(/#{Regexp.escape(tmpdir)}/)
         end
       end
     end

@@ -36,6 +36,7 @@ RSpec.configure do |config|
   end
 
   config.filter_run_excluding appveyor_agents: true unless ENV['APPVEYOR_AGENTS']
+  config.filter_run_excluding windows: true unless ENV['BOLT_WINDOWS']
 
   # rspec-mocks config
   config.mock_with :rspec do |mocks|
