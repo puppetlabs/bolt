@@ -361,6 +361,12 @@ Successful on 1 node: localhost
 Ran on 1 node in 0.12 seconds
 ```
 
+In general helper files should go in the `files` directory of a module to
+prevent them from being added to the puppet ruby loadpath or seen as tasks. However
+if a task helper can also be called as a task on it's own it belongs in the `tasks`
+directory. If it is ruby code that will be reused by types, providers or
+puppet functions it should go in the `lib` directory.
+
 ### Remote Tasks
 
 Some targets are hard or impossible to execute tasks on directly. For example a
@@ -439,7 +445,7 @@ Create task and metadata in a module at `~/.puppetlabs/bolt/site/mymodule/tasks/
 
 ```
 {
-  "files": ["python_task_helper/lib/task_helper.py"],
+  "files": ["python_task_helper/files/task_helper.py"],
   "input_method": "stdin"
 }
 ```
@@ -450,7 +456,7 @@ Create task and metadata in a module at `~/.puppetlabs/bolt/site/mymodule/tasks/
 #!/usr/bin/env python
 
 import os, sys
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'python_task_helper', 'lib'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'python_task_helper', 'files'))
 from task_helper import TaskHelper
 
 class MyTask(TaskHelper):
@@ -482,7 +488,7 @@ Create task and metadata in a new module at `~/.puppetlabs/bolt/site/mymodule/ta
 
 ```
 {
-  "files": ["ruby_task_helper/lib/task_helper.rb"],
+  "files": ["ruby_task_helper/files/task_helper.rb"],
   "input_method": "stdin"
 }
 ```
@@ -491,7 +497,7 @@ Create task and metadata in a new module at `~/.puppetlabs/bolt/site/mymodule/ta
 
 ```
 #!/usr/bin/env ruby
-require_relative '../lib/task_helper.rb'
+require_relative '../files/task_helper.rb'
 
 class MyTask < TaskHelper
   def task(name: nil, **kwargs)
