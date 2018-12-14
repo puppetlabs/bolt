@@ -367,63 +367,7 @@ if a task helper can also be called as a task on it's own it belongs in the `tas
 directory. If it is ruby code that will be reused by types, providers or
 puppet functions it should go in the `lib` directory.
 
-## Running remote tasks
 
-Some targets are hard or impossible to execute tasks on directly. In these cases, you can write a task that runs on a proxy target and remotely interacts with the real target. 
-
-For example, a network device might have a limited shell environment or a cloud service might be driven only by HTTP APIs. By writing a remote task, Bolt allows you to specify connection information for remote targets in their inventory file and injects them into the `_target` metaparam.
-
-This example shows how to write a task that posts messages to Slack and reads connection information from `inventory.yaml`:
-
-```ruby
-#!/usr/bin/env ruby
-# modules/slack/tasks/message.rb
-
-require 'json'
-require 'net/http'
-
-params = JSON.parse(STDIN.read)
-# the slack API token is passed in from inventory
-token = params['_target']['token']
-
-uri = URI('https://slack.com/api/chat.postMessage')
-http = Net::HTTP.new(uri.host, uri.port)
-http.use_ssl = true
-
-req = Net::HTTP::Post.new(uri, 'Content-type' => 'application/json')
-req['Authorization'] = "Bearer #{params['_target']['token']}"
-req.body = { channel: params['channel'], text: params['message'] }.to_json
-
-resp = http.request(req)
-
-puts resp.body
-```
-
-To prevent accidentally running a normal task on a remote target and breaking its configuration, Bolt won't run a task on a remote target unless its metadata defines it as remote:
-
-```json
-{
-  "remote": true
-}
-```
-
-Add Slack as a remote target in your inventory file:
-
-```yaml
----
-nodes:
-  - name: my_slack
-    config:
-      transport: remote
-      remote:
-        token: <slack API token goes here>
-```
-
-Finally, make `my_slack` a target that can run the `slack::message`:
-
-```bash
-bolt task run slack::message --nodes my_slack message="hello" channel=<slack channel id>
-```
 
 
 ### Task Helpers
@@ -514,6 +458,63 @@ Successful on 1 node: localhost
 Ran on 1 node in 0.12 seconds
 ```
 
+## Running remote tasks
+
+Some targets are hard or impossible to execute tasks on directly. In these cases, you can write a task that runs on a proxy target and remotely interacts with the real target. 
+
+For example, a network device might have a limited shell environment or a cloud service might be driven only by HTTP APIs. By writing a remote task, Bolt allows you to specify connection information for remote targets in their inventory file and injects them into the `_target` metaparam.
+
+This example shows how to write a task that posts messages to Slack and reads connection information from `inventory.yaml`:
+
+```ruby
+#!/usr/bin/env ruby
+# modules/slack/tasks/message.rb
+
+require 'json'
+require 'net/http'
+
+params = JSON.parse(STDIN.read)
+# the slack API token is passed in from inventory
+token = params['_target']['token']
+
+uri = URI('https://slack.com/api/chat.postMessage')
+http = Net::HTTP.new(uri.host, uri.port)
+http.use_ssl = true
+
+req = Net::HTTP::Post.new(uri, 'Content-type' => 'application/json')
+req['Authorization'] = "Bearer #{params['_target']['token']}"
+req.body = { channel: params['channel'], text: params['message'] }.to_json
+
+resp = http.request(req)
+
+puts resp.body
+```
+
+To prevent accidentally running a normal task on a remote target and breaking its configuration, Bolt won't run a task on a remote target unless its metadata defines it as remote:
+
+```json
+{
+  "remote": true
+}
+```
+
+Add Slack as a remote target in your inventory file:
+
+```yaml
+---
+nodes:
+  - name: my_slack
+    config:
+      transport: remote
+      remote:
+        token: <slack API token goes here>
+```
+
+Finally, make `my_slack` a target that can run the `slack::message`:
+
+```bash
+bolt task run slack::message --nodes my_slack message="hello" channel=<slack channel id>
+```
 
 ## Defining parameters in tasks
 
