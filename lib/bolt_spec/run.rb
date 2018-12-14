@@ -9,7 +9,6 @@ require 'bolt/puppetdb'
 require 'bolt/util'
 
 # This is intended to provide a relatively stable method of executing bolt in process from tests.
-# Currently it provides run_task, run_plan, run_script and run_command helpers.
 module BoltSpec
   module Run
     def run_task(task_name, targets, params = nil, config: nil, inventory: nil)
@@ -47,6 +46,27 @@ module BoltSpec
       end
       result = result.to_a
       Bolt::Util.walk_keys(result, &:to_s)
+    end
+
+    def apply_manifest(manifest, targets, execute: false, noop: false, config: nil, inventory: nil)
+      # The execute parameter is equivalent to the --execute option
+      if execute
+        code = manifest
+      else
+        begin
+          unless File.stat(manifest).readable?
+            raise BOLT::FileError.new("The manifest '#{manifest}' is unreadable", manifest)
+          end
+        rescue Errno::ENOENT
+          raise Bolt::FileError.new("The manifest '#{manifest}' does not exist", manifest)
+        end
+        code = File.read(File.expand_path(manifest))
+        filename = manifest
+      end
+      result = BoltRunner.with_runner(config, inventory) do |runner|
+        runner.apply_manifest(code, targets, filename, noop)
+      end
+      JSON.parse(result.to_json)
     end
 
     class BoltRunner
@@ -106,6 +126,20 @@ module BoltSpec
         executor = Bolt::Executor.new(config.concurrency, @analytics)
         targets = inventory.get_targets(targets)
         executor.run_script(targets, script, arguments, options)
+      end
+
+      def apply_manifest(code, targets, filename = nil, noop = false)
+        ast = pal.parse_manifest(code, filename)
+        executor = Bolt::Executor.new(config.concurrency, @analytics, noop)
+        targets = inventory.get_targets(targets)
+
+        pal.in_plan_compiler(executor, inventory, puppetdb_client) do |compiler|
+          compiler.call_function('apply_prep', targets)
+        end
+
+        pal.with_bolt_executor(executor, inventory, puppetdb_client) do
+          Puppet.lookup(:apply_executor).apply_ast(ast, targets, '_catch_errors' => true, '_noop' => noop)
+        end
       end
     end
   end
