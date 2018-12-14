@@ -56,6 +56,15 @@ module Bolt
       end
     end
 
+    def query_resources_task
+      @query_resources_task ||= begin
+        path = File.join(libexec, 'query_resources.rb')
+        file = { 'name' => 'query_resources.rb', 'path' => path }
+        metadata = { 'supports_noop' => true, 'input_method' => 'stdin' }
+        Bolt::Task.new(name: 'apply_helpers::query_resources', files: [file], metadata: metadata)
+      end
+    end
+
     def compile(target, ast, plan_vars)
       trusted = Puppet::Context::TrustedInformation.new('local', target.host, {})
 

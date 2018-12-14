@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'fileutils'
 require 'bolt/task'
 
 # Installs the puppet-agent package on targets if needed then collects facts, including any custom

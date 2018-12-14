@@ -211,6 +211,11 @@ module BoltSpec
       nil
     end
 
+    def allow_get_resources
+      allow_task('apply_helpers::query_resources').be_called_times(100)
+      nil
+    end
+
     # Example helpers to mock other run functions
     # The with_targets method makes sense for all stubs
     # with_params could be reused for options

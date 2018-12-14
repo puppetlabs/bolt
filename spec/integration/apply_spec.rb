@@ -17,6 +17,7 @@ describe "apply" do
 
   describe 'over ssh', ssh: true do
     let(:uri) { conn_uri('ssh') }
+    let(:user) { conn_info('winrm')[:user] }
     let(:password) { conn_info('ssh')[:password] }
     let(:tflags) { %W[--no-host-key-check --run-as root --sudo-password #{password}] }
 
@@ -101,6 +102,20 @@ describe "apply" do
             expect(result['status']).to eq('success')
             report = result['result']['report']
             expect(report['resource_statuses']).to include("Notify[Apply: Hi!]")
+          end
+        end
+      end
+
+      it 'gets resources' do
+        with_tempfile_containing('inventory', YAML.dump(agent_version_inventory), '.yaml') do |inv|
+          results = run_cli_json(%W[plan run basic::resources --nodes agent_targets
+                                    --modulepath #{modulepath} --inventoryfile #{inv.path}])
+          results.each do |result|
+            expect(result['status']).to eq('success')
+            resources = result['result']['resources']
+            expect(resources.map { |r| r['type'] }.uniq).to eq(%w[User File])
+            expect(resources.select { |r| r['title'] == user && r['type'] == 'User' }.count).to eq(1)
+            expect(resources.select { |r| r['title'] == '/tmp' && r['type'] == 'File' }.count).to eq(1)
           end
         end
       end
