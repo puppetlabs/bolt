@@ -367,17 +367,13 @@ if a task helper can also be called as a task on it's own it belongs in the `tas
 directory. If it is ruby code that will be reused by types, providers or
 puppet functions it should go in the `lib` directory.
 
-### Remote Tasks
+## Running remote tasks
 
-Some targets are hard or impossible to execute tasks on directly. For example a
-network device may have a limited shell environment or a cloud service may be
-driven only by HTTP APIs. In these cases it makes sense to write a task that
-runs on a proxy target and remotely interacts with the real target. By writing a
-remote task Bolt allows users to specify connection information for remote
-targets in their inventory file and injects them into the `_target` metaparam.
+Some targets are hard or impossible to execute tasks on directly. In these cases, you can write a task that runs on a proxy target and remotely interacts with the real target. 
 
-The following example shows how to write a task that posts messages to slack
-and reads connection information from inventory.yaml
+For example, a network device might have a limited shell environment or a cloud service might be driven only by HTTP APIs. By writing a remote task, Bolt allows you to specify connection information for remote targets in their inventory file and injects them into the `_target` metaparam.
+
+This example shows how to write a task that posts messages to Slack and reads connection information from `inventory.yaml`:
 
 ```ruby
 #!/usr/bin/env ruby
@@ -403,9 +399,7 @@ resp = http.request(req)
 puts resp.body
 ```
 
-Bolt will refuse to run the task on a remote target unless it's metadata
-defines it as remote. This prevents accidentally running a normal task on a
-remote target and breaking its configuration.
+To prevent accidentally running a normal task on a remote target and breaking its configuration, Bolt won't run a task on a remote target unless its metadata defines it as remote:
 
 ```json
 {
@@ -413,8 +407,7 @@ remote target and breaking its configuration.
 }
 ```
 
-In order to use this you'll have to add a slack as a remote target in your
-inventory file.
+Add Slack as a remote target in your inventory file:
 
 ```yaml
 ---
@@ -426,7 +419,7 @@ nodes:
         token: <slack API token goes here>
 ```
 
-This make `my_slack` a target that can run the `slack::message`
+Finally, make `my_slack` a target that can run the `slack::message`:
 
 ```bash
 bolt task run slack::message --nodes my_slack message="hello" channel=<slack channel id>
