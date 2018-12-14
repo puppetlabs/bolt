@@ -361,18 +361,18 @@ Successful on 1 node: localhost
 Ran on 1 node in 0.12 seconds
 ```
 
-In general helper files should go in the `files` directory of a module to
-prevent them from being added to the puppet ruby loadpath or seen as tasks. However
-if a task helper can also be called as a task on it's own it belongs in the `tasks`
-directory. If it is ruby code that will be reused by types, providers or
-puppet functions it should go in the `lib` directory.
-
 
 
 
 ### Task Helpers
 
 To simplify writing tasks, Bolt includes [python\_task\_helper](https://github.com/puppetlabs/puppetlabs-python_task_helper) and [ruby\_task\_helper](https://github.com/puppetlabs/puppetlabs-ruby_task_helper). It also makes a useful demonstration of including code from another module.
+
+Follow these guidelines to determine where to store helper files:
+
+- `files` directory of a module -- Most helper files. This prevents the file from being treated as a task or added to the Puppet Ruby loadpath.
+- `tasks` directory — Helper files that can be called as tasks on their own.
+- `lib` directory — Ruby code that might be reused by types, providers, or Puppet functions.
 
 #### Python Example
 
