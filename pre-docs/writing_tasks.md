@@ -295,7 +295,10 @@ Multiple tasks can share common files between them. Tasks can additionally pull 
 To create a task that includes additional files pulled from modules, include the files property in your metadata as an array of paths. A path consists of:
 
 -   the module name
--   one of `lib`, `files`, or `tasks` for the directory within the module
+-   one of the following directories within the module:
+    - `files` -- Most helper files. This prevents the file from being treated as a task or added to the Puppet Ruby loadpath.
+    - `tasks` -- Helper files that can be called as tasks on their own.
+    - `lib` -- Ruby code that might be reused by types, providers, or Puppet functions.
 -   the remaining path to a file or directory; directories must include a trailing slash `/`
 
 All path separators must be forward slashes. An example would be `stdlib/lib/puppet/`.
@@ -360,13 +363,6 @@ Finished on localhost:
 Successful on 1 node: localhost
 Ran on 1 node in 0.12 seconds
 ```
-
-In general helper files should go in the `files` directory of a module to
-prevent them from being added to the puppet ruby loadpath or seen as tasks. However
-if a task helper can also be called as a task on it's own it belongs in the `tasks`
-directory. If it is ruby code that will be reused by types, providers or
-puppet functions it should go in the `lib` directory.
-
 
 
 
