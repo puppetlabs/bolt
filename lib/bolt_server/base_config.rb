@@ -45,9 +45,6 @@ module BoltServer
       @data = defaults
       @data = @data.merge(config.select { |key, _| config_keys.include?(key) }) if config
       @config_path = nil
-      config_keys.each do |key|
-        self.class.send(:define_method, key.tr('-', '_').to_sym) { @data[key] }
-      end
     end
 
     def load_file_config(path)
@@ -83,7 +80,7 @@ module BoltServer
         raise Bolt::ValidationError, "You must configure #{k} in #{@config_path}"
       end
 
-      unless natural?(port)
+      unless natural?(@data['port'])
         raise Bolt::ValidationError, "Configured 'port' must be a valid integer greater than 0"
       end
       ssl_keys.each do |sk|
@@ -92,11 +89,11 @@ module BoltServer
         end
       end
 
-      unless ssl_cipher_suites.is_a?(Array)
+      unless @data['ssl-cipher-suites'].is_a?(Array)
         raise Bolt::ValidationError, "Configured 'ssl-cipher-suites' must be an array of cipher suite names"
       end
 
-      unless whitelist.nil? || whitelist.is_a?(Array)
+      unless @data['whitelist'].nil? || @data['whitelist'].is_a?(Array)
         raise Bolt::ValidationError, "Configured 'whitelist' must be an array of names"
       end
     end

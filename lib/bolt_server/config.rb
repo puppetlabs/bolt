@@ -50,11 +50,11 @@ module BoltServer
     def validate
       super
 
-      unless natural?(concurrency)
+      unless natural?(@data['concurrency'])
         raise Bolt::ValidationError, "Configured 'concurrency' must be a positive integer"
       end
 
-      unless natural?(file_server_conn_timeout)
+      unless natural?(@data['file-server-conn-timeout'])
         raise Bolt::ValidationError, "Configured 'file-server-conn-timeout' must be a positive integer"
       end
     end

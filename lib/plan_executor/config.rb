@@ -31,7 +31,7 @@ module PlanExecutor
 
     def validate
       super
-      unless natural?(workers)
+      unless natural?(@data['workers'])
         raise Bolt::ValidationError, "Configured 'workers' must be a positive integer"
       end
     end

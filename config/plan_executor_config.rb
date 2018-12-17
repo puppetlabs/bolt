@@ -23,24 +23,24 @@ config.validate
 Logging.logger[:root].add_appenders Logging.appenders.stderr(
   'console',
   layout: Bolt::Logger.default_layout,
-  level: config.loglevel
+  level: config['loglevel']
 )
 
-if config.logfile
-  stdout_redirect config.logfile, config.logfile, true
+if config['logfile']
+  stdout_redirect config['logfile'], config['logfile'], true
 end
 
-bind_addr = +"ssl://#{config.host}:#{config.port}?"
-bind_addr << "cert=#{config.ssl_cert}"
-bind_addr << "&key=#{config.ssl_key}"
-bind_addr << "&ca=#{config.ssl_ca_cert}"
+bind_addr = +"ssl://#{config['host']}:#{config['port']}?"
+bind_addr << "cert=#{config['ssl-cert']}"
+bind_addr << "&key=#{config['ssl-key']}"
+bind_addr << "&ca=#{config['ssl-ca-cert']}"
 bind_addr << "&verify_mode=force_peer"
-bind_addr << "&ssl_cipher_filter=#{config.ssl_cipher_suites.join(':')}"
+bind_addr << "&ssl_cipher_filter=#{config['ssl-cipher-suites'].join(':')}"
 bind bind_addr
 
-impl = PlanExecutor::App.new(config.modulepath)
-unless config.whitelist.nil?
-  impl = BoltServer::ACL.new(impl, config.whitelist)
+impl = PlanExecutor::App.new(config['modulepath'])
+unless config['whitelist'].nil?
+  impl = BoltServer::ACL.new(impl, config['whitelist'])
 end
 
 app impl

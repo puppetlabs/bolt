@@ -23,31 +23,31 @@ describe BoltServer::Config do
     let(:config) { build_config(globalconfig) }
 
     it 'reads host' do
-      expect(config.host).to eq('10.0.0.1')
+      expect(config['host']).to eq('10.0.0.1')
     end
 
     it 'reads port' do
-      expect(config.port).to eq(12345)
+      expect(config['port']).to eq(12345)
     end
 
     it 'reads loglevel' do
-      expect(config.loglevel).to eq('debug')
+      expect(config['loglevel']).to eq('debug')
     end
 
     it 'reads logfile' do
-      expect(config.logfile).to eq('/var/log/global')
+      expect(config['logfile']).to eq('/var/log/global')
     end
 
     it 'reads whitelist' do
-      expect(config.whitelist).to eq(['a'])
+      expect(config['whitelist']).to eq(['a'])
     end
 
     it 'reads ssl-cipher-suites' do
-      expect(config.ssl_cipher_suites).to eq(['a'])
+      expect(config['ssl-cipher-suites']).to eq(['a'])
     end
 
     it 'reads concurrency' do
-      expect(config.concurrency).to eq(12)
+      expect(config['concurrency']).to eq(12)
     end
   end
 
@@ -57,9 +57,10 @@ describe BoltServer::Config do
     end
 
     before(:context) do
-      BoltServer::Config.new.env_keys.each do |key|
+      empty = BoltServer::Config.new
+      empty.env_keys.each do |key|
         transformed_key = transform_key(key)
-        ENV[transformed_key] = if ['concurrency', 'file-server-conn-timeout'].include?(key)
+        ENV[transformed_key] = if empty.int_keys.include?(key)
                                  '23'
                                else
                                  __FILE__
@@ -77,50 +78,50 @@ describe BoltServer::Config do
     end
 
     it 'reads ssl-cert ' do
-      expect(config.ssl_cert).to eq(fake_env_config)
+      expect(config['ssl-cert']).to eq(fake_env_config)
     end
 
     it 'reads ssl-key' do
-      expect(config.ssl_key).to eq(fake_env_config)
+      expect(config['ssl-key']).to eq(fake_env_config)
     end
 
     it 'reads ssl-ca-cert' do
-      expect(config.ssl_ca_cert).to eq(fake_env_config)
+      expect(config['ssl-ca-cert']).to eq(fake_env_config)
     end
 
     it 'reads loglevel' do
-      expect(config.loglevel).to eq(fake_env_config)
+      expect(config['loglevel']).to eq(fake_env_config)
     end
 
     it 'reads concurrency' do
-      expect(config.concurrency).to eq(23)
+      expect(config['concurrency']).to eq(23)
     end
 
     it 'reads file-server-conn-timeout' do
-      expect(config.file_server_conn_timeout).to eq(23)
+      expect(config['file-server-conn-timeout']).to eq(23)
     end
 
     it 'reads file-server-uri' do
-      expect(config.file_server_uri).to eq(fake_env_config)
+      expect(config['file-server-uri']).to eq(fake_env_config)
     end
   end
 
   it "accepts only required config" do
     config = build_config(requiredconfig)
-    expect(config.host).to eq('127.0.0.1')
-    expect(config.port).to be(62658)
-    expect(config.loglevel).to eq('notice')
-    expect(config.logfile).to eq(nil)
-    expect(config.whitelist).to eq(nil)
-    expect(config.ssl_cipher_suites).to include('ECDHE-ECDSA-AES256-GCM-SHA384')
-    expect(config.concurrency).to eq(100)
+    expect(config['host']).to eq('127.0.0.1')
+    expect(config['port']).to be(62658)
+    expect(config['loglevel']).to eq('notice')
+    expect(config['logfile']).to eq(nil)
+    expect(config['whitelist']).to eq(nil)
+    expect(config['ssl-cipher-suites']).to include('ECDHE-ECDSA-AES256-GCM-SHA384')
+    expect(config['concurrency']).to eq(100)
   end
 
   it "reads ssl keys from config" do
     config = build_config(globalconfig)
-    expect(config.ssl_cert).to eq('spec/fixtures/ssl/cert.pem')
-    expect(config.ssl_key).to eq('spec/fixtures/ssl/key.pem')
-    expect(config.ssl_ca_cert).to eq('spec/fixtures/ssl/ca.pem')
+    expect(config['ssl-cert']).to eq('spec/fixtures/ssl/cert.pem')
+    expect(config['ssl-key']).to eq('spec/fixtures/ssl/key.pem')
+    expect(config['ssl-ca-cert']).to eq('spec/fixtures/ssl/ca.pem')
   end
 
   it "errors when the config file is missing" do

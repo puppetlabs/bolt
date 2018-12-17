@@ -23,51 +23,51 @@ describe PlanExecutor::Config do
     let(:config) { build_config(globalconfig) }
 
     it 'reads host' do
-      expect(config.host).to eq('10.0.0.1')
+      expect(config['host']).to eq('10.0.0.1')
     end
 
     it 'reads port' do
-      expect(config.port).to eq(12345)
+      expect(config['port']).to eq(12345)
     end
 
     it 'reads loglevel' do
-      expect(config.loglevel).to eq('debug')
+      expect(config['loglevel']).to eq('debug')
     end
 
     it 'reads logfile' do
-      expect(config.logfile).to eq('/var/log/global')
+      expect(config['logfile']).to eq('/var/log/global')
     end
 
     it 'reads whitelist' do
-      expect(config.whitelist).to eq(['a'])
+      expect(config['whitelist']).to eq(['a'])
     end
 
     it 'reads ssl-cipher-suites' do
-      expect(config.ssl_cipher_suites).to eq(['a'])
+      expect(config['ssl-cipher-suites']).to eq(['a'])
     end
 
     it 'reads workers' do
-      expect(config.workers).to eq(3)
+      expect(config['workers']).to eq(3)
     end
   end
 
   it "accepts only required config" do
     config = build_config(requiredconfig)
-    expect(config.host).to eq('127.0.0.1')
-    expect(config.port).to be(62659)
-    expect(config.loglevel).to eq('notice')
-    expect(config.logfile).to eq(nil)
-    expect(config.whitelist).to eq(nil)
-    expect(config.ssl_cipher_suites).to include('ECDHE-ECDSA-AES256-GCM-SHA384')
-    expect(config.modulepath).to eq('spec/fixtures/modules')
-    expect(config.workers).to eq(1)
+    expect(config['host']).to eq('127.0.0.1')
+    expect(config['port']).to be(62659)
+    expect(config['loglevel']).to eq('notice')
+    expect(config['logfile']).to eq(nil)
+    expect(config['whitelist']).to eq(nil)
+    expect(config['ssl-cipher-suites']).to include('ECDHE-ECDSA-AES256-GCM-SHA384')
+    expect(config['modulepath']).to eq('spec/fixtures/modules')
+    expect(config['workers']).to eq(1)
   end
 
   it "reads ssl keys from config" do
     config = build_config(globalconfig)
-    expect(config.ssl_cert).to eq('spec/fixtures/ssl/cert.pem')
-    expect(config.ssl_key).to eq('spec/fixtures/ssl/key.pem')
-    expect(config.ssl_ca_cert).to eq('spec/fixtures/ssl/ca.pem')
+    expect(config['ssl-cert']).to eq('spec/fixtures/ssl/cert.pem')
+    expect(config['ssl-key']).to eq('spec/fixtures/ssl/key.pem')
+    expect(config['ssl-ca-cert']).to eq('spec/fixtures/ssl/ca.pem')
   end
 
   it "errors when the config file is missing" do
