@@ -116,4 +116,22 @@ describe "PlanExecutor::App" do
       end
     end
   end
+
+  context 'with apply in a plan' do
+    let(:plan_name) { 'basic::apply' }
+    let(:params) { { 'nodes' => 'node1.example.com' } }
+
+    it 'executes' do
+      post '/plan/run', json_req, header
+      expect(last_response).to be_ok
+      expect(last_response.status).to eq(200)
+      status = JSON.parse(last_response.body)
+      expect(status).to include('status' => 'running')
+
+      get '/plan/result'
+      expect(last_response).to be_ok
+      result = JSON.parse(last_response.body)
+      expect(result).to include("kind" => 'bolt.plan-executor/not-implemented')
+    end
+  end
 end
