@@ -202,7 +202,7 @@ module BoltSpec
     end
 
     def allow_apply_prep
-      allow_task('apply_helpers::custom_facts')
+      allow_task('apply_helpers::custom_facts').be_called_times(100)
       nil
     end
 
