@@ -8,6 +8,7 @@ require 'bolt/inventory'
 require 'bolt/pal'
 require 'bolt/puppetdb'
 require 'plan_executor/applicator'
+require 'plan_executor/executor'
 require 'concurrent'
 require 'json'
 require 'json-schema'
@@ -31,7 +32,7 @@ module PlanExecutor
       @worker = Concurrent::SingleThreadExecutor.new
 
       # Create a basic executor, leave concurrency up to Orchestrator.
-      @executor = executor || Bolt::Executor.new(0, load_config: false)
+      @executor = executor || PlanExecutor::Executor.new(0)
       # Use an empty inventory until we figure out where this data comes from.
       @inventory = Bolt::Inventory.new(nil)
       # TODO: what should max compiles be set to for apply?
