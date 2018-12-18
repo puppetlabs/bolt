@@ -31,7 +31,7 @@ module BoltSpec
       end
 
       def parameters
-        @invocation[:arguments] + @invocation[:options]
+        @invocation[:arguments] + @invocation[:options] if @invocation.include[:arguments]
       end
 
       def result_for(target, stdout: '', stderr: '')

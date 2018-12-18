@@ -202,12 +202,17 @@ module BoltSpec
     end
 
     def allow_apply_prep
-      allow_task('apply_helpers::custom_facts')
+      allow_task('apply_helpers::custom_facts').be_called_times(100)
       nil
     end
 
     def allow_apply
       executor.stub_apply
+      nil
+    end
+
+    def allow_get_resources
+      allow_task('apply_helpers::query_resources').be_called_times(100)
       nil
     end
 

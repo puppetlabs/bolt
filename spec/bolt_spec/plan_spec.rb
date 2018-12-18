@@ -201,4 +201,18 @@ describe "BoltSpec::Plans" do
       expect(result).not_to be_ok
     end
   end
+
+  context 'with get_resources' do
+    let(:plan_name) { 'plans::get_resources' }
+
+    it 'runs' do
+      allow_get_resources
+      result = run_plan(plan_name, 'nodes' => targets)
+      expect(result).to be_ok
+    end
+
+    it 'fails' do
+      expect { run_plan(plan_name, 'nodes' => targets) }.to raise_error(RuntimeError, /Unexpected call to/)
+    end
+  end
 end
