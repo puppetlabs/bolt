@@ -36,7 +36,7 @@ module BoltSpec
       def initialize(expect = false)
         @calls = 0
         @expect = expect
-        @expected_calls = 1
+        @expected_calls = nil
         # invocation spec
         @invocation = {}
         # return value
@@ -63,6 +63,7 @@ module BoltSpec
       # This changes the stub from an allow to an expect which will validate
       # that it has been called.
       def expect_call
+        @expected_calls = 1
         @expect = true
         self
       end
