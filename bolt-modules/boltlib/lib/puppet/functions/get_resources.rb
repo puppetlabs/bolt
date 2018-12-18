@@ -41,6 +41,13 @@ Puppet::Functions.create_function(:get_resources) do
       )
     end
 
+    resources = [resources].flatten
+    resources.each do |resource|
+      if resource !~ /^\w+$/ && resource !~ /^\w+\[.+\]$/
+        raise Bolt::Error.new("#{resource} is not a valid resource type or type instance name", 'bolt/get-resources')
+      end
+    end
+
     executor.report_function_call('get_resources')
 
     targets = inventory.get_targets(target_spec)
@@ -57,7 +64,7 @@ Puppet::Functions.create_function(:get_resources) do
 
         task = applicator.query_resources_task
         arguments = {
-          'resources' => [resources].flatten,
+          'resources' => resources,
           'plugins' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(plugins)
         }
         results = executor.run_task(targets, task, arguments)

@@ -69,5 +69,17 @@ describe 'get_resources' do
         Bolt::RunFailure, "Plan aborted: run_task 'query_resources_task' failed on #{targets.count} nodes"
       )
     end
+
+    it 'errors if resource names are invalid' do
+      is_expected.to run.with_params(hostnames, 'not a type').and_raise_error(
+        Bolt::Error, "not a type is not a valid resource type or type instance name"
+      )
+    end
+
+    it 'errors if resource names are invalid' do
+      is_expected.to run.with_params(hostnames, 'not a type[hello there]').and_raise_error(
+        Bolt::Error, "not a type[hello there] is not a valid resource type or type instance name"
+      )
+    end
   end
 end
