@@ -214,7 +214,7 @@ Usage: bolt apply <manifest.pp> [options]
              'Maximum number of simultaneous manifest block compiles (default: number of cores)') do |concurrency|
         @options[:'compile-concurrency'] = concurrency
       end
-      define('--modulepath MODULES',
+      define('-m', '--modulepath MODULES',
              "List of directories containing modules, separated by '#{File::PATH_SEPARATOR}'") do |modulepath|
         # When specified from the CLI, modulepath entries are relative to pwd
         @options[:modulepath] = modulepath.split(File::PATH_SEPARATOR).map do |moduledir|
@@ -229,7 +229,7 @@ Usage: bolt apply <manifest.pp> [options]
              'Specify where to load config from (default: ~/.puppetlabs/bolt/bolt.yaml)') do |path|
         @options[:configfile] = path
       end
-      define('--inventoryfile FILEPATH',
+      define('-i', '--inventoryfile FILEPATH',
              'Specify where to load inventory from (default: ~/.puppetlabs/bolt/inventory.yaml)') do |path|
         if ENV.include?(Bolt::Inventory::ENVIRONMENT_VAR)
           raise Bolt::CLIError, "Cannot pass inventory file when #{Bolt::Inventory::ENVIRONMENT_VAR} is set"
@@ -262,7 +262,7 @@ Usage: bolt apply <manifest.pp> [options]
       define('-h', '--help', 'Display help') do |_|
         @options[:help] = true
       end
-      define('--verbose', 'Display verbose logging') do |_|
+      define('-v', '--verbose', 'Display verbose logging') do |_|
         @options[:verbose] = true
       end
       define('--debug', 'Display debug logging') do |_|
