@@ -67,6 +67,18 @@ describe Bolt::Transport::SSH do
   end
 
   context "when connecting", ssh: true do
+    it "passes proxyjump options" do
+      allow(Net::SSH)
+        .to receive(:start)
+        .with(anything,
+              anything,
+              hash_including(
+                proxy: instance_of(Net::SSH::Proxy::Jump)
+              ))
+      target = make_target(conf: mk_config(proxyjump: 'jump.example.com'))
+      ssh.with_connection(target) {}
+    end
+
     it "performs secure host key verification by default" do
       allow(Net::SSH)
         .to receive(:start)

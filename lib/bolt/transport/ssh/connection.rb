@@ -5,6 +5,7 @@ require 'shellwords'
 require 'bolt/node/errors'
 require 'bolt/node/output'
 require 'bolt/util'
+require 'net/ssh/proxy/jump'
 
 module Bolt
   module Transport
@@ -115,6 +116,8 @@ module Bolt
                                         Net::SSH::Verifiers::Null.new
                                       end
           options[:timeout] = target.options['connect-timeout'] if target.options['connect-timeout']
+
+          options[:proxy] = Net::SSH::Proxy::Jump.new(target.options['proxyjump']) if target.options['proxyjump']
 
           if @load_config
             # Mirroring:
