@@ -74,10 +74,10 @@ Options are optional unless marked as required. 
 |Option|Description|
 |------|-----------|
 |`--concurrency`, `-c`|Maximum number of simultaneous connections \(default: 100\).|
-| `--modulepath` |**Required for tasks and plans**. The path to the module containing the task. Separate multiple paths with a semicolon \(`;`\) on Windows or a colon \(`:`\) on all other platforms.|
+| `--modulepath`, `-m` |**Required for tasks and plans**. The path to the module containing the task. Separate multiple paths with a semicolon \(`;`\) on Windows or a colon \(`:`\) on all other platforms.|
 | `--configfile` |Specify where to load config from \(default: `bolt.yaml` inside the `Boltdir`\).|
 | `--boltdir` |Specify what Boltdir to load config from \(default: autodiscovered from current working dir\).|
-| `--inventoryfile` |Specify where to load inventory from \(default: `inventory.yaml` inside the `Boltdir`\).|
+| `--inventoryfile`, `-i` |Specify where to load inventory from \(default: `inventory.yaml` inside the `Boltdir`\).|
 
 ## Transport options
 
@@ -97,7 +97,7 @@ Options are optional unless marked as required. 
 | `--format` |Determines the output format to use: human readable or JSON.|
 |`--color`, `--no-color`|Whether to show output in color.|
 |`--help`, `-h`|Shows help for the `bolt` command.|
-| `--verbose` |Shows verbose logging.|
+| `--verbose`, `-v` |Shows verbose logging.|
 | `--debug` |Shows debug logging.|
 | `--version` |Shows the Bolt version.|
 

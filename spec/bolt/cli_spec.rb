@@ -442,6 +442,13 @@ bar
         expect(cli.parse).to include(modulepath: [site, File.expand_path('modules')])
       end
 
+      it "accepts shorthand -m" do
+        site = File.expand_path('site')
+        modulepath = [site, 'modules'].join(File::PATH_SEPARATOR)
+        cli = Bolt::CLI.new(%W[command run -m #{modulepath} --nodes foo])
+        expect(cli.parse).to include(modulepath: [site, File.expand_path('modules')])
+      end
+
       it "generates an error message if no value is given" do
         cli = Bolt::CLI.new(%w[command run --nodes foo --modulepath])
         expect {
