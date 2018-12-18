@@ -146,7 +146,12 @@ module Bolt
       # Expand paths relative to the Boltdir. Any settings that came from the
       # CLI will already be absolute, so the expand will be skipped.
       if data.key?('modulepath')
-        @modulepath = data['modulepath'].split(File::PATH_SEPARATOR).map do |moduledir|
+        moduledirs = if data['modulepath'].is_a?(String)
+                       data['modulepath'].split(File::PATH_SEPARATOR)
+                     else
+                       data['modulepath']
+                     end
+        @modulepath = moduledirs.map do |moduledir|
           File.expand_path(moduledir, @boltdir.path)
         end
       end

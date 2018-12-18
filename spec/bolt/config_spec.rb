@@ -27,6 +27,12 @@ describe Bolt::Config do
       config = Bolt::Config.new(boltdir, 'modulepath' => module_dirs.join(File::PATH_SEPARATOR))
       expect(config.modulepath).to eq(module_dirs.map { |dir| (boltdir.path + dir).to_s })
     end
+
+    it "accepts an array for modulepath" do
+      module_dirs = %w[site modules]
+      config = Bolt::Config.new(boltdir, 'modulepath' => module_dirs)
+      expect(config.modulepath).to eq(module_dirs.map { |dir| (boltdir.path + dir).to_s })
+    end
   end
 
   describe "deep_clone" do
