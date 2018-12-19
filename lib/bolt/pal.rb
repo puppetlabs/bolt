@@ -120,12 +120,12 @@ module Bolt
       r
     end
 
-    def with_bolt_executor(executor, inventory, pdb_client = nil, &block)
+    def with_bolt_executor(executor, inventory, pdb_client = nil, applicator = nil, &block)
       opts = {
         bolt_executor: executor,
         bolt_inventory: inventory,
         bolt_pdb_client: pdb_client,
-        apply_executor: Applicator.new(
+        apply_executor: applicator || Applicator.new(
           inventory,
           executor,
           @modulepath,
@@ -141,8 +141,8 @@ module Bolt
       Puppet.override(opts, &block)
     end
 
-    def in_plan_compiler(executor, inventory, pdb_client)
-      with_bolt_executor(executor, inventory, pdb_client) do
+    def in_plan_compiler(executor, inventory, pdb_client, applicator = nil)
+      with_bolt_executor(executor, inventory, pdb_client, applicator) do
         # TODO: remove this call and see if anything breaks when
         # settings dirs don't actually exist. Plans shouldn't
         # actually be using them.
@@ -287,8 +287,8 @@ module Bolt
       end
     end
 
-    def run_plan(plan_name, params, executor = nil, inventory = nil, pdb_client = nil)
-      in_plan_compiler(executor, inventory, pdb_client) do |compiler|
+    def run_plan(plan_name, params, executor = nil, inventory = nil, pdb_client = nil, applicator = nil)
+      in_plan_compiler(executor, inventory, pdb_client, applicator) do |compiler|
         r = compiler.call_function('run_plan', plan_name, params.merge('_bolt_api_call' => true))
         Bolt::PlanResult.from_pcore(r, 'success')
       end

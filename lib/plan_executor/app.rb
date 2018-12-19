@@ -7,6 +7,7 @@ require 'bolt/executor'
 require 'bolt/inventory'
 require 'bolt/pal'
 require 'bolt/puppetdb'
+require 'plan_executor/applicator'
 require 'concurrent'
 require 'json'
 require 'json-schema'
@@ -35,6 +36,8 @@ module PlanExecutor
       @inventory = Bolt::Inventory.new(nil)
       # TODO: what should max compiles be set to for apply?
       @pal = Bolt::PAL.new(modulepath, nil)
+
+      @applicator = PlanExecutor::Applicator.new(@inventory, @executor, nil)
 
       super(nil)
     end
@@ -82,7 +85,7 @@ module PlanExecutor
       # This provides a wait function, which promise doesn't
       result = Concurrent::Future.execute(executor: @worker) do
         # Stores result in result for testing
-        @pal.run_plan(name, params, @executor, @inventory, puppetdb_client)
+        @pal.run_plan(name, params, @executor, @inventory, puppetdb_client, @applicator)
       end
 
       [200, { status: 'running' }.to_json]
