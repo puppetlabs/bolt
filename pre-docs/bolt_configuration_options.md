@@ -44,6 +44,8 @@ ssh:
 
 `password`: Login password.
 
+`proxyjump`: A jump host to proxy ssh connections through and an optional user to connect as for example `jump.example.com` or `user1@jump.example.com`.
+
 `run-as`: A different user to run commands as after login.
 
 `sudo-password`: Password to use when changing users via `run-as`.
