@@ -463,7 +463,7 @@ without_default_logging { run_command('echo hi', $nodes) }
 
 
 
-You can use the `puppetdb_query` function in plans to make direct queries to PuppetDB. For example you can discover nodes from PuppetDB and then run tasks on them. You'll have to configure the [puppetdb client](bolt_connect_puppetdb.md)before running it. This [tutorial](https://puppet.com/docs/puppetdb/latest/api/query/tutorial-pql.html) shows how to structure queries.
+You can use the `puppetdb_query` function in plans to make direct queries to PuppetDB. For example you can discover nodes from PuppetDB and then run tasks on them. You'll have to configure the [puppetdb client](bolt_connect_puppetdb.md)before running it. You can learn how to [structure pql queries here](https://puppet.com/docs/puppetdb/latest/api/query/tutorial-pql.html), and find [pql reference and examples here](https://puppet.com/docs/puppetdb/latest/api/query/v4/pql.html)
 
 ```
 plan pdb_discover {
