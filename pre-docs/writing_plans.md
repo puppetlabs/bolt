@@ -467,7 +467,7 @@ You can use the `puppetdb_query` function in plans to make direct queries to Pu
 
 ```
 plan pdb_discover {
-  $result = puppetdb_query("inventory[certname] { app_role == 'web_server' })
+  $result = puppetdb_query("inventory[certname] { app_role == 'web_server' }")
   # extract the certnames into an array
   $names = $result.map |$r| { $r["certname"] }
   # wrap in url. You can skip this if the default transport is pcp
