@@ -56,7 +56,7 @@ module Bolt
             @connection.logger = @transport_logger
 
             @session = @connection.shell(:powershell)
-            @session.run('$PSVersionTable.PSVersion')
+            @separator = @session.run('[System.IO.Path]::DirectorySeparatorChar').stdout.strip
             @logger.debug { "Opened session" }
           end
         rescue Timeout::Error
@@ -217,14 +217,14 @@ module Bolt
         def write_remote_executable(dir, file, filename = nil)
           filename ||= File.basename(file)
           validate_extensions(File.extname(filename))
-          remote_path = "#{dir}\\#{filename}"
+          remote_path = "#{dir}#{@separator}#{filename}"
           write_remote_file(file, remote_path)
           remote_path
         end
 
         def write_executable_from_content(dir, content, filename)
           validate_extensions(File.extname(filename))
-          remote_path = "#{dir}\\#{filename}"
+          remote_path = "#{dir}#{@separator}#{filename}"
           write_remote_file(content, remote_path)
           remote_path
         end
