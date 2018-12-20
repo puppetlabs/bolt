@@ -7,7 +7,8 @@ Write plans in the Puppet language, giving them a `.pp` extension, and place the
 **Related information**  
 
 
-[Plan execution functions](plan_functions.md#)
+[Plan execution functions and standard library](plan_functions.md#)
+[Puppet functions available in plans](https://puppet.com/docs/puppet/6.1/function.html)
 
 ## Naming plans
 

@@ -15,6 +15,9 @@ There are certain types of improvements that we believe make sense in Bolt itsel
 
 * New Transports. Transports API is a work-in-progress, but is something we aim to stabilize. Currently these can't be extended via modules, although in the future they likely will be.
 * Core functionality we believe makes Bolt a better tool, such as the `aggregate` and `canary` plans included in `modules`.
+* New functions
+    * New core functions that use Bolt internals such as the Executor, Applicator, or Inventory should live in bolt-modules/boltlib.
+    * Other directories under bolt-modules are used to categorize Bolt's standard library functions.
 * New ways of interacting with plan progress and output, such as prompts to continue or output processors.
 * New inventory sources. This is experimental right now, but we're working towards patterns for getting inventory into Bolt and how to refer to it from within a plan.
 

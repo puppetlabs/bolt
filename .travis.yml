@@ -20,11 +20,13 @@ script:
 - bundle exec rubocop
 - |
   status=0
-  pushd bolt-modules/boltlib
-  if ! bundle exec rake spec; then
-    status=1
-  fi
-  popd
+  for i in 'boltlib' 'coll' 'ctrl' 'file' 'system'; do
+    pushd bolt-modules/$i
+    if ! bundle exec rake spec; then
+      status=1
+    fi
+    popd
+  done
   if [ $status -eq 1 ]; then
     false
   fi
