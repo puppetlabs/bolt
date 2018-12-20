@@ -54,7 +54,6 @@ task :docs do
   PuppetStrings.generate(PuppetStrings::DEFAULT_SEARCH_PATTERNS,
                          markup: 'markdown', json: true, path: tmpfile,
                          yard_args: ['bolt-modules/boltlib',
-                                     'bolt-modules/coll',
                                      'bolt-modules/ctrl',
                                      'bolt-modules/file',
                                      'bolt-modules/system'])

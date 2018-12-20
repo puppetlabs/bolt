@@ -64,7 +64,7 @@ for:
       - bundle exec rake appveyor
       - ps: |
           $test_fail = 0
-          $mods = ("boltlib", "coll", "ctrl", "file", "system")
+          $mods = ("boltlib", "ctrl", "file", "system")
           Get-ChildItem bolt-modules -Directory -Include $mods | foreach {
             cd $_.FullName;
             $test_output = bundle exec rake spec
