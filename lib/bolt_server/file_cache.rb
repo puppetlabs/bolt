@@ -26,7 +26,7 @@ module BoltServer
                    purge_timeout: PURGE_TIMEOUT,
                    purge_ttl: PURGE_TTL)
       @executor = executor
-      @cache_dir = config.cache_dir
+      @cache_dir = config['cache-dir']
       @config = config
       @logger = Logging.logger[self]
       @cache_dir_mutex = Concurrent::ReadWriteLock.new
@@ -48,30 +48,30 @@ module BoltServer
     end
 
     def ssl_cert
-      @ssl_cert ||= File.read(@config.ssl_cert)
+      @ssl_cert ||= File.read(@config['ssl-cert'])
     end
 
     def ssl_key
-      @ssl_key ||= File.read(@config.ssl_key)
+      @ssl_key ||= File.read(@config['ssl-key'])
     end
 
     def client
       @client ||= begin
-                    uri = URI(@config.file_server_uri)
+                    uri = URI(@config['file-server-uri'])
                     https = Net::HTTP.new(uri.host, uri.port)
                     https.use_ssl = true
                     https.ssl_version = :TLSv1_2
-                    https.ca_file = @config.ssl_ca_cert
+                    https.ca_file = @config['ssl-ca-cert']
                     https.cert = OpenSSL::X509::Certificate.new(ssl_cert)
                     https.key = OpenSSL::PKey::RSA.new(ssl_key)
                     https.verify_mode = OpenSSL::SSL::VERIFY_PEER
-                    https.open_timeout = @config.file_server_conn_timeout
+                    https.open_timeout = @config['file-server-conn-timeout']
                     https
                   end
     end
 
     def request_file(path, params, file)
-      uri = "#{@config.file_server_uri.chomp('/')}#{path}"
+      uri = "#{@config['file-server-uri'].chomp('/')}#{path}"
       uri = URI(uri)
       uri.query = URI.encode_www_form(params)
 

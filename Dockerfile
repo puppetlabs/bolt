@@ -22,10 +22,6 @@ LABEL org.label-schema.maintainer="Puppet Bolt Team <team-direct-change-bolt@pup
       org.label-schema.license="Apache-2.0" \
       org.label-schema.version=${bolt_version} \
       org.label-schema.vcs-url="https://github.com/puppetlabs/bolt" \
-      # Same with these
-      #org.label-schema.vcs-ref="b75674e1fbf52f7821f7900ab22a19f1a10cafdb" \
-      #org.label-schema.build-date="2018-05-09T20:10:01Z" \
-      #org.label-schema.schema-version="1.0" \
       org.label-schema.dockerfile="/Dockerfile"
 
 RUN \
@@ -37,4 +33,4 @@ WORKDIR /bolt-server
 EXPOSE 62658
 ENV BOLT_SERVER_CONF /bolt-server/config/docker.conf
 
-ENTRYPOINT bundle exec puma -C puma_config.rb
+ENTRYPOINT bundle exec puma -C /bolt-server/config/transport_service_config.rb
