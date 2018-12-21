@@ -430,7 +430,7 @@ Create task and metadata in a new module at `~/.puppetlabs/bolt/site/mymodule/ta
 
 ```
 #!/usr/bin/env ruby
-require_relative '../files/task_helper.rb'
+require_relative '../../ruby_task_helper/files/task_helper.rb'
 
 class MyTask < TaskHelper
   def task(name: nil, **kwargs)
