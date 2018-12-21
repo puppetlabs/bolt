@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Repeat the block until it returns 'true'.
+# Repeat the block until it returns a truthy value. Returns the value.
 Puppet::Functions.create_function(:'ctrl::do_until') do
   # @example Run a task until it succeeds
   #   ctrl::do_until || {
@@ -8,11 +8,10 @@ Puppet::Functions.create_function(:'ctrl::do_until') do
   #   }
   dispatch :do_until do
     block_param
-    return_type 'Undef'
   end
 
   def do_until
-    until yield; end
-    nil
+    until (x = yield); end
+    x
   end
 end
