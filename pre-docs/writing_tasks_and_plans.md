@@ -26,4 +26,5 @@ Tasks and plans are packaged in Puppet modules, so you can install them as you w
 Tasks are similar to scripts, but they are kept in modules and can have metadata. This allows you to reuse and share them more easily.
 -   **[Writing plans](writing_plans.md#)**  
 Plans allow you to run more than one task with a single command, compute values for the input to a task, process the results of tasks, or make decisions based on the result of running a task.
-
+-   **[The control repository pattern](control_repo.md#)**
+The control repository pattern is useful for creating a project that contains your tasks and plans - along with declaring modules they depend on - for others to run.
