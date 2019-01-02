@@ -62,9 +62,20 @@ for:
 
     test_script:
       - bundle exec rake appveyor
-      - cd bolt-modules/boltlib
-      - bundle exec rake spec
-      - cd ../..
+      - ps: |
+          $test_fail = 0
+          $mods = ("boltlib", "ctrl", "file", "system")
+          Get-ChildItem bolt-modules -Directory -Include $mods | foreach {
+            cd $_.FullName;
+            $test_output = bundle exec rake spec
+            $r = $LASTEXITCODE
+            Write-Output $test_output
+            if($r) {
+              $test_fail = $r
+            }
+          }
+          if($test_fail) { throw "core module tests failed" }
+          cd ../..
       - ps: |
           $test_fail = 0
           $mods = ("canary", "aggregate", "puppetdb_fact")
@@ -78,6 +89,7 @@ for:
             }
           }
           if($test_fail) { throw "module tests failed" }
+          cd ../..
 
   -
     matrix:

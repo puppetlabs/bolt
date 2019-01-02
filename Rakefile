@@ -53,7 +53,10 @@ task :docs do
   tmpfile = 'tmp/boltlib.json'
   PuppetStrings.generate(PuppetStrings::DEFAULT_SEARCH_PATTERNS,
                          markup: 'markdown', json: true, path: tmpfile,
-                         yard_args: ['bolt-modules/boltlib'])
+                         yard_args: ['bolt-modules/boltlib',
+                                     'bolt-modules/ctrl',
+                                     'bolt-modules/file',
+                                     'bolt-modules/system'])
   json = JSON.parse(File.read(tmpfile))
   funcs = json.delete('puppet_functions')
   json.each { |k, v| raise "Expected #{k} to be empty, found #{v}" unless v.empty? }
