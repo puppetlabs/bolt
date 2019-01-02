@@ -8,7 +8,7 @@ The inventory file is a yaml file stored by default at `inventory.yaml` inside t
 
 ## Inventory config
 
-You can only set transport configuration in the inventory file. This means using a top level `transport` value to assign a transport to the target and all values in the `transports` sections. You can set config on nodes or groups in the inventory file. Bolt performs a depth first search of nodes, followed by a search of groups, and uses the first value it finds. Nested hashes are merged.
+You can only set transport configuration in the inventory file. This means using a top level `transport` value to assign a transport to the target and all values in the section named for the transport (`ssh`, `winrm`, `remote`, etc.). You can set config on nodes or groups in the inventory file. Bolt performs a depth first search of nodes, followed by a search of groups, and uses the first value it finds. Nested hashes are merged.
 
 This inventory file example defines two top-level groups: `ssh_nodes` and `win_nodes`. The `ssh_nodes` group contains two other groups: `webservers` and `memcached`. Five nodes are configured to use ssh transport and four other nodes to use WinRM transport.
 
