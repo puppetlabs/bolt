@@ -19,12 +19,12 @@ Before you run tasks or plans in your environment, inspect them to determine wha
 -   **[Running tasks](bolt_running_tasks.md#)**  
 Bolt can run Puppet tasks on remote nodes without requiring any Puppet infrastructure. 
 -   **[Running plans](bolt_running_plans.md#)**  
- Bolt can run plans, allowing multiple tasks to be tied together. 
+Bolt can run plans, allowing multiple tasks to be tied together. 
 -   **[Installing tasks and plans](installing_tasks_from_the_forge.md#)**  
-Tasks and plans are packaged in Puppet modules, so you can install them as you would any module and manage them with a Puppetfile. 
+Tasks and plans are packaged in Puppet modules, so you can install them as you would any module and manage them with a Puppetfile.
+-   **[Directory structures for task and plan development](directory_structure.md#)**
+Running tasks and plans you've written requires they be placed in a Puppet module. This subject describes several patterns for writing and sharing projects that use tasks and plans.
 -   **[Writing tasks](writing_tasks.md#)**  
 Tasks are similar to scripts, but they are kept in modules and can have metadata. This allows you to reuse and share them more easily.
 -   **[Writing plans](writing_plans.md#)**  
 Plans allow you to run more than one task with a single command, compute values for the input to a task, process the results of tasks, or make decisions based on the result of running a task.
--   **[The control repository pattern](control_repo.md#)**
-The control repository pattern is useful for creating a project that contains your tasks and plans - along with declaring modules they depend on - for others to run.
