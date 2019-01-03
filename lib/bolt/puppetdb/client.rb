@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'json'
+require 'logging'
 require 'uri'
 require 'httpclient'
 
@@ -11,6 +12,9 @@ module Bolt
 
       def initialize(config)
         @config = config
+        @bad_urls = []
+        @current_url = nil
+        @logger = Logging.logger[self]
       end
 
       def query_certnames(query)
@@ -41,22 +45,35 @@ module Bolt
 
       def make_query(query, path = nil)
         body = JSON.generate(query: query)
-        url = "#{@config.uri}/pdb/query/v4"
+        url = "#{uri}/pdb/query/v4"
         url += "/#{path}" if path
 
         begin
           response = http_client.post(url, body: body, header: headers)
+        rescue SocketError, OpenSSL::SSL::SSLError, SystemCallError, Net::ProtocolError, IOError => err
+          raise Bolt::PuppetDBFailoverError, "Failed to query PuppetDB: #{err}"
         rescue StandardError => err
           raise Bolt::PuppetDBError, "Failed to query PuppetDB: #{err}"
         end
+
         if response.code != 200
-          raise Bolt::PuppetDBError, "Failed to query PuppetDB: #{response.body}"
+          msg = "Failed to query PuppetDB: #{response.body}"
+          if response.code == 400
+            raise Bolt::PuppetDBError, msg
+          else
+            raise Bolt::PuppetDBFailoverError, msg
+          end
         end
+
         begin
           JSON.parse(response.body)
         rescue JSON::ParserError
           raise Bolt::PuppetDBError, "Unable to parse response as JSON: #{response.body}"
         end
+      rescue Bolt::PuppetDBFailoverError => err
+        @logger.error("Request to puppetdb at #{@current_url} failed with #{err}.")
+        reject_url
+        make_query(query, path)
       end
 
       def http_client
@@ -66,6 +83,23 @@ module Bolt
         @http.ssl_config.add_trust_ca(@config.cacert)
 
         @http
+      end
+
+      def reject_url
+        @bad_urls << @current_url if @current_url
+        @current_url = nil
+      end
+
+      def uri
+        @current_url ||= (@config.server_urls - @bad_urls).first
+        unless @current_url
+          msg = "Failed to connect to all PuppetDB server_urls: #{@config.server_urls.to_a.join(', ')}."
+          raise Bolt::PuppetDBError, msg
+        end
+
+        uri = URI.parse(@current_url)
+        uri.port ||= 8081
+        uri
       end
 
       def headers

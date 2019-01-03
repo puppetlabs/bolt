@@ -1,0 +1,18 @@
+FROM puppet/puppetdb
+
+ARG hostname="bolt-puppetdb"
+
+# Use our own certs so this doesn't have to wait for puppetserver startup
+COPY fixtures/ssl/ca.pem /etc/puppetlabs/puppet/ssl/certs/ca.pem
+COPY fixtures/ssl/cert.pem /etc/puppetlabs/puppet/ssl/certs/pdb.pem
+COPY fixtures/ssl/key.pem /etc/puppetlabs/puppet/ssl/private_keys/pdb.pem
+COPY fixtures/ssl/crl.pem /etc/puppetlabs/puppet/ssl/ca/ca_crl.pem
+
+COPY fixtures/puppetdb/ssl-setup.sh /opt/puppetlabs/bin/ssl-setup.sh
+
+RUN /opt/puppetlabs/bin/ssl-setup.sh && chown -R puppetdb:puppetdb /etc/puppetlabs/puppetdb/ssl/
+
+# The normal bootstrap should copy the cert in place
+# Skip the normal bootstrapping and just run puppet-server
+ ENTRYPOINT ["/opt/puppetlabs/bin/puppetdb"]
+ CMD ["foreground"]

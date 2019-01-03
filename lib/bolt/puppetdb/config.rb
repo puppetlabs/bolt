@@ -45,8 +45,11 @@ module Bolt
 
       def token
         return @token if @token
-        if @settings['token']
-          @token = File.read(@settings['token'])
+        # Allow nil in config to skip loading a token
+        if @settings.include?('token')
+          if @settings['token']
+            @token = File.read(@settings['token'])
+          end
         elsif File.exist?(DEFAULT_TOKEN)
           @token = File.read(DEFAULT_TOKEN)
         end
@@ -64,6 +67,19 @@ module Bolt
           raise Bolt::PuppetDBError, "#{file} file #{@settings[file]} does not exist"
         end
         true
+      end
+
+      def server_urls
+        case @settings['server_urls']
+        when String
+          [@settings['server_urls']]
+        when Array
+          @settings['server_urls']
+        when nil
+          raise Bolt::PuppetDBError, "server_urls must be specified"
+        else
+          raise Bolt::PuppetDBError, "server_urls must be a string or array"
+        end
       end
 
       def uri

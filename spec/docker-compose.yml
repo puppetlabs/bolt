@@ -18,6 +18,26 @@ services:
       - ubuntu_node
     ports:
       - "20024:22"
+
+  postgres:
+    image: postgres:9.6
+    environment:
+      - POSTGRES_PASSWORD=puppetdb
+      - POSTGRES_USER=puppetdb
+      - POSTGRES_DB=puppetdb
+    volumes:
+      - ./fixtures/puppetdb/custom_source:/docker-entrypoint-initdb.d
+  puppetdb:
+    build:
+      context: .
+      dockerfile: Dockerfile.puppetdb
+    environment:
+      - "USE_PUPPETSERVER=false"
+    image: puppetdb
+    ports:
+      # 8081 is a common port
+      - "18081:8081"
+
   puppetserver:
     build:
       context: .
