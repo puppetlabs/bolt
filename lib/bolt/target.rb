@@ -62,6 +62,8 @@ module Bolt
         # Initialize with an empty scheme to ensure we parse the hostname correctly
         Addressable::URI.parse("//#{string}")
       end
+    rescue Addressable::URI::InvalidURIError => e
+      raise Bolt::ParseError, "Could not parse target URI: #{e.message}"
     end
     private :parse
 

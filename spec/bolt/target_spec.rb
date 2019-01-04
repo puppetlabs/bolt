@@ -45,7 +45,7 @@ describe Bolt::Target do
     it "rejects unescaped special characters" do
       expect {
         Bolt::Target.new("#{user}:a/b@neptune")
-      }.to raise_error(Addressable::URI::InvalidURIError,
+      }.to raise_error(Bolt::ParseError,
                        /Invalid port number/)
     end
 
