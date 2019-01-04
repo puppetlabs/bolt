@@ -274,7 +274,7 @@ describe "apply" do
 
         result = run_task('puppet_agent::version', conn_uri('winrm'), config: config)
         expect(result.count).to eq(1)
-        expect(result[0]['status']).to eq('success')
+        expect(result[0]).to include('status' => 'success')
         expect(result[0]['result']['version']).to match(/^5/)
       end
 
