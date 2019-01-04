@@ -4,11 +4,8 @@ Plans allow you to run more than one task with a single command, compute values 
 
 Write plans in the Puppet language, giving them a `.pp` extension, and place them in the module's `/plans` directory.
 
-**Related information**  
+Plans can use any combination of [Bolt functions](./plan_functions.html) or [built-in Puppet functions](https://puppet.com/docs/puppet/6.1/function.html).
 
-
-[Plan execution functions and standard library](plan_functions.md#)
-[Puppet functions available in plans](https://puppet.com/docs/puppet/6.1/function.html)
 
 ## Naming plans
 
