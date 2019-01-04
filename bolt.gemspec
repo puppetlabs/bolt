@@ -19,8 +19,8 @@ Gem::Specification.new do |spec|
                        Dir['lib/**/*.rb'] +
                        Dir['lib/**/*.json'] +
                        Dir['libexec/*'] +
-                       Dir['bolt-modules/boltlib/lib/**/*.rb'] +
-                       Dir['bolt-modules/boltlib/types/**/*.pp'] +
+                       Dir['bolt-modules/*/lib/**/*.rb'] +
+                       Dir['bolt-modules/*/types/**/*.pp'] +
                        Dir['modules/*/files/**/*'] +
                        Dir['modules/*/lib/**/*.rb'] +
                        Dir['modules/*/locales/**/*'] +
