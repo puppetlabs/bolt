@@ -4,7 +4,7 @@ cache: bundler
 services:
 - docker
 rvm:
-- 2.5
+- 2.6
 env:
   global:
     - REGISTRY_HOST=pcr-internal.puppet.net

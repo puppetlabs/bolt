@@ -36,6 +36,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "CFPropertyList", "~> 2.2"
   spec.add_dependency "concurrent-ruby", "~> 1.0"
   spec.add_dependency "docker-api", "~> 1.34"
+  spec.add_dependency "ffi", "~> 1.10"
   spec.add_dependency "logging", "~> 2.2"
   spec.add_dependency "minitar", "~> 0.6"
   spec.add_dependency "net-scp", "~> 1.2"
