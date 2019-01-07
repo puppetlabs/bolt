@@ -93,6 +93,13 @@ shared_examples 'transport api' do
       expect(result['stderr']).to eq('')
       expect(result['stdout']).to match(/hello " world/)
     end
+
+    it "can return a non-zero exit status" do
+      # explicitly launch bash because Docker doesn't have bash as a default shell
+      # when you perform a: docker exec
+      result = runner.run_command(target, "/bin/bash -c 'exit 1'", '_catch_errors' => true).value
+      expect(result['exit_code']).to eq(1)
+    end
   end
 
   context 'upload_file' do
