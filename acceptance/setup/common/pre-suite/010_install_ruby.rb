@@ -14,7 +14,7 @@ PS
       # HACK: to add chocolatey path to cygwin: this path should at least be
       # instrospected from the STDOUT of the installer.
       bolt.add_env_var('PATH', '/cygdrive/c/ProgramData/chocolatey/bin:PATH')
-      on(bolt, powershell('choco install ruby -y'))
+      on(bolt, powershell('choco install ruby -y --version 2.5.3.101'))
       on(bolt, powershell('choco list --lo ruby')) do |output|
         version = /ruby (2\.[0-9])/.match(output.stdout)[1].delete('.')
         bolt.add_env_var('PATH', "/cygdrive/c/tools/ruby#{version}/bin:PATH")
