@@ -47,7 +47,7 @@ test_name "Install Bolt via git" do
   end
 
   step "Install custom gem" do
-    install_command = "cd bolt; gem install bolt-#{version}.gem --no-ri --no-rdoc"
+    install_command = "cd bolt; gem install bolt-#{version}.gem --no-document"
     case bolt['platform']
     when /windows/
       execute_powershell_script_on(bolt, install_command)

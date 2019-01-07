@@ -6,7 +6,7 @@ test_name "Install Bolt gem" do
   extend Acceptance::BoltSetupHelper
 
   step "Install Bolt gem" do
-    install_command = "gem install bolt --source #{gem_source} --no-ri --no-rdoc"
+    install_command = "gem install bolt --source #{gem_source} --no-document"
     install_command += " -v '#{gem_version}'" unless gem_version.empty?
     case bolt['platform']
     when /windows/
