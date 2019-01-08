@@ -19,7 +19,7 @@ module Bolt
           result_output = Bolt::Node::Output.new
           result_output.stdout << stdout unless stdout.nil?
           result_output.stderr << stderr unless stderr.nil?
-          result_output.exit_code = rc.to_i
+          result_output.exit_code = rc.exitstatus
           result_output
         end
       end
