@@ -4,6 +4,7 @@ require 'spec_helper'
 require 'bolt_spec/conn'
 require 'bolt_spec/files'
 require 'bolt_spec/integration'
+require 'bolt_spec/puppetdb'
 require 'bolt/catalog'
 require 'bolt/task'
 
@@ -11,6 +12,7 @@ describe "passes parsed AST to the apply_catalog task" do
   include BoltSpec::Conn
   include BoltSpec::Files
   include BoltSpec::Integration
+  include BoltSpec::PuppetDB
 
   let(:modulepath) { File.join(__dir__, '../fixtures/apply') }
   let(:config_flags) { %W[--format json --nodes #{uri} --password #{password} --modulepath #{modulepath}] + tflags }
@@ -146,11 +148,7 @@ describe "passes parsed AST to the apply_catalog task" do
     context 'with puppetdb stubbed' do
       let(:config) {
         {
-          'puppetdb' => {
-            'server_urls' => 'https://localhost:99999',
-            'cacert' => File.join(Gem::Specification.find_by_name('bolt').gem_dir, 'resources', 'ca.pem')
-
-          }
+          'puppetdb' => pdb_conf
         }
       }
 

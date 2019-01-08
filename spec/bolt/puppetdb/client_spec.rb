@@ -2,11 +2,12 @@
 
 require 'spec_helper'
 require 'bolt/puppetdb/client'
+require 'bolt_spec/puppetdb'
 
 describe Bolt::PuppetDB::Client do
   let(:uri) { 'https://puppetdb:8081' }
   let(:cacert) { File.expand_path('/path/to/cacert') }
-  let(:config) { double('config', uri: URI.parse(uri), cacert: cacert, token: nil, cert: nil, key: nil) }
+  let(:config) { double('config', server_urls: [uri], cacert: cacert, token: nil, cert: nil, key: nil) }
   let(:client) { Bolt::PuppetDB::Client.new(config) }
 
   describe "#headers" do
@@ -60,24 +61,65 @@ describe Bolt::PuppetDB::Client do
     end
   end
 
-  describe "get facts for certnames" do
-    let(:response) { double('response', code: 200, body: '{}') }
-    let(:http_client) { double('http_client', post: response) }
+  describe "#facts_for_node" do
+    it 'should not make a request to pdb if there are no nodes' do
+      expect(client).to receive(:http_client).never
+      facts = client.facts_for_node([])
+      expect(facts).to eq({})
+    end
+  end
 
-    before :each do
-      allow(client).to receive(:http_client).and_return(http_client)
+  context 'when connected to puppetdb', puppetdb: true do
+    include BoltSpec::PuppetDB
+    def facts_hash
+      { 'node1' => {
+        'foo' => 'bar',
+        'name' => 'node1'
+      },
+        'node2' => {
+          'foo' => 'bar',
+          'name' => 'node2'
+        } }
     end
 
-    it 'returns facts for certnames' do
-      request = %w[foo bar foo]
-      body = [{ 'certname' => 'foo', 'facts' => { 'a' => 1 } }, { 'certname' => 'bar', 'facts' => { 'b' => 2 } }]
-      allow(response).to receive(:body).and_return(body.to_json)
+    let(:client) { pdb_client }
 
-      expect(client.facts_for_node(request)).to eq('foo' => { 'a' => 1 }, 'bar' => { 'b' => 2 })
+    before(:all) do
+      push_facts(facts_hash)
     end
 
-    it 'returns an empty list if no certnames are given' do
-      expect(client.facts_for_node([])).to eq({})
+    after(:all) do
+      clear_facts(facts_hash)
+    end
+
+    it 'should get facts' do
+      facts = client.facts_for_node(%w[node1 node2])
+      expect(facts).to eq(facts_hash)
+    end
+
+    it 'should get certnames' do
+      certnames = client.query_certnames("inventory { facts.name = 'node2' }")
+      expect(certnames).to eq(['node2'])
+    end
+
+    it 'should error with an invalid query' do
+      expect { client.query_certnames("inventory { 'name' = 'node2' }") }.to raise_error(Bolt::PuppetDBError, /parse/)
+    end
+
+    it 'should fail after all servers fail' do
+      conf = pdb_conf
+      conf['server_urls'] = ['https://bad_host1.dne.com', 'https://bad_host2.dne.com']
+      client = Bolt::PuppetDB::Client.new(Bolt::PuppetDB::Config.new(conf))
+      msg = "Failed to connect to all PuppetDB server_urls: https://bad_host1.dne.com, https://bad_host2.dne.com."
+      expect { client.facts_for_node(%w[node1 node2]) }.to raise_error(Bolt::PuppetDBError, msg)
+    end
+
+    it 'should failover if the first server fails' do
+      conf = pdb_conf
+      conf['server_urls'] = ['https://bad_host.dne.com', pdb_conf['server_urls']]
+      client = Bolt::PuppetDB::Client.new(Bolt::PuppetDB::Config.new(conf))
+      facts = client.facts_for_node(%w[node1 node2])
+      expect(facts).to eq(facts_hash)
     end
   end
 end

@@ -14,22 +14,24 @@ RSpec::Core::RakeTask.new(:spec)
 
 desc "Run RSpec tests that don't require VM fixtures or a particular shell"
 RSpec::Core::RakeTask.new(:unit) do |t|
-  t.rspec_opts = '--tag ~ssh --tag ~docker --tag ~bash --tag ~winrm --tag ~appveyor_agents --tag ~puppetserver'
+  t.rspec_opts = '--tag ~ssh --tag ~docker --tag ~bash --tag ~winrm ' \
+                 '--tag ~appveyor_agents --tag ~puppetserver --tag ~puppetdb'
 end
 
 desc "Run RSpec tests for AppVeyor that don't require SSH, Bash, Appveyor Puppet Agents, or orchestrator"
 RSpec::Core::RakeTask.new(:appveyor) do |t|
-  t.rspec_opts = '--tag ~ssh --tag ~docker --tag ~bash --tag ~appveyor_agents --tag ~orchestrator --tag ~puppetserver'
+  t.rspec_opts = '--tag ~ssh --tag ~docker --tag ~bash --tag ~appveyor_agents ' \
+         '--tag ~orchestrator --tag ~puppetserver --tag ~puppetdb'
 end
 
 desc "Run RSpec tests for TravisCI that don't require WinRM"
 RSpec::Core::RakeTask.new(:travisci) do |t|
-  t.rspec_opts = '--tag ~winrm --tag ~appveyor_agents --tag ~puppetserver --tag ~windows'
+  t.rspec_opts = '--tag ~winrm --tag ~appveyor_agents --tag ~puppetserver --tag ~puppetdb --tag ~windows'
 end
 
-desc "Run RSpec tests that require pupperserver"
+desc "Run RSpec tests that require slow to start puppet containers"
 RSpec::Core::RakeTask.new(:puppetserver) do |t|
-  t.rspec_opts = '--tag puppetserver'
+  t.rspec_opts = '--tag puppetserver --tag puppetdb'
 end
 
 RuboCop::RakeTask.new(:rubocop) do |t|
