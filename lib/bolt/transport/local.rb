@@ -36,11 +36,15 @@ module Bolt
 
       def in_tmpdir(base)
         args = base ? [nil, base] : []
-        Dir.mktmpdir(*args) do |dir|
-          yield dir
-        end
-      rescue StandardError => e
-        raise Bolt::Node::FileError.new("Could not make tempdir: #{e.message}", 'TEMPDIR_ERROR')
+        dir = begin
+                Dir.mktmpdir(*args)
+              rescue StandardError => e
+                raise Bolt::Node::FileError.new("Could not make tempdir: #{e.message}", 'TEMPDIR_ERROR')
+              end
+
+        yield dir
+      ensure
+        FileUtils.remove_entry dir if dir
       end
       private :in_tmpdir
 
