@@ -20,6 +20,7 @@ module Bolt
       end
 
       def self.load_config(filename, options)
+        config = {}
         global_path = Bolt::Util.windows? ? DEFAULT_CONFIG[:win_global] : DEFAULT_CONFIG[:global]
         if filename
           if File.exist?(filename)
@@ -27,13 +28,20 @@ module Bolt
           else
             raise Bolt::PuppetDBError, "config file #{filename} does not exist"
           end
-        elsif File.exist?(DEFAULT_CONFIG[:user])
-          config = JSON.parse(File.read(DEFAULT_CONFIG[:user]))
-        elsif File.exist?(global_path)
-          config = JSON.parse(File.read(global_path))
         else
-          config = {}
+          if File.exist?(DEFAULT_CONFIG[:user])
+            filepath = DEFAULT_CONFIG[:user]
+          elsif File.exist?(global_path)
+            filepath = global_path
+          end
+
+          begin
+            config = JSON.parse(File.read(filepath))
+          rescue StandardError => e
+            Logging.logger[self].error("Could not load puppetdb.conf from #{filepath}: #{e.message}")
+          end
         end
+
         config = config.fetch('puppetdb', {})
         new(config.merge(options))
       end
