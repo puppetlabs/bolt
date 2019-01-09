@@ -1020,9 +1020,7 @@ bar
           json = JSON.parse(output.string)
           tasks = [
             ["package", "Manage and inspect the state of packages"],
-            ["service", "Manage and inspect the state of services"],
-            ["service::linux", "Manage the state of services (without a puppet agent)"],
-            ["service::windows", "Manage the state of Windows services (without a puppet agent)"]
+            ["service", "Manage and inspect the state of services"]
           ]
           tasks.each do |task|
             expect(json).to include(task)
