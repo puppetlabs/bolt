@@ -38,7 +38,7 @@ bind_addr << "&verify_mode=force_peer"
 bind_addr << "&ssl_cipher_filter=#{config['ssl-cipher-suites'].join(':')}"
 bind bind_addr
 
-impl = PlanExecutor::App.new(config['modulepath'])
+impl = PlanExecutor::App.new(config)
 unless config['whitelist'].nil?
   impl = BoltServer::ACL.new(impl, config['whitelist'])
 end

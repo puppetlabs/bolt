@@ -24,7 +24,10 @@ describe "PlanExecutor::App" do
 
   def app
     moduledir = File.join(__dir__, '..', 'fixtures', 'plan_executor')
-    PlanExecutor::App.new(moduledir)
+    config = PlanExecutor::Config.new('modulepath' => moduledir,
+                                      'orchestrator-url' => 'abcde.com',
+                                      'ssl-ca-cert' => '/path/to/cert')
+    PlanExecutor::App.new(config)
   end
 
   it 'responds ok' do

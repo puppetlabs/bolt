@@ -76,7 +76,12 @@ module BoltServer
 
     def validate
       required_keys.each do |k|
-        next unless @data[k].nil?
+        # Handled nested config
+        if k.is_a?(Array)
+          next unless @data.dig(*k).nil?
+        else
+          next unless @data[k].nil?
+        end
         raise Bolt::ValidationError, "You must configure #{k} in #{@config_path}"
       end
 

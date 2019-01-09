@@ -7,7 +7,7 @@ require 'bolt/error'
 module PlanExecutor
   class Config < BoltServer::BaseConfig
     def config_keys
-      super + %w[modulepath workers]
+      super + %w[modulepath workers orchestrator-url]
     end
 
     def defaults
@@ -19,6 +19,10 @@ module PlanExecutor
 
     def service_name
       'plan-executor'
+    end
+
+    def required_keys
+      super + ['orchestrator-url']
     end
 
     def load_env_config

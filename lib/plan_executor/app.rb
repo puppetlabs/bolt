@@ -3,10 +3,10 @@
 require 'sinatra'
 require 'bolt'
 require 'bolt/error'
-require 'bolt/executor'
 require 'bolt/inventory'
 require 'bolt/pal'
 require 'bolt/puppetdb'
+require 'bolt/version'
 require 'plan_executor/applicator'
 require 'plan_executor/executor'
 require 'concurrent'
@@ -27,18 +27,24 @@ module PlanExecutor
       end
     end
 
-    def initialize(modulepath, executor = nil)
-      @schema = JSON.parse(File.read(File.join(__dir__, 'schemas', 'run_plan.json')))
-      @worker = Concurrent::SingleThreadExecutor.new
+    def initialize(config)
+      conn_opts = { 'service-url' => config['orchestrator-url'],
+                    'cacert' => config['ssl-ca-cert'],
+                    'User-Agent' => "Bolt/#{Bolt::VERSION}" }
+      @client = OrchestratorClient.new(conn_opts, false)
 
-      # Create a basic executor, leave concurrency up to Orchestrator.
-      @executor = executor || PlanExecutor::Executor.new(0)
       # Use an empty inventory until we figure out where this data comes from.
       @inventory = Bolt::Inventory.new(nil)
-      # TODO: what should max compiles be set to for apply?
-      @pal = Bolt::PAL.new(modulepath, nil)
 
-      @applicator = PlanExecutor::Applicator.new(@inventory, @executor, nil)
+      # PAL is not threadsafe. Part of the work of making the plan executor
+      # functional will be making changes to Puppet that remove the need for
+      # global Puppet state.
+      # https://github.com/puppetlabs/bolt/blob/master/lib/bolt/pal.rb#L166
+      @pal = Bolt::PAL.new(config['modulepath'], nil)
+
+      @schema = JSON.parse(File.read(File.join(__dir__, 'schemas', 'run_plan.json')))
+      @worker = Concurrent::SingleThreadExecutor.new
+      @modulepath = config['modulepath']
 
       super(nil)
     end
@@ -77,16 +83,18 @@ module PlanExecutor
       body = JSON.parse(request.body.read)
       error = validate_schema(@schema, body)
       return [400, error.to_json] unless error.nil?
-
       name = body['plan_name']
       # Errors if plan is not found
       @pal.get_plan_info(name)
 
+      executor = PlanExecutor::Executor.new(body['job_id'], @client)
+      applicator = PlanExecutor::Applicator.new(@inventory, executor, nil)
       params = body['params']
       # This provides a wait function, which promise doesn't
       result = Concurrent::Future.execute(executor: @worker) do
-        # Stores result in result for testing
-        @pal.run_plan(name, params, @executor, @inventory, puppetdb_client, @applicator)
+        pal_result = @pal.run_plan(name, params, executor, @inventory, puppetdb_client, applicator)
+        executor.finish_plan(pal_result)
+        pal_result
       end
 
       [200, { status: 'running' }.to_json]

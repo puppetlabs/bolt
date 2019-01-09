@@ -7,27 +7,26 @@ require 'logging'
 require 'set'
 require 'bolt/result'
 require 'bolt/config'
-require 'bolt/transport/api'
-require 'bolt/notifier'
 require 'bolt/result_set'
 require 'bolt/puppetdb'
+require 'plan_executor/orch_client'
 
 module PlanExecutor
   class Executor
-    attr_reader :noop, :transport
+    attr_reader :noop, :logger
+    attr_accessor :transport
 
-    def initialize(noop = nil)
+    def initialize(job_id, client, noop = nil)
       @logger = Logging.logger[self]
       @plan_logging = false
       @noop = noop
       @logger.debug { "Started" }
-      @notifier = Bolt::Notifier.new
-      @transport = Bolt::Transport::Api.new
+      @transport = PlanExecutor::OrchClient.new(job_id, client, @logger)
     end
 
     # This handles running the job, catching errors, and turning the result
     # into a result set
-    def execute(targets)
+    def as_resultset(targets)
       result_array = begin
                        yield
                      rescue StandardError => e
@@ -38,7 +37,7 @@ module PlanExecutor
       Bolt::ResultSet.new(result_array)
     end
 
-    # TODO: Remove in favor of service logging
+    # BOLT-1098
     def log_action(description, targets)
       # When running a plan, info messages like starting a task are promoted to notice.
       log_method = @plan_logging ? :notice : :info
@@ -62,6 +61,7 @@ module PlanExecutor
       results
     end
 
+    # BOLT-1098
     def log_plan(plan_name)
       log_method = @plan_logging ? :notice : :info
       @logger.send(log_method, "Starting: plan #{plan_name}")
@@ -78,60 +78,48 @@ module PlanExecutor
       results
     end
 
-    def run_command(targets, command, options = {}, &callback)
+    def run_command(targets, command, options = {})
       description = options.fetch('_description', "command '#{command}'")
       log_action(description, targets) do
-        notify = proc { |event| @notifier.notify(callback, event) if callback }
-
-        results = execute(targets) do
-          @transport.batch_command(targets, command, options, &notify)
+        results = as_resultset(targets) do
+          @transport.run_command(targets, command, options)
         end
 
-        @notifier.shutdown
         results
       end
     end
 
-    def run_script(targets, script, arguments, options = {}, &callback)
+    def run_script(targets, script, arguments, options = {})
       description = options.fetch('_description', "script #{script}")
       log_action(description, targets) do
-        notify = proc { |event| @notifier.notify(callback, event) if callback }
-
-        results = execute(targets) do
-          @transport.batch_script(targets, script, arguments, options, &notify)
+        results = as_resultset(targets) do
+          @transport.run_script(targets, script, arguments, options)
         end
 
-        @notifier.shutdown
         results
       end
     end
 
-    def run_task(targets, task, arguments, options = {}, &callback)
+    def run_task(targets, task, arguments, options = {})
       description = options.fetch('_description', "task #{task.name}")
       log_action(description, targets) do
-        notify = proc { |event| @notifier.notify(callback, event) if callback }
-
         arguments['_task'] = task.name
 
-        results = execute(targets) do
-          @transport.batch_task(targets, task, arguments, options, &notify)
+        results = as_resultset(targets) do
+          @transport.run_task(targets, task, arguments, options)
         end
 
-        @notifier.shutdown
         results
       end
     end
 
-    def upload_file(targets, source, destination, options = {}, &callback)
+    def upload_file(targets, source, destination, options = {})
       description = options.fetch('_description', "file upload from #{source} to #{destination}")
       log_action(description, targets) do
-        notify = proc { |event| @notifier.notify(callback, event) if callback }
-
-        results = execute(targets) do
-          @transport.batch_upload(targets, source, destination, options, &notify)
+        results = as_resultset(targets) do
+          @transport.file_upload(targets, source, destination, options)
         end
 
-        @notifier.shutdown
         results
       end
     end
@@ -144,7 +132,7 @@ module PlanExecutor
                              retry_interval: 1)
       log_action(description, targets) do
         begin
-          wait_until(wait_time, retry_interval) { @transport.batch_connected?(targets) }
+          wait_until(wait_time, retry_interval) { @transport.connected?(targets) }
           targets.map { |target| Bolt::Result.new(target) }
         rescue TimeoutError => e
           targets.map { |target| Bolt::Result.from_exception(target, e) }
@@ -158,21 +146,6 @@ module PlanExecutor
         raise(TimeoutError, 'Timed out waiting for target') if (wait_now - start).to_i >= timeout
         sleep(retry_interval)
       end
-    end
-
-    # Plan context doesn't make sense for most transports but it is tightly
-    # coupled with the orchestrator transport since the transport behaves
-    # differently when a plan is running. In order to limit how much this
-    # pollutes the transport API we only handle the orchestrator transport here.
-    # Since we callt this function without resolving targets this will result
-    # in the orchestrator transport always being initialized during plan runs.
-    # For now that's ok.
-    #
-    # In the future if other transports need this or if we want a plan stack
-    # we'll need to refactor.
-    def start_plan(plan_context)
-      @transport.plan_context = plan_context
-      @plan_logging = true
     end
 
     def finish_plan(plan_result)

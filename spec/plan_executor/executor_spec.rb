@@ -3,12 +3,15 @@
 require 'spec_helper'
 require 'bolt_spec/task'
 require 'plan_executor/executor'
+require 'plan_executor/config'
+require 'bolt/plan_result'
 require 'bolt/target'
 
 describe "PlanExecutor::Executor" do
   include BoltSpec::Task
 
-  let(:executor) { PlanExecutor::Executor.new(1) }
+  let(:mock_client) { instance_double("OrchestratorClient", run_task: client_results) }
+  let(:executor) { PlanExecutor::Executor.new('22', mock_client) }
   let(:api) { executor.transport }
   let(:command) { "hostname" }
   let(:base_path) { File.expand_path(File.join(File.dirname(__FILE__), '..', '..')) }
@@ -40,23 +43,33 @@ describe "PlanExecutor::Executor" do
        'results' => result }]
   }
 
-  let(:mock_client) { instance_double("OrchestratorClient", run_task: client_results) }
-
-  def start_event(target)
-    { type: :node_start, target: target }
-  end
-
-  def success_event(result)
-    { type: :node_result, result: result }
-  end
-
   before(:each) do
     allow(OrchestratorClient).to receive(:new).and_return(mock_client)
+    allow(mock_client).to receive(:config).and_return(PlanExecutor::Config.new)
+  end
+
+  it "sets the api plan job id" do
+    expect(api.plan_job).to eq('22')
+  end
+
+  context 'finishing a plan' do
+    it "finishes a plan" do
+      expect(api).to receive(:finish_plan)
+        .and_return(Bolt::PlanResult.new(client_results, 'success'))
+      expect(executor.finish_plan(client_results)).to be_a(Bolt::PlanResult)
+    end
+
+    it "catches finish_plan failures" do
+      expect(api).to receive(:finish_plan).and_raise(StandardError)
+      expect { executor.finish_plan(client_results) }.to raise_error(StandardError)
+      logs = @log_output.readlines
+      expect(logs).to include(/DEBUG.*#{client_results.to_json}/)
+    end
   end
 
   context 'running a command' do
     it 'executes on all nodes' do
-      expect(api).to receive(:batch_command)
+      expect(api).to receive(:run_command)
         .with(targets, command, {})
         .and_return(node_results)
 
@@ -64,29 +77,15 @@ describe "PlanExecutor::Executor" do
     end
 
     it 'passes options' do
-      expect(api).to receive(:batch_command)
+      expect(api).to receive(:run_command)
         .with(targets, command, 'service_url' => 'abcde.com')
         .and_return(node_results)
 
       executor.run_command(targets, command, 'service_url' => 'abcde.com')
     end
 
-    it "yields results" do
-      expect(mock_client).to receive(:run_task).and_return(client_results)
-
-      events = []
-      results = executor.run_command(targets, command) do |event|
-        events << event
-      end
-
-      results.each do |result|
-        expect(events).to include(success_event(result))
-        expect(events).to include(start_event(result.target))
-      end
-    end
-
     it 'catches errors' do
-      expect(api).to receive(:batch_command)
+      expect(api).to receive(:run_command)
         .with(targets, command, {})
         .and_raise(error)
 
@@ -99,7 +98,7 @@ describe "PlanExecutor::Executor" do
 
   context 'executes running a script' do
     it "on all nodes" do
-      expect(api).to receive(:batch_script)
+      expect(api).to receive(:run_script)
         .with(targets, script, [], {})
         .and_return(node_results)
 
@@ -109,23 +108,9 @@ describe "PlanExecutor::Executor" do
       end
     end
 
-    it "yields each result" do
-      expect(mock_client).to receive(:run_task).and_return(client_results)
-
-      events = []
-      results = executor.run_script(targets, script, []) do |event|
-        events << event
-      end
-
-      results.each do |result|
-        expect(events).to include(success_event(result))
-        expect(events).to include(start_event(result.target))
-      end
-    end
-
     it 'catches errors' do
       expect(api)
-        .to receive(:batch_script)
+        .to receive(:run_script)
         .with(targets, script, [], {})
         .and_raise(Bolt::Error, 'failed', 'my-exception')
 
@@ -139,7 +124,7 @@ describe "PlanExecutor::Executor" do
   context 'running a task' do
     it "executes on all nodes" do
       expect(api)
-        .to receive(:batch_task)
+        .to receive(:run_task)
         .with(targets, task_type(task), task_arguments, task_options)
         .and_return(node_results)
 
@@ -150,23 +135,9 @@ describe "PlanExecutor::Executor" do
       end
     end
 
-    it "yields each result" do
-      expect(mock_client).to receive(:run_task).and_return(client_results)
-
-      events = []
-      results = executor.run_task(targets, mock_task(task), task_arguments, task_options) do |event|
-        events << event
-      end
-
-      results.each do |result|
-        expect(events).to include(success_event(result))
-        expect(events).to include(start_event(result.target))
-      end
-    end
-
     it 'catches errors' do
       expect(api)
-        .to receive(:batch_task)
+        .to receive(:run_task)
         .with(targets, task_type(task), task_arguments, task_options)
         .and_raise(Bolt::Error, 'failed', 'my-exception')
 
@@ -180,7 +151,7 @@ describe "PlanExecutor::Executor" do
   context 'uploading a file' do
     it "executes on all nodes" do
       expect(api)
-        .to receive(:batch_upload)
+        .to receive(:file_upload)
         .with(targets, script, dest, {})
         .and_return(node_results)
 
@@ -190,23 +161,9 @@ describe "PlanExecutor::Executor" do
       end
     end
 
-    it "yields each result" do
-      expect(mock_client).to receive(:run_task).and_return(client_results)
-
-      events = []
-      results = executor.upload_file(targets, script, dest) do |event|
-        events << event
-      end
-
-      results.each do |result|
-        expect(events).to include(success_event(result))
-        expect(events).to include(start_event(result.target))
-      end
-    end
-
     it 'catches errors' do
       expect(api)
-        .to receive(:batch_upload)
+        .to receive(:file_upload)
         .with(targets, script, dest, {})
         .and_raise(Bolt::Error, 'failed', 'my-exception')
 
@@ -218,28 +175,22 @@ describe "PlanExecutor::Executor" do
   end
 
   it "returns and notifies an error result" do
-    expect(api)
-      .to receive(:get_connection)
-      .with(targets.first.options)
+    expect(mock_client)
+      .to receive(:run_task)
       .and_raise(
         Bolt::Node::ConnectError.new('Authentication failed', 'AUTH_ERROR')
       )
 
-    notices = []
-    results = executor.run_command(targets, command) { |notice| notices << notice }
+    results = executor.run_command(targets, command)
 
     results.each do |result|
       expect(result.error_hash['msg']).to eq('Authentication failed')
       expect(result.error_hash['kind']).to eq('puppetlabs.tasks/connect-error')
     end
-
-    expect(notices.count).to eq(4)
-    result_notices = notices.select { |notice| notice[:type] == :node_result }.map { |notice| notice[:result] }
-    expect(results).to eq(Bolt::ResultSet.new(result_notices))
   end
 
   it "returns an exception result if the connect raises an unhandled error" do
-    expect(api).to receive(:get_connection).and_raise("reset")
+    expect(mock_client).to receive(:run_task).and_raise("reset")
 
     results = executor.run_command(targets, command)
     results.each do |result|
