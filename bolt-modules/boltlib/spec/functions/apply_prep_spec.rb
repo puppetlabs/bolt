@@ -59,7 +59,7 @@ describe 'apply_prep' do
 
       is_expected.to run.with_params(hostnames.join(',')).and_return(nil)
       targets.each do |target|
-        expect(inventory.features(target)).to include('puppet-agent')
+        expect(inventory.features(target)).to include('puppet-agent') unless target.transport == 'pcp'
         expect(inventory.facts(target)).to eq(fact)
       end
     end
@@ -78,7 +78,7 @@ describe 'apply_prep' do
 
       is_expected.to run.with_params(hostnames)
       targets.each do |target|
-        expect(inventory.features(target)).to include('puppet-agent')
+        expect(inventory.features(target)).to include('puppet-agent') unless target.transport == 'pcp'
         expect(inventory.facts(target)).to eq(fact)
       end
     end
@@ -157,7 +157,7 @@ describe 'apply_prep' do
 
       is_expected.to run.with_params(hostnames.join(',')).and_return(nil)
       targets.each do |target|
-        expect(inventory.features(target)).to include('puppet-agent')
+        expect(inventory.features(target)).to include('puppet-agent') unless target.transport == 'pcp'
         expect(inventory.facts(target)).to eq(fact)
       end
     end
