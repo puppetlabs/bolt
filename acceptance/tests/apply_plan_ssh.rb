@@ -94,7 +94,7 @@ test_name "bolt plan run should apply manifest block on remote hosts via ssh" do
   end
 
   step "puppet service should be stopped" do
-    service_command = "bolt task run service action=status name=puppet -n #{targets}"
+    service_command = "bolt plan run example_apply::puppet_status -n #{targets}"
     result = bolt_command_on(bolt, service_command, flags)
 
     assert_equal(0, result.exit_code,
@@ -110,7 +110,7 @@ test_name "bolt plan run should apply manifest block on remote hosts via ssh" do
     ssh_nodes.each do |node|
       # Verify that node succeeded
       host = node.hostname
-      result = json['items'].select { |n| n['node'] == host }
+      result = json.select { |n| n['node'] == host }
       assert_equal('success', result[0]['status'],
                    "The task did not succeed on #{host}")
 

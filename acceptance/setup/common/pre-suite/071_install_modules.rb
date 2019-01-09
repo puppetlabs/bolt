@@ -7,11 +7,11 @@ test_name "Install modules" do
 
   on(bolt, "mkdir -p #{default_boltdir}")
   create_remote_file(bolt, "#{default_boltdir}/Puppetfile", <<-PUPPETFILE)
-mod 'puppetlabs-facts', '0.2.0'
-mod 'puppetlabs-service', '0.3.1'
+mod 'puppetlabs-facts', '0.5.0'
+mod 'puppetlabs-service', '0.5.0'
 mod 'puppet_agent',
     git: 'https://github.com/puppetlabs/puppetlabs-puppet_agent',
-    ref: '319ce44a65e73bcf2712ad17be01f9636f0673c9'
+    ref: 'fb4092305740f7f9e04722bb4a076afe89ab3161'
 PUPPETFILE
 
   bolt_command_on(bolt, 'bolt puppetfile install')
