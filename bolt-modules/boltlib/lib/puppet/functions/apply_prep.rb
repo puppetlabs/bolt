@@ -63,18 +63,19 @@ Puppet::Functions.create_function(:apply_prep) do
           need_install, installed = versions.partition { |r| r['version'].nil? }
           installed.each do |r|
             Puppet.debug "Puppet Agent #{r['version']} installed on #{r.target.name}"
+            inventory.set_feature(r.target, 'puppet-agent')
           end
 
           unless need_install.empty?
             need_install_targets = need_install.map(&:target)
             run_task(executor, need_install_targets, 'puppet_agent::install')
-
+            # Service task works best when targets have puppet-agent feature
+            need_install_targets.each { |target| inventory.set_feature(target, 'puppet-agent') }
             # Ensure the Puppet service is stopped after new install
             run_task(executor, need_install_targets, 'service', 'action' => 'stop', 'name' => 'puppet')
             run_task(executor, need_install_targets, 'service', 'action' => 'disable', 'name' => 'puppet')
           end
         end
-        targets.each { |target| inventory.set_feature(target, 'puppet-agent') }
 
         # Gather facts, including custom facts
         plugins = applicator.build_plugin_tarball do |mod|
