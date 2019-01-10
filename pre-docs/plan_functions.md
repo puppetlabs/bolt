@@ -1,14 +1,7 @@
-# Plan execution functions
+# Bolt Functions
 
-Your plan can execute multiple functions on remote systems.
 
-Your plan can include functions to run commands, scripts, tasks, and other plans on remote nodes. These execution functions correspond to task runner commands.
-
-**Note:** All the $nodes arguments support the patterns supported by --nodes \(except for shell expansion\).
-
-## Bolt functions
-
-## add\_facts
+## add_facts
 
 Deep merges a hash of facts with the existing facts on a target.
 
@@ -28,7 +21,7 @@ add_facts($target, { 'os' => { 'family' => 'windows', 'name' => 'windows' } })
 ```
 
 
-## add\_to\_group
+## add_to_group
 
 Adds a target to specified inventory group.
 
@@ -60,7 +53,7 @@ add_to_group('foo,bar,baz', 'group1')
 ```
 
 
-## apply\_prep
+## apply_prep
 
 Installs the puppet-agent package on targets if needed then collects facts, including any custom
 facts found in Bolt's modulepath.
@@ -86,7 +79,7 @@ apply_prep('target1,target2')
 ```
 
 
-## ctrl::do\_until
+## ctrl::do_until
 
 Repeat the block until it returns a truthy value. Returns the value.
 
@@ -145,7 +138,7 @@ facts($target)
 ```
 
 
-## fail\_plan
+## fail_plan
 
 Raises a Bolt::PlanFailure exception to signal to callers that the plan failed.
 
@@ -230,13 +223,13 @@ file::write('C:/Users/me/report', $apply_result.first.report)
 ```
 
 
-## get\_resources
+## get_resources
 
 Query the state of resources on a list of targets using resource definitions in Bolt's modulepath.
 The results are returned as a list of hashes representing each resource.
 
-Requires the Puppet Agent be installed on the target, which can be accomplished with apply\_prep
-or by directly running the puppet\_agent::install task.
+Requires the Puppet Agent be installed on the target, which can be accomplished with apply_prep
+or by directly running the puppet_agent::install task.
 
 
 ```
@@ -254,7 +247,7 @@ get_resources('target1,target2', [Package, File[/etc/puppetlabs]])
 ```
 
 
-## get\_targets
+## get_targets
 
 Parses common ways of referring to targets and returns an array of Targets.
 
@@ -289,7 +282,7 @@ get_targets('localhost')
 ```
 
 
-## puppetdb\_fact
+## puppetdb_fact
 
 Collects facts based on a list of certnames.
 
@@ -311,7 +304,7 @@ puppetdb_fact(['app.example.com', 'db.example.com'])
 ```
 
 
-## puppetdb\_query
+## puppetdb_query
 
 Makes a query to {https://puppet.com/docs/puppetdb/latest/index.html puppetdb}
 using Bolt's PuppetDB client.
@@ -332,7 +325,7 @@ puppetdb_query('nodes[certname] {}')
 ```
 
 
-## run\_command
+## run_command
 
 Runs a command on the given set of targets and returns the result from each command execution.
 This function does nothing if the list of targets is empty.
@@ -374,7 +367,7 @@ run_command('hostname', $targets, 'Get hostname')
 ```
 
 
-## run\_plan
+## run_plan
 
 Runs the `plan` referenced by its name. A plan is autoloaded from `<moduleroot>/plans`.
 
@@ -394,7 +387,7 @@ run_plan('canary', 'command' => 'false', 'nodes' => $targets, '_catch_errors' =>
 ```
 
 
-## run\_script
+## run_script
 
 Uploads the given script to the given set of targets and returns the result of having each target execute the script.
 This function does nothing if the list of targets is empty.
@@ -444,7 +437,7 @@ run_script('/var/tmp/myscript', $targets, 'Downloading my application')
 ```
 
 
-## run\_task
+## run_task
 
 Runs a given instance of a `Task` on the given set of targets and returns the result from each.
 This function does nothing if the list of targets is empty.
@@ -501,7 +494,7 @@ run_task(String[1] $task_name, Boltlib::TargetSpec $targets, Optional[String] $d
 
 
 
-## set\_feature
+## set_feature
 
 Sets a particular feature to present on a target.
 
@@ -528,7 +521,7 @@ set_feature($target, 'puppet-agent', true)
 ```
 
 
-## set\_var
+## set_var
 
 Sets a variable { key => value } for a target.
 
@@ -568,7 +561,7 @@ system::env('USER')
 ```
 
 
-## upload\_file
+## upload_file
 
 Uploads the given file or directory to the given set of targets and returns the result from each upload.
 This function does nothing if the list of targets is empty.
@@ -641,7 +634,7 @@ $target.vars
 ```
 
 
-## wait\_until\_available
+## wait_until_available
 
 Wait until all targets accept connections.
 
@@ -653,7 +646,7 @@ wait_until_available(Boltlib::TargetSpec $targets, Optional[Hash[String[1], Any]
 *Returns:* `ResultSet` A list of results, one entry per target. Successful results have no value.
 
 * **targets** `Boltlib::TargetSpec` A pattern identifying zero or more targets. See [`get_targets`](#get_targets) for accepted patterns.
-* **options** `Optional[Hash[String[1], Any]]` Additional options: 'description', 'wait\_time', 'retry\_interval', '\_catch\_errors'.
+* **options** `Optional[Hash[String[1], Any]]` Additional options: 'description', 'wait_time', 'retry_interval', '_catch_errors'.
 
 **Example:** Wait for targets
 ```
@@ -661,7 +654,7 @@ wait_until_available($targets, wait_time => 300)
 ```
 
 
-## without\_default\_logging
+## without_default_logging
 
 Define a block where default logging is suppressed.
 
@@ -687,3 +680,5 @@ without_default_logging() || {
   }
 }
 ```
+
+

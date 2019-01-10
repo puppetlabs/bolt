@@ -108,7 +108,7 @@ task :docs do
     func
   end
   renderer = ERB.new(File.read('pre-docs/reference.md.erb'), nil, '-')
-  File.write('REFERENCE.md', renderer.result)
+  File.write('pre-docs/plan_functions.md', renderer.result)
 end
 
 namespace :integration do
