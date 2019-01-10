@@ -36,7 +36,7 @@ module Bolt
           end
 
           begin
-            config = JSON.parse(File.read(filepath))
+            config = JSON.parse(File.read(filepath)) if filepath
           rescue StandardError => e
             Logging.logger[self].error("Could not load puppetdb.conf from #{filepath}: #{e.message}")
           end
