@@ -727,6 +727,31 @@ describe Bolt::Inventory::Group do
       it { expect { group }.to raise_error(/Invalid alias not a valid alias/) }
     end
 
+    context 'validating alias names' do
+      let(:data) do
+        {
+          'name' => 'root',
+          'nodes' => [
+            { 'name' => 'node1', 'alias' => @alias }
+          ]
+        }
+      end
+
+      %w[alias1 _alias1 1alias 1_alias_ alias-1 a 1].each do |alias_name|
+        it "accepts '#{alias_name}'" do
+          @alias = alias_name
+          expect(group.node_aliases).to eq(alias_name => 'node1')
+        end
+      end
+
+      %w[-alias1 alias/1 alias.1 - Alias1 ALIAS_1].each do |alias_name|
+        it "rejects '#{alias_name}'" do
+          @alias = alias_name
+          expect { group }.to raise_error(/Invalid alias/)
+        end
+      end
+    end
+
     context 'conflicting alias' do
       let(:data) do
         {
