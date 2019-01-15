@@ -50,10 +50,8 @@ module Bolt
 
         begin
           response = http_client.post(url, body: body, header: headers)
-        rescue SocketError, OpenSSL::SSL::SSLError, SystemCallError, Net::ProtocolError, IOError => err
-          raise Bolt::PuppetDBFailoverError, "Failed to query PuppetDB: #{err}"
         rescue StandardError => err
-          raise Bolt::PuppetDBError, "Failed to query PuppetDB: #{err}"
+          raise Bolt::PuppetDBFailoverError, "Failed to query PuppetDB: #{err}"
         end
 
         if response.code != 200

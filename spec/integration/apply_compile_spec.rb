@@ -159,7 +159,7 @@ describe "passes parsed AST to the apply_catalog task" do
           error = result['details']['result_set'][0]['result']['_error']
           expect(error['kind']).to eq('bolt/apply-error')
           expect(error['msg']).to match(/Apply failed to compile for #{uri}/)
-          expect(@log_output.readlines).to include(/Failed to query PuppetDB: /)
+          expect(@log_output.readlines).to include(/Failed to connect to all PuppetDB server_urls/)
         end
       end
 
@@ -170,7 +170,7 @@ describe "passes parsed AST to the apply_catalog task" do
           error = result['details']['result_set'][0]['result']['_error']
           expect(error['kind']).to eq('bolt/apply-error')
           expect(error['msg']).to match(/Apply failed to compile for #{uri}/)
-          expect(@log_output.readlines).to include(/Failed to query PuppetDB: /)
+          expect(@log_output.readlines).to include(/Failed to connect to all PuppetDB server_urls/)
         end
       end
     end
