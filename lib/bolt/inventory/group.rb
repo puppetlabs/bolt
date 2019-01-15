@@ -8,7 +8,7 @@ module Bolt
       attr_accessor :name, :nodes, :aliases, :name_or_alias, :groups, :config, :rest, :facts, :vars, :features
 
       # Regex used to validate group names and target aliases.
-      NAME_REGEX = /\A[a-z0-9_]+\Z/.freeze
+      NAME_REGEX = /\A[a-z0-9_][a-z0-9_-]*\Z/.freeze
 
       def initialize(data)
         @logger = Logging.logger[self]
