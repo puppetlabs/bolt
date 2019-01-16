@@ -9,7 +9,7 @@ mod 'puppetlabs-service', '0.5.0'
 mod 'puppetlabs-facts', '0.5.0'
 mod 'puppet_agent',
     git: 'https://github.com/puppetlabs/puppetlabs-puppet_agent',
-    ref: 'fb4092305740f7f9e04722bb4a076afe89ab3161'
+    ref: '4194511678422231e67c50793440bb37e5e747fc'
 
 # Core types and providers for Puppet 6
 mod 'puppetlabs-augeas_core', '1.0.3'
