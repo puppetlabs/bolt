@@ -4,14 +4,21 @@
 Puppet::Functions.create_function(:'ctrl::do_until') do
   # @example Run a task until it succeeds
   #   ctrl::do_until() || {
-  #     run_task('test', $target, _catch_errors => true).ok?
+  #     run_task('test', $target, _catch_errors => true).ok()
   #   }
   dispatch :do_until do
+    optional_param 'Integer', :limit
     block_param
   end
 
-  def do_until
-    until (x = yield); end
-    x
+  def do_until(limit)
+    i=0
+    limit ||= 0
+    until (x = yield)
+     i = i+1
+     next if limit==0
+     break if i >= limit
+    end
+    return x
   end
 end

@@ -85,7 +85,7 @@ Repeat the block until it returns a truthy value. Returns the value.
 
 
 ```
-ctrl::do_until(Callable &$block)
+ctrl::do_until(Integer limit, Callable &$block)
 ```
 
 *Returns:* `Any` 
@@ -94,8 +94,8 @@ ctrl::do_until(Callable &$block)
 
 **Example:** Run a task until it succeeds
 ```
-ctrl::do_until() || {
-  run_task('test', $target, _catch_errors => true).ok?
+ctrl::do_until(10) || {
+  run_task('test', $target, _catch_errors => true).ok()
 }
 ```
 
