@@ -3,7 +3,7 @@
 # Repeat the block until it returns a truthy value. Returns the value.
 Puppet::Functions.create_function(:'ctrl::do_until') do
   # @example Run a task until it succeeds
-  #   ctrl::do_until() || {
+  #   ctrl::do_until(10) || {
   #     run_task('test', $target, _catch_errors => true).ok()
   #   }
   dispatch :do_until do
