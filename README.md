@@ -4,6 +4,13 @@
 [![Appveyor Status](https://ci.appveyor.com/api/projects/status/m7dhiwxk455mkw2d/branch/master?svg=true)](https://ci.appveyor.com/project/puppetlabs/bolt/branch/master)
 [![Gem Version](https://badge.fury.io/rb/bolt.svg)](https://badge.fury.io/rb/bolt)
 
+<div name="logo">
+  <img src="resources/bolt-logo-dark.png"
+  style="display: block; margin-left: auto; margin-right: auto;"
+  width="50%"
+  alt="bolt logo">
+</div>
+
 Bolt is a Ruby command-line tool for executing commands, scripts, and tasks on remote systems using SSH and WinRM.
 
 * Executes commands on remote *nix and Windows systems.
