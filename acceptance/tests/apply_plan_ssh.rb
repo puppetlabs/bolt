@@ -7,10 +7,10 @@ test_name "bolt plan run should apply manifest block on remote hosts via ssh" do
   extend Acceptance::BoltCommandHelper
 
   ssh_nodes = select_hosts(roles: ['ssh'])
-  osx11 = select_hosts(platform: [/osx-10.11/])
+  skip_targets = select_hosts(platform: [/osx-10.11/, /osx-10.14/])
   targets = "ssh_nodes"
-  if osx11.any?
-    ssh_nodes -= osx11
+  if skip_targets.any?
+    ssh_nodes -= skip_targets
     targets = ssh_nodes.each_with_object([]) { |node, acc| acc.push(node[:vmhostname]) }.join(",")
   end
 
