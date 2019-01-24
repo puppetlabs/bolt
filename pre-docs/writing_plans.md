@@ -69,10 +69,10 @@ plan mymodule::my_plan(
 }
 ```
 
-To execute this plan from the command line, pass the parameters as `parameter=value`. The `Targetspec` will accept either an array as json or a comma separated string of target names.
+To execute this plan from the command line, pass the parameters as `parameter=value`, where complex values like arrays must be encoded as JSON. The `Targetspec` will accept either an array as json or a comma separated string of target names.
 
 ```
-bolt plan run mymodule::myplan --modulepath ./PATH/TO/MODULES --params load_balancer=lb.myorg.com frontends='["kermit.myorg.com","gonzo.myorg.com"]' backends=waldorf.myorg.com,statler.myorg.com
+bolt plan run mymodule::myplan --modulepath ./PATH/TO/MODULES load_balancer=lb.myorg.com frontends='["kermit.myorg.com","gonzo.myorg.com"]' backends=waldorf.myorg.com,statler.myorg.com
 
 ```
 
