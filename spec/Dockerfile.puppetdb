@@ -1,4 +1,4 @@
-FROM puppet/puppetdb
+FROM puppet/puppetdb:6.0.1
 
 ARG hostname="bolt-puppetdb"
 
