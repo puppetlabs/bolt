@@ -172,6 +172,7 @@ module Bolt
         Puppet.settings.send(:clear_everything_for_tests)
         Puppet.initialize_settings(cli)
         Puppet::GettextConfig.create_default_text_domain
+        Puppet.settings[:hiera_config] = @hiera_config
         self.class.configure_logging
         yield
       end
