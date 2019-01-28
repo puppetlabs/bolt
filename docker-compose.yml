@@ -1,9 +1,17 @@
 version: "3"
 services:
   boltserver:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.boltserver
     ports:
       - "62658:62658"
+  planexecutor:
+    build:
+      context: .
+      dockerfile: Dockerfile.planexecutor
+    ports:
+      - "62659:62659"
 networks:
   default:
     external:

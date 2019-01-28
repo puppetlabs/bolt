@@ -203,12 +203,12 @@ If successful, this will return
 {"status": "running"}
 ```
 
-## Running Bolt Server in a container
+## Running Bolt Server and Plan Executor in a container
 *Recommended*
 
 From your checkout of bolt start the spec docker-compose to run
 puppet-server and some targets then run the top level compose to start
-bolt-server connected to that network.
+bolt-server and plan-executor connected to that network.
 
 ```
 docker-compose -f spec/docker-compose.yml up -d --build
@@ -221,6 +221,7 @@ export BOLT_CACERT=spec/fixtures/ssl/ca.pem
 export BOLT_CERT=spec/fixtures/ssl/cert.pem
 export BOLT_KEY=spec/fixtures/ssl/key.pem
 export BOLT_ROOT=https://localhost:62658
+# For plan executor, use export BOLT_ROOT=https://localhost:62659
 ```
 
 You can now make a curl request to bolt which should have an empty response
@@ -233,7 +234,9 @@ curl -v --cacert $BOLT_CACERT --cert $BOLT_CERT --key $BOLT_KEY $BOLT_ROOT
 From your checkout of bolt run
 
 ```
-BOLT_SERVER_CONF=config/local.conf bundle exec puma -C puppet_config.rb
+BOLT_SERVER_CONF=config/local.conf bundle exec puma -C config/transport_service_config.rb
+# or
+PLAN_EXECUTOR_CONF=config/local.conf bundle exec puma -C config/plan_executor_config.rb
 ```
 
 Setup your environment for running commands with
@@ -242,6 +245,7 @@ export BOLT_CACERT=spec/fixtures/ssl/ca.pem
 export BOLT_CERT=spec/fixtures/ssl/cert.pem
 export BOLT_KEY=spec/fixtures/ssl/key.pem
 export BOLT_ROOT=https://localhost:62658
+# For plan executor, use export BOLT_ROOT=https://localhost:62659
 ```
 
 You can now make a curl request to bolt which should have an empty response
@@ -283,7 +287,9 @@ bundle exec scripts/server_client.rb sample::echo ssh://bolt:bolt@172.20.0.1:200
 
 ### With cURL
 
-The following is an example request body. There are other request examples in the `developer-docs/examples` directory. Note that all tasks in the `bolt/spec/fixtures/modules` are available from the puppetserver container, so a json request can be constructed using those tasks and the json structure below.
+#### Bolt Server
+
+The following is an example request body for bolt server. There are other request examples in the `developer-docs/examples` directory. Note that all tasks in the `bolt/spec/fixtures/modules` are available from the puppetserver container, so a json request can be constructed using those tasks and the json structure below.
 
 ```
 {"task":{
@@ -318,3 +324,29 @@ expected output
 "status":"success",
 "result":{"_output":"ac80223bd3b4 got passed the message: hey\n"}}
 ```
+
+#### Plan Executor
+
+The following is an example request body for the plan executor. There are other request examples in the `developer-docs/examples` directory. Note that all tasks in the `bolt/spec/fixtures/modules` are available from the puppetserver container, so a json request can be constructed using those tasks and the json structure below.
+
+```
+{
+  "plan_name" : "sample",
+  "environment": "production",
+  "job_id": "123842",
+  "description" : "Run a sample plan",
+  "params" : {}
+}
+```
+**Verify that the target information** is correct, and change it if you want to use a different target. You can find other example requests in the `examples` directory.
+
+You should then be able to post it with:
+```
+curl -X POST -H "Content-Type: application/json" -d @developer-docs/examples/sample-plan.json --cacert $BOLT_CACERT --cert $BOLT_CERT --key $BOLT_KEY $BOLT_ROOT/plan/run
+```
+expected output
+```
+{"status":"running"}
+```
+
+

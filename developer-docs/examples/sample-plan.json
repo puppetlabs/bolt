@@ -1,0 +1,7 @@
+{
+  "plan_name" : "sample",
+  "environment": "production",
+  "job_id": "123842",
+  "description" : "Run a sample plan",
+  "params" : {}
+}

@@ -31,6 +31,6 @@ COPY --from=build /bolt-server /bolt-server
 WORKDIR /bolt-server
 
 EXPOSE 62658
-ENV BOLT_SERVER_CONF /bolt-server/config/docker.conf
+ENV BOLT_SERVER_CONF /bolt-server/config/bolt_server_docker.conf
 
 ENTRYPOINT bundle exec puma -C /bolt-server/config/transport_service_config.rb
