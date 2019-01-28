@@ -473,7 +473,7 @@ describe Bolt::Transport::Orch, orchestrator: true do
 
       {
         task: 'bolt_shim::script',
-        params: { 'content' => content, 'arguments' => args }
+        params: { 'content' => content, 'arguments' => args, 'name' => 'success.sh' }
       }
     }
 
