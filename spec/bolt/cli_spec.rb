@@ -901,6 +901,7 @@ bar
       context "when showing available tasks", :reset_puppet_settings do
         before :each do
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
+          cli.config.format = 'json'
         end
 
         it "lists tasks with description" do
@@ -909,7 +910,7 @@ bar
             action: 'show'
           }
           cli.execute(options)
-          tasks = JSON.parse(output.string)
+          tasks = JSON.parse(output.string)['tasks']
           [
             ['sample', nil],
             ['sample::echo', nil],
@@ -925,13 +926,23 @@ bar
           end
         end
 
+        it "lists modulepath" do
+          options = {
+            subcommand: 'task',
+            action: 'show'
+          }
+          cli.execute(options)
+          modulepath = JSON.parse(output.string)['modulepath']
+          expect(modulepath).to include(File.join(__FILE__, '../../fixtures/modules').to_s)
+        end
+
         it "does not list a private task" do
           options = {
             subcommand: 'task',
             action: 'show'
           }
           cli.execute(options)
-          tasks = JSON.parse(output.string)
+          tasks = JSON.parse(output.string)['tasks']
           expect(tasks).not_to include(['sample::private', 'Do not list this task'])
         end
 
@@ -1009,6 +1020,7 @@ bar
       context "when available tasks include an error", :reset_puppet_settings do
         before :each do
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/invalid_mods')]
+          cli.config.format = 'json'
         end
 
         it "task show prints a warning but shows other valid tasks" do
@@ -1017,7 +1029,7 @@ bar
             action: 'show'
           }
           cli.execute(options)
-          json = JSON.parse(output.string)
+          json = JSON.parse(output.string)['tasks']
           tasks = [
             ["package", "Manage and inspect the state of packages"],
             ["service", "Manage and inspect the state of services"]
@@ -1053,6 +1065,7 @@ bar
       context "when showing available plans", :reset_puppet_settings do
         before :each do
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
+          cli.config.format = 'json'
         end
 
         it "lists plans" do
@@ -1061,7 +1074,7 @@ bar
             action: 'show'
           }
           cli.execute(options)
-          plan_list = JSON.parse(output.string)
+          plan_list = JSON.parse(output.string)['plans']
           [
             ['sample'],
             ['sample::single_task'],
@@ -1070,6 +1083,16 @@ bar
           ].each do |plan|
             expect(plan_list).to include(plan)
           end
+        end
+
+        it "lists modulepath" do
+          options = {
+            subcommand: 'plan',
+            action: 'show'
+          }
+          cli.execute(options)
+          modulepath = JSON.parse(output.string)['modulepath']
+          expect(modulepath).to include(File.join(__FILE__, '../../fixtures/modules').to_s)
         end
 
         it "shows an individual plan data" do
@@ -1103,6 +1126,7 @@ bar
       context "when available plans include an error", :reset_puppet_settings do
         before :each do
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/invalid_mods')]
+          cli.config.format = 'json'
         end
 
         it "plan show prints a warning but shows other valid plans" do
@@ -1112,7 +1136,7 @@ bar
           }
 
           cli.execute(options)
-          json = JSON.parse(output.string)
+          json = JSON.parse(output.string)['plans']
           expect(json).to include(["aggregate::count"],
                                   ["aggregate::nodes"],
                                   ["canary"],
