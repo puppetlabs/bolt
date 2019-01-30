@@ -573,7 +573,8 @@ describe Bolt::Inventory do
           'extensions' => ".py",
           'password' => 'youwinrm',
           'port' => '12345winrm',
-          'user' => 'mewinrm'
+          'user' => 'mewinrm',
+          'file-protocol' => 'winrm'
         )
       end
 

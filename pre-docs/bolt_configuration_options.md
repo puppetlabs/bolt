@@ -85,6 +85,10 @@ interpreters:
 
 `password`: Login password. Required.
 
+`file-protocol`: Which file transfer protocol to use. Either `winrm` or `smb`. Using `smb` is recommended for large file transfers. Default is `winrm`.
+
+*The smb file-protocol is experimental and is currently unsupported in conjunction with SSL given only SMB2 is currently implemented*
+
 ## PCP transport configuration options
 
 `service-url`: The URL of the orchestrator API.

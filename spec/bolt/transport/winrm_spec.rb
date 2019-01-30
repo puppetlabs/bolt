@@ -153,6 +153,7 @@ PS
       expect(winrm.run_command(target, command)['stdout']).to eq("#{user}\r\n")
     end
 
+    # refactor into other file upload tests when SMB gem adds SMB v3 support
     it "can upload a file to a host" do
       contents = "kadejtw89894"
       remote_path = 'C:\Windows\Temp\upload-test-winrm-ssl'
@@ -229,22 +230,34 @@ PS
       expect(outputs2).to eq(outs)
     end
 
-    it "can upload a file to a host", winrm: true do
-      contents = "934jklnvf"
-      remote_path = 'C:\Windows\Temp\upload-test-winrm'
-      with_tempfile_containing('upload-test-winrm', contents, '.ps1') do |file|
-        expect(
-          winrm.upload(target, file.path, remote_path).value
-        ).to eq(
-          '_output' => "Uploaded '#{file.path}' to '#{target.host}:#{remote_path}'"
-        )
+    %w[winrm smb].each do |protocol|
+      it "can upload a file to a host using #{protocol}", winrm: true do
+        conf = mk_config(ssl: false, user: user, password: password, 'file-protocol': protocol)
+        target = make_target(conf: conf)
+        contents = SecureRandom.uuid
+        remote_path = "C:\\Windows\\Temp\\upload-test-#{protocol}"
+        with_tempfile_containing("upload-test-winrm-#{protocol}", contents, '.ps1') do |file|
+          expect(
+            winrm.upload(target, file.path, remote_path).value
+          ).to eq(
+            '_output' => "Uploaded '#{file.path}' to '#{target.host}:#{remote_path}'"
+          )
 
-        expect(
-          winrm.run_command(target, "type #{remote_path}")['stdout']
-        ).to eq("#{contents}\r\n")
+          expect(
+            winrm.run_command(target, "type #{remote_path}")['stdout']
+          ).to eq("#{contents}\r\n")
 
-        winrm.run_command(target, "del #{remote_path}")
+          winrm.run_command(target, "del #{remote_path}")
+        end
       end
+    end
+
+    # when ruby_smb gem adds SMB v3 support, this will pass
+    # test should be refactored to supply an SSL flag for winrm + smb and remove other SSL test
+    it "will fail to upload a file with SMB with a host that requires SSL", winrm: true do
+      expect {
+        mk_config(ssl: true, user: user, password: password, 'file-protocol': 'smb')
+      }.to raise_error(Bolt::ValidationError)
     end
 
     it "catches winrm-fs upload error", winrm: true do
