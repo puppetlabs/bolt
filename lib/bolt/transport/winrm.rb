@@ -8,7 +8,7 @@ module Bolt
   module Transport
     class WinRM < Base
       def self.options
-        %w[port user password connect-timeout ssl ssl-verify tmpdir cacert extensions]
+        %w[port user password connect-timeout ssl ssl-verify tmpdir cacert extensions file-protocol]
       end
 
       def provided_features

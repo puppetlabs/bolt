@@ -48,7 +48,8 @@ module Bolt
       winrm: {
         'connect-timeout' => 10,
         'ssl' => true,
-        'ssl-verify' => true
+        'ssl-verify' => true,
+        'file-protocol' => 'winrm'
       },
       pcp: {
         'task-environment' => 'production'

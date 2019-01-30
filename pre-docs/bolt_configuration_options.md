@@ -72,6 +72,8 @@ ssh:
 
 `password`: Login password. Required.
 
+`file-protocol`: Which file transfer protocol to use. Either `winrm` or `smb`. Using `smb` is recommended for large file transfers. Default is `winrm`.
+
 ## PCP transport configuration options
 
 `service-url`: The URL of the orchestrator API.
