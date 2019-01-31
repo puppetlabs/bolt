@@ -53,6 +53,10 @@ module Bolt
         @stream.puts task.to_json
       end
 
+      def print_tasks(tasks, modulepath)
+        print_table('tasks' => tasks, 'modulepath' => modulepath)
+      end
+
       def print_plan_info(plan)
         path = plan.delete('module')
         plan['module_dir'] = if path.start_with?(Bolt::PAL::MODULES_PATH)
@@ -61,6 +65,10 @@ module Bolt
                                path
                              end
         @stream.puts plan.to_json
+      end
+
+      def print_plans(plans, modulepath)
+        print_table('plans' => plans, 'modulepath' => modulepath)
       end
 
       def print_apply_result(apply_result)

@@ -343,9 +343,7 @@ module Bolt
     end
 
     def list_tasks
-      outputter.print_table(pal.list_tasks)
-      outputter.print_message("\nUse `bolt task show <task-name>` to view "\
-                              "details and parameters for a specific task.")
+      outputter.print_tasks(pal.list_tasks, pal.list_modulepath)
     end
 
     def show_plan(plan_name)
@@ -353,9 +351,7 @@ module Bolt
     end
 
     def list_plans
-      outputter.print_table(pal.list_plans)
-      outputter.print_message("\nUse `bolt plan show <plan-name>` to view "\
-                              "details and parameters for a specific plan.")
+      outputter.print_plans(pal.list_plans, pal.list_modulepath)
     end
 
     def run_plan(plan_name, plan_arguments, nodes, options)

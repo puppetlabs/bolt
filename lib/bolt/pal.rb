@@ -197,6 +197,10 @@ module Bolt
       end
     end
 
+    def list_modulepath
+      @modulepath - [BOLTLIB_PATH, MODULES_PATH]
+    end
+
     def parse_params(type, object_name, params)
       in_bolt_compiler do |compiler|
         if type == 'task'

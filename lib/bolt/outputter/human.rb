@@ -115,6 +115,13 @@ module Bolt
         )
       end
 
+      def print_tasks(tasks, modulepath)
+        print_table(tasks)
+        print_message("\nMODULEPATH:\n#{modulepath.join(':')}\n"\
+                        "\nUse `bolt task show <task-name>` to view "\
+                        "details and parameters for a specific task.")
+      end
+
       # @param [Hash] task A hash representing the task
       def print_task_info(task)
         # Building lots of strings...
@@ -175,6 +182,13 @@ module Bolt
                        path
                      end
         @stream.puts(plan_info)
+      end
+
+      def print_plans(plans, modulepath)
+        print_table(plans)
+        print_message("\nMODULEPATH:\n#{modulepath.join(':')}\n"\
+                        "\nUse `bolt plan show <plan-name>` to view "\
+                        "details and parameters for a specific plan.")
       end
 
       # @param [Bolt::ResultSet] apply_result A ResultSet object representing the result of a `bolt apply`
