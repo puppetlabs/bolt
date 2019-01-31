@@ -61,6 +61,7 @@ describe PlanExecutor::Config do
     expect(config['ssl-cipher-suites']).to include('ECDHE-ECDSA-AES256-GCM-SHA384')
     expect(config['modulepath']).to eq('spec/fixtures/modules')
     expect(config['workers']).to eq(1)
+    expect(config['orchestrator-url']).to eq('abcde.puppet.com')
   end
 
   it "reads ssl keys from config" do

@@ -27,6 +27,7 @@ Most options are shared by the bolt server and plan executor applications
 
 **Plan Executor Only Options**
 - `modulepath`: String, *required* - The path to modules to read plans from
+- `orchestrator-url`: String, *required* - The hostname of the orchestrator service
 - `workers`: Integer, *optional* - The number of worker processes to create (default `1`).
 
 **Environmnet Variable Options**
