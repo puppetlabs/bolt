@@ -50,19 +50,39 @@
         "properties": {
           "uri": {
             "type": "object",
-            "description": "Where is the file"
+            "description": "Information on how to request the file contents",
+            "properties": {
+              "path": {
+                "description": "Relative URI for accessing task contents",
+                "type": "string"
+              },
+              "params": {
+                "description": "Map of query params when requesting task content",
+                "type": "object",
+                "properties": {
+                  "environment": {
+                    "description": "Environment the task is in",
+                    "type": "string"
+                  }
+                },
+                "required": ["environment"],
+                "additionalProperties": true
+              }
+            },
+            "required": ["path", "params"],
+            "additionalProperties": true
           },
           "sha256": {
             "type": "string",
-            "description": "checksum of file"
+            "description": "Checksum of file"
           },
           "filename": {
             "type": "string",
-            "description": "Name of file"
+            "description": "Name of file including extension"
           },
           "size": {
             "type": "number",
-            "description": "Size of file"
+            "description": "Size of file in bytes"
           }
         }
       },
