@@ -28,10 +28,7 @@ module PlanExecutor
     end
 
     def initialize(config)
-      conn_opts = { 'service-url' => config['orchestrator-url'],
-                    'cacert' => config['ssl-ca-cert'],
-                    'User-Agent' => "Bolt/#{Bolt::VERSION}" }
-      @client = OrchestratorClient.new(conn_opts, false)
+      @http_client = create_http(config)
 
       # Use an empty inventory until we figure out where this data comes from.
       @inventory = Bolt::Inventory.new(nil)
@@ -47,6 +44,15 @@ module PlanExecutor
       @modulepath = config['modulepath']
 
       super(nil)
+    end
+
+    def create_http(config)
+      base_url = config['orchestrator-url'].chomp('/') + '/orchestrator/v1/'
+      agent_name = "Bolt/#{Bolt::VERSION}"
+      http = JSONClient.new(base_url: base_url, agent_name: agent_name)
+      http.ssl_config.set_client_cert_file(config['ssl-cert'], config['ssl-key'])
+      http.ssl_config.add_trust_ca(config['ssl-ca-cert'])
+      http
     end
 
     def validate_schema(schema, body)
@@ -87,7 +93,7 @@ module PlanExecutor
       # Errors if plan is not found
       @pal.get_plan_info(name)
 
-      executor = PlanExecutor::Executor.new(body['job_id'], @client)
+      executor = PlanExecutor::Executor.new(body['job_id'], @http_client)
       applicator = PlanExecutor::Applicator.new(@inventory, executor, nil)
       params = body['params']
       # This provides a wait function, which promise doesn't

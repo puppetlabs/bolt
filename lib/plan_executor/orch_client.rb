@@ -1,30 +1,31 @@
 # frozen_string_literal: true
 
+require 'jsonclient'
+
 module PlanExecutor
   class OrchClient
-    attr_reader :plan_job, :client
+    attr_reader :plan_job, :http
 
     BOLT_COMMAND_TASK = Struct.new(:name).new('bolt_shim::command').freeze
     BOLT_SCRIPT_TASK = Struct.new(:name).new('bolt_shim::script').freeze
     BOLT_UPLOAD_TASK = Struct.new(:name).new('bolt_shim::upload').freeze
 
-    def initialize(plan_job, client, logger)
+    def initialize(plan_job, http_client, logger)
       @plan_job = plan_job
-      @client = client
       @logger = logger
-      @client_url = client.config['service-url']
-      logger.debug("Creating orchestrator client for #{@client_url}")
+      @http = http_client
       @environment = 'production'
     end
 
     def finish_plan(plan_result)
-      result = @client.command.plan_finish(
+      body = {
         plan_job: @plan_job,
         result: plan_result.value || '',
         status: plan_result.status
-      )
+      }
+      post_command('internal/plan_finish', body)
     rescue StandardError => e
-      @logger.debug("Failed to finish plan on #{@client_url}: #{e.message}\nResult: #{result.to_json}")
+      @logger.error("Failed to finish plan #{plan_job}: #{e.message}")
     end
 
     def run_task_job(targets, task, arguments, options)
@@ -43,6 +44,22 @@ module PlanExecutor
       end
     end
 
+    def get(url)
+      response = @http.get(url)
+      if response.status != 200
+        raise Bolt::Error.new(response.body['msg'], response.body['kind'], response.body['details'])
+      end
+      response.body
+    end
+
+    def post_command(url, body)
+      response = @http.post(url, body)
+      if response.status != 202
+        raise Bolt::Error.new(response.body['msg'], response.body['kind'], response.body['details'])
+      end
+      response.body
+    end
+
     def send_request(targets, task, arguments, options = {})
       description = options['_description']
       body = { task: task.name,
@@ -55,7 +72,15 @@ module PlanExecutor
       body[:description] = description if description
       body[:plan_job] = @plan_job if @plan_job
 
-      @client.run_task(body)
+      url = post_command('internal/plan_task', body).dig('job', 'id')
+
+      job = get(url)
+      until %w[stopped finished failed].include?(job['state'])
+        sleep 1
+        job = get(url)
+      end
+
+      get(job.dig('nodes', 'id'))['items']
     end
 
     def process_run_results(targets, results)
@@ -204,8 +229,8 @@ module PlanExecutor
     end
 
     def connected?(targets)
-      nodes = @client.post('inventory', nodes: targets.map(&:host))
-      nodes['items'].all? { |node| node['connected'] }
+      response = @http.post('inventory', nodes: targets.map(&:host))
+      response.body['items'].all? { |node| node['connected'] }
     end
   end
 end

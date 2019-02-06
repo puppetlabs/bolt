@@ -3,6 +3,7 @@
 require 'spec_helper'
 require 'bolt_spec/conn'
 require 'plan_executor/app'
+require 'plan_executor/config'
 require 'json'
 require 'rack/test'
 
@@ -24,9 +25,12 @@ describe "PlanExecutor::App" do
 
   def app
     moduledir = File.join(__dir__, '..', 'fixtures', 'plan_executor')
+    ssldir = File.join(__dir__, '..', 'fixtures', 'ssl')
     config = PlanExecutor::Config.new('modulepath' => moduledir,
                                       'orchestrator-url' => 'abcde.com',
-                                      'ssl-ca-cert' => '/path/to/cert')
+                                      'ssl-cert' => File.join(ssldir, 'cert.pem'),
+                                      'ssl-key' => File.join(ssldir, 'key.pem'),
+                                      'ssl-ca-cert' => File.join(ssldir, 'ca.pem'))
     PlanExecutor::App.new(config)
   end
 
