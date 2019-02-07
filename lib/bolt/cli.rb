@@ -30,7 +30,7 @@ module Bolt
                  'task' => %w[show run],
                  'plan' => %w[show run],
                  'file' => %w[upload],
-                 'puppetfile' => %w[install],
+                 'puppetfile' => %w[install show-modules],
                  'apply' => %w[] }.freeze
 
     attr_reader :config, :options
@@ -259,6 +259,9 @@ module Bolt
           end
         end
         return 0
+      elsif options[:action] == 'show-modules'
+        list_modules
+        return 0
       end
 
       message = 'There may be processes left executing on some nodes.'
@@ -398,6 +401,10 @@ module Bolt
       outputter.print_apply_result(results)
 
       results.ok ? 0 : 1
+    end
+
+    def list_modules
+      outputter.print_module_list(pal.list_modules)
     end
 
     def install_puppetfile(puppetfile, modulepath)

@@ -32,6 +32,7 @@ Available subcommands:
   bolt plan run <plan> [params]    Run a Puppet task plan
   bolt apply <manifest>            Apply Puppet manifest code
   bolt puppetfile install          Install modules from a Puppetfile into a Boltdir
+  bolt puppetfile show-modules     List modules available to Bolt
 
 Run `bolt <subcommand> --help` to view specific examples.
 
@@ -101,6 +102,7 @@ Usage: bolt puppetfile <action> [options]
 
 Available actions are:
   install                          Install modules from a Puppetfile into a Boltdir
+  show-modules                     List modules available to Bolt
 
 Install modules into the local Boltdir
   bolt puppetfile install

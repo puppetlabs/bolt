@@ -284,6 +284,26 @@ module Bolt
       plan_info
     end
 
+    # Returns a mapping of all modules available to the Bolt compiler
+    #
+    # @return [Hash{String => Array<Hash{Symbol => String,nil}>}] A hash that
+    #   associates each directory on the module path with an array containing
+    #   a hash of information for each module in that directory. Currently,
+    #   the name and version of each module is returned.
+    def list_modules
+      in_bolt_compiler do
+        # NOTE: Can replace map+to_h with transform_values when Ruby 2.4
+        #       is the minimum supported version.
+        Puppet.lookup(:current_environment).modules_by_path.map do |path, modules|
+          values = modules.map do |mod|
+            { name: (mod.forge_name || mod.name), version: mod.version }
+          end
+
+          [path, values]
+        end.to_h
+      end
+    end
+
     def run_task(task_name, targets, params, executor, inventory, description = nil, &eventblock)
       in_task_compiler(executor, inventory) do |compiler|
         params = params.merge('_bolt_api_call' => true)
