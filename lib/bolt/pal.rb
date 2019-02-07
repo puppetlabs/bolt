@@ -286,17 +286,27 @@ module Bolt
 
     # Returns a mapping of all modules available to the Bolt compiler
     #
-    # @return [Hash{String => Array<Hash{Symbol => String,nil}>}] A hash that
-    #   associates each directory on the module path with an array containing
-    #   a hash of information for each module in that directory. Currently,
-    #   the name and version of each module is returned.
+    # @return [Hash{String => Array<Hash{Symbol => String,nil}>}]
+    #   A hash that associates each directory on the module path with an array
+    #   containing a hash of information for each module in that directory.
+    #   The information hash provides the name, version, and a string
+    #   indicating whether the module belongs to an internal module group.
     def list_modules
+      internal_module_groups = { BOLTLIB_PATH => 'Plan Language Modules',
+                                 MODULES_PATH => 'Packaged Modules' }
+
       in_bolt_compiler do
         # NOTE: Can replace map+to_h with transform_values when Ruby 2.4
         #       is the minimum supported version.
         Puppet.lookup(:current_environment).modules_by_path.map do |path, modules|
+          module_group = internal_module_groups[path]
+
           values = modules.map do |mod|
-            { name: (mod.forge_name || mod.name), version: mod.version }
+            mod_info = { name: (mod.forge_name || mod.name),
+                         version: mod.version }
+            mod_info[:internal_module_group] = module_group unless module_group.nil?
+
+            mod_info
           end
 
           [path, values]

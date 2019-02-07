@@ -193,13 +193,15 @@ module Bolt
 
       def print_module_list(module_list)
         module_list.each do |path, modules|
-          @stream.write(path)
+          if (mod = modules.find { |m| m[:internal_module_group] })
+            @stream.puts(mod[:internal_module_group])
+          else
+            @stream.puts(path)
+          end
 
           if modules.empty?
-            @stream.write(" (no modules installed)\n")
+            @stream.puts('(no modules installed)')
           else
-            @stream.write("\n")
-
             module_info = modules.map do |m|
               version = m[:version] || '???'
               [m[:name], version]
