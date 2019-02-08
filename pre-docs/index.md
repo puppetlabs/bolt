@@ -13,7 +13,7 @@
     -   [Install Bolt on Mac OS X](bolt_installing.md#task-3621)
     -   [Install Bolt with Homebrew](bolt_installing.md#task-5322)
     -   [Install Bolt from apt repositories on Debian or Ubuntu](bolt_installing.md#task-7569)
-    -   [Install Bolt from yum repositories on RHEL or SLES](bolt_installing.md#task-5651)
+    -   [Install Bolt from yum repositories on RHEL, SLES, or Fedora](bolt_installing.md#task-5651)
     -   [Install gems with Bolt packages](bolt_installing.md#task-2023)
     -   [Install Bolt as a gem](bolt_installing.md#task-4877)
     -   [Analytics data collection](bolt_installing.md#concept-8242)

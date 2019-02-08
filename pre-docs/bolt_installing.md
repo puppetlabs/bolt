@@ -152,9 +152,9 @@ The Puppet repository for the APT package management system is [https://apt.pupp
     ```
 
 
-### Install Bolt on RHEL or SLES
+### Install Bolt on RHEL, SLES, or Fedora
 
-Packaged versions of Bolt are available for Red Hat Enterprise Linux 6 and 7, SUSE Linux Enterprise Server 12.
+Packaged versions of Bolt are available for Red Hat Enterprise Linux 6 and 7, SUSE Linux Enterprise Server 12, and Fedora 28 and 29.
 
 The Puppet repository for the YUM package management system is [http://yum.puppet.com/puppet6/](http://yum.puppet.com/puppet6/) Packages are named using the convention `<PLATFORM_NAME>-release-<OS ABBREVIATION>-<OS VERSION>.noarch.rpm`. For example, the release package for Puppet 6 Platform on Linux 7 is `puppet6-release-el-7.noarch.rpm`.
 
@@ -180,6 +180,20 @@ The Puppet repository for the YUM package management system is [http://yum.puppe
         ```
         sudo rpm -Uvh https://yum.puppet.com/puppet6/puppet6-release-sles-12.noarch.rpm
         sudo zypper install puppet-bolt
+        ```
+
+    -   Fedora 28
+
+        ```
+        sudo rpm -Uvh https://yum.puppet.com/puppet6/puppet6-release-fedora-28.noarch.rpm
+        sudo dnf install puppet-bolt
+        ```
+
+    -   Fedora 29
+
+        ```
+        sudo rpm -Uvh https://yum.puppet.com/puppet6/puppet6-release-fedora-29.noarch.rpm
+        sudo dnf install puppet-bolt
         ```
 
 2.  Run a Bolt command and get started. 
