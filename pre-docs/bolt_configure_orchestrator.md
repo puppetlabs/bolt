@@ -27,7 +27,7 @@ To set up Bolt to use the orchestrator API, you must:
 Bolt uses a task to execute commands, upload files, and run scripts over orchestrator. To install this task, install the [puppetlabs-bolt_shim](https://forge.puppet.com/puppetlabs/bolt_shim) module from the Forge. Install the code in the same environment as the other tasks you want to run. Use the following Puppetfile line:
 
 ```
-mod 'puppetlabs-bolt_shim', '0.2.0'
+mod 'puppetlabs-bolt_shim', '0.3.0'
 ```
 
 In addition to the bolt\_shim module, any task or module content you want to execute over Puppet Communications Protocol (PCP) must be present in the PE environment. For details about downloading and installing modules for Bolt, see [Set up Bolt to download and install modules](https://puppet.com/docs/bolt/latest/installing_tasks_from_the_forge.html). By allowing only content that is present in the PE environment to be executed over PCP, you maintain role-based access control over the nodes you manage in PE.
