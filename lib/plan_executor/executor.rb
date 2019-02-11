@@ -14,14 +14,14 @@ require 'plan_executor/orch_client'
 module PlanExecutor
   class Executor
     attr_reader :noop, :logger
-    attr_accessor :transport
+    attr_accessor :orch_client
 
-    def initialize(job_id, client, noop = nil)
+    def initialize(job_id, http_client, noop = nil)
       @logger = Logging.logger[self]
       @plan_logging = false
       @noop = noop
       @logger.debug { "Started" }
-      @transport = PlanExecutor::OrchClient.new(job_id, client, @logger)
+      @orch_client = PlanExecutor::OrchClient.new(job_id, http_client, @logger)
     end
 
     # This handles running the job, catching errors, and turning the result
@@ -82,7 +82,7 @@ module PlanExecutor
       description = options.fetch('_description', "command '#{command}'")
       log_action(description, targets) do
         results = as_resultset(targets) do
-          @transport.run_command(targets, command, options)
+          @orch_client.run_command(targets, command, options)
         end
 
         results
@@ -93,7 +93,7 @@ module PlanExecutor
       description = options.fetch('_description', "script #{script}")
       log_action(description, targets) do
         results = as_resultset(targets) do
-          @transport.run_script(targets, script, arguments, options)
+          @orch_client.run_script(targets, script, arguments, options)
         end
 
         results
@@ -106,7 +106,7 @@ module PlanExecutor
         arguments['_task'] = task.name
 
         results = as_resultset(targets) do
-          @transport.run_task(targets, task, arguments, options)
+          @orch_client.run_task(targets, task, arguments, options)
         end
 
         results
@@ -117,7 +117,7 @@ module PlanExecutor
       description = options.fetch('_description', "file upload from #{source} to #{destination}")
       log_action(description, targets) do
         results = as_resultset(targets) do
-          @transport.file_upload(targets, source, destination, options)
+          @orch_client.file_upload(targets, source, destination, options)
         end
 
         results
@@ -132,7 +132,7 @@ module PlanExecutor
                              retry_interval: 1)
       log_action(description, targets) do
         begin
-          wait_until(wait_time, retry_interval) { @transport.connected?(targets) }
+          wait_until(wait_time, retry_interval) { @orch_client.connected?(targets) }
           targets.map { |target| Bolt::Result.new(target) }
         rescue TimeoutError => e
           targets.map { |target| Bolt::Result.from_exception(target, e) }
@@ -149,7 +149,7 @@ module PlanExecutor
     end
 
     def finish_plan(plan_result)
-      @transport.finish_plan(plan_result)
+      @orch_client.finish_plan(plan_result)
     end
 
     def without_default_logging
