@@ -141,10 +141,10 @@ For example, the following runs 'sample::complex_params' task on localhost:
 ```
 
 ### SSH Target Object
-The Target is a JSON object. See the [schema](../lib/bolt_ext/schemas/ssh-run_task.json)
+The Target is a JSON object. See the [schema](../lib/bolt_server/schemas/ssh-run_task.json)
 
 ### WinRM Target Object
-The Target is a JSON object. See the [schema](../lib/bolt_ext/schemas/winrm-run_task.json)
+The Target is a JSON object. See the [schema](../lib/bolt_server/schemas/winrm-run_task.json)
 
 ### Task Object
 This is nearly identical to the [task detail JSON
@@ -152,6 +152,7 @@ object](https://github.com/puppetlabs/puppetserver/blob/master/documentation/pup
 from [puppetserver](https://github.com/puppetlabs/puppetserver), with an
 additional `file_content` key.
 
+See the [schema](../lib/bolt_server/schemas/task.json)
 The task is a JSON object which includes the following keys:
 
 #### Name
@@ -165,9 +166,18 @@ The metadata object is optional, and contains metadata about the task being run.
 - `parameters`: Object, *optional* - A JSON object whose keys are parameter names, and whose values are JSON objects with 2 keys:
     - `description`: String, *optional* - The parameter description.
     - `type`: String, *optional* - The type the parameter should accept.
+    - `sensitive`: Boolean, *optional* - Whether the task runner should treat the parameter value as sensitive
+    - `input_method`: String, *optional* - What input method should be used to pass params to task (stdin, environment, powershell)
 
 #### Files
-# TODO
+The files array is required, and contains details about the files the task needs as well as how to get them. Array items should be objects with the following keys:
+- `uri`: Object, *required* - Information on how to request task files
+    - `path`: String, *required* - Relative URI for requesting task content
+    - `params`: Object, *required* - Query parameters for locating task data
+        - `environment`: String, *required* - Environment task files are in
+- `sha256`: String, *required* - Shasum of the file contents
+- `filename`: String, *required* - File name including extension
+- `size`: Number, *optional* - Size of file in Bytes
 
 ### Response
 If the task runs the response will have status 200.

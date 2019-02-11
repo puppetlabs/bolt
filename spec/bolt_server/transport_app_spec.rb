@@ -51,7 +51,7 @@ describe "BoltServer::TransportApp" do
         files: [{
           filename: "echo.sh",
           sha256: "foo",
-          uri: {}
+          uri: { path: 'foo', params: { environment: 'foo' } }
         }]
       }
     }
@@ -180,7 +180,7 @@ describe "BoltServer::TransportApp" do
         files: [{
           filename: "wininput.ps1",
           sha256: "foo",
-          uri: {}
+          uri: { path: 'foo', params: { environment: 'foo' } }
         }]
 
       }
