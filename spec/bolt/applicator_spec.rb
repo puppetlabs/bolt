@@ -49,14 +49,16 @@ describe Bolt::Applicator do
           target_features: {}
         },
         config: {
-          transport: "ssh",
+          transport: 'ssh',
           transports: {
-            ssh: { 'connect-timeout' => 10, "host-key-check" => true, tty: false },
-            winrm: { 'connect-timeout' => 10, ssl: true, "ssl-verify" => true },
+            ssh: { 'connect-timeout' => 10, 'host-key-check' => true, tty: false },
+            winrm: { 'connect-timeout' => 10, ssl: true, 'ssl-verify' => true },
             pcp: {
-              "task-environment" => "production"
+              'task-environment' => 'production'
             },
-            local: {},
+            local: {
+              'interpreters' => { '.rb' => RbConfig.ruby }
+            },
             docker: {},
             remote: { 'run-on': 'localhost' }
           }

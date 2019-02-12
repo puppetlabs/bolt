@@ -87,6 +87,10 @@ module Bolt
         impl
       end
 
+      def select_interpreter(executable, interpreters)
+        interpreters[Pathname(executable).extname] if interpreters
+      end
+
       def reject_transport_options(target, options)
         if target.options['run-as']
           options.reject { |k, _v| k == '_run_as' }

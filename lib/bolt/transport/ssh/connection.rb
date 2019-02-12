@@ -227,6 +227,10 @@ module Bolt
           escalate = sudoable && run_as && @user != run_as
           use_sudo = escalate && @target.options['run-as-command'].nil?
 
+          if options[:interpreter]
+            command.is_a?(Array) ? command.unshift(options[:interpreter]) : [options[:interpreter], command]
+          end
+
           command_str = command.is_a?(String) ? command : Shellwords.shelljoin(command)
           if escalate
             if use_sudo

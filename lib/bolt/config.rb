@@ -36,7 +36,7 @@ module Bolt
 
     TRANSPORT_OPTIONS = %i[password run-as sudo-password extensions
                            private-key tty tmpdir user connect-timeout
-                           cacert token-file service-url].freeze
+                           cacert token-file service-url interpreters].freeze
 
     # TODO: move these to the transport themselves
     TRANSPORT_SPECIFIC_DEFAULTS = {
@@ -53,7 +53,9 @@ module Bolt
       pcp: {
         'task-environment' => 'production'
       },
-      local: {},
+      local: {
+        'interpreters' => { 'rb' => RbConfig.ruby }
+      },
       docker: {},
       remote: {
         'run-on' => 'localhost'
@@ -114,6 +116,12 @@ module Bolt
       Bolt::Util.deep_clone(self)
     end
 
+    def normalize_interpreters(interpreters)
+      Bolt::Util.walk_keys(interpreters) do |key|
+        key.chars[0] == '.' ? key : '.' + key
+      end
+    end
+
     def normalize_log(target)
       return target if target == 'console'
       target = target[5..-1] if target.start_with?('file:')
@@ -168,7 +176,10 @@ module Bolt
       TRANSPORTS.each do |key, impl|
         if data[key.to_s]
           selected = impl.filter_options(data[key.to_s])
-          @transports[key].merge!(selected)
+          @transports[key] = Bolt::Util.deep_merge(@transports[key], selected)
+        end
+        if @transports[key]['interpreters']
+          @transports[key]['interpreters'] = normalize_interpreters(@transports[key]['interpreters'])
         end
       end
     end

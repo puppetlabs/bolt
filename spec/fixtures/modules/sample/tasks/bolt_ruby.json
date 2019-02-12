@@ -1,0 +1,9 @@
+{
+  "description": "Task with incompatable shebang to be overriden by interpreter config",
+  "parameters": {
+    "message": {
+      "description": "Test message",
+      "type": "Optional[String[1]]"
+    }
+  }
+}

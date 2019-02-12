@@ -100,6 +100,23 @@ describe "when runnning over the winrm transport", winrm: true do
     }
     let(:uri) { (1..2).map { |i| "#{conn_uri('winrm')}?id=#{i}" }.join(',') }
     let(:config_flags) { %W[--nodes #{uri}] }
+    let(:single_target_conf) { %W[--nodes #{conn_uri('winrm')}] }
+    let(:interpreter_task) { 'sample::bolt_ruby' }
+    let(:interpreter_ext) do
+      { 'interpreters' => {
+        '.rb' => RbConfig.ruby
+      } }
+    end
+    let(:interpreter_no_ext) do
+      { 'interpreters' => {
+        'rb' => RbConfig.ruby
+      } }
+    end
+    let(:bad_interpreter) do
+      { 'interpreters' => {
+        'rb' => 'C:\dev\null'
+      } }
+    end
 
     it 'runs multiple commands' do
       with_tempfile_containing('conf', YAML.dump(config)) do |conf|
@@ -114,6 +131,36 @@ describe "when runnning over the winrm transport", winrm: true do
         results.each do |result|
           expect(result['_output'].strip).to match(/STDIN: {"messa/)
         end
+      end
+    end
+
+    it 'runs task with specified interpreter key rb', :reset_puppet_settings, windows: true do
+      winrm_conf = { 'winrm' => config['winrm'].merge(interpreter_no_ext) }
+      with_tempfile_containing('conf', YAML.dump(config.merge(winrm_conf))) do |conf|
+        result =
+          run_nodes(%W[task run #{interpreter_task} message=somemessage
+                       --configfile #{conf.path}] + config_flags)
+        expect(result.map { |r| r['env'].strip }).to eq(%w[somemessage somemessage])
+        expect(result.map { |r| r['stdin'].strip }).to eq(%w[somemessage somemessage])
+      end
+    end
+
+    it 'runs task with interpreter key .rb', :reset_puppet_settings, windows: true do
+      winrm_conf = { 'winrm' => config['winrm'].merge(interpreter_ext) }
+      with_tempfile_containing('conf', YAML.dump(config.merge(winrm_conf))) do |conf|
+        result = run_nodes(%W[task run #{interpreter_task} message=somemessage
+                              --configfile #{conf.path}] + config_flags)
+        expect(result.map { |r| r['env'].strip }).to eq(%w[somemessage somemessage])
+        expect(result.map { |r| r['stdin'].strip }).to eq(%w[somemessage somemessage])
+      end
+    end
+
+    it 'task fails with bad interpreter', :reset_puppet_settings, windows: true do
+      winrm_conf = { 'winrm' => config['winrm'].merge(bad_interpreter) }
+      with_tempfile_containing('conf', YAML.dump(config.merge(winrm_conf))) do |conf|
+        result = run_failed_node(%W[task run #{interpreter_task} message=somemessage
+                                    --configfile #{conf.path}] + single_target_conf)
+        expect(result['_error']['msg']).to match(/'C:\\dev\\null' is not recognized/)
       end
     end
   end

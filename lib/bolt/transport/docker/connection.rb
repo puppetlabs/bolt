@@ -27,6 +27,7 @@ module Bolt
         end
 
         def execute(*command, options)
+          command.unshift(options[:interpreter]) if options[:interpreter]
           if options[:environment]
             envs = options[:environment].map { |env, val| "#{env}=#{val}" }
             command = ['env'] + envs + command

@@ -8,7 +8,7 @@ module Bolt
   module Transport
     class Docker < Base
       def self.options
-        %w[service-url service-options tmpdir]
+        %w[service-url service-options tmpdir interpreters]
       end
 
       def provided_features
@@ -87,7 +87,7 @@ module Bolt
         arguments = unwrap_sensitive_args(arguments)
         with_connection(target) do |conn|
           execute_options = {}
-
+          execute_options[:interpreter] = select_interpreter(executable, target.options['interpreters'])
           conn.with_remote_tempdir do |dir|
             if extra_files.empty?
               task_dir = dir
@@ -112,7 +112,7 @@ module Bolt
             end
 
             stdout, stderr, exitcode = conn.execute(remote_task_path, execute_options)
-            Bolt::Result.for_task(target, stdout.join, stderr.join, exitcode)
+            Bolt::Result.for_task(target, stdout.join, stderr.join.force_encoding("UTF-8"), exitcode)
           end
         end
       end

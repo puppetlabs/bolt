@@ -17,9 +17,9 @@ module Bolt
           default_port = target.options['ssl'] ? HTTPS_PORT : HTTP_PORT
           @port = @target.port || default_port
           @user = @target.user
-
-          # Accept a single entry or a list, ensure each is prefixed with '.'
+          # Build set of extensions from extensions config as well as interpreters
           extensions = [target.options['extensions'] || []].flatten.map { |ext| ext[0] != '.' ? '.' + ext : ext }
+          extensions += target.options['interpreters'].keys if target.options['interpreters']
           @extensions = DEFAULT_EXTENSIONS.to_set.merge(extensions)
 
           @logger = Logging.logger[@target.host]
