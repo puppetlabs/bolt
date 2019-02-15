@@ -11,36 +11,35 @@ require 'bolt/util'
 # This is intended to provide a relatively stable method of executing bolt in process from tests.
 module BoltSpec
   module Run
-    def run_task(task_name, targets, params = nil, config: nil, inventory: nil)
+    def run_task(task_name, targets, params, config: nil, inventory: nil)
       result = BoltRunner.with_runner(config, inventory) do |runner|
-        runner.run_task(task_name, targets, params || {})
+        runner.run_task(task_name, targets, params)
       end
       result = result.to_a
       Bolt::Util.walk_keys(result, &:to_s)
     end
 
-    def run_plan(plan_name, params = nil, config: nil, inventory: nil)
+    def run_plan(plan_name, params, config: nil, inventory: nil)
       # Users copying code from run_task may forget that targets is not a parameter for run plan
-      params ||= {}
       raise ArgumentError, "params must be a hash" unless params.is_a?(Hash)
 
       result = BoltRunner.with_runner(config, inventory) do |runner|
-        runner.run_plan(plan_name, params || {})
+        runner.run_plan(plan_name, params)
       end
 
       { "status" => result.status,
         "value" => JSON.parse(result.value.to_json) }
     end
 
-    def run_command(command, targets, params = nil, config: nil, inventory: nil)
+    def run_command(command, targets, options: {}, config: nil, inventory: nil)
       result = BoltRunner.with_runner(config, inventory) do |runner|
-        runner.run_command(command, targets, params)
+        runner.run_command(command, targets, options)
       end
       result = result.to_a
       Bolt::Util.walk_keys(result, &:to_s)
     end
 
-    def run_script(script, targets, arguments = nil, options = {}, config: nil, inventory: nil)
+    def run_script(script, targets, arguments, options: {}, config: nil, inventory: nil)
       result = BoltRunner.with_runner(config, inventory) do |runner|
         runner.run_script(script, targets, arguments, options)
       end
@@ -116,13 +115,13 @@ module BoltSpec
         pal.run_plan(plan_name, params, executor, inventory, puppetdb_client)
       end
 
-      def run_command(command, targets, params = nil)
+      def run_command(command, targets, options)
         executor = Bolt::Executor.new(config.concurrency, @analytics)
         targets = inventory.get_targets(targets)
-        executor.run_command(targets, command, params || {})
+        executor.run_command(targets, command, options)
       end
 
-      def run_script(script, targets, arguments = nil, options = {})
+      def run_script(script, targets, arguments, options = {})
         executor = Bolt::Executor.new(config.concurrency, @analytics)
         targets = inventory.get_targets(targets)
         executor.run_script(targets, script, arguments, options)

@@ -66,7 +66,7 @@ describe "apply" do
         expect(result.count).to eq(1)
         expect(result[0]).to include('status' => 'success')
 
-        result = run_task('puppet_agent::version', 'puppet_5', inventory: agent_version_inventory)
+        result = run_task('puppet_agent::version', 'puppet_5', {}, inventory: agent_version_inventory)
         expect(result.count).to eq(1)
         expect(result[0]).to include('status' => 'success')
         expect(result[0]['result']['version']).to match(/^5/)
@@ -77,7 +77,7 @@ describe "apply" do
         expect(result.count).to eq(1)
         expect(result[0]).to include('status' => 'success')
 
-        result = run_task('puppet_agent::version', 'puppet_6', inventory: agent_version_inventory)
+        result = run_task('puppet_agent::version', 'puppet_6', {}, inventory: agent_version_inventory)
         expect(result.count).to eq(1)
         expect(result[0]).to include('status' => 'success')
         expect(result[0]['result']['version']).to match(/^6/)
@@ -167,7 +167,7 @@ describe "apply" do
         uri = conn_uri('ssh')
         inventory_data = conn_inventory
         config_data = root_config
-        run_task('puppet_agent::install', uri, config: config_data, inventory: inventory_data)
+        run_task('puppet_agent::install', uri, {}, config: config_data, inventory: inventory_data)
       end
 
       context "apply() function" do
@@ -272,7 +272,7 @@ describe "apply" do
         expect(result.count).to eq(1)
         expect(result[0]).to include('status' => 'success')
 
-        result = run_task('puppet_agent::version', conn_uri('winrm'), config: config)
+        result = run_task('puppet_agent::version', conn_uri('winrm'), {}, config: config)
         expect(result.count).to eq(1)
         expect(result[0]).to include('status' => 'success')
         expect(result[0]['result']['version']).to match(/^5/)
@@ -318,7 +318,7 @@ describe "apply" do
         expect(result.count).to eq(1)
         expect(result[0]['status']).to eq('success')
 
-        result = run_task('puppet_agent::version', conn_uri('winrm'), config: config)
+        result = run_task('puppet_agent::version', conn_uri('winrm'), {}, config: config)
         expect(result.count).to eq(1)
         expect(result[0]).to include('status' => 'success')
         expect(result[0]['result']['version']).to match(/^6/)
