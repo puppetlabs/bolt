@@ -11,6 +11,14 @@ module Bolt
         %w[port user password connect-timeout ssl ssl-verify tmpdir cacert extensions interpreters]
       end
 
+      def self.default_options
+        {
+          'connect-timeout' => 10,
+          'ssl' => true,
+          'ssl-verify' => true
+        }
+      end
+
       def provided_features
         ['powershell']
       end

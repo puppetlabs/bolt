@@ -13,6 +13,14 @@ module Bolt
            connect-timeout tmpdir run-as tty run-as-command proxyjump interpreters]
       end
 
+      def self.default_options
+        {
+          'connect-timeout' => 10,
+          'host-key-check' => true,
+          'tty' => false
+        }
+      end
+
       def provided_features
         ['shell']
       end

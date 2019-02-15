@@ -29,6 +29,10 @@ module Bolt
         %w[service-url cacert token-file task-environment]
       end
 
+      def self.default_options
+        { 'task-environment' => 'production' }
+      end
+
       def provided_features
         ['puppet-agent']
       end

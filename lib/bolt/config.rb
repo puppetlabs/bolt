@@ -38,30 +38,6 @@ module Bolt
                            private-key tty tmpdir user connect-timeout
                            cacert token-file service-url interpreters].freeze
 
-    # TODO: move these to the transport themselves
-    TRANSPORT_SPECIFIC_DEFAULTS = {
-      ssh: {
-        'connect-timeout' => 10,
-        'host-key-check' => true,
-        'tty' => false
-      },
-      winrm: {
-        'connect-timeout' => 10,
-        'ssl' => true,
-        'ssl-verify' => true
-      },
-      pcp: {
-        'task-environment' => 'production'
-      },
-      local: {
-        'interpreters' => { 'rb' => RbConfig.ruby }
-      },
-      docker: {},
-      remote: {
-        'run-on' => 'localhost'
-      }
-    }.freeze
-
     def self.default
       new(Bolt::Boltdir.new('.'), {})
     end
@@ -93,8 +69,9 @@ module Bolt
       @log = { 'console' => {} }
 
       @transports = {}
-      TRANSPORTS.each_key do |transport|
-        @transports[transport] = TRANSPORT_SPECIFIC_DEFAULTS[transport].dup
+
+      TRANSPORTS.each do |key, transport|
+        @transports[key] = transport.default_options
       end
 
       update_from_file(config_data)

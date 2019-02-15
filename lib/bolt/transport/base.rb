@@ -48,6 +48,10 @@ module Bolt
               "self.options() or self.filter_options(unfiltered) must be implemented by the transport class"
       end
 
+      def self.default_options
+        {}
+      end
+
       def self.filter_options(unfiltered)
         unfiltered.select { |k| options.include?(k) }
       end
