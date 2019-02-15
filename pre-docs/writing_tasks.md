@@ -318,7 +318,7 @@ The `files` property can be included both as a top-level metadata property, an
 When a task includes the `files` property, all files listed in the top-level property and in the specific implementation chosen for a target will be copied to a temporary directory on that target. The directory structure of the specified files will be preserved such that paths specified with the `files` metadata option will be available to tasks prefixed with `_installdir`. The task executable itself will be located in its module location under the `_installdir` as well, so other files can be found at `../../mymodule/files/` relative to the task executable's location.
 
 
-For example, you can create a task and metadata in a new module at `~/.puppetlabs/bolt/site/mymodule/tasks/task.{json,rb}`.
+For example, you can create a task and metadata in a new module at `~/.puppetlabs/bolt/site-modules/mymodule/tasks/task.{json,rb}`.
 
  **Metadata**
 
@@ -372,7 +372,7 @@ To simplify writing tasks, Bolt includes [python\_task\_helper](https://github.c
 
 #### Python Example
 
-Create task and metadata in a module at `~/.puppetlabs/bolt/site/mymodule/tasks/task.{json,py}`.
+Create task and metadata in a module at `~/.puppetlabs/bolt/site-modules/mymodule/tasks/task.{json,py}`.
 
  **Metadata**
 
@@ -415,7 +415,7 @@ Ran on 1 node in 0.12 seconds
 
 #### Ruby Example
 
-Create task and metadata in a new module at `~/.puppetlabs/bolt/site/mymodule/tasks/mytask.{json,rb}`.
+Create task and metadata in a new module at `~/.puppetlabs/bolt/site-modules/mymodule/tasks/mytask.{json,rb}`.
 
  **Metadata**
 
@@ -456,7 +456,7 @@ Ran on 1 node in 0.12 seconds
 
 ## Running remote tasks
 
-Some targets are hard or impossible to execute tasks on directly. In these cases, you can write a task that runs on a proxy target and remotely interacts with the real target. 
+Some targets are hard or impossible to execute tasks on directly. In these cases, you can write a task that runs on a proxy target and remotely interacts with the real target.
 
 For example, a network device might have a limited shell environment or a cloud service might be driven only by HTTP APIs. By writing a remote task, Bolt allows you to specify connection information for remote targets in their inventory file and injects them into the `_target` metaparam.
 

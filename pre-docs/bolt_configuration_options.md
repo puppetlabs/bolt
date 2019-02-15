@@ -5,7 +5,7 @@ Your Bolt configuration file can contain global and transport options.
 ## Sample Bolt configuration file
 
 ```
-modulepath: "~/.puppetlabs/bolt-code/modules:~/.puppetlabs/bolt-code/site"
+modulepath: "~/.puppetlabs/bolt-code/modules:~/.puppetlabs/bolt-code/site-modules"
 inventoryfile: "~/.puppetlabs/bolt/inventory.yaml"
 concurrency: 10
 format: human
@@ -20,13 +20,13 @@ ssh:
 
 `format`: The format to use when printing results. Options are `human` and `json`. Default is `human`.
 
-`modulepath`: The module path for loading tasks and plan code. This is either an array of directories or a string containing a list of directories separated by the OS specific PATH separator. The default path for modules is `modules:site` inside the `Boltdir`.
+`modulepath`: The module path for loading tasks and plan code. This is either an array of directories or a string containing a list of directories separated by the OS specific PATH separator. The default path for modules is `modules:site-modules:site` inside the Bolt project directory.
 
-`inventoryfile`: The path to a structured data inventory file used to refer to groups of nodes on the commandline and from plans. The default path for the inventory file is `inventory.yaml` inside the `Boltdir`.
+`inventoryfile`: The path to a structured data inventory file used to refer to groups of nodes on the commandline and from plans. The default path for the inventory file is `inventory.yaml` inside the Bolt project directory.
 
 `color`: Whether to use colored output when printing messages to the console.
 
-`hiera-config`: Specify the path to your Hiera config. The default path for the Hiera config file is `hiera.yaml` inside the `Boltdir`.
+`hiera-config`: Specify the path to your Hiera config. The default path for the Hiera config file is `hiera.yaml` inside the Bolt project directory.
 
 ## SSH transport configuration options
 

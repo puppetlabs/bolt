@@ -6,7 +6,7 @@ Similar to the `puppet apply` command, which applies a standalone Puppet manifes
 
 **Tip:** If you installed Bolt as a Ruby gem, make sure you have installed the core modules required to use the `puppet apply` command. These modules are listed in the [Bolt GitHub repository](https://github.com/puppetlabs/bolt/blob/master/Puppetfile)and you can install them using a Puppetfile.
 
-**Related information**  
+**Related information**
 
 
 [Set up Bolt to download and install modules](installing_tasks_from_the_forge.md#)
@@ -24,7 +24,7 @@ The `apply_prep` function identifies the nodes that do not have Puppet agents an
 Behind the scenes, Bolt compiles the code in your manifest block \(the code wrapped in curly braces that follows the `apply` function\) into a catalog. Code is compiled in the following order:
 
 -   Facts gathered from the targets or set in your inventory.
--   Local variables in the plan, such as `$site_content.` 
+-   Local variables in the plan, such as `$site_content.`
 -    [ `Vars` ](inventory_file.md#title-1541705359297) set in your inventory.
 
 Like the code compiled with the `puppet apply` function, all the variables are generated. As a result, you can reuse code between Bolt and Puppet. Bolt then copies custom module content from the Bolt modulepath to the target nodes and applies the catalog using Puppet.
@@ -86,7 +86,7 @@ Following the Hiera 5 convention, the default data dir is relative to `hiera.yam
 
 If a custom data provider is used \(such as `hiera-eyaml`, which allows you to encrypt your data\) the gem dependencies must be available to Bolt. See [Install gems with Bolt packages](bolt_installing.md#).
 
-**Related information**  
+**Related information**
 
 
 [Configuring Bolt](configuring_bolt.md)
@@ -95,15 +95,15 @@ If a custom data provider is used \(such as `hiera-eyaml`, which allows you to e
 
 In addition to the standard Puppet functions available to a catalog, such as `lookup`, you can use the following Bolt functions in a manifest block.
 
--    [puppetdb\_query](plan_functions.md#) 
+-    [puppetdb\_query](plan_functions.md#)
 
--    [puppetdb\_facts](plan_functions.md#) 
+-    [puppetdb\_facts](plan_functions.md#)
 
--    [get\_targets](plan_functions.md#) 
+-    [get\_targets](plan_functions.md#)
 
--    [facts](plan_functions.md#) 
+-    [facts](plan_functions.md#)
 
--    [vars](plan_functions.md#) 
+-    [vars](plan_functions.md#)
 
 
 ## Manifest block limitations
@@ -121,7 +121,7 @@ In addition, the following top-level variables, which exist in normal catalog co
 
 You can optionally set these from a target's `vars`, but they don't have defaults in Bolt.
 
-**Related information**  
+**Related information**
 
 
 [puppetdb\_query](plan_functions.md#)
@@ -130,24 +130,24 @@ You can optionally set these from a target's `vars`, but they don't have default
 
 Create a manifest that sets up a web server with nginx, and run it as a plan.
 
-1.  Go to the modules directory in the Bolt default Boltdir: `~/.puppetlabs/bolt/modules`
+1.  Go to the `site-modules` directory in the default Bolt project directory: `~/.puppetlabs/bolt/site-modules`
 2.  Create a module named profiles.
     -   If you use the Puppet Development Kit: `pdk new module profiles`
-    -   Otherwise create `~/.puppetlabs/bolt/modules/profiles`
+    -   Otherwise create `~/.puppetlabs/bolt/site-modules/profiles`
 3.  Add a `plans` directory to the profiles module.
-4.  In the plans directory, create a manifest file called nginx\_install.pp and add the following code: 
+4.  In the plans directory, create a manifest file called nginx\_install.pp and add the following code:
 
     ```
     plan profiles::nginx_install(
          TargetSpec $nodes,
          String $site_content = 'hello!',
        ) {
-    
+
          # Install the puppet-agent package if Puppet is not detected.
          # Copy over custom facts from the Bolt modulepath.
          # Run the `facter` command line tool to gather node information.
          $nodes.apply_prep
-    
+
          # Compile the manifest block into a catalog
          apply($nodes) {
            if($facts['os']['family'] == 'redhat') {
@@ -159,16 +159,16 @@ Create a manifest that sets up a web server with nginx, and run it as a plan.
            } else {
              $html_dir = '/var/www/html'
            }
-    
+
            package {'nginx':
              ensure => present,
            }
-    
+
            file {"${html_dir}/index.html":
              content => $site_content,
              ensure  => file,
            }
-    
+
            service {'nginx':
              ensure  => 'running',
              enable  => 'true',
@@ -184,14 +184,14 @@ Create a manifest that sets up a web server with nginx, and run it as a plan.
     bolt plan run profiles::nginx_install --nodes mynode.mydomain
     ```
 
-6.  In a web browser, open `mynode.mydomain` 
+6.  In a web browser, open `mynode.mydomain`
 
     The page displays the text **hello!**
 
 
 **Tip:** For more complex web server deployments, consider adding the [puppet-nginx](https://forge.puppet.com/puppet/nginx) module.
 
-**Related information**  
+**Related information**
 
 
 [NGINX](https://www.nginx.com/resources/glossary/nginx/)
@@ -200,13 +200,13 @@ Create a manifest that sets up a web server with nginx, and run it as a plan.
 
 Create a manifest that sets up a web server with IIS and run it as a plan.
 
-1.  Go to the modules directory in the Bolt default Boltdir: `~/.puppetlabs/bolt/modules`
+1.  Go to the site-modules directory in the default Bolt project directory: `~/.puppetlabs/bolt/site-modules`
 2.  Create a module named profiles.
     -   If you use the Puppet Development Kit: `pdk new module profiles`
     -   Otherwise create `~/.puppetlabs/bolt/modules/profiles`
 3.  Add a `plans` directory to the profiles module.
 4.  Install the IIS dependencies.
-    1.  Add the following code to `~/.puppetlabs/bolt/Puppetfile` 
+    1.  Add the following code to `~/.puppetlabs/bolt/Puppetfile`
 
         ```
         forge 'http://forge.puppetlabs.com'
@@ -215,33 +215,33 @@ Create a manifest that sets up a web server with IIS and run it as a plan.
         ```
 
     2.  Run `bolt puppetfile install`
-5.  In the plans directory, create a manifest file called iis\_install.pp and add the following code: 
+5.  In the plans directory, create a manifest file called iis\_install.pp and add the following code:
 
     ```
     plan profiles::iis_install(
          TargetSpec $nodes,
          String $site_content = 'hello!',
        ) {
-    
-         # Install the puppet-agent package if Puppet is not detected. 
+
+         # Install the puppet-agent package if Puppet is not detected.
          # Copy over custom facts from the Bolt modulepath.
          # Run the `facter` command line tool to gather node information.
          $nodes.apply_prep
-    
+
          # Compile the manifest block into a catalog
          return apply($nodes, '_catch_errors' => true) {
            $iis_features = ['Web-WebServer','Web-Scripting-Tools']
-    
+
            iis_feature { $iis_features:
              ensure => 'present',
            }
-    
+
            # Delete the default website to prevent a port binding conflict.
            iis_site {'Default Web Site':
              ensure  => absent,
              require => Iis_feature['Web-WebServer'],
            }
-    
+
            iis_site { 'minimal':
              ensure          => 'started',
              physicalpath    => 'c:\\inetpub\\minimal',
@@ -251,12 +251,12 @@ Create a manifest that sets up a web server with IIS and run it as a plan.
                Iis_site['Default Web Site']
              ],
            }
-    
+
            file { 'minimal':
              ensure => 'directory',
              path   => 'c:\\inetpub\\minimal',
            }
-    
+
            file { 'content':
              ensure  => 'file',
              path    => 'c:\\inetpub\\minimal\\index.html',
@@ -266,18 +266,18 @@ Create a manifest that sets up a web server with IIS and run it as a plan.
        }
     ```
 
-6.  Run the plan on a target node: 
+6.  Run the plan on a target node:
 
     ```
     bolt plan run profiles::iis_install --nodes mynode.mydomain --transport winrm
     ```
 
-7.  In a web browser, open `mynode.mydomain` 
+7.  In a web browser, open `mynode.mydomain`
 
     The page displays the text **hello!**
 
 
-**Related information**  
+**Related information**
 
 
 [IIS](https://www.iis.net)
