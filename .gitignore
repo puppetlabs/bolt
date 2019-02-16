@@ -36,6 +36,12 @@ Gemfile.local
 
 acceptance/hosts.yaml
 
+## Generated metadata.json for internal modules
+bolt-modules/*/metadata.json
+modules/aggregate/metadata.json
+modules/canary/metadata.json
+modules/puppetdb_fact/metadata.json
+
 modules/apply
 modules/facts
 modules/package

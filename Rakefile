@@ -8,6 +8,7 @@ require "puppet-strings"
 require "fileutils"
 require "json"
 require "erb"
+require "ostruct"
 
 desc "Run all RSpec tests"
 RSpec::Core::RakeTask.new(:spec)
@@ -149,6 +150,23 @@ namespace :integration do
     sh 'git submodule update --init'
   end
 end
+
+MODULE_METADATA_TEMPLATES = Rake::FileList['bolt-modules/*/metadata.erb',
+                                           'modules/*/metadata.erb']
+MODULE_METADATA_VARS = OpenStruct.new(bolt_version: Bundler::GemHelper.gemspec.version)
+
+rule(/metadata\.json$/ => ['.erb', 'lib/bolt/version.rb']) do |t|
+  puts("Rendering #{t.source} to: #{t.name}")
+  template = ERB.new(File.read(t.source), nil, '-')
+  # NOTE: result_with_hash can be used once Ruby 2.5 is the minimum
+  #       required version. This allows MODULE_METADATA_VARS to be
+  #       a simple hash instead of OpenStruct + binding hackery.
+  File.write(t.name, template.result(MODULE_METADATA_VARS.instance_eval { binding }))
+end
+
+desc 'Build metadata.json for bundled modules'
+task build_metadata: MODULE_METADATA_TEMPLATES.ext('.json')
+task build: :build_metadata
 
 spec = Gem::Specification.find_by_name 'gettext-setup'
 load "#{spec.gem_dir}/lib/tasks/gettext.rake"
