@@ -31,6 +31,7 @@ describe Bolt::Transport::WinRM do
   let(:host) { conn_info('winrm')[:host] }
   let(:port) { conn_info('winrm')[:port] }
   let(:ssl_port) { ENV['BOLT_WINRM_SSL_PORT'] || 25986 }
+  let(:smb_port) { ENV['BOLT_WINRM_SMB_PORT'] || 2445 }
   let(:user) { conn_info('winrm')[:user] }
   let(:password) { conn_info('winrm')[:password] }
   let(:command) { "echo $env:UserName" }
@@ -232,7 +233,7 @@ PS
 
     %w[winrm smb].each do |protocol|
       it "can upload a file to a host using #{protocol}", winrm: true do
-        conf = mk_config(ssl: false, user: user, password: password, 'file-protocol': protocol)
+        conf = mk_config(ssl: false, user: user, password: password, 'file-protocol': protocol, 'smb-port': smb_port)
         target = make_target(conf: conf)
         contents = SecureRandom.uuid
         remote_path = "C:\\Windows\\Temp\\upload-test-#{protocol}"
@@ -256,7 +257,7 @@ PS
     # test should be refactored to supply an SSL flag for winrm + smb and remove other SSL test
     it "will fail to upload a file with SMB with a host that requires SSL", winrm: true do
       expect {
-        mk_config(ssl: true, user: user, password: password, 'file-protocol': 'smb')
+        mk_config(ssl: true, user: user, password: password, 'file-protocol': 'smb', 'smb-port': smb_port)
       }.to raise_error(Bolt::ValidationError)
     end
 

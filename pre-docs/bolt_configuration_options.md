@@ -89,6 +89,8 @@ interpreters:
 
 *The smb file-protocol is experimental and is currently unsupported in conjunction with SSL given only SMB2 is currently implemented*
 
+`smb-port`: With `file-protocol` set to `smb`, this is the port to establish a connection on. Default is `445`.
+
 ## PCP transport configuration options
 
 `service-url`: The URL of the orchestrator API.

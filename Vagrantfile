@@ -5,6 +5,7 @@ windows_provision = <<SCRIPT
 ($user = New-LocalUser -Name bolt -Password (ConvertTo-SecureString -String bolt -Force -AsPlainText)) | Format-List
 # add the bolt user to the 'Remote Management Users' group
 Add-LocalGroupMember -Group 'Remote Management Users' -Member $user
+Add-LocalGroupMember -Group 'Administrators' -Member $user
 
 # import the certificate to be used for the winrm-ssl
 ($cert = Import-PfxCertificate -FilePath C:\\cert.pfx -CertStoreLocation cert:\\LocalMachine\\My -Password (ConvertTo-SecureString -String bolt -Force -AsPlainText)) | Format-List
@@ -39,6 +40,7 @@ Vagrant.configure('2') do |config|
     windows.vm.network :forwarded_port, guest: 22, host: 2222, id: 'ssh', disabled: true
     windows.vm.network :forwarded_port, guest: 5985, host: 25985, host_ip: '127.0.0.1', id: 'winrm'
     windows.vm.network :forwarded_port, guest: 5986, host: 25986, host_ip: '127.0.0.1', id: 'winrm-ssl'
+    windows.vm.network :forwarded_port, guest: 445, host: 2445, host_ip: '127.0.0.1', id: 'smb'
     windows.vm.provision 'file', source: 'resources/cert.pfx', destination: 'C:\cert.pfx'
     windows.vm.provision 'shell', privileged: true, inline: windows_provision
     windows.vm.provider 'virtualbox' do |vb|
@@ -52,6 +54,7 @@ Vagrant.configure('2') do |config|
       windows.vm.guest = :windows
       windows.vm.communicator = "winrm"
       windows.vm.network :forwarded_port, guest: 5985, host: 35985, host_ip: '127.0.0.1', id: 'winrm'
+      windows.vm.network :forwarded_port, guest: 445, host: 3445, host_ip: '127.0.0.1', id: 'smb'
       windows.vm.provision 'shell', privileged: true, inline: 'slmgr /rearm'
       windows.vm.provider "virtualbox" do |vb|
         vb.gui = false

@@ -266,7 +266,7 @@ module Bolt
           # It's lame that TCPSocket doesn't take a connect timeout
           # Using Timeout.timeout is bad, but is done elsewhere...
           Timeout.timeout(target.options['connect-timeout']) do
-            TCPSocket.new(target.host, SMB_PORT)
+            TCPSocket.new(target.host, target.options['smb-port'] || SMB_PORT)
           end
         rescue Errno::ECONNREFUSED => e
           # handle this to prevent obscuring error message as SMB problem
