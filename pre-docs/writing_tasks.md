@@ -178,11 +178,11 @@ Each task or plan name segment must begin with a lowercase letter and:
 
 -   The file extension must not use the reserved extensions .md or .json.
 
-### Tasks with a single implementation
+### Single-platform tasks
 
 A task can consist of a single executable with or without a corresponding metadata file. For instance, `./mysql/tasks/sql.rb` and `./mysql/tasks/sql.json`. In this case, no other `./mysql/tasks/sql.*` files can exist.
 
-### Tasks with multiple implementations
+### Cross-platform tasks
 
 A task can also have multiple implementations, with metadata that explains when to use each one. A primary use case for this is to support different implementations for different target platforms, referred to as `cross-platform tasks`. For instance, consider a module with the following files:
 
