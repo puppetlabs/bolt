@@ -33,7 +33,7 @@ module Bolt
       @path = Pathname.new(path).expand_path
       @config_file = @path + 'bolt.yaml'
       @inventory_file = @path + 'inventory.yaml'
-      @modulepath = [(@path + 'modules').to_s, (@path + 'site').to_s]
+      @modulepath = [(@path + 'modules').to_s, (@path + 'site-modules').to_s, (@path + 'site').to_s]
       @hiera_config = @path + 'hiera.yaml'
       @puppetfile = @path + 'Puppetfile'
     end
