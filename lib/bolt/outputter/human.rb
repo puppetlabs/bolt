@@ -203,7 +203,12 @@ module Bolt
             @stream.puts('(no modules installed)')
           else
             module_info = modules.map do |m|
-              version = m[:version] || '???'
+              version = if m[:version].nil?
+                          m[:internal_module_group].nil? ? '(no metadata)' : '(built-in)'
+                        else
+                          m[:version]
+                        end
+
               [m[:name], version]
             end
 
