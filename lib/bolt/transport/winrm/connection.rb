@@ -58,7 +58,8 @@ module Bolt
           # If we're using the default port with SSL, a timeout probably means the
           # host doesn't support SSL.
           if target.options['ssl'] && @port == HTTPS_PORT
-            the_problem = "\nUse --no-ssl if this host isn't configured to use SSL for WinRM"
+            the_problem = "\nVerify that required WinRM ports are open, " \
+                          "or use --no-ssl if this host isn't configured to use SSL for WinRM."
           end
           raise Bolt::Node::ConnectError.new(
             "Timeout after #{target.options['connect-timeout']} seconds connecting to #{endpoint}#{the_problem}",
