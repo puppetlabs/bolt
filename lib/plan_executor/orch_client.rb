@@ -124,7 +124,8 @@ module PlanExecutor
       content = Base64.encode64(content)
       params = {
         'content' => content,
-        'arguments' => arguments
+        'arguments' => arguments,
+        'name' => Pathname(script).basename.to_s
       }
       callback ||= proc {}
       results = run_task_job(targets, BOLT_SCRIPT_TASK, params, options, &callback)
