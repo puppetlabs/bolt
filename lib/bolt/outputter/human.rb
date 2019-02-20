@@ -191,6 +191,34 @@ module Bolt
                         "details and parameters for a specific plan.")
       end
 
+      def print_module_list(module_list)
+        module_list.each do |path, modules|
+          if (mod = modules.find { |m| m[:internal_module_group] })
+            @stream.puts(mod[:internal_module_group])
+          else
+            @stream.puts(path)
+          end
+
+          if modules.empty?
+            @stream.puts('(no modules installed)')
+          else
+            module_info = modules.map do |m|
+              version = if m[:version].nil?
+                          m[:internal_module_group].nil? ? '(no metadata)' : '(built-in)'
+                        else
+                          m[:version]
+                        end
+
+              [m[:name], version]
+            end
+
+            print_table(module_info)
+          end
+
+          @stream.write("\n")
+        end
+      end
+
       # @param [Bolt::ResultSet] apply_result A ResultSet object representing the result of a `bolt apply`
       def print_apply_result(apply_result)
         apply_result.each { |result| print_result(result) }

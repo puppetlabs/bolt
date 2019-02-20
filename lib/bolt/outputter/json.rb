@@ -42,6 +42,7 @@ module Bolt
       def print_table(results)
         @stream.puts results.to_json
       end
+      alias print_module_list print_table
 
       def print_task_info(task)
         path = task['files'][0]['path'].chomp("/tasks/#{task['files'][0]['name']}")
