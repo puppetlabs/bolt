@@ -62,7 +62,7 @@ bolt task run mymodule::mytask --nodes app1.myorg.com --params $(@{load_balancer
 ## Specify the module path
 
 In order for Bolt to find a task, the task must be in a module on the `modulepath`. By
-default, the `modulepath` includes `modules/` and `site/` directories inside the
+default, the `modulepath` includes `modules/` and `site-modules/` directories inside the
 `Boltdir`. If you are developing a new task you can specify `--modulepath
 <PARENT_DIR_OF/MODULE>` to tell Bolt where to load the module. For example if
 your module is in `~/src/modules/my_module/` run Bolt with `--modulepath

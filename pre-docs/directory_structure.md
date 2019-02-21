@@ -1,13 +1,16 @@
 # Directory structures for tasks and plans
 
-Follow these guidelines for writing and sharing projects that use tasks and plans.
+Puppet Tasks, Plans, Functions, Classes and Types, must exist inside a Puppet
+Module for Bolt to load them. Bolt loads modules by searching for module
+directories on the modulepath. By default the `modulepath` includes the `modules/` and
+`site-modules` directories in the [Bolt project directory](./bolt_project_directory.md).
 
-There are several ways that you might deploy tasks and plans, depending on how you want to use or share them. You can deploy tasks and plans as:
-* A standalone module that you publish, for example to the Forge.
-* A module that's part of a project you want to deploy.
-* A module that's part of a control repository.
 
-Regardless of how you deploy your tasks and plans, they must be structured as a module.
+## Directory structure of a module
+
+A module is a sub-directory of one of the directories on the modulepath. In
+order for Bolt to load Tasks and Plans they must exist in the `tasks/` or
+`plans/` directory of a module with the correct name.
 
 > **Tip**: You can use the Puppet Development Kit (PDK) to create modules and add tasks to it.
 
@@ -28,6 +31,8 @@ A typical module for use with Bolt may contain these directories:
     Hiera data that can be used when applying a manifest block.
 `files/`
     Static files that can be loaded by a plan or required as a dependency of a task. Prefer putting non-Ruby libraries used by a task here.
+`functions/`
+    Puppet Language functions that can be used from a plan.
 `hiera.yaml`
     Hiera configuration for this module.
 `lib/`
@@ -41,57 +46,46 @@ A typical module for use with Bolt may contain these directories:
 `tasks/`
     Tasks and their metadata.
 
-## Standalone modules
+## Where to put module code
 
-Standalone modules can be published to the Forge or saved in a local code repository. When you create a standalone module, be sure all dependencies are specified in the modulepath.
+Modules can either be written directly in `site-modules/` or be installed from
+the Puppet Forge or a code repository into `modules/`.
 
-To run a plan, you must declare the modulepath to find it, typically with `bolt --modulepath ..` where `modulepath` specifies the parent of the module directory you're working in. Any dependencies required to run the plan must either be in the same parent directory or in additional directories specified as modulepath entries.
+### Modules for projects
+
+Modules developed to support a particular project can be developed directly in
+the `site-modules` directory of the [Bolt project
+directory](./bolt_project_directory.md). Create a new directory for each module
+inside `site-modules` that matches the modules name or use [`pdk new
+module`](https://puppet.com/docs/pdk/latest/pdk.html) to create a skeleton
+structure.
+
+### Standalone modules
+
+Standalone modules can be published to the Forge or saved in a shared code
+repository. This allows a module to be used from multiple projects or shared
+publicly. To use a standalone module install it into the project directory as
+described in [Installing Modules](./bolt_installing_modules.md)
+
+To create a standalone module run `pdk new module` outside of the project
+directory, develop the module then push it to a code repository or the Puppet
+Forge before using it in your project. Read [The Beginners Guide to Writing
+Modules](https://puppet.com/docs/puppet/latest/bgtm.html) for more information
+about writing standalone modules.
 
 > **Tip**: As a best practice, write automated tests for the tasks and plans in your module, if possible. For information about automated testing patterns, check out these resources:
 > * [Example of unit testing plans and integration (acceptance) testing tasks](https://github.com/puppetlabs/puppetlabs-facts) (GitHub)
 > * [Writing Robust Puppet Bolt Tasks: A Guide](https://puppet.com/blog/writing-robust-puppet-bolt-tasks-guide) (Puppet blog)
 
+> **Tip** It's a good idea to add `modules/*` to `.gitignore` of your project to
+> prevent accidentally committing standalone modules.
 
-
-## Modules for projects
-
-Tasks and plans developed to support a particular project can be included with that project in a `Boltdir` at the root of the project.
-
-A typical project including a `Boltdir` is structured like this:
-```
-
-├── Boltdir
-│   ├── Puppetfile
-│   └── site/
-│       └── project/
-└── other_project_files
-```
-
-Tasks and plans go in the `Boltdir/site/project/tasks` and `Boltdir/site/project/plans` directories, respectively.
-
-The Puppetfile declares modules that your tasks and plans depend on. Within the project directory, run `bolt puppetfile install` to install dependencies to the `Boltdir/modules/` directory. When you run tasks and plans within the project, the `Boltdir` is detected and the default modulepaths (`Boltdir/site/` and `Boltdir/modules/`) are searched for modules containing Bolt content.
+> **Tip**: When you run tasks and plans within a project directory
+> the modulepath (`modules/` and `site-modules/`) is searched for modules
+> containing Bolt content. If a module is found in `modules` Tasks and Plans
+> from the version of the module in `site-modules` are ignored. Make sure
+> to remove a module from `site-modules` if you convert it to a standalone
+> module.
 
 Related information
 [Configuring Bolt](configuring_bolt.md)
-
-## Modules in control repositories
-
-The control repository pattern is useful for sharing tasks and plans — and the modules they depend on — with others.
-
-Your organization's centralized control repository can also act as your `Boltdir` by adding `bolt.yaml` to the root of the repository. The `bolt.yaml` can be an empty file. For more information about setting up a centralized control repository for your organization, see [best practices for control repositories](https://github.com/puppetlabs/best-practices/blob/master/control-repo-contents.md) and a corresponding [example](https://github.com/puppetlabs/control-repo).
-
-A typical control repository for running plans is structured like this:
-```
-
-├── bolt.yaml
-├── data/
-├── hiera.yaml
-├── Puppetfile
-├── README.md
-└── site/
-    ├── profile/
-```
-
-Tasks and plans go in the `site/profile/tasks` and `site/profile/plans` directories, respectively. The `hiera.yaml` file is used when [applying manifest code](applying_manifest_blocks.md) and can also be placed within the module at `site/profile/`.
-
-The Puppetfile declares modules that your tasks and plans depend on. Within the control repository, run `bolt puppetfile install` to install dependencies to the `modules/` directory. When you run tasks and plans within the control repository, the `bolt.yaml` file is interpreted as a `Boltdir`, and the default modulepaths (`site/` and `modules/`) are searched for modules containing Bolt content.

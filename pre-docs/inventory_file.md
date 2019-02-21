@@ -2,7 +2,13 @@
 
 In Bolt, you can use an inventory file to store information about your nodes. For example, you can organize your nodes into groups or set up connection information for nodes or node groups.
 
-The inventory file is a yaml file stored by default at `inventory.yaml` inside the `Boltdir`. At the top level it contains an array of nodes and groups. Each node can have a config, facts, vars, and features specific to that node. Each group can have an array of nodes and a config hash. node. Each group can have an array of nodes, an array of child groups, and can set default config, vars, and features for the entire group.
+The inventory file is a yaml file stored by default at `inventory.yaml` inside
+the [bolt project directory](bolt_project_directory.md). At the top level it
+contains an array of nodes and groups. Each node can have a config, facts,
+vars, and features specific to that node. Each group can have an array of nodes
+and a config hash. node. Each group can have an array of nodes, an array of
+child groups, and can set default config, vars, and features for the entire
+group.
 
 **Note:** Configuration values set at the top level of inventory will only apply to targets included in that inventory file. Set values for unknown targets in the Bolt configuration file.
 

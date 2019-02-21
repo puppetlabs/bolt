@@ -55,8 +55,8 @@ bolt plan run mymodule::myplan --nodes app1.myorg.com --params $(@{load_balancer
 ## Specify the module path
 
 In order for Bolt to find a plan, the plan must be in a module on the `modulepath`. By
-default the `modulepath` includes `modules/` and `site/` directories inside the
-`Boltdir`. If you are developing a new plan you can specify `--modulepath
+default the `modulepath` includes `modules/` and `site-modules/` directories inside the
+Bolt project directory. If you are developing a new plan you can specify `--modulepath
 <PARENT_DIR_OF/MODULE>` to tell Bolt where to load the module. For example if
 your module is in `~/src/modules/my_module/` run Bolt with `--modulepath
 ~/src/module`. If you often use the same `modulepath` you can set `modulepath` in
