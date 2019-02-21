@@ -23,9 +23,9 @@ Failed to connect to HOST: expected 64-byte String, got NUM
 
 Workaround: Generate new keys with the ssh-keygen flag `-m PEM`. For existing keys, OpenSSH provides the export \(`-e`\) option for exporting from its own format, but export is not implemented for all private key types. [\(BOLT-920\)](https://tickets.puppet.com/browse/BOLT-920) 
 
-## String segments in commands must be triple-quoted in PowerShell
+## JSON strings as command arguments may require additional escaping in PowerShell
 
-When running Bolt in PowerShell with commands to be run on \*nix nodes, string segments that can be interpreted by PowerShell need to be triple quoted. [\(BOLT-159\)](https://tickets.puppet.com/browse/BOLT-159)
+When passing complex arguments to tasks with `--params`, Bolt may require a JSON string (typically created with the `ConvertTo-Json` cmdlet) to have additional escaping. In some cases, the PowerShell stop parsing symbol `--%` may be used as a workaround, until Bolt provides better PowerShell support [\(BOLT-1130\)](https://tickets.puppet.com/browse/BOLT-1130)
 
 ## No Kerberos support
 
