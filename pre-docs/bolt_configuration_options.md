@@ -28,6 +28,8 @@ ssh:
 
 `hiera-config`: Specify the path to your Hiera config. The default path for the Hiera config file is `hiera.yaml` inside the Bolt project directory.
 
+`transport`: Specify the default transport to use when the transport for a target is not specified in the url or inventory. The valid options for transport are `docker`, `local`, `pcp`, `ssh`, and `winrm`.
+
 ## SSH transport configuration options
 
 `host-key-check`: Whether to perform host key validation when connecting over SSH. Default is `true`.
