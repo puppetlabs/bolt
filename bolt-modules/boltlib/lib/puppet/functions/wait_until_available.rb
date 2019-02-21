@@ -17,14 +17,13 @@ Puppet::Functions.create_function(:wait_until_available) do
   end
 
   def wait_until_available(targets, options = nil)
-    options ||= {}
-
     unless Puppet[:tasks]
-      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
-        Puppet::Pops::Issues::TASK_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, operation: 'wait_until_available'
-      )
+      raise Puppet::ParseErrorWithIssue
+        .from_issue_and_stack(Bolt::PAL::Issues::PLAN_OPERATION_NOT_SUPPORTED_WHEN_COMPILING,
+                              action: 'wait_until_available')
     end
 
+    options ||= {}
     executor = Puppet.lookup(:bolt_executor) { nil }
     inventory = Puppet.lookup(:bolt_inventory) { nil }
     unless executor && inventory && Puppet.features.bolt?

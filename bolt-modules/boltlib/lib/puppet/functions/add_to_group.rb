@@ -20,6 +20,11 @@ Puppet::Functions.create_function(:add_to_group) do
   end
 
   def add_to_group(targets, group)
+    unless Puppet[:tasks]
+      raise Puppet::ParseErrorWithIssue
+        .from_issue_and_stack(Bolt::PAL::Issues::PLAN_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, action: 'add_to_group')
+    end
+
     inventory = Puppet.lookup(:bolt_inventory) { nil }
 
     unless inventory && Puppet.features.bolt?

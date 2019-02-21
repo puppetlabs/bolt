@@ -151,10 +151,9 @@ describe 'run_command' do
 
   context 'without tasks enabled' do
     let(:tasks_enabled) { false }
-
     it 'fails and reports that run_command is not available' do
       is_expected.to run.with_params('echo hello', [])
-                        .and_raise_error(/The task operation 'run_command' is not available/)
+                        .and_raise_error(/Plan language function 'run_command' cannot be used/)
     end
   end
 end

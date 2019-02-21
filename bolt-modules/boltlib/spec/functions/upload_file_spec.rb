@@ -179,7 +179,7 @@ describe 'upload_file' do
 
     it 'fails and reports that upload_file is not available' do
       is_expected.to run.with_params('test/uploads/nonesuch.html', '/some/place', [])
-                        .and_raise_error(/The task operation 'upload_file' is not available/)
+                        .and_raise_error(/Plan language function 'upload_file' cannot be used/)
     end
   end
 end

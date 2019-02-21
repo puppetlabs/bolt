@@ -6,6 +6,11 @@ require 'bolt/error'
 
 describe 'fail_plan' do
   include PuppetlabsSpec::Fixtures
+  let(:tasks_enabled) { true }
+
+  before(:each) do
+    Puppet[:tasks] = tasks_enabled
+  end
 
   it 'raises an error from arguments' do
     is_expected.to run.with_params('oops').and_raise_error(Bolt::PlanFailure)
@@ -22,6 +27,14 @@ describe 'fail_plan' do
 
     Puppet.override(bolt_executor: executor) do
       is_expected.to run.with_params('foo').and_raise_error(Bolt::PlanFailure)
+    end
+  end
+
+  context 'without tasks enabled' do
+    let(:tasks_enabled) { false }
+    it 'fails and reports that fail_plan is not available' do
+      is_expected.to run.with_params('foo')
+                        .and_raise_error(/Plan language function 'fail_plan' cannot be used/)
     end
   end
 end

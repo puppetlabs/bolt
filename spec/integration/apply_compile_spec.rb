@@ -142,7 +142,7 @@ describe "passes parsed AST to the apply_catalog task" do
       expect(error['kind']).to eq('bolt/apply-error')
       expect(error['msg']).to match(/Apply failed to compile for #{uri}/)
       expect(@log_output.readlines)
-        .to include(/The task operation 'run_task' is not available when compiling a catalog/)
+        .to include(/Plan language function 'run_task' cannot be used from declarative manifest code/)
     end
 
     context 'with puppetdb stubbed' do

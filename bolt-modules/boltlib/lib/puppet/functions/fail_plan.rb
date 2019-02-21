@@ -32,6 +32,11 @@ Puppet::Functions.create_function(:fail_plan) do
   end
 
   def from_args(msg, kind = nil, details = nil, issue_code = nil)
+    unless Puppet[:tasks]
+      raise Puppet::ParseErrorWithIssue
+        .from_issue_and_stack(Bolt::PAL::Issues::PLAN_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, action: 'fail_plan')
+    end
+
     executor = Puppet.lookup(:bolt_executor) { nil }
     executor&.report_function_call('fail_plan')
 

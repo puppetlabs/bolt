@@ -13,9 +13,10 @@ describe 'apply_prep' do
   let(:applicator) { mock('Bolt::Applicator') }
   let(:executor) { Bolt::Executor.new }
   let(:inventory) { Bolt::Inventory.new({}) }
+  let(:tasks_enabled) { true }
 
   around(:each) do |example|
-    Puppet[:tasks] = true
+    Puppet[:tasks] = tasks_enabled
     Puppet.features.stubs(:bolt?).returns(true)
 
     executor.stubs(:noop).returns(false)
@@ -184,6 +185,14 @@ describe 'apply_prep' do
         expect(inventory.features(target)).to include('puppet-agent')
         expect(inventory.facts(target)).to eq(fact)
       end
+    end
+  end
+
+  context 'without tasks enabled' do
+    let(:tasks_enabled) { false }
+    it 'fails and reports that apply_prep is not available' do
+      is_expected.to run.with_params('foo')
+                        .and_raise_error(/Plan language function 'apply_prep' cannot be used/)
     end
   end
 end

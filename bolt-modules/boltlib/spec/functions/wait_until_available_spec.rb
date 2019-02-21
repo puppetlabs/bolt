@@ -54,4 +54,13 @@ describe 'wait_until_available' do
                         .and_raise_error(/The 'bolt' library is required to wait until targets are available/)
     end
   end
+
+  context 'without tasks enabled' do
+    let(:tasks_enabled) { false }
+
+    it 'fails and reports that wait_until_available is not available' do
+      is_expected.to run
+        .with_params(target).and_raise_error(/Plan language function 'wait_until_available' cannot be used/)
+    end
+  end
 end

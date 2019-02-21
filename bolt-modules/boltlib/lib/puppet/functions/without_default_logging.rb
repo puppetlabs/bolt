@@ -20,6 +20,12 @@ Puppet::Functions.create_function(:without_default_logging) do
   end
 
   def without_default_logging
+    unless Puppet[:tasks]
+      raise Puppet::ParseErrorWithIssue
+        .from_issue_and_stack(Bolt::PAL::Issues::PLAN_OPERATION_NOT_SUPPORTED_WHEN_COMPILING,
+                              action: 'without_default_logging')
+    end
+
     executor = Puppet.lookup(:bolt_executor) { nil }
     executor.report_function_call('without_default_logging')
 

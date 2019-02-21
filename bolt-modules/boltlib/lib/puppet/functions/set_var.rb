@@ -18,9 +18,8 @@ Puppet::Functions.create_function(:set_var) do
 
   def set_var(target, key, value)
     unless Puppet[:tasks]
-      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
-        Puppet::Pops::Issues::TASK_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, operation: 'set_var'
-      )
+      raise Puppet::ParseErrorWithIssue
+        .from_issue_and_stack(Bolt::PAL::Issues::PLAN_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, action: 'set_var')
     end
 
     inventory = Puppet.lookup(:bolt_inventory) { nil }

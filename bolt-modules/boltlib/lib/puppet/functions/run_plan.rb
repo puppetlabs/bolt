@@ -18,9 +18,8 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
 
   def run_plan(scope, plan_name, named_args = {})
     unless Puppet[:tasks]
-      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
-        Puppet::Pops::Issues::TASK_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, operation: 'run_plan'
-      )
+      raise Puppet::ParseErrorWithIssue
+        .from_issue_and_stack(Bolt::PAL::Issues::PLAN_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, action: 'run_plan')
     end
 
     executor = Puppet.lookup(:bolt_executor) { nil }

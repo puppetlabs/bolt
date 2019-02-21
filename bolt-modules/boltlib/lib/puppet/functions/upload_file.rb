@@ -50,15 +50,13 @@ Puppet::Functions.create_function(:upload_file, Puppet::Functions::InternalFunct
   end
 
   def upload_file_with_description(scope, source, destination, targets, description = nil, options = nil)
-    options ||= {}
-    options = options.merge('_description' => description) if description
-
     unless Puppet[:tasks]
-      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
-        Puppet::Pops::Issues::TASK_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, operation: 'upload_file'
-      )
+      raise Puppet::ParseErrorWithIssue
+        .from_issue_and_stack(Bolt::PAL::Issues::PLAN_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, action: 'upload_file')
     end
 
+    options ||= {}
+    options = options.merge('_description' => description) if description
     executor = Puppet.lookup(:bolt_executor) { nil }
     inventory = Puppet.lookup(:bolt_inventory) { nil }
     unless executor && inventory && Puppet.features.bolt?
