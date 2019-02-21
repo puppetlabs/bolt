@@ -24,7 +24,7 @@ describe "BoltSpec::Run", ssh: true do
 
   describe 'run_task' do
     it 'should run a task on a node' do
-      result = run_task('sample::echo', 'ssh', options)
+      result = run_task('sample::echo', 'ssh', {}, options)
       expect(result[0]['status']).to eq('success')
     end
 
@@ -43,7 +43,7 @@ describe "BoltSpec::Run", ssh: true do
     end
 
     it 'should accept _catch_errors' do
-      result = run_command('echo hello', 'non_existent_node', { '_catch_errors' => true }, options)
+      result = run_command('echo hello', 'non_existent_node', options: { '_catch_errors' => true }, **options)
 
       expect(result[0]['status']).to eq('failure')
       expect(result[0]['result']['_error']['kind']).to eq('puppetlabs.tasks/connect-error')
@@ -60,7 +60,7 @@ describe "BoltSpec::Run", ssh: true do
     end
 
     it 'should accept _catch_errors' do
-      result = run_script('missing.sh', 'non_existent_node', nil, { '_catch_errors' => true }, options)
+      result = run_script('missing.sh', 'non_existent_node', nil, options: { '_catch_errors' => true }, **options)
 
       expect(result[0]['status']).to eq('failure')
       expect(result[0]['result']['_error']['kind']).to eq('puppetlabs.tasks/connect-error')
@@ -92,10 +92,10 @@ describe "BoltSpec::Run", ssh: true do
     end
 
     before(:all) do
-      result = run_task('puppet_agent::version', 'ssh', inventory: conn_inventory, config: root_config)
+      result = run_task('puppet_agent::version', 'ssh', {}, inventory: conn_inventory, config: root_config)
       expect(result.first['status']).to eq('success')
       unless result.first['result']['version']
-        result = run_task('puppet_agent::install', 'ssh', inventory: conn_inventory, config: root_config)
+        result = run_task('puppet_agent::install', 'ssh', {}, inventory: conn_inventory, config: root_config)
       end
       expect(result.first['status']).to eq('success')
     end
