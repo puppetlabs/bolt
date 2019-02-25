@@ -708,6 +708,51 @@ else
 fi
 ```
 
+If you intend to use this task with PE and assign RBAC permissions for it make
+sure the script safely handles parameters or validate them to prevent shell
+injection vulnerabilities.
+
+### Wrapping an existing script
+
+If the script is not already installed on targets and you do not want to edit
+it, for example if it's a script someone else maintains, you can wrap the
+script in a small task without modifying it.
+
+Given a script, `myscript.sh`, that accepts 2 positional args, `filename` and `version`:
+
+1. Copy the script to the module's `files/` directory.
+
+2. Create a metadata file for the task that includes the parameters and file dependency.
+
+   ```
+   {
+     "input_method": "environment",
+     "parameters": {
+       "filename": { "type": "String[1]" },
+       "version": { "type": "String[1]" }
+     },
+     "files": [ "script_example/files/myscript.sh" ]
+   }
+   ```
+
+3. Create a small wrapper task that reads environment variables and calls the task.
+
+   ```
+   #!/usr/bin/env bash
+   set -e
+
+   script_file="$PT__installdir/script_example/files/myscript.sh"
+   # If this task is going to be run from windows nodes the wrapper must make sure it's exectutable
+   chmod +x $script_file
+   commandline=("$script_file" "$PT_filename" "$PT_version")
+   # If the stderr output of the script is important redirect it to stdout.
+   "${commandline[@]}" 2>&
+   ```
+
+If you intend to use this task with PE and assign RBAC permissions for it make
+sure the script safely handles parameters or validate them to prevent shell
+injection vulnerabilities.
+
 ## Supporting no-op in tasks
 
 Tasks support no-operation functionality, also known as no-op mode. This function shows what changes the task would make, without actually making those changes.
