@@ -8,7 +8,7 @@ module Bolt
   module Transport
     class Docker < Base
       def self.options
-        %w[service-url service-options tmpdir]
+        %w[service-url service-options tmpdir interpreters]
       end
 
       def provided_features
@@ -48,7 +48,7 @@ module Bolt
 
             _, stderr, exitcode = conn.execute('mv', tmpfile, destination, {})
             if exitcode != 0
-              message = "Could not move temporary file '#{tmpfile}' to #{destination}: #{stderr.join}"
+              message = "Could not move temporary file '#{tmpfile}' to #{destination}: #{stderr}"
               raise Bolt::Node::FileError.new(message, 'MV_ERROR')
             end
           end
@@ -59,7 +59,7 @@ module Bolt
       def run_command(target, command, _options = {})
         with_connection(target) do |conn|
           stdout, stderr, exitcode = conn.execute(*Shellwords.split(command), {})
-          Bolt::Result.for_command(target, stdout.join, stderr.join, exitcode)
+          Bolt::Result.for_command(target, stdout, stderr, exitcode)
         end
       end
 
@@ -71,7 +71,7 @@ module Bolt
           conn.with_remote_tempdir do |dir|
             remote_path = conn.write_remote_executable(dir, script)
             stdout, stderr, exitcode = conn.execute(remote_path, *arguments, {})
-            Bolt::Result.for_command(target, stdout.join, stderr.join, exitcode)
+            Bolt::Result.for_command(target, stdout, stderr, exitcode)
           end
         end
       end
@@ -87,7 +87,7 @@ module Bolt
         arguments = unwrap_sensitive_args(arguments)
         with_connection(target) do |conn|
           execute_options = {}
-
+          execute_options[:interpreter] = select_interpreter(executable, target.options['interpreters'])
           conn.with_remote_tempdir do |dir|
             if extra_files.empty?
               task_dir = dir
@@ -112,7 +112,7 @@ module Bolt
             end
 
             stdout, stderr, exitcode = conn.execute(remote_task_path, execute_options)
-            Bolt::Result.for_task(target, stdout.join, stderr.join, exitcode)
+            Bolt::Result.for_task(target, stdout, stderr, exitcode)
           end
         end
       end

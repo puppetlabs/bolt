@@ -8,7 +8,15 @@ module Bolt
   module Transport
     class WinRM < Base
       def self.options
-        %w[port user password connect-timeout ssl ssl-verify tmpdir cacert extensions]
+        %w[port user password connect-timeout ssl ssl-verify tmpdir cacert extensions interpreters]
+      end
+
+      def self.default_options
+        {
+          'connect-timeout' => 10,
+          'ssl' => true,
+          'ssl-verify' => true
+        }
       end
 
       def provided_features
@@ -135,7 +143,13 @@ module Bolt
               if Powershell.powershell_file?(remote_task_path) && stdin.nil?
                 conn.execute(Powershell.run_ps_task(arguments, remote_task_path, input_method))
               else
-                path, args = *Powershell.process_from_extension(remote_task_path)
+                interpreter = select_interpreter(remote_task_path, target.options['interpreters'])
+                if interpreter
+                  path = interpreter
+                  args = [remote_task_path]
+                else
+                  path, args = *Powershell.process_from_extension(remote_task_path)
+                end
                 conn.execute_process(path, args, stdin)
               end
 

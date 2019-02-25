@@ -48,6 +48,10 @@ module Bolt
               "self.options() or self.filter_options(unfiltered) must be implemented by the transport class"
       end
 
+      def self.default_options
+        {}
+      end
+
       def self.filter_options(unfiltered)
         unfiltered.select { |k| options.include?(k) }
       end
@@ -85,6 +89,10 @@ module Bolt
         impl = task.select_implementation(target, provided_features)
         impl['input_method'] ||= default_input_method(impl['path'])
         impl
+      end
+
+      def select_interpreter(executable, interpreters)
+        interpreters[Pathname(executable).extname] if interpreters
       end
 
       def reject_transport_options(target, options)

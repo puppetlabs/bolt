@@ -11,7 +11,13 @@ module Bolt
   module Transport
     class Local < Base
       def self.options
-        %w[tmpdir]
+        %w[tmpdir interpreters]
+      end
+
+      def self.default_options
+        {
+          'interpreters' => { '.rb' => RbConfig.ruby }
+        }
       end
 
       def provided_features
@@ -129,8 +135,10 @@ module Bolt
           copy_file(executable, script)
           File.chmod(0o750, script)
 
+          interpreter = select_interpreter(script, target.options['interpreters'])
+          interpreter_debug = interpreter ? " using '#{interpreter}' interpreter" : nil
           # log the arguments with sensitive data redacted, do NOT log unwrapped_arguments
-          logger.debug("Running '#{script}' with #{arguments}")
+          logger.debug("Running '#{script}' with #{arguments}#{interpreter_debug}")
           unwrapped_arguments = unwrap_sensitive_args(arguments)
 
           stdin = STDIN_METHODS.include?(input_method) ? JSON.dump(unwrapped_arguments) : nil
@@ -146,25 +154,32 @@ module Bolt
               environment_params = ""
             end
 
-            output =
-              if Powershell.powershell_file?(script) && stdin.nil?
-                command = Powershell.run_ps_task(arguments, script, input_method)
-                command = environment_params + Powershell.shell_init + command
+            if Powershell.powershell_file?(script) && stdin.nil?
+              command = Powershell.run_ps_task(arguments, script, input_method)
+              command = environment_params + Powershell.shell_init + command
+              interpreter ||= 'powershell.exe'
+              output =
                 if input_method == 'powershell'
-                  @conn.execute(command, dir: dir, env: "powershell.exe")
+                  @conn.execute(command, dir: dir, interpreter: interpreter)
                 else
-                  @conn.execute(command, dir: dir, stdin: stdin, env: "powershell.exe")
+                  @conn.execute(command, dir: dir, stdin: stdin, interpreter: interpreter)
                 end
+            end
+            unless output
+              if interpreter
+                env = ENVIRONMENT_METHODS.include?(input_method) ? envify_params(unwrapped_arguments) : nil
+                output = @conn.execute(script, stdin: stdin, env: env, dir: dir, interpreter: interpreter)
               else
                 path, args = *Powershell.process_from_extension(script)
                 command = args.unshift(path).join(' ')
                 command = environment_params + Powershell.shell_init + command
-                @conn.execute(command, dir: dir, stdin: stdin, env: "powershell.exe")
+                output = @conn.execute(command, dir: dir, stdin: stdin, interpreter: 'powershell.exe')
               end
+            end
           else
             # POSIX
             env = ENVIRONMENT_METHODS.include?(input_method) ? envify_params(unwrapped_arguments) : nil
-            output = @conn.execute(script, stdin: stdin, env: env, dir: dir)
+            output = @conn.execute(script, stdin: stdin, env: env, dir: dir, interpreter: interpreter)
           end
           Bolt::Result.for_task(target, output.stdout.string, output.stderr.string, output.exit_code)
         end

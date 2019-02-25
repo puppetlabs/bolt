@@ -16,6 +16,9 @@ describe "when running over the local transport" do
 
   context 'when using CLI options' do
     let(:echo) { "echo hi" }
+    let(:config_flags) {
+      %W[--nodes localhost --format json --modulepath #{modulepath}]
+    }
 
     it 'runs multiple commands' do
       result = run_nodes(%W[command run #{echo} --nodes #{uri} --format json])
@@ -25,6 +28,12 @@ describe "when running over the local transport" do
     it 'reports errors when command fails' do
       result = run_failed_nodes(%W[command run boop --nodes #{uri} --format json])
       expect(result[0]['_error']).to be
+    end
+
+    it 'runs a ruby task using bolt ruby', :reset_puppet_settings do
+      result = run_one_node(%w[task run sample::bolt_ruby message=somemessage] + config_flags)
+      expect(result['env']).to match(/somemessage/)
+      expect(result['stdin']).to match(/somemessage/)
     end
   end
 

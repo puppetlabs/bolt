@@ -12,6 +12,9 @@ format: human
 ssh:
   host-key-check: false
   private-key: ~/.ssh/bolt_id
+  user: foo
+  interpreters:
+    rb: /home/foo/.rbenv/versions/2.5.1/bin/ruby
 ```
 
 ## Global configuration options
@@ -29,6 +32,14 @@ ssh:
 `hiera-config`: Specify the path to your Hiera config. The default path for the Hiera config file is `hiera.yaml` inside the Bolt project directory.
 
 `transport`: Specify the default transport to use when the transport for a target is not specified in the url or inventory. The valid options for transport are `docker`, `local`, `pcp`, `ssh`, and `winrm`.
+
+`interpreters`: A map of extension name to absolute path of an executable. This allows a user to override the shebang defined in a task executable. The extension can optionally be specified with the '.' character included ('.py' and 'py' will both map to a task executable `task.py`) and the extension sepcified is case sensitive. The transports that support interpreter configuration are `docker`, `local`, `ssh`, and `winrm`. The local transport will default to using the ruby interpreter that is running bolt.
+
+*Example Interpreter Configuration*
+```
+interpreters:
+  py: /usr/bin/python3
+```
 
 ## SSH transport configuration options
 
@@ -52,7 +63,7 @@ ssh:
 
 `sudo-password`: Password to use when changing users via `run-as`.
 
-`tmpdir`: The directory to upload and execute temporary files on the target.
+`tmpdir`: The directory to upload and execute temporary files on the target. 
 
 ## WinRM transport configuration options
 

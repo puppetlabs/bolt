@@ -36,29 +36,7 @@ module Bolt
 
     TRANSPORT_OPTIONS = %i[password run-as sudo-password extensions
                            private-key tty tmpdir user connect-timeout
-                           cacert token-file service-url].freeze
-
-    # TODO: move these to the transport themselves
-    TRANSPORT_SPECIFIC_DEFAULTS = {
-      ssh: {
-        'connect-timeout' => 10,
-        'host-key-check' => true,
-        'tty' => false
-      },
-      winrm: {
-        'connect-timeout' => 10,
-        'ssl' => true,
-        'ssl-verify' => true
-      },
-      pcp: {
-        'task-environment' => 'production'
-      },
-      local: {},
-      docker: {},
-      remote: {
-        'run-on' => 'localhost'
-      }
-    }.freeze
+                           cacert token-file service-url interpreters].freeze
 
     def self.default
       new(Bolt::Boltdir.new('.'), {})
@@ -91,8 +69,9 @@ module Bolt
       @log = { 'console' => {} }
 
       @transports = {}
-      TRANSPORTS.each_key do |transport|
-        @transports[transport] = TRANSPORT_SPECIFIC_DEFAULTS[transport].dup
+
+      TRANSPORTS.each do |key, transport|
+        @transports[key] = transport.default_options
       end
 
       update_from_file(config_data)
@@ -112,6 +91,12 @@ module Bolt
 
     def deep_clone
       Bolt::Util.deep_clone(self)
+    end
+
+    def normalize_interpreters(interpreters)
+      Bolt::Util.walk_keys(interpreters) do |key|
+        key.chars[0] == '.' ? key : '.' + key
+      end
     end
 
     def normalize_log(target)
@@ -168,7 +153,10 @@ module Bolt
       TRANSPORTS.each do |key, impl|
         if data[key.to_s]
           selected = impl.filter_options(data[key.to_s])
-          @transports[key].merge!(selected)
+          @transports[key] = Bolt::Util.deep_merge(@transports[key], selected)
+        end
+        if @transports[key]['interpreters']
+          @transports[key]['interpreters'] = normalize_interpreters(@transports[key]['interpreters'])
         end
       end
     end

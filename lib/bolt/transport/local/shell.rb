@@ -8,6 +8,7 @@ module Bolt
     class Local
       class Shell
         def execute(*command, options)
+          command.unshift(options[:interpreter]) if options[:interpreter]
           command = [options[:env]] + command if options[:env]
 
           if options[:stdin]

@@ -11,6 +11,10 @@ module Bolt
         unfiltered
       end
 
+      def self.default_options
+        { 'run-on' => 'localhost' }
+      end
+
       def self.validate(options)
         # This will fail when validating global config
         # unless options['device-type']

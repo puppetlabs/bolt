@@ -43,4 +43,58 @@ describe "when running over the docker transport", docker: true do
       expect(result[0]['_error']).to be
     end
   end
+
+  context 'when using a configfile' do
+    let(:config) do
+      { 'format' => 'json',
+        'modulepath' => modulepath,
+        'transport' => 'docker',
+        'docker' => {
+          'user' => user
+        } }
+    end
+
+    let(:config_flags) { %W[--nodes #{uri}] }
+    let(:single_target_conf) { %W[--nodes #{conn_uri('docker')}] }
+    let(:interpreter_task) { 'sample::interpreter' }
+    let(:interpreter_ext) do
+      { 'interpreters' => {
+        '.py' => '/usr/bin/python3'
+      } }
+    end
+    let(:interpreter_no_ext) do
+      { 'interpreters' => {
+        'py' => '/usr/bin/python3'
+      } }
+    end
+
+    it 'runs task with specified interpreter key py', :reset_puppet_settings do
+      docker_conf = { 'docker' => config['docker'].merge(interpreter_no_ext) }
+      with_tempfile_containing('conf', YAML.dump(config.merge(docker_conf))) do |conf|
+        result =
+          run_nodes(%W[task run #{interpreter_task} message=somemessage
+                       --configfile #{conf.path}] + config_flags)
+        expect(result.map { |r| r['env'].strip }).to eq(%w[somemessage somemessage])
+        expect(result.map { |r| r['stdin'].strip }).to eq(%w[somemessage somemessage])
+      end
+    end
+
+    it 'runs task with interpreter key .py', :reset_puppet_settings do
+      docker_conf = { 'docker' => config['docker'].merge(interpreter_ext) }
+      with_tempfile_containing('conf', YAML.dump(config.merge(docker_conf))) do |conf|
+        result = run_nodes(%W[task run #{interpreter_task} message=somemessage
+                              --configfile #{conf.path}] + config_flags)
+        expect(result.map { |r| r['env'].strip }).to eq(%w[somemessage somemessage])
+        expect(result.map { |r| r['stdin'].strip }).to eq(%w[somemessage somemessage])
+      end
+    end
+
+    it 'task fails when bad shebang is not overriden', :reset_puppet_settings do
+      with_tempfile_containing('conf', YAML.dump(config)) do |conf|
+        result = run_failed_node(%W[task run #{interpreter_task} message=somemessage
+                                    --configfile #{conf.path}] + single_target_conf)
+        expect(result['_error']['msg']).to match(/interpreter.py’: No such file/)
+      end
+    end
+  end
 end

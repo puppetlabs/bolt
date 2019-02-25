@@ -10,7 +10,15 @@ module Bolt
     class SSH < Base
       def self.options
         %w[port user password sudo-password private-key host-key-check
-           connect-timeout tmpdir run-as tty run-as-command proxyjump]
+           connect-timeout tmpdir run-as tty run-as-command proxyjump interpreters]
+      end
+
+      def self.default_options
+        {
+          'connect-timeout' => 10,
+          'host-key-check' => true,
+          'tty' => false
+        }
       end
 
       def provided_features
@@ -169,6 +177,7 @@ module Bolt
               dir.chown(conn.run_as)
 
               execute_options[:sudoable] = true if conn.run_as
+              execute_options[:interpreter] = select_interpreter(executable, target.options['interpreters'])
               output = conn.execute(command, execute_options)
             end
             Bolt::Result.for_task(target, output.stdout.string,

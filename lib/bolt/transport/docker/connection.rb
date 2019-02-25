@@ -27,6 +27,7 @@ module Bolt
         end
 
         def execute(*command, options)
+          command.unshift(options[:interpreter]) if options[:interpreter]
           if options[:environment]
             envs = options[:environment].map { |env, val| "#{env}=#{val}" }
             command = ['env'] + envs + command
@@ -39,6 +40,8 @@ module Bolt
           else
             @logger.info { "Command failed with exit code #{result[2]}" }
           end
+          result[0] = result[0].join.force_encoding('UTF-8')
+          result[1] = result[1].join.force_encoding('UTF-8')
           result
         rescue StandardError
           @logger.debug { "Command aborted" }
@@ -62,7 +65,7 @@ module Bolt
         def mkdirs(dirs)
           _, stderr, exitcode = execute('mkdir', '-p', *dirs, {})
           if exitcode != 0
-            message = "Could not create directories: #{stderr.join}"
+            message = "Could not create directories: #{stderr}"
             raise Bolt::Node::FileError.new(message, 'MKDIR_ERROR')
           end
         end
@@ -73,7 +76,7 @@ module Bolt
 
           stdout, stderr, exitcode = execute('mkdir', '-m', '700', tmppath, {})
           if exitcode != 0
-            raise Bolt::Node::FileError.new("Could not make tempdir: #{stderr.join}", 'TEMPDIR_ERROR')
+            raise Bolt::Node::FileError.new("Could not make tempdir: #{stderr}", 'TEMPDIR_ERROR')
           end
           tmppath || stdout.first
         end
@@ -85,7 +88,7 @@ module Bolt
           if dir
             _, stderr, exitcode = execute('rm', '-rf', dir, {})
             if exitcode != 0
-              @logger.warn("Failed to clean up tempdir '#{dir}': #{stderr.join}")
+              @logger.warn("Failed to clean up tempdir '#{dir}': #{stderr}")
             end
           end
         end
@@ -101,7 +104,7 @@ module Bolt
         def make_executable(path)
           _, stderr, exitcode = execute('chmod', 'u+x', path, {})
           if exitcode != 0
-            message = "Could not make file '#{path}' executable: #{stderr.join}"
+            message = "Could not make file '#{path}' executable: #{stderr}"
             raise Bolt::Node::FileError.new(message, 'CHMOD_ERROR')
           end
         end
