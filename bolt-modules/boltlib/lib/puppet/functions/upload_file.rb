@@ -4,6 +4,8 @@ require 'bolt/error'
 
 # Uploads the given file or directory to the given set of targets and returns the result from each upload.
 # This function does nothing if the list of targets is empty.
+#
+# **NOTE:** Not available in apply block
 Puppet::Functions.create_function(:upload_file, Puppet::Functions::InternalFunction) do
   # Upload a file.
   # @param source A source path, either an absolute path or a modulename/filename selector for a file in

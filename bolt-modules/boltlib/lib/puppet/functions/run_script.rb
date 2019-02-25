@@ -2,6 +2,8 @@
 
 # Uploads the given script to the given set of targets and returns the result of having each target execute the script.
 # This function does nothing if the list of targets is empty.
+#
+# **NOTE:** Not available in apply block
 Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFunction) do
   # Run a script.
   # @param script Path to a script to run on target. May be an absolute path or a modulename/filename selector for a

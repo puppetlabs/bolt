@@ -3,6 +3,8 @@
 require 'bolt/util'
 
 # Wait until all targets accept connections.
+#
+# **NOTE:** Not available in apply block
 Puppet::Functions.create_function(:wait_until_available) do
   # Wait until targets are available.
   # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.

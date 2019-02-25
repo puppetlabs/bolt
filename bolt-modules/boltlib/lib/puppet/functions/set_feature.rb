@@ -9,6 +9,8 @@ require 'bolt/error'
 # - powershell
 # - shell
 # - puppet-agent
+#
+# **NOTE:** Not available in apply block
 Puppet::Functions.create_function(:set_feature) do
   # @param target The Target object to add features to. See {get_targets}.
   # @param feature The string identifying the feature.

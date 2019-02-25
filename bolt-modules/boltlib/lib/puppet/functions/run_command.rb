@@ -4,6 +4,8 @@ require 'bolt/error'
 
 # Runs a command on the given set of targets and returns the result from each command execution.
 # This function does nothing if the list of targets is empty.
+#
+# **NOTE:** Not available in apply block
 Puppet::Functions.create_function(:run_command) do
   # Run a command.
   # @param command A command to run on target.

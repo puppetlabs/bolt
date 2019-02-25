@@ -7,6 +7,8 @@ require 'bolt/task'
 #
 # Requires the Puppet Agent be installed on the target, which can be accomplished with apply_prep
 # or by directly running the puppet_agent::install task.
+#
+# **NOTE:** Not available in apply block
 Puppet::Functions.create_function(:get_resources) do
   # @param targets A pattern or array of patterns identifying a set of targets.
   # @param resources A resource type or instance, or an array of such.

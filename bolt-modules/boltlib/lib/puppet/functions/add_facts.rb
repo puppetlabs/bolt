@@ -3,6 +3,8 @@
 require 'bolt/error'
 
 # Deep merges a hash of facts with the existing facts on a target.
+#
+# **NOTE:** Not available in apply block
 Puppet::Functions.create_function(:add_facts) do
   # @param target A target.
   # @param facts A hash of fact names to values that may include structured facts.

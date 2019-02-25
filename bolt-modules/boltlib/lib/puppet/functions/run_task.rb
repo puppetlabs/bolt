@@ -6,6 +6,8 @@ require 'bolt/task'
 
 # Runs a given instance of a `Task` on the given set of targets and returns the result from each.
 # This function does nothing if the list of targets is empty.
+#
+# **NOTE:** Not available in apply block
 Puppet::Functions.create_function(:run_task) do
   # Run a task.
   # @param task_name The task to run.

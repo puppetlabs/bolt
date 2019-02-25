@@ -5,6 +5,8 @@
 
 Deep merges a hash of facts with the existing facts on a target.
 
+**NOTE:** Not available in apply block
+
 
 ```
 add_facts(Target $target, Hash $facts)
@@ -24,6 +26,8 @@ add_facts($target, { 'os' => { 'family' => 'windows', 'name' => 'windows' } })
 ## add_to_group
 
 Adds a target to specified inventory group.
+
+**NOTE:** Not available in apply block
 
 
 ```
@@ -63,6 +67,8 @@ property of its transport (PCP) or by explicitly setting it as a feature in Bolt
 
 If no agent is detected on the target using the 'puppet_agent::version' task, it's installed
 using 'puppet_agent::install' and the puppet service is stopped/disabled using the 'service' task.
+
+**NOTE:** Not available in apply block
 
 
 ```
@@ -144,6 +150,8 @@ Raises a Bolt::PlanFailure exception to signal to callers that the plan failed.
 
 Plan authors should call this function when their plan is not successful. The
 error may then be caught by another plans run_plan function or in bolt itself
+
+**NOTE:** Not available in apply block
 
 
 ### Fail a plan, generating an exception from the parameters.
@@ -230,6 +238,8 @@ The results are returned as a list of hashes representing each resource.
 
 Requires the Puppet Agent be installed on the target, which can be accomplished with apply_prep
 or by directly running the puppet_agent::install task.
+
+**NOTE:** Not available in apply block
 
 
 ```
@@ -330,6 +340,8 @@ puppetdb_query('nodes[certname] {}')
 Runs a command on the given set of targets and returns the result from each command execution.
 This function does nothing if the list of targets is empty.
 
+**NOTE:** Not available in apply block
+
 
 ### Run a command.
 
@@ -371,6 +383,8 @@ run_command('hostname', $targets, 'Get hostname')
 
 Runs the `plan` referenced by its name. A plan is autoloaded from `<moduleroot>/plans`.
 
+**NOTE:** Not available in apply block
+
 
 ```
 run_plan(String $plan_name, Optional[Hash] $named_args)
@@ -391,6 +405,8 @@ run_plan('canary', 'command' => 'false', 'nodes' => $targets, '_catch_errors' =>
 
 Uploads the given script to the given set of targets and returns the result of having each target execute the script.
 This function does nothing if the list of targets is empty.
+
+**NOTE:** Not available in apply block
 
 
 ### Run a script.
@@ -441,6 +457,8 @@ run_script('/var/tmp/myscript', $targets, 'Downloading my application')
 
 Runs a given instance of a `Task` on the given set of targets and returns the result from each.
 This function does nothing if the list of targets is empty.
+
+**NOTE:** Not available in apply block
 
 
 ### Run a task.
@@ -504,12 +522,14 @@ Currently supported features are
 - shell
 - puppet-agent
 
+**NOTE:** Not available in apply block
+
 
 ```
 set_feature(Target $target, String $feature, Optional[Boolean] $value)
 ```
 
-*Returns:* `Undef` 
+*Returns:* `Any` The target with the updated feature
 
 * **target** `Target` The Target object to add features to. See [`get_targets`](#get_targets).
 * **feature** `String` The string identifying the feature.
@@ -524,6 +544,8 @@ set_feature($target, 'puppet-agent', true)
 ## set_var
 
 Sets a variable { key => value } for a target.
+
+**NOTE:** Not available in apply block
 
 
 ```
@@ -565,6 +587,8 @@ system::env('USER')
 
 Uploads the given file or directory to the given set of targets and returns the result from each upload.
 This function does nothing if the list of targets is empty.
+
+**NOTE:** Not available in apply block
 
 
 ### Upload a file.
@@ -638,6 +662,8 @@ $target.vars
 
 Wait until all targets accept connections.
 
+**NOTE:** Not available in apply block
+
 
 ```
 wait_until_available(Boltlib::TargetSpec $targets, Optional[Hash[String[1], Any]] $options)
@@ -661,6 +687,8 @@ Define a block where default logging is suppressed.
 Messages for actions within this block will be logged at `info` level instead
 of `notice`, so they will not be seen normally but # will still be present
 when `verbose` logging is requested.
+
+**NOTE:** Not available in apply block
 
 
 ```

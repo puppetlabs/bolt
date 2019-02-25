@@ -10,6 +10,8 @@ require 'bolt/task'
 #
 # If no agent is detected on the target using the 'puppet_agent::version' task, it's installed
 # using 'puppet_agent::install' and the puppet service is stopped/disabled using the 'service' task.
+#
+# **NOTE:** Not available in apply block
 Puppet::Functions.create_function(:apply_prep) do
   # @param targets A pattern or array of patterns identifying a set of targets.
   # @example Prepare targets by name.
