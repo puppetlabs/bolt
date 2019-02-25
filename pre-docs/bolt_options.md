@@ -103,18 +103,21 @@ groups:
       - web7.mydomain.edu
 ```
 
-**Related information**  
+**Related information**
 
 
 [Inventory file](inventory_file.md)
 
 ### Set a default transport
 
-To set a default transport protocol, pass it with the command with the `--transport` option. Available transports are
+To set a default transport protocol, pass it with the command with the `--transport` option.
+
+Available transports are:
 - `ssh`
 - `winrm`
 - `local`
 - `docker`
+- `pcp`
 
 Pass the `--transport` option after the nodes list:
 
