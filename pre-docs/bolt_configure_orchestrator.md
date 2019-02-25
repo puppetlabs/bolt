@@ -73,6 +73,15 @@ pcp:
   task-environment: development
 ```
 
+## Specify the transport
+
+Bolt runs tasks through the PE Orchestrator when a target uses the `pcp` transport.
+Specify the transport for specific nodes by using the pcp protocol in the target's
+uri like `pcp://puppet.certname` or setting `transport` in a `config` section
+in `inventory.yaml`. Change the default transport for all nodes by
+setting `transport` in `bolt.yaml` or passing `--transport pcp` on the
+commandline.
+
 ## View available tasks
 
 To view a list of available tasks from the orchestrator API, run the command `puppet task show` \(instead of the command `bolt task show`\).
