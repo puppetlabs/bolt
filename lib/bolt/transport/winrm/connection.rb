@@ -91,6 +91,8 @@ module Bolt
         end
 
         def disconnect
+          # TODO: think the actual failure here is with closing the session
+          require 'pry'; binding.pry
           @session&.close
           @logger.debug { "Closed session" }
         end
@@ -143,6 +145,7 @@ module Bolt
           fs = ::WinRM::FS::FileManager.new(@connection)
           fs.upload(source, destination)
         rescue StandardError => e
+          require 'pry'; binding.pry
           raise Bolt::Node::FileError.new(e.message, 'WRITE_ERROR')
         end
 

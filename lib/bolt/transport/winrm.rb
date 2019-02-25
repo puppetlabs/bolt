@@ -55,6 +55,7 @@ module Bolt
         begin
           conn&.disconnect
         rescue StandardError => ex
+          require 'pry'; binding.pry
           logger.info("Failed to close connection to #{target.uri} : #{ex.message}")
         end
       end
@@ -80,6 +81,7 @@ module Bolt
           conn.with_remote_tempdir do |dir|
             remote_path = conn.write_remote_executable(dir, script)
             if Powershell.powershell_file?(remote_path)
+              require 'pry'; binding.pry
               output = conn.execute(Powershell.run_script(arguments, remote_path))
             else
               path, args = *Powershell.process_from_extension(remote_path)
