@@ -47,6 +47,15 @@
         "extensions": {
           "type": "array",
           "description": "List of file extensions that are accepted for scripts or tasks"
+        },
+        "file-protocol": {
+          "type": "string",
+          "enum": ["winrm", "smb"],
+          "description": "Protocol for file transfer, WinRM or SMB"
+        },
+        "smb-port": {
+          "type": "integer",
+          "description": "Port for SMB protocol"
         }
       },
       "required": ["hostname", "user", "password"],
