@@ -46,12 +46,12 @@ A typical module for use with Bolt may contain these directories:
 `tasks/`
     Tasks and their metadata.
 
-## Where to put module code
+### Where to put module code
 
 Modules can either be written directly in `site-modules/` or be installed from
 the Puppet Forge or a code repository into `modules/`.
 
-### Modules for projects
+## Modules for projects
 
 Modules developed to support a particular project can be developed directly in
 the `site-modules` directory of the [Bolt project
@@ -60,7 +60,7 @@ inside `site-modules` that matches the modules name or use [`pdk new
 module`](https://puppet.com/docs/pdk/latest/pdk.html) to create a skeleton
 structure.
 
-### Standalone modules
+## Standalone modules
 
 Standalone modules can be published to the Forge or saved in a shared code
 repository. This allows a module to be used from multiple projects or shared
@@ -73,19 +73,8 @@ Forge before using it in your project. Read [The Beginners Guide to Writing
 Modules](https://puppet.com/docs/puppet/latest/bgtm.html) for more information
 about writing standalone modules.
 
-> **Tip**: As a best practice, write automated tests for the tasks and plans in your module, if possible. For information about automated testing patterns, check out these resources:
-> * [Example of unit testing plans and integration (acceptance) testing tasks](https://github.com/puppetlabs/puppetlabs-facts) (GitHub)
-> * [Writing Robust Puppet Bolt Tasks: A Guide](https://puppet.com/blog/writing-robust-puppet-bolt-tasks-guide) (Puppet blog)
+Follow these tips for managing standalone modules:
 
-> **Tip** It's a good idea to add `modules/*` to `.gitignore` of your project to
-> prevent accidentally committing standalone modules.
-
-> **Tip**: When you run tasks and plans within a project directory
-> the modulepath (`modules/` and `site-modules/`) is searched for modules
-> containing Bolt content. If a module is found in `modules` Tasks and Plans
-> from the version of the module in `site-modules` are ignored. Make sure
-> to remove a module from `site-modules` if you convert it to a standalone
-> module.
-
-Related information
-[Configuring Bolt](configuring_bolt.md)
+* Add `modules/*` to `.gitignore` of your project to prevent accidentally committing standalone modules.
+* When you run tasks and plans within a project directory, the modulepath (`modules/` and `site-modules/`) is searched for modules containing Bolt content. If a module is found in `modules` tasks and plans from the version of the module in `site-modules` are ignored. Remove a module from `site-modules` if you convert it to a standalone module.
+* As a best practice, write automated tests for the tasks and plans in your module, if possible. For information about automated testing patterns, check out these resources: [Example of unit testing plans and integration (acceptance) testing tasks](https://github.com/puppetlabs/puppetlabs-facts) (GitHub) and [Writing Robust Puppet Bolt Tasks: A Guide](https://puppet.com/blog/writing-robust-puppet-bolt-tasks-guide) (Puppet blog)
