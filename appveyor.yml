@@ -15,6 +15,7 @@ environment:
   BOLT_WINRM_HOST: localhost
   BOLT_WINRM_PORT: 5985
   BOLT_WINRM_SSL_PORT: 5986
+  BOLT_WINRM_SMB_PORT: 445
   RUBY_VERSION: 25
 
 install:
@@ -98,7 +99,7 @@ for:
           RUBY_VERSION: 23
         - configuration: Agentfull
           RUBY_VERSION: 24
-    
+
     environment:
       APPVEYOR_AGENTS: true
 

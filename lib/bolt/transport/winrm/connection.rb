@@ -2,6 +2,7 @@
 
 require 'bolt/node/errors'
 require 'bolt/node/output'
+require 'ruby_smb'
 
 module Bolt
   module Transport
@@ -93,6 +94,7 @@ module Bolt
 
         def disconnect
           @session&.close
+          @client&.disconnect!
           @logger.debug { "Closed session" }
         end
 
@@ -141,8 +143,43 @@ module Bolt
         end
 
         def write_remote_file(source, destination)
+          if target.options['file-protocol'] == 'smb'
+            write_remote_file_smb(source, destination)
+          else
+            write_remote_file_winrm(source, destination)
+          end
+        end
+
+        def write_remote_file_winrm(source, destination)
           fs = ::WinRM::FS::FileManager.new(@connection)
           fs.upload(source, destination)
+        rescue StandardError => e
+          raise Bolt::Node::FileError.new(e.message, 'WRITE_ERROR')
+        end
+
+        def write_remote_file_smb(source, destination)
+          win_dest = destination.tr('/', '\\')
+          if (md = win_dest.match(/^([a-z]):\\(.*)/i))
+            # if drive, use admin share for that drive, so path is '\\host\C$'
+            path = "\\\\#{@target.host}\\#{md[1]}$"
+            dest = md[2]
+          elsif (md = win_dest.match(/^(\\\\[^\\]+\\[^\\]+)\\(.*)/))
+            # if unc, path is '\\host\share'
+            path = md[1]
+            dest = md[2]
+          else
+            raise ArgumentError, "Unknown destination '#{destination}'"
+          end
+
+          client = smb_client_login
+          tree = client.tree_connect(path)
+          begin
+            write_remote_file_smb_recursive(tree, source, dest)
+          ensure
+            tree.disconnect!
+          end
+        rescue ::RubySMB::Error::UnexpectedStatusCode => e
+          raise Bolt::Node::FileError.new("SMB Error: #{e.message}", 'WRITE_ERROR')
         rescue StandardError => e
           raise Bolt::Node::FileError.new(e.message, 'WRITE_ERROR')
         end
@@ -183,6 +220,79 @@ module Bolt
           remote_path = "#{dir}\\#{filename}"
           write_remote_file(content, remote_path)
           remote_path
+        end
+
+        private
+
+        def smb_client_login
+          return @client if @client
+
+          dispatcher = RubySMB::Dispatcher::Socket.new(smb_socket_connect)
+          @client = RubySMB::Client.new(dispatcher, smb1: false, smb2: true, username: @user, password: target.password)
+          status = @client.login
+          case status
+          when WindowsError::NTStatus::STATUS_SUCCESS
+            @logger.debug { "Connected to #{@client.dns_host_name}" }
+          when WindowsError::NTStatus::STATUS_LOGON_FAILURE
+            raise Bolt::Node::ConnectError.new(
+              "SMB authentication failed for #{target.host}",
+              'AUTH_ERROR'
+            )
+          else
+            raise Bolt::Node::ConnectError.new(
+              "Failed to connect to #{target.host} using SMB: #{status.description}",
+              'CONNECT_ERROR'
+            )
+          end
+
+          @client
+        end
+
+        SMB_PORT = 445
+
+        def smb_socket_connect
+          # It's lame that TCPSocket doesn't take a connect timeout
+          # Using Timeout.timeout is bad, but is done elsewhere...
+          Timeout.timeout(target.options['connect-timeout']) do
+            TCPSocket.new(target.host, target.options['smb-port'] || SMB_PORT)
+          end
+        rescue Errno::ECONNREFUSED => e
+          # handle this to prevent obscuring error message as SMB problem
+          raise Bolt::Node::ConnectError.new(
+            "Failed to connect to #{target.host} using SMB: #{e.message}",
+            'CONNECT_ERROR'
+          )
+        rescue Timeout::Error
+          raise Bolt::Node::ConnectError.new(
+            "Timeout after #{target.options['connect-timeout']} seconds connecting to #{target.host}",
+            'CONNECT_ERROR'
+          )
+        end
+
+        def write_remote_file_smb_recursive(tree, source, dest)
+          if Dir.exist?(source)
+            tree.open_directory(directory: dest, write: true, disposition: ::RubySMB::Dispositions::FILE_OPEN_IF)
+
+            (Dir.entries(source) - ['.', '..']).each do |child|
+              child_dest = dest + '\\' + child
+              write_remote_file_smb_recursive(tree, File.join(source, child), child_dest)
+            end
+            return
+          end
+
+          file = tree.open_file(filename: dest, write: true, disposition: ::RubySMB::Dispositions::FILE_OVERWRITE_IF)
+          begin
+            # `file` doesn't derive from IO, so can't use IO.copy_stream
+            File.open(source, 'rb') do |f|
+              pos = 0
+              while (buf = f.read(8 * 1024 * 1024))
+                file.write(data: buf, offset: pos)
+                pos += buf.length
+              end
+            end
+          ensure
+            file.close
+          end
         end
       end
     end

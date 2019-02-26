@@ -31,6 +31,7 @@ describe Bolt::Transport::WinRM do
   let(:host) { conn_info('winrm')[:host] }
   let(:port) { conn_info('winrm')[:port] }
   let(:ssl_port) { ENV['BOLT_WINRM_SSL_PORT'] || 25986 }
+  let(:smb_port) { ENV['BOLT_WINRM_SMB_PORT'] || 2445 }
   let(:user) { conn_info('winrm')[:user] }
   let(:password) { conn_info('winrm')[:password] }
   let(:command) { "echo $env:UserName" }
@@ -153,6 +154,7 @@ PS
       expect(winrm.run_command(target, command)['stdout']).to eq("#{user}\r\n")
     end
 
+    # refactor into other file upload tests when SMB gem adds SMB v3 support
     it "can upload a file to a host" do
       contents = "kadejtw89894"
       remote_path = 'C:\Windows\Temp\upload-test-winrm-ssl'
@@ -229,22 +231,34 @@ PS
       expect(outputs2).to eq(outs)
     end
 
-    it "can upload a file to a host", winrm: true do
-      contents = "934jklnvf"
-      remote_path = 'C:\Windows\Temp\upload-test-winrm'
-      with_tempfile_containing('upload-test-winrm', contents, '.ps1') do |file|
-        expect(
-          winrm.upload(target, file.path, remote_path).value
-        ).to eq(
-          '_output' => "Uploaded '#{file.path}' to '#{target.host}:#{remote_path}'"
-        )
+    %w[winrm smb].each do |protocol|
+      it "can upload a file to a host using #{protocol}", winrm: true do
+        conf = mk_config(ssl: false, user: user, password: password, 'file-protocol': protocol, 'smb-port': smb_port)
+        target = make_target(conf: conf)
+        contents = SecureRandom.uuid
+        remote_path = "C:\\Windows\\Temp\\upload-test-#{protocol}"
+        with_tempfile_containing("upload-test-winrm-#{protocol}", contents, '.ps1') do |file|
+          expect(
+            winrm.upload(target, file.path, remote_path).value
+          ).to eq(
+            '_output' => "Uploaded '#{file.path}' to '#{target.host}:#{remote_path}'"
+          )
 
-        expect(
-          winrm.run_command(target, "type #{remote_path}")['stdout']
-        ).to eq("#{contents}\r\n")
+          expect(
+            winrm.run_command(target, "type #{remote_path}")['stdout']
+          ).to eq("#{contents}\r\n")
 
-        winrm.run_command(target, "del #{remote_path}")
+          winrm.run_command(target, "del #{remote_path}")
+        end
       end
+    end
+
+    # when ruby_smb gem adds SMB v3 support, this will pass
+    # test should be refactored to supply an SSL flag for winrm + smb and remove other SSL test
+    it "will fail to upload a file with SMB with a host that requires SSL", winrm: true do
+      expect {
+        mk_config(ssl: true, user: user, password: password, 'file-protocol': 'smb', 'smb-port': smb_port)
+      }.to raise_error(Bolt::ValidationError)
     end
 
     it "catches winrm-fs upload error", winrm: true do
@@ -255,25 +269,30 @@ PS
       end
     end
 
-    it "can upload a directory to a host", winrm: true do
-      Dir.mktmpdir do |dir|
-        subdir = File.join(dir, 'subdir')
-        File.write(File.join(dir, 'content'), 'hello world')
-        Dir.mkdir(subdir)
-        File.write(File.join(subdir, 'more'), 'lorem ipsum')
+    %w[winrm smb].each do |protocol|
+      it "can upload a directory to a host using #{protocol}", winrm: true do
+        conf = mk_config(ssl: false, user: user, password: password, 'file-protocol': protocol, 'smb-port': smb_port)
+        target = make_target(conf: conf)
 
-        target_dir = 'C:\Windows\Temp\directory-test'
-        winrm.upload(target, dir, target_dir)
+        Dir.mktmpdir do |dir|
+          subdir = File.join(dir, 'subdir')
+          File.write(File.join(dir, 'content'), 'hello world')
+          Dir.mkdir(subdir)
+          File.write(File.join(subdir, 'more'), 'lorem ipsum')
 
-        expect(
-          winrm.run_command(target, "Get-ChildItem -Name #{target_dir}")['stdout'].split("\r\n")
-        ).to eq(%w[subdir content])
+          target_dir = "C:\\Windows\\Temp\\directory-test-#{protocol}"
+          winrm.upload(target, dir, target_dir)
 
-        expect(
-          winrm.run_command(target, "Get-ChildItem -Name #{File.join(target_dir, 'subdir')}")['stdout'].split("\r\n")
-        ).to eq(%w[more])
+          expect(
+            winrm.run_command(target, "Get-ChildItem -Name #{target_dir}")['stdout'].split("\r\n")
+          ).to eq(%w[subdir content])
 
-        winrm.run_command(target, "rm -r #{target_dir}")
+          expect(
+            winrm.run_command(target, "Get-ChildItem -Name #{File.join(target_dir, 'subdir')}")['stdout'].split("\r\n")
+          ).to eq(%w[more])
+
+          winrm.run_command(target, "rm -r #{target_dir}")
+        end
       end
     end
 

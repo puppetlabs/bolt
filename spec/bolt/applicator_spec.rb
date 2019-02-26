@@ -52,7 +52,7 @@ describe Bolt::Applicator do
           transport: 'ssh',
           transports: {
             ssh: { 'connect-timeout' => 10, 'host-key-check' => true, tty: false },
-            winrm: { 'connect-timeout' => 10, ssl: true, 'ssl-verify' => true },
+            winrm: { 'connect-timeout' => 10, ssl: true, 'ssl-verify' => true, 'file-protocol' => 'winrm' },
             pcp: {
               'task-environment' => 'production'
             },

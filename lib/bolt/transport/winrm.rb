@@ -8,14 +8,18 @@ module Bolt
   module Transport
     class WinRM < Base
       def self.options
-        %w[port user password connect-timeout ssl ssl-verify tmpdir cacert extensions interpreters]
+        %w[
+          port user password connect-timeout ssl ssl-verify tmpdir cacert
+          extensions interpreters file-protocol smb-port
+        ]
       end
 
       def self.default_options
         {
           'connect-timeout' => 10,
           'ssl' => true,
-          'ssl-verify' => true
+          'ssl-verify' => true,
+          'file-protocol' => 'winrm'
         }
       end
 
@@ -32,6 +36,10 @@ module Bolt
         ssl_flag = options['ssl']
         unless !!ssl_flag == ssl_flag
           raise Bolt::ValidationError, 'ssl option must be a Boolean true or false'
+        end
+
+        if ssl_flag && (options['file-protocol'] == 'smb')
+          raise Bolt::ValidationError, 'SMB file transfers are not allowed with SSL enabled'
         end
 
         ssl_verify_flag = options['ssl-verify']
