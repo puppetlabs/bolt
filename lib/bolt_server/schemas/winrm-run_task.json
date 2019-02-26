@@ -48,6 +48,10 @@
           "type": "array",
           "description": "List of file extensions that are accepted for scripts or tasks"
         },
+        "interpreters": {
+          "type": "object",
+          "description": "Map of file extensions to remote executable"
+        },
         "file-protocol": {
           "type": "string",
           "enum": ["winrm", "smb"],
@@ -58,6 +62,7 @@
           "description": "Port for SMB protocol"
         }
       },
+
       "required": ["hostname", "user", "password"],
       "additionalProperties": false
     },
