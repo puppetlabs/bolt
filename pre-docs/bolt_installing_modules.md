@@ -34,7 +34,7 @@ Bolt specific modules (not available on Forge):
 In the case where a different version of a bundled module is desired the user can [download](#set-upbolt-to-download-and-install-modules) the desired version and override the bundled module by [configuring](https://github.com/puppetlabs/bolt/blob/master/pre-docs/bolt_configuration_options.md) the `modulepath` to point to the desired module. Modules located on bolt's `modulepath` will take precedence over bundled modules allowing users to use custom versions or override the module namespace.
 
 
-## Set up Bolt to download and install modules.
+## Configure Bolt to download and install modules.
 
 Before you can use Bolt to install modules, you must first create a Puppetfile. A Puppetfile is a formatted text file that contains a list of modules and their versions. It can include modules from the Puppet Forge or a Git repository.
 
