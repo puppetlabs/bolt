@@ -32,6 +32,11 @@ require 'bolt/pal'
 #
 # Configuration
 #
+#  To configure Puppet and Bolt at the beginning of tests, add the following
+#  line to your spec_helper.rb:
+#
+#  BoltSpec::Plans.init
+#
 #  By default the plan helpers use the modulepath set up for rspec-puppet and
 #  an otherwise empty bolt config and inventory. To create your own values for
 #  these override the modulepath, config, or inventory methods.
