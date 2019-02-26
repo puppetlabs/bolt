@@ -269,25 +269,30 @@ PS
       end
     end
 
-    it "can upload a directory to a host", winrm: true do
-      Dir.mktmpdir do |dir|
-        subdir = File.join(dir, 'subdir')
-        File.write(File.join(dir, 'content'), 'hello world')
-        Dir.mkdir(subdir)
-        File.write(File.join(subdir, 'more'), 'lorem ipsum')
+    %w[winrm smb].each do |protocol|
+      it "can upload a directory to a host using #{protocol}", winrm: true do
+        conf = mk_config(ssl: false, user: user, password: password, 'file-protocol': protocol, 'smb-port': smb_port)
+        target = make_target(conf: conf)
 
-        target_dir = 'C:\Windows\Temp\directory-test'
-        winrm.upload(target, dir, target_dir)
+        Dir.mktmpdir do |dir|
+          subdir = File.join(dir, 'subdir')
+          File.write(File.join(dir, 'content'), 'hello world')
+          Dir.mkdir(subdir)
+          File.write(File.join(subdir, 'more'), 'lorem ipsum')
 
-        expect(
-          winrm.run_command(target, "Get-ChildItem -Name #{target_dir}")['stdout'].split("\r\n")
-        ).to eq(%w[subdir content])
+          target_dir = "C:\\Windows\\Temp\\directory-test-#{protocol}"
+          winrm.upload(target, dir, target_dir)
 
-        expect(
-          winrm.run_command(target, "Get-ChildItem -Name #{File.join(target_dir, 'subdir')}")['stdout'].split("\r\n")
-        ).to eq(%w[more])
+          expect(
+            winrm.run_command(target, "Get-ChildItem -Name #{target_dir}")['stdout'].split("\r\n")
+          ).to eq(%w[subdir content])
 
-        winrm.run_command(target, "rm -r #{target_dir}")
+          expect(
+            winrm.run_command(target, "Get-ChildItem -Name #{File.join(target_dir, 'subdir')}")['stdout'].split("\r\n")
+          ).to eq(%w[more])
+
+          winrm.run_command(target, "rm -r #{target_dir}")
+        end
       end
     end
 

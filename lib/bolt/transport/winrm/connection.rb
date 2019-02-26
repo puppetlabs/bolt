@@ -174,19 +174,7 @@ module Bolt
           client = smb_client_login
           tree = client.tree_connect(path)
           begin
-            file = tree.open_file(filename: dest, write: true, disposition: ::RubySMB::Dispositions::FILE_OVERWRITE_IF)
-            begin
-              # `file` doesn't derive from IO, so can't use IO.copy_stream
-              File.open(source, 'rb') do |f|
-                pos = 0
-                while (buf = f.read(8 * 1024 * 1024))
-                  file.write(data: buf, offset: pos)
-                  pos += buf.length
-                end
-              end
-            ensure
-              file.close
-            end
+            write_remote_file_smb_recursive(tree, source, dest)
           ensure
             tree.disconnect!
           end
@@ -279,6 +267,32 @@ module Bolt
             "Timeout after #{target.options['connect-timeout']} seconds connecting to #{target.host}",
             'CONNECT_ERROR'
           )
+        end
+
+        def write_remote_file_smb_recursive(tree, source, dest)
+          if Dir.exist?(source)
+            tree.open_directory(directory: dest, write: true, disposition: ::RubySMB::Dispositions::FILE_OPEN_IF)
+
+            (Dir.entries(source) - ['.', '..']).each do |child|
+              child_dest = dest + '\\' + child
+              write_remote_file_smb_recursive(tree, File.join(source, child), child_dest)
+            end
+            return
+          end
+
+          file = tree.open_file(filename: dest, write: true, disposition: ::RubySMB::Dispositions::FILE_OVERWRITE_IF)
+          begin
+            # `file` doesn't derive from IO, so can't use IO.copy_stream
+            File.open(source, 'rb') do |f|
+              pos = 0
+              while (buf = f.read(8 * 1024 * 1024))
+                file.write(data: buf, offset: pos)
+                pos += buf.length
+              end
+            end
+          ensure
+            file.close
+          end
         end
       end
     end
