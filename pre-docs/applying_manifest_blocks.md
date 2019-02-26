@@ -203,7 +203,7 @@ Create a manifest that sets up a web server with IIS and run it as a plan.
 1.  Go to the site-modules directory in the default Bolt project directory: `~/.puppetlabs/bolt/site-modules`
 2.  Create a module named profiles.
     -   If you use the Puppet Development Kit: `pdk new module profiles`
-    -   Otherwise create `~/.puppetlabs/bolt/modules/profiles`
+    -   Otherwise create `~/.puppetlabs/bolt/site-modules/profiles`
 3.  Add a `plans` directory to the profiles module.
 4.  Install the IIS dependencies.
     1.  Add the following code to `~/.puppetlabs/bolt/Puppetfile`
