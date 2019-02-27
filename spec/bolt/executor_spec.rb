@@ -55,22 +55,6 @@ describe "Bolt::Executor" do
       executor.run_command(targets, command)
     end
 
-    context 'nodes with run_as' do
-      let(:targets) {
-        [Bolt::Target.new("target1", 'run-as' => 'foo'),
-         Bolt::Target.new("target2", 'run-as' => 'foo')]
-      }
-
-      it 'does not pass _run_as' do
-        executor.run_as = 'foo'
-        node_results.each do |target, result|
-          expect(ssh).to receive(:run_command).with(target, command, {}).and_return(result)
-        end
-
-        executor.run_command(targets, command)
-      end
-    end
-
     it "yields each result" do
       node_results.each do |target, result|
         expect(ssh).to receive(:run_command).with(target, command, {}).and_return(result)
@@ -120,25 +104,6 @@ describe "Bolt::Executor" do
       results = executor.run_script(targets, script, [])
       results.each do |result|
         expect(result).to be_instance_of(Bolt::Result)
-      end
-    end
-
-    context 'nodes with run_as' do
-      let(:targets) {
-        [Bolt::Target.new("target1", 'run-as' => 'foo'),
-         Bolt::Target.new("target2", 'run-as' => 'foo')]
-      }
-
-      it 'does not pass _run_as' do
-        executor.run_as = 'foo'
-        node_results.each do |target, result|
-          expect(ssh).to receive(:run_script).with(target, script, [], {}).and_return(result)
-        end
-
-        results = executor.run_script(targets, script, [])
-        results.each do |result|
-          expect(result).to be_instance_of(Bolt::Result)
-        end
       end
     end
 
@@ -201,31 +166,6 @@ describe "Bolt::Executor" do
       results = executor.run_task(targets, mock_task(task), task_arguments, task_options)
       results.each do |result|
         expect(result).to be_instance_of(Bolt::Result)
-      end
-    end
-
-    context 'nodes with run_as' do
-      let(:targets) {
-        [Bolt::Target.new("target1", 'run-as' => 'foo'),
-         Bolt::Target.new("target2")]
-      }
-
-      it 'does not pass _run_as for nodes that specify run_as' do
-        executor.run_as = 'bar'
-        expect(ssh)
-          .to receive(:run_task)
-          .with(targets[0], task_type(task), task_arguments, task_options)
-          .and_return(node_results[targets[0]])
-
-        expect(ssh)
-          .to receive(:run_task)
-          .with(targets[1], task_type(task), task_arguments, { '_run_as' => 'bar' }.merge(task_options))
-          .and_return(node_results[targets[1]])
-
-        results = executor.run_task(targets, mock_task(task), task_arguments, task_options)
-        results.each do |result|
-          expect(result).to be_instance_of(Bolt::Result)
-        end
       end
     end
 
