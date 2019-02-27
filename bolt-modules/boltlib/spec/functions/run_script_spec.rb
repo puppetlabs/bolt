@@ -180,7 +180,8 @@ describe 'run_script' do
 
     it 'fails and reports that run_script is not available' do
       is_expected.to run
-        .with_params('test/uploads/nonesuch.sh', []).and_raise_error(/The task operation 'run_script' is not available/)
+        .with_params('test/uploads/nonesuch.sh', [])
+        .and_raise_error(/Plan language function 'run_script' cannot be used/)
     end
   end
 end

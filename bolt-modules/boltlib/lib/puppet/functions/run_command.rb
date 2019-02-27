@@ -4,6 +4,8 @@ require 'bolt/error'
 
 # Runs a command on the given set of targets and returns the result from each command execution.
 # This function does nothing if the list of targets is empty.
+#
+# **NOTE:** Not available in apply block
 Puppet::Functions.create_function(:run_command) do
   # Run a command.
   # @param command A command to run on target.
@@ -40,15 +42,13 @@ Puppet::Functions.create_function(:run_command) do
   end
 
   def run_command_with_description(command, targets, description = nil, options = nil)
-    options ||= {}
-    options = options.merge('_description' => description) if description
-
     unless Puppet[:tasks]
-      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
-        Puppet::Pops::Issues::TASK_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, operation: 'run_command'
-      )
+      raise Puppet::ParseErrorWithIssue
+        .from_issue_and_stack(Bolt::PAL::Issues::PLAN_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, action: 'run_command')
     end
 
+    options ||= {}
+    options = options.merge('_description' => description) if description
     executor = Puppet.lookup(:bolt_executor) { nil }
     inventory = Puppet.lookup(:bolt_inventory) { nil }
     unless executor && inventory && Puppet.features.bolt?

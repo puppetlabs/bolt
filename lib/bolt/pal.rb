@@ -80,6 +80,7 @@ module Bolt
       end
 
       require 'bolt/pal/logging'
+      require 'bolt/pal/issues'
 
       # Now that puppet is loaded we can include puppet mixins in data types
       Bolt::ResultSet.include_iterable

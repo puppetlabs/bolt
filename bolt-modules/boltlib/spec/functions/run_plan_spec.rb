@@ -7,9 +7,10 @@ require 'bolt/executor'
 describe 'run_plan' do
   include PuppetlabsSpec::Fixtures
   let(:executor) { Bolt::Executor.new }
+  let(:tasks_enabled) { true }
 
   around(:each) do |example|
-    Puppet[:tasks] = true
+    Puppet[:tasks] = tasks_enabled
     Puppet.features.stubs(:bolt?).returns(true)
     executor.stubs(:noop).returns(false)
 
@@ -86,6 +87,14 @@ describe 'run_plan' do
 
     it 'returns undef for plans without explicit return' do
       is_expected.to run.with_params('test::no_return').and_return(nil)
+    end
+  end
+
+  context 'without tasks enabled' do
+    let(:tasks_enabled) { false }
+    it 'fails and reports that run_plan is not available' do
+      is_expected.to run.with_params('test::run_me')
+                        .and_raise_error(/Plan language function 'run_plan' cannot be used/)
     end
   end
 end

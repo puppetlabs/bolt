@@ -28,9 +28,10 @@ describe 'run_task' do
   include PuppetlabsSpec::Fixtures
   let(:executor) { Bolt::Executor.new }
   let(:inventory) { mock('Bolt::Inventory') }
+  let(:tasks_enabled) { true }
 
   around(:each) do |example|
-    Puppet[:tasks] = true
+    Puppet[:tasks] = tasks_enabled
     Puppet.features.stubs(:bolt?).returns(true)
 
     executor.stubs(:noop).returns(false)
@@ -125,6 +126,15 @@ describe 'run_task' do
 
       is_expected.to run.with_params('Test::Echo', hostname, default_args.merge('_bolt_api_call' => true))
                         .and_return(result_set)
+    end
+
+    context 'without tasks enabled' do
+      let(:tasks_enabled) { false }
+
+      it 'fails and reports that run_task is not available' do
+        is_expected.to run
+          .with_params('Test::Echo', hostname).and_raise_error(/Plan language function 'run_task' cannot be used/)
+      end
     end
 
     context 'with description' do

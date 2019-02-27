@@ -5,6 +5,8 @@
 # Messages for actions within this block will be logged at `info` level instead
 # of `notice`, so they will not be seen normally but # will still be present
 # when `verbose` logging is requested.
+#
+# **NOTE:** Not available in apply block
 Puppet::Functions.create_function(:without_default_logging) do
   # @param block The block where action logging is suppressed.
   # @return [Undef]
@@ -20,6 +22,12 @@ Puppet::Functions.create_function(:without_default_logging) do
   end
 
   def without_default_logging
+    unless Puppet[:tasks]
+      raise Puppet::ParseErrorWithIssue
+        .from_issue_and_stack(Bolt::PAL::Issues::PLAN_OPERATION_NOT_SUPPORTED_WHEN_COMPILING,
+                              action: 'without_default_logging')
+    end
+
     executor = Puppet.lookup(:bolt_executor) { nil }
     executor.report_function_call('without_default_logging')
 

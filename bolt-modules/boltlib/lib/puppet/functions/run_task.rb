@@ -6,6 +6,8 @@ require 'bolt/task'
 
 # Runs a given instance of a `Task` on the given set of targets and returns the result from each.
 # This function does nothing if the list of targets is empty.
+#
+# **NOTE:** Not available in apply block
 Puppet::Functions.create_function(:run_task) do
   # Run a task.
   # @param task_name The task to run.
@@ -67,13 +69,12 @@ Puppet::Functions.create_function(:run_task) do
   end
 
   def run_task_raw(task_name, targets, description = nil, task_args = nil, &block)
-    task_args ||= {}
     unless Puppet[:tasks]
-      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
-        Puppet::Pops::Issues::TASK_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, operation: 'run_task'
-      )
+      raise Puppet::ParseErrorWithIssue
+        .from_issue_and_stack(Bolt::PAL::Issues::PLAN_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, action: 'run_task')
     end
 
+    task_args ||= {}
     executor = Puppet.lookup(:bolt_executor) { nil }
     inventory = Puppet.lookup(:bolt_inventory) { nil }
     unless executor && inventory && Puppet.features.bolt?

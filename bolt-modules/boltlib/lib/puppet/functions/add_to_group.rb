@@ -3,6 +3,8 @@
 require 'bolt/error'
 
 # Adds a target to specified inventory group.
+#
+# **NOTE:** Not available in apply block
 Puppet::Functions.create_function(:add_to_group) do
   # @param targets A pattern or array of patterns identifying a set of targets.
   # @param group The name of the group to add targets to.
@@ -20,6 +22,11 @@ Puppet::Functions.create_function(:add_to_group) do
   end
 
   def add_to_group(targets, group)
+    unless Puppet[:tasks]
+      raise Puppet::ParseErrorWithIssue
+        .from_issue_and_stack(Bolt::PAL::Issues::PLAN_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, action: 'add_to_group')
+    end
+
     inventory = Puppet.lookup(:bolt_inventory) { nil }
 
     unless inventory && Puppet.features.bolt?

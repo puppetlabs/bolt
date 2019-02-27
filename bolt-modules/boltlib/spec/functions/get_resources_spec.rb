@@ -13,9 +13,10 @@ describe 'get_resources' do
   let(:applicator) { mock('Bolt::Applicator') }
   let(:executor) { Bolt::Executor.new }
   let(:inventory) { Bolt::Inventory.new({}) }
+  let(:tasks_enabled) { true }
 
   around(:each) do |example|
-    Puppet[:tasks] = true
+    Puppet[:tasks] = tasks_enabled
     Puppet.features.stubs(:bolt?).returns(true)
 
     executor.stubs(:noop).returns(false)
@@ -79,6 +80,14 @@ describe 'get_resources' do
       is_expected.to run.with_params(hostnames, 'not a type[hello there]').and_raise_error(
         Bolt::Error, "not a type[hello there] is not a valid resource type or type instance name"
       )
+    end
+
+    context 'without tasks enabled' do
+      let(:tasks_enabled) { false }
+      it 'fails and reports that get_resources is not available' do
+        is_expected.to run.with_params(hostnames, 'file')
+                          .and_raise_error(/Plan language function 'get_resources' cannot be used/)
+      end
     end
   end
 end

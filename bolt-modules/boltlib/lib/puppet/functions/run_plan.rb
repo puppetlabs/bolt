@@ -3,6 +3,8 @@
 require 'bolt/error'
 
 # Runs the `plan` referenced by its name. A plan is autoloaded from `<moduleroot>/plans`.
+#
+# **NOTE:** Not available in apply block
 Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction) do
   # @param plan_name The plan to run.
   # @param named_args Arguments to the plan. Can also include additional options: '_catch_errors', '_run_as'.
@@ -18,9 +20,8 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
 
   def run_plan(scope, plan_name, named_args = {})
     unless Puppet[:tasks]
-      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
-        Puppet::Pops::Issues::TASK_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, operation: 'run_plan'
-      )
+      raise Puppet::ParseErrorWithIssue
+        .from_issue_and_stack(Bolt::PAL::Issues::PLAN_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, action: 'run_plan')
     end
 
     executor = Puppet.lookup(:bolt_executor) { nil }

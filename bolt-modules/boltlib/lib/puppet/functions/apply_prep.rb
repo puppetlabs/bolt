@@ -10,6 +10,8 @@ require 'bolt/task'
 #
 # If no agent is detected on the target using the 'puppet_agent::version' task, it's installed
 # using 'puppet_agent::install' and the puppet service is stopped/disabled using the 'service' task.
+#
+# **NOTE:** Not available in apply block
 Puppet::Functions.create_function(:apply_prep) do
   # @param targets A pattern or array of patterns identifying a set of targets.
   # @example Prepare targets by name.
@@ -39,9 +41,15 @@ Puppet::Functions.create_function(:apply_prep) do
   end
 
   def apply_prep(target_spec)
+    unless Puppet[:tasks]
+      raise Puppet::ParseErrorWithIssue
+        .from_issue_and_stack(Bolt::PAL::Issues::PLAN_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, action: 'apply_prep')
+    end
+
     applicator = Puppet.lookup(:apply_executor) { nil }
     executor = Puppet.lookup(:bolt_executor) { nil }
     inventory = Puppet.lookup(:bolt_inventory) { nil }
+
     unless applicator && executor && inventory && Puppet.features.bolt?
       raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
         Puppet::Pops::Issues::TASK_MISSING_BOLT, action: _('apply_prep')
