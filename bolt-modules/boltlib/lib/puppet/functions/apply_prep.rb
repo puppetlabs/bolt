@@ -37,7 +37,7 @@ Puppet::Functions.create_function(:apply_prep) do
   # Returns true if the target has the puppet-agent feature defined, either from inventory or transport.
   def agent?(target, executor, inventory)
     inventory.features(target).include?('puppet-agent') ||
-      executor.transport(target.protocol).provided_features.include?('puppet-agent')
+      executor.transport(target.transport).provided_features.include?('puppet-agent') || target.remote?
   end
 
   def apply_prep(target_spec)
