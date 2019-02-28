@@ -28,7 +28,6 @@ module Bolt
       @analytics = analytics
       @bundled_content = bundled_content
       @logger = Logging.logger[self]
-      @plan_logging = false
       @load_config = load_config
 
       @transports = Bolt::TRANSPORTS.each_with_object({}) do |(key, val), coll|
