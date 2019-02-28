@@ -108,7 +108,7 @@ module Bolt
       # with 'PT_' and values transformed to JSON unless they're strings.
       def envify_params(params)
         params.each_with_object({}) do |(k, v), h|
-          v = v.to_json unless v.is_a?(String)
+          v = v.to_json unless v.is_a?(String) || v.nil?
           h["PT_#{k}"] = v
         end
       end
