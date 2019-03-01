@@ -78,6 +78,43 @@ bolt plan run mymodule::myplan --modulepath ./PATH/TO/MODULES load_balancer=lb.m
 
 **Related information**  
 
+It is important to consider that parameters that are passed to the `run_*` plan functions are serialized to JSON. In order to illustrate this consider the following plan. 
+```
+plan test::parameter_passing (
+  TargetSpec $nodes,
+  Optional[String[1]] $example_nul = undef,
+) {
+  return run_task('test::demo_undef_bash', $nodes, example_nul => $example_nul)
+}
+```
+Note that the default value of `$example_nul` is `undef`. The plan calls the `test::demo_undef_bash` with the `example_nul` parameter. The implementation of the `demo_undef_bash.sh` task is as follows:
+```bash
+#!/bin/bash
+
+example_env=$PT_example_nul
+echo "Environment: $PT_example_nul"
+echo "Stdin:" 
+cat -
+```
+By default the task expects parameters to be passed as a JSON string on `STDIN` be accessible in prefixed environment variables (see [Defining Parameters in Tasks](writing_tasks.md#defining-parameters-in-tasks)). Consider the output of running the plan against localhost:
+```
+bolt@bolt: bolt plan run test::parameter_passing -n localhost
+Starting: plan test::parameter_passing
+Starting: task test::demo_undef_bash on localhost
+Finished: task test::demo_undef_bash with 0 failures in 0.0 sec
+Finished: plan test::parameter_passing in 0.01 sec
+Finished on localhost:
+  Environment: null
+  Stdin:
+  {"example_nul":null,"_task":"test::demo_undef_bash"}
+  {
+  }
+Successful on 1 node: localhost
+Ran on 1 node
+```
+The task demonstrates that the parameters `example_nul` and `_task` metadata are passed to the task as a JSON string over `STDIN`.
+
+Similarly parameters are made available to the task as environment variables where the name of parameter is converted to an environment variable prefixed with `PT_`. The `PT_` prefixed environment variable points to the `String` representation in `JSON` format of the parameter value. Thus the `PT_example_nul` environment variable has the value of `null` of type `String`.
 
 [Task metadata types](writing_tasks.md#)
 

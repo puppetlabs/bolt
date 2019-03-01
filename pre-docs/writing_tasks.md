@@ -520,7 +520,7 @@ Tasks can receive input as either environment variables, a JSON hash on standard
 
 If your task should receive parameters only in a certain way, such as `stdin` only, you can set the input method in your task metadata. For Windows tasks, it's usually better to use tasks written in PowerShell. See the related topic about task metadata for information about setting the input method.
 
-Environment variables are the easiest way to implement parameters, and they work well for simple JSON types such as strings and numbers. For arrays and hashes, use structured input instead. See the related topic about structured input and output for more information.
+Environment variables are the easiest way to implement parameters, and they work well for simple JSON types such as strings and numbers. Note that when a parameter with an undefined value ('nil', 'undef', etc) is passed as an environment variable it will have the 'String' value 'null' (see [example](writing_plans.md#related-information)). For arrays and hashes, use structured input instead. See the related topic about structured input and output for more information.
 
 To add parameters to your task as environment variables, pass the argument prefixed with the Puppet task prefix `PT_` .
 
