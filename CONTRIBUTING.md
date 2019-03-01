@@ -1,5 +1,9 @@
 # Contributing
 
+## Bolt Community Slack Channel 
+
+Join the `#bolt` channel in the [puppet community slack instance](https://slack.puppet.com/) where Bolt developers and community members who use and contribute to Bolt discuss the tool. Another channel of interest is the `#office-hours` where once a week a Bolt developer leads a Q&A session about using Bolt.
+
 ## Issues
 
 Please submit new issues on the GitHub issue tracker: https://github.com/puppetlabs/bolt/issues
@@ -30,6 +34,8 @@ License Agreement before we can accept your pull request: https://cla.puppet.com
 
 ## Installing Bolt
 
+If you are interested in trying bolt out or using in production we recommend installing from a system package detailed in [installing bolt](https://puppet.com/docs/bolt/latest/bolt_installing.html). The following installation instructions are focused on developers who wish to contribute to Bolt.
+
 Depending on your development workflow, you can install Bolt one of three ways:
 
 * From [RubyGems](https://rubygems.org)
@@ -50,11 +56,16 @@ To use [Bundler](https://bundler.io), add this to your Gemfile:
 
     gem 'bolt'
 
+
+Alternatively there are rake tasks defined in bundler that allow you to install your local Bolt with any changes you made for development and testing.
+
+    bundle exec rake install
+    bundle exec rake install:local
+
 ### Run Bolt from source
 
 To run Bolt from source:
 
-    git submodule update --init --recursive
     bundle install --path .bundle --without test
     bundle exec bolt ...
 
@@ -71,9 +82,9 @@ To change external modules (to add a new module or bump the version), update the
 
 ## Testing
 
-Some tests require a Windows VMs or Linux containers. For Linux tests (recommended, if you're not sure) run `docker-compose up -d --build` from `spec/` directory. For windows tests, execute `vagrant up` from the root of the bolt repo to bring these up with the provided Vagrantfile. Any tests that require this are tagged with `:winrm` or `:ssh` in rspec.
+Some tests require a Windows VM or Linux containers. For Linux tests (recommended, if you're not sure) run `docker-compose -f spec/docker-compose.yml up -d --build` from the project root directory. For windows tests, execute `vagrant up` from the root of the bolt repo to bring these up with the provided Vagrantfile. Any tests that require this are tagged with `:winrm` or `:ssh` in rspec.
 
-Additional tests may run in a local environment and require certain shell capabilities. Currently the only case is a Bash-like environment and is tagged with `:bash` in rspec.
+Additional tests may run in a local environment and require certain shell capabilities. For example tests that require a Bash-like environment are tagged with `:bash` in rspec.
 
 To run all tests, run:
 
