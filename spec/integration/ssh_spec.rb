@@ -137,6 +137,17 @@ describe "when runnning over the ssh transport", ssh: true do
       end
     end
 
+    it 'runs task with specified interpreter that with run-as set', :reset_puppet_settings do
+      ssh_conf = { 'ssh' => config['ssh'].merge(interpreter_no_ext) }
+      with_tempfile_containing('conf', YAML.dump(config.merge(ssh_conf))) do |conf|
+        result =
+          run_nodes(%W[task run #{interpreter_task} message=somemessage
+                       --configfile #{conf.path} --run-as root --sudo-password #{password}] + config_flags)
+        expect(result.map { |r| r['env'].strip }).to eq(%w[somemessage somemessage])
+        expect(result.map { |r| r['stdin'].strip }).to eq(%w[somemessage somemessage])
+      end
+    end
+
     it 'runs task with interpreter key .py', :reset_puppet_settings do
       ssh_conf = { 'ssh' => config['ssh'].merge(interpreter_ext) }
       with_tempfile_containing('conf', YAML.dump(config.merge(ssh_conf))) do |conf|

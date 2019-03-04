@@ -142,6 +142,7 @@ module Bolt
             stdin, output = nil
             command = []
             execute_options = {}
+            execute_options[:interpreter] = select_interpreter(executable, target.options['interpreters'])
 
             conn.with_remote_tempdir do |dir|
               if extra_files.empty?
@@ -167,7 +168,9 @@ module Bolt
               end
 
               if conn.run_as && stdin
-                wrapper = make_wrapper_stringio(remote_task_path, stdin)
+                # Inject interpreter in to wrapper script and remove from execute options
+                wrapper = make_wrapper_stringio(remote_task_path, stdin, execute_options[:interpreter])
+                execute_options.delete(:interpreter)
                 remote_wrapper_path = conn.write_remote_executable(dir, wrapper, 'wrapper.sh')
                 command << remote_wrapper_path
               else
@@ -177,7 +180,6 @@ module Bolt
               dir.chown(conn.run_as)
 
               execute_options[:sudoable] = true if conn.run_as
-              execute_options[:interpreter] = select_interpreter(executable, target.options['interpreters'])
               output = conn.execute(command, execute_options)
             end
             Bolt::Result.for_task(target, output.stdout.string,
@@ -187,13 +189,22 @@ module Bolt
         end
       end
 
-      def make_wrapper_stringio(task_path, stdin)
-        StringIO.new(<<-SCRIPT)
+      def make_wrapper_stringio(task_path, stdin, interpreter = nil)
+        if interpreter
+          StringIO.new(<<-SCRIPT)
+#!/bin/sh
+'#{interpreter}' '#{task_path}' <<'EOF'
+#{stdin}
+EOF
+SCRIPT
+        else
+          StringIO.new(<<-SCRIPT)
 #!/bin/sh
 '#{task_path}' <<'EOF'
 #{stdin}
 EOF
 SCRIPT
+        end
       end
 
       def connected?(target)
