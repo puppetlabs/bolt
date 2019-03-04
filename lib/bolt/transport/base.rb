@@ -95,15 +95,6 @@ module Bolt
         interpreters[Pathname(executable).extname] if interpreters
       end
 
-      def reject_transport_options(target, options)
-        if target.options['run-as']
-          options.reject { |k, _v| k == '_run_as' }
-        else
-          options
-        end
-      end
-      private :reject_transport_options
-
       # Transform a parameter map to an environment variable map, with parameter names prefixed
       # with 'PT_' and values transformed to JSON unless they're strings.
       def envify_params(params)
@@ -135,7 +126,7 @@ module Bolt
         target = targets.first
         with_events(target, callback) do
           @logger.debug { "Running task run '#{task}' on #{target.uri}" }
-          run_task(target, task, arguments, reject_transport_options(target, options))
+          run_task(target, task, arguments, options)
         end
       end
 
@@ -149,7 +140,7 @@ module Bolt
         target = targets.first
         with_events(target, callback) do
           @logger.debug("Running command '#{command}' on #{target.uri}")
-          run_command(target, command, reject_transport_options(target, options))
+          run_command(target, command, options)
         end
       end
 
@@ -163,7 +154,7 @@ module Bolt
         target = targets.first
         with_events(target, callback) do
           @logger.debug { "Running script '#{script}' on #{target.uri}" }
-          run_script(target, script, arguments, reject_transport_options(target, options))
+          run_script(target, script, arguments, options)
         end
       end
 
@@ -177,7 +168,7 @@ module Bolt
         target = targets.first
         with_events(target, callback) do
           @logger.debug { "Uploading: '#{source}' to #{destination} on #{target.uri}" }
-          upload(target, source, destination, reject_transport_options(target, options))
+          upload(target, source, destination, options)
         end
       end
 

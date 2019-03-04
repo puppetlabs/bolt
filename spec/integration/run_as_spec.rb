@@ -13,6 +13,7 @@ describe "when running a plan using run_as", ssh: true do
   let(:uri) { conn_uri('ssh', include_password: true) }
   let(:user) { conn_info('ssh')[:user] }
   let(:password) { conn_info('ssh')[:password] }
+  let(:non_existent_user) { 'foo' }
   let(:config_flags) { %W[--no-host-key-check --format json --sudo-password #{password} --modulepath #{modulepath}] }
 
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
@@ -47,7 +48,7 @@ describe "when running a plan using run_as", ssh: true do
 
   context 'as a non-root user' do
     let(:config_flags) {
-      %W[-u bolt -p bolt --no-host-key-check --format json --sudo-password bolt --modulepath #{modulepath}]
+      %W[-u #{user} -p #{password} --no-host-key-check --format json --sudo-password bolt --modulepath #{modulepath}]
     }
 
     it 'runs a plan as a non-root user passing in a non-root user' do
@@ -57,6 +58,27 @@ describe "when running a plan using run_as", ssh: true do
       expect(parsed['result']['stdout']).to eq("#{non_root}\n")
       expect(parsed['status']).to eq('success')
       expect(parsed['result']['exit_code']).to eq(0)
+    end
+  end
+
+  context 'when run-as is specified on cli or config' do
+    let(:config_flags) {
+      %W[-u #{user} -p #{password} --no-host-key-check --format json
+         --sudo-password #{password} --modulepath #{modulepath} --run_as #{non_existent_user}]
+    }
+
+    it 'runs a plan containing run_* functions with user specified by _run_as taking priority' do
+      run_as_config = { 'transport' => 'ssh', 'ssh' => { 'run-as' => non_existent_user.to_s } }
+      with_tempfile_containing('conf', YAML.dump(run_as_config)) do |conf|
+        non_root = 'test'
+        params = { target: uri, user: non_root }
+        config_array = config_flags + %W[--configfile #{conf.path}]
+        output = run_cli(['plan', 'run', 'test::run_as_user', "--params", params.to_json] + config_array)
+        parsed = JSON.parse(output)[0]
+        expect(parsed['result']['stdout']).to eq("#{non_root}\n")
+        expect(parsed['status']).to eq('success')
+        expect(parsed['result']['exit_code']).to eq(0)
+      end
     end
   end
 end
