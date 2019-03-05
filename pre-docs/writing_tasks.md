@@ -454,7 +454,7 @@ Successful on 1 node: localhost
 Ran on 1 node in 0.12 seconds
 ```
 
-## Running remote tasks
+## Writing remote tasks
 
 Some targets are hard or impossible to execute tasks on directly. In these cases, you can write a task that runs on a proxy target and remotely interacts with the real target.
 
