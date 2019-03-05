@@ -42,6 +42,24 @@ You must have the Chocolatey package manager installed.
     bolt --help
     ```
 
+### Add the Bolt module to PowerShell
+
+PowerShell versions 2.0 and 3.0 cannot automatically discover and load the Bolt module, so you'll need to add it manually.
+
+To allow PowerShell to load Bolt, add the module to your PowerShell profile.
+
+1.  Run the following command to update your PowerShell profile:
+    ```
+    'Import-Module -Name ${Env:ProgramFiles}\WindowsPowerShell\Modules\PuppetBolt' | Out-File -Append $PROFILE
+    ```
+
+2.  Re-source your profile to load the module in your current PowerShell window:
+    ```
+    . $PROFILE
+    ```
+
+Bolt will now automatically load every time you open PowerShell.
+
 
 ## Install Bolt on macOS
 
