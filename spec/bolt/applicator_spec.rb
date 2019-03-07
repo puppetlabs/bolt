@@ -72,6 +72,7 @@ describe Bolt::Applicator do
   end
 
   it 'passes catalog input' do
+    expect(Process).to receive(:respond_to?).with(:fork).and_return(false)
     expect(Open3).to receive(:capture3)
       .with('ruby', /bolt_catalog/, 'compile', stdin_data: input.to_json)
       .and_return(['{}', '', double(:status, success?: true)])
@@ -84,6 +85,7 @@ describe Bolt::Applicator do
       { notice: 'Stuff happened' }
     ]
 
+    expect(Process).to receive(:respond_to?).with(:fork).and_return(false)
     expect(Open3).to receive(:capture3)
       .with('ruby', /bolt_catalog/, 'compile', stdin_data: input.to_json)
       .and_return(['{}', logs.map(&:to_json).join("\n"), double(:status, success?: true)])

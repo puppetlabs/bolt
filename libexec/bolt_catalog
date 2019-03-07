@@ -41,7 +41,7 @@ elsif command == "compile"
             else
               JSON.parse(STDIN.read)
             end
-  catalog = Bolt::Catalog.new.compile_catalog(request)
+  catalog = Bolt::Catalog.new.from_request(request)
   # This seems to be a string in ruby 2.3
   if catalog.is_a?(String)
     catalog = JSON.parse(catalog)

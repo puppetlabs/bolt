@@ -60,28 +60,41 @@ module Bolt
                           Bolt::Util.symbolize_top_level_keys(inventory['target_hash']))
     end
 
-    def compile_catalog(request)
-      pal_main = request['code_ast'] || request['code_string']
-      target = request['target']
-      pdb_client = Bolt::PuppetDB::Client.new(Bolt::PuppetDB::Config.new(request['pdb_config']))
-      options = request['puppet_config'] || {}
+    def from_request(request)
+      # TODO: deserialize here!
+      @pal_main = request['code_ast'] || request['code_string']
+      @inventory = setup_inventory(request['inventory'])
+      # TODO: target should be loaded from inventory
+      @target = request['target']
+      @pdb_client = Bolt::PuppetDB::Client.new(Bolt::PuppetDB::Config.new(request['pdb_config']))
+      @options = request['puppet_config'] || {}
+      @hiera_config = request['hiera_config']
+      @modulepath = request['modulepath']
 
-      with_puppet_settings(request['hiera_config']) do
+      compile_catalog
+    end
+
+    # TODO: set up a different entrypoint for running in a fork.
+    def from_memory()
+    end
+
+    def compile_catalog()
+      with_puppet_settings(@hiera_config) do
         Puppet[:rich_data] = true
-        Puppet[:node_name_value] = target['name']
+        Puppet[:node_name_value] = @target['name']
         Puppet::Pal.in_tmp_environment('bolt_catalog',
-                                       modulepath: request["modulepath"] || [],
-                                       facts: target["facts"] || {},
-                                       variables: target["variables"] || {}) do |pal|
-          Puppet.override(bolt_pdb_client: pdb_client,
-                          bolt_inventory: setup_inventory(request['inventory'])) do
-            Puppet.lookup(:pal_current_node).trusted_data = target['trusted']
+                                       modulepath: @modulepath || [],
+                                       facts: @target["facts"] || {},
+                                       variables: @target["variables"] || {}) do |pal|
+          Puppet.override(bolt_pdb_client: @pdb_client,
+                          bolt_inventory: @inventory) do
+            Puppet.lookup(:pal_current_node).trusted_data = @target['trusted']
             pal.with_catalog_compiler do |compiler|
               # Configure language strictness in the CatalogCompiler. We want Bolt to be able
               # to compile most Puppet 4+ manifests, so we default to allowing deprecated functions.
-              Puppet[:strict] = options['strict'] || :warning
-              Puppet[:strict_variables] = options['strict_variables'] || false
-              ast = Puppet::Pops::Serialization::FromDataConverter.convert(pal_main)
+              Puppet[:strict] = @options['strict'] || :warning
+              Puppet[:strict_variables] = @options['strict_variables'] || false
+              ast = Puppet::Pops::Serialization::FromDataConverter.convert(@pal_main)
               compiler.evaluate(ast)
               compiler.compile_additions
               compiler.with_json_encoding(&:encode)

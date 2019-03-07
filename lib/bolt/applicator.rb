@@ -66,6 +66,54 @@ module Bolt
       end
     end
 
+    def fork_compile(catalog_input)
+      out_r, out_w = IO.pipe
+      err_r, err_w = IO.pipe
+
+      pid = fork do
+        begin
+          out_r.close
+          err_r.close
+          $stdout = out_w
+          $stderr = err_w
+
+          # This should be preloaded in most cases.
+          require 'bolt/catalog'
+
+          catalog_input = JSON.parse(catalog_input.to_json)
+          catalog = Bolt::Catalog.new.from_request(catalog_input)
+          # This seems to be a string in ruby 2.3
+          if catalog.is_a?(String)
+            catalog = JSON.parse(catalog)
+          end
+          puts JSON.pretty_generate(catalog)
+        # forks don't exit non-zero on unhandled exceptions
+        rescue StandardError => e
+          $stderr.puts "#{e.class}: #{e.message}"
+          $stderr.puts e.backtrace.join("\n")
+          $stderr.flush
+          $stdout.flush
+          Kernel.exit!(1)
+        end
+      end
+
+      _, status = Process.wait2(pid)
+
+      out_w.close
+      err_w.close
+
+      return [out_r.read, err_r.read, status]
+    end
+
+    def capture_compile(catalog_input)
+      bolt_catalog_exe = File.join(libexec, 'bolt_catalog')
+      old_path = ENV['PATH']
+      ENV['PATH'] = "#{RbConfig::CONFIG['bindir']}#{File::PATH_SEPARATOR}#{old_path}"
+      result = Open3.capture3('ruby', bolt_catalog_exe, 'compile', stdin_data: catalog_input.to_json)
+      ENV['PATH'] = old_path
+      result
+    end
+
     def compile(target, ast, plan_vars)
       trusted = Puppet::Context::TrustedInformation.new('local', target.host, {})
 
@@ -83,11 +131,13 @@ module Bolt
         inventory: @inventory.data_hash
       }
 
-      bolt_catalog_exe = File.join(libexec, 'bolt_catalog')
-      old_path = ENV['PATH']
-      ENV['PATH'] = "#{RbConfig::CONFIG['bindir']}#{File::PATH_SEPARATOR}#{old_path}"
-      out, err, stat = Open3.capture3('ruby', bolt_catalog_exe, 'compile', stdin_data: catalog_input.to_json)
-      ENV['PATH'] = old_path
+
+      # By using forks here this process can be loaded a lot faster
+      if Process.respond_to?(:fork)
+        out, err, stat = fork_compile(catalog_input)
+      else
+        out, err, stat = capture_compile(catalog_input)
+      end
 
       # stderr may contain formatted logs from Puppet's logger or other errors.
       # Print them in order, but handle them separately. Anything not a formatted log is assumed

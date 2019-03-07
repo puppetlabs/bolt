@@ -119,9 +119,9 @@ describe "passes parsed AST to the apply_catalog task" do
 
     it 'fails immediately on a compile error' do
       result = run_cli_json(%w[plan run basic::catch_error catch=false] + config_flags)
-      expect(result['kind']).to eq('bolt/apply-failure')
+      expect(result).to include('kind' => 'bolt/apply-failure')
       error = result['details']['result_set'][0]['result']['_error']
-      expect(error['kind']).to eq('bolt/apply-error')
+      expect(error).to include('kind' => 'bolt/apply-error')
       expect(error['msg']).to match(/Apply failed to compile for #{uri}/)
       expect(@log_output.readlines)
         .to include(/stop the insanity/)
