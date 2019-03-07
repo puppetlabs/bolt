@@ -746,7 +746,7 @@ Given a script, `myscript.sh`, that accepts 2 positional args, `filename` and `v
    chmod +x $script_file
    commandline=("$script_file" "$PT_filename" "$PT_version")
    # If the stderr output of the script is important redirect it to stdout.
-   "${commandline[@]}" 2>&
+   "${commandline[@]}" 2>&1
    ```
 
 If you intend to use this task with PE and assign RBAC permissions for it make
