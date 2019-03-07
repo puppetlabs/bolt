@@ -44,7 +44,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "orchestrator_client", "~> 0.3.1"
   spec.add_dependency "puppet", [">= 6.0.1", "< 7"]
   spec.add_dependency "puppet-resource_api"
-  spec.add_dependency "r10k", "~> 2.6"
+  spec.add_dependency "r10k", "~> 3.1"
   spec.add_dependency "ruby_smb", "~> 1.0"
   spec.add_dependency "terminal-table", "~> 1.8"
   spec.add_dependency "winrm", "~> 2.0"
