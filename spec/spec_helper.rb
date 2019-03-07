@@ -40,6 +40,7 @@ RSpec.configure do |config|
 
   config.filter_run_excluding appveyor_agents: true unless ENV['APPVEYOR_AGENTS']
   config.filter_run_excluding windows: true unless ENV['BOLT_WINDOWS']
+  config.filter_run_excluding sudo: true unless ENV['BOLT_SUDO_USER']
 
   # rspec-mocks config
   config.mock_with :rspec do |mocks|

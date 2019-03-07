@@ -29,6 +29,7 @@ describe Bolt::Transport::SSH do
   let(:bash_user) { 'test' }
   let(:bash_password) { 'test' }
   let(:port) { conn_info('ssh')[:port] }
+  let(:host_and_port) { "#{hostname}:#{port}" }
   let(:key) { conn_info('ssh')[:key] }
   let(:command) { "pwd" }
   let(:config) { mk_config(user: user, password: password) }
@@ -51,10 +52,11 @@ describe Bolt::Transport::SSH do
     include BoltSpec::Transport
 
     include_examples 'transport api'
+    include_examples 'with sudo'
 
     context 'file errors' do
       before(:each) do
-        allow_any_instance_of(Bolt::Transport::SSH::Connection).to receive(:write_remote_file).and_raise(
+        allow_any_instance_of(Bolt::Transport::SSH::Connection).to receive(:copy_file).and_raise(
           Bolt::Node::FileError.new("no write", "WRITE_ERROR")
         )
         allow_any_instance_of(Bolt::Transport::SSH::Connection).to receive(:make_tempdir).and_raise(
@@ -251,163 +253,76 @@ describe Bolt::Transport::SSH do
     end
   end
 
-  context "with sudo" do
+  # Local transport doesn't have concept of 'user'
+  # so this test only applies to ssh
+  context "with sudo as non-root", sudo: true do
     let(:config) {
-      mk_config('host-key-check' => false, 'sudo-password' => password, 'run-as' => 'root',
-                user: user, password: password)
+      mk_config('host-key-check' => false, 'sudo-password' => bash_password, 'run-as' => user,
+                user: bash_user, password: bash_password)
     }
+    let(:target) { make_target }
 
-    it "can execute a command", ssh: true do
-      expect(ssh.run_command(target, 'whoami')['stdout']).to eq("root\n")
+    it 'runs as that user' do
+      expect(ssh.run_command(target, 'whoami')['stdout'].chomp).to eq(user)
     end
 
-    it "can run a task passing input on stdin", ssh: true do
-      contents = "#!/bin/sh\ngrep 'message_one'"
-      arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-      with_task_containing('tasks_test_stdin', contents, 'stdin') do |task|
-        expect(ssh.run_task(target, task, arguments).value)
-          .to eq("message_one" => "Hello from task", "message_two" => "Goodbye")
+    it "can override run_as for command via an option" do
+      expect(ssh.run_command(target, 'whoami', '_run_as' => 'root')['stdout']).to eq("root\n")
+    end
+
+    it "can override run_as for script via an option" do
+      contents = "#!/bin/sh\nwhoami"
+      with_tempfile_containing('script test', contents) do |file|
+        expect(ssh.run_script(target, file.path, [], '_run_as' => 'root')['stdout']).to eq("root\n")
       end
     end
 
-    it "can run a task passing input with environment vars", ssh: true do
-      contents = "#!/bin/sh\necho -n ${PT_message_one} then ${PT_message_two}"
-      arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
+    it "can override run_as for task via an option" do
+      contents = "#!/bin/sh\nwhoami"
       with_task_containing('tasks_test', contents, 'environment') do |task|
-        expect(ssh.run_task(target, task, arguments).message)
-          .to eq('Hello from task then Goodbye')
+        expect(ssh.run_task(target, task, {}, '_run_as' => 'root').message).to eq("root\n")
       end
     end
 
-    it "can run a task with params containing variable references", ssh: true do
-      contents = <<SHELL
-#!/bin/sh
-cat
-SHELL
-
-      arguments = { message: "$PATH" }
-      with_task_containing('tasks_test_var', contents, 'both') do |task|
-        expect(ssh.run_task(target, task, arguments)['message']).to eq("$PATH")
-      end
-    end
-
-    it "can upload a file as root", ssh: true do
+    it "can override run_as for file upload via an option" do
       contents = "upload file test as root content"
       dest = '/tmp/root-file-upload-test'
       with_tempfile_containing('tasks test upload as root', contents) do |file|
-        expect(ssh.upload(target, file.path, dest).message).to match(/Uploaded/)
-        expect(ssh.run_command(target, "cat #{dest}")['stdout']).to eq(contents)
-        expect(ssh.run_command(target, "stat -c %U #{dest}")['stdout'].chomp).to eq('root')
-        expect(ssh.run_command(target, "stat -c %G #{dest}")['stdout'].chomp).to eq('root')
+        expect(ssh.upload(target, file.path, dest, '_run_as' => 'root').message).to match(/Uploaded/)
+        expect(ssh.run_command(target, "cat #{dest}", '_run_as' => 'root')['stdout']).to eq(contents)
+        expect(ssh.run_command(target, "stat -c %U #{dest}", '_run_as' => 'root')['stdout'].chomp).to eq('root')
+        expect(ssh.run_command(target, "stat -c %G #{dest}", '_run_as' => 'root')['stdout'].chomp).to eq('root')
       end
 
       ssh.run_command(target, "rm #{dest}", sudoable: true, run_as: 'root')
     end
+  end
 
-    context "requesting a pty" do
-      let(:config) {
-        mk_config('host-key-check' => false, 'sudo-password' => password, 'run-as' => 'root',
-                  tty: true, user: user, password: password)
-      }
+  context "as bash user with no password", sudo: true do
+    let(:config) {
+      mk_config('host-key-check' => false, 'run-as' => 'root', user: bash_user, password: bash_password)
+    }
+    let(:target) { make_target }
 
-      it "can execute a command when a tty is requested", ssh: true do
-        expect(ssh.run_command(target, 'whoami')['stdout'].strip).to eq('root')
-      end
-    end
-
-    context "as non-root" do
-      let(:config) {
-        mk_config('host-key-check' => false, 'sudo-password' => bash_password, 'run-as' => user,
-                  user: bash_user, password: bash_password)
-      }
-
-      it 'runs as that user', ssh: true do
-        expect(ssh.run_command(target, 'whoami')['stdout'].chomp).to eq(user)
-      end
-
-      it "can override run_as for command via an option", ssh: true do
-        expect(ssh.run_command(target, 'whoami', '_run_as' => 'root')['stdout']).to eq("root\n")
-      end
-
-      it "can override run_as for script via an option", ssh: true do
-        contents = "#!/bin/sh\nwhoami"
-        with_tempfile_containing('script test', contents) do |file|
-          expect(ssh.run_script(target, file.path, [], '_run_as' => 'root')['stdout']).to eq("root\n")
-        end
-      end
-
-      it "can override run_as for task via an option", ssh: true do
-        contents = "#!/bin/sh\nwhoami"
-        with_task_containing('tasks_test', contents, 'environment') do |task|
-          expect(ssh.run_task(target, task, {}, '_run_as' => 'root').message).to eq("root\n")
-        end
-      end
-
-      it "can override run_as for file upload via an option", ssh: true do
-        contents = "upload file test as root content"
-        dest = '/tmp/root-file-upload-test'
-        with_tempfile_containing('tasks test upload as root', contents) do |file|
-          expect(ssh.upload(target, file.path, dest, '_run_as' => 'root').message).to match(/Uploaded/)
-          expect(ssh.run_command(target, "cat #{dest}", '_run_as' => 'root')['stdout']).to eq(contents)
-          expect(ssh.run_command(target, "stat -c %U #{dest}", '_run_as' => 'root')['stdout'].chomp).to eq('root')
-          expect(ssh.run_command(target, "stat -c %G #{dest}", '_run_as' => 'root')['stdout'].chomp).to eq('root')
-        end
-
-        ssh.run_command(target, "rm #{dest}", sudoable: true, run_as: 'root')
-      end
-    end
-
-    context "with an incorrect password" do
-      let(:config) {
-        mk_config('host-key-check' => false, 'sudo-password' => 'nonsense', 'run-as' => 'root',
-                  user: user, password: password)
-      }
-
-      it "returns a failed result", ssh: true do
+    it "returns a failed result when a temporary directory is created" do
+      contents = "#!/bin/sh\nwhoami"
+      with_tempfile_containing('script test', contents) do |file|
         expect {
-          ssh.run_command(target, 'whoami')
+          ssh.run_script(target, file.path, [])
         }.to raise_error(Bolt::Node::EscalateError,
-                         "Sudo password for user #{user} not recognized on #{hostname}:#{port}")
-      end
-    end
-
-    context "with no password" do
-      let(:config) { mk_config('host-key-check' => false, 'run-as' => 'root', user: user, password: password) }
-
-      it "returns a failed result", ssh: true do
-        expect {
-          ssh.run_command(target, 'whoami')
-        }.to raise_error(Bolt::Node::EscalateError,
-                         "Sudo password for user #{user} was not provided for #{hostname}:#{port}")
-      end
-    end
-
-    context "as bash user with no password" do
-      let(:config) {
-        mk_config('host-key-check' => false, 'run-as' => 'root', user: bash_user, password: bash_password)
-      }
-
-      it "returns a failed result when a temporary directory is created", ssh: true do
-        contents = "#!/bin/sh\nwhoami"
-        with_tempfile_containing('script test', contents) do |file|
-          expect {
-            ssh.run_script(target, file.path, [])
-          }.to raise_error(Bolt::Node::EscalateError,
-                           "Sudo password for user #{bash_user} was not provided for #{hostname}:#{port}")
-        end
+                         "Sudo password for user #{bash_user} was not provided for #{host_and_port}")
       end
     end
   end
 
-  context "using a custom run-as-command" do
+  context "requesting a pty", sudo: true do
     let(:config) {
       mk_config('host-key-check' => false, 'sudo-password' => password, 'run-as' => 'root',
-                user: user, password: password,
-                'run-as-command' => ["sudo", "-nSEu"])
+                tty: true, user: user, password: password)
     }
 
-    it "can fails to execute with sudo -n", ssh: true do
-      expect(ssh.run_command(target, 'whoami')['stderr']).to match("sudo: a password is required")
+    it "can execute a command when a tty is requested", ssh: true do
+      expect(ssh.run_command(target, 'whoami')['stdout'].strip).to eq('root')
     end
   end
 end

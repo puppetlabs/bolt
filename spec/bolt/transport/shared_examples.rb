@@ -3,7 +3,6 @@
 require 'bolt_spec/files'
 require 'bolt_spec/task'
 require 'bolt_spec/sensitive'
-
 require 'bolt/inventory'
 
 def result_value(stdout = nil, stderr = nil, exit_code = 0)
@@ -54,6 +53,17 @@ def windows_context
     identity_script: "echo $PSScriptRoot",
     echo_script: "$args | ForEach-Object { Write-Output $_ }"
   }
+end
+
+def mk_config(conf)
+  conf = Bolt::Util.walk_keys(conf, &:to_s)
+  conf_object = Bolt::Config.new(Bolt::Boltdir.new('.'), transport.to_s => conf)
+  conf_object.transport = transport.to_s
+  conf_object
+end
+
+def make_target(target_: host_and_port, conf: config)
+  Bolt::Target.new(target_, transport_conf).update_conf(conf.transport_conf)
 end
 
 # Shared examples for Transports.
@@ -135,7 +145,7 @@ shared_examples 'transport api' do
         Dir.mkdir(subdir)
         File.write(File.join(subdir, 'more'), 'lorem ipsum')
 
-        target_dir = File.join(os_context[:destination_dir], "/directory-test")
+        target_dir = File.join(os_context[:destination_dir], "directory-test")
         runner.upload(target, dir, target_dir)
 
         expect(
@@ -208,7 +218,7 @@ QUOTED
                             file.path,
                             ['echo $HOME; cat /etc/passwd'])['stdout']
         ).to eq(<<~SHELLWORDS)
-          echo $HOME; cat /etc/passwd
+        echo $HOME; cat /etc/passwd
         SHELLWORDS
       end
     end
@@ -245,9 +255,9 @@ QUOTED
       arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
       with_task_containing('tasks-test-both', content, 'both', os_context[:extension]) do |task|
         expect(runner.run_task(target, task, arguments).message.strip).to eq(<<~OUTPUT.strip)
-          Hello from task
-          Goodbye
-          {"message_one":"Hello from task","message_two":"Goodbye"}
+        Hello from task
+        Goodbye
+        {"message_one":"Hello from task","message_two":"Goodbye"}
         OUTPUT
       end
     end
@@ -272,8 +282,8 @@ QUOTED
                     'message_two' => make_sensitive(deep_hash) }
       with_task_containing('tasks_test_sensitive', os_context[:env_task], 'both', os_context[:extension]) do |task|
         expect(runner.run_task(target, task, arguments).message).to eq(<<~SHELL)
-          $ecret!
-          {"k":"v","arr":[1,2,3]}
+        $ecret!
+        {"k":"v","arr":[1,2,3]}
         SHELL
       end
     end
@@ -538,6 +548,116 @@ shared_examples 'transport failures' do
           runner.run_task(target, task, {})
         }.to raise_error(Bolt::Node::FileError)
       end
+    end
+  end
+end
+
+# Shared run_as and sudo tests
+#
+# Requires the following variables
+# - target: a valid Target
+# - runner: instantiation of the Transport
+# - host_and_port: host and port to connect to
+# - user: the default user
+# - password: the default user password
+shared_examples 'with sudo', sudo: true do
+  context "with sudo" do
+    let(:config) {
+      mk_config('host-key-check' => false, 'sudo-password' => password, 'run-as' => 'root',
+                user: user, password: password)
+    }
+    let(:target) { make_target }
+
+    it "can execute a command" do
+      expect(runner.run_command(target, 'whoami')['stdout']).to eq("root\n")
+    end
+
+    it "catches stderr from a command" do
+      command, expected = os_context[:stderr_command]
+      expect(runner.run_command(target, command).value['stderr']).to match(expected)
+    end
+
+    it "can run a task passing input on stdin" do
+      contents = "#!/bin/sh\ngrep 'message_one'"
+      arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
+      with_task_containing('tasks_test_stdin', contents, 'stdin') do |task|
+        expect(runner.run_task(target, task, arguments).value)
+          .to eq("message_one" => "Hello from task", "message_two" => "Goodbye")
+      end
+    end
+
+    it "can run a task passing input with environment vars" do
+      contents = "#!/bin/sh\necho -n ${PT_message_one} then ${PT_message_two}"
+      arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
+      with_task_containing('tasks_test', contents, 'environment') do |task|
+        expect(runner.run_task(target, task, arguments).message)
+          .to eq('Hello from task then Goodbye')
+      end
+    end
+
+    it "can run a task with params containing variable references" do
+      contents = <<SHELL
+#!/bin/sh
+cat
+SHELL
+
+      arguments = { message: "$PATH" }
+      with_task_containing('tasks_test_var', contents, 'both') do |task|
+        expect(runner.run_task(target, task, arguments)['message']).to eq("$PATH")
+      end
+    end
+
+    it "can upload a file as root" do
+      contents = "upload file test as root content"
+      dest = '/tmp/root-file-upload-test'
+      with_tempfile_containing('tasks test upload as root', contents) do |file|
+        expect(runner.upload(target, file.path, dest).message).to match(/Uploaded/)
+        expect(runner.run_command(target, "cat #{dest}")['stdout']).to eq(contents)
+        expect(runner.run_command(target, "stat -c %U #{dest}")['stdout'].chomp).to eq('root')
+        expect(runner.run_command(target, "stat -c %G #{dest}")['stdout'].chomp).to eq('root')
+      end
+
+      runner.run_command(target, "rm #{dest}", sudoable: true, run_as: 'root')
+    end
+
+    context "with an incorrect password" do
+      let(:config) {
+        mk_config('host-key-check' => false, 'sudo-password' => 'nonsense', 'run-as' => 'root',
+                  user: user, password: password)
+      }
+      let(:target) { make_target }
+
+      it "returns a failed result" do
+        expect {
+          runner.run_command(target, 'whoami')
+        }.to raise_error(Bolt::Node::EscalateError,
+                         "Sudo password for user #{user} not recognized on #{host_and_port}")
+      end
+    end
+
+    context "with no password" do
+      let(:config) { mk_config('host-key-check' => false, 'run-as' => 'root', user: user, password: password) }
+      let(:target) { make_target }
+
+      it "returns a failed result" do
+        expect {
+          runner.run_command(target, 'whoami')
+        }.to raise_error(Bolt::Node::EscalateError,
+                         "Sudo password for user #{user} was not provided for #{host_and_port}")
+      end
+    end
+  end
+
+  context "using a custom run-as-command" do
+    let(:config) {
+      mk_config('host-key-check' => false, 'sudo-password' => password, 'run-as' => 'root',
+                user: user, password: password,
+                'run-as-command' => ["sudo", "-nkSEu"])
+    }
+    let(:target) { make_target }
+
+    it "can fail to execute with sudo -n" do
+      expect(runner.run_command(target, 'whoami')['stderr']).to match("sudo: a password is required")
     end
   end
 end

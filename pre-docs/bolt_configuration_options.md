@@ -107,6 +107,11 @@ interpreters:
 ## Local transport configuration options
 
 `tmpdir`: The directory to copy and execute temporary files.
+`run-as`: A different user to run commands as after login.
+
+`run-as-command`: The command to elevate permissions. Bolt appends the user and command strings to the configured run as a command before running it on the target. This command must not require an interactive password prompt, and the `sudo-password` option is ignored when `run-as-command` is specified. The run-as command must be specified as an array.
+
+`sudo-password`: Password to use when changing users via `run-as`.
 
 ## Docker transport configuration options
 

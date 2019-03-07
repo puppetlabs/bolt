@@ -11,6 +11,9 @@ describe "when running over the local transport" do
   let(:modulepath) { File.join(__dir__, '../fixtures/modules') }
   let(:uri) { 'localhost,local://foo' }
   let(:user) { ENV['USER'] }
+  let(:sudo_user) { 'root' }
+  let(:sudo_password) { 'travis' }
+  let(:stdin_task) { "sample::stdin" }
 
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
 
@@ -39,10 +42,8 @@ describe "when running over the local transport" do
 
   context 'when using CLI options on POSIX OS', bash: true do
     let(:config_flags) {
-      %W[--nodes #{uri} --no-host-key-check --format json --modulepath #{modulepath}]
+      %W[--nodes #{uri} --format json --modulepath #{modulepath}]
     }
-    let(:whoami) { "whoami" }
-    let(:stdin_task) { "sample::stdin" }
 
     it 'runs script with parameter', :reset_puppet_settings do
       with_tempfile_containing('script', "#!/usr/bin/env bash \n echo $1", '.sh') do |script|
@@ -79,6 +80,28 @@ describe "when running over the local transport" do
         expect(result).not_to include('kind')
         event = result.first['result']['report']['resource_statuses']['Notify[gettingvar]']['events'].first
         expect(event).to include('message' => "defined 'message' as 'testing this'")
+      end
+    end
+  end
+
+  context 'runs as an escalated user', sudo: true do
+    let(:config_flags) {
+      %W[--nodes #{uri} --format json --modulepath #{modulepath}] +
+        %W[--run-as #{sudo_user} --sudo-password #{sudo_password}]
+    }
+
+    it 'runs a command', :reset_puppet_settings do
+      result = run_nodes(%w[command run whoami] + config_flags)
+      expect(result.map { |r| r['stdout'].strip }).to eq(%w[root root])
+    end
+
+    it 'with script with parameters', :reset_puppet_settings do
+      with_tempfile_containing('script', "#!/usr/bin/env bash \n echo $1", '.sh') do |script|
+        results = run_cli_json(%W[script run #{script.path} hello] + config_flags)
+        results['items'].each do |result|
+          expect(result['status']).to eq('success')
+          expect(result['result']).to eq("stdout" => "hello\n", "stderr" => "", "exit_code" => 0)
+        end
       end
     end
   end

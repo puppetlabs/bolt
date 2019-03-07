@@ -348,7 +348,10 @@ describe 'running with an inventory file', reset_puppet_settings: true do
         after(:each) { `rm -rf #{tmpdir}` }
 
         it 'uses tmpdir' do
-          expect(run_one_node(run_command)['stdout'].strip).to match(/#{Regexp.escape(tmpdir)}/)
+          with_tempfile_containing('script', 'echo "`dirname $0`"', '.sh') do |f|
+            run_script = ['script', 'run', f.path, '--nodes', target] + config_flags
+            expect(run_one_node(run_script)['stdout'].strip).to match(/#{Regexp.escape(tmpdir)}/)
+          end
         end
       end
 
@@ -371,7 +374,10 @@ describe 'running with an inventory file', reset_puppet_settings: true do
         after(:each) { `rm -rf #{tmpdir}` }
 
         it 'uses tmpdir' do
-          expect(run_one_node(run_command)['stdout'].strip).to match(/#{Regexp.escape(tmpdir)}/)
+          with_tempfile_containing('script', 'echo "`dirname $0`"', '.sh') do |f|
+            run_script = ['script', 'run', f.path, '--nodes', target] + config_flags
+            expect(run_one_node(run_script)['stdout'].strip).to match(/#{Regexp.escape(tmpdir)}/)
+          end
         end
       end
     end

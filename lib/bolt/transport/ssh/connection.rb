@@ -4,62 +4,13 @@ require 'logging'
 require 'shellwords'
 require 'bolt/node/errors'
 require 'bolt/node/output'
+require 'bolt/transport/sudoable/connection'
 require 'bolt/util'
 
 module Bolt
   module Transport
-    class SSH < Base
-      class Connection
-        class RemoteTempdir
-          def initialize(node, path)
-            @node = node
-            @owner = node.user
-            @path = path
-            @logger = node.logger
-          end
-
-          def to_s
-            @path
-          end
-
-          def mkdirs(subdirs)
-            abs_subdirs = subdirs.map { |subdir| File.join(@path, subdir) }
-            result = @node.execute(['mkdir', '-p'] + abs_subdirs)
-            if result.exit_code != 0
-              message = "Could not create subdirectories in '#{@path}': #{result.stderr.string}"
-              raise Bolt::Node::FileError.new(message, 'MKDIR_ERROR')
-            end
-          end
-
-          def chown(owner)
-            return if owner.nil? || owner == @owner
-
-            result = @node.execute(['id', '-g', owner])
-            if result.exit_code != 0
-              message = "Could not identify group of user #{owner}: #{result.stderr.string}"
-              raise Bolt::Node::FileError.new(message, 'ID_ERROR')
-            end
-            group = result.stdout.string.chomp
-
-            # Chown can only be run by root.
-            result = @node.execute(['chown', '-R', "#{owner}:#{group}", @path], sudoable: true, run_as: 'root')
-            if result.exit_code != 0
-              message = "Could not change owner of '#{@path}' to #{owner}: #{result.stderr.string}"
-              raise Bolt::Node::FileError.new(message, 'CHOWN_ERROR')
-            end
-
-            # File ownership successfully changed, record the new owner.
-            @owner = owner
-          end
-
-          def delete
-            result = @node.execute(['rm', '-rf', @path], sudoable: true, run_as: @owner)
-            if result.exit_code != 0
-              @logger.warn("Failed to clean up tempdir '#{@path}': #{result.stderr.string}")
-            end
-          end
-        end
-
+    class SSH < Sudoable
+      class Connection < Sudoable::Connection
         attr_reader :logger, :user, :target
         attr_writer :run_as
 
@@ -174,27 +125,8 @@ module Bolt
           end
         end
 
-        # This method allows the @run_as variable to be used as a per-operation
-        # override for the user to run as. When @run_as is unset, the user
-        # specified on the target will be used.
-        def run_as
-          @run_as || target.options['run-as']
-        end
-
-        # Run as the specified user for the duration of the block.
-        def running_as(user)
-          @run_as = user
-          yield
-        ensure
-          @run_as = nil
-        end
-
-        def sudo_prompt
-          '[sudo] Bolt needs to run as another user, password: '
-        end
-
         def handled_sudo(channel, data)
-          if data.lines.include?(sudo_prompt)
+          if data.lines.include?(Sudoable.sudo_prompt)
             if target.options['sudo-password']
               channel.send_data "#{target.options['sudo-password']}\n"
               channel.wait
@@ -236,7 +168,7 @@ module Bolt
           command_str = command.is_a?(String) ? command : Shellwords.shelljoin(command)
           if escalate
             if use_sudo
-              sudo_flags = ["sudo", "-S", "-u", run_as, "-p", sudo_prompt]
+              sudo_flags = ["sudo", "-S", "-u", run_as, "-p", Sudoable.sudo_prompt]
               sudo_flags += ["-E"] if options[:environment]
               sudo_str = Shellwords.shelljoin(sudo_flags)
               command_str = "#{sudo_str} #{command_str}"
@@ -306,40 +238,10 @@ module Bolt
           raise
         end
 
-        def write_remote_file(source, destination)
+        def copy_file(source, destination)
           @session.scp.upload!(source, destination, recursive: true)
         rescue StandardError => e
           raise Bolt::Node::FileError.new(e.message, 'WRITE_ERROR')
-        end
-
-        def make_tempdir
-          tmpdir = target.options.fetch('tmpdir', '/tmp')
-          tmppath = "#{tmpdir}/#{SecureRandom.uuid}"
-          command = ['mkdir', '-m', 700, tmppath]
-
-          result = execute(command)
-          if result.exit_code != 0
-            raise Bolt::Node::FileError.new("Could not make tempdir: #{result.stderr.string}", 'TEMPDIR_ERROR')
-          end
-          path = tmppath || result.stdout.string.chomp
-          RemoteTempdir.new(self, path)
-        end
-
-        # A helper to create and delete a tempdir on the remote system. Yields the
-        # directory name.
-        def with_remote_tempdir
-          dir = make_tempdir
-          yield dir
-        ensure
-          dir&.delete
-        end
-
-        def write_remote_executable(dir, file, filename = nil)
-          filename ||= File.basename(file)
-          remote_path = File.join(dir.to_s, filename)
-          write_remote_file(file, remote_path)
-          make_executable(remote_path)
-          remote_path
         end
 
         def write_executable_from_content(dest, content, filename)
@@ -347,14 +249,6 @@ module Bolt
           @session.scp.upload!(StringIO.new(content), remote_path)
           make_executable(remote_path)
           remote_path
-        end
-
-        def make_executable(path)
-          result = execute(['chmod', 'u+x', path])
-          if result.exit_code != 0
-            message = "Could not make file '#{path}' executable: #{result.stderr.string}"
-            raise Bolt::Node::FileError.new(message, 'CHMOD_ERROR')
-          end
         end
       end
     end
