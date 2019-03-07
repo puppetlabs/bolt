@@ -111,13 +111,13 @@ You must have the command line tools for macOS and the Homebrew package manager 
 
 Use one of the supported \*nix installation methods to install Bolt.
 
+**Warning:** These instructions include enabling the Puppet 6 Platform repository. Adding the Puppet 6 Platform repository on Puppet Enterprise master nodes can result in unsupported updates to PE packages such as the puppet agent. To install only the Bolt package it is possible to download and install the package directly (from appropriate url path at `{apt,yum}.puppetlabs.com`) as well, however this will require repeating the download and install process to keep up to date with the latest Bolt version.
+
 ### Install Bolt on Debian or Ubuntu 
 
 Packaged versions of Bolt are available for Debian 8 and 9 and Ubuntu 14.04, 16.04 and 18.04.
 
 The Puppet repository for the APT package management system is [https://apt.puppet.com](https://apt.puppet.com). Packages are named using the convention `<PLATFORM_VERSION>-release-<VERSION CODE NAME>.deb`. For example, the release package for Puppet 6 Platform on Debian 8 “Jessie” is `puppet6-release-jessie.deb`.
-
-**Note:** These packages require you to download the Puppet 6 Platform. To install only the Bolt package you can install the packages directly as well.
 
 1.   Download and install the software and its dependencies. Use the commands appropriate to your system. 
     -    Debian 8
@@ -178,8 +178,6 @@ The Puppet repository for the APT package management system is [https://apt.pupp
 Packaged versions of Bolt are available for Red Hat Enterprise Linux 6 and 7, SUSE Linux Enterprise Server 12, and Fedora 28 and 29.
 
 The Puppet repository for the YUM package management system is [http://yum.puppet.com/puppet6/](http://yum.puppet.com/puppet6/) Packages are named using the convention `<PLATFORM_NAME>-release-<OS ABBREVIATION>-<OS VERSION>.noarch.rpm`. For example, the release package for Puppet 6 Platform on Linux 7 is `puppet6-release-el-7.noarch.rpm`.
-
-**Note:** These packages require you to download the Puppet 6 Platform. To install only the Bolt package you can install the packages directly as well.
 
 1.  Download and install the software and its dependencies. Use the commands appropriate to your system.
     -   Enterprise Linux 6
