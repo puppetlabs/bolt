@@ -2,6 +2,7 @@
 
 require 'bolt/node/errors'
 require 'bolt/transport/base'
+require 'bolt/transport/helpers'
 require 'json'
 require 'shellwords'
 
@@ -28,10 +29,7 @@ module Bolt
       def self.validate(options)
         logger = Logging.logger[self]
 
-        if options['sudo-password'] && options['run-as'].nil?
-          logger.warn("--sudo-password will not be used without specifying a " \
-                       "user to escalate to with --run-as")
-        end
+        validate_sudo_options(options, logger)
 
         host_key = options['host-key-check']
         unless !!host_key == host_key
@@ -49,11 +47,6 @@ module Bolt
         unless timeout_value.is_a?(Integer) || timeout_value.nil?
           error_msg = "connect-timeout value must be an Integer, received #{timeout_value}:#{timeout_value.class}"
           raise Bolt::ValidationError, error_msg
-        end
-
-        run_as_cmd = options['run-as-command']
-        if run_as_cmd && (!run_as_cmd.is_a?(Array) || run_as_cmd.any? { |n| !n.is_a?(String) })
-          raise Bolt::ValidationError, "run-as-command must be an Array of Strings, received #{run_as_cmd}"
         end
       end
 

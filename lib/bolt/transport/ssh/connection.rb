@@ -187,10 +187,6 @@ module Bolt
           @run_as = nil
         end
 
-        def sudo_prompt
-          '[sudo] Bolt needs to run as another user, password: '
-        end
-
         def handled_sudo(channel, data)
           if data.lines.include?(sudo_prompt)
             if target.options['sudo-password']
@@ -224,25 +220,13 @@ module Bolt
         def execute(command, sudoable: false, **options)
           result_output = Bolt::Node::Output.new
           run_as = options[:run_as] || self.run_as
-          escalate = sudoable && run_as && @user != run_as
-          use_sudo = escalate && @target.options['run-as-command'].nil?
 
-          if options[:interpreter]
-            command.is_a?(Array) ? command.unshift(options[:interpreter]) : [options[:interpreter], command]
-          end
-
-          command_str = command.is_a?(String) ? command : Shellwords.shelljoin(command)
-          if escalate
-            if use_sudo
-              sudo_flags = ["sudo", "-S", "-u", run_as, "-p", sudo_prompt]
-              sudo_flags += ["-E"] if options[:environment]
-              sudo_str = Shellwords.shelljoin(sudo_flags)
-              command_str = "#{sudo_str} #{command_str}"
-            else
-              run_as_str = Shellwords.shelljoin(@target.options['run-as-command'] + [run_as])
-              command_str = "#{run_as_str} #{command_str}"
-            end
-          end
+          command_str = execute_prep(command,
+                                     options,
+                                     sudoable: sudoable,
+                                     run_as_command: @target.options['run-as-command'],
+                                     run_as: run_as,
+                                     conn_user: @user)
 
           # Including the environment declarations in the shelljoin will escape
           # the = sign, so we have to handle them separately.
@@ -252,6 +236,9 @@ module Bolt
             end
             command_str = "#{env_decls.join(' ')} #{command_str}"
           end
+
+          escalate = sudoable && run_as && @user != run_as
+          use_sudo = escalate && @target.options['run-as-command'].nil?
 
           @logger.debug { "Executing: #{command_str}" }
 
