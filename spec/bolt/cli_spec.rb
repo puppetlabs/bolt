@@ -1079,7 +1079,8 @@ bar
             ['sample'],
             ['sample::single_task'],
             ['sample::three_tasks'],
-            ['sample::two_tasks']
+            ['sample::two_tasks'],
+            ['sample::yaml']
           ].each do |plan|
             expect(plan_list).to include(plan)
           end
@@ -1113,6 +1114,34 @@ bar
               },
               "param_optional" => {
                 "type" => "Optional[String]"
+              },
+              "param_with_default_value" => {
+                "type" => "String",
+                "default_value" => nil
+              }
+            }
+          )
+        end
+
+        it "shows an individual yaml plan data" do
+          plan_name = 'sample::yaml'
+          options = {
+            subcommand: 'plan',
+            action: 'show',
+            object: plan_name
+          }
+          cli.execute(options)
+          json = JSON.parse(output.string)
+          expect(json).to eq(
+            "name" => "sample::yaml",
+            "module_dir" => File.absolute_path(File.join(__dir__, "..", "fixtures", "modules", "sample")),
+            "parameters" => {
+              "nodes" => {
+                "type" => "TargetSpec"
+              },
+              "param_optional" => {
+                "type" => "Optional[String]",
+                "default_value" => nil
               },
               "param_with_default_value" => {
                 "type" => "String",

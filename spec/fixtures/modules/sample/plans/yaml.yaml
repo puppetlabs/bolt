@@ -1,0 +1,16 @@
+---
+parameters:
+  nodes:
+    type: TargetSpec
+  param_optional:
+    type: Optional[String]
+    default: undef
+  param_with_default_value:
+    type: String
+    default: 'hello'
+
+steps:
+  - task: sample::echo
+    target: $nodes
+  - command: echo hello world
+    target: $nodes
