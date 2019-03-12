@@ -46,13 +46,16 @@ describe Bolt::Transport::Orch, orchestrator: true do
 
   describe "when orchestrator_client-ruby is used" do
     it "bolt sets User-Agent header option to Bolt/${version}" do
-      config = {
-        'service-url' => 'foo',
-        'cacert' => 'bar'
-      }
-      allow(OrchestratorClient).to receive(:new).and_call_original
-      c = Bolt::Transport::Orch::Connection.new(config, nil, orch.logger)
-      expect(c.instance_variable_get(:@client).config.config["User-Agent"]).to eq("Bolt/#{Bolt::VERSION}")
+      with_tempfile_containing('token', 'faketoken') do |conf|
+        config = {
+          'service-url' => 'https://foo.bar:8143',
+          'cacert' => 'bar',
+          'token-file' => conf.path
+        }
+        allow(OrchestratorClient).to receive(:new).and_call_original
+        c = Bolt::Transport::Orch::Connection.new(config, nil, orch.logger)
+        expect(c.instance_variable_get(:@client).config.config["User-Agent"]).to eq("Bolt/#{Bolt::VERSION}")
+      end
     end
   end
 
