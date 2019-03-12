@@ -21,6 +21,11 @@ gem "puppetlabs_spec_helper",
     git: 'https://github.com/puppetlabs/puppetlabs_spec_helper.git',
     ref: '96a633ebf1a1e88062bf726d4271a3251baf082e'
 
+# Required to use YAML plans in development
+gem 'puppet',
+    git: 'https://github.com/puppetlabs/puppet.git',
+    ref: '1d1faaf94566fa93d59cc4587ee941c7aa478867'
+
 group(:test) do
   gem "beaker-hostgenerator"
   gem "gettext-setup", '~> 0.28', require: false
