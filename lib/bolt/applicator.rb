@@ -25,7 +25,15 @@ module Bolt
       @pool = Concurrent::ThreadPoolExecutor.new(max_threads: max_compiles)
       @logger = Logging.logger[self]
       @plugin_tarball = Concurrent::Delay.new do
-        build_plugin_tarball do |mod|
+        # do NOT encoded into base64 here to save space and allow us to upload
+        # the tarball directly instead of passing it over stdin
+        #
+        # TODO: Potential optimization: only include the files/ that are needed
+        #       by the catalog. This should be anything that is declared with a
+        #       Puppet URI (puppet://).
+        #       Question? The only place i know if this being used is in a 'file' resource
+        #       in the 'source' parameter, are there other places where this URI type is valid?
+        build_plugin_tarball(base64: false) do |mod|
           search_dirs = []
           search_dirs << mod.plugins if mod.plugins?
           search_dirs << mod.pluginfacts if mod.pluginfacts?
@@ -48,12 +56,20 @@ module Bolt
       end
     end
 
-    def catalog_apply_task
+    def catalog_apply_task(catalog_path, plugins_path)
       @catalog_apply_task ||= begin
         path = File.join(libexec, 'apply_catalog.rb')
-        file = { 'name' => 'apply_catalog.rb', 'path' => path }
-        metadata = { 'supports_noop' => true, 'input_method' => 'stdin' }
-        Bolt::Task.new(name: 'apply_helpers::apply_catalog', files: [file], metadata: metadata)
+        files = [
+          { 'name' => 'apply_catalog.rb', 'path' => path },
+          { 'name' => 'catalog.json', 'path' => catalog_path },
+          { 'name' => 'plugins.tar.gz', 'path' => plugins_path }
+        ]
+        metadata = {
+          'supports_noop' => true,
+          'input_method' => 'stdin',
+          'files' => ['catalog.json', 'plugins.tar.gz']
+        }
+        Bolt::Task.new(name: 'apply_helpers::apply_catalog', files: files, metadata: metadata)
       end
     end
 
@@ -179,14 +195,36 @@ module Bolt
               catalog = future.value
               raise future.reason if future.rejected?
 
-              arguments = {
-                'catalog' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(catalog),
-                'plugins' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(plugins),
-                '_noop' => options['_noop']
-              }
+              # create temporary files for the catalog and plugins tarball
+              # we do this two reasons:
+              #  1) Correctness.
+              #     If the plugins tarball or catalog is too big, then
+              #     Bash/PowerShell may fail with an error of the argument being too long.
+              #     Previously this data was passed via STDIN making the command line execution
+              #     gigantic with large base64 encoded plugin tarball and catalog arguments.
+              #
+              #  2) Efficiency.
+              #     Certain transports are faster at uploading data when using specific
+              #     upload functionality rather than trying to pass this data in as a
+              #     command.
+              with_tempfile('catalog.json', catalog.to_json) do |catalog_path|
+                with_tempfile('plugins.tar.gz', plugins, binary: true) do |plugins_path|
+                  # TODO: does this break PXP agent / Orchestrator?
+                  # TODO: should the two other places that do this create temporary files
+                  #       for their tarballs?
+                  #         - bolt-modules/boltlib/lib/puppet/functions/apply_prep.rb
+                  #         - bolt-modules/boltlib/lib/puppet/functions/get_resources.rb
+                  arguments = {
+                    #'catalog' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(catalog),
+                    #'plugins' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(plugins),
+                    '_noop' => options['_noop']
+                  }
+                  task = catalog_apply_task(catalog_path, plugins_path)
 
-              results = transport.batch_task(batch, catalog_apply_task, arguments, options, &notify)
-              Array(results).map { |result| ApplyResult.from_task_result(result) }
+                  results = transport.batch_task(batch, task, arguments, options, &notify)
+                  Array(results).map { |result| ApplyResult.from_task_result(result) }
+                end
+              end
             end
           end
         end
@@ -209,7 +247,7 @@ module Bolt
         raise(Bolt::Error.new("Failed to pack module plugins: #{@plugin_tarball.reason}", 'bolt/plugin-error'))
     end
 
-    def build_plugin_tarball
+    def build_plugin_tarball(base64: true)
       start_time = Time.now
       sio = StringIO.new
       output = Minitar::Output.new(Zlib::GzipWriter.new(sio))
@@ -239,9 +277,23 @@ module Bolt
       @logger.debug("Packed plugins in #{duration * 1000} ms")
 
       output.close
-      Base64.encode64(sio.string)
+      if base64
+        Base64.encode64(sio.string)
+      else
+        sio.string
+      end
     ensure
       output&.close
+    end
+
+    def with_tempfile(filename, content, binary: false)
+      # note: this returns the value that the yield returns
+      Tempfile.open(filename) do |file|
+        file.binmode if binary
+        file.write(content)
+        file.flush
+        yield(file.path)
+      end
     end
   end
 end

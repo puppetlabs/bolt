@@ -37,8 +37,9 @@ begin
   # directories we configured earlier.
   Puppet.settings.use(:main)
 
-  Tempfile.open('plugins.tar.gz') do |plugins|
-    File.binwrite(plugins, Base64.decode64(args['plugins']))
+  # unpack the plugins tarball that was transferred out-of-band into the installdir
+  installdir = args['_installdir']
+  File.open(File.join(installdir, 'plugins.tar.gz')) do |plugins|
     Puppet::ModuleTool::Tar.instance.unpack(plugins, moduledir, Etc.getlogin || Etc.getpwuid.name)
   end
 
@@ -59,7 +60,10 @@ begin
 
   Puppet.override(current_environment: env,
                   loaders: Puppet::Pops::Loaders.new(env)) do
-    catalog = Puppet::Resource::Catalog.from_data_hash(args['catalog'])
+    # read in the catalog as a JSON file that was transferred out-of-band into the installdir
+    catalog_json = File.read(File.join(installdir, 'catalog.json'))
+    catalog_hash = JSON.parse(catalog_json)
+    catalog = Puppet::Resource::Catalog.from_data_hash(catalog_hash)
     catalog.environment = env.name.to_s
     catalog.environment_instance = env
     if defined?(Puppet::Pops::Evaluator::DeferredResolver)
