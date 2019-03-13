@@ -75,6 +75,104 @@ describe Bolt::PAL::YamlPlanEvaluator do
     end
   end
 
+  describe "evaluating puppet code" do
+    let(:evaluator) { Puppet::Pops::Parser::EvaluatingParser.new }
+    describe Bolt::PAL::YamlPlanEvaluator::DoubleQuotedString do
+      it "treats literal strings as literal strings" do
+        str = described_class.new("hello world")
+        expect(str.evaluate(scope, evaluator)).to eq("hello world")
+      end
+
+      it "keeps escaped characters escaped" do
+        str = described_class.new("hello \" world")
+        expect(str.evaluate(scope, evaluator)).to eq("hello \" world")
+      end
+
+      it "evaluates embedded variables" do
+        str = described_class.new("hello $foo")
+        scope.with_local_scope('foo' => 'world') do |local_scope|
+          expect(str.evaluate(local_scope, evaluator)).to eq("hello world")
+        end
+      end
+
+      it "fails if the variable is not set in scope" do
+        str = described_class.new("hello $bar")
+        expect { str.evaluate(scope, evaluator) }.to raise_error(Puppet::ParseError, /Unknown variable/)
+      end
+
+      it "evaluates complex variable expressions" do
+        str = described_class.new("hello ${foo[0]}, brought to you by the numbers ${foo.length} and ${5+3}")
+        scope.with_local_scope('foo' => ['world']) do |local_scope|
+          expect(str.evaluate(local_scope, evaluator)).to eq("hello world, brought to you by the numbers 1 and 8")
+        end
+      end
+
+      it "does not evaluate arbitrary puppet code outside an interpolation" do
+        str = described_class.new("5+3")
+        expect(str.evaluate(scope, evaluator)).to eq("5+3")
+      end
+    end
+
+    describe Bolt::PAL::YamlPlanEvaluator::CodeLiteral do
+      it "treats the string as arbitrary code" do
+        str = described_class.new("5+3")
+        expect(str.evaluate(scope, evaluator)).to eq(8)
+      end
+
+      it "evaluates function calls" do
+        str = described_class.new("[1,2,3,4,5].map |$i| { $i + 2 }")
+        expect(str.evaluate(scope, evaluator)).to eq([3, 4, 5, 6, 7])
+      end
+
+      it "interpolates within embedded double-quoted strings" do
+        str = described_class.new('"hello $foo"')
+        scope.with_local_scope('foo' => 'world') do |local_scope|
+          expect(str.evaluate(local_scope, evaluator)).to eq("hello world")
+        end
+      end
+
+      it "fails if the code can't be parsed" do
+        str = described_class.new("invalid/puppet code")
+        expect { str.evaluate(scope, evaluator) }.to raise_error(Puppet::ParseError)
+      end
+    end
+
+    describe Bolt::PAL::YamlPlanEvaluator::BareString do
+      it "evaluates the code if it starts with a $" do
+        str = described_class.new("$foo")
+        scope.with_local_scope('foo' => 'hello world') do |local_scope|
+          expect(str.evaluate(local_scope, evaluator)).to eq("hello world")
+        end
+      end
+
+      it "evaluates nested variable lookups" do
+        str = described_class.new("$foo[0][$bar]")
+        scope.with_local_scope('foo' => ['testkey' => 'hello world'], 'bar' => 'testkey') do |local_scope|
+          expect(str.evaluate(local_scope, evaluator)).to eq("hello world")
+        end
+      end
+
+      it "evaluates function calls" do
+        str = described_class.new("$foo.map |$i| { $i + 2 }")
+        scope.with_local_scope('foo' => [1, 2, 3, 4, 5]) do |local_scope|
+          expect(str.evaluate(local_scope, evaluator)).to eq([3, 4, 5, 6, 7])
+        end
+      end
+
+      it "evaluates math expressions" do
+        str = described_class.new("$foo + 3")
+        scope.with_local_scope('foo' => 5) do |local_scope|
+          expect(str.evaluate(local_scope, evaluator)).to eq(8)
+        end
+      end
+
+      it "treats the code as a plain string if it doesn't start with a $" do
+        str = described_class.new("hello world")
+        expect(str.evaluate(scope, evaluator)).to eq("hello world")
+      end
+    end
+  end
+
   describe "::create" do
     it 'fails if the plan is not a Hash' do
       plan_body = '[]'
@@ -134,7 +232,7 @@ describe Bolt::PAL::YamlPlanEvaluator do
 
     it 'fails if the steps list is not an array' do
       plan_body = <<-YAML
-      steps: nil
+      steps: null
       YAML
 
       plan = described_class.create(loader, plan_name, 'test.yaml', plan_body)
@@ -177,6 +275,25 @@ describe Bolt::PAL::YamlPlanEvaluator do
       expect(scope).to receive(:call_function).with('run_command', ['hostname -f', nodes]).ordered
 
       call_plan(plan, 'package' => 'openssl', 'nodes' => nodes)
+    end
+
+    it 'can be run multiple times with different parameters' do
+      plan_body = <<-YAML
+      parameters:
+        nodes:
+          type: TargetSpec
+      steps:
+        - command: hostname -f
+          target: $nodes
+      YAML
+
+      plan = described_class.create(loader, plan_name, 'test.yaml', plan_body)
+
+      expect(scope).to receive(:call_function).with('run_command', ['hostname -f', ['foo.example.com']])
+      call_plan(plan, 'nodes' => ['foo.example.com'])
+
+      expect(scope).to receive(:call_function).with('run_command', ['hostname -f', ['bar.example.com']])
+      call_plan(plan, 'nodes' => ['bar.example.com'])
     end
 
     # task+command
@@ -234,31 +351,6 @@ describe Bolt::PAL::YamlPlanEvaluator do
       subject.task_step(scope, step)
     end
 
-    it 'accepts a variable for target' do
-      step['target'] = '$target'
-
-      scope.with_local_scope('target' => 'bar.example.com') do |local_scope|
-        args = ['package', 'bar.example.com', { 'action' => 'status', 'name' => 'openssl' }]
-        expect(local_scope).to receive(:call_function).with('run_task', args)
-
-        subject.task_step(local_scope, step)
-      end
-    end
-
-    it 'accepts a variable for parameter values' do
-      step['parameters'] = {
-        'name' => '$package',
-        'action' => 'status'
-      }
-
-      scope.with_local_scope('package' => 'vim') do |local_scope|
-        args = ['package', 'foo.example.com', { 'action' => 'status', 'name' => 'vim' }]
-        expect(local_scope).to receive(:call_function).with('run_task', args)
-
-        subject.task_step(local_scope, step)
-      end
-    end
-
     it 'supports a description' do
       step['description'] = 'run the thing'
 
@@ -281,72 +373,11 @@ describe Bolt::PAL::YamlPlanEvaluator do
       expect { subject.command_step(scope, step) }.to raise_error(/Can't run a command without specifying a target/)
     end
 
-    it 'accepts a variable for target' do
-      step['target'] = '$target'
-
-      scope.with_local_scope('target' => 'bar.example.com') do |local_scope|
-        expect(local_scope).to receive(:call_function).with('run_command', ['hostname -f', 'bar.example.com'])
-
-        subject.command_step(local_scope, step)
-      end
-    end
-
     it 'supports a description' do
       step['description'] = 'run the thing'
 
       expect(scope).to receive(:call_function).with('run_command', ['hostname -f', 'foo.example.com', 'run the thing'])
       subject.command_step(scope, step)
-    end
-  end
-
-  describe "#interpolate_variables" do
-    it 'returns non-String values unmodified' do
-      [
-        %w[a b c],
-        5,
-        true,
-        nil,
-        { 'a' => 1 },
-        %w[$a $b $c],
-        { '$a' => '$b' }
-      ].each do |value|
-        expect(subject.interpolate_variables(scope, value)).to eq(value)
-      end
-    end
-
-    it 'replaces exact variable matches with their value' do
-      scope.with_local_scope('message' => 'hello world') do |local_scope|
-        expect(subject.interpolate_variables(local_scope, '$message')).to eq('hello world')
-      end
-    end
-
-    it 'raises an error if an undefined variable is referenced' do
-      scope.with_local_scope('message' => 'hello world') do |local_scope|
-        expect { subject.interpolate_variables(local_scope, '$dressage') }.to raise_error(/Undefined variable/)
-      end
-    end
-
-    # This one seems like it should work, but `${message}` is actually invalid
-    # puppet code, because that form of variable reference needs to be inside a
-    # string literal.
-    it 'returns the string if it is wrapped in curly braces' do
-      expect(subject.interpolate_variables(scope, '${message}')).to eq('${message}')
-    end
-
-    it 'returns the string if it is not a variable reference' do
-      expect(subject.interpolate_variables(scope, 'foo')).to eq('foo')
-    end
-
-    it 'returns the string if it has an embedded variable reference' do
-      expect(subject.interpolate_variables(scope, 'foo$bar')).to eq('foo$bar')
-    end
-
-    it 'returns the string if it includes complex interpolation' do
-      expect(subject.interpolate_variables(scope, '${foo[0]}')).to eq('${foo[0]}')
-    end
-
-    it 'returns the string if it contains multiple variable interpolations' do
-      expect(subject.interpolate_variables(scope, '$foo$bar')).to eq('$foo$bar')
     end
   end
 end
