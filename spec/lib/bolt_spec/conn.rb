@@ -56,5 +56,9 @@ module BoltSpec
       end
       { "groups" => groups }
     end
+
+    def root_password
+      'root'
+    end
   end
 end

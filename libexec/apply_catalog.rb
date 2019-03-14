@@ -48,6 +48,31 @@ begin
     $LOAD_PATH << dir unless $LOAD_PATH.include?(dir)
   end
 
+  if (conn_info = args['_target'])
+    unless (type = conn_info['remote-transport'])
+      puts "Cannot execute a catalog for a remote target without knowing it's the remote-transport type."
+      exit 1
+    end
+
+    begin
+      require 'puppet/resource_api/transport'
+    rescue LoadError
+      msg = "Could not load 'puppet/resource_api/transport', puppet-resource_api "\
+            "gem version 1.8.0 or greater is required on the proxy target"
+      puts msg
+      exit 1
+    end
+
+    # Transport.connect will modify this hash!
+    transport_conn_info = conn_info.each_with_object({}) { |(k, v), h| h[k.to_sym] = v }
+
+    transport = Puppet::ResourceApi::Transport.connect(type, transport_conn_info)
+    Puppet::ResourceApi::Transport.inject_device(type, transport)
+
+    Puppet[:facts_terminus] = :network_device
+    Puppet[:certname] = conn_info['uri']
+  end
+
   # Ensure custom facts are available for provider suitability tests
   facts = Puppet::Node::Facts.indirection.find(SecureRandom.uuid, environment: env)
 
@@ -57,8 +82,11 @@ begin
              Puppet::Transaction::Report.new('apply')
            end
 
-  Puppet.override(current_environment: env,
-                  loaders: Puppet::Pops::Loaders.new(env)) do
+  overrides = { current_environment: env,
+                loaders: Puppet::Pops::Loaders.new(env) }
+  overrides[:network_device] = true if args['_target']
+
+  Puppet.override(overrides) do
     catalog = Puppet::Resource::Catalog.from_data_hash(args['catalog'])
     catalog.environment = env.name.to_s
     catalog.environment_instance = env

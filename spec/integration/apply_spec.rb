@@ -4,12 +4,14 @@ require 'spec_helper'
 require 'bolt_spec/conn'
 require 'bolt_spec/files'
 require 'bolt_spec/integration'
+require 'bolt_spec/puppet_agent'
 require 'bolt_spec/run'
 
 describe "apply" do
   include BoltSpec::Conn
   include BoltSpec::Files
   include BoltSpec::Integration
+  include BoltSpec::PuppetAgent
   include BoltSpec::Run
 
   let(:modulepath) { File.join(__dir__, '../fixtures/apply') }
@@ -52,19 +54,14 @@ describe "apply" do
     end
 
     after(:all) do
-      # TODO: Extract into test helper if needed in more files
       ssh_node = conn_uri('ssh', include_password: true)
-      uninstall = '/opt/puppetlabs/bin/puppet resource package puppet-agent ensure=absent'
-      run_command(uninstall, [ssh_node, 'agent_targets'], config: root_config, inventory: agent_version_inventory)
+      uninstall([ssh_node, 'agent_targets'], inventory: agent_version_inventory)
     end
 
     context "when running against puppet 5 or puppet 6" do
       before(:all) do
         # install puppet5
-        result = run_task('puppet_agent::install', 'puppet_5', { 'collection' => 'puppet5' },
-                          config: root_config, inventory: agent_version_inventory)
-        expect(result.count).to eq(1)
-        expect(result[0]).to include('status' => 'success')
+        install('puppet_5', collection: 'puppet5', inventory: agent_version_inventory)
 
         result = run_task('puppet_agent::version', 'puppet_5', {}, inventory: agent_version_inventory)
         expect(result.count).to eq(1)
@@ -316,7 +313,7 @@ describe "apply" do
         result = run_task('puppet_agent::install', conn_uri('winrm'),
                           { 'collection' => 'puppet6' }, config: config)
         expect(result.count).to eq(1)
-        expect(result[0]['status']).to eq('success')
+        expect(result[0]).to include('status' => 'success')
 
         result = run_task('puppet_agent::version', conn_uri('winrm'), {}, config: config)
         expect(result.count).to eq(1)
