@@ -76,8 +76,6 @@ bolt plan run mymodule::myplan --modulepath ./PATH/TO/MODULES load_balancer=lb.m
 
 ```
 
-**Related information**  
-
 It is important to consider that parameters that are passed to the `run_*` plan functions are serialized to JSON. In order to illustrate this consider the following plan. 
 ```
 plan test::parameter_passing (
@@ -116,6 +114,8 @@ The task demonstrates that the parameters `example_nul` and `_task` metadata are
 
 Similarly parameters are made available to the task as environment variables where the name of parameter is converted to an environment variable prefixed with `PT_`. The `PT_` prefixed environment variable points to the `String` representation in `JSON` format of the parameter value. Thus the `PT_example_nul` environment variable has the value of `null` of type `String`.
 
+
+**Related information**  
 [Task metadata types](writing_tasks.md#)
 
 ## Returning results from plans
