@@ -8,6 +8,9 @@ require 'logging'
 require 'rspec/logging_helper'
 # Make sure puppet is required for the 'reset puppet settings' context
 require 'puppet_pal'
+# HACK: must be loaded prior to spec libs that implement stub to prevent
+# RubySMB::Dcerpc::Request from shadowing 'stub' through BinData::DSLMixin::DSLFieldValidator
+require 'ruby_smb'
 
 ENV['RACK_ENV'] = 'test'
 $LOAD_PATH.unshift File.join(__dir__, 'lib')

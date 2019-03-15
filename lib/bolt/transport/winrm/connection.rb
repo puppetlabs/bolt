@@ -2,7 +2,6 @@
 
 require 'bolt/node/errors'
 require 'bolt/node/output'
-require 'ruby_smb'
 
 module Bolt
   module Transport
@@ -158,6 +157,9 @@ module Bolt
         end
 
         def write_remote_file_smb(source, destination)
+          # lazy-load expensive gem code
+          require 'ruby_smb'
+
           win_dest = destination.tr('/', '\\')
           if (md = win_dest.match(/^([a-z]):\\(.*)/i))
             # if drive, use admin share for that drive, so path is '\\host\C$'

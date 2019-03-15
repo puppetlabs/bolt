@@ -12,8 +12,14 @@ describe "when loading bolt for CLI invocation" do
     let(:loaded_features) { cli_loaded_features }
 
     [
+      # docker-api + dependencies
       'docker-api',
-      'excon'
+      'excon',
+      # ruby_smb + dependencies
+      'ruby_smb',
+      'bindata',
+      'rubyntlm',
+      'windows_error'
     ].each do |gem_name|
       it "does not load #{gem_name} gem code" do
         gem_path = Regexp.escape(Gem.loaded_specs[gem_name].full_gem_path)
