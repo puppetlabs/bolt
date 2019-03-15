@@ -11,7 +11,7 @@ module Bolt
           @evaluator = Puppet::Pops::Parser::EvaluatingParser.new
         end
 
-        STEP_KEYS = %w[task command eval script].freeze
+        STEP_KEYS = %w[task command eval script source].freeze
 
         def dispatch_step(scope, step)
           step = evaluate_code_blocks(scope, step)
@@ -28,6 +28,8 @@ module Bolt
             command_step(scope, step)
           when 'script'
             script_step(scope, step)
+          when 'source'
+            upload_file_step(scope, step)
           when 'eval'
             eval_step(scope, step)
           else
@@ -79,6 +81,19 @@ module Bolt
           args = [command, target]
           args << description if description
           scope.call_function('run_command', args)
+        end
+
+        def upload_file_step(scope, step)
+          source = step['source']
+          destination = step['destination']
+          target = step['target']
+          description = step['description']
+          raise "Can't upload a file without specifying a target" unless target
+          raise "Can't upload a file without specifying a destination" unless destination
+
+          args = [source, destination, target]
+          args << description if description
+          scope.call_function('upload_file', args)
         end
 
         def eval_step(_scope, step)
