@@ -76,15 +76,7 @@ module Bolt
           @transport_logger = transport_logger
         end
 
-        if Bolt::Util.windows?
-          require 'ffi'
-          module Win
-            extend FFI::Library
-            ffi_lib 'user32'
-            ffi_convention :stdcall
-            attach_function :FindWindow, :FindWindowW, %i[buffer_in buffer_in], :int
-          end
-        end
+        PAGEANT_NAME = "Pageant\0".encode(Encoding::UTF_16LE).freeze
 
         def connect
           options = {
@@ -134,8 +126,10 @@ module Bolt
                 options[:use_agent] = false
               end
             elsif Bolt::Util.windows?
-              pageant_wide = 'Pageant'.encode('UTF-16LE')
-              if Win.FindWindow(pageant_wide, pageant_wide).to_i == 0
+              require 'win32api'
+              # https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-findwindoww
+              @find_window ||= Win32API.new('user32', 'FindWindowW', %w[P P], 'L')
+              if @find_window.call(nil, PAGEANT_NAME).to_i == 0
                 @logger.debug { "Disabling use_agent in net-ssh: pageant process not running" }
                 options[:use_agent] = false
               end

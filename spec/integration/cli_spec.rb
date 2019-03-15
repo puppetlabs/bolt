@@ -19,7 +19,9 @@ describe "when loading bolt for CLI invocation" do
       'ruby_smb',
       'bindata',
       'rubyntlm',
-      'windows_error'
+      'windows_error',
+      # FFI + dependencies
+      'ffi'
     ].each do |gem_name|
       it "does not load #{gem_name} gem code" do
         gem_path = Regexp.escape(Gem.loaded_specs[gem_name].full_gem_path)
