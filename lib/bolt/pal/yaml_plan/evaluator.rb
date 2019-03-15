@@ -11,7 +11,7 @@ module Bolt
           @evaluator = Puppet::Pops::Parser::EvaluatingParser.new
         end
 
-        STEP_KEYS = %w[task command eval].freeze
+        STEP_KEYS = %w[task command eval script].freeze
 
         def dispatch_step(scope, step)
           step = evaluate_code_blocks(scope, step)
@@ -26,6 +26,8 @@ module Bolt
             task_step(scope, step)
           when 'command'
             command_step(scope, step)
+          when 'script'
+            script_step(scope, step)
           when 'eval'
             eval_step(scope, step)
           else
@@ -49,6 +51,23 @@ module Bolt
                    [task, target, params]
                  end
           scope.call_function('run_task', args)
+        end
+
+        def script_step(scope, step)
+          script = step['script']
+          target = step['target']
+          description = step['description']
+          arguments = step['arguments'] || []
+          raise "Can't run a script without specifying a target" unless target
+
+          options = { 'arguments' => arguments }
+          args = if description
+                   [script, target, description, options]
+                 else
+                   [script, target, options]
+                 end
+
+          scope.call_function('run_script', args)
         end
 
         def command_step(scope, step)

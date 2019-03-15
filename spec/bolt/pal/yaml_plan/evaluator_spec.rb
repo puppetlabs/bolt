@@ -222,6 +222,63 @@ describe Bolt::PAL::YamlPlan::Evaluator do
     end
   end
 
+  describe "#script_step" do
+    let(:step) do
+      { 'script' => 'mymodule/myscript.sh',
+        'target' => 'foo.example.com',
+        'arguments' => %w[a b c] }
+    end
+
+    it 'fails if no target is specified' do
+      step.delete('target')
+
+      expect { subject.script_step(scope, step) }.to raise_error(/Can't run a script without specifying a target/)
+    end
+
+    it 'passes arguments to the script' do
+      args = ['mymodule/myscript.sh', 'foo.example.com', 'arguments' => %w[a b c]]
+      expect(scope).to receive(:call_function).with('run_script', args)
+
+      subject.script_step(scope, step)
+    end
+
+    it 'succeeds if no arguments are specified' do
+      step.delete('arguments')
+
+      args = ['mymodule/myscript.sh', 'foo.example.com', 'arguments' => []]
+      expect(scope).to receive(:call_function).with('run_script', args)
+
+      subject.script_step(scope, step)
+    end
+
+    it 'succeeds if empty arguments are specified' do
+      step['arguments'] = []
+
+      args = ['mymodule/myscript.sh', 'foo.example.com', 'arguments' => []]
+      expect(scope).to receive(:call_function).with('run_script', args)
+
+      subject.script_step(scope, step)
+    end
+
+    it 'succeeds if nil arguments are specified' do
+      step['arguments'] = nil
+
+      args = ['mymodule/myscript.sh', 'foo.example.com', 'arguments' => []]
+      expect(scope).to receive(:call_function).with('run_script', args)
+
+      subject.script_step(scope, step)
+    end
+
+    it 'supports a description' do
+      step['description'] = 'run the script'
+
+      args = ['mymodule/myscript.sh', 'foo.example.com', 'run the script', 'arguments' => %w[a b c]]
+      expect(scope).to receive(:call_function).with('run_script', args)
+
+      subject.script_step(scope, step)
+    end
+  end
+
   describe "#eval_step" do
     let(:step) do
       { 'eval' => 55 }
