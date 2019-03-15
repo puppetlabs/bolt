@@ -279,6 +279,43 @@ describe Bolt::PAL::YamlPlan::Evaluator do
     end
   end
 
+  describe "#upload_file_step" do
+    let(:step) do
+      { 'source' => 'mymodule/file.txt',
+        'destination' => '/path/to/file.txt',
+        'target' => 'foo.example.com' }
+    end
+
+    it 'fails if no target is specified' do
+      step.delete('target')
+
+      expect { subject.upload_file_step(scope, step) }.to raise_error(/Can't upload a file without specifying a target/)
+    end
+
+    it 'fails if no destination is specified' do
+      step.delete('destination')
+
+      msg = /Can't upload a file without specifying a destination/
+      expect { subject.upload_file_step(scope, step) }.to raise_error(msg)
+    end
+
+    it 'uploads the file' do
+      args = ['mymodule/file.txt', '/path/to/file.txt', 'foo.example.com']
+      expect(scope).to receive(:call_function).with('upload_file', args)
+
+      subject.upload_file_step(scope, step)
+    end
+
+    it 'supports a description' do
+      step['description'] = 'upload the file'
+
+      args = ['mymodule/file.txt', '/path/to/file.txt', 'foo.example.com', 'upload the file']
+      expect(scope).to receive(:call_function).with('upload_file', args)
+
+      subject.upload_file_step(scope, step)
+    end
+  end
+
   describe "#eval_step" do
     let(:step) do
       { 'eval' => 55 }
