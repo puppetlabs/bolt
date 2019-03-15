@@ -3,7 +3,6 @@
 # Used for $ERROR_INFO. This *must* be capitalized!
 require 'English'
 require 'json'
-require 'concurrent'
 require 'logging'
 require 'set'
 require 'bolt/analytics'
@@ -25,6 +24,10 @@ module Bolt
                    noop = nil,
                    bundled_content: nil,
                    load_config: true)
+
+      # lazy-load expensive gem code
+      require 'concurrent'
+
       @analytics = analytics
       @bundled_content = bundled_content
       @logger = Logging.logger[self]

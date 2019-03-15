@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'base64'
-require 'concurrent'
 require 'find'
 require 'json'
 require 'minitar'
