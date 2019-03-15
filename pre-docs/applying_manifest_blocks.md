@@ -276,13 +276,18 @@ Create a manifest that sets up a web server with IIS and run it as a plan.
 
     The page displays the text **hello!**
 
+**Related information**
+
+[IIS](https://www.iis.net)
+
 ## Using Puppet Device modules from an apply statement
+
+Puppet device modules based on remote transports allow network devices and
+other targets that cannot run a puppet agent to be managed from a proxy. 
 
 **Support for device modules is experimental and may experience breaking changes in y releases**
 
-Puppet device modules based on remote transports allow network devices and
-other targets that cannot run a puppet agent to be managed from a proxy. To use
-device modules from an apply statements the devices need to be added to the
+To use device modules from an apply statements the devices need to be added to the
 bolt inventory as remote targets. The `name` of the target will be used to
 auto-populate the `name`, `uri`, `user`, `password`, `host`, and `port` fields
 of the remote transport's connnection info. You must set the `remote-transport`
@@ -302,7 +307,5 @@ When you set the `run-on` option with a device module the puppet-resource_api
 gem must installed with the puppet agent on the proxy target must be at least
 version 1.8.1.
 
-**Related information**
 
-[IIS](https://www.iis.net)
 
