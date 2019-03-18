@@ -99,6 +99,14 @@ describe Bolt::PAL::YamlPlan do
         str = described_class.new("5+3")
         expect(str.evaluate(scope, evaluator)).to eq("5+3")
       end
+
+      it "does not expose variable assignments to the outer scope" do
+        str = described_class.new("${$foo = 5}")
+        str.evaluate(scope, evaluator)
+
+        expect { described_class.new("$foo").evaluate(scope, evaluator) }
+          .to raise_error(Puppet::ParseError, /Unknown variable/)
+      end
     end
 
     describe Bolt::PAL::YamlPlan::CodeLiteral do
@@ -122,6 +130,14 @@ describe Bolt::PAL::YamlPlan do
       it "fails if the code can't be parsed" do
         str = described_class.new("invalid/puppet code")
         expect { str.evaluate(scope, evaluator) }.to raise_error(Puppet::ParseError)
+      end
+
+      it "does not expose variable assignments to the outer scope" do
+        str = described_class.new("$foo = 5")
+        str.evaluate(scope, evaluator)
+
+        expect { described_class.new("$foo").evaluate(scope, evaluator) }
+          .to raise_error(Puppet::ParseError, /Unknown variable/)
       end
     end
 
@@ -157,6 +173,14 @@ describe Bolt::PAL::YamlPlan do
       it "treats the code as a plain string if it doesn't start with a $" do
         str = described_class.new("hello world")
         expect(str.evaluate(scope, evaluator)).to eq("hello world")
+      end
+
+      it "does not expose variable assignments to the outer scope" do
+        str = described_class.new("$foo = 5")
+        str.evaluate(scope, evaluator)
+
+        expect { described_class.new("$foo").evaluate(scope, evaluator) }
+          .to raise_error(Puppet::ParseError, /Unknown variable/)
       end
     end
   end

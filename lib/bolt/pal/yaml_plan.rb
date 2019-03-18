@@ -82,7 +82,9 @@ module Bolt
           # YAML, Ruby and Puppet all support similar escape sequences.
           parse_result = evaluator.parse_string(@value.inspect)
 
-          evaluator.evaluate(scope, parse_result)
+          scope.with_local_scope({}) do
+            evaluator.evaluate(scope, parse_result)
+          end
         end
       end
 
@@ -91,7 +93,9 @@ module Bolt
         def evaluate(scope, evaluator)
           parse_result = evaluator.parse_string(@value)
 
-          evaluator.evaluate(scope, parse_result)
+          scope.with_local_scope({}) do
+            evaluator.evaluate(scope, parse_result)
+          end
         end
       end
 
@@ -104,7 +108,9 @@ module Bolt
             # Try to parse the string as Puppet code. If it's invalid code,
             # return the original string.
             parse_result = evaluator.parse_string(@value)
-            evaluator.evaluate(scope, parse_result)
+            scope.with_local_scope({}) do
+              evaluator.evaluate(scope, parse_result)
+            end
           else
             @value
           end
