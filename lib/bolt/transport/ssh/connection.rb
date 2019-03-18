@@ -119,6 +119,11 @@ module Bolt
 
           options[:proxy] = Net::SSH::Proxy::Jump.new(target.options['proxyjump']) if target.options['proxyjump']
 
+          # This option was to address discrepency betwen net-ssh host-key-check and ssh(1)
+          # For the net-ssh 5.x series it defaults to true, in 6.x it will default to false, and will be removed in 7.x
+          # https://github.com/net-ssh/net-ssh/pull/663#issuecomment-469979931
+          options[:check_host_ip] = false if Net::SSH::VALID_OPTIONS.include?(:check_host_ip)
+
           if @load_config
             # Mirroring:
             # https://github.com/net-ssh/net-ssh/blob/master/lib/net/ssh/authentication/agent.rb#L80
