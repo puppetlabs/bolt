@@ -11,6 +11,6 @@ Puppet::Functions.create_function(:'system::env') do
   end
 
   def env(name)
-    ENV[name].freeze
+    ENV[name]
   end
 end
