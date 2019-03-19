@@ -15,12 +15,13 @@ module Bolt
             new(scanner, class_loader)
           end
 
-          def visit_Psych_Nodes_Scalar(node) # rubocop:disable Naming/MethodName
+          def deserialize(node)
             if node.quoted
               case node.style
               when Psych::Nodes::Scalar::SINGLE_QUOTED
                 # Single-quoted strings are treated literally
-                node.transform
+                # @ss is a ScalarScanner, from the base ToRuby visitor class
+                node.value
               when Psych::Nodes::Scalar::DOUBLE_QUOTED
                 DoubleQuotedString.new(node.value)
               # | style string or > style string
@@ -28,10 +29,10 @@ module Bolt
                 CodeLiteral.new(node.value)
               # This one shouldn't be possible
               else
-                node.transform
+                @ss.tokenize(node.value)
               end
             else
-              value = node.transform
+              value = @ss.tokenize(node.value)
               if value.is_a?(String)
                 BareString.new(value)
               else
