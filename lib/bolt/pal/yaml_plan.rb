@@ -9,7 +9,7 @@ module Bolt
         end
       end
 
-      attr_reader :name, :parameters, :steps
+      attr_reader :name, :parameters, :steps, :return
 
       def initialize(name, plan)
         # Top-level plan keys aren't allowed to be Puppet code, so force them
@@ -35,6 +35,8 @@ module Bolt
           stringified_step['name'] = stringify(stringified_step['name']) if stringified_step.key?('name')
           stringified_step
         end.freeze
+
+        @return = plan['return']
 
         validate
       end
