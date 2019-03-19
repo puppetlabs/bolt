@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+require 'concurrent/atomic/read_write_lock'
+require 'concurrent/executor/single_thread_executor'
+require 'concurrent/promise'
+require 'concurrent/timer_task'
 require 'digest'
 require 'fileutils'
 require 'net/http'
@@ -20,15 +24,11 @@ module BoltServer
     PURGE_TTL = 7 * PURGE_INTERVAL
 
     def initialize(config,
-                   executor: nil,
+                   executor: Concurrent::SingleThreadExecutor.new,
                    purge_interval: PURGE_INTERVAL,
                    purge_timeout: PURGE_TIMEOUT,
                    purge_ttl: PURGE_TTL)
-
-      # lazy-load expensive gem code
-      require 'concurrent'
-
-      @executor = executor || Concurrent::SingleThreadExecutor.new
+      @executor = executor
       @cache_dir = config['cache-dir']
       @config = config
       @logger = Logging.logger[self]
