@@ -71,26 +71,6 @@ describe Bolt::PAL::YamlPlan::Evaluator do
       expect(call_plan(plan)).to eq(nil)
     end
 
-    it 'fails if the steps list is not an array' do
-      plan_body = <<-YAML
-      steps: null
-      YAML
-
-      plan = Bolt::PAL::YamlPlan::Loader.create(loader, plan_name, 'test.yaml', plan_body)
-
-      expect { call_plan(plan) }.to raise_error(Bolt::Error, /Plan must specify an array of steps/)
-    end
-
-    it 'fails if the steps list is not specified' do
-      plan_body = <<-YAML
-      parameters: {}
-      YAML
-
-      plan = Bolt::PAL::YamlPlan::Loader.create(loader, plan_name, 'test.yaml', plan_body)
-
-      expect { call_plan(plan) }.to raise_error(Bolt::Error, /Plan must specify an array of steps/)
-    end
-
     it 'runs each step in order' do
       plan_body = <<-YAML
       parameters:

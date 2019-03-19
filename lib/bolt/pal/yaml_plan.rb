@@ -35,6 +35,42 @@ module Bolt
           stringified_step['name'] = stringify(stringified_step['name']) if stringified_step.key?('name')
           stringified_step
         end.freeze
+
+        validate
+      end
+
+      VAR_NAME_PATTERN = /\A[a-z_][a-z0-9_]*\z/.freeze
+
+      def validate
+        unless @body.is_a?(Array)
+          raise Bolt::Error.new("Plan must specify an array of steps", "bolt/invalid-plan")
+        end
+
+        used_names = Set.new
+
+        # Parameters come in a hash, so they must be unique
+        @parameters.each do |param|
+          unless param.name.is_a?(String) && param.name.match?(VAR_NAME_PATTERN)
+            raise Bolt::Error.new("Invalid parameter name #{param.name.inspect}", "bolt/invalid-plan")
+          end
+
+          used_names << param.name
+        end
+
+        @body.each do |step|
+          next unless step.key?('name')
+
+          unless step['name'].is_a?(String) && step['name'].match?(VAR_NAME_PATTERN)
+            raise Bolt::Error.new("Invalid step name #{step['name'].inspect}", "bolt/invalid-plan")
+          end
+
+          if used_names.include?(step['name'])
+            msg = "Step name #{step['name'].inspect} matches an existing parameter or step name"
+            raise Bolt::Error.new(msg, "bolt/invalid-plan")
+          end
+
+          used_names << step['name']
+        end
       end
 
       # Turn all "potential" strings in the object into actual strings.
