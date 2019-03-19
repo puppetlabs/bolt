@@ -14,5 +14,8 @@ steps:
     target: $nodes
     parameters:
       message: hello world
-  - command: echo hello world
+  - name: echo_message
+    command: echo hello world
     target: $nodes
+
+return: $echo_message.first.value

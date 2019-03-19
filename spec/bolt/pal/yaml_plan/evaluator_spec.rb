@@ -31,8 +31,10 @@ describe Bolt::PAL::YamlPlan::Evaluator do
   end
 
   describe "evaluating a plan" do
+    let(:plan) { Bolt::PAL::YamlPlan::Loader.create(loader, plan_name, 'test.yaml', @plan_body) }
+
     it 'validates the parameters' do
-      plan_body = <<-YAML
+      @plan_body = <<-YAML
       parameters:
         foo:
           type: String
@@ -41,8 +43,6 @@ describe Bolt::PAL::YamlPlan::Evaluator do
 
       steps: []
       YAML
-
-      plan = Bolt::PAL::YamlPlan::Loader.create(loader, plan_name, 'test.yaml', plan_body)
 
       expect(call_plan(plan, 'foo' => 'hello', 'bar' => 5)).to eq(nil)
       expect(call_plan(plan, 'foo' => '', 'bar' => 5)).to eq(nil)
@@ -60,11 +60,9 @@ describe Bolt::PAL::YamlPlan::Evaluator do
 
     # a) empty array, b) nil, c) missing key
     it 'does nothing if the steps list is empty' do
-      plan_body = <<-YAML
+      @plan_body = <<-YAML
       steps: []
       YAML
-
-      plan = Bolt::PAL::YamlPlan::Loader.create(loader, plan_name, 'test.yaml', plan_body)
 
       expect(scope).not_to receive(:call_function)
 
@@ -72,7 +70,7 @@ describe Bolt::PAL::YamlPlan::Evaluator do
     end
 
     it 'runs each step in order' do
-      plan_body = <<-YAML
+      @plan_body = <<-YAML
       parameters:
         package:
           type: String
@@ -88,8 +86,6 @@ describe Bolt::PAL::YamlPlan::Evaluator do
           target: $nodes
       YAML
 
-      plan = Bolt::PAL::YamlPlan::Loader.create(loader, plan_name, 'test.yaml', plan_body)
-
       nodes = %w[foo.example.com bar.example.com]
       params = { 'action' => 'status', 'name' => 'openssl' }
       expect(scope).to receive(:call_function).with('run_task', ['package', nodes, params]).ordered
@@ -99,7 +95,7 @@ describe Bolt::PAL::YamlPlan::Evaluator do
     end
 
     it 'can be run multiple times with different parameters' do
-      plan_body = <<-YAML
+      @plan_body = <<-YAML
       parameters:
         nodes:
           type: TargetSpec
@@ -107,8 +103,6 @@ describe Bolt::PAL::YamlPlan::Evaluator do
         - command: hostname -f
           target: $nodes
       YAML
-
-      plan = Bolt::PAL::YamlPlan::Loader.create(loader, plan_name, 'test.yaml', plan_body)
 
       expect(scope).to receive(:call_function).with('run_command', ['hostname -f', ['foo.example.com']])
       call_plan(plan, 'nodes' => ['foo.example.com'])
@@ -119,28 +113,93 @@ describe Bolt::PAL::YamlPlan::Evaluator do
 
     # task+command
     it 'fails if a step is ambiguous' do
-      plan_body = <<-YAML
+      @plan_body = <<-YAML
       steps:
         - task: package
           command: yum install package
           target: ["foo.example.com"]
       YAML
 
-      plan = Bolt::PAL::YamlPlan::Loader.create(loader, plan_name, 'test.yaml', plan_body)
-
       expect { call_plan(plan) }.to raise_error(Bolt::Error, /Unsupported plan step/)
     end
 
     it 'fails for an unknown step' do
-      plan_body = <<-YAML
+      @plan_body = <<-YAML
       steps:
         - package: openssl
           target: ["foo.example.com"]
       YAML
 
-      plan = Bolt::PAL::YamlPlan::Loader.create(loader, plan_name, 'test.yaml', plan_body)
-
       expect { call_plan(plan) }.to raise_error(Bolt::Error, /Unsupported plan step/)
+    end
+
+    it 'returns the `return` value on completion' do
+      @plan_body = <<-YAML
+      steps: []
+      return: "hello world"
+      YAML
+
+      expect(call_plan(plan)).to eq('hello world')
+    end
+
+    it 'accepts an expression for the `return` value' do
+      @plan_body = <<-YAML
+      parameters:
+        foo:
+          type: String
+      steps: []
+      return: $foo
+      YAML
+
+      expect(call_plan(plan, 'foo' => 'hello world')).to eq('hello world')
+    end
+
+    it 'accepts an object for the `return` value' do
+      @plan_body = <<-YAML
+      steps: []
+      return: [1, 2, 3, 4, 5]
+      YAML
+
+      expect(call_plan(plan)).to eq([1, 2, 3, 4, 5])
+    end
+
+    it 'accepts an array of expressions for the `return` value' do
+      @plan_body = <<-YAML
+      parameters:
+        n:
+          type: Integer
+      steps: []
+      return:
+        - $n
+        - $n * 2
+        - $n + 5
+      YAML
+
+      expect(call_plan(plan, 'n' => 7)).to eq([7, 14, 12])
+    end
+
+    it 'can reference step results in the `return` expression' do
+      @plan_body = <<-YAML
+      parameters:
+        n:
+          type: Integer
+      steps:
+        - name: first
+          eval: $n * 2
+        - name: second
+          eval: $first * 3
+      return: [ $n, $first, $second ]
+      YAML
+
+      expect(call_plan(plan, 'n' => 3)).to eq([3, 6, 18])
+    end
+
+    it 'returns undef if the plan has no `return` expression' do
+      @plan_body = <<-YAML
+      steps: []
+      YAML
+
+      expect(call_plan(plan)).to be_nil
     end
   end
 
@@ -307,8 +366,10 @@ describe Bolt::PAL::YamlPlan::Evaluator do
   end
 
   describe "referring to previous steps" do
+    let(:plan) { Bolt::PAL::YamlPlan::Loader.create(loader, plan_name, 'test.yaml', @plan_body) }
+
     it "stores the result of a step in a variable" do
-      plan_body = <<-YAML
+      @plan_body = <<-YAML
       parameters:
         input:
           type: Integer
@@ -321,27 +382,23 @@ describe Bolt::PAL::YamlPlan::Evaluator do
           target: foo.example.com
       YAML
 
-      plan = Bolt::PAL::YamlPlan::Loader.create(loader, plan_name, 'test.yaml', plan_body)
-
       expect(scope).to receive(:call_function).with('run_command', ['echo 34', 'foo.example.com'])
 
       call_plan(plan, 'input' => 12)
     end
 
     it "accepts a step without a name" do
-      plan_body = <<-YAML
+      @plan_body = <<-YAML
       steps:
         - eval: >
             5+6
       YAML
 
-      plan = Bolt::PAL::YamlPlan::Loader.create(loader, plan_name, 'test.yaml', plan_body)
-
       call_plan(plan)
     end
 
     it "can store and retrieve 'undef' results" do
-      plan_body = <<-YAML
+      @plan_body = <<-YAML
       steps:
         - name: foo
           eval: >
@@ -349,8 +406,6 @@ describe Bolt::PAL::YamlPlan::Evaluator do
         - name: bar
           eval: $foo
       YAML
-
-      plan = Bolt::PAL::YamlPlan::Loader.create(loader, plan_name, 'test.yaml', plan_body)
 
       call_plan(plan)
     end

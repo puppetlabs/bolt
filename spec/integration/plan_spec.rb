@@ -45,7 +45,7 @@ describe "When a plan succeeds" do
 
   it 'runs a yaml plan', ssh: true do
     result = run_cli(['plan', 'run', 'sample::yaml', '--nodes', target] + config_flags)
-    expect(JSON.parse(result)).to be_nil
+    expect(JSON.parse(result)).to eq('stdout' => "hello world\n", 'stderr' => '', 'exit_code' => 0)
 
     lines = @log_output.readlines
     expect(lines).to include(match(/Starting: task/))
