@@ -11,7 +11,7 @@ module Bolt
           @evaluator = Puppet::Pops::Parser::EvaluatingParser.new
         end
 
-        STEP_KEYS = %w[task command].freeze
+        STEP_KEYS = %w[task command eval].freeze
 
         def dispatch_step(scope, step)
           step = evaluate_code_blocks(scope, step)
@@ -26,6 +26,8 @@ module Bolt
             task_step(scope, step)
           when 'command'
             command_step(scope, step)
+          when 'eval'
+            eval_step(scope, step)
           else
             # This shouldn't be able to happen since this case statement should
             # match the STEP_KEYS list, but raise an error *just in case*,
@@ -58,6 +60,10 @@ module Bolt
           args = [command, target]
           args << description if description
           scope.call_function('run_command', args)
+        end
+
+        def eval_step(_scope, step)
+          step['eval']
         end
 
         def unsupported_step(_scope, step)

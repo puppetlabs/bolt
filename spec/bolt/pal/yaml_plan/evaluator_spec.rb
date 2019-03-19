@@ -221,4 +221,14 @@ describe Bolt::PAL::YamlPlan::Evaluator do
       subject.command_step(scope, step)
     end
   end
+
+  describe "#eval_step" do
+    let(:step) do
+      { 'eval' => 55 }
+    end
+
+    it 'returns the result of the eval key' do
+      expect(subject.eval_step(scope, step)). to eq(55)
+    end
+  end
 end
