@@ -113,7 +113,9 @@ module Bolt
 
           closure_scope.with_local_scope(args_hash) do |scope|
             steps.each do |step|
-              dispatch_step(scope, step)
+              result = dispatch_step(scope, step)
+
+              scope.setvar(step['name'], result) if step.key?('name')
             end
           end
 
