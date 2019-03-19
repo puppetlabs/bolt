@@ -106,13 +106,9 @@ module Bolt
 
         # This is the method that Puppet calls to evaluate the plan. The name
         # makes more sense for .pp plans.
-        def evaluate_block_with_bindings(closure_scope, args_hash, steps)
-          unless steps.is_a?(Array)
-            raise Bolt::Error.new("Plan must specify an array of steps", "bolt/invalid-plan")
-          end
-
+        def evaluate_block_with_bindings(closure_scope, args_hash, plan)
           closure_scope.with_local_scope(args_hash) do |scope|
-            steps.each do |step|
+            plan.steps.each do |step|
               result = dispatch_step(scope, step)
 
               scope.setvar(step['name'], result) if step.key?('name')

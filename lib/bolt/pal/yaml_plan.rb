@@ -9,7 +9,7 @@ module Bolt
         end
       end
 
-      attr_reader :name, :parameters, :body
+      attr_reader :name, :parameters, :steps
 
       def initialize(name, plan)
         # Top-level plan keys aren't allowed to be Puppet code, so force them
@@ -29,7 +29,7 @@ module Bolt
           Parameter.new(param, definition['default'], type)
         end.freeze
 
-        @body = plan['steps']&.map do |step|
+        @steps = plan['steps']&.map do |step|
           # Step keys also aren't allowed to be code and neither is the value of "name"
           stringified_step = Bolt::Util.walk_keys(step) { |key| stringify(key) }
           stringified_step['name'] = stringify(stringified_step['name']) if stringified_step.key?('name')
@@ -42,7 +42,7 @@ module Bolt
       VAR_NAME_PATTERN = /\A[a-z_][a-z0-9_]*\z/.freeze
 
       def validate
-        unless @body.is_a?(Array)
+        unless @steps.is_a?(Array)
           raise Bolt::Error.new("Plan must specify an array of steps", "bolt/invalid-plan")
         end
 
@@ -57,7 +57,7 @@ module Bolt
           used_names << param.name
         end
 
-        @body.each do |step|
+        @steps.each do |step|
           next unless step.key?('name')
 
           unless step['name'].is_a?(String) && step['name'].match?(VAR_NAME_PATTERN)
@@ -71,6 +71,10 @@ module Bolt
 
           used_names << step['name']
         end
+      end
+
+      def body
+        self
       end
 
       # Turn all "potential" strings in the object into actual strings.
