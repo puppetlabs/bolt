@@ -4,7 +4,6 @@ require 'base64'
 require 'find'
 require 'json'
 require 'minitar'
-require 'orchestrator_client'
 require 'pathname'
 require 'zlib'
 require 'bolt/transport/base'
@@ -39,6 +38,9 @@ module Bolt
       def self.validate(options); end
 
       def initialize(*args)
+        # lazy-load expensive gem code
+        require 'orchestrator_client'
+
         @connections = {}
         super
       end
