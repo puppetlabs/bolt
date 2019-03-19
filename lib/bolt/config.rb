@@ -1,9 +1,8 @@
 # frozen_string_literal: true
 
+require 'etc'
 require 'yaml'
 require 'logging'
-# limit the loaded portion of concurrent as its expensive
-require 'concurrent/utility/processor_counter'
 require 'pathname'
 require 'bolt/boltdir'
 require 'bolt/transport/ssh'
@@ -60,7 +59,7 @@ module Bolt
 
       @boltdir = boltdir
       @concurrency = 100
-      @compile_concurrency = Concurrent.processor_count
+      @compile_concurrency = Etc.nprocessors
       @transport = 'ssh'
       @format = 'human'
       @puppetdb = {}
@@ -246,7 +245,7 @@ module Bolt
         raise Bolt::ValidationError, 'Compile concurrency must be a positive integer'
       end
 
-      compile_limit = 2 * Concurrent.processor_count
+      compile_limit = 2 * Etc.nprocessors
       unless @compile_concurrency < compile_limit
         raise Bolt::ValidationError, "Compilation is CPU-intensive, set concurrency less than #{compile_limit}"
       end

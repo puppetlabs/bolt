@@ -6,6 +6,7 @@ require 'bolt_spec/files'
 require 'bolt_spec/task'
 require 'bolt/cli'
 require 'bolt/util'
+require 'concurrent/utility/processor_counter'
 require 'r10k/action/puppetfile/install'
 
 describe "Bolt::CLI" do
@@ -378,6 +379,7 @@ bar
       it "defaults to unset" do
         cli = Bolt::CLI.new(%w[command run --nodes foo])
         cli.parse
+        # verifies Etc.nprocessors is the same as Concurrent.processor_count
         expect(cli.config.compile_concurrency).to eq(Concurrent.processor_count)
       end
 
