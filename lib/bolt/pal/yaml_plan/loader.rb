@@ -54,7 +54,11 @@ module Bolt
             raise ArgumentError, "The data loaded from #{source_ref} does not contain an object - its type is #{type}"
           end
 
-          plan_definition = YamlPlan.new(typed_name, result).freeze
+          begin
+            plan_definition = YamlPlan.new(typed_name, result).freeze
+          rescue Bolt::Error => e
+            raise Puppet::ParseError.new(e.message, source_ref)
+          end
 
           created = create_function_class(plan_definition)
           closure_scope = nil
