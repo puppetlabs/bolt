@@ -27,13 +27,25 @@ describe "when loading bolt for CLI invocation" do
       'faraday',
       'multipart-post',
       # concurrent gem + dependencies
-      'concurrent-ruby'
+      'concurrent-ruby',
+      # httpclient + dependencies
+      'httpclient'
     ].each do |gem_name|
       it "does not load #{gem_name} gem code" do
         gem_path = Regexp.escape(Gem.loaded_specs[gem_name].full_gem_path)
         any_gem_source_code = a_string_matching(gem_path)
         fail_msg = "loaded unexpected #{gem_name} gem code from #{gem_path}"
         expect(loaded_features).not_to include(any_gem_source_code), fail_msg
+      end
+    end
+
+    [
+      'openssl/x509.rb'
+    ].each do |code_path|
+      it "does not load #{code_path}" do
+        specific_code = a_string_matching(Regexp.escape(code_path))
+        fail_msg = "loaded unexpected #{code_path}"
+        expect(loaded_features).not_to include(specific_code), fail_msg
       end
     end
   end
