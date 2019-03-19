@@ -81,7 +81,7 @@ module Bolt
 
       require 'bolt/pal/logging'
       require 'bolt/pal/issues'
-      require 'bolt/pal/yaml_plan_evaluator'
+      require 'bolt/pal/yaml_plan/loader'
 
       # Now that puppet is loaded we can include puppet mixins in data types
       Bolt::ResultSet.include_iterable
@@ -104,7 +104,7 @@ module Bolt
         pal.with_script_compiler do |compiler|
           alias_types(compiler)
           begin
-            Puppet.override(yaml_plan_instantiator: Bolt::PAL::YamlPlanEvaluator) do
+            Puppet.override(yaml_plan_instantiator: Bolt::PAL::YamlPlan::Loader) do
               yield compiler
             end
           rescue Bolt::Error => err

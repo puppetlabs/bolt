@@ -12,5 +12,7 @@ parameters:
 steps:
   - task: sample::echo
     target: $nodes
+    parameters:
+      message: hello world
   - command: echo hello world
     target: $nodes
