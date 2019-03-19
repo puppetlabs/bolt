@@ -62,6 +62,10 @@ module Bolt
       attr_reader :user_id
 
       def initialize(user_id)
+        # lazy-load expensive gem code
+        require 'concurrent/configuration'
+        require 'concurrent/future'
+
         @logger = Logging.logger[self]
         @http = HTTPClient.new
         @user_id = user_id

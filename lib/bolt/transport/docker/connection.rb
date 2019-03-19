@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'docker'
 require 'logging'
 require 'bolt/node/errors'
 
@@ -9,6 +8,9 @@ module Bolt
     class Docker < Base
       class Connection
         def initialize(target)
+          # lazy-load expensive gem code
+          require 'docker'
+
           @target = target
           @logger = Logging.logger[target.host]
         end

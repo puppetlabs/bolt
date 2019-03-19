@@ -2,7 +2,8 @@
 
 require 'yaml'
 require 'logging'
-require 'concurrent'
+# limit the loaded portion of concurrent as its expensive
+require 'concurrent/utility/processor_counter'
 require 'pathname'
 require 'bolt/boltdir'
 require 'bolt/transport/ssh'

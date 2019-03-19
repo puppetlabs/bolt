@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
-require 'concurrent'
+require 'concurrent/atomic/read_write_lock'
+require 'concurrent/executor/single_thread_executor'
+require 'concurrent/promise'
+require 'concurrent/timer_task'
 require 'digest'
 require 'fileutils'
 require 'net/http'
