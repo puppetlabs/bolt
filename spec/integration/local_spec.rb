@@ -63,6 +63,24 @@ describe "when running over the local transport" do
       result = run_failed_nodes(%w[task run results fail=true] + config_flags)
       expect(result[0]['_error']).to be
     end
+
+    context 'with environment variables set' do
+      before(:each) { ENV['test_var'] = "testing this" }
+      after(:each) { ENV.delete('test_var') }
+
+      it 'exposes environment variables to the task' do
+        result = run_one_node(%w[task run env_var::get_var] + config_flags)
+        output = result['_output'].strip
+        expect(output).to eq("testing this")
+      end
+
+      it 'exposes environment variables during apply' do
+        result = run_cli_json(%w[plan run env_var::get_var] + config_flags)
+        expect(result).not_to include('kind')
+        event = result.first['result']['report']['resource_statuses']['Notify[gettingvar]']['events'].first
+        expect(event).to include('message' => "defined 'message' as 'testing this'")
+      end
+    end
   end
 
   context 'when using CLI options on Windows OS', windows: true do
