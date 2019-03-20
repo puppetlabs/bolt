@@ -241,6 +241,35 @@ describe Bolt::PAL::YamlPlan::Evaluator do
     end
   end
 
+  describe "#plan_step" do
+    let(:step) do
+      { 'plan' => 'testplan',
+        'parameters' => { 'message' => 'hello',
+                          'count' => 5 } }
+    end
+
+    it 'passes parameters to the plan' do
+      expect(scope).to receive(:call_function).with('run_plan', ['testplan', { 'message' => 'hello', 'count' => 5 }])
+
+      subject.plan_step(scope, step)
+    end
+
+    it 'succeeds if no parameters are specified' do
+      step.delete('parameters')
+
+      expect(scope).to receive(:call_function).with('run_plan', ['testplan', {}])
+
+      subject.plan_step(scope, step)
+    end
+    it 'succeeds if nil parameters are specified' do
+      step['parameters'] = nil
+
+      expect(scope).to receive(:call_function).with('run_plan', ['testplan', {}])
+
+      subject.plan_step(scope, step)
+    end
+  end
+
   describe "#command_step" do
     let(:step) do
       { 'command' => 'hostname -f',

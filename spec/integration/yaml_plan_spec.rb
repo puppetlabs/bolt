@@ -60,6 +60,26 @@ describe "running YAML plans", ssh: true do
     expect(result.first['result']['_output']).to match(/Uploaded .*test.sh/)
   end
 
+  it 'runs another plan' do
+    result = run_plan('yaml::delegate', nodes: target)
+
+    expect(result.first['node']).to eq(target)
+    expect(result.first['status']).to eq('success')
+    expect(result.first['result']).to eq('_output' => "hello world\n")
+  end
+
+  it 'does not expose its own variables to a sub-plan' do
+    result = run_plan('yaml::plan_with_isolated_subplan', message: 'hello world')
+
+    expect(result['msg']).to match(/Unknown variable/)
+  end
+
+  it 'does not leak variables back into the calling plan' do
+    result = run_plan('yaml::plan_isolated_from_subplan')
+
+    expect(result['msg']).to match(/Unknown variable/)
+  end
+
   it 'passes information between steps' do
     result = run_plan('yaml::param_passing')
 
