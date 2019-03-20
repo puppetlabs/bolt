@@ -76,7 +76,7 @@ module Bolt
           @transport_logger = transport_logger
         end
 
-        PAGEANT_NAME = "Pageant\0".encode(Encoding::UTF_16LE).freeze
+        PAGEANT_NAME = "Pageant\0".encode(Encoding::UTF_16LE)
 
         def connect
           options = {
