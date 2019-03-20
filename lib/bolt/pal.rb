@@ -250,7 +250,12 @@ module Bolt
 
     def list_plans
       in_bolt_compiler do |compiler|
-        compiler.list_plans.map { |plan| [plan.name] }.sort
+        errors = []
+        plans = compiler.list_plans(nil, errors).map { |plan| [plan.name] }.sort
+        errors.each do |error|
+          @logger.warn(error.details['original_error'])
+        end
+        plans
       end
     end
 
