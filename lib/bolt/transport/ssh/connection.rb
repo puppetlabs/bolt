@@ -126,7 +126,7 @@ module Bolt
                 options[:use_agent] = false
               end
             elsif Bolt::Util.windows?
-              require 'win32api'
+              require 'Win32API' # case matters in this require!
               # https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-findwindoww
               @find_window ||= Win32API.new('user32', 'FindWindowW', %w[P P], 'L')
               if @find_window.call(nil, PAGEANT_NAME).to_i == 0
