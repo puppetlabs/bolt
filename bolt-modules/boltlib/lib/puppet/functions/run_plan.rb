@@ -66,7 +66,9 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
         # If the plan does not throw :return by calling the return function it's result is
         # undef/nil
         result = catch(:return) do
-          func.class.dispatcher.dispatchers[0].call_by_name_with_scope(scope, params, true)
+          scope.with_global_scope do |global_scope|
+            func.class.dispatcher.dispatchers[0].call_by_name_with_scope(global_scope, params, true)
+          end
           nil
         end&.value
         # Validate the result is a PlanResult
