@@ -28,7 +28,10 @@ describe Bolt::PAL::YamlPlan::Loader do
     end
 
     it 'returns a puppet function wrapper' do
-      plan_body = '{}'
+      plan_body = <<-YAML
+      steps: []
+      YAML
+
       plan = described_class.create(loader, plan_name, 'test.yaml', plan_body)
       expect(plan).to be_a(Puppet::Functions::Function)
     end

@@ -33,7 +33,8 @@ describe Bolt::PAL::YamlPlan do
           'count' => {
             'type' => 'Integer'
           }
-        }
+        },
+        'steps' => []
       }
 
       param_types = plan.parameters.inject({}) { |acc, param| acc.merge(param.name => param.type_expr) }
@@ -49,7 +50,8 @@ describe Bolt::PAL::YamlPlan do
         'parameters' => {
           'empty' => {},
           'nil' => nil
-        }
+        },
+        'steps' => []
       }
 
       expect(plan.parameters.map(&:name)).to contain_exactly('empty', 'nil')
@@ -57,9 +59,72 @@ describe Bolt::PAL::YamlPlan do
     end
 
     it 'uses an empty parameter list if none are specified' do
-      @plan_body = {}
+      @plan_body = {
+        'steps' => []
+      }
 
       expect(plan.parameters).to eq([])
+    end
+
+    describe "plan validation" do
+      let(:plan) { described_class.new(plan_name, @plan_body) }
+
+      it 'fails if a parameter has a name that is not a valid variable name' do
+        @plan_body = {
+          'parameters' => { 'foo-bar' => {} },
+          'steps' => []
+        }
+
+        expect { plan }.to raise_error(Bolt::Error, /Invalid parameter name "foo-bar"/)
+      end
+
+      it 'fails if a step has the same name as a parameter' do
+        @plan_body = {
+          'parameters' => { 'foo' => {} },
+          'steps' => [{ 'name' => 'foo',
+                        'eval' => '$foo' }]
+        }
+
+        expect { plan }.to raise_error(Bolt::Error, /Step name "foo" matches an existing parameter or step name/)
+      end
+
+      it 'fails if two steps have the same name' do
+        @plan_body = {
+          'steps' => [
+            { 'name' => 'foo',
+              'eval' => '$foo' },
+            { 'name' => 'foo',
+              'eval' => '$foo' }
+          ]
+        }
+
+        expect { plan }.to raise_error(Bolt::Error, /Step name "foo" matches an existing parameter or step name/)
+      end
+
+      it 'fails if a step has a name that is not a valid variable name' do
+        @plan_body = {
+          'steps' => [
+            { 'name' => 'foo-bar',
+              'eval' => '$foo' }
+          ]
+        }
+
+        expect { plan }.to raise_error(Bolt::Error, /Invalid step name "foo-bar"/)
+      end
+
+      it 'fails if the steps list is not an array' do
+        @plan_body = {
+          'steps' => nil
+        }
+
+        expect { plan }.to raise_error(Bolt::Error, /Plan must specify an array of steps/)
+      end
+
+      it 'fails if the steps list is not specified' do
+        @plan_body = {}
+
+        expect { plan }.to raise_error(Bolt::Error, /Plan must specify an array of steps/)
+      end
     end
   end
 
