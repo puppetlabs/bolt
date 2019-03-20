@@ -1,0 +1,16 @@
+parameters:
+  n:
+    type: Integer
+    default: 12
+
+steps:
+  - name: doubled
+    eval: $n * 2
+  - name: tripled
+    eval: $n * 3
+  - name: quintupled
+    eval: $doubled + $tripled
+  - name: stringified
+    eval: "${quintupled}"
+
+return: [$doubled, $tripled, $quintupled, $stringified]
