@@ -67,6 +67,23 @@ describe "BoltSpec::Run", ssh: true do
     end
   end
 
+  describe 'upload_file' do
+    let(:file) { File.join(config_data['modulepath'], '..', 'scripts', 'success.sh') }
+    let(:dest) { "/tmp/#{SecureRandom.hex}" }
+
+    it 'should upload a file to a node', ssh: true do
+      result = upload_file(file, dest, 'ssh', options)
+      expect(result[0]['status']).to eq('success')
+    end
+
+    it 'should accept _catch_errors' do
+      result = run_script('missing.sh', 'non_existent_node', nil, options: { '_catch_errors' => true }, **options)
+
+      expect(result[0]['status']).to eq('failure')
+      expect(result[0]['result']['_error']['kind']).to eq('puppetlabs.tasks/connect-error')
+    end
+  end
+
   describe 'run_plan' do
     it 'should run a plan' do
       result = run_plan('sample::single_task', { 'nodes' => 'ssh' }, options)
