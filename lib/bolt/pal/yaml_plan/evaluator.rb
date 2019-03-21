@@ -106,21 +106,18 @@ module Bolt
 
         # This is the method that Puppet calls to evaluate the plan. The name
         # makes more sense for .pp plans.
-        def evaluate_block_with_bindings(closure_scope, args_hash, steps)
-          unless steps.is_a?(Array)
-            raise Bolt::Error.new("Plan must specify an array of steps", "bolt/invalid-plan")
-          end
+        def evaluate_block_with_bindings(closure_scope, args_hash, plan)
+          plan_result = closure_scope.with_local_scope(args_hash) do |scope|
+            plan.steps.each do |step|
+              step_result = dispatch_step(scope, step)
 
-          closure_scope.with_local_scope(args_hash) do |scope|
-            steps.each do |step|
-              result = dispatch_step(scope, step)
-
-              scope.setvar(step['name'], result) if step.key?('name')
+              scope.setvar(step['name'], step_result) if step.key?('name')
             end
+
+            evaluate_code_blocks(scope, plan.return)
           end
 
-          result = nil
-          throw :return, Puppet::Pops::Evaluator::Return.new(result, nil, nil)
+          throw :return, Puppet::Pops::Evaluator::Return.new(plan_result, nil, nil)
         end
 
         # Recursively evaluate any EvaluableString instances in the object.
