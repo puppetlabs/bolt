@@ -26,5 +26,7 @@ Tasks and plans are packaged in Puppet modules, so you can install them as you w
 Running tasks and plans you've written requires they be placed in a Puppet module. This subject describes several patterns for writing and sharing projects that use tasks and plans.
 -   **[Writing tasks](writing_tasks.md#)**  
 Tasks are similar to scripts, but they are kept in modules and can have metadata. This allows you to reuse and share them more easily.
--   **[Writing plans](writing_plans.md#)**  
+-   **[Writing plans in Puppet language](writing_plans.md#)**  
 Plans allow you to run more than one task with a single command, compute values for the input to a task, process the results of tasks, or make decisions based on the result of running a task.
+-   **[Writing plans in YAML](writing_plans.md#)**  
+Simple plans are written in YAML instead of Puppet language.

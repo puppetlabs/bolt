@@ -1,4 +1,4 @@
-# Writing plans
+# Writing plans in Puppet language
 
 Plans allow you to run more than one task with a single command, compute values for the input to a task, process the results of tasks, or make decisions based on the result of running a task.
 
