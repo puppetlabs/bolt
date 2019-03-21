@@ -47,6 +47,14 @@ module BoltSpec
       Bolt::Util.walk_keys(result, &:to_s)
     end
 
+    def upload_file(source, dest, targets, options: {}, config: nil, inventory: nil)
+      result = BoltRunner.with_runner(config, inventory) do |runner|
+        runner.upload_file(source, dest, targets, options)
+      end
+      result = result.to_a
+      Bolt::Util.walk_keys(result, &:to_s)
+    end
+
     def apply_manifest(manifest, targets, execute: false, noop: false, config: nil, inventory: nil)
       # The execute parameter is equivalent to the --execute option
       if execute
@@ -125,6 +133,12 @@ module BoltSpec
         executor = Bolt::Executor.new(config.concurrency, @analytics)
         targets = inventory.get_targets(targets)
         executor.run_script(targets, script, arguments, options)
+      end
+
+      def upload_file(source, dest, targets, options = {})
+        executor = Bolt::Executor.new(config.concurrency, @analytics)
+        targets = inventory.get_targets(targets)
+        executor.upload_file(targets, source, dest, options)
       end
 
       def apply_manifest(code, targets, filename = nil, noop = false)
