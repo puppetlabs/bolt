@@ -863,5 +863,42 @@ describe Bolt::Inventory::Group do
 
       it { expect { group.validate }.to raise_error(/Alias alias1 refers to multiple targets: node1 and node2/) }
     end
+
+    context 'with unexpected keys' do
+      let(:mock_logger) { instance_double("Logging.logger") }
+      before(:each) do
+        allow(Logging).to receive(:logger).and_return(mock_logger)
+        allow(mock_logger).to receive(:[]).and_return(mock_logger)
+      end
+
+      it 'does not log when no unexpected keys are present' do
+        expect(mock_logger).not_to receive(:warn)
+        Bolt::Inventory::Group.new('name' => 'foo', 'nodes' => [{ 'name' => 'bar' }])
+      end
+
+      it 'logs unexpected group keys' do
+        expect(mock_logger).to receive(:warn).with(/in group foo/)
+        Bolt::Inventory::Group.new('name' => 'foo', 'unexpected' => 1)
+      end
+
+      it 'logs unexpected group config keys' do
+        expect(mock_logger).to receive(:warn).with(/in config for group foo/)
+        Bolt::Inventory::Group.new('name' => 'foo', 'config' => { 'unexpected' => 1 })
+      end
+
+      it 'logs unexpected node keys' do
+        expect(mock_logger).to receive(:warn).with(/in node bar/)
+        Bolt::Inventory::Group.new('name' => 'foo', 'nodes' => [
+                                     { 'name' => 'bar', 'unexpected' => 1 }
+                                   ])
+      end
+
+      it 'logs unexpected node config keys' do
+        expect(mock_logger).to receive(:warn).with(/in config for node bar/)
+        Bolt::Inventory::Group.new('name' => 'foo', 'nodes' => [
+                                     { 'name' => 'bar', 'config' => { 'unexpected' => 1 } }
+                                   ])
+      end
+    end
   end
 end

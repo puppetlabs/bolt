@@ -10,6 +10,11 @@ module Bolt
       # Regex used to validate group names and target aliases.
       NAME_REGEX = /\A[a-z0-9_][a-z0-9_-]*\Z/.freeze
 
+      DATA_KEYS = %w[name config facts vars features].freeze
+      NODE_KEYS = DATA_KEYS + ['alias']
+      GROUP_KEYS = DATA_KEYS + %w[groups nodes]
+      CONFIG_KEYS = Bolt::TRANSPORTS.keys.map(&:to_s) + ['transport']
+
       def initialize(data)
         @logger = Logging.logger[self]
 
@@ -20,10 +25,20 @@ module Bolt
         raise ValidationError.new("Group name must be a String, not #{@name.inspect}", nil) unless @name.is_a?(String)
         raise ValidationError.new("Invalid group name #{@name}", @name) unless @name =~ NAME_REGEX
 
+        unless (unexpected_keys = data.keys - GROUP_KEYS).empty?
+          msg = "Found unexpected key(s) #{unexpected_keys.join(', ')} in group #{@name}"
+          @logger.warn(msg)
+        end
+
         @vars = fetch_value(data, 'vars', Hash)
         @facts = fetch_value(data, 'facts', Hash)
         @features = fetch_value(data, 'features', Array)
         @config = fetch_value(data, 'config', Hash)
+
+        unless (unexpected_keys = @config.keys - CONFIG_KEYS).empty?
+          msg = "Found unexpected key(s) #{unexpected_keys.join(', ')} in config for group #{@name}"
+          @logger.warn(msg)
+        end
 
         nodes = fetch_value(data, 'nodes', Array)
         groups = fetch_value(data, 'groups', Array)
@@ -42,6 +57,16 @@ module Bolt
 
           raise ValidationError.new("Node #{node} does not have a name", @name) unless node['name']
           @nodes[node['name']] = node
+
+          unless (unexpected_keys = node.keys - NODE_KEYS).empty?
+            msg = "Found unexpected key(s) #{unexpected_keys.join(', ')} in node #{node['name']}"
+            @logger.warn(msg)
+          end
+          config_keys = node['config']&.keys || []
+          unless (unexpected_keys = config_keys - CONFIG_KEYS).empty?
+            msg = "Found unexpected key(s) #{unexpected_keys.join(', ')} in config for node #{node['name']}"
+            @logger.warn(msg)
+          end
 
           next unless node.include?('alias')
 
@@ -67,9 +92,6 @@ module Bolt
         @name_or_alias = nodes.select { |node| node.is_a?(String) }
 
         @groups = groups.map { |g| Group.new(g) }
-
-        # this allows arbitrary info for the top level
-        @rest = data.reject { |k, _| %w[name nodes config groups vars facts features].include? k }
       end
 
       private def fetch_value(data, key, type)
