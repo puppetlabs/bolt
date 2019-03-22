@@ -21,10 +21,23 @@ module Bolt
     :metadata
   ) do
 
-    def initialize(task)
+    attr_reader :file_cache
+
+    def initialize(task, file_cache = nil)
       super(nil, nil, [], {})
 
+      if file_cache
+        @file_cache = file_cache
+        task = update_file_data(task)
+      end
+
       task.reject { |k, _| k == 'parameters' }.each { |k, v| self[k] = v }
+    end
+
+    # puppetserver file entries have 'filename' rather then 'name'
+    def update_file_data(task_data)
+      task_data['files'].each { |f| f['name'] = f['filename'] }
+      task_data
     end
 
     def description
@@ -55,7 +68,12 @@ module Bolt
     # This provides a method we can override in subclasses if the 'path' needs
     # to be fetched or computed.
     def file_path(file_name)
-      file_map[file_name]['path']
+      if @file_cache
+        file = file_map[file_name]
+        file['path'] ||= @file_cache.update_file(file)
+      else
+        file_map[file_name]['path']
+      end
     end
 
     def implementations

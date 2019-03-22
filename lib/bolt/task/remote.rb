@@ -6,7 +6,7 @@ module Bolt
   class Task
     class Remote < Task
       def self.from_task(task)
-        new(task.name, task.file, task.files, task.metadata)
+        new(task.to_h.each_with_object({}) { |(k, v), h| h[k.to_s] = v }, task.file_cache)
       end
 
       def implementations
