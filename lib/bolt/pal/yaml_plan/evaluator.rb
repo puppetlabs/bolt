@@ -11,7 +11,7 @@ module Bolt
           @evaluator = Puppet::Pops::Parser::EvaluatingParser.new
         end
 
-        STEP_KEYS = %w[task command eval script source].freeze
+        STEP_KEYS = %w[task command eval script source plan].freeze
 
         def dispatch_step(scope, step)
           step = evaluate_code_blocks(scope, step)
@@ -26,6 +26,8 @@ module Bolt
             task_step(scope, step)
           when 'command'
             command_step(scope, step)
+          when 'plan'
+            plan_step(scope, step)
           when 'script'
             script_step(scope, step)
           when 'source'
@@ -52,7 +54,17 @@ module Bolt
                  else
                    [task, target, params]
                  end
+
           scope.call_function('run_task', args)
+        end
+
+        def plan_step(scope, step)
+          plan = step['plan']
+          parameters = step['parameters'] || {}
+
+          args = [plan, parameters]
+
+          scope.call_function('run_plan', args)
         end
 
         def script_step(scope, step)

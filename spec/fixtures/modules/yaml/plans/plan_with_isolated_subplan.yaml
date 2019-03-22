@@ -1,0 +1,9 @@
+parameters:
+  message:
+    type: String
+
+steps:
+  - name: undefined_var
+    plan: yaml::undefined_var
+
+return: $undefined_var
