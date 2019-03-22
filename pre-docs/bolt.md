@@ -34,7 +34,9 @@ Bolt is an open source task runner that automates the manual work that you do to
 
  [Writing tasks](writing_tasks.md#) 
 
- [Writing plans](writing_plans.md#) 
+ [Writing plans in Puppet language](writing_plans.md#) 
+
+ [Writing plans in YAML](writing_yaml_plans.md#) 
 
  [Applying manifest blocks](applying_manifest_blocks.md#) 
 
