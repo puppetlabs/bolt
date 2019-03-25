@@ -4,7 +4,6 @@ require 'base64'
 require 'find'
 require 'json'
 require 'logging'
-require 'minitar'
 require 'open3'
 require 'bolt/error'
 require 'bolt/task'
@@ -225,6 +224,10 @@ module Bolt
     end
 
     def build_plugin_tarball
+      # lazy-load expensive gem code
+      require 'minitar'
+      require 'zlib'
+
       start_time = Time.now
       sio = StringIO.new
       output = Minitar::Output.new(Zlib::GzipWriter.new(sio))

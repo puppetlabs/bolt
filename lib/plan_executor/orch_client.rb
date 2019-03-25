@@ -136,6 +136,10 @@ module PlanExecutor
     end
 
     def pack(directory)
+      # lazy-load expensive gem code
+      require 'minitar'
+      require 'zlib'
+
       start_time = Time.now
       io = StringIO.new
       output = Minitar::Output.new(Zlib::GzipWriter.new(io))

@@ -3,9 +3,7 @@
 require 'base64'
 require 'find'
 require 'json'
-require 'minitar'
 require 'pathname'
-require 'zlib'
 require 'bolt/transport/base'
 require 'bolt/transport/orch/connection'
 
@@ -128,6 +126,10 @@ module Bolt
       end
 
       def pack(directory)
+        # lazy-load expensive gem code
+        require 'minitar'
+        require 'zlib'
+
         start_time = Time.now
         io = StringIO.new
         output = Minitar::Output.new(Zlib::GzipWriter.new(io))
