@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'addressable/uri'
 require 'bolt/error'
 
 module Bolt
@@ -18,6 +17,9 @@ module Bolt
     end
 
     def initialize(uri, options = nil)
+      # lazy-load expensive gem code
+      require 'addressable/uri'
+
       @uri = uri
       @uri_obj = parse(uri)
       @options = options || {}

@@ -33,7 +33,10 @@ describe "when loading bolt for CLI invocation" do
       # locale + dependencies
       'locale',
       # minitar + dependencies
-      'minitar'
+      'minitar',
+      # addressable + dependencies
+      'addressable',
+      'public_suffix'
     ].each do |gem_name|
       it "does not load #{gem_name} gem code" do
         gem_path = Regexp.escape(Gem.loaded_specs[gem_name].full_gem_path)
