@@ -5,7 +5,6 @@ require 'shellwords'
 require 'bolt/node/errors'
 require 'bolt/node/output'
 require 'bolt/util'
-require 'net/ssh/proxy/jump'
 
 module Bolt
   module Transport
@@ -65,6 +64,10 @@ module Bolt
         attr_writer :run_as
 
         def initialize(target, transport_logger, load_config = true)
+          # lazy-load expensive gem code
+          require 'net/ssh'
+          require 'net/ssh/proxy/jump'
+
           @target = target
           @load_config = load_config
 
