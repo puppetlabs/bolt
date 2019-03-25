@@ -1489,7 +1489,7 @@ bar
           expect(executor)
             .to receive(:run_task)
             .with(targets, task_t, { 'message' => 'hi there' }, kind_of(Hash))
-            .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0)]))
+            .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0, 'some_task')]))
 
           expect(executor).to receive(:start_plan)
           expect(executor).to receive(:log_plan)
@@ -1497,7 +1497,11 @@ bar
 
           cli.execute(options)
           expect(JSON.parse(output.string)).to eq(
-            [{ 'node' => 'foo', 'status' => 'success', 'result' => { '_output' => 'yes' } }]
+            [{ 'node' => 'foo',
+               'status' => 'success',
+               'type' => 'task',
+               'object' => 'some_task',
+               'result' => { '_output' => 'yes' } }]
           )
         end
 
@@ -1515,7 +1519,7 @@ bar
           expect(executor)
             .to receive(:run_task)
             .with(targets, task_t, { 'message' => 'hi there' }, kind_of(Hash))
-            .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0)]))
+            .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0, 'some_task')]))
 
           expect(executor).to receive(:start_plan)
           expect(executor).to receive(:log_plan)
@@ -1523,7 +1527,11 @@ bar
 
           cli.execute(options)
           expect(JSON.parse(output.string)).to eq(
-            [{ 'node' => 'foo', 'status' => 'success', 'result' => { '_output' => 'yes' } }]
+            [{ 'node' => 'foo',
+               'status' => 'success',
+               'type' => 'task',
+               'object' => 'some_task',
+               'result' => { '_output' => 'yes' } }]
           )
         end
 
@@ -1545,7 +1553,7 @@ bar
           expect(executor)
             .to receive(:run_task)
             .with(targets, task_t, { 'message' => 'hi there' }, kind_of(Hash))
-            .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'no', '', 1)]))
+            .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'no', '', 1, 'some_task')]))
 
           expect(executor).to receive(:start_plan)
           expect(executor).to receive(:log_plan)
@@ -1557,6 +1565,8 @@ bar
               {
                 'node' => 'foo',
                 'status' => 'failure',
+                'type' => 'task',
+                'object' => 'some_task',
                 'result' => {
                   "_output" => "no",
                   "_error" => {

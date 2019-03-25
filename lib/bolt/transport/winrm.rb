@@ -85,7 +85,11 @@ module Bolt
       def run_command(target, command, _options = {})
         with_connection(target) do |conn|
           output = conn.execute(command)
-          Bolt::Result.for_command(target, output.stdout.string, output.stderr.string, output.exit_code)
+          Bolt::Result.for_command(target,
+                                   output.stdout.string,
+                                   output.stderr.string,
+                                   output.exit_code,
+                                   'command', command)
         end
       end
 
@@ -102,7 +106,11 @@ module Bolt
               args += Powershell.escape_arguments(arguments)
               output = conn.execute_process(path, args)
             end
-            Bolt::Result.for_command(target, output.stdout.string, output.stderr.string, output.exit_code)
+            Bolt::Result.for_command(target,
+                                     output.stdout.string,
+                                     output.stderr.string,
+                                     output.exit_code,
+                                     'script', script)
           end
         end
       end
@@ -163,7 +171,8 @@ module Bolt
 
             Bolt::Result.for_task(target, output.stdout.string,
                                   output.stderr.string,
-                                  output.exit_code)
+                                  output.exit_code,
+                                  task.name)
           end
         end
       end

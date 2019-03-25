@@ -217,7 +217,7 @@ plans/plans/plans/plans
   end
 
   it "prints CommandResults" do
-    outputter.print_result(Bolt::Result.for_command(target, "stout", "sterr", 2))
+    outputter.print_result(Bolt::Result.for_command(target, "stout", "sterr", 2, 'command', "executed"))
     lines = output.string
     expect(lines).to match(/STDOUT:\n    stout/)
     expect(lines).to match(/STDERR:\n    sterr/)
@@ -227,7 +227,7 @@ plans/plans/plans/plans
     result = { 'key' => 'val',
                '_error' => { 'msg' => 'oops' },
                '_output' => 'hello' }
-    outputter.print_result(Bolt::Result.for_task(target, result.to_json, "", 2))
+    outputter.print_result(Bolt::Result.for_task(target, result.to_json, "", 2, 'atask'))
     lines = output.string
     expect(lines).to match(/^  oops\n  hello$/)
     expect(lines).to match(/^    "key": "val"$/)

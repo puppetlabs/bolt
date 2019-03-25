@@ -79,7 +79,10 @@ shared_examples 'transport api' do
   context 'run_command' do
     it "executes a command on a host" do
       command, expected = os_context[:stdout_command]
-      expect(runner.run_command(target, command).value['stdout']).to match(expected)
+      result = runner.run_command(target, command)
+      expect(result.value['stdout']).to match(expected)
+      expect(result.type).to eq('command')
+      expect(result.object).to eq(command)
     end
 
     it "captures stderr from a host" do
@@ -112,11 +115,10 @@ shared_examples 'transport api' do
       contents = "kljhdfg"
       remote_path = File.join(os_context[:destination_dir], 'upload-test')
       with_tempfile_containing('upload-test', contents) do |file|
-        expect(
-          runner.upload(target, file.path, remote_path).value
-        ).to eq(
-          '_output' => "Uploaded '#{file.path}' to '#{target.host}:#{remote_path}'"
-        )
+        result = runner.upload(target, file.path, remote_path)
+        expect(result.message).to eq("Uploaded '#{file.path}' to '#{target.host}:#{remote_path}'")
+        expect(result.type).to eq('upload')
+        expect(result.object).to eq(file.path)
 
         expect(
           runner.run_command(target, "#{os_context[:cat_cmd]} #{remote_path}").value['stdout']
@@ -152,9 +154,10 @@ shared_examples 'transport api' do
   context 'run_script' do
     it "can run a script remotely" do
       with_tempfile_containing('script test', os_context[:echo_script]) do |file|
-        expect(
-          runner.run_script(target, file.path, [])['stdout'].strip
-        ).to eq('')
+        result = runner.run_script(target, file.path, [])
+        expect(result['stdout'].strip).to eq('')
+        expect(result.type).to eq('script')
+        expect(result.object).to eq(file.path)
       end
     end
 
@@ -215,8 +218,9 @@ QUOTED
     it "can run a task" do
       arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
       with_task_containing('tasks_test', os_context[:env_task], 'environment', os_context[:extension]) do |task|
-        expect(runner.run_task(target, task, arguments).message)
-          .to eq("Hello from task\nGoodbye\n")
+        result = runner.run_task(target, task, arguments)
+        expect(result.message).to eq("Hello from task\nGoodbye\n")
+        expect(result.object).to eq('tasks_test')
       end
     end
 
