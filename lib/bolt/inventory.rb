@@ -5,6 +5,7 @@ require 'bolt/config'
 require 'bolt/inventory/group'
 require 'bolt/target'
 require 'bolt/util'
+require 'yaml'
 
 module Bolt
   class Inventory

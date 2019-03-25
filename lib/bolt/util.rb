@@ -4,6 +4,8 @@ module Bolt
   module Util
     class << self
       def read_config_file(path, default_paths = nil, file_name = 'file')
+        require 'yaml'
+
         logger = Logging.logger[self]
         path_passed = path
         if path.nil? && default_paths

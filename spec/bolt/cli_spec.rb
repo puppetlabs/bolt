@@ -8,6 +8,7 @@ require 'bolt/cli'
 require 'bolt/util'
 require 'concurrent/utility/processor_counter'
 require 'r10k/action/puppetfile/install'
+require 'yaml'
 
 describe "Bolt::CLI" do
   include BoltSpec::Files

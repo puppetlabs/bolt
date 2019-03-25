@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'etc'
-require 'yaml'
 require 'logging'
 require 'pathname'
 require 'bolt/boltdir'

@@ -3,6 +3,7 @@
 require 'spec_helper'
 require 'bolt_spec/config'
 require 'bolt/inventory'
+require 'yaml'
 
 describe Bolt::Inventory do
   include BoltSpec::Config
