@@ -3,7 +3,6 @@
 require 'bolt/util'
 require 'bolt/version'
 require 'json'
-require 'locale'
 require 'logging'
 require 'securerandom'
 
@@ -65,6 +64,7 @@ module Bolt
         require 'concurrent/configuration'
         require 'concurrent/future'
         require 'httpclient'
+        require 'locale'
 
         @logger = Logging.logger[self]
         @http = HTTPClient.new
