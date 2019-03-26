@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'bolt/task/remote'
+require 'bolt/task'
 require 'bolt/transport/base'
 
 module Bolt
@@ -47,7 +47,7 @@ module Bolt
         transport = @executor.transport(proxy_target.protocol)
         arguments = arguments.merge('_target' => target.to_h.reject { |_, v| v.nil? })
 
-        remote_task = Bolt::Task::Remote.from_task(task)
+        remote_task = task.remote_instance
 
         result = transport.run_task(proxy_target, remote_task, arguments, options)
         Bolt::Result.new(target, value: result.value)
