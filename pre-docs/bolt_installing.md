@@ -194,6 +194,14 @@ The Puppet repository for the YUM package management system is [http://yum.puppe
         sudo yum install puppet-bolt
         ```
 
+    -   Enterprise Linux 8
+
+        ```
+        sudo rpm -Uvh https://yum.puppet.com/puppet6/puppet6-release-el-8.noarch.rpm
+        sudo yum install puppet-bolt
+        ```
+
+
     -   SUSE Linux Enterprise Server 12
 
         ```
