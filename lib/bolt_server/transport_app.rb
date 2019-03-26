@@ -4,7 +4,6 @@ require 'sinatra'
 require 'bolt'
 require 'bolt/error'
 require 'bolt/target'
-require 'bolt/task/puppet_server'
 require 'bolt_server/file_cache'
 require 'json'
 require 'json-schema'
@@ -81,7 +80,7 @@ module BoltServer
 
       target = [Bolt::Target.new(body['target']['hostname'], opts)]
 
-      task = Bolt::Task::PuppetServer.new(body['task'], @file_cache)
+      task = Bolt::Task.new(body['task'], @file_cache)
 
       parameters = body['parameters'] || {}
 
@@ -102,7 +101,7 @@ module BoltServer
 
       target = [Bolt::Target.new(body['target']['hostname'], opts)]
 
-      task = Bolt::Task::PuppetServer.new(body['task'], @file_cache)
+      task = Bolt::Task.new(body['task'], @file_cache)
 
       parameters = body['parameters'] || {}
 

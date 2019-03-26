@@ -47,7 +47,7 @@ module Bolt
         transport = @executor.transport(proxy_target.protocol)
         arguments = arguments.merge('_target' => target.to_h.reject { |_, v| v.nil? })
 
-        remote_task = Bolt::Task::Remote.new(task.to_h)
+        remote_task = Bolt::Task::Remote.from_task(task)
 
         result = transport.run_task(proxy_target, remote_task, arguments, options)
         Bolt::Result.new(target, value: result.value)
