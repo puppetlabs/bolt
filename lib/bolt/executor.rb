@@ -201,6 +201,22 @@ module Bolt
       @analytics&.event('Apply', 'ast', data)
     end
 
+    def report_yaml_plan(plan)
+      steps = plan.steps.count
+      return_type = case plan.return
+                    when Bolt::PAL::YamlPlan::EvaluableString
+                      'expression'
+                    when nil
+                      nil
+                    else
+                      'value'
+                    end
+
+      @analytics&.event('Plan', 'yaml', plan_steps: steps, return_type: return_type)
+    rescue StandardError => e
+      @logger.debug { "Failed to submit analytics event: #{e.message}" }
+    end
+
     def with_node_logging(description, batch)
       @logger.info("#{description} on #{batch.map(&:uri)}")
       result = yield
