@@ -4,6 +4,7 @@ require 'spec_helper'
 require 'json'
 require 'bolt'
 require 'bolt/result'
+require 'bolt/target'
 
 describe Bolt::Result do
   let(:target1) { "node1" }
@@ -22,8 +23,16 @@ describe Bolt::Result do
   end
 
   it 'is creates the correct json' do
-    expected = '[{"node":"node1","status":"success","result":{"key":"val1"}},'\
-      '{"node":"node1","status":"failure","result":{"key":"val2","_error":{"kind":"bolt/oops"}}}]'
-    expect(result_set.to_json).to eq(expected)
+    expected = [{ "node" => "node1",
+                  "type" => nil,
+                  "object" => nil,
+                  "status" => "success",
+                  "result" => { "key" => "val1" } },
+                { "node" => "node1",
+                  "type" => nil,
+                  "object" => nil,
+                  "status" => "failure",
+                  "result" => { "key" => "val2", "_error" => { "kind" => "bolt/oops" } } }]
+    expect(JSON.parse(result_set.to_json)).to eq(expected)
   end
 end

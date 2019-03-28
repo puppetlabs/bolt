@@ -108,7 +108,11 @@ module Bolt
         with_connection(target) do |conn|
           conn.running_as(options['_run_as']) do
             output = conn.execute(command, sudoable: true)
-            Bolt::Result.for_command(target, output.stdout.string, output.stderr.string, output.exit_code)
+            Bolt::Result.for_command(target,
+                                     output.stdout.string,
+                                     output.stderr.string,
+                                     output.exit_code,
+                                     'command', command)
           end
         end
       end
@@ -123,7 +127,11 @@ module Bolt
               remote_path = conn.write_remote_executable(dir, script)
               dir.chown(conn.run_as)
               output = conn.execute([remote_path, *arguments], sudoable: true)
-              Bolt::Result.for_command(target, output.stdout.string, output.stderr.string, output.exit_code)
+              Bolt::Result.for_command(target,
+                                       output.stdout.string,
+                                       output.stderr.string,
+                                       output.exit_code,
+                                       'script', script)
             end
           end
         end
@@ -184,7 +192,8 @@ module Bolt
             end
             Bolt::Result.for_task(target, output.stdout.string,
                                   output.stderr.string,
-                                  output.exit_code)
+                                  output.exit_code,
+                                  task.name)
           end
         end
       end

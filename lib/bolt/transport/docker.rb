@@ -59,7 +59,7 @@ module Bolt
       def run_command(target, command, _options = {})
         with_connection(target) do |conn|
           stdout, stderr, exitcode = conn.execute(*Shellwords.split(command), {})
-          Bolt::Result.for_command(target, stdout, stderr, exitcode)
+          Bolt::Result.for_command(target, stdout, stderr, exitcode, 'command', command)
         end
       end
 
@@ -71,7 +71,7 @@ module Bolt
           conn.with_remote_tempdir do |dir|
             remote_path = conn.write_remote_executable(dir, script)
             stdout, stderr, exitcode = conn.execute(remote_path, *arguments, {})
-            Bolt::Result.for_command(target, stdout, stderr, exitcode)
+            Bolt::Result.for_command(target, stdout, stderr, exitcode, 'script', script)
           end
         end
       end
@@ -112,7 +112,7 @@ module Bolt
             end
 
             stdout, stderr, exitcode = conn.execute(remote_task_path, execute_options)
-            Bolt::Result.for_task(target, stdout, stderr, exitcode)
+            Bolt::Result.for_task(target, stdout, stderr, exitcode, task.name)
           end
         end
       end

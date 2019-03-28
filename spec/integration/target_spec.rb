@@ -25,6 +25,8 @@ describe "when running a plan that creates targets", ssh: true do
         [
           {
             'node' => uri,
+            'type' => 'task',
+            'object' => 'results',
             'status' => 'success',
             'result' => {
               '_output' => "hi\n"

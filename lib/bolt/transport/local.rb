@@ -78,7 +78,11 @@ module Bolt
       def run_command(target, command, _options = {})
         in_tmpdir(target.options['tmpdir']) do |dir|
           output = @conn.execute(command, dir: dir)
-          Bolt::Result.for_command(target, output.stdout.string, output.stderr.string, output.exit_code)
+          Bolt::Result.for_command(target,
+                                   output.stdout.string,
+                                   output.stderr.string,
+                                   output.exit_code,
+                                   'command', command)
         end
       end
 
@@ -106,7 +110,11 @@ module Bolt
             end
             output = @conn.execute(file, *arguments, dir: dir)
           end
-          Bolt::Result.for_command(target, output.stdout.string, output.stderr.string, output.exit_code)
+          Bolt::Result.for_command(target,
+                                   output.stdout.string,
+                                   output.stderr.string,
+                                   output.exit_code,
+                                   'script', script)
         end
       end
 
@@ -181,7 +189,7 @@ module Bolt
             env = ENVIRONMENT_METHODS.include?(input_method) ? envify_params(unwrapped_arguments) : nil
             output = @conn.execute(script, stdin: stdin, env: env, dir: dir, interpreter: interpreter)
           end
-          Bolt::Result.for_task(target, output.stdout.string, output.stderr.string, output.exit_code)
+          Bolt::Result.for_task(target, output.stdout.string, output.stderr.string, output.exit_code, task.name)
         end
       end
 

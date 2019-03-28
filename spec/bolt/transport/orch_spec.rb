@@ -8,6 +8,7 @@ require 'bolt/transport/orch'
 require 'bolt/plan_result'
 require 'bolt/target'
 require 'open3'
+require 'orchestrator_client'
 
 describe Bolt::Transport::Orch, orchestrator: true do
   include BoltSpec::Files
@@ -121,7 +122,7 @@ describe Bolt::Transport::Orch, orchestrator: true do
     it "returns a result for every successful node" do
       results = [{ 'name' => 'node1', 'state' => 'finished', 'result' => { '_output' => 'hello' } },
                  { 'name' => 'node2', 'state' => 'finished', 'result' => { '_output' => 'goodbye' } }]
-      node_results = orch.process_run_results(targets, results)
+      node_results = orch.process_run_results(targets, results, 'thetask')
 
       expect(node_results[0]).to be_success
       expect(node_results[1]).to be_success
@@ -135,7 +136,7 @@ describe Bolt::Transport::Orch, orchestrator: true do
       it "returns failure for only the failed node" do
         results = [{ 'name' => 'node1', 'state' => 'finished', 'result' => { '_output' => 'hello' } },
                    { 'name' => 'node2', 'state' => 'failed', 'result' => { '_output' => 'goodbye' } }]
-        node_results = orch.process_run_results(targets, results)
+        node_results = orch.process_run_results(targets, results, 'thetask')
 
         expect(node_results[0]).to be_success
         expect(node_results[1]).not_to be_success
@@ -151,7 +152,7 @@ describe Bolt::Transport::Orch, orchestrator: true do
                                        'details' => {} } }
         results = [{ 'name' => 'node1', 'state' => 'finished', 'result' => { '_output' => 'hello' } },
                    { 'name' => 'node2', 'state' => 'failed', 'result' => error_result }]
-        node_results = orch.process_run_results(targets, results)
+        node_results = orch.process_run_results(targets, results, 'thetask')
 
         expect(node_results[0]).to be_success
         expect(node_results[1]).not_to be_success
@@ -163,7 +164,7 @@ describe Bolt::Transport::Orch, orchestrator: true do
         results = [{ 'name' => 'node1', 'state' => 'finished', 'result' => { '_output' => 'hello' } },
                    # XXX double-check that this is the correct result for a skipped node
                    { 'name' => 'node2', 'state' => 'skipped', 'result' => nil }]
-        node_results = orch.process_run_results(targets, results)
+        node_results = orch.process_run_results(targets, results, 'thetask')
 
         expect(node_results[0]).to be_success
         expect(node_results[1]).not_to be_success
