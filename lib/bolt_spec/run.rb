@@ -12,6 +12,14 @@ require 'bolt/util'
 module BoltSpec
   module Run
     def run_task(task_name, targets, params, config: nil, inventory: nil)
+      if config.nil? && defined?(bolt_config)
+        config = bolt_config
+      end
+
+      if inventory.nil? && defined?(bolt_inventory)
+        inventory = bolt_inventory
+      end
+
       result = BoltRunner.with_runner(config, inventory) do |runner|
         runner.run_task(task_name, targets, params)
       end
@@ -20,6 +28,14 @@ module BoltSpec
     end
 
     def run_plan(plan_name, params, config: nil, inventory: nil)
+      if config.nil? && defined?(bolt_config)
+        config = bolt_config
+      end
+
+      if inventory.nil? && defined?(bolt_inventory)
+        inventory = bolt_inventory
+      end
+
       # Users copying code from run_task may forget that targets is not a parameter for run plan
       raise ArgumentError, "params must be a hash" unless params.is_a?(Hash)
 
@@ -32,6 +48,14 @@ module BoltSpec
     end
 
     def run_command(command, targets, options: {}, config: nil, inventory: nil)
+      if config.nil? && defined?(bolt_config)
+        config = bolt_config
+      end
+
+      if inventory.nil? && defined?(bolt_inventory)
+        inventory = bolt_inventory
+      end
+
       result = BoltRunner.with_runner(config, inventory) do |runner|
         runner.run_command(command, targets, options)
       end
@@ -40,6 +64,14 @@ module BoltSpec
     end
 
     def run_script(script, targets, arguments, options: {}, config: nil, inventory: nil)
+      if config.nil? && defined?(bolt_config)
+        config = bolt_config
+      end
+
+      if inventory.nil? && defined?(bolt_inventory)
+        inventory = bolt_inventory
+      end
+
       result = BoltRunner.with_runner(config, inventory) do |runner|
         runner.run_script(script, targets, arguments, options)
       end
@@ -48,6 +80,14 @@ module BoltSpec
     end
 
     def upload_file(source, dest, targets, options: {}, config: nil, inventory: nil)
+      if config.nil? && defined?(bolt_config)
+        config = bolt_config
+      end
+
+      if inventory.nil? && defined?(bolt_inventory)
+        inventory = bolt_inventory
+      end
+
       result = BoltRunner.with_runner(config, inventory) do |runner|
         runner.upload_file(source, dest, targets, options)
       end
@@ -56,6 +96,14 @@ module BoltSpec
     end
 
     def apply_manifest(manifest, targets, execute: false, noop: false, config: nil, inventory: nil)
+      if config.nil? && defined?(bolt_config)
+        config = bolt_config
+      end
+
+      if inventory.nil? && defined?(bolt_inventory)
+        inventory = bolt_inventory
+      end
+
       # The execute parameter is equivalent to the --execute option
       if execute
         code = manifest

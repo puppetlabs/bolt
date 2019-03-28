@@ -14,22 +14,21 @@ describe "BoltSpec::Run", ssh: true do
   include BoltSpec::Files
 
   let(:modulepath) { File.join(__dir__, '../fixtures/modules') }
-  let(:config_data) {
+  let(:bolt_config) {
     { "modulepath" => modulepath,
       "ssh" => { "host-key-check" => false },
       "winrm" => { "ssl" => false } }
   }
-  let(:inventory_data) { conn_inventory }
-  let(:options) { { config: config_data, inventory: inventory_data } }
+  let(:bolt_inventory) { conn_inventory }
 
   describe 'run_task' do
     it 'should run a task on a node' do
-      result = run_task('sample::echo', 'ssh', {}, options)
+      result = run_task('sample::echo', 'ssh', {})
       expect(result[0]['status']).to eq('success')
     end
 
     it 'should accept _catch_errors' do
-      result = run_task('sample::echo', 'non_existent_node', { '_catch_errors' => true }, options)
+      result = run_task('sample::echo', 'non_existent_node', '_catch_errors' => true)
 
       expect(result[0]['status']).to eq('failure')
       expect(result[0]['result']['_error']['kind']).to eq('puppetlabs.tasks/connect-error')
@@ -38,12 +37,12 @@ describe "BoltSpec::Run", ssh: true do
 
   describe 'run_command' do
     it 'should run a command on a node', ssh: true do
-      result = run_command('echo hello', 'ssh', options)
+      result = run_command('echo hello', 'ssh')
       expect(result[0]['status']).to eq('success')
     end
 
     it 'should accept _catch_errors' do
-      result = run_command('echo hello', 'non_existent_node', options: { '_catch_errors' => true }, **options)
+      result = run_command('echo hello', 'non_existent_node', options: { '_catch_errors' => true })
 
       expect(result[0]['status']).to eq('failure')
       expect(result[0]['result']['_error']['kind']).to eq('puppetlabs.tasks/connect-error')
@@ -51,16 +50,16 @@ describe "BoltSpec::Run", ssh: true do
   end
 
   describe 'run_script' do
-    let(:script) { File.join(config_data['modulepath'], '..', 'scripts', 'success.sh') }
+    let(:script) { File.join(bolt_config['modulepath'], '..', 'scripts', 'success.sh') }
 
     it 'should run a command on a node with an argument', ssh: true do
-      result = run_script(script, 'ssh', ['hi'], options)
+      result = run_script(script, 'ssh', ['hi'])
       expect(result[0]['status']).to eq('success')
       expect(result[0]['result']['stdout']).to match(/arg: hi/)
     end
 
     it 'should accept _catch_errors' do
-      result = run_script('missing.sh', 'non_existent_node', nil, options: { '_catch_errors' => true }, **options)
+      result = run_script('missing.sh', 'non_existent_node', nil, options: { '_catch_errors' => true })
 
       expect(result[0]['status']).to eq('failure')
       expect(result[0]['result']['_error']['kind']).to eq('puppetlabs.tasks/connect-error')
@@ -68,16 +67,16 @@ describe "BoltSpec::Run", ssh: true do
   end
 
   describe 'upload_file' do
-    let(:file) { File.join(config_data['modulepath'], '..', 'scripts', 'success.sh') }
+    let(:file) { File.join(bolt_config['modulepath'], '..', 'scripts', 'success.sh') }
     let(:dest) { "/tmp/#{SecureRandom.hex}" }
 
     it 'should upload a file to a node', ssh: true do
-      result = upload_file(file, dest, 'ssh', options)
+      result = upload_file(file, dest, 'ssh')
       expect(result[0]['status']).to eq('success')
     end
 
     it 'should accept _catch_errors' do
-      result = run_script('missing.sh', 'non_existent_node', nil, options: { '_catch_errors' => true }, **options)
+      result = run_script('missing.sh', 'non_existent_node', nil, options: { '_catch_errors' => true })
 
       expect(result[0]['status']).to eq('failure')
       expect(result[0]['result']['_error']['kind']).to eq('puppetlabs.tasks/connect-error')
@@ -86,14 +85,14 @@ describe "BoltSpec::Run", ssh: true do
 
   describe 'run_plan' do
     it 'should run a plan' do
-      result = run_plan('sample::single_task', { 'nodes' => 'ssh' }, options)
+      result = run_plan('sample::single_task', 'nodes' => 'ssh')
       expect(result['status']).to eq('success')
       data = result['value'][0]
       expect(data['status']).to eq('success')
     end
 
     it 'should return a failure' do
-      result = run_plan('error::run_fail', { 'target' => 'ssh' }, options)
+      result = run_plan('error::run_fail', 'target' => 'ssh')
       expect(result['status']).to eq('failure')
       expect(result['value']['kind']).to eq('bolt/run-failure')
     end
@@ -125,7 +124,7 @@ describe "BoltSpec::Run", ssh: true do
     describe 'apply_manifest' do
       it 'should apply a manifest file' do
         with_tempfile_containing('manifest', "notify { 'hello world': }", '.pp') do |manifest|
-          results = apply_manifest(manifest.path, 'ssh', options)
+          results = apply_manifest(manifest.path, 'ssh')
           results.each do |result|
             expect(result['status']).to eq('success')
             expect(result.dig('result', 'report', 'resource_statuses')).to include('Notify[hello world]')
@@ -134,7 +133,7 @@ describe "BoltSpec::Run", ssh: true do
       end
 
       it 'should apply a manifest code block' do
-        results = apply_manifest("notify { 'hello world': }", 'ssh', options.merge(execute: true))
+        results = apply_manifest("notify { 'hello world': }", 'ssh', execute: true)
         results.each do |result|
           expect(result['status']).to eq('success')
           expect(result.dig('result', 'report', 'resource_statuses')).to include('Notify[hello world]')
@@ -143,12 +142,12 @@ describe "BoltSpec::Run", ssh: true do
 
       it 'should raise an error when manifest file does not exist' do
         expect do
-          apply_manifest("missing.na", 'ssh', options)
+          apply_manifest("missing.na", 'ssh')
         end.to raise_error(Bolt::FileError)
       end
 
       it 'should return a failure' do
-        results = apply_manifest("fail()", 'ssh', options.merge(execute: true))
+        results = apply_manifest("fail()", 'ssh', execute: true)
         results.each do |result|
           expect(result['status']).to eq('failure')
           expect(result.dig('result', '_error', 'kind')).to eq('bolt/apply-error')
