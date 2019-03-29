@@ -1,4 +1,4 @@
-# Writing plans
+# Writing plans in Puppet language
 
 Plans allow you to run more than one task with a single command, compute values for the input to a task, process the results of tasks, or make decisions based on the result of running a task.
 
@@ -154,20 +154,16 @@ Variant[Data, String, Numeric, Boolean, Error, Result, ResultSet, Target, Array[
 
 ## Returning errors in plans
 
-To return an error if your plan fails, include an `Error` object in your plan.
+To return an error if your plan fails, call the `fail_plan` function.
 
-Specify `Error` parameters to provide details about the failure.
+Specify parameters to provide details about the failure.
 
 For example, if called with `run_plan('mymodule::myplan')`, this would return an error to the caller.
 
 ```
 plan mymodule::myplan {
-  Error(
-    message    => "Sorry, this plan does not work yet.",
-    kind       => 'mymodule/error',
-    issue_code => 'NOT_IMPLEMENTED'
-    )
-  }
+  fail_plan("Sorry, this plan does not work yet.", 'mymodule/error')
+}
 ```
 
 ## Success and failure in plans

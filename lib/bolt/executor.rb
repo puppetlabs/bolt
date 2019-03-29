@@ -31,7 +31,6 @@ module Bolt
       @analytics = analytics
       @bundled_content = bundled_content
       @logger = Logging.logger[self]
-      @plan_logging = false
       @load_config = load_config
 
       @transports = Bolt::TRANSPORTS.each_with_object({}) do |(key, val), coll|
@@ -200,6 +199,22 @@ module Bolt
       end
 
       @analytics&.event('Apply', 'ast', data)
+    end
+
+    def report_yaml_plan(plan)
+      steps = plan.steps.count
+      return_type = case plan.return
+                    when Bolt::PAL::YamlPlan::EvaluableString
+                      'expression'
+                    when nil
+                      nil
+                    else
+                      'value'
+                    end
+
+      @analytics&.event('Plan', 'yaml', plan_steps: steps, return_type: return_type)
+    rescue StandardError => e
+      @logger.debug { "Failed to submit analytics event: #{e.message}" }
     end
 
     def with_node_logging(description, batch)

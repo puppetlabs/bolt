@@ -42,4 +42,13 @@ describe "When a plan succeeds" do
     expect(result).to match(/Successful on 1 node:/)
     expect(result).to match(/Ran on 1 node/)
   end
+
+  it 'runs a yaml plan', ssh: true do
+    result = run_cli(['plan', 'run', 'sample::yaml', '--nodes', target] + config_flags)
+    expect(JSON.parse(result)).to eq('stdout' => "hello world\n", 'stderr' => '', 'exit_code' => 0)
+
+    lines = @log_output.readlines
+    expect(lines).to include(match(/Starting: task/))
+    expect(lines).to include(match(/Starting: command/))
+  end
 end
