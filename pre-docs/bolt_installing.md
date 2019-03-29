@@ -257,6 +257,8 @@ Bolt collects data about how you use it. You can opt out of providing this data.
 - The output format selected \(human-readable, JSON\) 
 - The number of times Bolt tasks and plans are run \(This does not include user-defined tasks or plans.\)
 - Number of statements in an apply block, and how many resources that produces for each target.
+- Number of steps in a YAML plan
+- Return type (expression vs. value) of a YAML plan
 
 This data is associated with a random, non-identifiable user UUID.
 

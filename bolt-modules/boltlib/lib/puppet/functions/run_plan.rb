@@ -59,6 +59,11 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
       executor.run_as = run_as
     end
 
+    closure = func.class.dispatcher.dispatchers[0]
+    if closure.model.is_a?(Bolt::PAL::YamlPlan)
+      executor.report_yaml_plan(closure.model.body)
+    end
+
     # wrap plan execution in logging messages
     executor.log_plan(plan_name) do
       result = nil
@@ -67,7 +72,7 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
         # undef/nil
         result = catch(:return) do
           scope.with_global_scope do |global_scope|
-            func.class.dispatcher.dispatchers[0].call_by_name_with_scope(global_scope, params, true)
+            closure.call_by_name_with_scope(global_scope, params, true)
           end
           nil
         end&.value
