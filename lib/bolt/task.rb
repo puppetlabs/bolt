@@ -21,23 +21,18 @@ module Bolt
     :metadata
   ) do
 
-    attr_reader :file_cache
+    attr_reader :remote
 
-    def initialize(task, file_cache = nil)
+    def initialize(task, remote: false)
       super(nil, nil, [], {})
 
-      if file_cache
-        @file_cache = file_cache
-        task = update_file_data(task)
-      end
+      @remote = remote
 
       task.reject { |k, _| k == 'parameters' }.each { |k, v| self[k] = v }
     end
 
-    # puppetserver file entries have 'filename' rather then 'name'
-    def update_file_data(task_data)
-      task_data['files'].each { |f| f['name'] = f['filename'] }
-      task_data
+    def remote_instance
+      self.class.new(to_h.each_with_object({}) { |(k, v), h| h[k.to_s] = v }, remote: true)
     end
 
     def description
@@ -68,12 +63,7 @@ module Bolt
     # This provides a method we can override in subclasses if the 'path' needs
     # to be fetched or computed.
     def file_path(file_name)
-      if @file_cache
-        file = file_map[file_name]
-        file['path'] ||= @file_cache.update_file(file)
-      else
-        file_map[file_name]['path']
-      end
+      file_map[file_name]['path']
     end
 
     def implementations
@@ -85,13 +75,18 @@ module Bolt
     def select_implementation(target, additional_features = [])
       impl = if (impls = implementations)
                available_features = target.features + additional_features
-               impl = impls.find { |imp| Set.new(imp['requirements']).subset?(available_features) }
+               impl = impls.find do |imp|
+                 remote_impl = imp['remote']
+                 remote_impl = metadata['remote'] if remote_impl.nil?
+                 Set.new(imp['requirements']).subset?(available_features) && !!remote_impl == @remote
+               end
                raise NoImplementationError.new(target, self) unless impl
                impl = impl.dup
                impl['path'] = file_path(impl['name'])
                impl.delete('requirements')
                impl
              else
+               raise NoImplementationError.new(target, self) unless !!metadata['remote'] == @remote
                name = files.first['name']
                { 'name' => name, 'path' => file_path(name) }
              end

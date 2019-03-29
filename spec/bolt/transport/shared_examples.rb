@@ -381,6 +381,18 @@ QUOTED
     end
   end
 
+  context 'with a remote task' do
+    it 'fails to run' do
+      arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
+      with_task_containing('tasks_test_stdin', os_context[:stdin_task], 'stdin', os_context[:extension]) do |task|
+        task['metadata']['remote'] = true
+        expect do
+          runner.run_task(target, task, arguments)
+        end.to raise_error("No suitable implementation of #{task['name']} for #{target.name}")
+      end
+    end
+  end
+
   context 'when used by the remote transport' do
     let(:remote_target) do
       # TODO: remove the config here. it is a workaround for BOLT-943
