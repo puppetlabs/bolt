@@ -84,7 +84,7 @@ interpreters:
 
 `smb-port`: With `file-protocol` set to `smb`, this is the port to establish a connection on. Default is `445`.
 
-`ssl`: When `true`, Bolt will use normal http connections for WinRM. Default is `true`.
+`ssl`: When `true`, Bolt will use secure https connections for WinRM. Default is `true`.
 
 `ssl-verify`: When true, verifies the targets certificate matches the `cacert`. Default is `true`.
 
