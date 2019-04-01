@@ -11,7 +11,10 @@ Plans can use any combination of [Bolt functions](./plan_functions.html) or [bui
 
 Plan names are named based on the filename of the plan, the name of the module containing the plan, and the path to the plan within the module.
 
-Write plan files in Puppet, give them the extension `.pp` , and place them in your module's `./plans` directory.
+Place plan files in your module's ./plans directory, using these file extensions:
+
+* Puppet plans -- `.pp`
+* YAML plans -- `.yaml`, not `.yml`
 
 Plan names are composed of two or more name segments, indicating:
 
