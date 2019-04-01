@@ -11,6 +11,8 @@ module Bolt
           # lazy-load expensive gem code
           require 'docker'
 
+          raise Bolt::ValidationError, "Target #{target.name} does not have a host" unless target.host
+
           @target = target
           @logger = Logging.logger[target.host]
         end

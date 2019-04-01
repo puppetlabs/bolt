@@ -179,4 +179,15 @@ describe Bolt::Target do
     uri2 = Bolt::Target.new(uri1.uri)
     expect(uri1).to eq(uri2)
   end
+
+  it 'can have an empty uri' do
+    t1 = Bolt::Target.new(nil, 'name' => 'name1')
+    expect(t1.host).to be(nil)
+    expect(t1.name).to be('name1')
+    expect(t1.uri).to be(nil)
+    expect(t1.password).to be(nil)
+    expect(t1.user).to be(nil)
+    expect(t1.protocol).to be(nil)
+    expect(t1.port).to be(nil)
+  end
 end

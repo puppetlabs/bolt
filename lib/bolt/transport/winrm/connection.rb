@@ -12,6 +12,7 @@ module Bolt
         DEFAULT_EXTENSIONS = ['.ps1', '.rb', '.pp'].freeze
 
         def initialize(target, transport_logger)
+          raise Bolt::ValidationError, "Target #{target.name} does not have a host" unless target.host
           @target = target
 
           default_port = target.options['ssl'] ? HTTPS_PORT : HTTP_PORT

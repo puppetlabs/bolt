@@ -1034,4 +1034,12 @@ OUTPUT
       end
     end
   end
+
+  context 'when there is no host in the target' do
+    let(:target) { Bolt::Target.new(nil, "name" => "hostless") }
+
+    it 'errors' do
+      expect { winrm.run_command(target, 'whoami') }.to raise_error(/does not have a host/)
+    end
+  end
 end

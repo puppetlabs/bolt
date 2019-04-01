@@ -4,10 +4,10 @@ require 'bolt/error'
 
 module Bolt
   class Target
-    attr_reader :uri, :options
+    attr_reader :options
     # CODEREVIEW: this feels wrong. The altertative is threading inventory through the
     # executor to the RemoteTransport
-    attr_accessor :inventory
+    attr_accessor :uri, :inventory
 
     PRINT_OPTS ||= %w[host user port protocol].freeze
 
@@ -16,6 +16,7 @@ module Bolt
       new(hash['uri'], hash['options'])
     end
 
+    # URI can be passes as nil
     def initialize(uri, options = nil)
       # lazy-load expensive gem code
       require 'addressable/uri'
@@ -40,6 +41,13 @@ module Bolt
       if @options['protocol']
         @protocol = @options['protocol']
       end
+
+      if @options['host']
+        @host = @options['host']
+      end
+
+      # WARNING: name should never be updated
+      @name = @options['name'] || @uri
     end
 
     def update_conf(conf)
@@ -50,6 +58,7 @@ module Bolt
       @user = t_conf['user']
       @password = t_conf['password']
       @port = t_conf['port']
+      @host = t_conf['host']
 
       # Preserve everything in options so we can easily create copies of a Target.
       @options = t_conf.merge(@options)
@@ -58,7 +67,9 @@ module Bolt
     end
 
     def parse(string)
-      if string =~ %r{^[^:]+://}
+      if string.nil?
+        nil
+      elsif string =~ %r{^[^:]+://}
         Addressable::URI.parse(string)
       else
         # Initialize with an empty scheme to ensure we parse the hostname correctly
@@ -77,8 +88,17 @@ module Bolt
       end
     end
 
+    # TODO: WHAT does equality mean here?
+    # should we just compare names? is there something else that is meaninful?
     def eql?(other)
-      self.class.equal?(other.class) && @uri == other.uri
+      if self.class.equal?(other.class)
+        if @uri
+          return @uri == other.uri
+        else
+          @name = other.name
+        end
+      end
+      false
     end
     alias == eql?
 
@@ -104,21 +124,19 @@ module Bolt
     end
 
     def host
-      @uri_obj.hostname
+      @uri_obj&.hostname || @host
     end
 
-    # name is currently just uri but should be used instead to identify the
-    # Target ouside the transport or uri options.
     def name
-      uri
+      @name || @uri
     end
 
     def remote?
-      @uri_obj.scheme == 'remote' || @protocol == 'remote'
+      @uri_obj&.scheme == 'remote' || @protocol == 'remote'
     end
 
     def port
-      @uri_obj.port || @port
+      @uri_obj&.port || @port
     end
 
     # transport is separate from protocol for remote targets.
@@ -127,15 +145,15 @@ module Bolt
     end
 
     def protocol
-      @uri_obj.scheme || @protocol
+      @uri_obj&.scheme || @protocol
     end
 
     def user
-      Addressable::URI.unencode_component(@uri_obj.user) || @user
+      Addressable::URI.unencode_component(@uri_obj&.user) || @user
     end
 
     def password
-      Addressable::URI.unencode_component(@uri_obj.password) || @password
+      Addressable::URI.unencode_component(@uri_obj&.password) || @password
     end
   end
 end
