@@ -1,50 +1,73 @@
 # Writing plans in YAML
 
-**YAML plans are an experimental feature and may experience breaking changes in y releases**
-
 YAML plans run a list of steps in order, which allows you to define simple workflows. Steps can contain embedded Puppet code expressions to add logic where necessary.
 
-## Defining plans
+**NOTE:** YAML plans are an experimental feature and might experience breaking changes in future minor (y) releases.
 
-### Plan naming
+## Naming plans
 
-Plan names are based on the module that contains the plan, and the path to the plan in the module.
+Plan names are named based on the filename of the plan, the name of the module containing the plan, and the path to the plan within the module.
 
-Plans files should be named `planname.yaml`. Note that the file extension must be `.yaml` and not `.yml`.
+Place plan files in your module's ./plans directory, using these file extensions:
 
-See [Naming plans](writing_plans.md) for more details about where plan files should be located.
+* Puppet plans -- `.pp`
+* YAML plans -- `.yaml`, not `.yml`
 
-### Plan structure
+Plan names are composed of two or more name segments, indicating:
 
-A plan is a YAML document containing a map with several keys:
+-   The name of the module the plan is located in.
+-   The name of the plan file, without the extension.
+-   The path within the module, if the plan is in a subdirectory of `./plans`.
+
+
+For example, given a module called `mymodule` with a plan defined in `./mymodule/plans/myplan.pp`, the plan name is `mymodule::myplan`. A plan defined in `./mymodule/plans/service/myplan.pp`would be `mymodule::service::myplan`. This name is how you refer to the plan when you run commands.
+
+The plan filename `init` is special: the plan it defines is referenced using the module name only. For example, in a module called `mymodule`, the plan defined in `init.pp` is the `mymodule` plan.
+
+Avoid giving plans the same names as constructs in the Puppet language. Although plans do not share their namespace with other language constructs, giving plans these names makes your code difficult to read.
+
+Each plan name segment must begin with a lowercase letter and:
+
+-   May include lowercase letters.
+-   May include digits.
+-   May include underscores.
+-   Must not be a [reserved word](https://docs.puppet.com/puppet/5.3/lang_reserved.html).
+-   Must not have the same name as any Puppet data types.
+-   Namespace segments must match the following regular expression `\A[a-z][a-z0-9_]*\Z`
+
+## Plan structure
+
+YAML plans contain a list of steps with optional parameters and results.
+
+YAML maps accept these keys:
 
 `steps`: The list of steps to perform
 `parameters`: The parameters accepted by the plan (optional)
 `return`: The value to return from the plan (optional)
 
-## Plan steps
+### Steps key
 
 The `steps` key is an array of step objects, each of which corresponds to a specific action to take.
 
-When the plan is run, each step will be executed in order. If a step fails, the plan will halt execution and raise an error containing the result of the step that failed.
+When the plan runs, each step is executed in order. If a step fails, the plan halts execution and raises an error containing the result of the step that failed.
 
-Steps can have a `name` field, which must be unique and can be used to refer to the result of the step later.
+Steps use these fields:
+* `name`: A unique name that can be used to refer to the result of the step later
+* `description` (Optional) An explanation of what the step is doing.
 
-Steps can also have a `description` field to explain what the step is doing.
+Other available keys depend on the type of step.
 
-The other available keys depend on the kind of step.
+#### Command step
 
-### Command step
+Use a `command` step to run a single command on a list of targets and save the results, containing stdout, stderr, and exit code.
 
-You can use a `command` step to run a single command on a list of targets and save the results, containing stdout, stderr and exit code.
+The step fails if the exit code of any command is non-zero.
 
-The step will fail if the exit code of any command is non-zero.
+Command steps use these fields:
+* `command`: The command to run
+* `target`: A target or list of targets to run the command on
 
-Fields:
-`command`: Which command to run
-`target`: A target or list of targets to run the command on
-
-Example:
+For example:
 
 ```yaml
 steps:
@@ -56,16 +79,16 @@ steps:
     description: "Get the webserver hostnames"
 ```
 
-### Task step
+#### Task step
 
-You can use a `task` step to run a Bolt task on a list of targets and save the results.
+Use a `task` step to run a Bolt task on a list of targets and save the results.
 
-Fields:
-`task`: Which task to run
-`target`: A target or list of targets to run the task on
-`parameters`: A map of parameter values to pass to the task (optional)
+Task steps use these fields:
+* `task`: The task to run
+* `target`: A target or list of targets to run the task on
+* `parameters`: (Optional) A map of parameter values to pass to the task
 
-Example:
+For example:
 
 ```yaml
 steps:
@@ -80,18 +103,18 @@ steps:
       name: openssl
 ```
 
-### Script step
+#### Script step
 
-You can use a `script` step to run a script on a list of targets and save the results.
+Use a `script` step to run a script on a list of targets and save the results.
 
-The script must be in the `files/` directory of a module. The name of the script should be specified as `<modulename>/path/to/script`, omitting the `files` directory from the path.
+The script must be in the `files/` directory of a module. The name of the script must be specified as `<modulename>/path/to/script`, omitting the `files` directory from the path.
 
-Fields:
-`script`: Which script to run
-`target`: A target or list of targets to run the script on
-`arguments`: An array of command-line arguments to pass to the script (optional)
+Script steps use these fields:
+* `script`: The script to run
+* `target`: A target or list of targets to run the script on
+* `arguments`: (Optional) An array of command-line arguments to pass to the script
 
-Example:
+For example:
 
 ```yaml
 steps:
@@ -106,15 +129,17 @@ steps:
       - 60
 ```
 
-### File upload step
+#### File upload step
 
-You can use a file upload step to upload a file to a specific location on a list of targets.
+Use a file upload step to upload a file to a specific location on a list of targets.
 
-The file to upload must be in the `files/` directory of a Puppet module. The source for the file should be specified as `<modulename>/path/to/file`, omitting the `files` directory from the path.
+The file to upload must be in the `files/` directory of a Puppet module. The source for the file must be specified as `<modulename>/path/to/file`, omitting the `files` directory from the path.
 
-Fields:
-`source`: The location of the file to be uploaded
-`destination`: The location where the file should be uploaded to
+File upload steps use these fields:
+* `source`: The location of the file to be uploaded
+* `destination`: The location where the file should be uploaded to
+
+For example:
 
 ```yaml
 steps:
@@ -127,15 +152,15 @@ steps:
     description: "Upload motd to the webservers"
 ```
 
-### Plan step
+#### Plan step
 
-You can use a `plan` step to run another plan and save its result.
+Use a `plan` step to run another plan and save its result.
 
-Fields:
-`plan`: The name of the plan to run
-`parameters`: A map of parameter values to pass to the plan (optional)
+Plan steps use these fields:
+* `plan`: The name of the plan to run
+* `parameters`: (Optional) A map of parameter values to pass to the plan
 
-Example:
+For example:
 
 ```yaml
 steps:
@@ -148,9 +173,16 @@ steps:
         - web3.example.com
 ```
 
-## Parameters
+### Parameters key
 
-Your plan can accept parameters with the `parameters` key. The value of `parameters` is a map, where each key is the name of a parameter and the value is a map describing the parameter. A parameter can have a `type`, a `default`, and a `description`, which are all optional.
+Plans accept parameters with the `parameters` key. The value of `parameters` is a map, where each key is the name of a parameter and the value is a map describing the parameter.
+
+Parameter values can be referenced from steps as variables.
+
+Parameters can use these fields:
+* `type`: (Optional) A valid [Puppet data type](https://puppet.com/docs/puppet/6.3/lang_data.html#puppet-data-types). The value supplied must match the type or the plan fails.
+* `default`: (Optional) Used if no value is given for the parameter
+* `description`: (Optional)
 
 For example, this plan accepts a `load_balancer` name as a string, two sets of nodes called `frontends` and `backends`, and a `version` string.
 
@@ -169,186 +201,9 @@ parameters:
     description: "The new application version to deploy"
 ```
 
-If a type is specified, the plan will fail if a value is supplied that doesn't match the type.
+### How strings are evaluated
 
-The `type` must be a valid Puppet datatype. See [Puppet's data types](https://puppet.com/docs/puppet/6.3/lang_data.html#puppet-data-types) for more information.
-
-If the parameter specifies a `default`, it will be used if no value is given for that parameter.
-
-Parameter values can be referenced from steps as variables.
-
-## Using variables
-
-Parameters and step results are available as variables during plan execution, and they can be used to compute the value for each field of a step.
-
-### Variable references
-
-The simplest way to use a variable is to reference it directly by name.
-
-```yaml
-parameters:
-  nodes:
-    type: TargetSpec
-
-steps:
-  - command: hostname -f
-    target: $nodes
-```
-
-This plan takes a parameter called `nodes` and passes it as the target list to a step.
-
-### String interpolation
-
-Variables can also be interpolated into string values.
-
-```yaml
-parameters:
-  username:
-    type: String
-
-steps:
-  - task: echo
-    message: "hello ${username}"
-    target: $nodes
-```
-
-The string must be double-quoted to allow interpolation.
-
-## Simple expressions
-
-Many operations can be performed on variables to compute new values for step parameters or other fields.
-
-### Array/Hash indexing
-
-You can retrieve a value from an Array or a Hash using the `[]` operator.
-
-This operator can also be used when interpolating a value inside a string.
-
-```yaml
-parameters:
-  users:
-    # Array[String] is a Puppet data type representing an array of strings
-    type: Array[String]
-
-steps:
-  - task: user::add
-    target: 'host.example.com'
-    parameters:
-      name: $users[0]
-  - task: echo
-    target: 'host.example.com'
-    parameters:
-      message: "hello ${users[0]}"
-```
-
-### Calling functions
-
-You can call a Puppet function to compute a value.
-
-See the [Bolt function reference](https://puppet.com/docs/bolt/latest/plan_functions.html) and the [Puppet function reference](https://puppet.com/docs/puppet/latest/function.html) for a list of built-in functions.
-
-```yaml
-parameters:
-  users:
-    type: Array[String]
-
-steps:
-  - task: user::add
-    parameters:
-      name: $users.first
-  - task: echo
-    message: "hello ${users.join(',')}"
-```
-
-### Blocks
-
-Some Puppet functions take a block of code as an argument.
-
-For instance, you can filter an array of items based on the result of a block of code.
-
-```yaml
-parameters:
-  numbers:
-    type: Array[Integer]
-
-steps:
-  - task: sum
-    description: "add up the numbers > 5"
-    parameters:
-      indexes: $numbers.filter |$num| { $num > 5 }
-```
-
-The result of the `filter` function is an Array here, not a String, because the expression isn't inside quotes.
-
-## Connecting steps
-
-You can connect multiple steps by using the result of one step to compute the parameters for another step.
-
-### Using step results
-
-If a step has a `name` key, its result will be available to later steps in a variable with that name.
-
-```yaml
-parameters:
-  nodes:
-    type: TargetSpec
-
-steps:
-  - name: hostnames
-    command: hostname -f
-    target: $nodes
-  - task: echo
-    parameters:
-      message: $hostnames.map |$hostname_result| { $hostname_result['stdout'] }.join(',')
-```
-
-This example uses the `map` function to get the value of `stdout` from each command result and then joins them into a single string separated by commas.
-
-### Eval step
-
-You can use an `eval` step to evaluate an expression and save the result in a variable. This is useful to compute a variable to use multiple times later.
-
-```yaml
-parameters:
-  count:
-    type: Integer
-
-steps:
-  - name: double_count
-    eval: $count * 2
-  - task: echo
-    target: web1.example.com
-    parameters:
-      message: "The count is ${count}, and twice the count is ${double_count}"
-```
-
-## Returning results
-
-You can return a result from a plan by setting the `return` key at the top level of the plan. When the plan finishes, the `return` key will be evaluated and returned as the result of the plan. If no `return` key is set, the plan will return `undef`.
-
-The `return` value can be a plain value or it can be a code expression.
-
-Example:
-```yaml
-steps:
-  - name: hostnames
-    command: hostname -f
-    target: $nodes
-
-return: $hostnames.map |$hostname_result| { $hostname_result['stdout'] }
-```
-
-## Advanced Puppet code expressions
-
-You can use a Puppet code expression as the value of any field of a step except the `name`. This allows for complex values to be computed.
-
-Bolt loads the plan as a YAML data structure. As it executes each step, it evaluates any expressions embedded in the step. Each plan parameter and the values of every previous named step will be available in scope.
-
-This lets you take advantage of the power of Puppet language in the places it's necessary, while keeping the rest of your plan simple.
-
-## String evaluation
-
-The behavior of strings is defined by how they are written in the plan.
+The behavior of strings is defined by how they're written in the plan.
 
 `'single-quoted strings'` are treated as string literals without any interpolation.
 
@@ -359,7 +214,7 @@ The behavior of strings is defined by how they are written in the plan.
 
 `bare strings` are treated dynamically based on their content. If they begin with a `$`, they are treated as Puppet code expressions. Otherwise, they are treated as YAML literals.
 
-An example of the different kinds of strings:
+Here's an example of different kinds of strings in use:
 
 ```yaml
 parameters:
@@ -381,8 +236,168 @@ steps:
     description: 'This will evaluate to: hello hello hello'
 ```
 
-## Migrating to Puppet plans
 
-Once your plans need more sophisticated control flow or error handling beyond running a list of steps in order, it's time to convert them to Puppet language plans.
 
-See [Writing plans in Puppet language](./writing_plans.html) for information about how to write Puppet plans.
+## Using variables and simple expressions
+
+Parameters and step results are available as variables during plan execution, and they can be used to compute the value for each field of a step.
+
+The simplest way to use a variable is to reference it directly by name. For example, this plan takes a parameter called `nodes` and passes it as the target list to a step:
+
+```yaml
+parameters:
+  nodes:
+    type: TargetSpec
+
+steps:
+  - command: hostname -f
+    target: $nodes
+```
+
+
+Variables can also be interpolated into string values. The string must be double-quoted to allow interpolation. For example:
+
+```yaml
+parameters:
+  username:
+    type: String
+
+steps:
+  - task: echo
+    message: "hello ${username}"
+    target: $nodes
+```
+
+Many operations can be performed on variables to compute new values for step parameters or other fields.
+
+### Indexing arrays or hashes
+
+You can retrieve a value from an Array or a Hash using the `[]` operator. This operator can also be used when interpolating a value inside a string.
+
+```yaml
+parameters:
+  users:
+    # Array[String] is a Puppet data type representing an array of strings
+    type: Array[String]
+
+steps:
+  - task: user::add
+    target: 'host.example.com'
+    parameters:
+      name: $users[0]
+  - task: echo
+    target: 'host.example.com'
+    parameters:
+      message: "hello ${users[0]}"
+```
+
+### Calling functions
+
+You can call built-in [Bolt functions](https://puppet.com/docs/bolt/latest/plan_functions.html) or [Puppet functions](https://puppet.com/docs/puppet/latest/function.html) to compute a value.
+
+
+```yaml
+parameters:
+  users:
+    type: Array[String]
+
+steps:
+  - task: user::add
+    parameters:
+      name: $users.first
+  - task: echo
+    message: "hello ${users.join(',')}"
+```
+
+### Using code blocks
+
+Some Puppet functions take a block of code as an argument. For instance, you can filter an array of items based on the result of a block of code.
+
+The result of the `filter` function is an array here, not a string, because the expression isn't inside quotes.
+
+```yaml
+parameters:
+  numbers:
+    type: Array[Integer]
+
+steps:
+  - task: sum
+    description: "add up the numbers > 5"
+    parameters:
+      indexes: $numbers.filter |$num| { $num > 5 }
+```
+
+
+
+## Connecting steps
+
+You can connect multiple steps by using the result of one step to compute the parameters for another step.
+
+### `name` key
+
+The `name` key makes its result available to later steps in a variable with that name.
+
+This example uses the `map` function to get the value of `stdout` from each command result and then joins them into a single string separated by commas.
+
+```yaml
+parameters:
+  nodes:
+    type: TargetSpec
+
+steps:
+  - name: hostnames
+    command: hostname -f
+    target: $nodes
+  - task: echo
+    parameters:
+      message: $hostnames.map |$hostname_result| { $hostname_result['stdout'] }.join(',')
+```
+
+
+### `eval` step
+
+The `eval` step evaluates an expression and saves the result in a variable. This is useful to compute a variable to use multiple times later.
+
+```yaml
+parameters:
+  count:
+    type: Integer
+
+steps:
+  - name: double_count
+    eval: $count * 2
+  - task: echo
+    target: web1.example.com
+    parameters:
+      message: "The count is ${count}, and twice the count is ${double_count}"
+```
+
+## Returning results
+
+You can return a result from a plan by setting the `return` key at the top level of the plan. When the plan finishes, the `return` key is evaluated and returned as the result of the plan. If no `return` key is set, the plan returns `undef`.
+
+The `return` value can be a plain value or it can be a code expression.
+
+Example:
+```yaml
+steps:
+  - name: hostnames
+    command: hostname -f
+    target: $nodes
+
+return: $hostnames.map |$hostname_result| { $hostname_result['stdout'] }
+```
+
+## Computing complex values
+
+To compute complex values, you can use a Puppet code expression as the value of any field of a step except the `name`.
+
+Bolt loads the plan as a YAML data structure. As it executes each step, it evaluates any expressions embedded in the step. Each plan parameter and the values of every previous named step are available in scope.
+
+This lets you take advantage of the power of Puppet language in the places it's necessary, while keeping the rest of your plan simple.
+
+When your plans need more sophisticated control flow or error handling beyond running a list of steps in order, it's time to convert them to [Puppet language plans](./writing_plans.html).
+
+
+
+
