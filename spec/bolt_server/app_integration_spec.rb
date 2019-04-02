@@ -52,15 +52,19 @@ describe "BoltServer::TransportApp", puppetserver: true do
 
     it 'runs a shareable task' do
       body = build_request('shareable',
-                           conn_target('ssh', include_password: true),
-                           "message": "Hello!")
+                           conn_target('ssh', include_password: true))
 
       post(path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
       expect(last_response).to be_ok
       expect(last_response.status).to eq(200)
       result = JSON.parse(last_response.body)
       expect(result).to include('status' => 'success')
-      expect(result['result']['_output'].chomp).to match(/\w+ got passed the message: Hello!/)
+      files = result['result']['_output'].split("\n").map(&:strip).sort
+      expect(files.count).to eq(4)
+      expect(files[0]).to match(%r{^174 .*/shareable/tasks/unknown_file.json$})
+      expect(files[1]).to match(%r{^236 .*/shareable/tasks/list.sh})
+      expect(files[2]).to match(%r{^310 .*/results/lib/puppet/functions/results/make_result.rb$})
+      expect(files[3]).to match(%r{^43 .*/error/tasks/fail.sh$})
     end
   end
 end
