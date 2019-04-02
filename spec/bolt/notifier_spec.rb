@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'concurrent/executor/immediate_executor'
+require 'bolt/notifier'
+require 'bolt/result'
+require 'bolt/target'
 
 module Bolt
   class MockCallback

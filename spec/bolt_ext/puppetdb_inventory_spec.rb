@@ -2,6 +2,7 @@
 
 require 'bolt_ext/puppetdb_inventory'
 require 'bolt_spec/files'
+require 'yaml'
 
 describe "Bolt::PuppetDBInventory::CLI" do
   include BoltSpec::Files

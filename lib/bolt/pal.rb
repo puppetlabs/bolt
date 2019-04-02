@@ -5,6 +5,7 @@ require 'bolt/executor'
 require 'bolt/error'
 require 'bolt/plan_result'
 require 'bolt/util'
+require 'etc'
 
 module Bolt
   class PAL
@@ -36,7 +37,7 @@ module Bolt
       end
     end
 
-    def initialize(modulepath, hiera_config, max_compiles = Concurrent.processor_count)
+    def initialize(modulepath, hiera_config, max_compiles = Etc.nprocessors)
       # Nothing works without initialized this global state. Reinitializing
       # is safe and in practice only happen in tests
       self.class.load_puppet

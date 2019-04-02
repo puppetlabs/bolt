@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'terminal-table'
 require 'bolt/pal'
 
 module Bolt
@@ -101,6 +100,9 @@ module Bolt
       end
 
       def print_table(results)
+        # lazy-load expensive gem code
+        require 'terminal-table'
+
         @stream.puts Terminal::Table.new(
           rows: results,
           style: {

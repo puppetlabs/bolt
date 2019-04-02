@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'sinatra'
+require 'addressable/uri'
 require 'bolt'
 require 'bolt/error'
 require 'bolt/target'

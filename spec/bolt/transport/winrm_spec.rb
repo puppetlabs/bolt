@@ -9,7 +9,6 @@ require 'bolt_spec/task'
 require 'bolt/transport/winrm'
 require 'bolt/config'
 require 'bolt/target'
-require 'httpclient'
 require 'winrm'
 
 describe Bolt::Transport::WinRM do

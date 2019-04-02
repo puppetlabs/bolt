@@ -3,7 +3,6 @@
 require 'json'
 require 'logging'
 require 'uri'
-require 'httpclient'
 
 module Bolt
   module PuppetDB
@@ -76,6 +75,8 @@ module Bolt
 
       def http_client
         return @http if @http
+        # lazy-load expensive gem code
+        require 'httpclient'
         @http = HTTPClient.new
         @http.ssl_config.set_client_cert_file(@config.cert, @config.key) if @config.cert
         @http.ssl_config.add_trust_ca(@config.cacert)

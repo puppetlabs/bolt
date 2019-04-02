@@ -2,9 +2,7 @@
 
 require 'bolt/util'
 require 'bolt/version'
-require 'httpclient'
 require 'json'
-require 'locale'
 require 'logging'
 require 'securerandom'
 
@@ -67,6 +65,8 @@ module Bolt
         # lazy-load expensive gem code
         require 'concurrent/configuration'
         require 'concurrent/future'
+        require 'httpclient'
+        require 'locale'
 
         @logger = Logging.logger[self]
         @http = HTTPClient.new
