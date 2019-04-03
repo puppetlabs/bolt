@@ -21,7 +21,7 @@ module Bolt
     # https://makandracards.com/makandra/36011-ruby-do-not-mix-optional-and-keyword-arguments
     def initialize(concurrency = 1,
                    analytics = Bolt::Analytics::NoopClient.new,
-                   noop = nil,
+                   noop = false,
                    bundled_content: nil)
 
       # lazy-load expensive gem code
