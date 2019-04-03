@@ -16,7 +16,7 @@ describe Bolt::Transport::Remote do
                                         } }],
                                     'config' => { "transport" => "remote" })
 
-    executor = Bolt::Executor.new(load_config: false)
+    executor = Bolt::Executor.new
     remote_transport = executor.transports['remote'].value
     target = inventory.get_targets("node2").first
 

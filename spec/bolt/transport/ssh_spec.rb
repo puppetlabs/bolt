@@ -184,7 +184,8 @@ describe Bolt::Transport::SSH do
       allow(Etc).to receive(:getlogin).and_return('bolt')
       expect(Net::SSH::Config).not_to receive(:for)
 
-      config_user = ssh.with_connection(make_target(conf: no_user_config), false, &:user)
+      transport_conf['load-config'] = false
+      config_user = ssh.with_connection(make_target(conf: no_user_config), &:user)
       expect(config_user).to be('bolt')
     end
   end

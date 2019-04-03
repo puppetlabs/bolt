@@ -405,7 +405,7 @@ QUOTED
     end
 
     let(:remote_runner) do
-      executor = Bolt::Executor.new(load_config: false)
+      executor = Bolt::Executor.new
       executor.transports[transport.to_s] = Concurrent::Delay.new { runner }
       executor.transports['remote'].value
     end

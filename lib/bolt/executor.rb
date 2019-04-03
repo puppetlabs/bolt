@@ -22,8 +22,7 @@ module Bolt
     def initialize(concurrency = 1,
                    analytics = Bolt::Analytics::NoopClient.new,
                    noop = nil,
-                   bundled_content: nil,
-                   load_config: true)
+                   bundled_content: nil)
 
       # lazy-load expensive gem code
       require 'concurrent'
@@ -31,7 +30,6 @@ module Bolt
       @analytics = analytics
       @bundled_content = bundled_content
       @logger = Logging.logger[self]
-      @load_config = load_config
 
       @transports = Bolt::TRANSPORTS.each_with_object({}) do |(key, val), coll|
         coll[key.to_s] = if key == :remote
@@ -263,7 +261,6 @@ module Bolt
       log_action(description, targets) do
         notify = proc { |event| @notifier.notify(callback, event) if callback }
         options = { '_run_as' => run_as }.merge(options) if run_as
-        options = options.merge('_load_config' => @load_config)
         arguments['_task'] = task.name
 
         results = batch_execute(targets) do |transport, batch|

@@ -25,7 +25,7 @@ module BoltServer
                                        Addressable::URI.parse("file:task"))
       JSON::Validator.add_schema(shared_schema)
 
-      @executor = Bolt::Executor.new(0, load_config: false)
+      @executor = Bolt::Executor.new(0)
 
       @file_cache = BoltServer::FileCache.new(@config).setup
 
@@ -79,6 +79,7 @@ module BoltServer
         opts['private-key'] = { 'key-data' => opts['private-key-content'] }
         opts.delete('private-key-content')
       end
+      opts['load-config'] = false
 
       target = [Bolt::Target.new(body['target']['hostname'], opts)]
 
