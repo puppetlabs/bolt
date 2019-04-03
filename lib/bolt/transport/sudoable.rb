@@ -81,7 +81,7 @@ module Bolt
         input_method = implementation['input_method']
         extra_files = implementation['files']
 
-        with_connection(target, options.fetch('_load_config', true)) do |conn|
+        with_connection(target) do |conn|
           conn.running_as(options['_run_as']) do
             stdin, output = nil
             command = []

@@ -84,7 +84,8 @@ describe Bolt::Inventory do
     {
       'connect-timeout' => 10,
       'tty' => false,
-      'host-key-check' => true
+      'host-key-check' => true,
+      'load-config' => true
     }
   }
 
@@ -548,6 +549,7 @@ describe Bolt::Inventory do
         expect(target.options).to eq(
           'connect-timeout' => 3,
           'tty' => true,
+          'load-config' => true,
           'host-key-check' => false,
           'private-key' => "anything",
           'tmpdir' => "/ssh",

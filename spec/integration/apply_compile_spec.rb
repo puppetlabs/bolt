@@ -232,7 +232,8 @@ describe "passes parsed AST to the apply_catalog task" do
           expect(notify[0]['title']).to eq("Num Targets: 3")
           expect(notify[1]['title']).to eq("Target 1 Facts: {operatingsystem => Ubuntu, added => fact}")
           expect(notify[2]['title']).to eq("Target 1 Vars: {environment => production, features => [puppet-agent]}")
-          res = "Target 0 Config: {connect-timeout => 11, host-key-check => false, tty => false, password => bolt}"
+          res = "Target 0 Config: {connect-timeout => 11, host-key-check => false, " \
+                "tty => false, load-config => true, password => bolt}"
           expect(notify[3]['title']).to eq(res)
           expect(notify[4]['title']).to eq("Target 1 Password: secret")
         end
