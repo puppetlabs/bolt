@@ -60,6 +60,7 @@ module Bolt
 
     class Client
       attr_reader :user_id
+      attr_accessor :bundled_content
 
       def initialize(user_id)
         # lazy-load expensive gem code
@@ -73,6 +74,7 @@ module Bolt
         @user_id = user_id
         @executor = Concurrent.global_io_executor
         @os = compute_os
+        @bundled_content = []
       end
 
       def screen_view(screen, **kwargs)
@@ -164,8 +166,11 @@ module Bolt
     end
 
     class NoopClient
+      attr_accessor :bundled_content
+
       def initialize
         @logger = Logging.logger[self]
+        @bundled_content = []
       end
 
       def screen_view(screen, **_kwargs)
