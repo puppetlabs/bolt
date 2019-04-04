@@ -29,6 +29,9 @@ Style/NumericLiterals:
 Style/NumericPredicate:
   Enabled: false
 
+Style/StderrPuts:
+  Enabled: false
+
 Layout/EmptyLineAfterGuardClause:
   Enabled: false
 

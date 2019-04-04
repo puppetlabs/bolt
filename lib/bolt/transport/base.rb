@@ -69,8 +69,8 @@ module Bolt
 
         result = begin
                    yield
-                 rescue StandardError, NotImplementedError => ex
-                   Bolt::Result.from_exception(target, ex)
+                 rescue StandardError, NotImplementedError => e
+                   Bolt::Result.from_exception(target, e)
                  end
 
         callback&.call(type: :node_result, result: result)

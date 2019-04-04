@@ -70,8 +70,8 @@ module Bolt
       ensure
         begin
           conn&.disconnect
-        rescue StandardError => ex
-          logger.info("Failed to close connection to #{target.uri} : #{ex.message}")
+        rescue StandardError => e
+          logger.info("Failed to close connection to #{target.uri} : #{e.message}")
         end
       end
 

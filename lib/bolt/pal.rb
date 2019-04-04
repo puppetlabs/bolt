@@ -108,12 +108,12 @@ module Bolt
             Puppet.override(yaml_plan_instantiator: Bolt::PAL::YamlPlan::Loader) do
               yield compiler
             end
-          rescue Bolt::Error => err
-            err
-          rescue Puppet::PreformattedError => err
-            PALError.from_preformatted_error(err)
-          rescue StandardError => err
-            PALError.from_preformatted_error(err)
+          rescue Bolt::Error => e
+            e
+          rescue Puppet::PreformattedError => e
+            PALError.from_preformatted_error(e)
+          rescue StandardError => e
+            PALError.from_preformatted_error(e)
           end
         end
       end
