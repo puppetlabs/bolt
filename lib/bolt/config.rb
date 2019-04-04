@@ -8,15 +8,17 @@ require 'bolt/transport/ssh'
 require 'bolt/transport/winrm'
 require 'bolt/transport/orch'
 require 'bolt/transport/local'
+require 'bolt/transport/local_windows'
 require 'bolt/transport/docker'
 require 'bolt/transport/remote'
+require 'bolt/util'
 
 module Bolt
   TRANSPORTS = {
     ssh: Bolt::Transport::SSH,
     winrm: Bolt::Transport::WinRM,
     pcp: Bolt::Transport::Orch,
-    local: Bolt::Transport::Local,
+    local: Bolt::Util.windows? ? Bolt::Transport::LocalWindows : Bolt::Transport::Local,
     docker: Bolt::Transport::Docker,
     remote: Bolt::Transport::Remote
   }.freeze

@@ -9,12 +9,21 @@ env:
   global:
     - REGISTRY_HOST=pcr-internal.puppet.net
     - DOCKER_REGISTRY=pe-and-platform
+    - BOLT_SUDO_USER=true
     - secure: Gk8LaACXYEVpv5LIWEMOuH3sJP4CzB2aSvE1BUcfDWkI+Hdgr2by3w/nGbKpyVD+v2H8r0zXyVrbCJ/qzx2gCRxqKJ2GKJEsrStT+8z3BXRRRzwkThIBVyWKk9b9bTt8AE0G94I3BE4gJyIPfbX5XxnKcg7nJZGOmubZpUPQX+2SXSfy9EbtY9iismwK7LGtWv6l90cK2eSLZGvdsSKPo7cylOldXfdYIyeBtvsIL1juBaiINX52Zgt371+nX53fDSYOKdIDLuhNqX3zpNOuIJ9DUj4E7IJA7+XhHy77zL98VjHtPo5H4fmKyZ2k+xbYqOydc5OPGguKequsnyDo5npktDrkbswnjWMXNDu+wImAd+IwHG2lTamsAnOGQ+E6g2oK0R5fUL26XJ3lBnTRrsLDnlrvqYqFxt3MCR+o5+DnTirSVQJfrRVsIKTucWHlYLTOUWkVDrLavJqIbWHytEbMf/BXUcovlQzSgfu5/Y1GkUJBnthtbiZfTImmBLcrqKDD4PnDmvC1v9Z5KR78MYu7lFTe5C4STj2aR6bwvqjiPKm6kYG5etOFEyRJ+CbqD2QsdF2N6Ww/RFWovqVqQIWuGdhumDUTdmQAiiPxl12M0+kIH6NugpBD3gt4RT0sni/T+booDw6b3Ts4WJ8FW1/LPWdy7gVo9yOCL4FhjOw=
 before_script:
 - docker-compose -f spec/docker-compose.yml up -d --build
 - eval `ssh-agent`
 - cat Gemfile.lock
 - bundle exec r10k puppetfile install
+  # Add users to test sudo on localhost
+- sudo groupadd bolt
+- sudo useradd -g bolt bolt
+- echo 'bolt:bolt' | sudo chpasswd
+- echo 'travis:travis' | sudo chpasswd
+  # Undo travis sudoers config
+- sudo sh -c "echo 'Defaults authenticate' >> /etc/sudoers"
+- sudo sh -c "echo 'travis  ALL=(ALL) PASSWD:ALL' >> /etc/sudoers"
 script:
 - bundle exec rake travisci
 - bundle exec rubocop
