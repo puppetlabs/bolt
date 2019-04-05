@@ -314,8 +314,8 @@ Usage: bolt apply <manifest.pp> [options]
     def parse_params(params)
       json = get_arg_input(params)
       JSON.parse(json)
-    rescue JSON::ParserError => err
-      raise Bolt::CLIError, "Unable to parse --params value as JSON: #{err}"
+    rescue JSON::ParserError => e
+      raise Bolt::CLIError, "Unable to parse --params value as JSON: #{e}"
     end
 
     def get_arg_input(value)
@@ -331,8 +331,8 @@ Usage: bolt apply <manifest.pp> [options]
 
     def read_arg_file(file)
       File.read(File.expand_path(file))
-    rescue StandardError => err
-      raise Bolt::FileError.new("Error attempting to read #{file}: #{err}", file)
+    rescue StandardError => e
+      raise Bolt::FileError.new("Error attempting to read #{file}: #{e}", file)
     end
   end
 end

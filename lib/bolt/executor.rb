@@ -21,17 +21,13 @@ module Bolt
     # https://makandracards.com/makandra/36011-ruby-do-not-mix-optional-and-keyword-arguments
     def initialize(concurrency = 1,
                    analytics = Bolt::Analytics::NoopClient.new,
-                   noop = nil,
-                   bundled_content: nil,
-                   load_config: true)
+                   noop = false)
 
       # lazy-load expensive gem code
       require 'concurrent'
 
       @analytics = analytics
-      @bundled_content = bundled_content
       @logger = Logging.logger[self]
-      @load_config = load_config
 
       @transports = Bolt::TRANSPORTS.each_with_object({}) do |(key, val), coll|
         coll[key.to_s] = if key == :remote
@@ -184,7 +180,7 @@ module Bolt
     end
 
     def report_bundled_content(mode, name)
-      if @bundled_content&.include?(name)
+      if @analytics.bundled_content&.include?(name)
         @analytics&.event('Bundled Content', mode, label: name)
       end
     end
@@ -263,7 +259,6 @@ module Bolt
       log_action(description, targets) do
         notify = proc { |event| @notifier.notify(callback, event) if callback }
         options = { '_run_as' => run_as }.merge(options) if run_as
-        options = options.merge('_load_config' => @load_config)
         arguments['_task'] = task.name
 
         results = batch_execute(targets) do |transport, batch|

@@ -231,6 +231,7 @@ module Bolt
       end
 
       @analytics = Bolt::Analytics.build_client
+      @analytics.bundled_content = bundled_content
 
       screen = "#{options[:subcommand]}_#{options[:action]}"
       # submit a different screen for `bolt task show` and `bolt task show foo`
@@ -282,7 +283,7 @@ module Bolt
         end
         code = apply_manifest(options[:code], options[:targets], options[:object], options[:noop])
       else
-        executor = Bolt::Executor.new(config.concurrency, @analytics, options[:noop], bundled_content: bundled_content)
+        executor = Bolt::Executor.new(config.concurrency, @analytics, options[:noop])
         targets = options[:targets]
 
         results = nil
@@ -373,7 +374,7 @@ module Bolt
                        params: params }
       plan_context[:description] = options[:description] if options[:description]
 
-      executor = Bolt::Executor.new(config.concurrency, @analytics, options[:noop], bundled_content: bundled_content)
+      executor = Bolt::Executor.new(config.concurrency, @analytics, options[:noop])
       executor.start_plan(plan_context)
       result = pal.run_plan(plan_name, plan_arguments, executor, inventory, puppetdb_client)
 
@@ -386,7 +387,7 @@ module Bolt
     def apply_manifest(code, targets, filename = nil, noop = false)
       ast = pal.parse_manifest(code, filename)
 
-      executor = Bolt::Executor.new(config.concurrency, @analytics, noop, bundled_content: bundled_content)
+      executor = Bolt::Executor.new(config.concurrency, @analytics, noop)
       # Call start_plan just to enable plan_logging
       executor.start_plan(nil)
 
@@ -469,7 +470,8 @@ module Bolt
     end
 
     def bundled_content
-      if %w[plan task].include?(options[:subcommand])
+      # We only need to enumerate bundled content when running a task or plan
+      if %w[plan task].include?(options[:subcommand]) && options[:action] == 'run'
         default_content = Bolt::PAL.new([], nil)
         plans = default_content.list_plans.each_with_object([]) do |iter, col|
           col << iter&.first
@@ -478,6 +480,8 @@ module Bolt
           col << iter&.first
         end
         plans.concat tasks
+      else
+        []
       end
     end
   end

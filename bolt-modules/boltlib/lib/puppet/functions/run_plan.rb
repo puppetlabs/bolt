@@ -82,11 +82,11 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
         end
 
         result
-      rescue Puppet::PreformattedError => err
-        if named_args['_catch_errors'] && err.cause.is_a?(Bolt::Error)
-          result = err.cause.to_puppet_error
+      rescue Puppet::PreformattedError => e
+        if named_args['_catch_errors'] && e.cause.is_a?(Bolt::Error)
+          result = e.cause.to_puppet_error
         else
-          raise err
+          raise e
         end
       ensure
         if run_as

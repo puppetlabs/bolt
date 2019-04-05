@@ -49,8 +49,8 @@ module Bolt
 
         begin
           response = http_client.post(url, body: body, header: headers)
-        rescue StandardError => err
-          raise Bolt::PuppetDBFailoverError, "Failed to query PuppetDB: #{err}"
+        rescue StandardError => e
+          raise Bolt::PuppetDBFailoverError, "Failed to query PuppetDB: #{e}"
         end
 
         if response.code != 200
@@ -67,8 +67,8 @@ module Bolt
         rescue JSON::ParserError
           raise Bolt::PuppetDBError, "Unable to parse response as JSON: #{response.body}"
         end
-      rescue Bolt::PuppetDBFailoverError => err
-        @logger.error("Request to puppetdb at #{@current_url} failed with #{err}.")
+      rescue Bolt::PuppetDBFailoverError => e
+        @logger.error("Request to puppetdb at #{@current_url} failed with #{e}.")
         reject_url
         make_query(query, path)
       end

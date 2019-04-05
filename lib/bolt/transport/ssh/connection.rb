@@ -14,15 +14,15 @@ module Bolt
         attr_reader :logger, :user, :target
         attr_writer :run_as
 
-        def initialize(target, transport_logger, load_config = true)
+        def initialize(target, transport_logger)
           # lazy-load expensive gem code
           require 'net/ssh'
           require 'net/ssh/proxy/jump'
 
           @target = target
-          @load_config = load_config
+          @load_config = target.options['load-config']
 
-          ssh_user = load_config ? Net::SSH::Config.for(target.host)[:user] : nil
+          ssh_user = @load_config ? Net::SSH::Config.for(target.host)[:user] : nil
           @user = @target.user || ssh_user || Etc.getlogin
           @run_as = nil
 

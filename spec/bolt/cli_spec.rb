@@ -701,36 +701,36 @@ bar
       it "does not calculate bundled content for a command" do
         cli = Bolt::CLI.new(%w[command run foo --nodes bar])
         cli.parse
-        expect(cli.bundled_content).to be_nil
+        expect(cli.bundled_content).to eq([])
       end
 
       it "does not calculate bundled content for a script" do
         cli = Bolt::CLI.new(%w[script run foo --nodes bar])
         cli.parse
-        expect(cli.bundled_content).to be_nil
+        expect(cli.bundled_content).to eq([])
       end
 
       it "does not calculate bundled content for a file" do
         cli = Bolt::CLI.new(%w[file upload /tmp /var foo --nodes bar])
         cli.parse
-        expect(cli.bundled_content).to be_nil
+        expect(cli.bundled_content).to eq([])
       end
 
       it "calculates bundled content for a task" do
         cli = Bolt::CLI.new(%w[task run foo --nodes bar])
         cli.parse
-        expect(cli.bundled_content).to be
+        expect(cli.bundled_content).not_to be_empty
       end
 
       it "calculates bundled content for a plan" do
         cli = Bolt::CLI.new(%w[plan run foo --nodes bar])
         cli.parse
-        expect(cli.bundled_content).to be
+        expect(cli.bundled_content).not_to be_empty
       end
     end
 
     describe "execute" do
-      let(:executor) { double('executor', noop: false, analytics: nil) }
+      let(:executor) { double('executor', noop: false, analytics: Bolt::Analytics::NoopClient.new) }
       let(:cli) { Bolt::CLI.new({}) }
       let(:targets) { [target] }
       let(:output) { StringIO.new }
@@ -1730,7 +1730,7 @@ bar
     end
 
     describe "execute with noop" do
-      let(:executor) { double('executor', noop: true, analytics: nil) }
+      let(:executor) { double('executor', noop: true, analytics: Bolt::Analytics::NoopClient.new) }
       let(:cli) { Bolt::CLI.new({}) }
       let(:targets) { [target] }
       let(:output) { StringIO.new }
@@ -1740,8 +1740,7 @@ bar
         allow(cli).to receive(:bundled_content).and_return(bundled_content)
         expect(Bolt::Executor).to receive(:new).with(Bolt::Config.default.concurrency,
                                                      anything,
-                                                     true,
-                                                     bundled_content: bundled_content).and_return(executor)
+                                                     true).and_return(executor)
         outputter = Bolt::Outputter::JSON.new(false, false, output)
         allow(cli).to receive(:outputter).and_return(outputter)
         allow(executor).to receive(:report_bundled_content)

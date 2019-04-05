@@ -17,7 +17,8 @@ module Bolt
         {
           'connect-timeout' => 10,
           'host-key-check' => true,
-          'tty' => false
+          'tty' => false,
+          'load-config' => true
         }
       end
 
@@ -63,15 +64,15 @@ module Bolt
         @transport_logger.level = :warn
       end
 
-      def with_connection(target, load_config = true)
-        conn = Connection.new(target, @transport_logger, load_config)
+      def with_connection(target)
+        conn = Connection.new(target, @transport_logger)
         conn.connect
         yield conn
       ensure
         begin
           conn&.disconnect
-        rescue StandardError => ex
-          logger.info("Failed to close connection to #{target.uri} : #{ex.message}")
+        rescue StandardError => e
+          logger.info("Failed to close connection to #{target.uri} : #{e.message}")
         end
       end
 
