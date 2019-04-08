@@ -177,6 +177,21 @@ module Bolt
     end
     private :groups_in
 
+    # TODO: Possibly refactor this once inventory v2 is more stable
+    def self.localhost_defaults(data)
+      defaults = {
+        'config' => {
+          'transport' => 'local',
+          'local' => { 'interpreters' => { '.rb' => RbConfig.ruby } }
+        },
+        'features' => ['puppet-agent']
+      }
+      data = Bolt::Util.deep_merge(defaults, data)
+      # If features is an empty array deep_merge won't add the puppet-agent
+      data['features'] << 'puppet-agent' if data['features'].empty?
+      data
+    end
+
     # Pass a target to get_targets for a public version of this
     # Should this reconfigure configured targets?
     def update_target(target)
@@ -188,10 +203,7 @@ module Bolt
         data['config'] = {}
       end
 
-      unless data['config']['transport']
-        data['config']['transport'] = 'local' if target.name == 'localhost'
-      end
-
+      data = self.class.localhost_defaults(data) if target.name == 'localhost'
       # These should only get set from the inventory if they have not yet
       # been instantiated
       set_vars_from_hash(target.name, data['vars']) unless @target_vars[target.name]

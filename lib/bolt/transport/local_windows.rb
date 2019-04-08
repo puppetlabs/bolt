@@ -16,12 +16,6 @@ module Bolt
         %w[tmpdir interpreters run-as run-as-command sudo-password]
       end
 
-      def self.default_options
-        {
-          'interpreters' => { '.rb' => RbConfig.ruby }
-        }
-      end
-
       def provided_features
         ['powershell']
       end

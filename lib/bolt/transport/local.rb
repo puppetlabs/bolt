@@ -7,12 +7,6 @@ module Bolt
         %w[tmpdir interpreters sudo-password run-as run-as-command]
       end
 
-      def self.default_options
-        {
-          'interpreters' => { '.rb' => RbConfig.ruby }
-        }
-      end
-
       def provided_features
         ['shell']
       end

@@ -122,10 +122,7 @@ module Bolt
           data['config'] = {}
         end
 
-        unless data['config']['transport']
-          data['config']['transport'] = 'local' if target.name == 'localhost'
-        end
-
+        data = Bolt::Inventory.localhost_defaults(data) if target.name == 'localhost'
         # These should only get set from the inventory if they have not yet
         # been instantiated
         set_vars_from_hash(target.name, data['vars']) unless @target_vars[target.name]
