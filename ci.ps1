@@ -1,3 +1,4 @@
+$InformationPreference = 'Continue'
 $ErrorActionPreference = 'Stop'
 
 function Set-CACert
@@ -67,6 +68,38 @@ function Set-WinRMHostConfiguration
   $cert = Install-Certificate -Path 'resources/cert.pfx' -Password 'bolt'
   $cert | Format-List
   Grant-WinRMHttpsAccess -CertThumbprint $cert.Thumbprint
+}
+
+function Test-WinRMConfiguration($userName, $password, $retries = 15, $timeout = 1)
+{
+  $retried = 0
+
+  Do
+  {
+    try {
+      $pass = ConvertTo-SecureString $password -AsPlainText -Force
+      $sessionArgs = @{
+        ComputerName = 'localhost'
+        Credential   = New-Object System.Management.Automation.PSCredential ($userName, $pass)
+        UseSSL       = $true
+        SessionOption = New-PSSessionOption -SkipRevocationCheck -SkipCACheck
+      }
+
+      $session = New-PSSession @sessionArgs
+      if ($session)
+      {
+        Write-Information "Successfully established WinRM connection with $userName after $($retried + 1) attempt(s)"
+        return $true
+      }
+    }
+    catch
+    {
+      $retried++
+      Start-Sleep -Seconds $timeout
+    }
+  } While ($retried -lt $retries)
+
+  throw "Failed to establish WinRM connection over SSL in $retries retries`n$($Error[0])"
 }
 
 # Ensure Puppet Ruby 5 / 6 takes precedence over system Ruby
