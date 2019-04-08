@@ -42,6 +42,8 @@ for:
           type Gemfile.lock
           . .\ci.ps1
           Install-Puppetfile
+          $ENV:BOLT_WINRM_PASSWORD = New-RandomPassword
+          New-LocalAdmin -UserName $ENV:BOLT_WINRM_USER -Password $ENV:BOLT_WINRM_PASSWORD
           Set-WinRMHostConfiguration
 
     test_script:
@@ -94,6 +96,8 @@ for:
           type Gemfile.lock
           . .\ci.ps1
           Install-Puppetfile
+          $ENV:BOLT_WINRM_PASSWORD = New-RandomPassword
+          New-LocalAdmin -UserName $ENV:BOLT_WINRM_USER -Password $ENV:BOLT_WINRM_PASSWORD
           Set-WinRMHostConfiguration
           Set-ActiveRubyFromPuppet
 

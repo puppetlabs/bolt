@@ -21,13 +21,21 @@ function Install-Puppetfile
   bundle exec r10k puppetfile install
 }
 
-function Set-WinRMHostConfiguration
+function New-RandomPassword
 {
   Add-Type -AssemblyName System.Web
-  $ENV:BOLT_WINRM_PASSWORD = "&aA4" + [System.Web.Security.Membership]::GeneratePassword(10, 3)
-  ($user = New-LocalUser -Name $ENV:BOLT_WINRM_USER -Password (ConvertTo-SecureString -String $ENV:BOLT_WINRM_PASSWORD -Force -AsPlainText)) | Format-List
+  "&aA4" + [System.Web.Security.Membership]::GeneratePassword(10, 3)
+}
+
+function New-LocalAdmin($userName, $password)
+{
+  ($user = New-LocalUser -Name $userName -Password (ConvertTo-SecureString -String $password -Force -AsPlainText)) | Format-List
   Add-LocalGroupMember -Group 'Remote Management Users' -Member $user
   Add-LocalGroupMember -Group Administrators -Member $user
+}
+
+function Set-WinRMHostConfiguration
+{
   # configure WinRM to use resources/cert.pfx for SSL
   ($cert = Import-PfxCertificate -FilePath resources/cert.pfx -CertStoreLocation cert:\\LocalMachine\\My -Password (ConvertTo-SecureString -String bolt -Force -AsPlainText)) | Format-List
   New-WSManInstance -ResourceURI winrm/config/Listener -SelectorSet @{Address='*';Transport='HTTPS'} -ValueSet @{Hostname='localhost';CertificateThumbprint=$cert.Thumbprint} | Format-List
