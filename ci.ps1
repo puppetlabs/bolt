@@ -3,13 +3,22 @@ $ErrorActionPreference = 'Stop'
 
 function Set-CACert
 {
+  $uri = 'https://curl.haxx.se/ca/cacert.pem'
   $CACertFile = Join-Path -Path $ENV:AppData -ChildPath 'RubyCACert.pem'
 
-  If (-Not (Test-Path -Path $CACertFile)) {
-    Write-Information "Downloading CA Cert bundle.."
-    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    Invoke-WebRequest -Uri 'https://curl.haxx.se/ca/cacert.pem' -UseBasicParsing -OutFile $CACertFile | Out-Null
+  $retryArgs = @{
+    SuccessMessage = "Succeeded in downloading CA bundle from $uri"
+    FailMessage    = "Failed to download CA bundle from $uri"
+    Retries        = 5
+    Timeout        = 1
+    Script         = {
+      [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+      Invoke-WebRequest -Uri $uri -UseBasicParsing -OutFile $CACertFile | Out-Null
+    }
   }
+
+  # only download CA file if not present - throw on failures
+  If (-Not (Test-Path -Path $CACertFile)) { Invoke-ScriptBlockWithRetry @retryArgs }
 
   Write-Information "Setting CA Certificate store set to $CACertFile.."
   $ENV:SSL_CERT_FILE = $CACertFile
