@@ -247,24 +247,6 @@ bar
           cli.parse
         }.to raise_error(Bolt::CLIError, /Targets must be specified/)
       end
-
-      it 'does not list nodes in plan --help' do
-        cli = Bolt::CLI.new(%w[plan --help])
-        expect {
-          expect {
-            cli.parse
-          }.to raise_error(Bolt::CLIExit)
-        }.not_to output(/--nodes/).to_stdout
-      end
-
-      it 'does not list nodes in help plan' do
-        cli = Bolt::CLI.new(%w[help plan])
-        expect {
-          expect {
-            cli.parse
-          }.to raise_error(Bolt::CLIExit)
-        }.not_to output(/--nodes/).to_stdout
-      end
     end
 
     describe "query" do
@@ -669,7 +651,7 @@ bar
         expect {
           cli = Bolt::CLI.new(%w[plan run foo --query nodes{} --nodes bar])
           cli.parse
-        }.to raise_error(Bolt::CLIError, /'--nodes' or '--query'/)
+        }.to raise_error(Bolt::CLIError, /Only one of '--nodes'/)
       end
 
       it "fails with --noop" do
@@ -1530,6 +1512,7 @@ bar
           cli.execute(options)
           expect(JSON.parse(output.string)).to eq(
             [{ 'node' => 'foo',
+               'target' => 'foo',
                'status' => 'success',
                'type' => 'task',
                'object' => 'some_task',
@@ -1560,6 +1543,7 @@ bar
           cli.execute(options)
           expect(JSON.parse(output.string)).to eq(
             [{ 'node' => 'foo',
+               'target' => 'foo',
                'status' => 'success',
                'type' => 'task',
                'object' => 'some_task',
@@ -1596,6 +1580,7 @@ bar
             [
               {
                 'node' => 'foo',
+                'target' => 'foo',
                 'status' => 'failure',
                 'type' => 'task',
                 'object' => 'some_task',

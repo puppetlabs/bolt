@@ -2,6 +2,7 @@
 
 require 'spec_helper'
 require 'net/ssh'
+require 'net/ssh/proxy/jump'
 require 'bolt_spec/conn'
 require 'bolt_spec/errors'
 require 'bolt_spec/transport'

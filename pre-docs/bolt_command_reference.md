@@ -4,7 +4,7 @@ Review the subcommands, actions, and options that are available for Bolt.
 
 ## Common Bolt commands
 
-Bolt commands use the syntax: `bolt <subcommand> <action> [options]` 
+Bolt commands use the syntax: `bolt <subcommand> <action> [options]`
 
 |Command|Description|Arguments|
 |-------|-----------|---------|
@@ -14,7 +14,7 @@ Bolt commands use the syntax: `bolt <subcommand> <action> [options]`
 | `bolt plan run` | Runs a task plan. | - The plan name, in the format `modulename::planname`.<br>- The nodes on which to run the plan.
 | `bolt apply` | Applies a Puppet manifest file. | - The path to the manifest file.<br>- The nodes on which to run the plan.
 | `bolt file upload` | Uploads a local file to a remote node. | - The path to the source file.<br>- The path to the remote location.<br>- The nodes on which to upload the file.
-| `bolt task show` | Lists all the tasks on the modulepath that have not been marked `private`. Will note whether a task supports no-operation mode. | - Adding a specific task name displays details and parameters for the task.<br>- Optionally, the name of a task you want details for: `bolt task show <TASK NAME>` 
+| `bolt task show` | Lists all the tasks on the modulepath that have not been marked `private`. Will note whether a task supports no-operation mode. | - Adding a specific task name displays details and parameters for the task.<br>- Optionally, the name of a task you want details for: `bolt task show <TASK NAME>`
 | `bolt plan show` | Lists the plans that are installed on the current module path. | - Adding a specific plan name displays details and parameters for the plan.
 
 ## Command options
@@ -33,9 +33,10 @@ Options are optional unless marked as required. 
 
  |
 | `--query` `, -q` |Query PuppetDB to determine the targets.|
+|`--rerun`| use the `.rerun.json` file to choose the targets. Requires a single filter options: all, failure, or success.
 | `--noop` |Execute a task that supports it in no-operation mode.|
 | `--description` |Add a description to the run. Used in logging and submitted to Orchestrator with the PCP transport.|
-| `--params` | Parameters, passed as a JSON object on the command line, or as a JSON parameter file, prefaced with `@` like `@params.json`. For Windows PowerShell,  add single quotation marks to define the file: `'@params.json'` 
+| `--params` | Parameters, passed as a JSON object on the command line, or as a JSON parameter file, prefaced with `@` like `@params.json`. For Windows PowerShell,  add single quotation marks to define the file: `'@params.json'`
 
  |
 
@@ -78,6 +79,7 @@ Options are optional unless marked as required. 
 | `--configfile` |Specify where to load config from \(default: `bolt.yaml` inside the `Boltdir`\).|
 | `--boltdir` |Specify what Boltdir to load config from \(default: autodiscovered from current working dir\).|
 | `--inventoryfile`, `-i` |Specify where to load inventory from \(default: `inventory.yaml` inside the `Boltdir`\).|
+| `--save-rerun, --no-save-rerun` | Specify whether bolt should update the `.rerun.json` file (default: save-rerun). |
 
 ## Transport options
 

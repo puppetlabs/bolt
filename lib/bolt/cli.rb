@@ -15,6 +15,7 @@ require 'bolt/config'
 require 'bolt/error'
 require 'bolt/executor'
 require 'bolt/inventory'
+require 'bolt/rerun'
 require 'bolt/logger'
 require 'bolt/outputter'
 require 'bolt/puppetdb'
@@ -117,22 +118,32 @@ module Bolt
 
       # After validation, initialize inventory and targets. Errors here are better to catch early.
       unless options[:subcommand] == 'puppetfile' || options[:action] == 'show'
-        if options[:query]
-          if options[:nodes].any?
-            raise Bolt::CLIError, "Only one of '--nodes' or '--query' may be specified"
-          end
-          nodes = query_puppetdb_nodes(options[:query])
-          options[:targets] = inventory.get_targets(nodes)
-          options[:nodes] = nodes if options[:subcommand] == 'plan'
-        else
-          options[:targets] = inventory.get_targets(options[:nodes])
-        end
+        options[:targets] = get_targets(options)
       end
 
       options
     rescue Bolt::Error => e
       warn e.message
       raise e
+    end
+
+    def get_targets(options)
+      target_opts =  options.keys.select { |opt| %i[query rerun].include?(opt) }
+      target_opts << :nodes unless options[:nodes].empty?
+      if target_opts.length > 1
+        raise Bolt::CLIError, "Only one of '--nodes', '--rerun', or '--query' may be specified"
+      end
+
+      if options[:query]
+        nodes = query_puppetdb_nodes(options[:query])
+        options[:nodes] = nodes if options[:subcommand] == 'plan'
+      elsif options[:rerun]
+        nodes = rerun.get_targets(options[:rerun])
+        options[:nodes] = nodes if options[:subcommand] == 'plan'
+      else
+        nodes = options[:nodes]
+      end
+      inventory.get_targets(nodes)
     end
 
     def validate(options)
@@ -174,10 +185,10 @@ module Bolt
       end
 
       if !%w[plan puppetfile].include?(options[:subcommand]) && options[:action] != 'show'
-        if options[:nodes].empty? && options[:query].nil?
-          raise Bolt::CLIError, "Targets must be specified with '--nodes' or '--query'"
+        if options[:nodes].empty? && options[:query].nil? && options[:rerun].nil?
+          raise Bolt::CLIError, "Targets must be specified with '--nodes', '--query' or '--rerun'"
         elsif options[:nodes].any? && options[:query]
-          raise Bolt::CLIError, "Only one of '--nodes' or '--query' may be specified"
+          raise Bolt::CLIError, "Only one of '--nodes', '--query', or '--rerun'  may be specified"
         end
       end
 
@@ -329,6 +340,7 @@ module Bolt
             end
         end
 
+        rerun.update(results)
         outputter.print_summary(results, elapsed_time)
         code = results.ok ? 0 : 2
       end
@@ -380,6 +392,7 @@ module Bolt
 
       # If a non-bolt exception bubbles up the plan won't get finished
       executor.finish_plan(result)
+      rerun.update(result)
       outputter.print_plan_result(result)
       result.ok? ? 0 : 1
     end
@@ -400,6 +413,7 @@ module Bolt
       end
 
       outputter.print_apply_result(results)
+      rerun.update(results)
 
       results.ok ? 0 : 1
     end
@@ -463,6 +477,10 @@ module Bolt
 
     def file_stat(path)
       File.stat(path)
+    end
+
+    def rerun
+      @rerun ||= Bolt::Rerun.new(@config.rerunfile, @config.save_rerun)
     end
 
     def outputter

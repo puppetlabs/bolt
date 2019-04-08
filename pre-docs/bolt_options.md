@@ -21,7 +21,7 @@ When targeting systems with the `--nodes` flag, you can specify the transport ei
 -   To generate a node list with brace expansion, specify the node list with an equals sign \(`=`\), such as `--nodes=web{1,2}`.
 
     ```
-     bolt command run --nodes={web{5,6,7},elasticsearch{1,2,3}.subdomain}.mydomain.edu  
+     bolt command run --nodes={web{5,6,7},elasticsearch{1,2,3}.subdomain}.mydomain.edu
     ```
 
     This command runs Bolt on the following hosts:
@@ -83,7 +83,7 @@ To specify nodes from an inventory file, reference nodes by node name, a glob ma
 -   To match all the nodes that start with elasticsearch in the inventory file example:
 
 ```
---nodes 'elasticsearch*' 
+--nodes 'elasticsearch*'
 ```
 
 
@@ -107,6 +107,32 @@ groups:
 
 
 [Inventory file](inventory_file.md)
+
+### Rerunning based on the last result
+
+After every execution Bolt will write information about the result of that run to a
+`.rerun.json` file inside the Bolt project directory. That file can then be
+used to specify nodes for future bolt commands.
+
+To attempt to retry the action target the nodes on which the previous action
+failed with `--rerun failure`. If you want to continue targeting these nodes
+pass `--no-save-rerun` to prevent bolt from updating the file.
+
+```
+bolt command run false --nodes all
+bolt command run whoami --rerun failure --no-save-rerun
+```
+
+If one command is dependant on the success of a previous command you can target
+the successful nodes with `--rerun success`.
+
+```
+bolt task run package action=install name=httpd --nodes all
+bolt task run server action=restart name=httpd --rerun success
+```
+
+*note*: When a plan does not return a `ResultSet` object bolt cannot save
+information for reruns and `.rerun.json` will be deleted.
 
 ### Set a default transport
 
