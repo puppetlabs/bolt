@@ -28,7 +28,17 @@ function Set-CACert
 function Install-Puppetfile
 {
   Set-CACert
-  bundle exec r10k puppetfile install
+
+  # Forge connections may fail intermittently
+  $retryArgs = @{
+    SuccessMessage = 'Succeeded in installing Puppetfile'
+    FailMessage    = 'Failed to install required modules from Forge'
+    Retries        = 10
+    Timeout        = 2
+    Script         = { bundle exec r10k puppetfile install }
+  }
+
+  Invoke-ScriptBlockWithRetry @retryArgs
 }
 
 function New-RandomPassword
