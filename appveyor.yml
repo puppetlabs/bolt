@@ -95,10 +95,7 @@ for:
           . .\ci.ps1
           Install-Puppetfile
           Set-WinRMHostConfiguration
-          # Make sure Puppet Ruby take precedence over system ruby (pup 5/6)
-          $puppet_five_ruby = "C:\Program Files\Puppet Labs\Puppet\sys\ruby\bin"
-          $puppet_six_ruby = "C:\Program Files\Puppet Labs\Puppet\puppet\bin"
-          [System.Environment]::SetEnvironmentVariable("Path","$puppet_five_ruby;$puppet_six_ruby;" + $ENV:Path, [System.EnvironmentVariableTarget]::Machine)
+          Set-ActiveRubyFromPuppet
 
     test_script:
       - bundle exec rake integration:appveyor_agents

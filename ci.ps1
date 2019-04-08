@@ -32,3 +32,11 @@ function Set-WinRMHostConfiguration
   ($cert = Import-PfxCertificate -FilePath resources/cert.pfx -CertStoreLocation cert:\\LocalMachine\\My -Password (ConvertTo-SecureString -String bolt -Force -AsPlainText)) | Format-List
   New-WSManInstance -ResourceURI winrm/config/Listener -SelectorSet @{Address='*';Transport='HTTPS'} -ValueSet @{Hostname='localhost';CertificateThumbprint=$cert.Thumbprint} | Format-List
 }
+
+function Set-ActiveRubyFromPuppet
+{
+  # Make sure Puppet Ruby take precedence over system ruby (pup 5/6)
+  $puppet_five_ruby = "C:\Program Files\Puppet Labs\Puppet\sys\ruby\bin"
+  $puppet_six_ruby = "C:\Program Files\Puppet Labs\Puppet\puppet\bin"
+  [System.Environment]::SetEnvironmentVariable("Path","$puppet_five_ruby;$puppet_six_ruby;" + $ENV:Path, [System.EnvironmentVariableTarget]::Machine)
+}
