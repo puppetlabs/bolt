@@ -6,12 +6,12 @@ function Set-CACert
   $CACertFile = Join-Path -Path $ENV:AppData -ChildPath 'RubyCACert.pem'
 
   If (-Not (Test-Path -Path $CACertFile)) {
-    "Downloading CA Cert bundle.."
+    Write-Information "Downloading CA Cert bundle.."
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     Invoke-WebRequest -Uri 'https://curl.haxx.se/ca/cacert.pem' -UseBasicParsing -OutFile $CACertFile | Out-Null
   }
 
-  "Setting CA Certificate store set to $CACertFile.."
+  Write-Information "Setting CA Certificate store set to $CACertFile.."
   $ENV:SSL_CERT_FILE = $CACertFile
   [System.Environment]::SetEnvironmentVariable('SSL_CERT_FILE', $CACertFile, [System.EnvironmentVariableTarget]::Machine)
 }
@@ -36,7 +36,7 @@ function New-LocalAdmin($userName, $password)
   }
 
   $user = New-LocalUser @userArgs
-  $user | Format-List
+  Write-Information ($user | Format-List | Out-String)
   Add-LocalGroupMember -Group 'Remote Management Users' -Member $user
   Add-LocalGroupMember -Group Administrators -Member $user
 }
@@ -59,14 +59,15 @@ function Grant-WinRMHttpsAccess($certThumbprint)
     SelectorSet = @{ Address = '*'; Transport = 'HTTPS' }
     ValueSet    = @{ Hostname = 'localhost'; CertificateThumbprint = $certThumbprint }
   }
-  New-WSManInstance @winRMArgs | Format-List
+  $instance = New-WSManInstance @winRMArgs
+  Write-Information ($instance | Format-List | Out-String)
 }
 
 function Set-WinRMHostConfiguration
 {
   # configure WinRM to use resources/cert.pfx for SSL
   $cert = Install-Certificate -Path 'resources/cert.pfx' -Password 'bolt'
-  $cert | Format-List
+  Write-Information ($cert | Format-List | Out-String)
   Grant-WinRMHttpsAccess -CertThumbprint $cert.Thumbprint
 }
 
