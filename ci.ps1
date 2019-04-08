@@ -71,27 +71,16 @@ function Set-WinRMHostConfiguration
   Grant-WinRMHttpsAccess -CertThumbprint $cert.Thumbprint
 }
 
-function Test-WinRMConfiguration($userName, $password, $retries = 15, $timeout = 1)
+function Invoke-ScriptBlockWithRetry([ScriptBlock]$script, $failMessage, $successMessage, $retries = 15, $timeout = 1)
 {
   $retried = 0
 
   Do
   {
     try {
-      $pass = ConvertTo-SecureString $password -AsPlainText -Force
-      $sessionArgs = @{
-        ComputerName = 'localhost'
-        Credential   = New-Object System.Management.Automation.PSCredential ($userName, $pass)
-        UseSSL       = $true
-        SessionOption = New-PSSessionOption -SkipRevocationCheck -SkipCACheck
-      }
-
-      $session = New-PSSession @sessionArgs
-      if ($session)
-      {
-        Write-Information "Successfully established WinRM connection with $userName after $($retried + 1) attempt(s)"
-        return $true
-      }
+      $script.Invoke()
+      Write-Information "$successMessage after $($retried + 1) attempt(s)"
+      return $true
     }
     catch
     {
@@ -100,7 +89,31 @@ function Test-WinRMConfiguration($userName, $password, $retries = 15, $timeout =
     }
   } While ($retried -lt $retries)
 
-  throw "Failed to establish WinRM connection over SSL in $retries retries`n$($Error[0])"
+  throw "ERROR: $failMessage in $retried retries`n$($Error[0])"
+
+}
+
+function Test-WinRMConfiguration($userName, $password, $retries = 15, $timeout = 1)
+{
+  $retryArgs = @{
+    FailMessage    = 'Failed to establish WinRM connection over SSL'
+    SuccessMessage = "Successfully established WinRM connection with $userName"
+    Retries        = $retries
+    Timeout        = $timeout
+    Script         = {
+      $pass = ConvertTo-SecureString $password -AsPlainText -Force
+      $sessionArgs = @{
+        ComputerName = 'localhost'
+        Credential   = New-Object System.Management.Automation.PSCredential ($userName, $pass)
+        UseSSL       = $true
+        SessionOption = New-PSSessionOption -SkipRevocationCheck -SkipCACheck
+      }
+
+      if (New-PSSession @sessionArgs) { return $true }
+    }
+  }
+
+  Invoke-ScriptBlockWithRetry @retryArgs
 }
 
 # Ensure Puppet Ruby 5 / 6 takes precedence over system Ruby
