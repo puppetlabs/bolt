@@ -31,7 +31,7 @@ describe Bolt::Applicator do
       hiera_config: nil,
       target: {
         name: uri,
-        facts: {},
+        facts: { 'bolt' => true },
         variables: {},
         trusted: {
           authenticated: 'local',
