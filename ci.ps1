@@ -29,7 +29,13 @@ function New-RandomPassword
 
 function New-LocalAdmin($userName, $password)
 {
-  ($user = New-LocalUser -Name $userName -Password (ConvertTo-SecureString -String $password -Force -AsPlainText)) | Format-List
+  $userArgs = @{
+    Name     = $userName
+    Password = (ConvertTo-SecureString -String $password -Force -AsPlainText)
+  }
+
+  $user = New-LocalUser @userArgs
+  $user | Format-List
   Add-LocalGroupMember -Group 'Remote Management Users' -Member $user
   Add-LocalGroupMember -Group Administrators -Member $user
 }
