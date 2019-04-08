@@ -33,10 +33,15 @@ function Set-WinRMHostConfiguration
   New-WSManInstance -ResourceURI winrm/config/Listener -SelectorSet @{Address='*';Transport='HTTPS'} -ValueSet @{Hostname='localhost';CertificateThumbprint=$cert.Thumbprint} | Format-List
 }
 
+# Ensure Puppet Ruby 5 / 6 takes precedence over system Ruby
 function Set-ActiveRubyFromPuppet
 {
-  # Make sure Puppet Ruby take precedence over system ruby (pup 5/6)
-  $puppet_five_ruby = "C:\Program Files\Puppet Labs\Puppet\sys\ruby\bin"
-  $puppet_six_ruby = "C:\Program Files\Puppet Labs\Puppet\puppet\bin"
-  [System.Environment]::SetEnvironmentVariable("Path","$puppet_five_ruby;$puppet_six_ruby;" + $ENV:Path, [System.EnvironmentVariableTarget]::Machine)
+  # https://github.com/puppetlabs/puppet-specifications/blob/master/file_paths.md
+  $path = @(
+    "${ENV:ProgramFiles}\Puppet Labs\Puppet\sys\ruby\bin",
+    "${ENV:ProgramFiles}\Puppet Labs\Puppet\puppet\bin",
+    $ENV:Path
+  ) -join ';'
+
+  [System.Environment]::SetEnvironmentVariable('Path', $path, [System.EnvironmentVariableTarget]::Machine)
 }
