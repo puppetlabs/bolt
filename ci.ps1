@@ -40,11 +40,33 @@ function New-LocalAdmin($userName, $password)
   Add-LocalGroupMember -Group Administrators -Member $user
 }
 
+function Install-Certificate($path, $password)
+{
+  $importArgs = @{
+    FilePath          = $path
+    CertStoreLocation = 'cert:\\LocalMachine\\My'
+    Password          = (ConvertTo-SecureString -String $password -Force -AsPlainText)
+  }
+
+  return (Import-PfxCertificate @importArgs)
+}
+
+function Grant-WinRMHttpsAccess($certThumbprint)
+{
+  $winRMArgs = @{
+    ResourceURI = 'winrm/config/Listener'
+    SelectorSet = @{ Address = '*'; Transport = 'HTTPS' }
+    ValueSet    = @{ Hostname = 'localhost'; CertificateThumbprint = $certThumbprint }
+  }
+  New-WSManInstance @winRMArgs | Format-List
+}
+
 function Set-WinRMHostConfiguration
 {
   # configure WinRM to use resources/cert.pfx for SSL
-  ($cert = Import-PfxCertificate -FilePath resources/cert.pfx -CertStoreLocation cert:\\LocalMachine\\My -Password (ConvertTo-SecureString -String bolt -Force -AsPlainText)) | Format-List
-  New-WSManInstance -ResourceURI winrm/config/Listener -SelectorSet @{Address='*';Transport='HTTPS'} -ValueSet @{Hostname='localhost';CertificateThumbprint=$cert.Thumbprint} | Format-List
+  $cert = Install-Certificate -Path 'resources/cert.pfx' -Password 'bolt'
+  $cert | Format-List
+  Grant-WinRMHttpsAccess -CertThumbprint $cert.Thumbprint
 }
 
 # Ensure Puppet Ruby 5 / 6 takes precedence over system Ruby
