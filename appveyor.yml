@@ -40,26 +40,9 @@ for:
           gem -v
           bundle -v
           type Gemfile.lock
-          $CACertFile = Join-Path -Path $ENV:AppData -ChildPath 'RubyCACert.pem'
-
-          If (-Not (Test-Path -Path $CACertFile)) {
-            "Downloading CA Cert bundle.."
-              [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-                Invoke-WebRequest -Uri 'https://curl.haxx.se/ca/cacert.pem' -UseBasicParsing -OutFile $CACertFile | Out-Null
-              }
-
-              "Setting CA Certificate store set to $CACertFile.."
-          $ENV:SSL_CERT_FILE = $CACertFile
-          [System.Environment]::SetEnvironmentVariable('SSL_CERT_FILE',$CACertFile, [System.EnvironmentVariableTarget]::Machine)
-          bundle exec r10k puppetfile install
-          Add-Type -AssemblyName System.Web
-          $ENV:BOLT_WINRM_PASSWORD = "&aA4" + [System.Web.Security.Membership]::GeneratePassword(10, 3)
-          ($user = New-LocalUser -Name $ENV:BOLT_WINRM_USER -Password (ConvertTo-SecureString -String $ENV:BOLT_WINRM_PASSWORD -Force -AsPlainText)) | Format-List
-          Add-LocalGroupMember -Group 'Remote Management Users' -Member $user
-          Add-LocalGroupMember -Group Administrators -Member $user
-          # configure WinRM to use resources/cert.pfx for SSL
-          ($cert = Import-PfxCertificate -FilePath resources/cert.pfx -CertStoreLocation cert:\\LocalMachine\\My -Password (ConvertTo-SecureString -String bolt -Force -AsPlainText)) | Format-List
-          New-WSManInstance -ResourceURI winrm/config/Listener -SelectorSet @{Address='*';Transport='HTTPS'} -ValueSet @{Hostname='localhost';CertificateThumbprint=$cert.Thumbprint} | Format-List
+          . .\ci.ps1
+          Install-Puppetfile
+          Set-WinRMHostConfiguration
 
     test_script:
       - bundle exec rake appveyor
@@ -109,30 +92,13 @@ for:
           gem -v
           bundle -v
           type Gemfile.lock
-          $CACertFile = Join-Path -Path $ENV:AppData -ChildPath 'RubyCACert.pem'
-
-          If (-Not (Test-Path -Path $CACertFile)) {
-            "Downloading CA Cert bundle.."
-              [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-                Invoke-WebRequest -Uri 'https://curl.haxx.se/ca/cacert.pem' -UseBasicParsing -OutFile $CACertFile | Out-Null
-              }
-
-              "Setting CA Certificate store set to $CACertFile.."
-          $ENV:SSL_CERT_FILE = $CACertFile
-          [System.Environment]::SetEnvironmentVariable('SSL_CERT_FILE',$CACertFile, [System.EnvironmentVariableTarget]::Machine)
-          bundle exec r10k puppetfile install
-          Add-Type -AssemblyName System.Web
-          $ENV:BOLT_WINRM_PASSWORD = "&aA4" + [System.Web.Security.Membership]::GeneratePassword(10, 3)
-          ($user = New-LocalUser -Name $ENV:BOLT_WINRM_USER -Password (ConvertTo-SecureString -String $ENV:BOLT_WINRM_PASSWORD -Force -AsPlainText)) | Format-List
-          Add-LocalGroupMember -Group 'Remote Management Users' -Member $user
-          Add-LocalGroupMember -Group Administrators -Member $user
+          . .\ci.ps1
+          Install-Puppetfile
+          Set-WinRMHostConfiguration
           # Make sure Puppet Ruby take precedence over system ruby (pup 5/6)
           $puppet_five_ruby = "C:\Program Files\Puppet Labs\Puppet\sys\ruby\bin"
           $puppet_six_ruby = "C:\Program Files\Puppet Labs\Puppet\puppet\bin"
           [System.Environment]::SetEnvironmentVariable("Path","$puppet_five_ruby;$puppet_six_ruby;" + $ENV:Path, [System.EnvironmentVariableTarget]::Machine)
-          # configure WinRM to use resources/cert.pfx for SSL
-          ($cert = Import-PfxCertificate -FilePath resources/cert.pfx -CertStoreLocation cert:\\LocalMachine\\My -Password (ConvertTo-SecureString -String bolt -Force -AsPlainText)) | Format-List
-          New-WSManInstance -ResourceURI winrm/config/Listener -SelectorSet @{Address='*';Transport='HTTPS'} -ValueSet @{Hostname='localhost';CertificateThumbprint=$cert.Thumbprint} | Format-List
 
     test_script:
       - bundle exec rake integration:appveyor_agents
