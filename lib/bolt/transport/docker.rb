@@ -8,7 +8,7 @@ module Bolt
   module Transport
     class Docker < Base
       def self.options
-        %w[service-url service-options tmpdir interpreters]
+        %w[host service-url service-options tmpdir interpreters]
       end
 
       def provided_features

@@ -596,4 +596,21 @@ describe Bolt::Inventory do
       end
     end
   end
+
+  describe :create_version do
+    it 'creates a version1 inventory by default' do
+      inv = Bolt::Inventory.create_version({}, config)
+      expect(inv.class).to eq(Bolt::Inventory)
+    end
+
+    it 'creates a version1 inventlory when specified' do
+      inv = Bolt::Inventory.create_version({ 'version' => 1 }, config)
+      expect(inv.class).to eq(Bolt::Inventory)
+    end
+
+    it 'creates a version2 inventory when specified' do
+      inv = Bolt::Inventory.create_version({ 'version' => 2 }, config)
+      expect(inv.class).to eq(Bolt::Inventory::Inventory2)
+    end
+  end
 end

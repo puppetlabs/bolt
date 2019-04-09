@@ -9,8 +9,8 @@ module Bolt
     class WinRM < Base
       def self.options
         %w[
-          port user password connect-timeout ssl ssl-verify tmpdir cacert
-          extensions interpreters file-protocol smb-port
+          host port user password connect-timeout ssl ssl-verify tmpdir
+          cacert extensions interpreters file-protocol smb-port
         ]
       end
 

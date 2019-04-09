@@ -58,13 +58,17 @@ module Bolt
           end
         end
 
+        def get_certnames(targets)
+          targets.map { |t| t.host || t.name }
+        end
+
         def build_request(targets, task, arguments, description = nil)
           body = { task: task.name,
                    environment: @environment,
                    noop: arguments['_noop'],
                    params: arguments.reject { |k, _| k.start_with?('_') },
                    scope: {
-                     nodes: targets.map(&:host)
+                     nodes: get_certnames(targets)
                    } }
           body[:description] = description if description
           body[:plan_job] = @plan_job if @plan_job
@@ -77,7 +81,7 @@ module Bolt
         end
 
         def query_inventory(targets)
-          @client.post('inventory', nodes: targets.map(&:host))
+          @client.post('inventory', nodes: get_certnames(targets))
         end
       end
     end

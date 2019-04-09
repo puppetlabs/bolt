@@ -22,7 +22,7 @@ module Bolt
       attr_writer :plan_context
 
       def self.options
-        %w[service-url cacert token-file task-environment]
+        %w[host service-url cacert token-file task-environment]
       end
 
       def self.default_options
@@ -66,7 +66,7 @@ module Bolt
       end
 
       def process_run_results(targets, results, task_name)
-        targets_by_name = Hash[targets.map(&:host).zip(targets)]
+        targets_by_name = Hash[targets.map { |t| t.host || t.name }.zip(targets)]
         results.map do |node_result|
           target = targets_by_name[node_result['name']]
           state = node_result['state']

@@ -19,6 +19,8 @@ module Bolt
           require 'net/ssh'
           require 'net/ssh/proxy/jump'
 
+          raise Bolt::ValidationError, "Target #{target.name} does not have a host" unless target.host
+
           @target = target
           @load_config = target.options['load-config']
 

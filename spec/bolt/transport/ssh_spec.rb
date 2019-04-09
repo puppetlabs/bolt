@@ -326,4 +326,12 @@ describe Bolt::Transport::SSH do
       expect(ssh.run_command(target, 'whoami')['stdout'].strip).to eq('root')
     end
   end
+
+  context 'when there is no host in the target' do
+    let(:target) { Bolt::Target.new(nil, "name" => "hostless") }
+
+    it 'errors' do
+      expect { ssh.run_command(target, 'whoami') }.to raise_error(/does not have a host/)
+    end
+  end
 end

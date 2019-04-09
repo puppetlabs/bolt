@@ -3,6 +3,7 @@
 require 'set'
 require 'bolt/config'
 require 'bolt/inventory/group'
+require 'bolt/inventory/inventory2'
 require 'bolt/target'
 require 'bolt/util'
 require 'yaml'
@@ -53,9 +54,21 @@ module Bolt
         data = Bolt::Util.read_config_file(config.inventoryfile, config.default_inventoryfile, 'inventory')
       end
 
-      inventory = new(data, config)
+      inventory = create_version(data, config)
       inventory.validate
       inventory
+    end
+
+    def self.create_version(data, config)
+      version = (data || {}).delete('version') { 1 }
+      case version
+      when 1
+        new(data, config)
+      when 2
+        Bolt::Inventory::Inventory2.new(data, config)
+      else
+        raise ValidationError, "Unsupported version #{version} specified in inventory"
+      end
     end
 
     def initialize(data, config = nil, target_vars: {}, target_facts: {}, target_features: {})
@@ -225,6 +238,11 @@ module Bolt
     end
     private :resolve_name
 
+    def create_target(data)
+      Target.new(data)
+    end
+    private :create_target
+
     def expand_targets(targets)
       if targets.is_a? Bolt::Target
         targets.inventory = self
@@ -236,7 +254,7 @@ module Bolt
         targets.split(/[[:space:],]+/).reject(&:empty?).map do |name|
           ts = resolve_name(name)
           ts.map do |t|
-            target = Target.new(t)
+            target = create_target(t)
             target.inventory = self
             target
           end
