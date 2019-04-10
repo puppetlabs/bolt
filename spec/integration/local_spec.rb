@@ -68,6 +68,8 @@ describe "when running over the local transport" do
     context 'with environment variables set' do
       before(:each) { ENV['test_var'] = "testing this" }
       after(:each) { ENV.delete('test_var') }
+      # Only works with localhost's default configuration
+      let(:uri) { 'localhost' }
 
       it 'exposes environment variables to the task' do
         result = run_one_node(%w[task run env_var::get_var] + config_flags)

@@ -56,9 +56,7 @@ describe Bolt::Applicator do
             pcp: {
               'task-environment' => 'production'
             },
-            local: {
-              'interpreters' => { '.rb' => RbConfig.ruby }
-            },
+            local: {},
             docker: {},
             remote: { 'run-on': 'localhost' }
           }

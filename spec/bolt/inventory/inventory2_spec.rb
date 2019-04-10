@@ -665,4 +665,63 @@ describe Bolt::Inventory::Inventory2 do
       end
     end
   end
+
+  context 'with localhost' do
+    context 'with no additional config' do
+      let(:data) {
+        { 'nodes' => ['localhost'] }
+      }
+
+      let(:inventory) { Bolt::Inventory.new(data) }
+
+      it 'adds magic config options' do
+        target = get_target(inventory, 'localhost')
+        expect(target.protocol).to eq('local')
+        expect(target.options['interpreters']).to include('.rb' => RbConfig.ruby)
+        expect(target.features).to include('puppet-agent')
+      end
+    end
+
+    context 'with config' do
+      let(:data) {
+        { 'name' => 'locomoco',
+          'nodes' => ['localhost'],
+          'config' => {
+            'transport' => 'local',
+            'local' => {
+              'interpreters' => { '.rb' => '/foo/ruby' }
+            }
+          } }
+      }
+      let(:inventory) { Bolt::Inventory.new(data) }
+
+      it 'does not override config options' do
+        target = get_target(inventory, 'localhost')
+        expect(target.protocol).to eq('local')
+        expect(target.options['interpreters']).to include('.rb' => '/foo/ruby')
+        expect(target.features).to include('puppet-agent')
+      end
+    end
+
+    context 'with non-local transport' do
+      let(:data) {
+        { 'nodes' => [{
+          'name' => 'localhost',
+          'config' => {
+            'transport' => 'ssh',
+            'ssh' => {
+              'interpreters' => { '.rb' => '/foo/ruby' }
+            }
+          }
+        }] }
+      }
+      let(:inventory) { Bolt::Inventory.new(data) }
+      it 'does not set magic config' do
+        target = get_target(inventory, 'localhost')
+        expect(target.protocol).to eq('ssh')
+        expect(target.options['interpreters']).to include('.rb' => '/foo/ruby')
+        expect(target.features).to include('puppet-agent')
+      end
+    end
+  end
 end

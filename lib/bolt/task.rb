@@ -72,9 +72,9 @@ module Bolt
 
     # Returns a hash of implementation name, path to executable, input method (if defined),
     # and any additional files (name and path)
-    def select_implementation(target, additional_features = [])
+    def select_implementation(target, provided_features = [])
       impl = if (impls = implementations)
-               available_features = target.features + additional_features
+               available_features = target.features + provided_features
                impl = impls.find do |imp|
                  remote_impl = imp['remote']
                  remote_impl = metadata['remote'] if remote_impl.nil?
