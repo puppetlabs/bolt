@@ -191,6 +191,21 @@ describe "passes parsed AST to the apply_catalog task" do
           'hiera-config' => File.join(__dir__, '../fixtures/apply/hiera_invalid.yaml').to_s
         }
       }
+      let(:eyaml_config) {
+        {
+          "version" => 5,
+          "defaults" => { "data_hash" => "yaml_data", "datadir" => File.join(__dir__, '../fixtures/apply/data').to_s },
+          "hierarchy" => [{
+            "name" => "Encrypted Data",
+            "lookup_key" => "eyaml_lookup_key",
+            "paths" => ["secure.eyaml"],
+            "options" => {
+              "pkcs7_private_key" => File.join(__dir__, '../fixtures/keys/private_key.pkcs7.pem').to_s,
+              "pkcs7_public_key" => File.join(__dir__, '../fixtures/keys/public_key.pkcs7.pem').to_s
+            }
+          }]
+        }
+      }
 
       it 'default datadir is accessible' do
         with_tempfile_containing('conf', YAML.dump(default_datadir)) do |conf|
@@ -205,6 +220,17 @@ describe "passes parsed AST to the apply_catalog task" do
           result = run_cli_json(%W[plan run basic::hiera_lookup --configfile #{conf.path}] + config_flags)
           notify = get_notifies(result)
           expect(notify[0]['title']).to eq("hello custom datadir")
+        end
+      end
+
+      it 'hiera eyaml can be decoded' do
+        with_tempfile_containing('yaml', YAML.dump(eyaml_config)) do |yaml_data|
+          config = { 'hiera-config' => yaml_data.path.to_s }
+          with_tempfile_containing('conf', YAML.dump(config)) do |conf|
+            result = run_cli_json(%W[plan run basic::hiera_lookup --configfile #{conf.path}] + config_flags)
+            notify = get_notifies(result)
+            expect(notify[0]['title']).to eq("hello encrypted value")
+          end
         end
       end
 
