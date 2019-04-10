@@ -283,3 +283,7 @@ To disable the collection of analytics data add the following line to `~/.puppe
 ```
 disabled: true
 ```
+
+## Have Questions?
+
+Get in touch! We're in `#bolt` on the [Puppet community Slack](https://slack.puppet.com/).

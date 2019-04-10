@@ -71,6 +71,10 @@ Bolt is an open source task runner that automates the manual work that you do to
 
  -   **Share and contribute**
 
+[Join us on Slack](https://slack.puppet.com/) - Join the `#bolt` channel in the [Puppet community Slack](https://slack.puppet.com/)
+
+[Follow us on Twitter](https://twitter.com/puppetize/)
+
 [Engage with the Puppet community](https://puppet.com/community) - Share what you know and get help from other users and employees.
 
 [Puppet Forge](https://forge.puppet.com) - Find modules you can use, and contribute modules you've made to the community.
