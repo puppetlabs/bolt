@@ -5,7 +5,7 @@ forge "http://forge.puppetlabs.com"
 moduledir File.join(File.dirname(__FILE__), 'modules')
 
 # Core modules used by 'apply'
-mod 'puppetlabs-service', '0.5.0'
+mod 'puppetlabs-service', '0.6.0'
 mod 'puppetlabs-facts', '0.5.0'
 mod 'puppet_agent',
     git: 'https://github.com/puppetlabs/puppetlabs-puppet_agent',
@@ -24,7 +24,7 @@ mod 'puppetlabs-yumrepo_core', '1.0.1'
 mod 'puppetlabs-zone_core', '1.0.1'
 
 # Useful additional modules
-mod 'puppetlabs-package', '0.4.1'
+mod 'puppetlabs-package', '0.5.0'
 mod 'puppetlabs-puppet_conf', '0.3.0'
 mod 'puppetlabs-python_task_helper', '0.2.0'
 mod 'puppetlabs-reboot', '2.1.2'
