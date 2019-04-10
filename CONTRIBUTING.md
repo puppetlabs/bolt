@@ -2,7 +2,7 @@
 
 ## Bolt Community Slack Channel 
 
-Join the `#bolt` channel in the [puppet community slack instance](https://slack.puppet.com/) where Bolt developers and community members who use and contribute to Bolt discuss the tool. Another channel of interest is the `#office-hours` where once a week a Bolt developer leads a Q&A session about using Bolt.
+Join the `#bolt` channel in the [Puppet community Slack](https://slack.puppet.com/) where Bolt developers and community members who use and contribute to Bolt discuss the tool. Another channel of interest is the `#office-hours` where once a week a Bolt developer leads a Q&A session about using Bolt.
 
 ## Issues
 

@@ -50,6 +50,10 @@ Additionally the Bolt project includes:
     * [Writing Plans](https://puppet.com/docs/bolt/latest/writing_plans.html)
 * [Applying Manifest Blocks in Plans](https://puppet.com/docs/bolt/latest/applying_manifest_blocks.html)
 
+## Getting Help
+
+* [#bolt on Slack](https://slack.puppet.com/) - Join the Bolt developers and community
+
 ## Kudos
 
 Thank you to [Marcin Bunsch](https://github.com/marcinbunsch) for allowing Puppet to use the `bolt` gem name.
