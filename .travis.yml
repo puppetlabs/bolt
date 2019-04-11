@@ -17,9 +17,6 @@ before_script:
 - cat Gemfile.lock
 - bundle exec r10k puppetfile install
   # Add users to test sudo on localhost
-- sudo groupadd bolt
-- sudo useradd -g bolt bolt
-- echo 'bolt:bolt' | sudo chpasswd
 - echo 'travis:travis' | sudo chpasswd
   # Undo travis sudoers config
 - sudo sh -c "echo 'Defaults authenticate' >> /etc/sudoers"
