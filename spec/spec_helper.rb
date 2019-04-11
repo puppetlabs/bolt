@@ -36,6 +36,7 @@ RSpec.configure do |config|
     # ...rather than:
     #     # => "be bigger than 2"
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true
+    expectations.max_formatted_output_length = 500
   end
 
   config.filter_run_excluding appveyor_agents: true unless ENV['APPVEYOR_AGENTS']

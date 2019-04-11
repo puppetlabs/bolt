@@ -12,26 +12,23 @@ module Bolt
           @evaluator = Puppet::Pops::Parser::EvaluatingParser.new
         end
 
-        STEP_KEYS = %w[task command eval script source plan].freeze
-
         def dispatch_step(scope, step)
-          step = evaluate_code_blocks(scope, step)
-
-          step_type = STEP_KEYS.find { |key| step.key?(key) }
+          step_type = step.type
+          step_body = evaluate_code_blocks(scope, step.body)
 
           case step_type
           when 'task'
-            task_step(scope, step)
+            task_step(scope, step_body)
           when 'command'
-            command_step(scope, step)
+            command_step(scope, step_body)
           when 'plan'
-            plan_step(scope, step)
+            plan_step(scope, step_body)
           when 'script'
-            script_step(scope, step)
+            script_step(scope, step_body)
           when 'source'
-            upload_file_step(scope, step)
+            upload_file_step(scope, step_body)
           when 'eval'
-            eval_step(scope, step)
+            eval_step(scope, step_body)
           end
         end
 
@@ -107,7 +104,7 @@ module Bolt
             plan.steps.each do |step|
               step_result = dispatch_step(scope, step)
 
-              scope.setvar(step['name'], step_result) if step.key?('name')
+              scope.setvar(step.name, step_result) if step.name
             end
 
             evaluate_code_blocks(scope, plan.return)

@@ -30,7 +30,7 @@ module Bolt
     COMMANDS = { 'command' => %w[run],
                  'script' => %w[run],
                  'task' => %w[show run],
-                 'plan' => %w[show run],
+                 'plan' => %w[show run convert],
                  'file' => %w[upload],
                  'puppetfile' => %w[install show-modules],
                  'apply' => %w[] }.freeze
@@ -119,7 +119,10 @@ module Bolt
       # After this step
       # options[:target_args] will contain a string/array version of the targetting options this is passed to plans
       # options[:targets] will contain a resolved set of Target objects
-      unless options[:subcommand] == 'puppetfile' || options[:action] == 'show'
+      unless options[:subcommand] == 'puppetfile' ||
+             options[:action] == 'show' ||
+             options[:action] == 'convert'
+
         update_targets(options)
       end
 
@@ -242,6 +245,11 @@ module Bolt
           "Exiting after receiving SIG#{Signal.signame(signo)} signal.#{message ? ' ' + message : ''}"
         )
         exit!
+      end
+
+      if options[:action] == 'convert'
+        convert_plan(options[:object])
+        return 0
       end
 
       @analytics = Bolt::Analytics.build_client
@@ -454,6 +462,10 @@ module Bolt
 
     def pal
       @pal ||= Bolt::PAL.new(config.modulepath, config.hiera_config, config.compile_concurrency)
+    end
+
+    def convert_plan(plan)
+      pal.convert_plan(plan)
     end
 
     def validate_file(type, path, allow_dir = false)
