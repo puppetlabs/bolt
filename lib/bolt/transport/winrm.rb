@@ -10,7 +10,7 @@ module Bolt
       def self.options
         %w[
           host port user password connect-timeout ssl ssl-verify tmpdir
-          cacert extensions interpreters file-protocol smb-port
+          cacert extensions interpreters file-protocol smb-port realm
         ]
       end
 

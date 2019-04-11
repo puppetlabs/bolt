@@ -15,7 +15,7 @@ module Bolt
           raise Bolt::ValidationError, "Target #{target.name} does not have a host" unless target.host
           @target = target
 
-          default_port = target.options['ssl'] ? HTTPS_PORT : HTTP_PORT
+          default_port = target.options['ssl'] && target.options['realm'].nil? ? HTTPS_PORT : HTTP_PORT
           @port = @target.port || default_port
           @user = @target.user
           # Build set of extensions from extensions config as well as interpreters
@@ -31,20 +31,30 @@ module Bolt
         HTTPS_PORT = 5986
 
         def connect
-          if target.options['ssl']
+          if target.options['realm']
+            scheme = 'http'
+            transport = :kerberos
+            user = ''
+            password = ''
+          elsif target.options['ssl']
             scheme = 'https'
             transport = :ssl
+            user = @user
+            password = target.password
           else
             scheme = 'http'
             transport = :negotiate
+            user = @user
+            password = target.password
           end
           endpoint = "#{scheme}://#{target.host}:#{@port}/wsman"
           options = { endpoint: endpoint,
-                      user: @user,
-                      password: target.password,
+                      user: user,
+                      password: password,
                       retry_limit: 1,
                       transport: transport,
                       ca_trust_path: target.options['cacert'],
+                      realm: target.options['realm'],
                       no_ssl_peer_verification: !target.options['ssl-verify'] }
 
           Timeout.timeout(target.options['connect-timeout']) do

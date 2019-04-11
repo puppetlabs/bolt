@@ -191,6 +191,9 @@ Usage: bolt apply <manifest.pp> [options]
       define('--[no-]ssl-verify', 'Verify remote host SSL certificate with WinRM') do |ssl_verify|
         @options[:'ssl-verify'] = ssl_verify
       end
+      define('--realm REALM', 'Kerberos realm for WinRM authentication') do |realm|
+        @options[:realm] = realm
+      end
 
       separator 'Escalation:'
       define('--run-as USER', 'User to run as using privilege escalation') do |user|
