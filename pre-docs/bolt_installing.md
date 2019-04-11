@@ -2,6 +2,8 @@
 
 Packaged versions of Bolt are available for many modern Linux distributions, as well as macOS and Windows.
 
+Have Questions? Get in touch. We're in `#bolt` on the [Puppet community Slack](https://slack.puppet.com/).
+
 **Tip:** Bolt uses an internal version of Puppet that supports tasks and plans, so you do not need to install Puppet. If you use Bolt on a machine that has Puppet installed, then Bolt uses its internal version of Puppet and does not conflict with the Puppet version you have installed.
 
 **Note:** Bolt automatically collects data about how you use it. If you want to opt out of providing this data, you can do so. For more information see, [Analytics data collection](bolt_installing.md#)
@@ -284,6 +286,3 @@ To disable the collection of analytics data add the following line to `~/.puppe
 disabled: true
 ```
 
-## Have Questions?
-
-Get in touch! We're in `#bolt` on the [Puppet community Slack](https://slack.puppet.com/).
