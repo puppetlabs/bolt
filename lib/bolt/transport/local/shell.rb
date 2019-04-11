@@ -103,6 +103,10 @@ module Bolt
           # handle_sudo will return the line if it is not a sudo prompt or error
           lines.map! { |line| handle_sudo(inp, line, pid) }
           lines.join("")
+        # If stream has reached EOF, no password prompt is expected
+        # return an empty string
+        rescue EOFError
+          ''
         end
 
         def execute(command, sudoable: true, **options)
@@ -152,7 +156,7 @@ module Bolt
             read_streams[err] << check_sudo(err, inp, t.pid) if ready_read
           end
 
-          # True while the thread is running or waiting for IO input
+          # True while the process is running or waiting for IO input
           while t.alive?
             # See if we can read from out or err, or write to in
             ready_read, ready_write, = select(read_streams.keys, write_stream, nil, timeout)
@@ -179,14 +183,20 @@ module Bolt
                          !ready_write.nil?
                        end
 
-            if writable && index < in_buffer.length
-              to_print = in_buffer[index..-1]
-              written = inp.write_nonblock to_print
-              index += written
-            end
+            begin
+              if writable && index < in_buffer.length
+                to_print = in_buffer[index..-1]
+                written = inp.write_nonblock to_print
+                index += written
 
-            if index >= in_buffer.length && !write_stream.empty?
-              inp.close
+                if index >= in_buffer.length && !write_stream.empty?
+                  inp.close
+                  write_stream = []
+                end
+              end
+              # If a task has stdin as an input_method but doesn't actually
+              # read from stdin, the task may return and close the input stream
+            rescue Errno::EPIPE
               write_stream = []
             end
           end
