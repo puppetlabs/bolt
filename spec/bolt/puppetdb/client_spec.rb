@@ -108,15 +108,15 @@ describe Bolt::PuppetDB::Client do
 
     it 'should fail after all servers fail' do
       conf = pdb_conf
-      conf['server_urls'] = ['https://bad_host1.dne.com', 'https://bad_host2.dne.com']
+      conf['server_urls'] = ['https://bad1.example.com', 'https://bad2.example.com']
       client = Bolt::PuppetDB::Client.new(Bolt::PuppetDB::Config.new(conf))
-      msg = "Failed to connect to all PuppetDB server_urls: https://bad_host1.dne.com, https://bad_host2.dne.com."
+      msg = "Failed to connect to all PuppetDB server_urls: https://bad1.example.com, https://bad2.example.com."
       expect { client.facts_for_node(%w[node1 node2]) }.to raise_error(Bolt::PuppetDBError, msg)
     end
 
     it 'should failover if the first server fails' do
       conf = pdb_conf
-      conf['server_urls'] = ['https://bad_host.dne.com', pdb_conf['server_urls']]
+      conf['server_urls'] = ['https://bad.example.com', pdb_conf['server_urls']]
       client = Bolt::PuppetDB::Client.new(Bolt::PuppetDB::Config.new(conf))
       facts = client.facts_for_node(%w[node1 node2])
       expect(facts).to eq(facts_hash)
