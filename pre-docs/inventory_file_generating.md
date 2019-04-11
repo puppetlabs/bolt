@@ -4,7 +4,10 @@ Use the `bolt-inventory-pdb` script to generate inventory files based on PuppetD
 
 ## Usage
 
-The `bolt-inventory-pdb` script accepts a single argument: the path of the source file used to generate the inventory file. It queries PuppetDB to resolve node lists and prints inventory yaml output to stdout or to a file you specify with the `-o` flag.
+The `bolt-inventory-pdb` script accepts a single argument: the path of the
+source file used to generate the inventory file. It queries PuppetDB to resolve
+node lists and prints inventory yaml output to stdout or to a file you specify
+with the `-o` flag.
 
 ```
 bolt-inventory-pdb pdb.yaml -o ~/.puppetlabs/bolt/inventory.yaml
@@ -16,20 +19,19 @@ For full usage information, type `bolt-inventory-pdb --help`.
 
 The `bolt-inventory-pdb` script uses the configuration file `puppetdb.conf`, which is stored at:
 
--    **\*nix systems** `$HOME/.puppetlabs/client-tools/puppetdb.conf` 
+-    **\*nix systems** `$HOME/.puppetlabs/client-tools/puppetdb.conf`
 
--    **Windows** `%USERPROFILE%\.puppetlabs\client-tools\puppetdb.conf` 
+-    **Windows** `%USERPROFILE%\.puppetlabs\client-tools\puppetdb.conf`
 
 
 **Note:** The precedence used to load puppetdb config is:
 
 1.   `configfile` \(optionally specified with `--configfile`\)
-2.   `$HOME/.puppetlabs/client-tools/puppetdb.conf` 
+2.   `$HOME/.puppetlabs/client-tools/puppetdb.conf`
 3.   `/etc/puppetlabs/client-tools/puppetdb.conf` \(Windows: `C:\ProgramData\PuppetLabs\client-tools\puppetdb.conf`\)
 
- `bolt-inventory-pdb` requires the following file settings:
+ `bolt-inventory-pdb` configuration can also be passed on the commandline. The following settings are required:
 
--    `--token-file` The path to the PE Authorization token.
 
 -    `--cacert` The path for the certification authority \(CA\) certificate.
 
@@ -38,6 +40,15 @@ The `bolt-inventory-pdb` script uses the configuration file `puppetdb.conf`, whi
     Windows - C:\\ProgramData\\PuppetLabs\\puppet\\etc\\ssl\\certs\\ca.pem
 
 -    `--url` The URL of your PuppetDB server.
+
+One of the following authentication methods is required
+
+-    `--token-file` The path to the PE Authorization token.
+
+or
+
+-    `--cert` The path to a client ssl certificate to authenticate with.
+-    `--key`  The private key for that certificate.
 
 
 ```
@@ -52,10 +63,10 @@ The `bolt-inventory-pdb` tool generates an inventory file from a source yaml fil
 query: "nodes[certname] {}"
 groups:
 - name: windows
-query: "inventory[certname] { facts.osfamily = 'windows' }"
-config:
-transport: winrm
+  query: "inventory[certname] { facts.osfamily = 'windows' }"
+  config:
+    transport: winrm
 - name: basil
-query: "nodes[certname] { certname ~ '^basil' }"
+  query: "nodes[certname] { certname ~ '^basil' }"
 ```
 
