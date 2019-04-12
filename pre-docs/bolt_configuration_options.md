@@ -27,7 +27,7 @@ ssh:
 
 `hiera-config`: Specify the path to your Hiera config. The default path for the Hiera config file is `hiera.yaml` inside the Bolt project directory.
 
-`interpreters`: A map of an extension name to the absolute path of an executable, enabling you to override the shebang defined in a task executable. The extension can optionally be specified with the '.' character ('.py' and 'py' both map to a task executable `task.py`) and the extension is case sensitive. The transports that support interpreter configuration are `docker`, `local`, `ssh`, and `winrm`. The local transport defaults to using the ruby interpreter that is running Bolt. For example:
+`interpreters`: A map of an extension name to the absolute path of an executable, enabling you to override the shebang defined in a task executable. The extension can optionally be specified with the '.' character ('.py' and 'py' both map to a task executable `task.py`) and the extension is case sensitive. The transports that support interpreter configuration are `docker`, `local`, `ssh`, and `winrm`. When a node's name is `localhost` ruby tasks are run with Bolt's ruby interpreter by default. The following example demonstrates configuring python tasks to be run with a python3 interpreter:
 
 ```
 interpreters:
