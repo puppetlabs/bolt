@@ -31,8 +31,8 @@ module Bolt
   end
 
   class Config
-    attr_accessor :concurrency, :format, :trace, :log, :puppetdb, :color,
-                  :transport, :transports, :inventoryfile, :compile_concurrency
+    attr_accessor :concurrency, :format, :trace, :log, :puppetdb, :color, :save_rerun,
+                  :transport, :transports, :inventoryfile, :compile_concurrency, :boltdir
     attr_writer :modulepath
 
     TRANSPORT_OPTIONS = %i[password run-as sudo-password extensions
@@ -65,6 +65,7 @@ module Bolt
       @format = 'human'
       @puppetdb = {}
       @color = true
+      @save_rerun = true
 
       # add an entry for the default console logger
       @log = { 'console' => {} }
@@ -147,6 +148,8 @@ module Bolt
       @hiera_config = File.expand_path(data['hiera-config'], @boltdir.path) if data.key?('hiera-config')
       @compile_concurrency = data['compile-concurrency'] if data.key?('compile-concurrency')
 
+      @save_rerun = data['save-rerun'] if data.key?('save-rerun')
+
       %w[concurrency format puppetdb color transport].each do |key|
         send("#{key}=", data[key]) if data.key?(key)
       end
@@ -167,6 +170,8 @@ module Bolt
       %i[concurrency transport format trace modulepath inventoryfile color].each do |key|
         send("#{key}=", options[key]) if options.key?(key)
       end
+
+      @save_rerun = options[:'save-rerun'] if options.key?(:'save-rerun')
 
       if options[:debug]
         @log['console'][:level] = :debug
@@ -213,6 +218,10 @@ module Bolt
 
     def default_inventoryfile
       [@boltdir.inventory_file]
+    end
+
+    def rerunfile
+      @boltdir.rerunfile
     end
 
     def hiera_config

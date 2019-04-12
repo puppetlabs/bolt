@@ -6,7 +6,7 @@ module Bolt
   class Boltdir
     BOLTDIR_NAME = 'Boltdir'
 
-    attr_reader :path, :config_file, :inventory_file, :modulepath, :hiera_config, :puppetfile
+    attr_reader :path, :config_file, :inventory_file, :modulepath, :hiera_config, :puppetfile, :rerunfile
 
     def self.default_boltdir
       Boltdir.new(File.join('~', '.puppetlabs', 'bolt'))
@@ -36,6 +36,7 @@ module Bolt
       @modulepath = [(@path + 'modules').to_s, (@path + 'site-modules').to_s, (@path + 'site').to_s]
       @hiera_config = @path + 'hiera.yaml'
       @puppetfile = @path + 'Puppetfile'
+      @rerunfile = @path + '.rerun.json'
     end
 
     def to_s

@@ -91,7 +91,9 @@ module Bolt
     end
 
     def status_hash
+      # DEPRECATION: node in status hashes is deprecated and should be removed in 2.0
       { node: @target.name,
+        target: @target.name,
         type: type,
         object: object,
         status: ok? ? 'success' : 'failure',

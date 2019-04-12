@@ -27,7 +27,7 @@ ssh:
 
 `hiera-config`: Specify the path to your Hiera config. The default path for the Hiera config file is `hiera.yaml` inside the Bolt project directory.
 
-`interpreters`: A map of an extension name to the absolute path of an executable, enabling you to override the shebang defined in a task executable. The extension can optionally be specified with the '.' character ('.py' and 'py' both map to a task executable `task.py`) and the extension is case sensitive. The transports that support interpreter configuration are `docker`, `local`, `ssh`, and `winrm`. The local transport defaults to using the ruby interpreter that is running Bolt. For example: 
+`interpreters`: A map of an extension name to the absolute path of an executable, enabling you to override the shebang defined in a task executable. The extension can optionally be specified with the '.' character ('.py' and 'py' both map to a task executable `task.py`) and the extension is case sensitive. The transports that support interpreter configuration are `docker`, `local`, `ssh`, and `winrm`. The local transport defaults to using the ruby interpreter that is running Bolt. For example:
 
 ```
 interpreters:
@@ -40,6 +40,9 @@ interpreters:
 
 `transport`: Specify the default transport to use when the transport for a target is not specified in the url or inventory. The valid options for transport are `docker`, `local`, `pcp`, `ssh`, and `winrm`.
 
+`save-rerun`: Whether bolt should update `.rerun.json` in the Bolt project
+directory. If your target names include passwords you should set this to false
+to avoid writing them to disk.
 
 ## SSH transport configuration options
 
@@ -61,7 +64,7 @@ interpreters:
 
 `sudo-password`: Password to use when changing users via `run-as`.
 
-`tmpdir`: The directory to upload and execute temporary files on the target. 
+`tmpdir`: The directory to upload and execute temporary files on the target.
 
 `user`: Login user. Default is `root`.
 

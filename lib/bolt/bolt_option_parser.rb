@@ -149,6 +149,12 @@ Usage: bolt apply <manifest.pp> [options]
       @query = define('-q', '--query QUERY', 'Query PuppetDB to determine the targets') do |query|
         @options[:query] = query
       end.extend(SwitchHider)
+      @rerun = define('--rerun FILTER', 'Retry on nodes from the last run',
+                      "'all' all nodes that were part of the last run.",
+                      "'failure' nodes that failed in the last run.",
+                      "'success' nodes that succeeded in the last run.") do |rerun|
+        @options[:rerun] = rerun
+      end.extend(SwitchHider)
       define('--noop', 'Execute a task that supports it in noop mode') do |_|
         @options[:noop] = true
       end
@@ -238,6 +244,9 @@ Usage: bolt apply <manifest.pp> [options]
         end
         @options[:inventoryfile] = File.expand_path(path)
       end
+      define('--[no-]save-rerun', 'Whether to update the rerun file after this command.') do |save|
+        @options[:'save-rerun'] = save
+      end
 
       separator 'Transports:'
       define('--transport TRANSPORT', TRANSPORTS.keys.map(&:to_s),
@@ -282,16 +291,14 @@ Usage: bolt apply <manifest.pp> [options]
     end
 
     def update
-      # show the --nodes and --query switches by default
-      @nodes.hide = @query.hide = false
+      # show the --nodes, --query, and --rerun switches by default
+      @nodes.hide = @query.hide = @rerun.hide = false
       # Don't show the --execute switch except for `apply`
       @execute.hide = true
 
       # Update the banner according to the subcommand
       self.banner = case @options[:subcommand]
                     when 'plan'
-                      # don't show the --nodes and --query switches in the plan help
-                      @nodes.hide = @query.hide = true
                       PLAN_HELP
                     when 'command'
                       COMMAND_HELP
@@ -302,6 +309,8 @@ Usage: bolt apply <manifest.pp> [options]
                     when 'file'
                       FILE_HELP
                     when 'puppetfile'
+                      # Don't show targeting options for puppetfile
+                      @nodes.hide = @query.hide = @rerun.hide = true
                       PUPPETFILE_HELP
                     when 'apply'
                       @execute.hide = false
