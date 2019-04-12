@@ -224,7 +224,7 @@ The set of features available on the target is determined by the task runner. Yo
 
 The following features are defined by default:
 
--   `puppet-agent`: present if the target has the puppet agent package installed
+-   `puppet-agent`: present if the target has the puppet agent package installed. This is automatically added to hosts with name `localhost`.
 -   `shell`: present if the target has a posix shell
 -   `powershell`: present if the target has powershell
 
