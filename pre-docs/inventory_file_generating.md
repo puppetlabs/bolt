@@ -43,12 +43,8 @@ The `bolt-inventory-pdb` script uses the configuration file `puppetdb.conf`, whi
 
 One of the following authentication methods is required
 
--    `--token-file` The path to the PE Authorization token.
-
-or
-
--    `--cert` The path to a client ssl certificate to authenticate with.
--    `--key`  The private key for that certificate.
+-    `--token-file` The path to the PE authorization token.
+-    `--cert` and `--key` The path to a client ssl certificate, and the private key for that certificate.
 
 
 ```
