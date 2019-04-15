@@ -7,9 +7,8 @@ steps:
     source: 'yaml/test.sh'
     destination: '/tmp/test_upload.sh'
     target: $nodes
-    arguments: ["foo", "bar", "baz"]
   - name: cleanup
-    eval: rm '/tmp/test_upload.sh'
+    command: rm '/tmp/test_upload.sh'
     target: $nodes
 
 return: $upload_file

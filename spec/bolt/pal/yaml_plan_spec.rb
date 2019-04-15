@@ -78,6 +78,15 @@ describe Bolt::PAL::YamlPlan do
         expect { plan }.to raise_error(Bolt::Error, /Invalid parameter name "foo-bar"/)
       end
 
+      it 'fails if a parameters is not a hash' do
+        @plan_body = {
+          'parameters' => nil,
+          'steps' => []
+        }
+
+        expect { plan }.to raise_error(Bolt::Error, /Plan parameters must be a Hash/)
+      end
+
       it 'fails if a step has the same name as a parameter' do
         @plan_body = {
           'parameters' => { 'foo' => {} },
@@ -85,7 +94,21 @@ describe Bolt::PAL::YamlPlan do
                         'eval' => '$foo' }]
         }
 
-        expect { plan }.to raise_error(Bolt::Error, /Step name "foo" matches an existing parameter or step name/)
+        expect { plan }.to raise_error do |error|
+          expect(error.kind).to eq('bolt/invalid-plan')
+          expect(error.message).to match(/Parse error in step number 1 with name \"foo\"/)
+          expect(error.message).to match(/Duplicate step name or parameter detected: \"foo\"/)
+        end
+      end
+
+      it 'fails if invalid top level key is specified' do
+        @plan_body = {
+          'parameters' => { 'foo' => {} },
+          'steps' => [],
+          'foo' => 'bar'
+        }
+
+        expect { plan }.to raise_error(Bolt::Error, /Plan contains illegal key\(s\) \[\"foo\"\]/)
       end
 
       it 'fails if two steps have the same name' do
@@ -98,7 +121,11 @@ describe Bolt::PAL::YamlPlan do
           ]
         }
 
-        expect { plan }.to raise_error(Bolt::Error, /Step name "foo" matches an existing parameter or step name/)
+        expect { plan }.to raise_error do |error|
+          expect(error.kind).to eq('bolt/invalid-plan')
+          expect(error.message).to match(/Parse error in step number 2 with name \"foo\"/)
+          expect(error.message).to match(/Duplicate step name or parameter detected: \"foo\"/)
+        end
       end
 
       it 'fails if a step has a name that is not a valid variable name' do
@@ -109,7 +136,59 @@ describe Bolt::PAL::YamlPlan do
           ]
         }
 
-        expect { plan }.to raise_error(Bolt::Error, /Invalid step name "foo-bar"/)
+        expect { plan }.to raise_error do |error|
+          expect(error.kind).to eq('bolt/invalid-plan')
+          expect(error.message).to match(/Parse error in step number 1 with name \"foo-bar\"/)
+          expect(error.message).to match(/Invalid step name: \"foo-bar\"/)
+        end
+      end
+
+      it 'fails if a step has multiple action keys' do
+        @plan_body = {
+          'steps' => [
+            { 'name' => 'foo-bar',
+              'eval' => '$foo',
+              'task' => 'foo' }
+          ]
+        }
+
+        expect { plan }.to raise_error do |error|
+          expect(error.kind).to eq('bolt/invalid-plan')
+          expect(error.message).to match(/Parse error in step number 1 with name \"foo-bar\"/)
+          expect(error.message).to match(/Multiple action keys detected: \[\"task\", \"eval\"\]/)
+        end
+      end
+
+      it 'fails if a step has illegal keys' do
+        @plan_body = {
+          'steps' => [
+            { 'description' => 'foo-bar',
+              'eval' => '$foo',
+              'bar' => 'foo' }
+          ]
+        }
+
+        expect { plan }.to raise_error do |error|
+          expect(error.kind).to eq('bolt/invalid-plan')
+          expect(error.message).to match(/Parse error in step number 1/)
+          expect(error.message).to match(/The \"eval\" step does not support: \[\"bar\"\] key\(s\)/)
+        end
+      end
+
+      it 'fails if a step is missing keys' do
+        @plan_body = {
+          'steps' => [
+            { 'description' => 'foo-bar',
+              'task' => '$foo',
+              'name' => 'foo' }
+          ]
+        }
+
+        expect { plan }.to raise_error do |error|
+          expect(error.kind).to eq('bolt/invalid-plan')
+          expect(error.message).to match(/Parse error in step number 1 with name \"foo\"/)
+          expect(error.message).to match(/The \"task\" step requires: \[\"target\"\] key\(s\)/)
+        end
       end
 
       it 'fails if the steps list is not an array' do
