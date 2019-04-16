@@ -5,6 +5,13 @@ require 'bolt/inventory/group2'
 module Bolt
   class Inventory
     class Inventory2
+      # This uses "targets" in the message instead of "nodes"
+      class WildcardError < Bolt::Error
+        def initialize(target)
+          super("Found 0 targets matching wildcard pattern #{target}", 'bolt.inventory/wildcard-error')
+        end
+      end
+
       def initialize(data, config = nil, target_vars: {}, target_facts: {}, target_features: {})
         @logger = Logging.logger[self]
         # Config is saved to add config options to targets
@@ -16,7 +23,7 @@ module Bolt
         @target_facts = target_facts
         @target_features = target_features
 
-        @groups.resolve_aliases(@groups.node_aliases, @groups.node_names)
+        @groups.resolve_aliases(@groups.target_aliases, @groups.target_names)
         collect_groups
       end
 
@@ -33,9 +40,11 @@ module Bolt
         @group_lookup.keys
       end
 
-      def node_names
-        @groups.node_names
+      def target_names
+        @groups.target_names
       end
+      # alias for analytics
+      alias node_names target_names
 
       def get_targets(targets)
         targets = expand_targets(targets)
@@ -51,9 +60,9 @@ module Bolt
         if group_names.include?(desired_group)
           targets.each do |target|
             if group_names.include?(target.name)
-              raise ValidationError.new("Group #{target.name} conflicts with node of the same name", target.name)
+              raise ValidationError.new("Group #{target.name} conflicts with target of the same name", target.name)
             end
-            add_node(@groups, target, desired_group)
+            add_target(@groups, target, desired_group)
           end
         else
           raise ValidationError.new("Group #{desired_group} does not exist in inventory", nil)
@@ -106,8 +115,8 @@ module Bolt
       #### PRIVATE ####
       #
       # For debugging only now
-      def groups_in(node_name)
-        @groups.data_for(node_name)['groups'] || {}
+      def groups_in(target_name)
+        @groups.data_for(target_name)['groups'] || {}
       end
       private :groups_in
 
@@ -145,25 +154,25 @@ module Bolt
       private :update_target
 
       # If target is a group name, expand it to the members of that group.
-      # Else match against nodes in inventory by name or alias.
+      # Else match against targets in inventory by name or alias.
       # If a wildcard string, error if no matches are found.
       # Else fall back to [target] if no matches are found.
       def resolve_name(target)
         if (group = @group_lookup[target])
-          group.node_names
+          group.target_names
         else
-          # Try to wildcard match nodes in inventory
+          # Try to wildcard match targets in inventory
           # Ignore case because hostnames are generally case-insensitive
           regexp = Regexp.new("^#{Regexp.escape(target).gsub('\*', '.*?')}$", Regexp::IGNORECASE)
 
-          nodes = @groups.node_names.select { |node| node =~ regexp }
-          nodes += @groups.node_aliases.select { |target_alias, _node| target_alias =~ regexp }.values
+          targets = @groups.target_names.select { |targ| targ =~ regexp }
+          targets += @groups.target_aliases.select { |target_alias, _target| target_alias =~ regexp }.values
 
-          if nodes.empty?
+          if targets.empty?
             raise(WildcardError, target) if target.include?('*')
             [target]
           else
-            nodes
+            targets
           end
         end
       end
@@ -208,12 +217,15 @@ module Bolt
       end
       private :set_facts
 
-      def add_node(current_group, target, desired_group, track = { 'all' => nil })
+      def add_target(current_group, target, desired_group, track = { 'all' => nil })
         if current_group.name == desired_group
           # Group to add to is found
           t_name = target.name
-          # Add target to nodes hash
-          current_group.nodes[t_name] = { 'name' => t_name }.merge(target.options)
+          # Add target to targets hash
+          target_hash = { 'name' => t_name }.merge(target.options)
+          target_hash['uri'] = target.uri if target.uri
+          current_group.targets[t_name] = target_hash
+
           # Inherit facts, vars, and features from hierarchy
           current_group_data = { facts: current_group.facts,
                                  vars: current_group.vars,
@@ -229,10 +241,10 @@ module Bolt
         # Recurse on children Groups if not desired_group
         current_group.groups.each do |child_group|
           track[child_group.name] = current_group
-          add_node(child_group, target, desired_group, track)
+          add_target(child_group, target, desired_group, track)
         end
       end
-      private :add_node
+      private :add_target
 
       def inherit_data(track, name, data)
         unless track[name].nil?
@@ -250,7 +262,7 @@ module Bolt
         name_opt = {}
         name_opt['name'] = data['name'] if data['name']
 
-        # If there is no name then this node was only referred to as a string.
+        # If there is no name then this target was only referred to as a string.
         uri = data['uri']
         uri ||= target_name unless data['name']
 

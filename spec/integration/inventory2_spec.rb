@@ -15,7 +15,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
   let(:conn) { conn_info('ssh') }
   let(:inventory) do
     { version: 2,
-      nodes: [
+      targets: [
         { uri: conn[:host],
           config: {
             transport: conn[:protocol],
@@ -40,7 +40,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
       ],
       groups: [{
         name: "group1",
-        nodes: [
+        targets: [
           conn[:host]
         ]
       }],
@@ -87,7 +87,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
       expect(result).to be
     end
 
-    context 'with a uriless node' do
+    context 'with a uriless target' do
       let(:target) { 'uriless' }
       it 'connects to run a command' do
         result = run_one_node(run_command)
@@ -142,7 +142,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
       end
 
       context 'with target not in inventory' do
-        let(:inventory) { {} }
+        let(:inventory) { { version: 2 } }
 
         it 'does not error when facts are retrieved' do
           expect(run_cli_json(var_plan('vars::emit'))).to eq("Vars for localhost: {}")
@@ -175,7 +175,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
       end
 
       context 'with target not in inventory' do
-        let(:inventory) { {} }
+        let(:inventory) { { version: 2 } }
 
         it 'does not error when facts are retrieved' do
           expect(run_cli_json(fact_plan('facts_test::emit'))).to eq("Facts for localhost: {}")
@@ -192,10 +192,11 @@ describe 'running with an inventory file', reset_puppet_settings: true do
     let(:conn) { conn_info('ssh') }
     let(:inventory) do
       {
+        version: 2,
         groups: [
           {
             name: 'foo',
-            nodes: [
+            targets: [
               {
                 name: 'foo_1'
               }
@@ -216,9 +217,9 @@ describe 'running with an inventory file', reset_puppet_settings: true do
             groups: [
               {
                 name: 'add_me',
-                nodes: [
+                targets: [
                   {
-                    name: conn[:host]
+                    uri: conn[:host]
                   }
                 ],
                 config: {
@@ -239,11 +240,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
           },
           {
             name: 'bar',
-            nodes: [
-              {
-                name: 'bar_1'
-              }
-            ],
+            targets: [],
             config: {
               transport: 'local'
             },
@@ -275,9 +272,12 @@ describe 'running with an inventory file', reset_puppet_settings: true do
                             'added_group' => 'keep' }
       expected_hash_post = expected_hash_pre.merge('override_parent' => 'keep', 'plan_context' => 'keep')
       result = run_cli_json(plan)
-      expect(result['addme_group'])
-        .to eq(["Target('#{conn[:host]}', {\"user\"=>\"#{conn[:user]}\", \"port\"=>#{conn[:port]}})",
-                "Target('0.0.0.0:20024', {\"user\"=>\"bolt\", \"port\"=>20022})"])
+      expect(result)
+        .to include(
+          'addme_group' =>
+            ["Target('#{conn[:host]}', {\"user\"=>\"#{conn[:user]}\", \"port\"=>#{conn[:port]}})",
+             "Target('0.0.0.0:20024', {\"user\"=>\"bolt\", \"port\"=>20022})"]
+        )
       expect(result['existing_facts']).to eq(expected_hash_pre)
       expect(result['existing_vars']).to eq(expected_hash_pre)
       expect(result['added_facts']).to eq(expected_hash_post)
@@ -297,7 +297,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
       plan = ['plan', 'run', 'add_group::x_fail_group_name_exists', '--nodes', 'add_me'] + config_flags
       result = run_cli_json(plan)
       expect(result['kind']).to eq('bolt.inventory/validation-error')
-      expect(result['msg']).to match(/Group foo conflicts with node of the same name for group/)
+      expect(result['msg']).to match(/Group foo conflicts with target of the same name for group/)
       expect(result['details']).to eq("path" => ["foo"])
     end
   end
@@ -319,8 +319,8 @@ describe 'running with an inventory file', reset_puppet_settings: true do
   context 'when running over remote', bash: true do
     let(:inventory) do
       { version: 2,
-        nodes: [
-          { name: 'remote_node',
+        targets: [
+          { name: 'remote_target',
             config: {
               transport: 'remote',
               remote: {
@@ -331,7 +331,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
     end
 
     it 'passes the correct host to the task' do
-      task = ['task', 'run', 'remote', '--nodes', 'remote_node'] + config_flags
+      task = ['task', 'run', 'remote', '--nodes', 'remote_target'] + config_flags
       result = run_one_node(task)
       expect(result['_target']).to include('host' => 'not.the.name')
     end
@@ -341,7 +341,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
     let(:shell_cmd) { "whoami" }
 
     let(:inventory) do
-      {}
+      { version: 2 }
     end
 
     let(:config_flags) {
@@ -379,7 +379,8 @@ describe 'running with an inventory file', reset_puppet_settings: true do
           # Ensure that we try to connect to a *closed* port, to avoid spurious "success"
           port = TCPServer.open(0) { |socket| socket.addr[1] }
           config = { transport: 'ssh', ssh: { port: port } }
-          { nodes: ['localhost'], config: config }
+          { version: 2,
+            targets: ['localhost'], config: config }
         end
 
         it 'fails to connect' do
@@ -393,7 +394,8 @@ describe 'running with an inventory file', reset_puppet_settings: true do
         let(:shell_cmd) { 'pwd' }
         let(:inventory) do
           {
-            nodes: ['localhost'],
+            version: 2,
+            targets: ['localhost'],
             config: {
               transport: 'local',
               local: { tmpdir: tmpdir }
@@ -412,12 +414,13 @@ describe 'running with an inventory file', reset_puppet_settings: true do
         end
       end
 
-      context 'with localhost specifying tmpdir via node' do
+      context 'with localhost specifying tmpdir via target' do
         let(:tmpdir) { '/tmp/foo' }
         let(:shell_cmd) { 'pwd' }
         let(:inventory) do
           {
-            nodes: [{
+            version: 2,
+            targets: [{
               name: 'localhost',
               config: {
                 transport: 'local',
