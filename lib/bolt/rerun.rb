@@ -47,12 +47,12 @@ module Bolt
         if result_set.is_a?(Bolt::ResultSet)
           data = result_set.map { |res| res.status_hash.select { |k, _| %i[target status].include? k } }
           File.write(@path, data.to_json)
-        else
+        elsif File.exist?(@path)
           FileUtils.rm(@path)
         end
       end
     rescue StandardError => e
-      @logger.warn("Failed to save failure to #{@path}: #{e.message}")
+      @logger.warn("Failed to save result to #{@path}: #{e.message}")
     end
   end
 end
