@@ -19,9 +19,9 @@ plan add_group (TargetSpec $nodes) {
   $add_me_targets = get_targets('add_me')
 
   $result = { 'addme_group' => $add_me_targets,
-			  'existing_facts' => $add_me_targets[0].facts,
+        'existing_facts' => $add_me_targets[0].facts,
 			  'existing_vars' => $add_me_targets[0].vars,
-			  'added_facts' => $add_me_targets[1].facts,
+        'added_facts' => $add_me_targets[1].facts,
 			  'added_vars' => $add_me_targets[1].vars,
 			  'target_from_string' => get_targets('bar'),
 			  'target_to_all_group' => get_targets('all')}
