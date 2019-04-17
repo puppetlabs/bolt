@@ -195,9 +195,9 @@ describe "Bolt::CLI" do
       end
 
       it "reads from stdin when --nodes is '-'" do
-        nodes = <<-'NODES'
-foo
-bar
+        nodes = <<~'NODES'
+         foo
+         bar
         NODES
         cli = Bolt::CLI.new(%w[command run --nodes -])
         allow(STDIN).to receive(:read).and_return(nodes)
@@ -206,9 +206,9 @@ bar
       end
 
       it "reads from a file when --nodes starts with @" do
-        nodes = <<-'NODES'
-foo
-bar
+        nodes = <<~'NODES'
+          foo
+          bar
         NODES
         with_tempfile_containing('nodes-args', nodes) do |file|
           cli = Bolt::CLI.new(%W[command run --nodes @#{file.path}])
@@ -245,7 +245,37 @@ bar
         cli = Bolt::CLI.new(%w[command run])
         expect {
           cli.parse
-        }.to raise_error(Bolt::CLIError, /Targets must be specified/)
+        }.to raise_error(Bolt::CLIError, /Command requires a targeting option/)
+      end
+    end
+
+    describe "targets" do
+      let(:targets) { [target, Bolt::Target.new('bar')] }
+
+      it "reads from a file when --nodes starts with @" do
+        nodes = <<~'NODES'
+          foo
+          bar
+        NODES
+        with_tempfile_containing('nodes-args', nodes) do |file|
+          cli = Bolt::CLI.new(%W[command run --targets @#{file.path}])
+          result = cli.parse
+          expect(result[:targets]).to eq(targets)
+        end
+      end
+
+      it "generates an error message if no targets are given" do
+        cli = Bolt::CLI.new(%w[command run --targets])
+        expect {
+          cli.parse
+        }.to raise_error(Bolt::CLIError, /Option '--targets' needs a parameter/)
+      end
+
+      it "generates an error if nodes and targets are specified" do
+        cli = Bolt::CLI.new(%w[command run --nodes foo --targets bar])
+        expect {
+          cli.parse
+        }.to raise_error(Bolt::CLIError, /Only one targeting option/)
       end
     end
 
@@ -644,14 +674,14 @@ bar
         cli.validate(result)
         cli.execute(result)
         expect(result[:targets]).to eq(targets)
-        expect(result[:nodes]).to eq(%w[foo bar])
+        expect(result[:target_args]).to eq(%w[foo bar])
       end
 
       it "fails when --nodes AND --query provided" do
         expect {
           cli = Bolt::CLI.new(%w[plan run foo --query nodes{} --nodes bar])
           cli.parse
-        }.to raise_error(Bolt::CLIError, /Only one of '--nodes'/)
+        }.to raise_error(Bolt::CLIError, /Only one targeting option/)
       end
 
       it "fails with --noop" do
@@ -1481,7 +1511,7 @@ bar
         let(:plan_params) { { 'nodes' => targets.map(&:host).join(',') } }
         let(:options) {
           {
-            nodes: [],
+            target_args: [],
             subcommand: 'plan',
             action: 'run',
             object: plan_name,
@@ -1498,7 +1528,7 @@ bar
 
         it "uses the nodes passed using the --nodes option(s) as the 'nodes' plan parameter" do
           plan_params.clear
-          options[:nodes] = targets.map(&:host)
+          options[:target_args] = targets.map(&:host)
 
           expect(executor)
             .to receive(:run_task)
@@ -1521,7 +1551,7 @@ bar
         end
 
         it "errors when the --nodes option(s) and the 'nodes' plan parameter are both specified" do
-          options[:nodes] = targets.map(&:host)
+          options[:target_args] = targets.map(&:host)
 
           expect { cli.execute(options) }.to raise_error(
             /A plan's 'nodes' parameter may be specified using the --nodes option, (?x:

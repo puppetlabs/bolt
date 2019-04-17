@@ -41,9 +41,7 @@ module Bolt
       @logger = Logging.logger[self]
       @argv = argv
       @config = Bolt::Config.default
-      @options = {
-        nodes: []
-      }
+      @options = {}
     end
 
     # Only call after @config has been initialized.
@@ -117,8 +115,11 @@ module Bolt
       Bolt::Logger.configure(config.log, config.color)
 
       # After validation, initialize inventory and targets. Errors here are better to catch early.
+      # After this step
+      # options[:target_args] will contain a string/array version of the targetting options this is passed to plans
+      # options[:targets] will contain a resolved set of Target objects
       unless options[:subcommand] == 'puppetfile' || options[:action] == 'show'
-        options[:targets] = get_targets(options)
+        update_targets(options)
       end
 
       options
@@ -127,23 +128,24 @@ module Bolt
       raise e
     end
 
-    def get_targets(options)
-      target_opts =  options.keys.select { |opt| %i[query rerun].include?(opt) }
-      target_opts << :nodes unless options[:nodes].empty?
+    def update_targets(options)
+      target_opts = options.keys.select { |opt| %i[query rerun nodes targets].include?(opt) }
+      target_string = "'--nodes', '--targets', '--rerun', or '--query'"
       if target_opts.length > 1
-        raise Bolt::CLIError, "Only one of '--nodes', '--rerun', or '--query' may be specified"
+        raise Bolt::CLIError, "Only one targeting option #{target_string} may be specified"
+      elsif target_opts.empty? && options[:subcommand] != 'plan'
+        raise Bolt::CLIError, "Command requires a targeting option: #{target_string}"
       end
 
-      if options[:query]
-        nodes = query_puppetdb_nodes(options[:query])
-        options[:nodes] = nodes if options[:subcommand] == 'plan'
-      elsif options[:rerun]
-        nodes = rerun.get_targets(options[:rerun])
-        options[:nodes] = nodes if options[:subcommand] == 'plan'
-      else
-        nodes = options[:nodes]
-      end
-      inventory.get_targets(nodes)
+      nodes = if options[:query]
+                query_puppetdb_nodes(options[:query])
+              elsif options[:rerun]
+                rerun.get_targets(options[:rerun])
+              else
+                options[:targets] || options[:nodes] || []
+              end
+      options[:target_args] = nodes
+      options[:targets] = inventory.get_targets(nodes)
     end
 
     def validate(options)
@@ -181,14 +183,6 @@ module Bolt
         unless options[:object] =~ /\A([a-z][a-z0-9_]*)?(::[a-z][a-z0-9_]*)*\Z/
           raise Bolt::CLIError,
                 "Invalid #{options[:subcommand]} '#{options[:object]}'"
-        end
-      end
-
-      if !%w[plan puppetfile].include?(options[:subcommand]) && options[:action] != 'show'
-        if options[:nodes].empty? && options[:query].nil? && options[:rerun].nil?
-          raise Bolt::CLIError, "Targets must be specified with '--nodes', '--query' or '--rerun'"
-        elsif options[:nodes].any? && options[:query]
-          raise Bolt::CLIError, "Only one of '--nodes', '--query', or '--rerun'  may be specified"
         end
       end
 
@@ -284,7 +278,7 @@ module Bolt
 
       case options[:subcommand]
       when 'plan'
-        code = run_plan(options[:object], options[:task_options], options[:nodes], options)
+        code = run_plan(options[:object], options[:task_options], options[:target_args], options)
       when 'puppetfile'
         code = install_puppetfile(@config.puppetfile, @config.modulepath)
       when 'apply'
