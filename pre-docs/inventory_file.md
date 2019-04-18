@@ -196,7 +196,7 @@ The inventory file uses the following objects.
 
 ## File format
 
-The inventory file is a yaml file that contains a single group. This group can be referred to as "all". In addition to the normal group fields, the top level has an inventory file version key that defaults to 1.0.
+The inventory file is a yaml file that contains a single group. This group can be referred to as "all". In addition to the normal group fields, the top level has an inventory file version key that defaults to 1.
 
 ## Precedence
 
