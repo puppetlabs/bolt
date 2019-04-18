@@ -240,7 +240,12 @@ describe 'running with an inventory file', reset_puppet_settings: true do
           },
           {
             name: 'bar',
-            targets: [],
+            targets: [
+              {
+                uri: 'bar_1',
+                vars: { bar_1_var: 'dont_overwrite' }
+              }
+            ],
             config: {
               transport: 'local'
             },
@@ -282,7 +287,8 @@ describe 'running with an inventory file', reset_puppet_settings: true do
       expect(result['existing_vars']).to eq(expected_hash_pre)
       expect(result['added_facts']).to eq(expected_hash_post)
       expect(result['added_vars']).to eq(expected_hash_post)
-      expect(result['target_from_string']).to eq(["Target('bar_1', {})"])
+      expect(result['target_not_overwritten']).to eq("dont_overwrite")
+      expect(result['target_not_duplicated']).to eq(["Target('bar_1', {})"])
       expect(result['target_to_all_group']).to include("Target('add_to_all', {})")
     end
 
