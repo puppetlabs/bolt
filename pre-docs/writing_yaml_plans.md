@@ -193,7 +193,7 @@ parameters:
   frontends:
     type: TargetSpec
     description: "The frontend web servers"
-  frontends:
+  backends:
     type: TargetSpec
     description: "The backend application servers"
   version:
