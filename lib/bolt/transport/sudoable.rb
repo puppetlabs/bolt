@@ -44,7 +44,7 @@ module Bolt
               conn.copy_file(source, tmpfile)
               # pass over file ownership if we're using run-as to be a different user
               dir.chown(conn.run_as)
-              result = conn.execute(['mv', tmpfile, destination], sudoable: true)
+              result = conn.execute(['mv', '-f', tmpfile, destination], sudoable: true)
               if result.exit_code != 0
                 message = "Could not move temporary file '#{tmpfile}' to #{destination}: #{result.stderr.string}"
                 raise Bolt::Node::FileError.new(message, 'MV_ERROR')
