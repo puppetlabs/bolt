@@ -135,16 +135,22 @@ Usage: bolt apply <manifest.pp> [options]
       @options = options
 
       @nodes = define('-n', '--nodes NODES',
-                      'Identifies the nodes to target.',
-                      'Enter a comma-separated list of node URIs or group names.',
-                      "Or read a node list from an input file '@<file>' or stdin '-'.",
-                      'Example: --nodes localhost,node_group,ssh://nix.com:23,winrm://windows.puppet.com',
-                      'URI format is [protocol://]host[:port]',
-                      "SSH is the default protocol; may be #{TRANSPORTS.keys.join(', ')}",
-                      'For Windows nodes, specify the winrm:// protocol if it has not be configured',
-                      'For SSH, port defaults to `22`',
-                      'For WinRM, port defaults to `5985` or `5986` based on the --[no-]ssl setting') do |nodes|
+                      'Alias for --targets') do |nodes|
+        @options [:nodes] ||= []
         @options[:nodes] << get_arg_input(nodes)
+      end.extend(SwitchHider)
+      @targets = define('-t', '--targets TARGETS',
+                        'Identifies the targets of command.',
+                        'Enter a comma-separated list of target URIs or group names.',
+                        "Or read a target list from an input file '@<file>' or stdin '-'.",
+                        'Example: --targets localhost,node_group,ssh://nix.com:23,winrm://windows.puppet.com',
+                        'URI format is [protocol://]host[:port]',
+                        "SSH is the default protocol; may be #{TRANSPORTS.keys.join(', ')}",
+                        'For Windows targets, specify the winrm:// protocol if it has not be configured',
+                        'For SSH, port defaults to `22`',
+                        'For WinRM, port defaults to `5985` or `5986` based on the --[no-]ssl setting') do |targets|
+        @options[:targets] ||= []
+        @options[:targets] << get_arg_input(targets)
       end.extend(SwitchHider)
       @query = define('-q', '--query QUERY', 'Query PuppetDB to determine the targets') do |query|
         @options[:query] = query
@@ -290,9 +296,13 @@ Usage: bolt apply <manifest.pp> [options]
       update
     end
 
+    def hide_target_opts(toggle = true)
+      @nodes.hide = @query.hide = @rerun.hide = @targets.hide = toggle
+    end
+
     def update
       # show the --nodes, --query, and --rerun switches by default
-      @nodes.hide = @query.hide = @rerun.hide = false
+      hide_target_opts(false)
       # Don't show the --execute switch except for `apply`
       @execute.hide = true
 
@@ -310,7 +320,7 @@ Usage: bolt apply <manifest.pp> [options]
                       FILE_HELP
                     when 'puppetfile'
                       # Don't show targeting options for puppetfile
-                      @nodes.hide = @query.hide = @rerun.hide = true
+                      hide_target_opts
                       PUPPETFILE_HELP
                     when 'apply'
                       @execute.hide = false
