@@ -111,28 +111,6 @@ describe Bolt::PAL::YamlPlan::Evaluator do
       call_plan(plan, 'nodes' => ['bar.example.com'])
     end
 
-    # task+command
-    it 'fails if a step is ambiguous' do
-      @plan_body = <<-YAML
-      steps:
-        - task: package
-          command: yum install package
-          target: ["foo.example.com"]
-      YAML
-
-      expect { call_plan(plan) }.to raise_error(Bolt::Error, /Unsupported plan step/)
-    end
-
-    it 'fails for an unknown step' do
-      @plan_body = <<-YAML
-      steps:
-        - package: openssl
-          target: ["foo.example.com"]
-      YAML
-
-      expect { call_plan(plan) }.to raise_error(Bolt::Error, /Unsupported plan step/)
-    end
-
     it 'returns the `return` value on completion' do
       @plan_body = <<-YAML
       steps: []
@@ -211,12 +189,6 @@ describe Bolt::PAL::YamlPlan::Evaluator do
                           'name' => 'openssl' } }
     end
 
-    it 'fails if no target is specified' do
-      step.delete('target')
-
-      expect { subject.task_step(scope, step) }.to raise_error(/Can't run a task without specifying a target/)
-    end
-
     it 'succeeds if no parameters are specified' do
       step.delete('parameters')
 
@@ -276,12 +248,6 @@ describe Bolt::PAL::YamlPlan::Evaluator do
         'target' => 'foo.example.com' }
     end
 
-    it 'fails if no target is specified' do
-      step.delete('target')
-
-      expect { subject.command_step(scope, step) }.to raise_error(/Can't run a command without specifying a target/)
-    end
-
     it 'supports a description' do
       step['description'] = 'run the thing'
 
@@ -295,12 +261,6 @@ describe Bolt::PAL::YamlPlan::Evaluator do
       { 'script' => 'mymodule/myscript.sh',
         'target' => 'foo.example.com',
         'arguments' => %w[a b c] }
-    end
-
-    it 'fails if no target is specified' do
-      step.delete('target')
-
-      expect { subject.script_step(scope, step) }.to raise_error(/Can't run a script without specifying a target/)
     end
 
     it 'passes arguments to the script' do
@@ -352,19 +312,6 @@ describe Bolt::PAL::YamlPlan::Evaluator do
       { 'source' => 'mymodule/file.txt',
         'destination' => '/path/to/file.txt',
         'target' => 'foo.example.com' }
-    end
-
-    it 'fails if no target is specified' do
-      step.delete('target')
-
-      expect { subject.upload_file_step(scope, step) }.to raise_error(/Can't upload a file without specifying a target/)
-    end
-
-    it 'fails if no destination is specified' do
-      step.delete('destination')
-
-      msg = /Can't upload a file without specifying a destination/
-      expect { subject.upload_file_step(scope, step) }.to raise_error(msg)
     end
 
     it 'uploads the file' do

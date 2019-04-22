@@ -80,6 +80,13 @@ describe "running YAML plans", ssh: true do
     expect(result['msg']).to match(/Unknown variable/)
   end
 
+  it 'fails when embedded puppet code cannot be parsed' do
+    result = run_plan('yaml::bad_puppet')
+
+    expect(result['kind']).to eq("bolt/invalid-plan")
+    expect(result['msg']).to match(/Parse error in step number 1 with name \"x_fail\":/)
+  end
+
   it 'passes information between steps' do
     result = run_plan('yaml::param_passing')
 

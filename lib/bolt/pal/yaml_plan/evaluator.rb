@@ -17,10 +17,7 @@ module Bolt
         def dispatch_step(scope, step)
           step = evaluate_code_blocks(scope, step)
 
-          step_type, *extra_keys = STEP_KEYS.select { |key| step.key?(key) }
-          if !step_type || extra_keys.any?
-            unsupported_step(scope, step)
-          end
+          step_type = STEP_KEYS.find { |key| step.key?(key) }
 
           case step_type
           when 'task'
@@ -35,11 +32,6 @@ module Bolt
             upload_file_step(scope, step)
           when 'eval'
             eval_step(scope, step)
-          else
-            # This shouldn't be able to happen since this case statement should
-            # match the STEP_KEYS list, but raise an error *just in case*,
-            # instead of silently skipping the step.
-            unsupported_step(scope, step)
           end
         end
 
@@ -48,7 +40,6 @@ module Bolt
           target = step['target']
           description = step['description']
           params = step['parameters'] || {}
-          raise "Can't run a task without specifying a target" unless target
 
           args = if description
                    [task, target, description, params]
@@ -73,7 +64,6 @@ module Bolt
           target = step['target']
           description = step['description']
           arguments = step['arguments'] || []
-          raise "Can't run a script without specifying a target" unless target
 
           options = { 'arguments' => arguments }
           args = if description
@@ -89,7 +79,6 @@ module Bolt
           command = step['command']
           target = step['target']
           description = step['description']
-          raise "Can't run a command without specifying a target" unless target
 
           args = [command, target]
           args << description if description
@@ -101,8 +90,6 @@ module Bolt
           destination = step['destination']
           target = step['target']
           description = step['description']
-          raise "Can't upload a file without specifying a target" unless target
-          raise "Can't upload a file without specifying a destination" unless destination
 
           args = [source, destination, target]
           args << description if description
@@ -111,10 +98,6 @@ module Bolt
 
         def eval_step(_scope, step)
           step['eval']
-        end
-
-        def unsupported_step(_scope, step)
-          raise Bolt::Error.new("Unsupported plan step", "bolt/unsupported-step", step: step)
         end
 
         # This is the method that Puppet calls to evaluate the plan. The name

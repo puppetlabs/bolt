@@ -27,6 +27,19 @@ describe Bolt::PAL::YamlPlan::Loader do
       )
     end
 
+    it 'fails if step key points to bad puppet code' do
+      plan_body = <<-YAML
+      steps:
+        - command: $
+          target: foo
+      YAML
+
+      expect { described_class.create(loader, plan_name, 'test.yaml', plan_body) }.to raise_error do |error|
+        expect(error.to_s).to match(/Parse error in step number 1/)
+        expect(error.to_s).to match(/Error parsing \"command\": Illegal variable name/)
+      end
+    end
+
     it 'returns a puppet function wrapper' do
       plan_body = <<-YAML
       steps: []
