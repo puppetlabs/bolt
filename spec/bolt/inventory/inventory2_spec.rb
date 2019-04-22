@@ -3,6 +3,7 @@
 require 'spec_helper'
 require 'bolt_spec/config'
 require 'bolt/inventory'
+require 'bolt/plugin'
 
 describe Bolt::Inventory::Inventory2 do
   include BoltSpec::Config
@@ -18,6 +19,7 @@ describe Bolt::Inventory::Inventory2 do
     targets[0]
   end
 
+  let(:plugins) { Bolt::Plugin.new(config) }
   let(:target_name) { "example.com" }
   let(:target_entry) { target_name }
   let(:targets) { [target_entry] }
@@ -31,7 +33,7 @@ describe Bolt::Inventory::Inventory2 do
     }
   end
 
-  let(:inventory) { Bolt::Inventory.create_version(data, config) }
+  let(:inventory) { Bolt::Inventory.create_version(data, config, plugins) }
 
   it 'creates simple inventory' do
     expect(inventory.class).to eq(Bolt::Inventory::Inventory2)
@@ -724,6 +726,58 @@ describe Bolt::Inventory::Inventory2 do
         expect(target.options['interpreters']).to include('.rb' => '/foo/ruby')
         expect(target.features).to include('puppet-agent')
       end
+    end
+  end
+
+  context 'with plugins' do
+    let(:data) {
+      {
+        'version' => 2,
+        'groups' => [
+          { 'name' => 'group1',
+            'targets' => [
+              { 'name' => 'node1',
+                'config' => { 'transport' => 'winrm' } }
+            ] },
+          { 'name' => 'group2',
+            'target-lookups' => [
+              { 'plugin' => 'test_plugin' }
+            ] },
+          { 'name' => 'group3',
+            'targets' => [
+              { 'name' => 'node2',
+                'config' => { 'transport' => 'winrm' } }
+            ] }
+        ]
+      }
+    }
+
+    let(:lookup) {
+      [
+        { 'name' => 'node1',
+          'config' => { 'transport' => 'remote' } },
+        { 'name' => 'node2',
+          'config' => { 'transport' => 'remote' } }
+      ]
+    }
+
+    let(:plugins) do
+      plugins = Bolt::Plugin.new(nil)
+      plugin = double('plugin')
+      allow(plugin).to receive(:name).and_return('test_plugin')
+      allow(plugin).to receive(:lookup_targets).and_return(lookup)
+      plugins.add_plugin(plugin)
+      plugins
+    end
+
+    it 'does not override a preceding definition' do
+      target = get_target(inventory, 'node1')
+      expect(target.transport).to eq('winrm')
+    end
+
+    it 'does override a later defintion' do
+      target = get_target(inventory, 'node2')
+      expect(target.transport).to eq('remote')
     end
   end
 end

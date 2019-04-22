@@ -230,6 +230,7 @@ describe "Bolt::CLI" do
       it "expands tilde to a user directory when --nodes starts with @" do
         expect(File).to receive(:read).with(File.join(Dir.home, 'nodes.txt')).and_return("foo\nbar\n")
         cli = Bolt::CLI.new(%w[command run --nodes @~/nodes.txt])
+        allow(cli).to receive(:puppetdb_client)
         result = cli.parse
         expect(result[:targets]).to eq(targets)
       end

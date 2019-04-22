@@ -19,6 +19,7 @@ require 'bolt/rerun'
 require 'bolt/logger'
 require 'bolt/outputter'
 require 'bolt/puppetdb'
+require 'bolt/plugin'
 require 'bolt/pal'
 require 'bolt/target'
 require 'bolt/version'
@@ -46,7 +47,7 @@ module Bolt
 
     # Only call after @config has been initialized.
     def inventory
-      @inventory ||= Bolt::Inventory.from_config(config)
+      @inventory ||= Bolt::Inventory.from_config(config, plugins)
     end
     private :inventory
 
@@ -219,6 +220,10 @@ module Bolt
       return @puppetdb_client if @puppetdb_client
       puppetdb_config = Bolt::PuppetDB::Config.load_config(nil, config.puppetdb)
       @puppetdb_client = Bolt::PuppetDB::Client.new(puppetdb_config)
+    end
+
+    def plugins
+      @plugins ||= Bolt::Plugin.setup(config, puppetdb_client)
     end
 
     def query_puppetdb_nodes(query)

@@ -43,7 +43,7 @@ module Bolt
       end
     end
 
-    def self.from_config(config)
+    def self.from_config(config, plugins = nil)
       if ENV.include?(ENVIRONMENT_VAR)
         begin
           data = YAML.safe_load(ENV[ENVIRONMENT_VAR])
@@ -54,18 +54,18 @@ module Bolt
         data = Bolt::Util.read_config_file(config.inventoryfile, config.default_inventoryfile, 'inventory')
       end
 
-      inventory = create_version(data, config)
+      inventory = create_version(data, config, plugins)
       inventory.validate
       inventory
     end
 
-    def self.create_version(data, config)
+    def self.create_version(data, config, plugins)
       version = (data || {}).delete('version') { 1 }
       case version
       when 1
         new(data, config)
       when 2
-        Bolt::Inventory::Inventory2.new(data, config)
+        Bolt::Inventory::Inventory2.new(data, config, plugins: plugins)
       else
         raise ValidationError, "Unsupported version #{version} specified in inventory"
       end
