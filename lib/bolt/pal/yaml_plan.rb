@@ -4,7 +4,7 @@ module Bolt
   class PAL
     class YamlPlan
       PLAN_KEYS = Set['parameters', 'steps', 'return', 'version']
-      PARAMETER_KEYS = Set['type', 'default']
+      PARAMETER_KEYS = Set['type', 'default', 'description']
       COMMON_STEP_KEYS = %w[name description target].freeze
       STEP_KEYS = {
         'command' => {
