@@ -46,6 +46,7 @@ module Bolt
 
         if result_set.is_a?(Bolt::ResultSet)
           data = result_set.map { |res| res.status_hash.select { |k, _| %i[target status].include? k } }
+          FileUtils.mkdir_p(File.dirname(@path))
           File.write(@path, data.to_json)
         elsif File.exist?(@path)
           FileUtils.rm(@path)
