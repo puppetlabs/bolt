@@ -5,12 +5,14 @@ require 'bolt_spec/config'
 require 'bolt_spec/conn'
 require 'bolt_spec/files'
 require 'bolt_spec/integration'
+require 'bolt_spec/puppetdb'
 
 describe 'running with an inventory file', reset_puppet_settings: true do
   include BoltSpec::Config
   include BoltSpec::Conn
   include BoltSpec::Files
   include BoltSpec::Integration
+  include BoltSpec::PuppetDB
 
   let(:conn) { conn_info('ssh') }
   let(:inventory) do
@@ -446,6 +448,52 @@ describe 'running with an inventory file', reset_puppet_settings: true do
           end
         end
       end
+    end
+  end
+
+  # TODO: these tests require docker so they may as well require ssh for now
+  context 'with pdb lookups', ssh: true, puppetdb: true do
+    before(:each) do
+      allow_any_instance_of(Bolt::CLI).to receive(:puppetdb_client).and_return(pdb_client)
+
+      push_facts(facts)
+    end
+
+    after(:each) { clear_facts(facts) }
+
+    let(:facts) {
+      { conn[:host] => { 'fact1' => true },
+        'noanode.example.com' => { 'fact1' => false } }
+    }
+
+    let(:inventory) do
+      {
+        version: 2,
+        "target-lookups" => [
+          {
+            plugin: 'puppetdb',
+            query: 'inventory { facts.fact1 = true }'
+          }
+        ],
+        config: {
+          transport: conn[:protocol],
+          conn[:protocol] => {
+            host: conn[:host],
+            user: conn[:user],
+            port: conn[:port],
+            'host-key-check' => false
+          }
+        }
+      }
+    end
+
+    let(:shell_cmd) { 'whoami' }
+
+    it 'runs a plan' do
+      result = run_cli_json(run_plan)
+      expect(result).not_to include('kind')
+      expect(result.length).to eq(1)
+      expect(result[0]).to include('status' => 'success', 'target' => conn[:host])
     end
   end
 end

@@ -145,33 +145,32 @@ describe "passes parsed AST to the apply_catalog task" do
         .to include(/Plan language function 'run_task' cannot be used from declarative manifest code/)
     end
 
-    context 'with puppetdb stubbed' do
-      let(:config) {
+    context 'with puppetdb misconfigured' do
+      let(:pdb_conf) {
         {
-          'puppetdb' => pdb_conf
+          'server_urls' => 'https://puppetdb.example.com',
+          'cacert' => '/path/to/cacert'
         }
       }
 
+      let(:config) { {} }
+
       it 'calls puppetdb_query' do
-        with_tempfile_containing('conf', YAML.dump(config)) do |conf|
-          result = run_cli_json(%W[plan run basic::pdb_query --configfile #{conf.path}] + config_flags)
-          expect(result['kind']).to eq('bolt/apply-failure')
-          error = result['details']['result_set'][0]['result']['_error']
-          expect(error['kind']).to eq('bolt/apply-error')
-          expect(error['msg']).to match(/Apply failed to compile for #{uri}/)
-          expect(@log_output.readlines).to include(/Failed to connect to all PuppetDB server_urls/)
-        end
+        result = run_cli_json(%w[plan run basic::pdb_query] + config_flags)
+        expect(result['kind']).to eq('bolt/apply-failure')
+        error = result['details']['result_set'][0]['result']['_error']
+        expect(error['kind']).to eq('bolt/apply-error')
+        expect(error['msg']).to match(/Apply failed to compile for #{uri}/)
+        expect(@log_output.readlines).to include(/Failed to connect to all PuppetDB server_urls/)
       end
 
       it 'calls puppetdb_fact' do
-        with_tempfile_containing('conf', YAML.dump(config)) do |conf|
-          result = run_cli_json(%W[plan run basic::pdb_fact --configfile #{conf.path}] + config_flags)
-          expect(result['kind']).to eq('bolt/apply-failure')
-          error = result['details']['result_set'][0]['result']['_error']
-          expect(error['kind']).to eq('bolt/apply-error')
-          expect(error['msg']).to match(/Apply failed to compile for #{uri}/)
-          expect(@log_output.readlines).to include(/Failed to connect to all PuppetDB server_urls/)
-        end
+        result = run_cli_json(%w[plan run basic::pdb_fact] + config_flags)
+        expect(result['kind']).to eq('bolt/apply-failure')
+        error = result['details']['result_set'][0]['result']['_error']
+        expect(error['kind']).to eq('bolt/apply-error')
+        expect(error['msg']).to match(/Apply failed to compile for #{uri}/)
+        expect(@log_output.readlines).to include(/Failed to connect to all PuppetDB server_urls/)
       end
     end
 

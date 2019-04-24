@@ -12,7 +12,7 @@ module Bolt
         end
       end
 
-      def initialize(data, config = nil, target_vars: {}, target_facts: {}, target_features: {})
+      def initialize(data, config = nil, plugins: nil, target_vars: {}, target_facts: {}, target_features: {})
         @logger = Logging.logger[self]
         # Config is saved to add config options to targets
         @config = config || Bolt::Config.default
@@ -23,6 +23,7 @@ module Bolt
         @target_facts = target_facts
         @target_features = target_features
 
+        @groups.lookup_targets(plugins)
         @groups.resolve_aliases(@groups.target_aliases, @groups.target_names)
         collect_groups
       end

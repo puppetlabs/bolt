@@ -3,6 +3,7 @@
 require 'spec_helper'
 require 'bolt_spec/config'
 require 'bolt/inventory'
+require 'bolt/plugin'
 require 'yaml'
 
 describe Bolt::Inventory do
@@ -18,6 +19,8 @@ describe Bolt::Inventory do
     expect(targets[0].name).to eq(name)
     targets[0]
   end
+
+  let(:plugins) { Bolt::Plugin.new(config) }
 
   let(:data) {
     {
@@ -133,7 +136,7 @@ describe Bolt::Inventory do
   end
 
   context 'with an empty config' do
-    let(:inventory) { Bolt::Inventory.from_config(config) }
+    let(:inventory) { Bolt::Inventory.from_config(config, plugins) }
     let(:target) { inventory.get_targets('nonode')[0] }
 
     it 'should accept an empty file' do
@@ -150,7 +153,7 @@ describe Bolt::Inventory do
   end
 
   context 'with BOLT_INVENTORY set' do
-    let(:inventory) { Bolt::Inventory.from_config(config) }
+    let(:inventory) { Bolt::Inventory.from_config(config, plugins) }
     let(:target) { inventory.get_targets('node1')[0] }
 
     before(:each) do
@@ -175,7 +178,8 @@ describe Bolt::Inventory do
                                          'winrm' => {
                                            'ssl' => false,
                                            'ssl-verify' => false
-                                         }))
+                                         }),
+                                  plugins)
     }
     let(:target) { inventory.get_targets('nonode')[0] }
 
@@ -194,7 +198,7 @@ describe Bolt::Inventory do
 
   describe 'get_targets' do
     context 'empty inventory' do
-      let(:inventory) { Bolt::Inventory.from_config(config) }
+      let(:inventory) { Bolt::Inventory.from_config(config, plugins) }
 
       it 'should parse a single target URI' do
         name = 'nonode'
@@ -669,17 +673,17 @@ describe Bolt::Inventory do
 
   describe :create_version do
     it 'creates a version1 inventory by default' do
-      inv = Bolt::Inventory.create_version({}, config)
+      inv = Bolt::Inventory.create_version({}, config, plugins)
       expect(inv.class).to eq(Bolt::Inventory)
     end
 
     it 'creates a version1 inventlory when specified' do
-      inv = Bolt::Inventory.create_version({ 'version' => 1 }, config)
+      inv = Bolt::Inventory.create_version({ 'version' => 1 }, config, plugins)
       expect(inv.class).to eq(Bolt::Inventory)
     end
 
     it 'creates a version2 inventory when specified' do
-      inv = Bolt::Inventory.create_version({ 'version' => 2 }, config)
+      inv = Bolt::Inventory.create_version({ 'version' => 2 }, config, plugins)
       expect(inv.class).to eq(Bolt::Inventory::Inventory2)
     end
   end

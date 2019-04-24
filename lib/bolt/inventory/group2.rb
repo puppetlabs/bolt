@@ -13,7 +13,7 @@ module Bolt
 
       DATA_KEYS = %w[name config facts vars features].freeze
       NODE_KEYS = DATA_KEYS + %w[alias uri]
-      GROUP_KEYS = DATA_KEYS + %w[groups targets]
+      GROUP_KEYS = DATA_KEYS + %w[groups targets target-lookups]
       CONFIG_KEYS = Bolt::TRANSPORTS.keys.map(&:to_s) + ['transport']
 
       def initialize(data)
@@ -36,6 +36,8 @@ module Bolt
         @features = fetch_value(data, 'features', Array)
         @config = fetch_value(data, 'config', Hash)
 
+        @target_lookups = fetch_value(data, 'target-lookups', Array)
+
         unless (unexpected_keys = @config.keys - CONFIG_KEYS).empty?
           msg = "Found unexpected key(s) #{unexpected_keys.join(', ')} in config for group #{@name}"
           @logger.warn(msg)
@@ -46,57 +48,17 @@ module Bolt
 
         @targets = {}
         @aliases = {}
-        targets.reject { |target| target.is_a?(String) }.each do |target|
-          unless target.is_a?(Hash)
-            raise ValidationError.new("Node entry must be a String or Hash, not #{target.class}", @name)
-          end
-
-          target['name'] ||= target['uri']
-
-          if target['name'].nil? || target['name'].empty?
-            raise ValidationError.new("No name or uri for target: #{target}", @name)
-          end
-
-          if @targets.include?(target['name'])
-            @logger.warn("Ignoring duplicate target in #{@name}: #{target}")
-            next
-          end
-
-          raise ValidationError.new("Node #{target} does not have a name", @name) unless target['name']
-          @targets[target['name']] = target
-
-          unless (unexpected_keys = target.keys - NODE_KEYS).empty?
-            msg = "Found unexpected key(s) #{unexpected_keys.join(', ')} in target #{target['name']}"
-            @logger.warn(msg)
-          end
-          config_keys = target['config']&.keys || []
-          unless (unexpected_keys = config_keys - CONFIG_KEYS).empty?
-            msg = "Found unexpected key(s) #{unexpected_keys.join(', ')} in config for target #{target['name']}"
-            @logger.warn(msg)
-          end
-
-          next unless target.include?('alias')
-
-          aliases = target['alias']
-          aliases = [aliases] if aliases.is_a?(String)
-          unless aliases.is_a?(Array)
-            msg = "Alias entry on #{target['name']} must be a String or Array, not #{aliases.class}"
-            raise ValidationError.new(msg, @name)
-          end
-
-          aliases.each do |alia|
-            raise ValidationError.new("Invalid alias #{alia}", @name) unless alia =~ NAME_REGEX
-
-            if (found = @aliases[alia])
-              raise ValidationError.new(alias_conflict(alia, found, target['name']), @name)
-            end
-            @aliases[alia] = target['name']
+        @name_or_alias = []
+        targets.each do |target|
+          # If target is a string, it can refer to either a target name or
+          # alias. Which can't be determined until all groups have been
+          # resolved, and requires a depth-first traversal to categorize them.
+          if target.is_a?(String)
+            @name_or_alias << target
+          else
+            add_target(target)
           end
         end
-
-        # If target is a string, it can refer to either a target name or alias. Which can't be determined
-        # until all groups have been resolved, and requires a depth-first traversal to categorize them.
-        @name_or_alias = targets.select { |target| target.is_a?(String) }
 
         @groups = groups.map { |g| Group2.new(g) }
       end
@@ -113,6 +75,79 @@ module Bolt
             # groups come from group_data
             'groups' => [] }
         end
+      end
+
+      def add_target(target)
+        # TODO: Do we want to accept strings from lookup_targets plugins? How should
+        # they be handled?
+        unless target.is_a?(Hash)
+          raise ValidationError.new("Node entry must be a String or Hash, not #{target.class}", @name)
+        end
+
+        target['name'] ||= target['uri']
+
+        if target['name'].nil? || target['name'].empty?
+          raise ValidationError.new("No name or uri for target: #{target}", @name)
+        end
+
+        if @targets.include?(target['name'])
+          @logger.warn("Ignoring duplicate target in #{@name}: #{target}")
+          return
+        end
+
+        raise ValidationError.new("Node #{target} does not have a name", @name) unless target['name']
+        @targets[target['name']] = target
+
+        unless (unexpected_keys = target.keys - NODE_KEYS).empty?
+          msg = "Found unexpected key(s) #{unexpected_keys.join(', ')} in target #{target['name']}"
+          @logger.warn(msg)
+        end
+        config_keys = target['config']&.keys || []
+        unless (unexpected_keys = config_keys - CONFIG_KEYS).empty?
+          msg = "Found unexpected key(s) #{unexpected_keys.join(', ')} in config for target #{target['name']}"
+          @logger.warn(msg)
+        end
+
+        unless target.include?('alias')
+          return
+        end
+
+        aliases = target['alias']
+        aliases = [aliases] if aliases.is_a?(String)
+        unless aliases.is_a?(Array)
+          msg = "Alias entry on #{target['name']} must be a String or Array, not #{aliases.class}"
+          raise ValidationError.new(msg, @name)
+        end
+
+        aliases.each do |alia|
+          raise ValidationError.new("Invalid alias #{alia}", @name) unless alia =~ NAME_REGEX
+
+          if (found = @aliases[alia])
+            raise ValidationError.new(alias_conflict(alia, found, target['name']), @name)
+          end
+          @aliases[alia] = target['name']
+        end
+      end
+
+      def lookup_targets(plugins)
+        @target_lookups.each do |lookup|
+          unless lookup.is_a?(Hash)
+            raise ValidationError.new("target-lookup is not a hash: #{lookup}", @name)
+          end
+          unless lookup['plugin']
+            raise ValidationError.new("target-lookup does not specify a plugin: #{lookup}", @name)
+          end
+
+          unless (plugin = plugins.by_name(lookup['plugin']))
+            raise ValidationError.new("target-lookup specifies an unkown plugin: '#{lookup['plugin']}'", @name)
+
+          end
+
+          targets = plugin.lookup_targets(lookup)
+          targets.each { |target| add_target(target) }
+        end
+
+        @groups.each { |g| g.lookup_targets(plugins) }
       end
 
       def data_merge(data1, data2)

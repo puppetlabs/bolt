@@ -59,6 +59,41 @@ targets:
     uri: 192.168.100.179
 ```
 
+### `target-lookups` and dynamic puppetdb queries
+
+`target-lookups` is a new key at the group level that allows you to dynamically
+lookup the targets in the node. The lookup method is eventually expected to be
+pluggable but for now Bolt only ships a single builtin plugin `puppetdb` that
+can use a puppetdb query to populate the targets.
+
+```
+groups:
+  - name: windows
+    target-lookups:
+      - plugin: puppetdb
+        query: "inventory[certname] { facts.osfamily = 'windows' }"
+    config:
+      transport: winrm
+  - name: redhat
+    target-lookups:
+      - plugin: puppetdb
+        query: "inventory[certname] { facts.osfamily = 'RedHat' }"
+    config:
+      transport: ssh
+```
+
+`target-lookups` contains an array of target lookup objects. Each
+`target-lookup` entry must include a `plugin` key that defines which plugin
+should be used for the lookup. The rest of the keys are specific to the plugin
+being used.
+
+For the puppetdb plugin The query field is a string containing a pql query or an array containing a
+query in the puppetdb ast syntax.
+
+Make sure you have [configured puppetdb](./bolt_connect_puppetdb.md)
+
+
+
 ## Inventory config
 
 You can only set transport configuration in the inventory file. This means using a top level `transport` value to assign a transport to the target and all values in the section named for the transport (`ssh`, `winrm`, `remote`, etc.). You can set config on targets or groups in the inventory file. Bolt performs a depth first search of targets, followed by a search of groups, and uses the first value it finds. Nested hashes are merged.
