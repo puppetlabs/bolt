@@ -1,5 +1,9 @@
 # Inspecting tasks and plans
 
+## Packaged modules
+
+Bolt is packaged with a collection of useful modules to support common workflows. See the [list of packaged modules](bolt_installing_modules.md#packaged-modules) for specifics.
+
 Before you run tasks or plans in your environment, inspect them to determine what effect they will have on your target nodes.
 
 ## Run in no operation mode

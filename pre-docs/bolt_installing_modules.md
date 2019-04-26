@@ -17,6 +17,7 @@ This list of packaged modules is available in a [Puppetfile](https://github.com/
 - [puppet_conf](https://forge.puppet.com/puppetlabs/puppet_conf): Inspect and change the configuration options in the `puppet.conf` file.
 - [facts](https://forge.puppet.com/puppetlabs/facts): Retrieve facts from specified nodes.
 - [puppet_agent](https://forge.puppet.com/puppetlabs/puppet_agent): Install Puppet Agent package.
+- [reboot](https://forge.puppet.com/puppetlabs/reboot): Manage system reboots.
 
 ### Core Puppet providers
 
@@ -37,6 +38,11 @@ This list of packaged modules is available in a [Puppetfile](https://github.com/
 - [canary](https://github.com/puppetlabs/bolt/tree/master/modules/canary): Run action against a small number of nodes and only if it succeeds will it run on the rest.
 - [puppetdb_fact](https://github.com/puppetlabs/bolt/tree/master/modules/puppetdb_fact): Collect facts for the specified nodes from the configured PuppetDB connection and stores the collected facts on the Targets.
 
+### Modules that contain helper code for writing your own tasks
+
+- [ruby_task_helper](https://forge.puppet.com/puppetlabs/ruby_task_helper): A helper for writing tasks in ruby.
+- [python_task_helper](https://forge.puppet.com/puppetlabs/python_task_helper): A helper for writing tasks in python.
+
 **Tip**: To override a packaged module with another version, download the version you want and configure your modulepath to point to it.
 
 
@@ -53,18 +59,18 @@ For more details about specifying modules in a Puppetfile, see the [Puppetfile d
 
      ```
      # Modules from the Puppet Forge.
-     mod 'puppetlabs/package', '0.2.0'
-     mod 'puppetlabs/service', '0.3.1'
+     mod 'puppetlabs-apache', '4.1.0'
+     mod 'puppetlabs-postgresql', '5.12.1'
 
      # Module from a Git repository.
-     mod 'puppetlabs/puppetlabs-facter_task', git: 'git@github.com:puppetlabs/puppetlabs-facter_task.git', ref: 'master'
+     mod 'puppetlabs-haproxy', git: 'https://github.com/puppetlabs/puppetlabs-haproxy.git', ref: 'master'
      ```
 
 3.   Add any task or plan modules stored locally in `modules/` to the list. If
      these modules are not listed in the Puppetfile, they will be deleted.
 
      ```
-     mod 'myteam/app_foo', local: true
+     mod 'my_awesome_module', local: true
      ```
 
     Install any modules that you don't want to manage with the Puppetfile to a

@@ -84,3 +84,7 @@ default, the `modulepath` includes `modules/` and `site-modules/` directories in
 your module is in `~/src/modules/my_module/` run Bolt with `--modulepath
 ~/src/module`. If you often use the same `modulepath` you can set `modulepath` in
 `bolt.yaml`.
+
+## Packaged task content
+
+Bolt is packaged with a collection of modules that contain useful tasks to support common workflows. See the [list of packaged modules](bolt_installing_modules.md#packaged-modules) for specifics.
