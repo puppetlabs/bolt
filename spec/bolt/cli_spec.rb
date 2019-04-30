@@ -179,17 +179,17 @@ describe "Bolt::CLI" do
       let(:targets) { [target, Bolt::Target.new('bar')] }
 
       it "accepts a single node" do
-        cli = Bolt::CLI.new(%w[command run --nodes foo])
+        cli = Bolt::CLI.new(%w[command run uptime --nodes foo])
         expect(cli.parse).to include(targets: [target])
       end
 
       it "accepts multiple nodes" do
-        cli = Bolt::CLI.new(%w[command run --nodes foo,bar])
+        cli = Bolt::CLI.new(%w[command run uptime --nodes foo,bar])
         expect(cli.parse).to include(targets: targets)
       end
 
       it "accepts multiple nodes across multiple declarations" do
-        cli = Bolt::CLI.new(%w[command run --nodes foo,bar --nodes bar,more,bars])
+        cli = Bolt::CLI.new(%w[command run uptime --nodes foo,bar --nodes bar,more,bars])
         extra_targets = [Bolt::Target.new('more'), Bolt::Target.new('bars')]
         expect(cli.parse).to include(targets: targets + extra_targets)
       end
@@ -199,7 +199,7 @@ describe "Bolt::CLI" do
          foo
          bar
         NODES
-        cli = Bolt::CLI.new(%w[command run --nodes -])
+        cli = Bolt::CLI.new(%w[command run uptime --nodes -])
         allow(STDIN).to receive(:read).and_return(nodes)
         result = cli.parse
         expect(result[:targets]).to eq(targets)
@@ -211,7 +211,7 @@ describe "Bolt::CLI" do
           bar
         NODES
         with_tempfile_containing('nodes-args', nodes) do |file|
-          cli = Bolt::CLI.new(%W[command run --nodes @#{file.path}])
+          cli = Bolt::CLI.new(%W[command run uptime --nodes @#{file.path}])
           result = cli.parse
           expect(result[:targets]).to eq(targets)
         end
@@ -220,7 +220,7 @@ describe "Bolt::CLI" do
       it "strips leading and trailing whitespace" do
         nodes = "  foo\nbar  \nbaz\nqux  "
         with_tempfile_containing('nodes-args', nodes) do |file|
-          cli = Bolt::CLI.new(%W[command run --nodes @#{file.path}])
+          cli = Bolt::CLI.new(%W[command run uptime --nodes @#{file.path}])
           result = cli.parse
           extra_targets = [Bolt::Target.new('baz'), Bolt::Target.new('qux')]
           expect(result[:targets]).to eq(targets + extra_targets)
@@ -229,21 +229,21 @@ describe "Bolt::CLI" do
 
       it "expands tilde to a user directory when --nodes starts with @" do
         expect(File).to receive(:read).with(File.join(Dir.home, 'nodes.txt')).and_return("foo\nbar\n")
-        cli = Bolt::CLI.new(%w[command run --nodes @~/nodes.txt])
+        cli = Bolt::CLI.new(%w[command run uptime --nodes @~/nodes.txt])
         allow(cli).to receive(:puppetdb_client)
         result = cli.parse
         expect(result[:targets]).to eq(targets)
       end
 
       it "generates an error message if no nodes given" do
-        cli = Bolt::CLI.new(%w[command run --nodes])
+        cli = Bolt::CLI.new(%w[command run uptime --nodes])
         expect {
           cli.parse
         }.to raise_error(Bolt::CLIError, /Option '--nodes' needs a parameter/)
       end
 
       it "generates an error message if nodes is omitted" do
-        cli = Bolt::CLI.new(%w[command run])
+        cli = Bolt::CLI.new(%w[command run uptime])
         expect {
           cli.parse
         }.to raise_error(Bolt::CLIError, /Command requires a targeting option/)
@@ -259,21 +259,21 @@ describe "Bolt::CLI" do
           bar
         NODES
         with_tempfile_containing('nodes-args', nodes) do |file|
-          cli = Bolt::CLI.new(%W[command run --targets @#{file.path}])
+          cli = Bolt::CLI.new(%W[command run uptime --targets @#{file.path}])
           result = cli.parse
           expect(result[:targets]).to eq(targets)
         end
       end
 
       it "generates an error message if no targets are given" do
-        cli = Bolt::CLI.new(%w[command run --targets])
+        cli = Bolt::CLI.new(%w[command run uptime --targets])
         expect {
           cli.parse
         }.to raise_error(Bolt::CLIError, /Option '--targets' needs a parameter/)
       end
 
       it "generates an error if nodes and targets are specified" do
-        cli = Bolt::CLI.new(%w[command run --nodes foo --targets bar])
+        cli = Bolt::CLI.new(%w[command run uptime --nodes foo --targets bar])
         expect {
           cli.parse
         }.to raise_error(Bolt::CLIError, /Only one targeting option/)
@@ -318,12 +318,12 @@ describe "Bolt::CLI" do
 
     describe "user" do
       it "accepts a user" do
-        cli = Bolt::CLI.new(%w[command run --user root --nodes foo])
+        cli = Bolt::CLI.new(%w[command run uptime --user root --nodes foo])
         expect(cli.parse).to include(user: 'root')
       end
 
       it "generates an error message if no user value is given" do
-        cli = Bolt::CLI.new(%w[command run --nodes foo --user])
+        cli = Bolt::CLI.new(%w[command run uptime --nodes foo --user])
         expect {
           cli.parse
         }.to raise_error(Bolt::CLIError, /Option '--user' needs a parameter/)
@@ -332,7 +332,7 @@ describe "Bolt::CLI" do
 
     describe "password" do
       it "accepts a password" do
-        cli = Bolt::CLI.new(%w[command run --password opensesame --nodes foo])
+        cli = Bolt::CLI.new(%w[command run uptime --password opensesame --nodes foo])
         expect(cli.parse).to include(password: 'opensesame')
       end
 
@@ -340,14 +340,14 @@ describe "Bolt::CLI" do
         allow(STDIN).to receive(:noecho).and_return('opensesame')
         allow(STDOUT).to receive(:print).with('Please enter your password: ')
         allow(STDOUT).to receive(:puts)
-        cli = Bolt::CLI.new(%w[command run --nodes foo --password])
+        cli = Bolt::CLI.new(%w[command run uptime --nodes foo --password])
         expect(cli.parse).to include(password: 'opensesame')
       end
     end
 
     describe "key" do
       it "accepts a private key" do
-        cli = Bolt::CLI.new(%w[  command run
+        cli = Bolt::CLI.new(%w[  command run uptime
                                  --private-key ~/.ssh/google_compute_engine
                                  --nodes foo])
         expect(cli.parse).to include('private-key': '~/.ssh/google_compute_engine')
@@ -365,18 +365,18 @@ describe "Bolt::CLI" do
 
     describe "concurrency" do
       it "accepts a concurrency limit" do
-        cli = Bolt::CLI.new(%w[command run --concurrency 10 --nodes foo])
+        cli = Bolt::CLI.new(%w[command run uptime --concurrency 10 --nodes foo])
         expect(cli.parse).to include(concurrency: 10)
       end
 
       it "defaults to 100" do
-        cli = Bolt::CLI.new(%w[command run --nodes foo])
+        cli = Bolt::CLI.new(%w[command run uptime --nodes foo])
         cli.parse
         expect(cli.config.concurrency).to eq(100)
       end
 
       it "generates an error message if no concurrency value is given" do
-        cli = Bolt::CLI.new(%w[command run --nodes foo --concurrency])
+        cli = Bolt::CLI.new(%w[command run uptime --nodes foo --concurrency])
         expect {
           cli.parse
         }.to raise_error(Bolt::CLIError,
@@ -386,19 +386,19 @@ describe "Bolt::CLI" do
 
     describe "compile-concurrency" do
       it "accepts a concurrency limit" do
-        cli = Bolt::CLI.new(%w[command run --compile-concurrency 2 --nodes foo])
+        cli = Bolt::CLI.new(%w[command run uptime --compile-concurrency 2 --nodes foo])
         expect(cli.parse).to include('compile-concurrency': 2)
       end
 
       it "defaults to unset" do
-        cli = Bolt::CLI.new(%w[command run --nodes foo])
+        cli = Bolt::CLI.new(%w[command run uptime --nodes foo])
         cli.parse
         # verifies Etc.nprocessors is the same as Concurrent.processor_count
         expect(cli.config.compile_concurrency).to eq(Concurrent.processor_count)
       end
 
       it "generates an error message if no concurrency value is given" do
-        cli = Bolt::CLI.new(%w[command run --nodes foo --compile-concurrency])
+        cli = Bolt::CLI.new(%w[command run uptime --nodes foo --compile-concurrency])
         expect {
           cli.parse
         }.to raise_error(Bolt::CLIError,
@@ -410,26 +410,26 @@ describe "Bolt::CLI" do
       it "is not sensitive to ordering of debug and verbose" do
         expect(Bolt::Logger).to receive(:configure).with({ 'console' => { level: :debug } }, true)
 
-        cli = Bolt::CLI.new(%w[command run --nodes foo --debug --verbose])
+        cli = Bolt::CLI.new(%w[command run uptime --nodes foo --debug --verbose])
         cli.parse
       end
     end
 
     describe "host-key-check" do
       it "accepts `--host-key-check`" do
-        cli = Bolt::CLI.new(%w[command run --host-key-check --nodes foo])
+        cli = Bolt::CLI.new(%w[command run uptime --host-key-check --nodes foo])
         cli.parse
         expect(cli.config.transports[:ssh]['host-key-check']).to eq(true)
       end
 
       it "accepts `--no-host-key-check`" do
-        cli = Bolt::CLI.new(%w[command run --no-host-key-check --nodes foo])
+        cli = Bolt::CLI.new(%w[command run uptime --no-host-key-check --nodes foo])
         cli.parse
         expect(cli.config.transports[:ssh]['host-key-check']).to eq(false)
       end
 
       it "defaults to true" do
-        cli = Bolt::CLI.new(%w[command run --nodes foo])
+        cli = Bolt::CLI.new(%w[command run uptime --nodes foo])
         cli.parse
         expect(cli.config.transports[:ssh]['host-key-check']).to eq(true)
       end
@@ -437,12 +437,12 @@ describe "Bolt::CLI" do
 
     describe "connect-timeout" do
       it "accepts a specific timeout" do
-        cli = Bolt::CLI.new(%w[command run --connect-timeout 123 --nodes foo])
+        cli = Bolt::CLI.new(%w[command run uptime --connect-timeout 123 --nodes foo])
         expect(cli.parse).to include('connect-timeout': 123)
       end
 
       it "generates an error message if no timeout value is given" do
-        cli = Bolt::CLI.new(%w[command run --nodes foo --connect-timeout])
+        cli = Bolt::CLI.new(%w[command run uptime --nodes foo --connect-timeout])
         expect {
           cli.parse
         }.to raise_error(Bolt::CLIError,
@@ -454,19 +454,19 @@ describe "Bolt::CLI" do
       it "treats relative modulepath as relative to pwd" do
         site = File.expand_path('site')
         modulepath = [site, 'modules'].join(File::PATH_SEPARATOR)
-        cli = Bolt::CLI.new(%W[command run --modulepath #{modulepath} --nodes foo])
+        cli = Bolt::CLI.new(%W[command run uptime --modulepath #{modulepath} --nodes foo])
         expect(cli.parse).to include(modulepath: [site, File.expand_path('modules')])
       end
 
       it "accepts shorthand -m" do
         site = File.expand_path('site')
         modulepath = [site, 'modules'].join(File::PATH_SEPARATOR)
-        cli = Bolt::CLI.new(%W[command run -m #{modulepath} --nodes foo])
+        cli = Bolt::CLI.new(%W[command run uptime -m #{modulepath} --nodes foo])
         expect(cli.parse).to include(modulepath: [site, File.expand_path('modules')])
       end
 
       it "generates an error message if no value is given" do
-        cli = Bolt::CLI.new(%w[command run --nodes foo --modulepath])
+        cli = Bolt::CLI.new(%w[command run uptime --nodes foo --modulepath])
         expect {
           cli.parse
         }.to raise_error(Bolt::CLIError,
@@ -483,7 +483,7 @@ describe "Bolt::CLI" do
 
     describe "sudo-password" do
       it "accepts a password" do
-        cli = Bolt::CLI.new(%w[command run --sudo-password opensez --run-as alibaba --nodes foo])
+        cli = Bolt::CLI.new(%w[command run uptime --sudo-password opensez --run-as alibaba --nodes foo])
         expect(cli.parse).to include('sudo-password': 'opensez')
       end
 
@@ -492,7 +492,7 @@ describe "Bolt::CLI" do
         pw_prompt = 'Please enter your privilege escalation password: '
         allow(STDOUT).to receive(:print).with(pw_prompt)
         allow(STDOUT).to receive(:puts)
-        cli = Bolt::CLI.new(%w[command run --nodes foo --run-as alibaba --sudo-password])
+        cli = Bolt::CLI.new(%w[command run uptime --nodes foo --run-as alibaba --sudo-password])
         expect(cli.parse).to include('sudo-password': 'opensez')
       end
     end
@@ -532,6 +532,20 @@ describe "Bolt::CLI" do
       it "interprets whoami as the command" do
         cli = Bolt::CLI.new(%w[command run --nodes foo whoami])
         expect(cli.parse[:object]).to eq('whoami')
+      end
+
+      it "errors when a command is not specified" do
+        cli = Bolt::CLI.new(%w[command run --nodes foo])
+        expect {
+          cli.parse
+        }.to raise_error(Bolt::CLIError, /Must specify a command to run/)
+      end
+
+      it "errors when a command is empty string" do
+        cli = Bolt::CLI.new(['command', 'run', '', '--nodes', 'foo'])
+        expect {
+          cli.parse
+        }.to raise_error(Bolt::CLIError, /Must specify a command to run/)
       end
     end
 
@@ -1945,7 +1959,7 @@ describe "Bolt::CLI" do
 
     it 'reads modulepath' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-host-key-check])
+        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --nodes foo --no-host-key-check])
         cli.parse
         expect(cli.config.modulepath).to eq(modulepath)
       end
@@ -1953,7 +1967,7 @@ describe "Bolt::CLI" do
 
     it 'reads concurrency' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-host-key-check])
+        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --nodes foo --no-host-key-check])
         cli.parse
         expect(cli.config.concurrency).to eq(14)
       end
@@ -1961,7 +1975,7 @@ describe "Bolt::CLI" do
 
     it 'reads compile-concurrency' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-host-key-check])
+        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --nodes foo --no-host-key-check])
         cli.parse
         expect(cli.config.compile_concurrency).to eq(2)
       end
@@ -1969,7 +1983,7 @@ describe "Bolt::CLI" do
 
     it 'reads format' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-host-key-check])
+        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --nodes foo --no-host-key-check])
         cli.parse
         expect(cli.config.format).to eq('json')
       end
@@ -1977,7 +1991,7 @@ describe "Bolt::CLI" do
 
     it 'reads log file' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-host-key-check])
+        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --nodes foo --no-host-key-check])
         cli.parse
         normalized_path = File.expand_path(File.join(configdir, 'debug.log'))
         expect(cli.config.log).to eq(
@@ -1989,7 +2003,7 @@ describe "Bolt::CLI" do
 
     it 'reads private-key for ssh' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-host-key-check])
+        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --nodes foo --no-host-key-check])
         cli.parse
         expect(cli.config.transports[:ssh]['private-key']).to eq('/bar/foo')
       end
@@ -1997,7 +2011,7 @@ describe "Bolt::CLI" do
 
     it 'reads host-key-check for ssh' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo])
+        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --nodes foo])
         cli.parse
         expect(cli.config.transports[:ssh]['host-key-check']).to eq(false)
       end
@@ -2005,7 +2019,7 @@ describe "Bolt::CLI" do
 
     it 'reads run-as for ssh' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --password bar --no-host-key-check])
+        cli = Bolt::CLI.new(%W[command run r --configfile #{conf.path} --nodes foo --password bar --no-host-key-check])
         cli.parse
         expect(cli.config.transports[:ssh]['run-as']).to eq('Fakey McFakerson')
       end
@@ -2013,7 +2027,7 @@ describe "Bolt::CLI" do
 
     it 'reads separate connect-timeout for ssh and winrm' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-host-key-check --no-ssl])
+        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --nodes foo --no-host-key-check --no-ssl])
         cli.parse
         expect(cli.config.transports[:ssh]['connect-timeout']).to eq(4)
         expect(cli.config.transports[:winrm]['connect-timeout']).to eq(7)
@@ -2022,7 +2036,7 @@ describe "Bolt::CLI" do
 
     it 'reads ssl for winrm' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo])
+        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --nodes foo])
         cli.parse
         expect(cli.config.transports[:winrm]['ssl']).to eq(false)
       end
@@ -2030,7 +2044,7 @@ describe "Bolt::CLI" do
 
     it 'reads ssl-verify for winrm' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo])
+        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --nodes foo])
         cli.parse
         expect(cli.config.transports[:winrm]['ssl-verify']).to eq(false)
       end
@@ -2038,7 +2052,7 @@ describe "Bolt::CLI" do
 
     it 'reads extensions for winrm' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-ssl])
+        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --nodes foo --no-ssl])
         cli.parse
         expect(cli.config.transports[:winrm]['extensions']).to eq(['.py', '.bat'])
       end
@@ -2046,7 +2060,7 @@ describe "Bolt::CLI" do
 
     it 'reads task environment for pcp' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo])
+        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --nodes foo])
         cli.parse
         expect(cli.config.transports[:pcp]['task-environment']).to eq('testenv')
       end
@@ -2054,7 +2068,7 @@ describe "Bolt::CLI" do
 
     it 'reads service url for pcp' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo])
+        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --nodes foo])
         cli.parse
         expect(cli.config.transports[:pcp]['service-url']).to eql('http://foo.org')
       end
@@ -2062,7 +2076,7 @@ describe "Bolt::CLI" do
 
     it 'reads token file for pcp' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo])
+        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --nodes foo])
         cli.parse
         expect(cli.config.transports[:pcp]['token-file']).to eql('/path/to/token')
       end
@@ -2070,7 +2084,7 @@ describe "Bolt::CLI" do
 
     it 'reads separate cacert file for pcp and winrm' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-host-key-check --no-ssl])
+        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --nodes foo --no-host-key-check --no-ssl])
         cli.parse
         expect(cli.config.transports[:pcp]['cacert']).to eql('/path/to/cacert')
         expect(cli.config.transports[:winrm]['cacert']).to eql('/path/to/winrm-cacert')
@@ -2079,14 +2093,14 @@ describe "Bolt::CLI" do
 
     it 'CLI flags override config' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --concurrency 12])
+        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --nodes foo --concurrency 12])
         cli.parse
         expect(cli.config.concurrency).to eq(12)
       end
     end
 
     it 'raises an error if a config file is specified and invalid' do
-      cli = Bolt::CLI.new(%W[command run --configfile #{File.join(configdir, 'invalid.yml')} --nodes foo])
+      cli = Bolt::CLI.new(%W[command run uptime --configfile #{File.join(configdir, 'invalid.yml')} --nodes foo])
       expect {
         cli.parse
       }.to raise_error(Bolt::FileError, /Could not parse/)
@@ -2097,7 +2111,7 @@ describe "Bolt::CLI" do
     let(:inventorydir) { File.join(__dir__, '..', 'fixtures', 'configs') }
 
     it 'raises an error if a inventory file is specified and invalid' do
-      cli = Bolt::CLI.new(%W[command run --inventoryfile #{File.join(inventorydir, 'invalid.yml')} --nodes foo])
+      cli = Bolt::CLI.new(%W[command run uptime --inventoryfile #{File.join(inventorydir, 'invalid.yml')} --nodes foo])
       expect {
         cli.parse
       }.to raise_error(Bolt::Error, /Could not parse/)
@@ -2108,7 +2122,7 @@ describe "Bolt::CLI" do
       after(:each) { ENV.delete('BOLT_INVENTORY') }
 
       it 'errors when BOLT_INVENTORY is set' do
-        cli = Bolt::CLI.new(%W[command run --inventoryfile #{File.join(inventorydir, 'invalid.yml')} --nodes foo])
+        cli = Bolt::CLI.new(%W[command run id --inventoryfile #{File.join(inventorydir, 'invalid.yml')} --nodes foo])
         expect {
           cli.parse
         }.to raise_error(Bolt::Error, /BOLT_INVENTORY is set/)
