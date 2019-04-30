@@ -204,6 +204,10 @@ module Bolt
       if options[:subcommand] == 'apply' && (!options[:object] && !options[:code])
         raise Bolt::CLIError, "a manifest file or --execute is required"
       end
+
+      if options[:subcommand] == 'command' && (!options[:object] || options[:object].empty?)
+        raise Bolt::CLIError, "Must specify a command to run"
+      end
     end
 
     def handle_parser_errors
