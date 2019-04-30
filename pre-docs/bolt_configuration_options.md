@@ -68,6 +68,39 @@ to avoid writing them to disk.
 
 `user`: Login user. Default is `root`.
 
+### OpenSSH configuration options 
+
+In addition to the ssh transport options defined in Bolt-specific configuration files some additional ssh options are read from OpenSSH configuration files ( `~/.ssh/config`, `/etc/ssh_config`, and `/etc/ssh/ssh_config`). Not all OpenSSH configuration values have equivalents in Bolt. Below is a list of options configurable in OpenSSH files.
+ 
+- `User`
+- `Port`
+- `UserKnownHostsFile`
+
+**Note**: For OpenSSH configuration options with direct equivalents in Bolt (for example `user` and `port`) the setting in Bolt config take precedence. 
+
+In order to illustrate consider the following example:
+
+inventory.yaml
+```yaml
+nodes:
+  - name: host1.example.net
+    config:
+      transport: ssh
+      ssh:
+        host-key-check: true
+        port: 22
+        private-key: /.ssh/id_rsa-example
+```
+\~/.ssh/config
+```
+Host *.example.net
+  UserKnownHostsFile=~/.ssh/known_hosts
+  User root
+  Port 444
+```
+The ssh connection will be configured to use the user and known hosts file defined in OpenSSH config and the port defined in Bolt config. Note that `host-key-check` must be set in Bolt config (the `StrictHostKeyChecking` OpenSSH configuration value is ignored). 
+
+When using the ssh transport Bolt also interacts with the ssh-agent for ssh key management. The most common interaction is to handle password protected private keys. When a private key is password protected it must be added to the ssh-agent in order to be used to authenticate Bolt ssh connections.
 
 ## WinRM transport configuration options
 
