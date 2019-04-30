@@ -65,7 +65,7 @@ module Bolt
     def initialize(target, error: nil, report: nil)
       @target = target
       @value = {}
-      @type = 'apply'
+      @action = 'apply'
       value['report'] = report if report
       value['_error'] = error if error
       value['_output'] = metrics_message if metrics_message

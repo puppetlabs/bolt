@@ -1545,7 +1545,7 @@ describe "Bolt::CLI" do
             [{ 'node' => 'foo',
                'target' => 'foo',
                'status' => 'success',
-               'type' => 'task',
+               'action' => 'task',
                'object' => 'some_task',
                'result' => { '_output' => 'yes' } }]
           )
@@ -1576,7 +1576,7 @@ describe "Bolt::CLI" do
             [{ 'node' => 'foo',
                'target' => 'foo',
                'status' => 'success',
-               'type' => 'task',
+               'action' => 'task',
                'object' => 'some_task',
                'result' => { '_output' => 'yes' } }]
           )
@@ -1613,7 +1613,7 @@ describe "Bolt::CLI" do
                 'node' => 'foo',
                 'target' => 'foo',
                 'status' => 'failure',
-                'type' => 'task',
+                'action' => 'task',
                 'object' => 'some_task',
                 'result' => {
                   "_output" => "no",

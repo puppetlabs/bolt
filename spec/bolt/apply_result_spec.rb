@@ -50,11 +50,11 @@ describe Bolt::ApplyResult do
     end
   end
 
-  describe 'type and object' do
-    it 'exposes apply as the type' do
+  describe 'action and object' do
+    it 'exposes apply as the action' do
       result = Bolt::Result.for_task(:target, 'hello', '', 0, 'catalog')
       result = Bolt::ApplyResult.new(result)
-      expect(result.type).to be('apply')
+      expect(result.action).to be('apply')
       expect(result.object).to be(nil)
     end
   end

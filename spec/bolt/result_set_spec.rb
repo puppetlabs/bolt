@@ -25,13 +25,13 @@ describe Bolt::Result do
   it 'is creates the correct json' do
     expected = [{ "node" => "node1",
                   "target" => "node1",
-                  "type" => nil,
+                  "action" => nil,
                   "object" => nil,
                   "status" => "success",
                   "result" => { "key" => "val1" } },
                 { "node" => "node1",
                   "target" => "node1",
-                  "type" => nil,
+                  "action" => nil,
                   "object" => nil,
                   "status" => "failure",
                   "result" => { "key" => "val2", "_error" => { "kind" => "bolt/oops" } } }]
