@@ -128,6 +128,10 @@ module Bolt
       to_json
     end
 
+    def to_data
+      Bolt::Util.walk_keys(status_hash, &:to_s)
+    end
+
     def ok?
       error_hash.nil?
     end
