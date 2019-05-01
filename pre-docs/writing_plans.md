@@ -6,6 +6,8 @@ Write plans in the Puppet language, giving them a `.pp` extension, and place the
 
 Plans can use any combination of [Bolt functions](./plan_functions.html) or [built-in Puppet functions](https://puppet.com/docs/puppet/6.1/function.html).
 
+**Related information**
+[Converting YAML plans to Puppet plans](writing_yaml_plans.md#converting-yaml-plans-to-puppet-plans)
 
 ## Naming plans
 
@@ -509,4 +511,3 @@ plan pdb_discover {
   run_task('my_task', $nodes)
 }
 ```
-
