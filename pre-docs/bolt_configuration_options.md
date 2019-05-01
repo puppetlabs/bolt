@@ -72,9 +72,17 @@ to avoid writing them to disk.
 
 In addition to the ssh transport options defined in Bolt-specific configuration files some additional ssh options are read from OpenSSH configuration files ( `~/.ssh/config`, `/etc/ssh_config`, and `/etc/ssh/ssh_config`). Not all OpenSSH configuration values have equivalents in Bolt. Below is a list of options configurable in OpenSSH files.
  
-- `User`
-- `Port`
-- `UserKnownHostsFile`
+- `Ciphers`: Ciphers allowed in order of preference. Multiple ciphers must be comma-separated.
+- `Compression`: Whether to use compression.
+- `CompressionLevel`: Compression level to use if compression is enabled.
+- `GlobalKnownHostsFile`: Path to global host key database.
+- `HostKeyAlgorithms`: Host key algorithms that the client wants to use in order of preference.
+- `HostKeyAlias`: Use alias instead of real host name when looking up or saving the host key in the host key database file.
+- `IdentitiesOnly`: Only use Identity Key in ssh config even if ssh-agent offers others.
+- `HostName`: Host name to log.
+- `IdentityFile`: File which user's identity key is stored.
+- `Port`: SSH port.
+- `UserKnownHostsFile`: Path to local user's host key database.
 
 **Note**: For OpenSSH configuration options with direct equivalents in Bolt (for example `user` and `port`) the setting in Bolt config take precedence. 
 
