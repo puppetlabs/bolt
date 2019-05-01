@@ -92,9 +92,15 @@ module PlanExecutor
       error = validate_schema(@schema, body)
       return [400, error.to_json] unless error.nil?
       name = body['plan_name']
-      # Errors if plan is not found
-      @pal.get_plan_info(name)
-
+      # We need to wrap all calls to @pal (not just plan_run) in a future
+      # to ensure that the process always uses the SingleThreadExecutor
+      # worker and forces one call to @pal at a time regardless of the number
+      # of concurrent calls to POST /plan_run
+      result = Concurrent::Future.execute(executor: @worker) do
+        @pal.get_plan_info(name)
+      end
+      # .value! will fail if the internal process of the thread fails
+      result.value!
       executor = PlanExecutor::Executor.new(body['job_id'], @http_client)
       applicator = PlanExecutor::Applicator.new(@inventory, executor, nil)
       params = body['params']
@@ -104,7 +110,6 @@ module PlanExecutor
         executor.finish_plan(pal_result)
         pal_result
       end
-
       [200, { status: 'running' }.to_json]
     end
 
