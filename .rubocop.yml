@@ -85,9 +85,6 @@ Metrics/ParameterLists:
 Metrics/PerceivedComplexity:
   Enabled: false
 
-Performance/UnfreezeString:
-  Enabled: false
-
 Lint/HandleExceptions:
   Exclude:
     - lib/bolt/transport/local/shell.rb
