@@ -27,7 +27,7 @@ test_name "bolt command run should execute command on localhost via local transp
 
     result = bolt_command_on(bolt, bolt_command, flags)
 
-    message = "command executed as non run-as user:\n#{result.cmd}"
+    message = "command did not execute as #{local_user}:\n#{result.cmd}"
     regex = /#{local_user}/
     assert_match(regex, result.stdout, message)
   end
