@@ -28,7 +28,7 @@ test_name "bolt apply should apply manifest block on remote hosts via ssh and wi
 
     targets.each do |node|
       # Verify that node succeeded
-      host = node.hostname
+      host = node == 'localhost' ? 'localhost' : node.hostname
       result = json.find { |n| n['node'] == host }
       assert_equal('success', result['status'],
                    "The task did not succeed on #{host}")
@@ -46,6 +46,17 @@ test_name "bolt apply should apply manifest block on remote hosts via ssh and wi
 
     result = bolt_command_on(bolt, bolt_command, flags)
     check_result(result, targets)
+  end
+
+  step "execute `bolt apply -e <code>` with json output against localhost" do
+    # TODO: Execute with '--run-as local_user' when BOLT-1283 is fixed
+    bolt_command = "bolt apply -e \"notify { 'hello world': }\" --nodes localhost"
+    flags = {
+      '--format' => 'json'
+    }
+
+    result = bolt_command_on(bolt, bolt_command, flags)
+    check_result(result, ['localhost'])
   end
 
   step "execute `bolt apply <file.pp>` with json output" do
