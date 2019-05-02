@@ -57,11 +57,6 @@ Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFuncti
     options = options.merge('_description' => description) if description
     executor = Puppet.lookup(:bolt_executor) { nil }
     inventory = Puppet.lookup(:bolt_inventory) { nil }
-    unless executor && inventory && Puppet.features.bolt?
-      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
-        Puppet::Pops::Issues::TASK_MISSING_BOLT, action: _('run a script')
-      )
-    end
 
     executor.report_function_call('run_script')
 

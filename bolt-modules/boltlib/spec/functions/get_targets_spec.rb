@@ -64,12 +64,4 @@ describe 'get_targets' do
       is_expected.to run.with_params(hostname).and_return([target])
     end
   end
-
-  context 'without bolt feature present' do
-    it 'fails and reports that bolt library is required' do
-      Puppet.features.stubs(:bolt?).returns(false)
-      is_expected.to run.with_params('echo hello')
-                        .and_raise_error(/The 'bolt' library is required to process targets through inventory/)
-    end
-  end
 end

@@ -24,7 +24,7 @@ Puppet::Functions.create_function(:get_targets) do
   def get_targets(names)
     inventory = Puppet.lookup(:bolt_inventory) { nil }
 
-    unless inventory && Puppet.features.bolt?
+    unless inventory
       raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
         Puppet::Pops::Issues::TASK_MISSING_BOLT, action: _('process targets through inventory')
       )

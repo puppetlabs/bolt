@@ -77,11 +77,6 @@ Puppet::Functions.create_function(:run_task) do
     task_args ||= {}
     executor = Puppet.lookup(:bolt_executor) { nil }
     inventory = Puppet.lookup(:bolt_inventory) { nil }
-    unless executor && inventory && Puppet.features.bolt?
-      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
-        Puppet::Pops::Issues::TASK_MISSING_BOLT, action: _('run a task')
-      )
-    end
 
     # Bolt calls this function internally to trigger tasks from the CLI. We
     # don't want to count those invocations.

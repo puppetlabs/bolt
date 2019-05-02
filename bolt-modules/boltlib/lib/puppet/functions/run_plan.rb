@@ -25,11 +25,6 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
     end
 
     executor = Puppet.lookup(:bolt_executor) { nil }
-    unless executor && Puppet.features.bolt?
-      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
-        Puppet::Pops::Issues::TASK_MISSING_BOLT, action: _('run a plan')
-      )
-    end
 
     # Bolt calls this function internally to trigger plans from the CLI. We
     # don't want to count those invocations.
