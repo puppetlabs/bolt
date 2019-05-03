@@ -123,6 +123,11 @@ module Bolt
         update_targets(options)
       end
 
+      unless options.key?(:verbose)
+        # Default to verbose for everything except plans
+        options[:verbose] = options[:subcommand] != 'plan'
+      end
+
       options
     rescue Bolt::Error => e
       warn e.message
