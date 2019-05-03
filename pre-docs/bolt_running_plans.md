@@ -20,6 +20,8 @@ bolt plan run mymodule::myplan load_balancer=lb.myorg.com
 
 Note that, like `--nodes`, you can pass a comma-separated list of node names, wildcard patterns, or group names to a plan parameter that will be passed to a run function or that the plan resolves using `get_targets`.
 
+**Tip**: Bolt is packaged with a collection of modules that contain useful plans to support common workflows. For details, see [Packaged modules](bolt_installing_modules.md#packaged-modules).
+
 
 ## Passing structured data
 
@@ -81,6 +83,3 @@ your module is in `~/src/modules/my_module/` run Bolt with `--modulepath
 ~/src/module`. If you often use the same `modulepath` you can set `modulepath` in
 `bolt.yaml`.
 
-## Packaged plan content
-
-Bolt is packaged with a collection of modules that contain useful plans to support common workflows. See the [list of packaged modules](bolt_installing_modules.md#packaged-modules) for specifics.
