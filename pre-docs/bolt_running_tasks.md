@@ -25,6 +25,8 @@ To run the main module task defined in `init`, refer to the task by the module n
 bolt task run package action=status name=vim --nodes neptune --modulepath ~/modules
 ```
 
+**Tip**: Bolt is packaged with a collection of modules that contain useful plans to support common workflows. For details, see [Packaged modules](bolt_installing_modules.md#packaged-modules).
+
 ## Passing structured data
 
 If one of your task or plan parameters accept structured data like an `Array` or
@@ -84,7 +86,3 @@ default, the `modulepath` includes `modules/` and `site-modules/` directories in
 your module is in `~/src/modules/my_module/` run Bolt with `--modulepath
 ~/src/module`. If you often use the same `modulepath` you can set `modulepath` in
 `bolt.yaml`.
-
-## Packaged task content
-
-Bolt is packaged with a collection of modules that contain useful tasks to support common workflows. See the [list of packaged modules](bolt_installing_modules.md#packaged-modules) for specifics.
