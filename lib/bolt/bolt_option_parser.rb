@@ -27,6 +27,7 @@ Available subcommands:
   bolt task show                   Show list of available tasks
   bolt task show <task>            Show documentation for task
   bolt task run <task> [params]    Run a Puppet task
+  bolt plan convert <plan_path>    Convert a YAML plan to a Puppet plan
   bolt plan show                   Show list of available plans
   bolt plan show <plan>            Show details for plan
   bolt plan run <plan> [params]    Run a Puppet task plan
@@ -77,6 +78,7 @@ Available options are:
 Usage: bolt plan <action> <plan> [options] [parameters]
 
 Available actions are:
+  convert <plan_path>              Convert a YAML plan to a Puppet plan
   show                             Show list of available plans
   show <plan>                      Show details for plan
   run                              Run a Puppet task plan
