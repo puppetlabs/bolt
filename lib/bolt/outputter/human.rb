@@ -82,6 +82,15 @@ module Bolt
           @stream.puts(colorize(:red, remove_trail(indent(2, result.error_hash['msg']))))
         end
 
+        if result.is_a?(Bolt::ApplyResult) && @verbose
+          result.resource_logs.each do |log|
+            # Omit low-level info/debug messages
+            next if %w[info debug].include?(log['level'])
+            message = format_log(log)
+            @stream.puts(indent(2, message))
+          end
+        end
+
         if result.message
           @stream.puts(remove_trail(indent(2, result.message)))
         end
@@ -102,6 +111,19 @@ module Bolt
             @stream.puts(indent(2, ::JSON.pretty_generate(result.generic_value)))
           end
         end
+      end
+
+      def format_log(log)
+        color = case log['level']
+                when 'warn'
+                  :yellow
+                when 'err'
+                  :red
+                end
+        source = "#{log['source']}: " if log['source']
+        message = "#{log['level'].capitalize}: #{source}#{log['message']}"
+        message = colorize(color, message) if color
+        message
       end
 
       def print_step_start(description:, targets:, **_kwargs)
