@@ -16,7 +16,7 @@ module BoltSpec
       allow(cli).to receive(:puppetdb_client).and_return(pdb_client)
 
       output =  StringIO.new
-      outputter = outputter.new(false, false, output)
+      outputter = outputter.new(false, false, false, output)
       allow(cli).to receive(:outputter).and_return(outputter)
       allow(Bolt::Logger).to receive(:configure)
 
@@ -36,7 +36,7 @@ module BoltSpec
     end
 
     def run_cli_json(arguments, **opts)
-      output = run_cli(arguments, opts)
+      output = run_cli(arguments + ['--format', 'json'], opts)
 
       begin
         result = JSON.parse(output, quirks_mode: true)

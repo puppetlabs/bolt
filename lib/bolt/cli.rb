@@ -302,29 +302,23 @@ module Bolt
         elapsed_time = Benchmark.realtime do
           executor_opts = {}
           executor_opts['_description'] = options[:description] if options.key?(:description)
+          executor.subscribe(outputter)
+          executor.subscribe(log_outputter)
           results =
             case options[:subcommand]
             when 'command'
-              executor.run_command(targets, options[:object], executor_opts) do |event|
-                outputter.print_event(event)
-              end
+              executor.run_command(targets, options[:object], executor_opts)
             when 'script'
               script = options[:object]
               validate_file('script', script)
-              executor.run_script(
-                targets, script, options[:leftovers], executor_opts
-              ) do |event|
-                outputter.print_event(event)
-              end
+              executor.run_script(targets, script, options[:leftovers], executor_opts)
             when 'task'
               pal.run_task(options[:object],
                            targets,
                            options[:task_options],
                            executor,
                            inventory,
-                           options[:description]) do |event|
-                outputter.print_event(event)
-              end
+                           options[:description])
             when 'file'
               src = options[:object]
               dest = options[:leftovers].first
@@ -333,13 +327,13 @@ module Bolt
                 raise Bolt::CLIError, "A destination path must be specified"
               end
               validate_file('source file', src, true)
-              executor.upload_file(targets, src, dest, executor_opts) do |event|
-                outputter.print_event(event)
-              end
+              executor.upload_file(targets, src, dest, executor_opts)
             end
         end
 
+        executor.shutdown
         rerun.update(results)
+
         outputter.print_summary(results, elapsed_time)
         code = results.ok ? 0 : 2
       end
@@ -386,12 +380,16 @@ module Bolt
       plan_context[:description] = options[:description] if options[:description]
 
       executor = Bolt::Executor.new(config.concurrency, @analytics, options[:noop])
+      executor.subscribe(outputter) if options.fetch(:format, 'human') == 'human'
+      executor.subscribe(log_outputter)
       executor.start_plan(plan_context)
       result = pal.run_plan(plan_name, plan_arguments, executor, inventory, puppetdb_client)
 
       # If a non-bolt exception bubbles up the plan won't get finished
       executor.finish_plan(result)
+      executor.shutdown
       rerun.update(result)
+
       outputter.print_plan_result(result)
       result.ok? ? 0 : 1
     end
@@ -400,18 +398,25 @@ module Bolt
       ast = pal.parse_manifest(code, filename)
 
       executor = Bolt::Executor.new(config.concurrency, @analytics, noop)
-      # Call start_plan just to enable plan_logging
-      executor.start_plan(nil)
+      executor.subscribe(outputter) if options.fetch(:format, 'human') == 'human'
+      executor.subscribe(log_outputter)
+      # apply logging looks like plan logging, so tell the outputter we're in a
+      # plan even though we're not
+      executor.publish_event(type: :plan_start, plan: nil)
 
-      pal.in_plan_compiler(executor, inventory, puppetdb_client) do |compiler|
-        compiler.call_function('apply_prep', targets)
+      results = nil
+      elapsed_time = Benchmark.realtime do
+        pal.in_plan_compiler(executor, inventory, puppetdb_client) do |compiler|
+          compiler.call_function('apply_prep', targets)
+        end
+
+        results = pal.with_bolt_executor(executor, inventory, puppetdb_client) do
+          Puppet.lookup(:apply_executor).apply_ast(ast, targets, '_catch_errors' => true, '_noop' => noop)
+        end
       end
 
-      results = pal.with_bolt_executor(executor, inventory, puppetdb_client) do
-        Puppet.lookup(:apply_executor).apply_ast(ast, targets, '_catch_errors' => true, '_noop' => noop)
-      end
-
-      outputter.print_apply_result(results)
+      executor.shutdown
+      outputter.print_apply_result(results, elapsed_time)
       rerun.update(results)
 
       results.ok ? 0 : 1
@@ -483,7 +488,11 @@ module Bolt
     end
 
     def outputter
-      @outputter ||= Bolt::Outputter.for_format(config.format, config.color, config.trace)
+      @outputter ||= Bolt::Outputter.for_format(config.format, config.color, options[:verbose], config.trace)
+    end
+
+    def log_outputter
+      @log_outputter ||= Bolt::Outputter::Logger.new(options[:verbose], config.trace)
     end
 
     def bundled_content

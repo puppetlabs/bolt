@@ -72,7 +72,10 @@ describe "PlanExecutor::Executor" do
         .with(targets, 'hostname', {})
         .and_raise(Bolt::Error.new('failed', 'my-exception'))
 
-      executor.run_command(targets, 'hostname') do |result|
+      results = executor.run_command(targets, 'hostname')
+
+      expect(results.length).to eq(1)
+      results.each do |result|
         expect(result.error_hash['msg']).to eq('failed')
         expect(result.error_hash['kind']).to eq('my-exception')
       end
@@ -87,6 +90,8 @@ describe "PlanExecutor::Executor" do
         .and_return(node_results)
 
       results = executor.run_script(targets, script, [], {})
+
+      expect(results.length).to eq(targets.length)
       results.each do |result|
         expect(result).to be_instance_of(Bolt::Result)
       end
@@ -96,9 +101,12 @@ describe "PlanExecutor::Executor" do
       expect(executor.orch_client)
         .to receive(:run_script)
         .with(targets, script, [], {})
-        .and_raise(Bolt::Error, 'failed', 'my-exception')
+        .and_raise(Bolt::Error.new('failed', 'my-exception'))
 
-      executor.run_script(targets, script, []) do |result|
+      results = executor.run_script(targets, script, [])
+
+      expect(results.length).to eq(1)
+      results.each do |result|
         expect(result.error_hash['msg']).to eq('failed')
         expect(result.error_hash['kind']).to eq('my-exception')
       end
@@ -117,6 +125,8 @@ describe "PlanExecutor::Executor" do
         .and_return(node_results)
 
       results = executor.run_task(targets, mock_task(task), task_arguments, task_options)
+
+      expect(results.length).to eq(targets.length)
       results.each do |result|
         expect(result).to be_instance_of(Bolt::Result)
         expect(result).to be_success
@@ -127,9 +137,12 @@ describe "PlanExecutor::Executor" do
       expect(executor.orch_client)
         .to receive(:run_task)
         .with(targets, task_type(task), task_arguments, task_options)
-        .and_raise(Bolt::Error, 'failed', 'my-exception')
+        .and_raise(Bolt::Error.new('failed', 'my-exception'))
 
-      executor.run_task(targets, mock_task(task), task_arguments, task_options) do |result|
+      results = executor.run_task(targets, mock_task(task), task_arguments, task_options)
+
+      expect(results.length).to eq(1)
+      results.each do |result|
         expect(result.error_hash['msg']).to eq('failed')
         expect(result.error_hash['kind']).to eq('my-exception')
       end
@@ -147,6 +160,8 @@ describe "PlanExecutor::Executor" do
         .and_return(node_results)
 
       results = executor.upload_file(targets, source, dest)
+
+      expect(results.length).to eq(targets.length)
       results.each do |result|
         expect(result).to be_instance_of(Bolt::Result)
       end
@@ -156,9 +171,12 @@ describe "PlanExecutor::Executor" do
       expect(executor.orch_client)
         .to receive(:file_upload)
         .with(targets, source, dest, {})
-        .and_raise(Bolt::Error, 'failed', 'my-exception')
+        .and_raise(Bolt::Error.new('failed', 'my-exception'))
 
-      executor.upload_file(targets, source, dest) do |result|
+      results = executor.upload_file(targets, source, dest)
+
+      expect(results.length).to eq(1)
+      results.each do |result|
         expect(result.error_hash['msg']).to eq('failed')
         expect(result.error_hash['kind']).to eq('my-exception')
       end

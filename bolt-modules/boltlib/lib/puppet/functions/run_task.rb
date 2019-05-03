@@ -34,24 +34,8 @@ Puppet::Functions.create_function(:run_task) do
   dispatch :run_task_with_description do
     param 'String[1]', :task_name
     param 'Boltlib::TargetSpec', :targets
-    param 'String', :description
-    optional_param 'Hash[String[1], Any]', :task_args
-    return_type 'ResultSet'
-  end
-
-  # Run a task, calling the block as each node starts and finishes execution. This is used from 'bolt task run'
-  # @param task_name The task to run.
-  # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
-  # @param description A description to be output when calling this function.
-  # @param task_args Arguments to the plan. Can also include additional options: '_catch_errors', '_run_as'.
-  # @param block A block that's invoked as actions are started and finished on each node.
-  # @return A list of results, one entry per target.
-  dispatch :run_task_raw do
-    param 'String[1]', :task_name
-    param 'Boltlib::TargetSpec', :targets
     param 'Optional[String]', :description
     optional_param 'Hash[String[1], Any]', :task_args
-    block_param 'Callable[Struct[{type => Enum[node_start, node_result], target => Target}], 1, 1]', :block
     return_type 'ResultSet'
   end
 
@@ -60,15 +44,6 @@ Puppet::Functions.create_function(:run_task) do
   end
 
   def run_task_with_description(task_name, targets, description, task_args = nil)
-    task_args ||= {}
-    r = run_task_raw(task_name, targets, description, task_args)
-    if !r.ok && !task_args['_catch_errors']
-      raise Bolt::RunFailure.new(r, 'run_task', task_name)
-    end
-    r
-  end
-
-  def run_task_raw(task_name, targets, description = nil, task_args = nil, &block)
     unless Puppet[:tasks]
       raise Puppet::ParseErrorWithIssue
         .from_issue_and_stack(Bolt::PAL::Issues::PLAN_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, action: 'run_task')
@@ -149,7 +124,11 @@ Puppet::Functions.create_function(:run_task) do
     if targets.empty?
       Bolt::ResultSet.new([])
     else
-      executor.run_task(targets, task, use_args, options, &block)
+      result = executor.run_task(targets, task, use_args, options)
+      if !result.ok && !task_args['_catch_errors']
+        raise Bolt::RunFailure.new(result, 'run_task', task_name)
+      end
+      result
     end
   end
 
