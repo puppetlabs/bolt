@@ -1,0 +1,18 @@
+parameters:
+  empty:
+  mandatory_string:
+    type: String[1, 10]
+  mandatory_integer:
+    type: Integer
+  boolean:
+    type: Boolean
+  optional_string:
+    type: Optional[String]
+  with_default:
+    type: TargetSpec
+    default: 'localhost'
+
+steps:
+  - name: print
+    target: localhost
+    command: echo Initializing

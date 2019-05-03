@@ -35,6 +35,70 @@ module Bolt
         raise Bolt::FileError.new("Could not read #{file_name} file: #{path}", path)
       end
 
+      # Accepts a path with either 'plans' or 'tasks' in it and determines
+      # the name of the module
+      def module_name(path)
+        # Remove extra dots and slashes
+        path = Pathname.new(path).cleanpath.to_s
+        fs = File::SEPARATOR
+        regex = Regexp.new("#{fs}plans#{fs}|#{fs}tasks#{fs}")
+
+        # Only accept paths with '/plans/' or '/tasks/'
+        unless path.match?(regex)
+          msg = "Could not determine module from #{path}. "\
+            "The path must include 'plans' or 'tasks' directory"
+          raise Bolt::Error.new(msg, 'bolt/modulepath-error')
+        end
+
+        # Split the path on the first instance of /plans/ or /tasks/
+        parts = path.split(regex, 2)
+        # Module name is the last entry before 'plans' or 'tasks'
+        modulename = parts[0].split(fs)[-1]
+        filename = File.basename(path).split('.')[0]
+        # Remove "/init.*" if filename is init or just remove the file
+        # extension
+        if filename == 'init'
+          parts[1].chomp!(File.basename(path))
+        else
+          parts[1].chomp!(File.extname(path))
+        end
+
+        # The plan or task name is the rest of the path
+        [modulename, parts[1].split(fs)].flatten.join('::')
+      end
+
+      def to_code(string)
+        case string
+        when Bolt::PAL::YamlPlan::DoubleQuotedString
+          string.value.inspect
+        when Bolt::PAL::YamlPlan::BareString
+          if string.value.start_with?('$')
+            string.value.to_s
+          else
+            "'#{string.value}'"
+          end
+        when Bolt::PAL::YamlPlan::EvaluableString, Bolt::PAL::YamlPlan::CodeLiteral
+          string.value.to_s
+        when String
+          "'#{string}'"
+        when Hash
+          formatted = String.new("{")
+          string.each do |k, v|
+            formatted << "#{to_code(k)} => #{to_code(v)}, "
+          end
+          formatted.chomp!(", ")
+          formatted << "}"
+          formatted
+        when Array
+          formatted = String.new("[")
+          formatted << string.map { |str| to_code(str) }.join(', ')
+          formatted << "]"
+          formatted
+        else
+          string
+        end
+      end
+
       def deep_merge(hash1, hash2)
         recursive_merge = proc do |_key, h1, h2|
           if h1.is_a?(Hash) && h2.is_a?(Hash)

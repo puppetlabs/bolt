@@ -37,6 +37,8 @@ module Bolt
       end
     end
 
+    attr_reader :modulepath
+
     def initialize(modulepath, hiera_config, max_compiles = Etc.nprocessors)
       # Nothing works without initialized this global state. Reinitializing
       # is safe and in practice only happen in tests
@@ -83,6 +85,7 @@ module Bolt
       require 'bolt/pal/logging'
       require 'bolt/pal/issues'
       require 'bolt/pal/yaml_plan/loader'
+      require 'bolt/pal/yaml_plan/transpiler'
 
       # Now that puppet is loaded we can include puppet mixins in data types
       Bolt::ResultSet.include_iterable
@@ -292,6 +295,12 @@ module Bolt
         raise Bolt::Error.new(Bolt::Error.unknown_plan(plan_name), 'bolt/unknown-plan')
       end
       plan_info
+    end
+
+    def convert_plan(plan_path)
+      Puppet[:tasks] = true
+      transpiler = YamlPlan::Transpiler.new
+      transpiler.transpile(plan_path)
     end
 
     # Returns a mapping of all modules available to the Bolt compiler

@@ -1,0 +1,23 @@
+parameters:
+  nodes:
+    type: TargetSpec
+  message:
+    type: String
+    default: "hello world"
+
+steps:
+  - name: sample
+    task: sample
+    target: $nodes
+    parameters:
+      message: $message
+  - name: eval_output
+    eval: |
+      # TODO: Can blocks handle comments?
+      $list = $sample.targets.map |$t| {
+        notice($t)
+        $t
+      }
+      $list.map |$l| {$l.name}
+
+return: $eval_output

@@ -1,0 +1,22 @@
+parameters:
+  message:
+    type: String
+    default: hello
+
+steps:
+  - name: barestring
+    eval: hello
+    description: 'This will evaluate to: hello'
+  - name: barestring_var
+    eval: $message
+    description: 'This will evaluate to: hello'
+  - name: single_quoted
+    eval: '$message'
+    description: 'This will evaluate to: $message'
+  - name: double_quoted_with_var
+    eval: "${message} world"
+    description: 'This will evaluate to: hello world'
+  - name: codeblock
+    eval: |
+      [$message, $message, $message].join(" ")
+    description: 'This will evaluate to: hello hello hello'
