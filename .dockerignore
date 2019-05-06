@@ -1,5 +1,7 @@
-.bundle/
-.git/
-# If we start shipping this we may reevaluate
-Gemfile.lock
-vendor/bundle
+*
+!config
+!lib
+!locales
+!bolt.gemspec
+!Gemfile
+!spec/fixtures/ssl
