@@ -17,6 +17,8 @@ Bolt commands use the syntax: `bolt <subcommand> <action> [options]`
 | `bolt task show` | Lists all the tasks on the modulepath that have not been marked `private`. Will note whether a task supports no-operation mode. | - Adding a specific task name displays details and parameters for the task.<br>- Optionally, the name of a task you want details for: `bolt task show <TASK NAME>`
 | `bolt plan show` | Lists the plans that are installed on the current module path. | - Adding a specific plan name displays details and parameters for the plan.
 | `bolt plan convert` | Converts a YAML plan to a Puppet plan | - The path (relative or absolute) to the YAML plan to be converted.
+| `bolt puppetfile install` | Installs the modules listed in the Puppetfile to the current `Boltdir`. | |
+| `bolt puppetfile show-modules` | Lists the modules, and their versions, that are installed in the current `Boltdir`. | |
 
 ## Command options
 
