@@ -90,6 +90,10 @@ module Bolt
       @results.map(&:status_hash).to_json(opts)
     end
 
+    def to_data
+      @results.map(&:to_data)
+    end
+
     def to_s
       to_json
     end

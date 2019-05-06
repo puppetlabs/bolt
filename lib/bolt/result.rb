@@ -5,7 +5,7 @@ require 'bolt/error'
 
 module Bolt
   class Result
-    attr_reader :target, :value, :type, :object
+    attr_reader :target, :value, :action, :object
 
     def self.from_exception(target, exception)
       @exception = exception
@@ -23,7 +23,7 @@ module Bolt
       Result.new(target, error: error)
     end
 
-    def self.for_command(target, stdout, stderr, exit_code, type, command)
+    def self.for_command(target, stdout, stderr, exit_code, action, command)
       value = {
         'stdout' => stdout,
         'stderr' => stderr,
@@ -37,7 +37,7 @@ module Bolt
           'details' => { 'exit_code' => exit_code }
         }
       end
-      new(target, value: value, type: type, object: command)
+      new(target, value: value, action: action, object: command)
     end
 
     def self.for_task(target, stdout, stderr, exit_code, task)
@@ -61,11 +61,11 @@ module Bolt
                             'msg' => msg,
                             'details' => { 'exit_code' => exit_code } }
       end
-      new(target, value: value, type: 'task', object: task)
+      new(target, value: value, action: 'task', object: task)
     end
 
     def self.for_upload(target, source, destination)
-      new(target, message: "Uploaded '#{source}' to '#{target.host}:#{destination}'", type: 'upload', object: source)
+      new(target, message: "Uploaded '#{source}' to '#{target.host}:#{destination}'", action: 'upload', object: source)
     end
 
     # Satisfies the Puppet datatypes API
@@ -73,10 +73,10 @@ module Bolt
       new(target, value: value)
     end
 
-    def initialize(target, error: nil, message: nil, value: nil, type: nil, object: nil)
+    def initialize(target, error: nil, message: nil, value: nil, action: nil, object: nil)
       @target = target
       @value = value || {}
-      @type = type
+      @action = action
       @object = object
       @value_set = !value.nil?
       if error && !error.is_a?(Hash)
@@ -94,7 +94,7 @@ module Bolt
       # DEPRECATION: node in status hashes is deprecated and should be removed in 2.0
       { node: @target.name,
         target: @target.name,
-        type: type,
+        action: action,
         object: object,
         status: ok? ? 'success' : 'failure',
         result: @value }
@@ -126,6 +126,10 @@ module Bolt
 
     def to_s
       to_json
+    end
+
+    def to_data
+      Bolt::Util.walk_keys(status_hash, &:to_s)
     end
 
     def ok?

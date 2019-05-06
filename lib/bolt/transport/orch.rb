@@ -75,7 +75,7 @@ module Bolt
           # If it's finished or already has a proper error simply pass it to the
           # the result otherwise make sure an error is generated
           if state == 'finished' || (result && result['_error'])
-            Bolt::Result.new(target, value: result, type: 'task', object: task_name)
+            Bolt::Result.new(target, value: result, action: 'task', object: task_name)
           elsif state == 'skipped'
             Bolt::Result.new(
               target,
@@ -84,7 +84,7 @@ module Bolt
                 'msg' => "Node #{target.host} was skipped",
                 'details' => {}
               } },
-              type: 'task', object: task_name
+              action: 'task', object: task_name
             )
           else
             # Make a generic error with a unkown exit_code
@@ -230,7 +230,7 @@ module Bolt
       # run_task generates a result that makes sense for a generic task which
       # needs to be unwrapped to extract stdout/stderr/exitcode.
       #
-      def unwrap_bolt_result(target, result, type, obj)
+      def unwrap_bolt_result(target, result, action, obj)
         if result.error_hash
           # something went wrong return the failure
           return result
@@ -240,7 +240,7 @@ module Bolt
                                  result.value['stdout'],
                                  result.value['stderr'],
                                  result.value['exit_code'],
-                                 type, obj)
+                                 action, obj)
       end
     end
   end

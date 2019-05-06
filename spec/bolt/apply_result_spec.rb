@@ -50,12 +50,34 @@ describe Bolt::ApplyResult do
     end
   end
 
-  describe 'type and object' do
-    it 'exposes apply as the type' do
+  describe 'action and object' do
+    it 'exposes apply as the action' do
       result = Bolt::Result.for_task(:target, 'hello', '', 0, 'catalog')
       result = Bolt::ApplyResult.new(result)
-      expect(result.type).to be('apply')
+      expect(result.action).to be('apply')
       expect(result.object).to be(nil)
+    end
+  end
+
+  describe 'exposes methods for examining data' do
+    let(:example_target) { Bolt::Target.new('target') }
+    let(:task_result) { Bolt::Result.for_task(example_target, 'hello', '', 0, 'catalog') }
+    let(:apply_result) { Bolt::ApplyResult.from_task_result(task_result) }
+    let(:expected) {
+      { "node" => "target",
+        "target" => "target",
+        "action" => "apply",
+        "object" => nil,
+        "status" => "success",
+        "result" => { "report" => { "_output" => "hello" } } }
+    }
+
+    it 'with to_json' do
+      expect(JSON.parse(apply_result.to_json)).to eq(expected)
+    end
+
+    it 'with to_data' do
+      expect(apply_result.to_data).to eq(expected)
     end
   end
 end

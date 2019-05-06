@@ -91,7 +91,7 @@ shared_examples 'transport api' do
       command, expected = os_context[:stdout_command]
       result = runner.run_command(target, command)
       expect(result.value['stdout']).to match(expected)
-      expect(result.type).to eq('command')
+      expect(result.action).to eq('command')
       expect(result.object).to eq(command)
     end
 
@@ -127,7 +127,7 @@ shared_examples 'transport api' do
       with_tempfile_containing('upload-test', contents) do |file|
         result = runner.upload(target, file.path, remote_path)
         expect(result.message).to eq("Uploaded '#{file.path}' to '#{target.host}:#{remote_path}'")
-        expect(result.type).to eq('upload')
+        expect(result.action).to eq('upload')
         expect(result.object).to eq(file.path)
 
         expect(
@@ -166,7 +166,7 @@ shared_examples 'transport api' do
       with_tempfile_containing('script test', os_context[:echo_script]) do |file|
         result = runner.run_script(target, file.path, [])
         expect(result['stdout'].strip).to eq('')
-        expect(result.type).to eq('script')
+        expect(result.action).to eq('script')
         expect(result.object).to eq(file.path)
       end
     end

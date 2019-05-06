@@ -283,6 +283,8 @@ A `ResultSet` has the following methods:
 
 -   `ok():``Boolean` that is the same as `error_nodes.empty`.
 
+-   `to_data()`: An array of Hashes representing either `Result`s or `ApplyResults`
+
 
 A `Result` has the following methods:
 
@@ -298,6 +300,10 @@ A `Result` has the following methods:
 
 -   `[]`: Accesses the value hash directly.
 
+-   `to_data()`: Hash representation of `Result`.
+
+-   `action()`: String representation of result type (task, command, etc).
+
 
 An `ApplyResult` has the following methods:
 
@@ -309,6 +315,9 @@ An `ApplyResult` has the following methods:
 
 -   `ok()`: Returns `true` if the `Result` was successful.
 
+-   `to_data()`: Hash representation of `ApplyResult`.
+
+-   `action()`: String representation of result type (apply).
 
 An instance of `ResultSet` is `Iterable` as if it were an `Array[Variant[Result, ApplyResult]]` so that iterative functions such as `each`, `map`, `reduce`, or `filter` work directly on the ResultSet returning each result.
 
@@ -333,6 +342,13 @@ $r.each |$result| {
     notice("${node} errored with a message: ${result.error.message}")
   }
 }
+```
+
+Similarly you can iterate over the array of hashes returned by calling `to_data` on a `ResultSet` and access hash values. For example:
+
+```
+$r = run_command('whoami', 'localhost,local://0.0.0.0')
+$r.to_data.each |$result_hash| { notice($result_hash['result']['stdout']) }
 ```
 
 ## Passing sensitive data to tasks
