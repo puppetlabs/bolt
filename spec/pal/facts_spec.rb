@@ -24,6 +24,9 @@ describe 'Facts functions' do
   let(:inv) { Bolt::Inventory.new(data) }
   let(:pal) { Bolt::PAL.new(modulepath, nil) }
 
+  let(:analytics) { Bolt::Analytics::NoopClient.new }
+  let(:executor) { Bolt::Executor.new(1, analytics) }
+
   let(:target) { "$t = get_targets(#{node})[0]\n" }
   let(:facts) { "facts($t)\n" }
   let(:add_facts) { "add_facts($t, {'hot' => 'tamales', 'dark' => 'chocolate'})\n" }
@@ -34,13 +37,13 @@ describe 'Facts functions' do
   end
 
   it 'should set facts for a target' do
-    output = peval(target + add_facts + facts, pal, nil, inv)
+    output = peval(target + add_facts + facts, pal, executor, inv)
     expect(output).to eq('hot' => 'tamales', 'dark' => 'chocolate')
   end
 
   it 'should be consistent between target instances' do
     t2 = "$t2 = get_targets(#{node})[0]\nfacts($t2)\n"
-    output = peval(target + add_facts + t2 + facts, pal, nil, inv)
+    output = peval(target + add_facts + t2 + facts, pal, executor, inv)
     expect(output).to eq('hot' => 'tamales', 'dark' => 'chocolate')
   end
 
@@ -52,13 +55,13 @@ describe 'Facts functions' do
 
   it 'should be consistent when modified on a separate instance' do
     t2 = "$t2 = get_targets(#{node})[0]\n"
-    output = peval(target + t2 + add_facts + "facts($t2)", pal, nil, inv)
+    output = peval(target + t2 + add_facts + "facts($t2)", pal, executor, inv)
     expect(output).to eq('hot' => 'tamales', 'dark' => 'chocolate')
   end
 
   it 'should not mutate previously assigned facts' do
     assignx = "$x = facts($t)\n"
-    output = peval(target + assignx + add_facts + "$x", pal, nil, inv)
+    output = peval(target + assignx + add_facts + "$x", pal, executor, inv)
     expect(output).to eq('hot' => 'chocolate')
   end
 end

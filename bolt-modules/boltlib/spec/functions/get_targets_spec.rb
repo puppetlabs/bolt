@@ -19,9 +19,6 @@ describe 'get_targets' do
   context 'it calls inventory get_targets' do
     let(:hostname) { 'test.example.com' }
     let(:target) { Bolt::Target.new(hostname) }
-    before(:each) do
-      Puppet.features.stubs(:bolt?).returns(true)
-    end
 
     it 'with given host' do
       inventory.expects(:get_targets).with(hostname).returns([target])

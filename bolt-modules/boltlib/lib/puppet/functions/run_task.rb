@@ -75,8 +75,8 @@ Puppet::Functions.create_function(:run_task) do
     end
 
     task_args ||= {}
-    executor = Puppet.lookup(:bolt_executor) { nil }
-    inventory = Puppet.lookup(:bolt_inventory) { nil }
+    executor = Puppet.lookup(:bolt_executor)
+    inventory = Puppet.lookup(:bolt_inventory)
 
     # Bolt calls this function internally to trigger tasks from the CLI. We
     # don't want to count those invocations.

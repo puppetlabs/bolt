@@ -47,14 +47,6 @@ describe 'wait_until_available' do
     end
   end
 
-  context 'without bolt feature present' do
-    it 'fails and reports that bolt library is required' do
-      Puppet.features.stubs(:bolt?).returns(false)
-      is_expected.to run.with_params('echo hello')
-                        .and_raise_error(/The 'bolt' library is required to wait until targets are available/)
-    end
-  end
-
   context 'without tasks enabled' do
     let(:tasks_enabled) { false }
 

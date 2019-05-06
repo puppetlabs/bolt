@@ -24,7 +24,7 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
         .from_issue_and_stack(Bolt::PAL::Issues::PLAN_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, action: 'run_plan')
     end
 
-    executor = Puppet.lookup(:bolt_executor) { nil }
+    executor = Puppet.lookup(:bolt_executor)
 
     # Bolt calls this function internally to trigger plans from the CLI. We
     # don't want to count those invocations.

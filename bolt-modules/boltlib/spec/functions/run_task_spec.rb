@@ -32,8 +32,6 @@ describe 'run_task' do
 
   around(:each) do |example|
     Puppet[:tasks] = tasks_enabled
-    Puppet.features.stubs(:bolt?).returns(true)
-
     executor.stubs(:noop).returns(false)
 
     Puppet.override(bolt_executor: executor, bolt_inventory: inventory) do

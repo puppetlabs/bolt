@@ -9,8 +9,6 @@ describe 'puppetdb_fact' do
 
   around(:each) do |example|
     Puppet[:tasks] = true
-    Puppet.features.stubs(:bolt?).returns(true)
-
     Puppet.override(bolt_pdb_client: pdb_client) do
       example.run
     end

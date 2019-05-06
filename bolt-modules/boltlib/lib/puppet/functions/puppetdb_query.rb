@@ -19,13 +19,8 @@ Puppet::Functions.create_function(:puppetdb_query) do
   # The query type could be more specific ASTQuery = Array[Variant[String, ASTQuery]]
 
   def make_query(query)
-    puppetdb_client = Puppet.lookup(:bolt_pdb_client) { nil }
-    unless puppetdb_client
-      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
-        Puppet::Pops::Issues::TASK_MISSING_BOLT, action: _('query facts from puppetdb')
-      )
-    end
-
+    puppetdb_client = Puppet.lookup(:bolt_pdb_client)
+    # Bolt executor not expected when invoked from apply block
     executor = Puppet.lookup(:bolt_executor) { nil }
     executor&.report_function_call('puppetdb_query')
 
