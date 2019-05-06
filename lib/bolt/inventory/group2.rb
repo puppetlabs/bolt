@@ -102,6 +102,11 @@ module Bolt
           msg = "Found unexpected key(s) #{unexpected_keys.join(', ')} in target #{target['name']}"
           @logger.warn(msg)
         end
+
+        unless target['config'].nil? || target['config'].is_a?(Hash)
+          raise ValidationError.new("Invalid configuration for target: #{target['name']}", @name)
+        end
+
         config_keys = target['config']&.keys || []
         unless (unexpected_keys = config_keys - CONFIG_KEYS).empty?
           msg = "Found unexpected key(s) #{unexpected_keys.join(', ')} in config for target #{target['name']}"

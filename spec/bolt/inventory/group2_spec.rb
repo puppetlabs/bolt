@@ -438,6 +438,24 @@ describe Bolt::Inventory::Group2 do
     end
   end
 
+  context 'where a config value is not a hash' do
+    let(:data) do
+      {
+        'name' => 'group1',
+        'groups' => [
+          {
+            'name' => 'foo1',
+            'targets' => [{ 'name' => 'foo1', 'config' => 'foo' }]
+          }
+        ]
+      }
+    end
+
+    it 'raises an error' do
+      expect { group.validate }.to raise_error(Bolt::Inventory::ValidationError, /Invalid configuration for target/)
+    end
+  end
+
   context 'with nested groups' do
     context 'when one group contains a child group' do
       let(:data) do

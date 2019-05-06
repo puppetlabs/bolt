@@ -62,6 +62,11 @@ module Bolt
             msg = "Found unexpected key(s) #{unexpected_keys.join(', ')} in node #{node['name']}"
             @logger.warn(msg)
           end
+
+          unless node['config'].nil? || node['config'].is_a?(Hash)
+            raise ValidationError.new("Invalid configuration for node: #{node['name']}", @name)
+          end
+
           config_keys = node['config']&.keys || []
           unless (unexpected_keys = config_keys - CONFIG_KEYS).empty?
             msg = "Found unexpected key(s) #{unexpected_keys.join(', ')} in config for node #{node['name']}"
