@@ -1,12 +1,14 @@
 # frozen_string_literal: true
 
 require 'bolt/plugin/puppetdb'
+require 'bolt/plugin/terraform'
 
 module Bolt
   class Plugin
     def self.setup(config, pdb_client)
       plugins = new(config)
       plugins.add_plugin(Bolt::Plugin::Puppetdb.new(pdb_client))
+      plugins.add_plugin(Bolt::Plugin::Terraform.new)
       plugins
     end
 
