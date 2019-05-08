@@ -1045,6 +1045,17 @@ describe "Bolt::CLI" do
             }
           )
         end
+
+        it "does not load inventory" do
+          options = {
+            subcommand: 'task',
+            action: 'show'
+          }
+
+          expect(cli).not_to receive(:inventory)
+
+          cli.execute(options)
+        end
       end
 
       context "when available tasks include an error", :reset_puppet_settings do
@@ -1179,6 +1190,17 @@ describe "Bolt::CLI" do
               }
             }
           )
+        end
+
+        it "does not load inventory" do
+          options = {
+            subcommand: 'plan',
+            action: 'show'
+          }
+
+          expect(cli).not_to receive(:inventory)
+
+          cli.execute(options)
         end
       end
 
