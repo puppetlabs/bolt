@@ -24,16 +24,9 @@ Puppet::Functions.create_function(:set_var) do
         .from_issue_and_stack(Bolt::PAL::Issues::PLAN_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, action: 'set_var')
     end
 
-    inventory = Puppet.lookup(:bolt_inventory) { nil }
-
-    unless inventory
-      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
-        Puppet::Pops::Issues::TASK_MISSING_BOLT, action: _('set a var on a target')
-      )
-    end
-
-    executor = Puppet.lookup(:bolt_executor) { nil }
-    executor&.report_function_call('set_var')
+    inventory = Puppet.lookup(:bolt_inventory)
+    executor = Puppet.lookup(:bolt_executor)
+    executor.report_function_call('set_var')
 
     inventory.set_var(target, key, value)
   end

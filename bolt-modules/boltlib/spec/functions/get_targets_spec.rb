@@ -19,9 +19,6 @@ describe 'get_targets' do
   context 'it calls inventory get_targets' do
     let(:hostname) { 'test.example.com' }
     let(:target) { Bolt::Target.new(hostname) }
-    before(:each) do
-      Puppet.features.stubs(:bolt?).returns(true)
-    end
 
     it 'with given host' do
       inventory.expects(:get_targets).with(hostname).returns([target])
@@ -62,14 +59,6 @@ describe 'get_targets' do
       executor.expects(:report_function_call).with('get_targets')
 
       is_expected.to run.with_params(hostname).and_return([target])
-    end
-  end
-
-  context 'without bolt feature present' do
-    it 'fails and reports that bolt library is required' do
-      Puppet.features.stubs(:bolt?).returns(false)
-      is_expected.to run.with_params('echo hello')
-                        .and_raise_error(/The 'bolt' library is required to process targets through inventory/)
     end
   end
 end

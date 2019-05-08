@@ -23,16 +23,9 @@ Puppet::Functions.create_function(:add_facts) do
         .from_issue_and_stack(Bolt::PAL::Issues::PLAN_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, action: 'add_facts')
     end
 
-    inventory = Puppet.lookup(:bolt_inventory) { nil }
-
-    unless inventory
-      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
-        Puppet::Pops::Issues::TASK_MISSING_BOLT, action: _('add facts')
-      )
-    end
-
-    executor = Puppet.lookup(:bolt_executor) { nil }
-    executor&.report_function_call('add_facts')
+    inventory = Puppet.lookup(:bolt_inventory)
+    executor = Puppet.lookup(:bolt_executor)
+    executor.report_function_call('add_facts')
 
     inventory.add_facts(target, facts)
   end

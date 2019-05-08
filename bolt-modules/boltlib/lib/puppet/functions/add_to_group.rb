@@ -27,16 +27,9 @@ Puppet::Functions.create_function(:add_to_group) do
         .from_issue_and_stack(Bolt::PAL::Issues::PLAN_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, action: 'add_to_group')
     end
 
-    inventory = Puppet.lookup(:bolt_inventory) { nil }
-
-    unless inventory && Puppet.features.bolt?
-      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
-        Puppet::Pops::Issues::TASK_MISSING_BOLT, action: _('process targets through inventory')
-      )
-    end
-
-    executor = Puppet.lookup(:bolt_executor) { nil }
-    executor&.report_function_call('add_to_group')
+    inventory = Puppet.lookup(:bolt_inventory)
+    executor = Puppet.lookup(:bolt_executor)
+    executor.report_function_call('add_to_group')
 
     inventory.add_to_group(inventory.get_targets(targets), group)
   end

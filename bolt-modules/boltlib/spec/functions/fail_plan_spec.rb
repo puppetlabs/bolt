@@ -7,9 +7,13 @@ require 'bolt/error'
 describe 'fail_plan' do
   include PuppetlabsSpec::Fixtures
   let(:tasks_enabled) { true }
+  let(:executor) { Bolt::Executor.new }
 
-  before(:each) do
+  around(:each) do |example|
     Puppet[:tasks] = tasks_enabled
+    Puppet.override(bolt_executor: executor) do
+      example.run
+    end
   end
 
   it 'raises an error from arguments' do

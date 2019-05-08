@@ -65,7 +65,6 @@ module Bolt
       target = request['target']
       pdb_client = Bolt::PuppetDB::Client.new(Bolt::PuppetDB::Config.new(request['pdb_config']))
       options = request['puppet_config'] || {}
-
       with_puppet_settings(request['hiera_config']) do
         Puppet[:rich_data] = true
         Puppet[:node_name_value] = target['name']

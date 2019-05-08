@@ -39,14 +39,9 @@ Puppet::Functions.create_function(:get_resources) do
         .from_issue_and_stack(Bolt::PAL::Issues::PLAN_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, action: 'get_resources')
     end
 
-    applicator = Puppet.lookup(:apply_executor) { nil }
-    executor = Puppet.lookup(:bolt_executor) { nil }
-    inventory = Puppet.lookup(:bolt_inventory) { nil }
-    unless applicator && executor && inventory && Puppet.features.bolt?
-      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
-        Puppet::Pops::Issues::TASK_MISSING_BOLT, action: _('get_resources')
-      )
-    end
+    applicator = Puppet.lookup(:apply_executor)
+    executor = Puppet.lookup(:bolt_executor)
+    inventory = Puppet.lookup(:bolt_inventory)
 
     resources = [resources].flatten
     resources.each do |resource|
