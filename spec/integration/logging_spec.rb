@@ -18,6 +18,7 @@ describe "when logging executor activity", ssh: true do
   let(:user) { conn_info('ssh')[:user] }
   let(:password) { conn_info('ssh')[:password] }
   let(:log_level) { :notice }
+  let(:lines) { @log_output.readlines }
 
   let(:config_flags) {
     %W[--nodes #{uri} --no-host-key-check --format json --modulepath #{modulepath} --password #{password}]
@@ -33,49 +34,28 @@ describe "when logging executor activity", ssh: true do
 
   it 'does not log with a command' do
     result = run_cli_json(%W[command run #{whoami}] + config_flags)
-    expect(@log_output.readline).to be_nil
+    expect(lines).to be_empty
     expect(result['items'][0]['result']['stdout'].strip).to eq(conn_info('ssh')[:user])
   end
 
   it 'does not log with a task' do
     result = run_cli_json(%W[task run #{stdin_task} message=somemessage] + config_flags)
-    expect(@log_output.readline).to be_nil
+    expect(lines).to be_empty
     expect(result['items'][0]['result']['message'].strip).to eq('somemessage')
   end
 
-  it 'logs with a plan that includes a description' do
+  it 'logs the start and end of a plan' do
     result = run_cli_json(%W[plan run #{echo_plan} description=somemessage] + config_flags)
-    lines = @log_output.readlines
     expect(lines).to include(match(/NOTICE.*Starting: plan #{echo_plan}/))
-    expect(lines).to include(match(/Starting: somemessage on/))
-    expect(lines).to include(match(/Finished: somemessage/))
     expect(lines).to include(match(/NOTICE.*Finished: plan #{echo_plan}/))
     expect(result[0]['result']['_output'].strip).to match(/hi there/)
-  end
-
-  it 'logs extra with a plan' do
-    result = run_cli_json(%W[plan run #{echo_plan}] + config_flags)
-    lines = @log_output.readlines
-    expect(lines).to include(match(/NOTICE.*Starting: plan #{echo_plan}/))
-    expect(lines).to include(match(/Starting: task sample::echo/))
-    expect(lines).to include(match(/Finished: task sample::echo/))
-    expect(lines).to include(match(/NOTICE.*Finished: plan #{echo_plan}/))
-    expect(result[0]['result']['_output'].strip).to match(/hi there/)
-  end
-
-  it 'does not log extra without_default_logging in a plan' do
-    run_cli_json(%W[plan run #{without_default_plan}] + config_flags)
-    logs = @log_output.read
-    expect(logs).not_to match(/Starting: task logging::echo/)
-    expect(logs).not_to match(/Finished: task logging::echo/)
   end
 
   context 'with verbose logging' do
     let(:log_level) { :info }
 
-    it 'logs actions with a command' do
+    it 'logs node-level details for a command' do
       result = run_cli_json(%W[command run #{whoami}] + config_flags)
-      lines = @log_output.readlines
       expect(lines).to include(match(/Starting: command '#{whoami}'/))
       expect(lines).to include(match(/Running command '#{whoami}'/))
       expect(lines).to include(match(/#{conn_info('ssh')[:user]}/))
@@ -83,9 +63,8 @@ describe "when logging executor activity", ssh: true do
       expect(result['items'][0]['result']['stdout'].strip).to eq(conn_info('ssh')[:user])
     end
 
-    it 'logs actions with a task' do
+    it 'logs node-level details for a task' do
       result = run_cli_json(%W[task run #{stdin_task} message=somemessage] + config_flags)
-      lines = @log_output.readlines
       expect(lines).to include(match(/Starting: task #{stdin_task}/))
       expect(lines).to include(match(/Running task #{stdin_task} with/))
       expect(lines).to include(match(/somemessage/))
@@ -93,9 +72,8 @@ describe "when logging executor activity", ssh: true do
       expect(result['items'][0]['result']['message'].strip).to eq('somemessage')
     end
 
-    it 'logs extra with a plan' do
+    it 'logs node-level details for a plan' do
       result = run_cli_json(%W[plan run #{echo_plan}] + config_flags)
-      lines = @log_output.readlines
       expect(lines).to include(match(/NOTICE.*Starting: plan #{echo_plan}/))
       expect(lines).to include(match(/Starting: task sample::echo/))
       expect(lines).to include(match(/Running task sample::echo with/))
@@ -105,9 +83,8 @@ describe "when logging executor activity", ssh: true do
       expect(result[0]['result']['_output'].strip).to match(/hi there/)
     end
 
-    it 'logs extra without_default in a plan' do
+    it 'logs node-level details when without_default_logging is set in a plan' do
       run_cli_json(%W[plan run #{without_default_plan}] + config_flags)
-      lines = @log_output.readlines
       expect(lines).to include(match(/NOTICE.*Starting: plan #{without_default_plan}/))
       expect(lines).to include(match(/Starting: task logging::echo/))
       expect(lines).to include(match(/Running task logging::echo with/))

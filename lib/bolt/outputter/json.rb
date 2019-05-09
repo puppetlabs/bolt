@@ -3,11 +3,11 @@
 module Bolt
   class Outputter
     class JSON < Bolt::Outputter
-      def initialize(color, trace, stream = $stdout)
+      def initialize(color, verbose, trace, stream = $stdout)
+        super
         @items_open = false
         @object_open = false
         @preceding_item = false
-        super(color, trace, stream)
       end
 
       def print_head
@@ -17,7 +17,7 @@ module Bolt
         @object_open = true
       end
 
-      def print_event(event)
+      def handle_event(event)
         case event[:type]
         when :node_result
           print_result(event[:result])
@@ -72,7 +72,7 @@ module Bolt
         print_table('plans' => plans, 'modulepath' => modulepath)
       end
 
-      def print_apply_result(apply_result)
+      def print_apply_result(apply_result, _elapsed_time)
         @stream.puts apply_result.to_json
       end
 

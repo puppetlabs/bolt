@@ -281,8 +281,8 @@ Usage: bolt apply <manifest.pp> [options]
       define('-h', '--help', 'Display help') do |_|
         @options[:help] = true
       end
-      define('-v', '--verbose', 'Display verbose logging') do |_|
-        @options[:verbose] = true
+      define('-v', '--[no-]verbose', 'Display verbose logging') do |value|
+        @options[:verbose] = value
       end
       define('--debug', 'Display debug logging') do |_|
         @options[:debug] = true

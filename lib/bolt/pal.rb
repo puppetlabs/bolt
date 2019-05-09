@@ -333,10 +333,10 @@ module Bolt
       end
     end
 
-    def run_task(task_name, targets, params, executor, inventory, description = nil, &eventblock)
+    def run_task(task_name, targets, params, executor, inventory, description = nil)
       in_task_compiler(executor, inventory) do |compiler|
-        params = params.merge('_bolt_api_call' => true)
-        compiler.call_function('run_task', task_name, targets, description, params, &eventblock)
+        params = params.merge('_bolt_api_call' => true, '_catch_errors' => true)
+        compiler.call_function('run_task', task_name, targets, description, params)
       end
     end
 

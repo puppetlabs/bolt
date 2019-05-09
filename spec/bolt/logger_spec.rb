@@ -75,16 +75,16 @@ describe Bolt::Logger do
 
       expect(console_appender).not_to be_nil
       expect(console_appender.class).to eq(Logging::Appenders::Stderr)
-      expect(console_appender.level).to eq(Logging.level_num(:notice))
+      expect(console_appender.level).to eq(Logging.level_num(:warn))
       expect(console_appender.layout.color_scheme).to eq(Logging::ColorScheme['bolt'])
     end
 
     it 'overrides the level of the console appender if specified' do
-      appenders = { 'console' => { level: :warn } }
+      appenders = { 'console' => { level: :info } }
 
       Bolt::Logger.configure(appenders, true)
 
-      expect(Logging.appenders['console'].level).to eq(Logging.level_num(:warn))
+      expect(Logging.appenders['console'].level).to eq(Logging.level_num(:info))
     end
 
     it 'disables color if specified' do

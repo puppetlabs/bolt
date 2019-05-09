@@ -177,8 +177,6 @@ module Bolt
     def apply_ast(raw_ast, targets, options, plan_vars = {})
       ast = Puppet::Pops::Serialization::ToDataConverter.convert(raw_ast, rich_data: true, symbol_to_string: true)
 
-      notify = proc { |_| nil }
-
       r = @executor.log_action('apply catalog', targets) do
         futures = targets.map do |target|
           Concurrent::Future.execute(executor: @pool) do
@@ -200,7 +198,13 @@ module Bolt
                 '_noop' => options['_noop']
               }
 
-              results = transport.batch_task(batch, catalog_apply_task, arguments, options, &notify)
+              callback = proc do |event|
+                if event[:type] == :node_result
+                  event = event.merge(result: ApplyResult.from_task_result(event[:result]))
+                end
+                @executor.publish_event(event)
+              end
+              results = transport.batch_task(batch, catalog_apply_task, arguments, options, &callback)
               Array(results).map { |result| ApplyResult.from_task_result(result) }
             end
           end

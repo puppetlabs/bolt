@@ -16,7 +16,7 @@ describe "Bolt::CLI" do
   let(:target) { Bolt::Target.new('foo') }
 
   before(:each) do
-    outputter = Bolt::Outputter::Human.new(false, false, StringIO.new)
+    outputter = Bolt::Outputter::Human.new(false, false, false, StringIO.new)
 
     allow_any_instance_of(Bolt::CLI).to receive(:outputter).and_return(outputter)
     allow_any_instance_of(Bolt::CLI).to receive(:warn)
@@ -757,7 +757,7 @@ describe "Bolt::CLI" do
     end
 
     describe "execute" do
-      let(:executor) { double('executor', noop: false, analytics: Bolt::Analytics::NoopClient.new) }
+      let(:executor) { double('executor', noop: false, subscribe: nil, shutdown: nil) }
       let(:cli) { Bolt::CLI.new({}) }
       let(:targets) { [target] }
       let(:output) { StringIO.new }
@@ -781,7 +781,7 @@ describe "Bolt::CLI" do
         allow(Bolt::Executor).to receive(:new).and_return(executor)
         allow(executor).to receive(:log_plan) { |_plan_name, &block| block.call }
 
-        outputter = Bolt::Outputter::JSON.new(false, false, output)
+        outputter = Bolt::Outputter::JSON.new(false, false, false, output)
 
         allow(cli).to receive(:outputter).and_return(outputter)
       end
@@ -1267,7 +1267,7 @@ describe "Bolt::CLI" do
         it "runs a task given a name" do
           expect(executor)
             .to receive(:run_task)
-            .with(targets, task_t, task_params, '_bolt_api_call' => true)
+            .with(targets, task_t, task_params, kind_of(Hash))
             .and_return(Bolt::ResultSet.new([]))
           expect(cli.execute(options)).to eq(0)
           expect(JSON.parse(output.string)).to be
@@ -1276,7 +1276,7 @@ describe "Bolt::CLI" do
         it "returns 2 if any node fails" do
           expect(executor)
             .to receive(:run_task)
-            .with(targets, task_t, task_params, '_bolt_api_call' => true)
+            .with(targets, task_t, task_params, kind_of(Hash))
             .and_return(fail_set)
 
           expect(cli.execute(options)).to eq(2)
@@ -1305,7 +1305,7 @@ describe "Bolt::CLI" do
 
           expect(executor)
             .to receive(:run_task)
-            .with(targets, task_t, {}, '_bolt_api_call' => true)
+            .with(targets, task_t, {}, kind_of(Hash))
             .and_raise("Could not connect to target")
 
           expect { cli.execute(options) }.to raise_error(/Could not connect to target/)
@@ -1317,7 +1317,7 @@ describe "Bolt::CLI" do
 
           expect(executor)
             .to receive(:run_task)
-            .with(targets, task_t, task_params, '_bolt_api_call' => true)
+            .with(targets, task_t, task_params, kind_of(Hash))
             .and_return(Bolt::ResultSet.new([]))
 
           cli.execute(options)
@@ -1332,7 +1332,7 @@ describe "Bolt::CLI" do
 
             expect(executor)
               .to receive(:run_task)
-              .with(targets, task_t, task_params, '_bolt_api_call' => true)
+              .with(targets, task_t, task_params, kind_of(Hash))
               .and_return(Bolt::ResultSet.new([]))
 
             cli.execute(options)
@@ -1345,7 +1345,7 @@ describe "Bolt::CLI" do
 
             expect(executor)
               .to receive(:run_task)
-              .with(targets, task_t, task_params, '_bolt_api_call' => true)
+              .with(targets, task_t, task_params, kind_of(Hash))
               .and_return(Bolt::ResultSet.new([]))
 
             cli.execute(options)
@@ -1356,7 +1356,7 @@ describe "Bolt::CLI" do
         it "traps SIGINT", :signals_self do
           expect(executor)
             .to receive(:run_task)
-            .with(targets, task_t, task_params, '_bolt_api_call' => true) do
+            .with(targets, task_t, task_params, kind_of(Hash)) do
               Process.kill :INT, Process.pid
               sync_thread.join(1) # give ruby some time to handle the signal
               Bolt::ResultSet.new([])
@@ -1447,7 +1447,7 @@ describe "Bolt::CLI" do
           it "runs the task when the specified parameters are successfully validated" do
             expect(executor)
               .to receive(:run_task)
-              .with(targets, task_t, task_params, '_bolt_api_call' => true)
+              .with(targets, task_t, task_params, kind_of(Hash))
               .and_return(Bolt::ResultSet.new([]))
             task_params.merge!(
               'mandatory_string' => ' ',
@@ -1500,7 +1500,7 @@ describe "Bolt::CLI" do
 
                 expect(executor)
                   .to receive(:run_task)
-                  .with(targets, task_t, task_params, '_bolt_api_call' => true)
+                  .with(targets, task_t, task_params, kind_of(Hash))
                   .and_return(Bolt::ResultSet.new([]))
 
                 cli.execute(options)
@@ -1510,7 +1510,7 @@ describe "Bolt::CLI" do
               it "runs the task even when invalid (according to the local task definition) parameters are specified" do
                 expect(executor)
                   .to receive(:run_task)
-                  .with(targets, task_t, task_params, '_bolt_api_call' => true)
+                  .with(targets, task_t, task_params, kind_of(Hash))
                   .and_return(Bolt::ResultSet.new([]))
 
                 cli.execute(options)
@@ -1760,7 +1760,7 @@ describe "Bolt::CLI" do
     end
 
     describe "execute with noop" do
-      let(:executor) { double('executor', noop: true, analytics: Bolt::Analytics::NoopClient.new) }
+      let(:executor) { double('executor', noop: true, subscribe: nil, shutdown: nil) }
       let(:cli) { Bolt::CLI.new({}) }
       let(:targets) { [target] }
       let(:output) { StringIO.new }
@@ -1771,7 +1771,7 @@ describe "Bolt::CLI" do
         expect(Bolt::Executor).to receive(:new).with(Bolt::Config.default.concurrency,
                                                      anything,
                                                      true).and_return(executor)
-        outputter = Bolt::Outputter::JSON.new(false, false, output)
+        outputter = Bolt::Outputter::JSON.new(false, false, false, output)
         allow(cli).to receive(:outputter).and_return(outputter)
         allow(executor).to receive(:report_bundled_content)
       end
@@ -1798,7 +1798,7 @@ describe "Bolt::CLI" do
         it "runs a task that supports noop" do
           expect(executor)
             .to receive(:run_task)
-            .with(targets, task_t, task_params.merge('_noop' => true), '_bolt_api_call' => true)
+            .with(targets, task_t, task_params.merge('_noop' => true), kind_of(Hash))
             .and_return(Bolt::ResultSet.new([]))
 
           cli.execute(options)
@@ -1837,7 +1837,7 @@ describe "Bolt::CLI" do
       let(:cli) { Bolt::CLI.new({}) }
 
       before :each do
-        allow(cli).to receive(:outputter).and_return(Bolt::Outputter::JSON.new(false, false, output))
+        allow(cli).to receive(:outputter).and_return(Bolt::Outputter::JSON.new(false, false, false, output))
         allow(puppetfile).to receive(:exist?).and_return(true)
 
         # Ensure we never actually install modules.
@@ -1904,7 +1904,7 @@ describe "Bolt::CLI" do
       let(:cli) { Bolt::CLI.new([]) }
 
       before :each do
-        allow(cli).to receive(:outputter).and_return(Bolt::Outputter::JSON.new(false, false, output))
+        allow(cli).to receive(:outputter).and_return(Bolt::Outputter::JSON.new(false, false, false, output))
       end
 
       it 'fails if the code file does not exist' do

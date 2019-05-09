@@ -175,8 +175,6 @@ module Bolt
 
       if options[:debug]
         @log['console'][:level] = :debug
-      elsif options[:verbose]
-        @log['console'][:level] = :info
       end
 
       @compile_concurrency = options[:'compile-concurrency'] if options[:'compile-concurrency']

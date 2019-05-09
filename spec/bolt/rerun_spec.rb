@@ -18,7 +18,7 @@ describe 'rerun' do
     end
   end
 
-  let(:executor) { double('executor', noop: false, analytics: Bolt::Analytics::NoopClient.new) }
+  let(:executor) { double('executor', noop: false, subscribe: nil, shutdown: nil, publish_event: nil) }
   let(:pal) { double('pal') }
 
   let(:target_spec) { %w[node1 node2] }
@@ -49,7 +49,7 @@ describe 'rerun' do
     # Don't allow tests to override the captured log config
     allow(Bolt::Logger).to receive(:configure)
     allow_any_instance_of(Bolt::CLI).to receive(:warn)
-    outputter = Bolt::Outputter::JSON.new(false, false, output)
+    outputter = Bolt::Outputter::JSON.new(false, false, false, output)
     allow_any_instance_of(Bolt::CLI).to receive(:outputter).and_return(outputter)
   end
 
