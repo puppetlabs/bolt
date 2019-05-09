@@ -164,7 +164,11 @@ describe "apply" do
         uri = conn_uri('ssh')
         inventory_data = conn_inventory
         config_data = root_config
-        run_task('puppet_agent::install', uri, {}, config: config_data, inventory: inventory_data)
+        run_task('puppet_agent::install',
+                 uri,
+                 { 'collection' => 'puppet6' },
+                 config: config_data,
+                 inventory: inventory_data)
       end
 
       context "apply() function" do
@@ -193,7 +197,6 @@ describe "apply" do
           expect(result).not_to include('kind')
           expect(result[0]['status']).to eq('success')
           resources = result[0]['result']['report']['resource_statuses']
-
           local_pid = resources['Notify[local pid]']['events'][0]['desired_value'][/(\d+)/, 1]
           raise 'local pid was not found' if local_pid.nil?
           remote_pid = resources['Notify[remote pid]']['events'][0]['desired_value'][/(\d+)/, 1]
