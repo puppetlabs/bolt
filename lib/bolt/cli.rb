@@ -266,11 +266,19 @@ module Bolt
         screen += '_object'
       end
 
-      @analytics.screen_view(screen,
-                             output_format: config.format,
-                             target_nodes: options.fetch(:targets, []).count,
-                             inventory_nodes: inventory.node_names.count,
-                             inventory_groups: inventory.group_names.count)
+      screen_view_fields = {
+        output_format: config.format
+      }
+
+      # Only include target and inventory info for commands that take a targets
+      # list. This avoids loading inventory for commands that don't need it.
+      if options.key?(:targets)
+        screen_view_fields.merge!(target_nodes: options[:targets].count,
+                                  inventory_nodes: inventory.node_names.count,
+                                  inventory_groups: inventory.group_names.count)
+      end
+
+      @analytics.screen_view(screen, screen_view_fields)
 
       if options[:action] == 'show'
         if options[:subcommand] == 'task'
