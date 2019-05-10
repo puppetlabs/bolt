@@ -77,7 +77,7 @@ module Bolt
             # We have to do a little extra parsing here, since we only need
             # with() for eval blocks
             code = Bolt::Util.to_code(body['eval'])
-            if @name && code.include?("\n")
+            if @name && code.lines.count > 1
               # A little indented niceness
               indented = code.gsub(/\n/, "\n    ").chomp("  ")
               result << "with() || {\n    #{indented}}"
