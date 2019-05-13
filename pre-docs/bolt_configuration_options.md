@@ -167,6 +167,10 @@ When using the ssh transport Bolt also interacts with the ssh-agent for ssh key 
 
 `tmpdir`: The directory to upload and execute temporary files on the target.
 
+`shell-command`: A shell command any docker exec commands should be wrapped in. For example: `bash -lc`.
+
+`tty`: When `true`, enable tty on docker exec commands. Default is `false`.
+
 ## Remote transport configuration options
 
 *The remote transport is a new feature and currently experimental. It's configuration options and behavior may change between y releases*
