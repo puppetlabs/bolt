@@ -1,0 +1,3 @@
+.vagrant
+node_modules/*
+09-writing-advanced-plans/modules/stdlib

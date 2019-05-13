@@ -1,0 +1,23 @@
+{
+    "description": "An exercise in writing great metadata",
+    "supports_noop": true,
+    "input_method": "stdin",
+    "parameters": {
+        "name": {
+            "description": "The description for the 'name' parameter",
+            "type": "String"
+        },
+        "recursive": {
+            "description": "The description for the 'recursive' parameter",
+            "type": "Boolean"
+        },
+        "action": {
+            "description": "The description for the 'action' parameter",
+            "type": "Enum[stop, start, restart]"
+        },
+        "timeout": {
+            "description": "The description for the 'timeout' parameter",
+            "type": "Optional[Integer]"
+        }
+    }
+}
