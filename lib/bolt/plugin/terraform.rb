@@ -5,12 +5,20 @@ require 'json'
 module Bolt
   class Plugin
     class Terraform
+      def initialize
+        @logger = Logging.logger[self]
+      end
+
       def name
         'terraform'
       end
 
       def hooks
         ['lookup_targets']
+      end
+
+      def warn_missing_property(name, property)
+        @logger.warn("Could not find property #{property} of terraform resource #{name}")
       end
 
       def lookup_targets(opts)
@@ -26,16 +34,25 @@ module Bolt
 
         resources.select do |name, _resource|
           name.match?(regex)
-        end.map do |_name, resource|
+        end.map do |name, resource|
+          unless resource.key?(opts['uri'])
+            warn_missing_property(name, opts['uri'])
+            next
+          end
+
           target = { 'uri' => resource[opts['uri']] }
           if opts.key?('name')
-            target['name'] = resource[opts['name']]
+            if resource.key?(opts['name'])
+              target['name'] = resource[opts['name']]
+            else
+              warn_missing_property(name, opts['name'])
+            end
           end
           if opts.key?('config')
-            target['config'] = resolve_config(resource, opts['config'])
+            target['config'] = resolve_config(name, resource, opts['config'])
           end
           target
-        end
+        end.compact
       end
 
       def load_statefile(opts)
@@ -48,10 +65,15 @@ module Bolt
         raise Bolt::FileError.new("Could not load Terraform state file #{filename}: #{e}", filename)
       end
 
-      def resolve_config(resource, config_template)
+      def resolve_config(name, resource, config_template)
         Bolt::Util.walk_vals(config_template) do |value|
           if value.is_a?(String)
-            resource[value]
+            if resource.key?(value)
+              resource[value]
+            else
+              warn_missing_property(name, value)
+              nil
+            end
           else
             value
           end
