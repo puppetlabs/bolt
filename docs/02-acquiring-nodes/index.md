@@ -1,3 +1,9 @@
+---
+downloads:
+  - docker-compose.yml
+  - Dockerfile
+  - Vagrantfile
+---
 # Setting up test nodes to use with Bolt
 
 > **Difficulty**: Basic
