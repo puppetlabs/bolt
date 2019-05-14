@@ -40,6 +40,8 @@ Bolt is an open source task runner that automates the manual work that you do to
 
  [Applying manifest blocks](applying_manifest_blocks.md#) 
 
+ [Plan examples](writing_yaml_plans.md#example-plans)
+
 
  | -   **Learn the basics**
 
