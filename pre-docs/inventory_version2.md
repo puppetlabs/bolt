@@ -52,19 +52,31 @@ config in addition to the `name`.
 targets:
   - name: my_device
     config:
-      tranport: remote
+      transport: remote
       remote:
         host: 192.168.100.179
   - name: my_device2
     uri: 192.168.100.179
 ```
 
-### `target-lookups` and dynamic puppetdb queries
+### `target-lookups` and dynamic inventory
 
 `target-lookups` is a new key at the group level that allows you to dynamically
-lookup the targets in the node. The lookup method is eventually expected to be
-pluggable but for now Bolt only ships a single builtin plugin `puppetdb` that
-can use a puppetdb query to populate the targets.
+lookup the targets in the node. `target-lookups` contains an array of target
+lookup objects. Each `target-lookups` entry must include a `plugin` key that
+defines which plugin should be used for the lookup. The rest of the keys are
+specific to the plugin being used.
+
+The available lookup methods are expected to eventually be extensible, but
+currently Bolt only ships builtin lookup plugins. The plugins are:
+
+* `puppetdb` - Query PuppetDB to populate the targets.
+* `terraform` - Load a Terraform state file to populate the targets.
+
+#### PuppetDB
+
+The PuppetDB plugin takes a `query` field, which is either a string containing
+a PQL query or an array containing a PuppetDB AST format query.
 
 ```
 groups:
@@ -82,17 +94,89 @@ groups:
       transport: ssh
 ```
 
-`target-lookups` contains an array of target lookup objects. Each
-`target-lookup` entry must include a `plugin` key that defines which plugin
-should be used for the lookup. The rest of the keys are specific to the plugin
-being used.
+Make sure you have [configured PuppetDB](./bolt_connect_puppetdb.md)
 
-For the puppetdb plugin The query field is a string containing a pql query or an array containing a
-query in the puppetdb ast syntax.
+#### Terraform
 
-Make sure you have [configured puppetdb](./bolt_connect_puppetdb.md)
+The Terraform plugin accepts several fields:
 
+`dir`: The directory from which to load Terraform state  
+`resource_type`: The Terraform resources to match, as a regular expression  
+`uri`: The property of the Terraform resource to use as the target URI  
+`statefile`: The name of the Terraform state file to load within `dir` (optional, defaults to `terraform.tfstate`)  
+`name`: The property of the Terraform resource to use as the target name (optional)  
+`config`: A Bolt config map where each value is the Terraform property to use for that config setting
 
+```
+groups:
+  - name: cloud-webs
+    target-lookups:
+      - plugin: terraform
+        dir: /path/to/terraform/project1
+        resource_type: google_compute_instance.web
+        uri: network_interface.0.access_config.0.nat_ip
+      - plugin: terraform
+        dir: /path/to/terraform/project2
+        resource_type: aws_instance.web
+        uri: public_ip
+```
+
+The resource and property names correspond to the output of `terraform show`. For instance, given the following truncated output:
+
+```
+google_compute_instance.web.0:
+  id = web-0
+  cpu_platform = Intel Broadwell
+  machine_type = f1-micro
+  name = web-0
+  network_interface.# = 1
+  network_interface.0.access_config.# = 1
+  network_interface.0.access_config.0.assigned_nat_ip = 
+  network_interface.0.access_config.0.nat_ip = 34.83.150.52
+  network_interface.0.address = 
+  network_interface.0.name = nic0
+  network_interface.0.network = https://www.googleapis.com/compute/v1/projects/cloud-app1/global/networks/default
+  network_interface.0.network_ip = 10.138.0.22
+  project = cloud-app1
+  self_link = https://www.googleapis.com/compute/v1/projects/cloud-app1/zones/us-west1-a/instances/web-0
+  zone = us-west1-a
+google_compute_instance.web.1:
+  id = web-1
+  cpu_platform = Intel Broadwell
+  machine_type = f1-micro
+  name = web-1
+  network_interface.# = 1
+  network_interface.0.access_config.# = 1
+  network_interface.0.access_config.0.assigned_nat_ip = 
+  network_interface.0.access_config.0.nat_ip = 34.83.16.240
+  network_interface.0.address = 
+  network_interface.0.name = nic0
+  network_interface.0.network = https://www.googleapis.com/compute/v1/projects/cloud-app1/global/networks/default
+  network_interface.0.network_ip = 10.138.0.21
+  project = cloud-app1
+  self_link = https://www.googleapis.com/compute/v1/projects/cloud-app1/zones/us-west1-a/instances/web-1
+  zone = us-west1-a
+google_compute_instance.app.1:
+  id = app-1
+  cpu_platform = Intel Broadwell
+  machine_type = f1-micro
+  name = app-1
+  network_interface.# = 1
+  network_interface.0.access_config.# = 1
+  network_interface.0.access_config.0.assigned_nat_ip = 
+  network_interface.0.access_config.0.nat_ip = 35.197.93.137
+  network_interface.0.address = 
+  network_interface.0.name = nic0
+  network_interface.0.network = https://www.googleapis.com/compute/v1/projects/cloud-app1/global/networks/default
+  network_interface.0.network_ip = 10.138.0.23
+  project = cloud-app1
+  self_link = https://www.googleapis.com/compute/v1/projects/cloud-app1/zones/us-west1-a/instances/app-1
+  zone = us-west1-a
+```
+
+This inventory would create two targets, named `34.83.150.52` and `34.83.16.240`.
+
+These targets are created by matching the resources `google_compute_instance.web.0` and `google_compute_instance.web.1`. The `uri` for each target is the value of their `network_interface.0.access_config.0.nat_ip` property, which corresponds to the externally routable IP address in Google Cloud.
 
 ## Inventory config
 
