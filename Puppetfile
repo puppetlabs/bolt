@@ -7,7 +7,7 @@ moduledir File.join(File.dirname(__FILE__), 'modules')
 # Core modules used by 'apply'
 mod 'puppetlabs-service', '0.6.0'
 mod 'puppetlabs-facts', '0.5.1'
-mod 'puppetlabs-puppet_agent', '2.1.1'
+mod 'puppetlabs-puppet_agent', '2.1.2'
 
 # Core types and providers for Puppet 6
 mod 'puppetlabs-augeas_core', '1.0.4'
