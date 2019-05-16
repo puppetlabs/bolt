@@ -22,6 +22,7 @@ Note that, like `--nodes`, you can pass a comma-separated list of node names, wi
 
 **Tip**: Bolt is packaged with a collection of modules that contain useful plans to support common workflows. For details, see [Packaged modules](bolt_installing_modules.md#packaged-modules).
 
+**Related information**: Check out some [plan examples](writing_yaml_plans.md#example-plans) to get an idea of some use cases for plans. 
 
 ## Passing structured data
 
