@@ -160,11 +160,12 @@ describe "apply" do
 
     context "with a puppet_agent installed" do
       before(:all) do
-        # TODO: Extract into test helper if needed in more files
-        uri = conn_uri('ssh')
-        inventory_data = conn_inventory
-        config_data = root_config
-        run_task('puppet_agent::install', uri, {}, config: config_data, inventory: inventory_data)
+        # Deferred must use puppet >= 6
+        target = conn_uri('ssh')
+        install(target, inventory: conn_inventory)
+        result = run_task('puppet_agent::version', target, {}, config: root_config, inventory: conn_inventory)
+        major_version = result.first['result']['version'].split('.').first.to_i
+        expect(major_version).to be >= 6
       end
 
       context "apply() function" do
