@@ -8,6 +8,8 @@ module BoltSpec
       default_host = 'localhost'
       default_user = 'bolt'
       default_password = 'bolt'
+      default_second_user = 'test'
+      default_second_pw = 'test'
       default_key = Dir["spec/fixtures/keys/id_rsa"][0]
       default_port = 0
 
@@ -31,7 +33,10 @@ module BoltSpec
         user: ENV["BOLT_#{tu}_USER"] || default_user,
         password: ENV["BOLT_#{tu}_PASSWORD"] || default_password,
         port: (ENV["BOLT_#{tu}_PORT"] || default_port).to_i,
-        key: ENV["BOLT_#{tu}_KEY"] || default_key
+        key: ENV["BOLT_#{tu}_KEY"] || default_key,
+        second_user: ENV["BOLT_#{tu}_SECOND_USER"] || default_second_user,
+        second_pw: ENV["BOLT_#{tu}_SECOND_PW"] || default_second_pw,
+        system_user: `whoami`.strip
       }
     end
 

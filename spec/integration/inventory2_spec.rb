@@ -453,18 +453,20 @@ describe 'running with an inventory file', reset_puppet_settings: true do
 
   # TODO: these tests require docker so they may as well require ssh for now
   context 'with pdb lookups', ssh: true, puppetdb: true do
+    let(:shell_cmd) { 'whoami' }
+    let(:ssh_config) { {} }
+    let(:addtl_inv) { {} }
+    let(:facts) { {} }
+
     before(:each) do
       allow_any_instance_of(Bolt::CLI).to receive(:puppetdb_client).and_return(pdb_client)
 
       push_facts(facts)
     end
 
-    after(:each) { clear_facts(facts) }
-
-    let(:facts) {
-      { conn[:host] => { 'fact1' => true },
-        'noanode.example.com' => { 'fact1' => false } }
-    }
+    after(:each) do
+      clear_facts(facts)
+    end
 
     let(:inventory) do
       {
@@ -472,8 +474,11 @@ describe 'running with an inventory file', reset_puppet_settings: true do
         "target-lookups" => [
           {
             plugin: 'puppetdb',
-            query: 'inventory { facts.fact1 = true }'
-          }
+            query: 'inventory { facts.fact1 = true }',
+            config: {
+              ssh: ssh_config
+            }
+          }.merge(addtl_inv)
         ],
         config: {
           transport: conn[:protocol],
@@ -487,13 +492,99 @@ describe 'running with an inventory file', reset_puppet_settings: true do
       }
     end
 
-    let(:shell_cmd) { 'whoami' }
-
     it 'runs a plan' do
       result = run_cli_json(run_plan)
       expect(result).not_to include('kind')
       expect(result.length).to eq(1)
       expect(result[0]).to include('status' => 'success', 'target' => conn[:host])
+    end
+
+    context 'applies config to dynamic inventory' do
+      context 'with name and uri set' do
+        let(:target) { 'myhostname' }
+        let(:facts) do
+          { conn[:host] => {
+            'fact1' => true,
+            'identity' => { 'user' => conn[:second_user] },
+            'uri_fact' => conn[:host],
+            'name_fact' => target
+          } }
+        end
+
+        let(:addtl_inv) do
+          { name: 'facts.name_fact',
+            uri: 'facts.uri_fact' }
+        end
+
+        let(:ssh_config) do
+          { user: 'facts.identity.user',
+            password: 'facts.identity.user' }
+        end
+
+        it 'runs a plan' do
+          result = run_cli_json(run_plan)
+          expect(result).not_to include('kind')
+          expect(result.length).to eq(1)
+          expect(result[0]).to include('status' => 'success', 'target' => 'myhostname')
+        end
+
+        it 'handles structured facts' do
+          result = run_cli_json(run_command)
+          expect(result).not_to include('kind')
+          expect(result['items'][0]['result']['stdout']).to eq("#{conn[:second_user]}\n")
+        end
+      end
+
+      context 'on another node' do
+        let(:target) { 'bullseye' }
+        let(:facts) do
+          { conn[:host] => {
+            'uri_fact' => conn[:host],
+            'name_fact' => target,
+            'fact1' => true
+          } }
+        end
+
+        let(:addtl_inv) do
+          { name: 'facts.name_fact',
+            uri: 'facts.uri_fact' }
+        end
+
+        it 'uses fact-based name' do
+          result = run_cli_json(run_command)
+          expect(result).not_to include('kind')
+          expect(result['items'][0]['target']).to eq(target)
+        end
+      end
+
+      context 'when a fact is not set' do
+        let(:facts) do
+          { conn[:host] => {
+            'fact1' => true
+          } }
+        end
+
+        let(:ssh_config) { { user: 'facts.identity.user' } }
+
+        it 'sets config to nil' do
+          result = run_cli_json(run_command)
+          expect(result['items'][0]['result']['_error']['msg'])
+            .to include("Authentication failed for user #{conn[:system_user]}")
+          expect(@log_output.readlines).to include(/Could not find fact/)
+        end
+      end
+
+      context 'on a non-queried node' do
+        # Are curly braces : rspec :: parens : lisps?
+        let(:facts) { { conn[:host] => { 'identity' => { 'user' => 'fake' } } } }
+
+        it 'does not load fact-lookup config' do
+          result = run_cli_json(run_command)
+          expect(result).not_to include('kind')
+          # If puppetdb config loaded this would be fake
+          expect(result['items'][0]['result']['stdout']).to eq("#{conn[:system_user]}\n")
+        end
+      end
     end
   end
 end
