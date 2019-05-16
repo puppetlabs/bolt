@@ -25,11 +25,23 @@ PS
       install_package(bolt, 'ruby')
       install_package(bolt, 'ruby-ffi')
       result = on(bolt, 'ruby --version')
-    when /el-|centos|fedora/
+    when /el-|centos/
       # install system ruby packages
       install_package(bolt, 'ruby')
       install_package(bolt, 'rubygem-json')
       install_package(bolt, 'rubygem-ffi')
+      install_package(bolt, 'rubygem-bigdecimal')
+      install_package(bolt, 'rubygem-io-console')
+      result = on(bolt, 'ruby --version')
+    when /fedora/
+      # install system ruby packages
+      install_package(bolt, 'ruby')
+      install_package(bolt, 'ruby-devel')
+      install_package(bolt, 'libffi')
+      install_package(bolt, 'libffi-devel')
+      install_package(bolt, 'redhat-rpm-config')
+      on(bolt, "dnf group install -y 'C Development Tools and Libraries'")
+      install_package(bolt, 'rubygem-json')
       install_package(bolt, 'rubygem-bigdecimal')
       install_package(bolt, 'rubygem-io-console')
       result = on(bolt, 'ruby --version')
