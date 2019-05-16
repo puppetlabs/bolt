@@ -61,7 +61,7 @@ targets:
 
 ### `target-lookups` and dynamic inventory
 
-`target-lookups` is a new key at the group level that allows you to dynamically
+`target-lookups` is a key at the group level that allows you to dynamically
 lookup the targets in the node. `target-lookups` contains an array of target
 lookup objects. Each `target-lookups` entry must include a `plugin` key that
 defines which plugin should be used for the lookup. The rest of the keys are
@@ -75,8 +75,16 @@ currently Bolt only ships builtin lookup plugins. The plugins are:
 
 #### PuppetDB
 
-The PuppetDB plugin takes a `query` field, which is either a string containing
-a PQL query or an array containing a PuppetDB AST format query.
+The PuppetDB plugin takes a `query` field, which is either a string
+containing a
+[PQL](https://puppet.com/docs/puppetdb/latest/api/query/v4/pql.html) query or
+an array containing a [PuppetDB
+AST](https://puppet.com/docs/puppetdb/latest/api/query/v4/ast.html) format
+query. The query is used to determine which targets should be included in the
+group. If `name` or `uri` is not specified with a [fact lookup](#fact-lookups)
+then the [certname] for each target in the query result will be used as the
+`uri` for the new target. Read the [Migrating to Version
+2](#migrating-to-version-2) section for more details on `uri` and `name` keys.
 
 ```
 groups:
@@ -95,6 +103,52 @@ groups:
 ```
 
 Make sure you have [configured PuppetDB](./bolt_connect_puppetdb.md)
+
+##### Fact Lookups
+
+If target-specific configuration is required the PuppetDB plugin can be used to
+lookup configuration values for the `name`, `uri`, and `config` inventory
+options for each target. The fact lookup values can be either `certname` to
+reference the [certname] of the target or a [PQL dot
+notation](https://puppet.com/docs/puppetdb/latest/api/query/v4/ast.html#dot-notation)
+facts string such as `facts.os.family` to reference fact value. Dot notation is
+required for both structured and unstructured facts.
+
+**Note:** If the `name` or `uri` values are set to a lookup the PuppetDB plugin
+will **not** set the `uri` to the certname of the target.
+
+For example, to set the user to be the user from the [identity
+fact](https://puppet.com/docs/facter/latest/core_facts.html#identity): ```
+version: 2
+groups:
+  - name: dynamic_config
+    target-lookups:
+      - plugin: puppetdb
+        query: "inventory[certname] { facts.osfamily = 'RedHat' }"
+        config:
+          ssh:
+            # Lookup config from PuppetDB facts
+            user: facts.identity.user
+    # And include static config
+    config:
+      ssh:
+        tmpdir: /tmp/mytmp
+```
+
+And to use the certname of a target as the `name`:
+```
+version: 2
+groups:
+  - name: dynamic_config
+    target-lookups:
+      - plugin: puppetdb
+        query: "inventory[certname] { facts.osfamily = 'RedHat' }"
+        name: certname
+        config:
+          ssh:
+            # Lookup config from PuppetDB facts
+            hostname: facts.networking.interfaces.en0.ipaddress
+```
 
 #### Terraform
 
@@ -425,3 +479,5 @@ targets:
 
 
 [Naming tasks](writing_tasks.md#)
+
+[certname]: https://puppet.com/docs/puppet/latest/lang_facts_and_builtin_vars.html#trusted-facts
