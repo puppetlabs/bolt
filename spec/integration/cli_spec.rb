@@ -26,8 +26,6 @@ describe "when loading bolt for CLI invocation" do
       'orchestrator_client',
       'faraday',
       'multipart-post',
-      # concurrent gem + dependencies
-      'concurrent-ruby',
       # httpclient + dependencies
       'httpclient',
       # locale + dependencies

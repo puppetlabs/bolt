@@ -729,7 +729,7 @@ describe Bolt::Inventory::Inventory2 do
     end
   end
 
-  context 'with plugins' do
+  context 'with lookup_targets plugins' do
     let(:data) {
       {
         'version' => 2,

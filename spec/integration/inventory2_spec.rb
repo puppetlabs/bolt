@@ -587,4 +587,52 @@ describe 'running with an inventory file', reset_puppet_settings: true do
       end
     end
   end
+
+  context 'with prompt inventory_config_lookups', ssh: true do
+    let(:inventory) do
+      {
+        version: 2,
+        targets: [
+          {
+            name: 'target-1',
+            config: {
+              transport: 'ssh',
+              ssh: {
+                password: { _plugin: 'prompt', message: 'password please' },
+                user: conn[:user],
+                host: conn[:host],
+                port: conn[:port],
+                'host-key-check': false
+              }
+            }
+          },
+          {
+            name: 'target-2',
+            config: {
+              transport: 'ssh',
+              ssh: {
+                password: { _plugin: 'prompt', message: 'password please' },
+                user: conn[:user],
+                host: conn[:host],
+                port: conn[:port],
+                'host-key-check': false
+              }
+            }
+          }
+        ]
+      }
+    end
+
+    let(:shell_cmd) { 'whoami' }
+
+    it 'sets a password from a prompt and only executes a single concurrent delay' do
+      allow(STDIN).to receive(:noecho).and_return('bolt').once
+      allow(STDOUT).to receive(:puts)
+
+      expect(STDOUT).to receive(:print).with("password please:").once
+
+      result = run_one_node(['command', 'run', shell_cmd, '--nodes', 'target-1'] + config_flags)
+      expect(result).to include('stdout' => "bolt\n")
+    end
+  end
 end
