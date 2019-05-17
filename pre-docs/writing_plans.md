@@ -539,7 +539,7 @@ Check out some example plans for inspiration writing your own.
 | [reboot module](https://forge.puppet.com/puppetlabs/reboot)                                                                                            | Contains tasks and plans for managing system reboots.                            | Intermediate    |
 | [reboot plan](https://github.com/puppetlabs/puppetlabs-reboot/blob/master/plans/init.pp)                                                               | Restarts a target system and waits for it to become available again.             | Intermediate    |
 | [Introducing Masterless Puppet with Bolt](https://puppet.com/blog/introducing-masterless-puppet-bolt)                                                  | Blog post explaining how plans can be used to deploy a load-balanced web server. | Advanced        |
-| profiles::nginx_install plan](https://github.com/puppetlabs/bolt/blob/master/docs/11-apply-manifest-code/Boltdir/site/profiles/plans/nginx_install.pp) | Shows an example plan for deploying Nginx and HAProxy.                           | Advanced        |
+| [profiles::nginx_install plan](https://github.com/puppetlabs/bolt/blob/master/docs/11-apply-manifest-code/Boltdir/site/profiles/plans/nginx_install.pp) | Shows an example plan for deploying Nginx and HAProxy.                           | Advanced        |
 
 * **Getting started** resources show simple use cases such as running a task and manipulating the results.
 * **Intermediate** resources show more advanced features in the plan language.
