@@ -121,7 +121,9 @@ groups:
         uri: public_ip
 ```
 
-The resource and property names correspond to the output of `terraform show`. For instance, given the following truncated output:
+The resource and property names correspond to the output of `terraform show`. 
+
+For example, the following truncated output creates two targets, named `34.83.150.52` and `34.83.16.240`. These targets are created by matching the resources `google_compute_instance.web.0` and `google_compute_instance.web.1`. The `uri` for each target is the value of their `network_interface.0.access_config.0.nat_ip` property, which corresponds to the externally routable IP address in Google Cloud.
 
 ```
 google_compute_instance.web.0:
@@ -173,10 +175,6 @@ google_compute_instance.app.1:
   self_link = https://www.googleapis.com/compute/v1/projects/cloud-app1/zones/us-west1-a/instances/app-1
   zone = us-west1-a
 ```
-
-This inventory would create two targets, named `34.83.150.52` and `34.83.16.240`.
-
-These targets are created by matching the resources `google_compute_instance.web.0` and `google_compute_instance.web.1`. The `uri` for each target is the value of their `network_interface.0.access_config.0.nat_ip` property, which corresponds to the externally routable IP address in Google Cloud.
 
 ## Inventory config
 
