@@ -1,8 +1,8 @@
-# Installing Bolt
-
-> **Difficulty**: Basic
-
-> **Time**: Approximately 10 minutes
+---
+title: Installing Bolt
+difficulty: Basic
+time: Approximately 10 minutes
+---
 
 In this exercise you will install Bolt so you can get started with Puppet Tasks.
 
