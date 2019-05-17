@@ -531,34 +531,16 @@ plan pdb_discover {
 
 Check out some example plans for inspiration writing your own.
 
-#### Beginner plans
+| Resource                                                                                                                                               | Description                                                                      | Level           |
+|--------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------|-----------------|
+| [facts module](https://forge.puppet.com/puppetlabs/facts)                                                                                              | Contains tasks and plans to discover facts about target systems.                 | Getting started |
+| [facts plan](https://github.com/puppetlabs/puppetlabs-facts/blob/master/plans/init.pp)                                                                 | Gathers facts using the facts task and sets the facts in inventory.              | Getting started |
+| [facts::info plan](https://github.com/puppetlabs/puppetlabs-facts/blob/master/plans/info.pp)                                                           | Uses the facts task to discover facts and map relevant fact values to targets.   | Getting started |
+| [reboot module](https://forge.puppet.com/puppetlabs/reboot)                                                                                            | Contains tasks and plans for managing system reboots.                            | Intermediate    |
+| [reboot plan](https://github.com/puppetlabs/puppetlabs-reboot/blob/master/plans/init.pp)                                                               | Restarts a target system and waits for it to become available again.             | Intermediate    |
+| [Introducing Masterless Puppet with Bolt](https://puppet.com/blog/introducing-masterless-puppet-bolt)                                                  | Blog post explaining how plans can be used to deploy a load-balanced web server. | Advanced        |
+| profiles::nginx_install plan](https://github.com/puppetlabs/bolt/blob/master/docs/11-apply-manifest-code/Boltdir/site/profiles/plans/nginx_install.pp) | Shows an example plan for deploying Nginx and HAProxy.                           | Advanced        |
 
-These plans show very simple use cases such as running a task and manipulating the results.
-
-##### Facts plans 
-
-The [facts module](https://forge.puppet.com/puppetlabs/facts) contains tasks and plans to discover facts about target systems.
-
-The [facts plan](https://github.com/puppetlabs/puppetlabs-facts/blob/master/plans/init.pp) gathers facts using the facts task and sets the facts in inventory. 
-
-The [facts::info plan](https://github.com/puppetlabs/puppetlabs-facts/blob/master/plans/info.pp) utilizes the facts task to discover facts and map relevant fact values to targets.
-
-#### Intermediate plans
-
-These plans show more advanced features in the plan language. 
-
-##### Reboot plan
-
-The [reboot module](https://forge.puppet.com/puppetlabs/reboot) contains tasks and plans for managing system reboots.
-
-The [reboot plan](https://github.com/puppetlabs/puppetlabs-reboot/blob/master/plans/init.pp) restarts a target system and waits for it to become available again.
-
-#### Advanced plans
-
-These plans show advanced plan features such as applying puppet code blocks and using external modules.
-
-##### Using plans to deploy Nginx and HAProxy
-
-In the [Introducing Masterless Puppet with Bolt](https://puppet.com/blog/introducing-masterless-puppet-bolt) blog post plans are used to deploy a load balanced web server.
-
-The [profiles::nginx_install plan](https://github.com/puppetlabs/bolt/blob/master/docs/11-apply-manifest-code/Boltdir/site/profiles/plans/nginx_install.pp) shows an example of how to deploy an example from the blog post.
+* **Getting started** resources show simple use cases such as running a task and manipulating the results.
+* **Intermediate** resources show more advanced features in the plan language.
+* **Advanced** resources show more complex use cases such as applying puppet code blocks and using external modules.
