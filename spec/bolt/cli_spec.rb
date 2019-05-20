@@ -30,11 +30,11 @@ describe "Bolt::CLI" do
   def stub_file(path)
     stat = double('stat', readable?: true, file?: true, directory?: false)
 
-    allow(cli).to receive(:file_stat).with(path).and_return(stat)
+    allow(Bolt::Util).to receive(:file_stat).with(path).and_return(stat)
   end
 
   def stub_non_existent_file(path)
-    allow(cli).to receive(:file_stat).with(path).and_raise(
+    allow(Bolt::Util).to receive(:file_stat).with(path).and_raise(
       Errno::ENOENT, "No such file or directory @ rb_file_s_stat - #{path}"
     )
   end
@@ -42,13 +42,13 @@ describe "Bolt::CLI" do
   def stub_unreadable_file(path)
     stat = double('stat', readable?: false, file?: true)
 
-    allow(cli).to receive(:file_stat).with(path).and_return(stat)
+    allow(Bolt::Util).to receive(:file_stat).with(path).and_return(stat)
   end
 
   def stub_directory(path)
     stat = double('stat', readable?: true, file?: false, directory?: true)
 
-    allow(cli).to receive(:file_stat).with(path).and_return(stat)
+    allow(Bolt::Util).to receive(:file_stat).with(path).and_return(stat)
   end
 
   def stub_config(file_content = {})
