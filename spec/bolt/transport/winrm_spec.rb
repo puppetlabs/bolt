@@ -33,7 +33,7 @@ describe Bolt::Transport::WinRM do
   let(:smb_port) { ENV['BOLT_WINRM_SMB_PORT'] || 2445 }
   let(:user) { conn_info('winrm')[:user] }
   let(:password) { conn_info('winrm')[:password] }
-  let(:command) { "echo $env:UserName" }
+  let(:command) { "[Environment]::UserName" }
   let(:config) { mk_config(ssl: false, user: user, password: password) }
   let(:ssl_config) { mk_config(cacert: 'resources/ca.pem', user: user, password: password) }
   let(:winrm) { Bolt::Transport::WinRM.new }
@@ -145,7 +145,7 @@ PS
   context "connecting over SSL", winrm: true do
     let(:target) { make_target(port_: ssl_port, conf: ssl_config) }
 
-    it "can test whether the target is available", winrm: true do
+    it "can test whether the target is available" do
       expect(winrm.connected?(target)).to eq(true)
     end
 
@@ -172,7 +172,8 @@ PS
       end
     end
 
-    it "skips verification with ssl-verify: false" do
+    # NOTE: OMI server uses a self-signed cert and only supports this config right now
+    it "skips verification with ssl-verify: false", omi: true do
       target.options.delete('cacert')
       target.options['ssl-verify'] = false
 

@@ -47,3 +47,13 @@ services:
       - "8140:8140"
     volumes:
       - ./fixtures/modules:/etc/puppetlabs/code/modules
+
+  omiserver:
+    build:
+      context: .
+      dockerfile: Dockerfile.omiserver
+      args:
+        BOLT_PASSWORD: bolt
+    ports:
+      - "25985:5985"
+      - "25986:5986"
