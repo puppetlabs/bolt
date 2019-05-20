@@ -1,4 +1,6 @@
-# Puppet Tasks Hands-on Lab
+---
+title: Bolt Hands-on Lab
+---
 
 ## Introduction
 
