@@ -58,6 +58,7 @@ task :docs do
                          yard_args: ['bolt-modules/boltlib',
                                      'bolt-modules/ctrl',
                                      'bolt-modules/file',
+                                     'bolt-modules/out',
                                      'bolt-modules/system'])
   json = JSON.parse(File.read(tmpfile))
   funcs = json.delete('puppet_functions')

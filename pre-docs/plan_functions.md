@@ -338,6 +338,29 @@ get_targets('localhost')
 ```
 
 
+## out::message
+
+Output a message for the user.
+
+This will print a message to stdout when using the human output format.
+
+**NOTE:** Not available in apply block
+
+
+```
+out::message(String $message)
+```
+
+*Returns:* `Undef` 
+
+* **message** `String` The message to output.
+
+**Example:** Print a message
+```
+out::message('Something went wrong')
+```
+
+
 ## puppetdb_fact
 
 Collects facts based on a list of certnames.

@@ -56,6 +56,8 @@ module Bolt
           @disable_depth -= 1
         when :disable_default_output
           @disable_depth += 1
+        when :message
+          print_message_event(event)
         end
       end
 
@@ -334,6 +336,10 @@ module Bolt
         end
       end
 
+      def print_message_event(event)
+        print_message(event[:message])
+      end
+
       def fatal_error(err)
         @stream.puts(colorize(:red, err.message))
         if err.is_a? Bolt::RunFailure
@@ -346,10 +352,10 @@ module Bolt
           end
         end
       end
-    end
 
-    def print_message(message)
-      @stream.puts(message)
+      def print_message(message)
+        @stream.puts(message)
+      end
     end
   end
 end

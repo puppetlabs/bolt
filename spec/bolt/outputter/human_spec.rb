@@ -285,4 +285,9 @@ plans/plans/plans/plans
     outputter.fatal_error(Bolt::CLIError.new("oops"))
     expect(output.string).to eq("oops\n")
   end
+
+  it "handles message events" do
+    outputter.print_message_event(message: "hello world")
+    expect(output.string).to eq("hello world\n")
+  end
 end
