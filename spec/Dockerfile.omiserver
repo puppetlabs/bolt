@@ -18,17 +18,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
  && apt-get update -y \
  && apt-get install -y \
     gss-ntlmssp \
-    libc6 \
-    libgcc1 \
     libgssapi-krb5-2 \
-    liblttng-ust0 \
-    libstdc++6 \
-    libcurl3 \
-    libunwind8 \
-    libuuid1 \
-    zlib1g \
-    libssl1.0.0 \
-    libicu60 \
     omi \
     powershell \
  && wget https://github.com/PowerShell/psl-omi-provider/releases/download/v1.4.2-2/psrp-1.4.2-2.universal.x64.deb \
