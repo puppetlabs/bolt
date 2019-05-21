@@ -58,8 +58,5 @@ RUN touch /etc/opt/omi/creds/ntlm \
 
 EXPOSE 5985 5986
 
-ENTRYPOINT /opt/omi/bin/omiserver --version \
- && pwsh --version \
- && /opt/omi/bin/omiserver -d \
- && echo 'Daemonized OMI server' \
- && tail -f /var/opt/omi/log/omiserver.log
+ADD fixtures/omiserver/docker-entrypoint.sh /
+ENTRYPOINT ["/docker-entrypoint.sh"]
