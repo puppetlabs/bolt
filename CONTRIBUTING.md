@@ -32,6 +32,24 @@ Pull requests are also welcome on GitHub: https://github.com/puppetlabs/bolt
 As with other open-source projects managed by Puppet, you must digitally sign the Contributor
 License Agreement before we can accept your pull request: https://cla.puppet.com
 
+**If this is your first time submitting a PR**:
+1. Fork the Bolt project (button in the top-right, next to 'star' and 'watch')
+1. Clone your fork of Bolt
+1. Add the puppetlabs repo as an upstream - `git remote add upstream git@github.com:puppetlabs/bolt`
+1. Make a new branch off of master - `git checkout -b mybranchname`
+1. Commit your changes and add a useful commit message, including what specifically you changed and why - `git commit`
+1. Push your changes to your branch on your fork - `git push origin mybranchname`
+1. Open a PR against master at https://github.com/puppetlabs/bolt
+
+**If it's not your first PR**
+1. Update from upstream:
+   ```
+   git fetch upstream && git checkout upstream/master && git checkout -b mybranchname
+   ```
+1. Commit your changes and add a useful commit message, including what specifically you changed and why - `git commit`
+1. Push your changes to your branch on your fork - `git push origin mybranchname`
+1. Open a PR against master at https://github.com/puppetlabs/bolt
+
 ## Installing Bolt
 
 If you are interested in trying bolt out or using in production we recommend installing from a system package detailed in [installing bolt](https://puppet.com/docs/bolt/latest/bolt_installing.html). The following installation instructions are focused on developers who wish to contribute to Bolt.
