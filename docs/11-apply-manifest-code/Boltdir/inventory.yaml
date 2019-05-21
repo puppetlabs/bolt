@@ -18,4 +18,3 @@ config:
     host-key-check: false
     password: root
     user: root
-    

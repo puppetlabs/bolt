@@ -1,8 +1,8 @@
-# Deploying an application with a plan
-
-> **Difficulty**: Advanced
-
-> **Time**: Approximately 20 minutes
+---
+title: Deploying an application with a plan
+difficulty: Advanced
+time: Approximately 20 minutes
+---
 
 In this exercise you will further explore Puppet Plans by writing a
 multi-stage plan to deploy a sample application.
@@ -56,143 +56,81 @@ When you have four nodes, update your SSH config to include them all.
 ## Set up inventory file
 Set up an inventory file to more easily map the nodes to their role in the application. 
 
-1. Assign one node to the load balancer (lb) group, one to the database (db) group and the other two to the application (app) group.
-    ```yaml
-    ---
-    groups:
-      - name: lb
-        nodes:
-          - "0.0.0.0:32771"
-      - name: db
-        nodes:
-          - "0.0.0.0:32770"
-      - name: app
-        nodes:
-          - "0.0.0.0:32768"
-          - "0.0.0.0:32769"
-    config:
-      ssh:
-        host-key-check: false
-        # These are credentials for Docker. Manage Vagrant with SSH config.
-        password: root
-        user: root
-    ```
-    **Note**: inventory.yaml for nodes provisioned with vagrant
-    ```yaml
-    ---
-    groups:
-      - name: lb
-        nodes:
-          - node1
-      - name: db
-        nodes:
-          - node2
-      - name: app
-        nodes:
-          - node3
-          - node4
-    config:
-      ssh:
-        host-key-check: false
-    ```
+Assign one node to the load balancer (lb) group, one to the database (db) group and the other two to the application (app) group.
 
-2. Make sure your inventory is configured correctly and you can connect to all nodes. Run:
+```yaml
+---
+groups:
+  - name: lb
+    nodes:
+      - "0.0.0.0:32771"
+  - name: db
+    nodes:
+      - "0.0.0.0:32770"
+  - name: app
+    nodes:
+      - "0.0.0.0:32768"
+      - "0.0.0.0:32769"
+config:
+  ssh:
+    host-key-check: false
+    # These are credentials for Docker. Manage Vagrant with SSH config.
+    password: root
+    user: root
+```
 
-    ```bash
-    bolt command run 'echo hi' -n db,app,lb --inventoryfile ./inventory.yaml
-    ```
+**Note**: inventory.yaml for nodes provisioned with vagrant
+
+```yaml
+---
+groups:
+  - name: lb
+    nodes:
+      - node1
+  - name: db
+    nodes:
+      - node2
+  - name: app
+    nodes:
+      - node3
+      - node4
+config:
+  ssh:
+    host-key-check: false
+```
+
+Make sure your inventory is configured correctly and you can connect to all nodes. Run:
+
+```bash
+bolt command run 'echo hi' -n db,app,lb --inventoryfile ./inventory.yaml
+```
 
 ## Write tasks for each stage of the application deployment
 
 The tasks for this plan are code samples to enable us to focus on the plan itself.
 
 ```python
-#!/usr/bin/env python
-# my_app/tasks/install.py
-# Install application
-
-import json
-import sys
-
-params = json.load(sys.stdin)
-json.dump(dict(status = "success", previous_version = "1.0.0", new_version = params['version']), sys.stdout)
+{% include_relative modules/my_app/tasks/install.py -%}
 ```
 
 ```python
-#!/usr/bin/env python
-# my_app/tasks/migrate.py
-# Migrate DB schema
-
-import json
-import sys
-
-params = json.load(sys.stdin)
-json.dump(dict(status = "success"), sys.stdout)
+{% include_relative modules/my_app/tasks/migrate.py -%}
 ```
 
 ```python
-#!/usr/bin/env python
-# my_app/tasks/lb.py
-# manipulate load_balancer
-
-import json
-import sys
-
-from random import randint
-from time import sleep
-
-params = json.load(sys.stdin)
-
-def stats():
-    return { "connections": randint(0, 10), "status": "ok" }
-
-def drain():
-    sleep(3)
-    return { "status": "success"}
-
-def add():
-    return { "status": "success" }
-
-result_fn  = {
-  "stats" : stats,
-  "drain": drain,
-  "add" : add,
-}[params["action"]]
-
-json.dump(result_fn(), sys.stdout)
+{% include_relative modules/my_app/tasks/lb.py -%}
 ```
 
 ```python
-#!/usr/bin/env python
-# my_app/tasks/deploy.py
-# Update and restart the application on the new version
-
-import json
-import sys
-
-json.dump(dict(status = "success"), sys.stdout)
+{% include_relative modules/my_app/tasks/deploy.py -%}
 ```
 
 ```python
-#!/usr/bin/env python
-# my_app/tasks/healthcheck.py
-# perform a healthcheck of a url
-
-import json
-import sys
-
-json.dump(dict(status = "success"), sys.stdout)
+{% include_relative modules/my_app/tasks/health_check.py -%}
 ```
 
 ```python
-#!/usr/bin/env python
-# my_app/tasks/uninstall.py
-# Remove and old version of the application
-
-import json
-import sys
-
-json.dump(dict(status = "success"), sys.stdout)
+{% include_relative modules/my_app/tasks/uninstall.py -%}
 ```
 ## Write a plan that uses the tasks
 
@@ -202,103 +140,8 @@ database, makes the new code available on each application server and, finally, 
 versions of the application.
 
 ```puppet
-plan my_app::deploy(
-  Pattern[/\d+\.\d+\.\d+/] $version,
-  TargetSpec $app_servers,
-  TargetSpec $db_server,
-  TargetSpec $lb_server,
-  String[1] $instance = 'my_app',
-  Boolean $force = false
-) {
-  # Validate that there is only a single load balancer server to check
-  if get_targets($lb_server).length > 1 {
-    fail_plan("${lb_server} did not resolve to a single target")
-  }
-
-  # First query the load balancer and make sure the app isn't under too much load to do a deploy.
-  unless $force {
-    $conns = run_task('my_app::lb', $lb_server,
-       "Check load before starting deploy",
-       action => 'stats',
-       backend => $instance,
-       server => 'FRONTEND',
-    ).first['connections']
-    if ($conns > 8) {
-      fail_plan("The application has too many open connections: ${conns}")
-    } else {
-      # Info messages will be displayed when the --verbose flag is used.
-      info("Application has ${conns} open connections.")
-    }
-  }
-
-  # Install the new version of the application and check what version was previously
-  # installed so it can be deleted after the deploy.
-  $old_versions = run_task('my_app::install', [$app_servers, $db_server],
-    "Install ${version} of the application",
-    version => $version
-  ).map |$r| { $r['previous_version'] }
-
-  run_task('my_app::migrate', $db_server)
-
-  # Don't log every action on each node, only log important messages
-  without_default_logging() || {
-    # Expand group references or globs before iterating
-    get_targets($app_servers).each |$server| {
-
-      # Check stats and print a message to the user
-      $stats = run_task('my_app::lb', $lb_server,
-        action => 'stats',
-        backend => $instance,
-        server => $server.name,
-        _catch_errors => $force
-      ).first
-      notice("Deploying to ${server.name}, currently ${stats["status"]} with ${stats["connections"]} open connections.")
-
-      run_task('my_app::lb', $lb_server,
-        "Drain connections from ${server.name}",
-        action => 'drain',
-        backend => $instance,
-        server => $server.name,
-        _catch_errors => $force
-      )
-
-      run_task('my_app::deploy', [$server],
-        "Update application for new version",
-      )
-
-      # Verify the app server is healthy before returning it to the load
-      # balancer.
-      $health = run_task('my_app::health_check', $lb_server,
-        "Run Healthcheck for ${server.name}",
-        target => "http://${server.name}:5000/",
-        '_catch_errors' => true).first
-
-      if $health['status'] == 'success' {
-        info("Upgrade Healthy, Returning ${server.name} to load balancer")
-      } else {
-        # Fail the plan unless the app server is healthy or this is a forced deploy
-        unless $force {
-          fail_plan("Deploy failed on app server ${server.name}: ${health.result}")
-        }
-      }
-
-      run_task('my_app::lb', $lb_server,
-        action => 'add',
-        backend => $instance,
-        server => $server.name,
-        _catch_errors => $force
-      )
-      notice("Deploy complete on ${server}.")
-    }
-  }
-
-  run_task('my_app::uninstall', [$db_server, $app_servers],
-    "Clean up old versions",
-    live_versions => $old_versions + $version,
-  )
-}
+{% include_relative modules/my_app/plans/deploy.pp -%}
 ```
-
 
 Run this plan with the following command. It will randomly fail 10% of the
 time when the simulated load is high.
@@ -306,8 +149,10 @@ time when the simulated load is high.
 ```bash
 bolt plan run my_app::deploy version=1.0.2 app_servers=app db_server=db lb_server=lb --inventoryfile ./inventory.yaml --modulepath=./modules
 ```
+
 The result (when simulated load is below threshold)
-```
+
+```plain
 Starting: Check load before starting deploy on node1
 Finished: Check load before starting deploy with 0 failures in 0.89 sec
 Starting: Install 1.0.2 of the application on node3, node4, node2
@@ -322,8 +167,10 @@ Starting: Clean up old versions on node2, node3, node4
 Finished: Clean up old versions with 0 failures in 0.88 sec
 Plan completed successfully with no result
 ```
+
 The result (when simulated load is above threshold)
-```
+
+```plain
 Starting: Check load before starting deploy on node1
 Finished: Check load before starting deploy with 0 failures in 0.89 sec
 {
@@ -332,8 +179,8 @@ Finished: Check load before starting deploy with 0 failures in 0.89 sec
   "details": {
   }
 }
-
 ```
+
 ### Parameters
 
 ```puppet
@@ -498,6 +345,7 @@ run_task('my_app::lb', $lb_server,
   server => $server.name,
 )
 ```
+
 In order to prevent execution from halting after an error when the `$force`
 parameter is specified we have to use the `_catch_errors` metaparam. For each
 `run_task` command  that should continue when in force mode add `_catch_errors =>

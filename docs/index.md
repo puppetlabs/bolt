@@ -1,4 +1,6 @@
-# Puppet Tasks Hands-on Lab
+---
+title: Bolt Hands-on Lab
+---
 
 ## Introduction
 
@@ -23,6 +25,7 @@ These step through the basic functionality of Puppet Tasks and focus on simple c
 1. [Writing advanced Tasks](08-writing-advanced-tasks)
 1. [Writing advanced Plans](09-writing-advanced-plans)
 1. [Deploying an Application](10-deploying-an-application)
+1. [Applying manifest code](11-apply-manifest-code)
 
 ## Self-Paced Training
 
