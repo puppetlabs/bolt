@@ -11,7 +11,7 @@ Add-LocalGroupMember -Group 'Administrators' -Member $user
 ($cert = Import-PfxCertificate -FilePath C:\\cert.pfx -CertStoreLocation cert:\\LocalMachine\\My -Password (ConvertTo-SecureString -String bolt -Force -AsPlainText)) | Format-List
 
 # add the winrm-ssl listener
-New-WSManInstance -ResourceURI winrm/config/Listener -SelectorSet @{Address='*';Transport='HTTPS'} -ValueSet @{Hostname='localhost';CertificateThumbprint=$cert.Thumbprint} | Format-List
+New-WSManInstance -ResourceURI winrm/config/Listener -SelectorSet @{Address='*';Transport='HTTPS'} -ValueSet @{Hostname='boltserver';CertificateThumbprint=$cert.Thumbprint} | Format-List
 
 # add a firewall rule allowing access to the winrm-ssl port (TCP port 5986)
 New-NetFirewallRule -DisplayName 'Windows Remote Management (HTTPS-In)' -Direction Inbound -Protocol TCP -LocalPort 5986 -Action Allow | Format-List
@@ -41,7 +41,7 @@ Vagrant.configure('2') do |config|
     windows.vm.network :forwarded_port, guest: 5985, host: 25985, host_ip: '127.0.0.1', id: 'winrm'
     windows.vm.network :forwarded_port, guest: 5986, host: 25986, host_ip: '127.0.0.1', id: 'winrm-ssl'
     windows.vm.network :forwarded_port, guest: 445, host: 2445, host_ip: '127.0.0.1', id: 'smb'
-    windows.vm.provision 'file', source: 'resources/cert.pfx', destination: 'C:\cert.pfx'
+    windows.vm.provision 'file', source: 'spec/fixtures/ssl/cert.pfx', destination: 'C:\cert.pfx'
     windows.vm.provision 'shell', privileged: true, inline: windows_provision
     windows.vm.provider 'virtualbox' do |vb|
       vb.gui = false

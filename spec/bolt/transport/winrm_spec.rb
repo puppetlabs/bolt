@@ -33,9 +33,10 @@ describe Bolt::Transport::WinRM do
   let(:smb_port) { ENV['BOLT_WINRM_SMB_PORT'] || 2445 }
   let(:user) { conn_info('winrm')[:user] }
   let(:password) { conn_info('winrm')[:password] }
-  let(:command) { "echo $env:UserName" }
+  let(:command) { "[Environment]::UserName" }
   let(:config) { mk_config(ssl: false, user: user, password: password) }
-  let(:ssl_config) { mk_config(cacert: 'resources/ca.pem', user: user, password: password) }
+  let(:cacert_path) { 'spec/fixtures/ssl/ca.pem' }
+  let(:ssl_config) { mk_config(cacert: cacert_path, user: user, password: password) }
   let(:winrm) { Bolt::Transport::WinRM.new }
   let(:winrm_ssl) { Bolt::Transport::WinRM.new }
   let(:echo_script) { <<PS }
@@ -142,10 +143,10 @@ PS
     end
   end
 
-  context "connecting over SSL", winrm: true do
+  context "connecting over SSL", winrm: true, omi: true do
     let(:target) { make_target(port_: ssl_port, conf: ssl_config) }
 
-    it "can test whether the target is available", winrm: true do
+    it "can test whether the target is available" do
       expect(winrm.connected?(target)).to eq(true)
     end
 
@@ -153,8 +154,9 @@ PS
       expect(winrm.run_command(target, command)['stdout']).to eq("#{user}\r\n")
     end
 
+    # winrm gem doesn't fully support OMI server, so disable this test
     # refactor into other file upload tests when SMB gem adds SMB v3 support
-    it "can upload a file to a host" do
+    it "can upload a file to a host", omi: false do
       contents = "kadejtw89894"
       remote_path = 'C:\Windows\Temp\upload-test-winrm-ssl'
       with_tempfile_containing('upload-test-winrm-ssl', contents, '.ps1') do |file|
