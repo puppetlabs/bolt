@@ -76,7 +76,7 @@ function Grant-WinRMHttpsAccess($certThumbprint)
   $winRMArgs = @{
     ResourceURI = 'winrm/config/Listener'
     SelectorSet = @{ Address = '*'; Transport = 'HTTPS' }
-    ValueSet    = @{ Hostname = 'localhost'; CertificateThumbprint = $certThumbprint }
+    ValueSet    = @{ Hostname = 'boltserver'; CertificateThumbprint = $certThumbprint }
   }
   $instance = New-WSManInstance @winRMArgs
   Write-Information ($instance | Format-List | Out-String)
@@ -84,8 +84,8 @@ function Grant-WinRMHttpsAccess($certThumbprint)
 
 function Set-WinRMHostConfiguration
 {
-  # configure WinRM to use resources/cert.pfx for SSL
-  $cert = Install-Certificate -Path 'resources/cert.pfx' -Password 'bolt'
+  # configure WinRM to use cert.pfx for SSL
+  $cert = Install-Certificate -Path 'spec/fixtures/ssl/cert.pfx' -Password 'bolt'
   Write-Information ($cert | Format-List | Out-String)
   Grant-WinRMHttpsAccess -CertThumbprint $cert.Thumbprint
 }
