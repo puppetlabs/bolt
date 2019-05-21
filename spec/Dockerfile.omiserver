@@ -45,16 +45,22 @@ RUN cat /etc/opt/omi/conf/omiserver.conf \
  >tmp.conf \
  && mv -f tmp.conf /etc/opt/omi/conf/omiserver.conf
 
+# Well known certs for use in specs installed to default OMI location
+COPY fixtures/ssl/cert.pem /etc/opt/omi/ssl/omi.pem
+COPY fixtures/ssl/key.pem /etc/opt/omi/ssl/omikey.pem
+
 # https://github.com/Microsoft/omi/blob/master/Unix/doc/setup-ntlm-omi.md
 # mechanism file at /etc/gss/mech.d/mech.ntlmssp.conf is already properly configured
 # gssntlmssp_v1           1.3.6.1.4.1.311.2.2.10          /usr/lib/x86_64-linux-gnu/gssntlmssp/gssntlmssp.so
 # setup the NTLM auth file with proper ownership and perms
+# setup SSL public / private key with proper ownership
 # adding the bolt user to NTLM authentication file
 RUN touch /etc/opt/omi/creds/ntlm \
  && echo ":bolt:$BOLT_PASSWORD" >> /etc/opt/omi/creds/ntlm \
  && chown -R omi:omi /etc/opt/omi/creds \
  && chmod 500 /etc/opt/omi/creds \
- && chmod 600 /etc/opt/omi/creds/ntlm
+ && chmod 600 /etc/opt/omi/creds/ntlm \
+ && chown omi:omi /etc/opt/omi/ssl/omikey.pem
 
 EXPOSE 5985 5986
 

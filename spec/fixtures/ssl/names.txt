@@ -1,2 +1,0 @@
-common-name=boltserver
-alt-names=localhost,boltserver,bolt_boltserver_1,spec_puppetserver_1,bolt_server,puppet_server,spec_boltserver_1,puppetdb,spec_puppetdb_1

@@ -49,6 +49,7 @@ services:
       - ./fixtures/modules:/etc/puppetlabs/code/modules
 
   omiserver:
+    hostname: omiserver
     build:
       context: .
       dockerfile: Dockerfile.omiserver
