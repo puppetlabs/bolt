@@ -47,6 +47,8 @@ PS
       result = on(bolt, 'ruby --version')
     when /osx/
       # ruby dev tools should be already installed
+      # Pin ffi to 1.9.25 to avoid incompatability with 1.11.1
+      on(bolt, 'gem install ffi --no-document -v 1.9.25')
       result = on(bolt, 'ruby --version')
     else
       fail_test("#{bolt['platform']} not currently a supported bolt controller")
