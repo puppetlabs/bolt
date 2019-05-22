@@ -5,6 +5,7 @@ require 'net/ssh'
 require 'net/ssh/proxy/jump'
 require 'bolt_spec/conn'
 require 'bolt_spec/errors'
+require 'bolt_spec/logger'
 require 'bolt_spec/transport'
 require 'bolt/transport/ssh'
 require 'bolt/config'
@@ -314,6 +315,21 @@ describe Bolt::Transport::SSH do
         }.to raise_error(Bolt::Node::EscalateError,
                          "Sudo password for user #{bash_user} was not provided for #{host_and_port}")
       end
+    end
+  end
+
+  context "with a bad private-key option" do
+    include BoltSpec::Logger
+
+    let(:config) do
+      mk_config('host-key-check' => false, 'private-key' => '/bad/path/to/key',
+                user: user, password: password)
+    end
+
+    it "warns but succeeds when the private-key is missing", ssh: true do
+      stub_logger
+      expect(mock_logger).to receive(:warn)
+      expect(ssh.run_command(target, 'whoami')['exit_code']).to eq(0)
     end
   end
 

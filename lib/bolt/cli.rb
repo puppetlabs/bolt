@@ -491,25 +491,7 @@ module Bolt
         raise Bolt::CLIError, "A #{type} must be specified"
       end
 
-      stat = file_stat(path)
-
-      if !stat.readable?
-        raise Bolt::FileError.new("The #{type} '#{path}' is unreadable", path)
-      elsif !stat.file? && (!allow_dir || !stat.directory?)
-        expected = allow_dir ? 'file or directory' : 'file'
-        raise Bolt::FileError.new("The #{type} '#{path}' is not a #{expected}", path)
-      elsif stat.directory?
-        Dir.foreach(path) do |file|
-          next if %w[. ..].include?(file)
-          validate_file(type, File.join(path, file), allow_dir)
-        end
-      end
-    rescue Errno::ENOENT
-      raise Bolt::FileError.new("The #{type} '#{path}' does not exist", path)
-    end
-
-    def file_stat(path)
-      File.stat(path)
+      Bolt::Util.validate_file(type, path, allow_dir)
     end
 
     def rerun

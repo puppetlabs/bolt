@@ -30,6 +30,14 @@ module Bolt
 
           @logger = Logging.logger[@target.host]
           @transport_logger = transport_logger
+
+          if target.options['private-key']&.instance_of?(String)
+            begin
+              Bolt::Util.validate_file('ssh key', target.options['private-key'])
+            rescue Bolt::FileError => e
+              @logger.warn(e.msg)
+            end
+          end
         end
 
         PAGEANT_NAME = "Pageant\0".encode(Encoding::UTF_16LE)
