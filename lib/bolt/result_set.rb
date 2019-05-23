@@ -30,7 +30,7 @@ module Bolt
       self
     end
 
-    def filter
+    def filter_set
       filtered = @results.select { |r| yield r }
       self.class.new(filtered)
     end

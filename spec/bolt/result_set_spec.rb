@@ -44,7 +44,7 @@ describe Bolt::Result do
     expect(result_set.to_data).to eq(expected)
   end
 
-  it 'returns a ResultSet when filtered' do
-    expect(result_set.filter { |r| r['node'] == 'node1' }).to be_a(Bolt::ResultSet)
+  it 'filter_set returns a ResultSet' do
+    expect(result_set.filter_set { |r| r['node'] == 'node1' }).to be_a(Bolt::ResultSet)
   end
 end
