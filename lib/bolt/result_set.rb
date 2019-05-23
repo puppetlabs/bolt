@@ -30,6 +30,11 @@ module Bolt
       self
     end
 
+    def filter
+      filtered = @results.select { |r| yield r }
+      self.class.new(filtered)
+    end
+
     def result_hash
       @result_hash ||= @results.each_with_object({}) do |result, acc|
         acc[result.target.name] = result
