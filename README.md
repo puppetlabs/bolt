@@ -18,7 +18,7 @@ Bolt is a Ruby command-line tool for executing commands, scripts, and tasks on r
 * Scales to more than 1000 concurrent connections.
 * Supports industry standard protocols (SSH/SCP, WinRM/PSRP) and authentication methods (password, publickey).
 
-> For a step-by-step introduction to Bolt, see our [hands-on-lab](https://github.com/puppetlabs/tasks-hands-on-lab).
+> For a step-by-step introduction to Bolt, see our [hands-on-lab](https://puppetlabs.github.io/bolt/).
 
 Additionally the Bolt project includes:
 

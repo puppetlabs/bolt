@@ -4,7 +4,7 @@ Using hands-on exercises, discover how Bolt can help you manage your infrastruct
 
 ## Hands-on lab
 
-The Puppet Tasks Hands-on Lab is a GitHub repository that contains sample files, code examples, and exercises to help you configure Bolt and learn to use it in a safe environment. For more information, see the [puppetlabs/tasks-hands-on-lab repository](https://github.com/puppetlabs/tasks-hands-on-lab#puppet-tasks-hands-on-lab).
+For a step-by-step introduction to Bolt and to the Puppet Tasks ecosystem try out the [Bolt Hands On Lab](https://puppetlabs.github.io/bolt/).
 
 ## Online training
 

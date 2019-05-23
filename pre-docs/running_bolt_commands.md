@@ -23,11 +23,11 @@ bolt command run <COMMAND> --nodes winrm://<WINDOWS.NODE> --user <USERNAME> --pa
 -   To run a command that contains spaces or shell special characters, wrap the command in single quotation marks:
 
 ```
-bolt command run 'echo $HOME' --nodes web5.mydomain.edu, web6.mydomain.edu
+bolt command run 'echo $HOME' --nodes web5.mydomain.edu,web6.mydomain.edu
 ```
 
 ```
-bolt command run "netstat -an | grep 'tcp.*LISTEN'" --nodes web5.mydomain.edu, web6.mydomain.edu
+bolt command run "netstat -an | grep 'tcp.*LISTEN'" --nodes web5.mydomain.edu,web6.mydomain.edu
 ```
 
 -   To run a cross-platform command:
@@ -62,7 +62,7 @@ bolt script run <PATH/TO/SCRIPT> --nodes <NODE NAME>,<NODE NAME>,<NODE NAME>
 ```
 
 ```
-bolt script run ../myscript.sh --nodes web5.mydomain.edu, web6.mydomain.edu
+bolt script run ../myscript.sh --nodes web5.mydomain.edu,web6.mydomain.edu
 ```
 
 -   When executing on WinRM nodes, include the WinRM protocol in the nodes string:
@@ -111,7 +111,7 @@ bolt file upload <SOURCE> <DESTINATION> --nodes <NODE NAME>,<NODE NAME>
 ```
 
 ```
-bolt file upload my_file.txt /tmp/remote_file.txt --nodes web5.mydomain.edu, web6.mydomain.edu
+bolt file upload my_file.txt /tmp/remote_file.txt --nodes web5.mydomain.edu,web6.mydomain.edu
 ```
 
 

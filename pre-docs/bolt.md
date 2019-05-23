@@ -47,7 +47,7 @@ Bolt is an open source task runner that automates the manual work that you do to
 
  | -   **Learn the basics**
 
-[Hands-on lab](https://github.com/puppetlabs/tasks-hands-on-lab#puppet-tasks-hands-on-lab) - Using a GitHub repository with sample files and code examples, install and run Bolt in a safe environment.
+[Hands-on lab](https://puppetlabs.github.io/bolt/) - Using a GitHub repository with sample files and code examples, install and run Bolt in a safe environment.
 
 [Online training](https://learn.puppet.com/course/puppet-orchestration-bolt-and-tasks?_ga=2.158319738.1526297716.1533055277-261802629.1531434605) - Learn how to use Bolt to run a command, a script, and a task.
 
