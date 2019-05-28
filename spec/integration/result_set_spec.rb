@@ -34,10 +34,25 @@ describe "when running a plan that manipulates an execution result", ssh: true d
       expect(output.strip).to eq('false')
     end
 
+    context 'filters result sets' do
+      it 'includes target when filter is true' do
+        params = { target: uri }.to_json
+        run_cli(['plan', 'run', 'results::test_methods', "--params", params] + config_flags)
+        expect(@log_output.readlines)
+          .to include("NOTICE  Puppet : Filtered set: [Target('ssh://bolt:bolt@localhost:20022', {})]\n")
+      end
+
+      it 'excludes target when filter is false' do
+        params = { target: uri, fail: true }.to_json
+        run_cli(['plan', 'run', 'results::test_methods', "--params", params] + config_flags)
+        expect(@log_output.readlines).to include("NOTICE  Puppet : Filtered set: []\n")
+      end
+    end
+
     it 'exposes errrors for results' do
       params = { target: uri }.to_json
       output = run_cli(['plan', 'run', 'results::test_error', "--params", params] + config_flags)
-      expect(output.strip).to eq('"The task failed with exit code 1"')
+      expect(output.strip).to eq('"The task failed with exit code 1:\n"')
     end
   end
 end

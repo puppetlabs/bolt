@@ -278,6 +278,7 @@ A `ResultSet` has the following methods:
 -   `error_set()`: A `ResultSet`containing only the results of failed nodes.
 
 -   `ok_set()`: A `ResultSet` containing only the successful results.
+-   `filter_set(block)`: Filters a `ResultSet` with the given block and returns a `ResultSet` object (where [Puppet's filter function](https://puppet.com/docs/puppet/6.4/function.html#filter) returns an array or hash)
 
 -   `targets()`: An array of all the `Target` objects from every `Result`in the set.
 
@@ -349,6 +350,13 @@ Similarly you can iterate over the array of hashes returned by calling `to_data`
 ```
 $r = run_command('whoami', 'localhost,local://0.0.0.0')
 $r.to_data.each |$result_hash| { notice($result_hash['result']['stdout']) }
+```
+
+You can also use `filter_set` to filter a ResultSet and apply a ResultSet function such as `targets` to the output:
+```
+$filtered = $result.filter_set |$r| {
+  $r['tag'] == "you're it"
+}.targets
 ```
 
 ## Passing sensitive data to tasks
