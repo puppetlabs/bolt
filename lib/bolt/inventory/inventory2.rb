@@ -102,13 +102,13 @@ module Bolt
 
       def data_hash
         {
-          data: @data,
+          data: {},
           target_hash: {
-            target_vars: @target_vars,
-            target_facts: @target_facts,
-            target_features: @target_features
+            target_vars: {},
+            target_facts: {},
+            target_features: {}
           },
-          config: @config.transport_data_get
+          config: { transports: {} }
         }
       end
 
