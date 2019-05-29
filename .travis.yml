@@ -10,6 +10,8 @@ env:
     - REGISTRY_HOST=pcr-internal.puppet.net
     - DOCKER_REGISTRY=pe-and-platform
     - BOLT_SUDO_USER=true
+    - DOCKERHUB_USER=Puppet
+    - DOCKERHUB_REPO=bolt
     - secure: Gk8LaACXYEVpv5LIWEMOuH3sJP4CzB2aSvE1BUcfDWkI+Hdgr2by3w/nGbKpyVD+v2H8r0zXyVrbCJ/qzx2gCRxqKJ2GKJEsrStT+8z3BXRRRzwkThIBVyWKk9b9bTt8AE0G94I3BE4gJyIPfbX5XxnKcg7nJZGOmubZpUPQX+2SXSfy9EbtY9iismwK7LGtWv6l90cK2eSLZGvdsSKPo7cylOldXfdYIyeBtvsIL1juBaiINX52Zgt371+nX53fDSYOKdIDLuhNqX3zpNOuIJ9DUj4E7IJA7+XhHy77zL98VjHtPo5H4fmKyZ2k+xbYqOydc5OPGguKequsnyDo5npktDrkbswnjWMXNDu+wImAd+IwHG2lTamsAnOGQ+E6g2oK0R5fUL26XJ3lBnTRrsLDnlrvqYqFxt3MCR+o5+DnTirSVQJfrRVsIKTucWHlYLTOUWkVDrLavJqIbWHytEbMf/BXUcovlQzSgfu5/Y1GkUJBnthtbiZfTImmBLcrqKDD4PnDmvC1v9Z5KR78MYu7lFTe5C4STj2aR6bwvqjiPKm6kYG5etOFEyRJ+CbqD2QsdF2N6Ww/RFWovqVqQIWuGdhumDUTdmQAiiPxl12M0+kIH6NugpBD3gt4RT0sni/T+booDw6b3Ts4WJ8FW1/LPWdy7gVo9yOCL4FhjOw=
 before_script:
 - docker-compose -f spec/docker-compose.yml up -d --build
@@ -57,12 +59,18 @@ script:
 after_script:
 - docker-compose -f spec/docker-compose.yml logs
 deploy:
-  provider: script
-  on:
-    repo: puppetlabs/bolt
-    # deploy the master branch or tag pushes
-    condition: $TRAVIS_BRANCH == "master" || -n $TRAVIS_TAG
-  script: bash scripts/deploy.sh
+  - provider: script
+    on:
+      repo: puppetlabs/bolt
+      # deploy the master branch or tag pushes
+      condition: $TRAVIS_BRANCH == "master" || -n $TRAVIS_TAG
+    script: bash scripts/deploy.sh
+  - provider: script
+    on:
+      repo: puppetlabs/bolt
+      # deploy the master branch or tag pushes
+      condition: $TRAVIS_BRANCH == "master" || -n $TRAVIS_TAG
+    script: bash scripts/push-bolt-to-dockerhub.sh
 notifications:
   email: false
   hipchat:
