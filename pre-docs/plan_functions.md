@@ -188,6 +188,29 @@ fail_plan(Error('We goofed up', 'task-unexpected-result', { 'result' => 'null' }
 ```
 
 
+## file::exists
+
+check if a file exists
+
+
+```
+file::exists(String $filename)
+```
+
+*Returns:* `Boolean` 
+
+* **filename** `String` Absolute path or Puppet file path.
+
+**Example:** Check a file on disk
+```
+file::exists('/tmp/i_dumped_this_here')
+```
+**Example:** check a file from the modulepath
+```
+file::exists('example/files/VERSION')
+```
+
+
 ## file::read
 
 Read a file and return its contents.
@@ -208,6 +231,29 @@ file::read('/tmp/i_dumped_this_here')
 **Example:** Read a file from the modulepath
 ```
 file::read('example/files/VERSION')
+```
+
+
+## file::readable
+
+check if a file is readable
+
+
+```
+file::readable(String $filename)
+```
+
+*Returns:* `Boolean` 
+
+* **filename** `String` Absolute path or Puppet file path.
+
+**Example:** Check a file on disk
+```
+file::readable('/tmp/i_dumped_this_here')
+```
+**Example:** check a file from the modulepath
+```
+file::readable('example/files/VERSION')
 ```
 
 
@@ -481,25 +527,7 @@ run_task('facts', $targets, '_run_as' => 'root')
 ### Run a task, logging the provided description.
 
 ```
-run_task(String[1] $task_name, Boltlib::TargetSpec $targets, String $description, Optional[Hash[String[1], Any]] $task_args)
-```
-
-*Returns:* `ResultSet` A list of results, one entry per target.
-
-* **task_name** `String[1]` The task to run.
-* **targets** `Boltlib::TargetSpec` A pattern identifying zero or more targets. See [`get_targets`](#get_targets) for accepted patterns.
-* **description** `String` A description to be output when calling this function.
-* **task_args** `Optional[Hash[String[1], Any]]` Arguments to the plan. Can also include additional options: '_catch_errors', '_run_as'.
-
-**Example:** Run a task
-```
-run_task('facts', $targets, 'Gather OS facts')
-```
-
-### Run a task, calling the block as each node starts and finishes execution. This is used from 'bolt task run'
-
-```
-run_task(String[1] $task_name, Boltlib::TargetSpec $targets, Optional[String] $description, Optional[Hash[String[1], Any]] $task_args, Callable[Struct[{type => Enum[node_start, node_result], target => Target}], 1, 1] &$block)
+run_task(String[1] $task_name, Boltlib::TargetSpec $targets, Optional[String] $description, Optional[Hash[String[1], Any]] $task_args)
 ```
 
 *Returns:* `ResultSet` A list of results, one entry per target.
@@ -508,8 +536,11 @@ run_task(String[1] $task_name, Boltlib::TargetSpec $targets, Optional[String] $d
 * **targets** `Boltlib::TargetSpec` A pattern identifying zero or more targets. See [`get_targets`](#get_targets) for accepted patterns.
 * **description** `Optional[String]` A description to be output when calling this function.
 * **task_args** `Optional[Hash[String[1], Any]]` Arguments to the plan. Can also include additional options: '_catch_errors', '_run_as'.
-* **&block** `Callable[Struct[{type => Enum[node_start, node_result], target => Target}], 1, 1]` A block that's invoked as actions are started and finished on each node.
 
+**Example:** Run a task
+```
+run_task('facts', $targets, 'Gather OS facts')
+```
 
 
 ## set_feature
