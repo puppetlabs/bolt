@@ -52,6 +52,8 @@ script:
 - |
   if ! bundle exec rake docs; then
     false
+  elif ! git diff --exit-code; then
+    false
   fi
 - bundle exec rake puppetserver
 after_script:
