@@ -8,7 +8,7 @@ module Bolt
   module Transport
     class Docker < Base
       def self.options
-        %w[host service-url service-options tmpdir interpreters]
+        %w[host service-url service-options tmpdir interpreters shell-command tty]
       end
 
       def provided_features
@@ -56,9 +56,17 @@ module Bolt
         end
       end
 
-      def run_command(target, command, _options = {})
+      def run_command(target, command, options = {})
+        if target.options['tty']
+          options[:Tty] = true
+        end
+        if target.options['shell-command'] && !target.options['shell-command'].empty?
+          # escape any double quotes in command
+          command = command.gsub('"', '\"')
+          command = "#{target.options['shell-command']} \" #{command}\""
+        end
         with_connection(target) do |conn|
-          stdout, stderr, exitcode = conn.execute(*Shellwords.split(command), {})
+          stdout, stderr, exitcode = conn.execute(*Shellwords.split(command), options)
           Bolt::Result.for_command(target, stdout, stderr, exitcode, 'command', command)
         end
       end
