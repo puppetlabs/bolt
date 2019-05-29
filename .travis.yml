@@ -26,7 +26,7 @@ script:
 - bundle exec rubocop
 - |
   status=0
-  for i in 'boltlib' 'ctrl' 'file' 'system'; do
+  for i in 'boltlib' 'ctrl' 'file' 'out' 'system'; do
     pushd bolt-modules/$i
     if ! bundle exec rake spec; then
       status=1
