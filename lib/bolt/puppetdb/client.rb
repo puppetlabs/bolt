@@ -42,6 +42,22 @@ module Bolt
         end
       end
 
+      def fact_values(certnames = [], facts = [])
+        return {} if certnames.empty? || facts.empty?
+
+        certnames.uniq!
+        name_query = certnames.map { |c| ["=", "certname", c] }
+        name_query.insert(0, "or")
+
+        facts_query = facts.map { |f| ["=", "path", f] }
+        facts_query.insert(0, "or")
+
+        query = ['and', name_query, facts_query]
+        result = make_query(query, 'fact-contents')
+        result.map! { |h| h.delete_if { |k, _v| %w[environment name].include?(k) } }
+        result.group_by { |c| c['certname'] }
+      end
+
       def make_query(query, path = nil)
         body = JSON.generate(query: query)
         url = "#{uri}/pdb/query/v4"

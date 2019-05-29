@@ -78,11 +78,34 @@ describe Bolt::PuppetDB::Client do
       },
         'node2' => {
           'foo' => 'bar',
-          'name' => 'node2'
+          '1' => 'the loneliest number',
+          'name' => {
+            'node' => {
+              'kit' => 'kat'
+            }
+          }
         } }
     end
 
     let(:client) { pdb_client }
+
+    # Hash formatting is hard, so do it in the examples
+    let(:expected_node1_foo) do
+      [{ "certname" => "node1", "path" => ["foo"], "value" => "bar" }]
+    end
+
+    let(:expected_node2_foo) do
+      [{ "certname" => "node2", "path" => ["foo"], "value" => "bar" }]
+    end
+
+    let(:expected_node2_all) do
+      [{ "certname" => "node2",
+         "path" => ["foo"],
+         "value" => "bar" },
+       { "certname" => "node2",
+         "path" => %w[name node kit],
+         "value" => "kat" }]
+    end
 
     before(:all) do
       push_facts(facts_hash)
@@ -97,8 +120,25 @@ describe Bolt::PuppetDB::Client do
       expect(facts).to eq(facts_hash)
     end
 
+    it 'should get fact values' do
+      values = client.fact_values(%w[node1], [['foo']])
+      expect(values).to eq('node1' => expected_node1_foo)
+    end
+
+    it 'should get fact values for multiple nodes' do
+      values = client.fact_values(%w[node1 node2], [['foo']])
+      expect(values).to eq('node1' => expected_node1_foo,
+                           'node2' => expected_node2_foo)
+    end
+
+    it 'should get fact values for multiple facts' do
+      values = client.fact_values(%w[node1 node2], [['foo'], %w[name node kit]])
+      expect(values).to eq('node1' => expected_node1_foo,
+                           'node2' => expected_node2_all)
+    end
+
     it 'should get certnames' do
-      certnames = client.query_certnames("inventory { facts.name = 'node2' }")
+      certnames = client.query_certnames("inventory { facts.name.node.kit = 'kat' }")
       expect(certnames).to eq(['node2'])
     end
 
@@ -120,6 +160,14 @@ describe Bolt::PuppetDB::Client do
       client = Bolt::PuppetDB::Client.new(Bolt::PuppetDB::Config.new(conf))
       facts = client.facts_for_node(%w[node1 node2])
       expect(facts).to eq(facts_hash)
+    end
+  end
+
+  describe "#fact_values" do
+    it 'should not make a request to pdb if there are no nodes' do
+      expect(client).to receive(:http_client).never
+      facts = client.fact_values([])
+      expect(facts).to eq({})
     end
   end
 end
