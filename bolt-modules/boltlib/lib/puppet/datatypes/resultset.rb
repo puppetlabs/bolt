@@ -9,6 +9,7 @@ Puppet::DataTypes.create_type('ResultSet') do
       count => Callable[[], Integer],
       empty => Callable[[], Boolean],
       error_set => Callable[[], ResultSet],
+      filter_set => Callable[[Callable], ResultSet],
       find => Callable[[String[1]], Optional[Variant[Result, ApplyResult]]],
       first => Callable[[], Optional[Variant[Result, ApplyResult]]],
       names => Callable[[], Array[String[1]]],

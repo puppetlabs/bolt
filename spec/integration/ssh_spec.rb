@@ -55,7 +55,7 @@ describe "when runnning over the ssh transport", ssh: true do
     it 'reports errors when task fails', :reset_puppet_settings do
       result = run_failed_node(%w[task run results fail=true] + config_flags)
       expect(result['_error']['kind']).to eq('puppetlabs.tasks/task-error')
-      expect(result['_error']['msg']).to eq('The task failed with exit code 1')
+      expect(result['_error']['msg']).to eq("The task failed with exit code 1:\n")
     end
 
     it 'passes noop to a task that supports noop', :reset_puppet_settings do

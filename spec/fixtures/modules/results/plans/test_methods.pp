@@ -10,6 +10,11 @@ plan results::test_methods(
 
   # Test to_s works
   $str = "result ${result}"
+  # Test filter_set works
+  $filtered = $result.filter_set |$r| {
+    $r['tag'] == "you're it"
+  }.targets
+  notice("Filtered set: ${$filtered}")
   # return ok
   return $result.ok
 }

@@ -30,7 +30,7 @@ describe "when running a plan that creates targets", ssh: true do
             'object' => 'results',
             'status' => 'success',
             'result' => {
-              '_output' => "hi\n"
+              "tag" => "you're it"
             }
           }
         ]
