@@ -20,7 +20,6 @@ module Bolt
     :files,
     :metadata
   ) do
-
     attr_reader :remote
 
     def initialize(task, remote: false)
