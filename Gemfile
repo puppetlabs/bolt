@@ -15,6 +15,9 @@ gem "rack", '>= 2.0.5'
 gem "rails-auth", '>= 2.1.4'
 gem "sinatra", '>= 2.0.4'
 
+# Pin cri for now so r10k installs modules
+gem 'cri', '2.15.6'
+
 # Required to pick up plan specs in the rake spec task
 # TODO: move to test group?
 gem "puppetlabs_spec_helper",
