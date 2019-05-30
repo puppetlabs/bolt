@@ -6,7 +6,7 @@ require 'bolt/error'
 #
 # **NOTE:** Not available in apply block
 Puppet::Functions.create_function(:add_facts) do
-  # @param target A target.
+  # @param target A target. oops forgot to run docs rake task
   # @param facts A hash of fact names to values that may include structured facts.
   # @return The target's new facts.
   # @example Adding facts to a target
