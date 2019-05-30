@@ -4,9 +4,9 @@ module Bolt
   module Transport
     module Powershell
       class << self
-        PS_ARGS = %w[
-          -NoProfile -NonInteractive -NoLogo -ExecutionPolicy Bypass
-        ].freeze
+        def ps_args
+          %w[-NoProfile -NonInteractive -NoLogo -ExecutionPolicy Bypass]
+        end
 
         def powershell_file?(path)
           Pathname(path).extname.casecmp('.ps1').zero?
@@ -22,7 +22,7 @@ module Bolt
           when '.ps1'
             [
               'powershell.exe',
-              [*PS_ARGS, '-File', "\"#{path}\""]
+              [*ps_args, '-File', "\"#{path}\""]
             ]
           when '.pp'
             [

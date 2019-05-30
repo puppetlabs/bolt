@@ -63,7 +63,8 @@ module Bolt
       private :with_tmpscript
 
       def execute(*command, options)
-        command.unshift(options[:interpreter]) if options[:interpreter]
+        # Interpreter can be an array or string. It will be appended to the command array.
+        command.unshift(options[:interpreter]).flatten! if options[:interpreter]
         command = [options[:env]] + command if options[:env]
 
         if options[:stdin]
@@ -106,7 +107,8 @@ module Bolt
           arguments = unwrap_sensitive_args(arguments)
           if Powershell.powershell_file?(file)
             command = Powershell.run_script(arguments, file)
-            output = execute(command, dir: dir, env: "powershell.exe")
+            interpreter = ['powershell.exe', *Powershell.ps_args]
+            output = execute(command, dir: dir, interpreter: interpreter)
           else
             path, args = *Powershell.process_from_extension(file)
             args += Powershell.escape_arguments(arguments)
@@ -166,7 +168,7 @@ module Bolt
           if Powershell.powershell_file?(script) && stdin.nil?
             command = Powershell.run_ps_task(arguments, script, input_method)
             command = environment_params + Powershell.shell_init + command
-            interpreter ||= 'powershell.exe'
+            interpreter ||= ['powershell.exe', *Powershell.ps_args]
             output =
               if input_method == 'powershell'
                 execute(command, dir: dir, interpreter: interpreter)
