@@ -6,3 +6,31 @@
 .page-header {
   display: none;
 }
+
+.bolt-logo {
+  height: 4rem;
+}
+
+.sidebar {
+  padding-top: 2rem;
+}
+
+.main-content {
+  margin: 0;
+}
+
+.container {
+  display: flex;
+}
+
+.nav-list {
+  list-style: none;
+}
+
+.nav-list li a {
+  white-space: nowrap;
+}
+
+.nav-header {
+  font-weight: bold;
+}
