@@ -25,7 +25,7 @@ Puppet::Functions.create_function(:get_targets) do
     inventory = Puppet.lookup(:bolt_inventory)
     # Bolt executor not expected when invoked from apply block
     executor = Puppet.lookup(:bolt_executor) { nil }
-    executor&.report_function_call('get_targets')
+    executor&.report_function_call(self.class.name)
 
     inventory.get_targets(names)
   end

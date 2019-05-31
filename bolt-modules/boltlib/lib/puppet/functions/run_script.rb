@@ -58,7 +58,7 @@ Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFuncti
     executor = Puppet.lookup(:bolt_executor)
     inventory = Puppet.lookup(:bolt_inventory)
 
-    executor.report_function_call('run_script')
+    executor.report_function_call(self.class.name)
 
     found = Puppet::Parser::Files.find_file(script, scope.compiler.environment)
     unless found && Puppet::FileSystem.exist?(found)

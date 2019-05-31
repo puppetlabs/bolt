@@ -50,7 +50,7 @@ Puppet::Functions.create_function(:get_resources) do
       end
     end
 
-    executor.report_function_call('get_resources')
+    executor.report_function_call(self.class.name)
 
     targets = inventory.get_targets(target_spec)
 
