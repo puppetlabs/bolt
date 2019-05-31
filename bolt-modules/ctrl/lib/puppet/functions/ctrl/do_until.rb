@@ -11,6 +11,7 @@ Puppet::Functions.create_function(:'ctrl::do_until') do
   end
 
   def do_until
+    Puppet.lookup(:bolt_executor) {}&.report_function_call(self.class.name)
     until (x = yield); end
     x
   end

@@ -25,7 +25,7 @@ Puppet::Functions.create_function(:add_facts) do
 
     inventory = Puppet.lookup(:bolt_inventory)
     executor = Puppet.lookup(:bolt_executor)
-    executor.report_function_call('add_facts')
+    executor.report_function_call(self.class.name)
 
     inventory.add_facts(target, facts)
   end

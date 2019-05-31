@@ -11,6 +11,7 @@ Puppet::Functions.create_function(:'ctrl::sleep') do
   end
 
   def sleeper(period)
+    Puppet.lookup(:bolt_executor) {}&.report_function_call(self.class.name)
     sleep(period)
     nil
   end

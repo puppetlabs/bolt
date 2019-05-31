@@ -50,7 +50,7 @@ Puppet::Functions.create_function(:apply_prep) do
     executor = Puppet.lookup(:bolt_executor)
     inventory = Puppet.lookup(:bolt_inventory)
 
-    executor.report_function_call('apply_prep')
+    executor.report_function_call(self.class.name)
 
     targets = inventory.get_targets(target_spec)
 

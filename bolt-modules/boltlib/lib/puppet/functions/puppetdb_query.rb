@@ -22,7 +22,7 @@ Puppet::Functions.create_function(:puppetdb_query) do
     puppetdb_client = Puppet.lookup(:bolt_pdb_client)
     # Bolt executor not expected when invoked from apply block
     executor = Puppet.lookup(:bolt_executor) { nil }
-    executor&.report_function_call('puppetdb_query')
+    executor&.report_function_call(self.class.name)
 
     puppetdb_client.make_query(query)
   end

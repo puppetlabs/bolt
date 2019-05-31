@@ -56,7 +56,7 @@ Puppet::Functions.create_function(:run_task) do
     # Bolt calls this function internally to trigger tasks from the CLI. We
     # don't want to count those invocations.
     unless task_args['_bolt_api_call']
-      executor.report_function_call('run_task')
+      executor.report_function_call(self.class.name)
     end
 
     # Report bundled content, this should capture tasks run from both CLI and Plans

@@ -29,7 +29,7 @@ Puppet::Functions.create_function(:wait_until_available) do
     executor = Puppet.lookup(:bolt_executor)
     inventory = Puppet.lookup(:bolt_inventory)
 
-    executor.report_function_call('wait_until_available')
+    executor.report_function_call(self.class.name)
 
     # Ensure that given targets are all Target instances
     targets = inventory.get_targets(targets)

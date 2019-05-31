@@ -52,7 +52,7 @@ Puppet::Functions.create_function(:run_command) do
     executor = Puppet.lookup(:bolt_executor)
     inventory = Puppet.lookup(:bolt_inventory)
 
-    executor.report_function_call('run_command')
+    executor.report_function_call(self.class.name)
 
     # Ensure that given targets are all Target instances
     targets = inventory.get_targets(targets)

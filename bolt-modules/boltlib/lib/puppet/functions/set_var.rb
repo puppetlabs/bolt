@@ -26,7 +26,7 @@ Puppet::Functions.create_function(:set_var) do
 
     inventory = Puppet.lookup(:bolt_inventory)
     executor = Puppet.lookup(:bolt_executor)
-    executor.report_function_call('set_var')
+    executor.report_function_call(self.class.name)
 
     inventory.set_var(target, key, value)
   end
