@@ -54,7 +54,7 @@ For modules that require Ruby gems, see [Installing Gems with Bolt Packages](bol
 
 For more details about specifying modules in a Puppetfile, see the [Puppetfile documentation](https://puppet.com/docs/pe/2018.1/puppetfile.html).
 
-1.   Create a file named Puppetfile and store it in the [bolt project directory](./bolt_project_directory.md)
+1.   Create a file named Puppetfile and store it in the [Bolt project directory](./bolt_project_directory.md)
 2.   Open the Puppetfile in a text editor and add the modules and versions that you want to install. If the modules have dependencies, list those as well.
 
      ```

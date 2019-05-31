@@ -2,6 +2,10 @@
 
 Your Bolt configuration file can contain global and transport options.
 
+**Related Information**
+
+[Bolt project directory](./bolt_project_directory.md)
+
 ## Sample Bolt configuration file
 
 ```
@@ -40,8 +44,8 @@ interpreters:
 
 `transport`: Specify the default transport to use when the transport for a target is not specified in the url or inventory. The valid options for transport are `docker`, `local`, `pcp`, `ssh`, and `winrm`.
 
-`save-rerun`: Whether bolt should update `.rerun.json` in the Bolt project
-directory. If your target names include passwords you should set this to false
+`save-rerun`: Whether bolt should update `.rerun.json` in the [Bolt project
+directory]. If your target names include passwords you should set this to false
 to avoid writing them to disk.
 
 ## SSH transport configuration options

@@ -154,9 +154,10 @@ To have Bolt securely prompt for a password, use the `--password` or `-p` flag w
 
 ## Rerunning commands based on the last result
 
-After every execution, Bolt writes information about the result of that run to a
-`.rerun.json` file inside the Bolt project directory. That file can then be
-used to specify nodes for future commands.
+After every execution, Bolt writes information about the result of that run
+to a `.rerun.json` file inside the Bolt project
+directory. That file can then be used to
+specify nodes for future commands.
 
 To attempt to retry a failed action on target nodes, use `--rerun failure`. To continue targeting those nodes,
 pass `--no-save-rerun` to prevent updating the file.
@@ -177,3 +178,5 @@ bolt task run server action=restart name=httpd --rerun success
 **Note**: When a plan does not return a `ResultSet` object, Bolt can't save
 information for reruns and `.rerun.json` is deleted.
 
+**Related Information**
+[Bolt project directory](./bolt_project_directory.md)

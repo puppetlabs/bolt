@@ -193,7 +193,7 @@ Create a manifest that sets up a web server with nginx, and run it as a plan.
 
 **Related information**
 
-
+[Bolt project directory](./bolt_project_directory.md)
 [NGINX](https://www.nginx.com/resources/glossary/nginx/)
 
 ## Create a sample manifest for IIS on Windows
@@ -278,6 +278,7 @@ Create a manifest that sets up a web server with IIS and run it as a plan.
 
 **Related information**
 
+[Bolt project directory](./bolt_project_directory.md)
 [IIS](https://www.iis.net)
 
 ## Using Puppet Device modules from an apply statement
@@ -306,6 +307,4 @@ nodes:
 When you set the `run-on` option with a device module the puppet-resource_api
 gem must installed with the puppet agent on the proxy target must be at least
 version 1.8.1.
-
-
 
