@@ -13,6 +13,7 @@ Puppet::Functions.create_function(:'file::write') do
   end
 
   def write(filename, content)
+    Puppet.lookup(:bolt_executor) {}&.report_function_call(self.class.name)
     File.write(filename, content)
     nil
   end
