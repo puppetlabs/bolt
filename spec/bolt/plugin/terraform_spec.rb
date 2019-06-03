@@ -54,6 +54,14 @@ describe Bolt::Plugin::Terraform do
                                          { 'uri' => ip1, 'name' => 'test-instance-1' })
     end
 
+    it 'sets only name if uri is not specified' do
+      opts.delete('uri')
+      targets = subject.lookup_targets(opts.merge('name' => 'id'))
+
+      expect(targets).to contain_exactly({ 'name' => 'test-instance-0' },
+                                         { 'name' => 'test-instance-1' })
+    end
+
     it 'builds a config map from the inventory' do
       config_template = { 'ssh' => { 'user' => 'metadata.sshUser' } }
       targets = subject.lookup_targets(opts.merge('config' => config_template))

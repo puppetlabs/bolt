@@ -31,10 +31,12 @@ module Bolt
         resources.select do |name, _resource|
           name.match?(regex)
         end.map do |name, resource|
-          uri = lookup(name, resource, opts['uri'])
-          next unless uri
+          target = {}
 
-          target = { 'uri' => uri }
+          if opts.key?('uri')
+            uri = lookup(name, resource, opts['uri'])
+            target['uri'] = uri if uri
+          end
           if opts.key?('name')
             real_name = lookup(name, resource, opts['name'])
             target['name'] = real_name if real_name
