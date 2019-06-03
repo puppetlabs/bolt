@@ -1,0 +1,13 @@
+{
+  "implementations": [
+    {
+      "name": "typed.sh",
+      "requirements": ["shell"]
+    },
+    {
+      "name": "typed.ps1",
+      "requirements": ["powershell"],
+      "input_method": "environment"
+    }
+  ]
+}
