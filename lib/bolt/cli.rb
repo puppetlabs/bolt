@@ -310,7 +310,7 @@ module Bolt
       when 'plan'
         code = run_plan(options[:object], options[:task_options], options[:target_args], options)
       when 'puppetfile'
-        code = install_puppetfile(@config.puppetfile, @config.modulepath)
+        code = install_puppetfile(@config.puppetfile_config, @config.puppetfile, @config.modulepath)
       when 'apply'
         if options[:object]
           validate_file('manifest', options[:object])
@@ -451,18 +451,21 @@ module Bolt
       outputter.print_module_list(pal.list_modules)
     end
 
-    def install_puppetfile(puppetfile, modulepath)
-      require 'r10k/action/puppetfile/install'
+    def install_puppetfile(config, puppetfile, modulepath)
+      require 'r10k/cli'
       require 'bolt/r10k_log_proxy'
 
       if puppetfile.exist?
         moduledir = modulepath.first.to_s
-        r10k_config = {
+        r10k_opts = {
           root: puppetfile.dirname.to_s,
           puppetfile: puppetfile.to_s,
           moduledir: moduledir
         }
-        install_action = R10K::Action::Puppetfile::Install.new(r10k_config, nil)
+
+        settings = R10K::Settings.global_settings.evaluate(config)
+        R10K::Initializers::GlobalInitializer.new(settings).call
+        install_action = R10K::Action::Puppetfile::Install.new(r10k_opts, nil)
 
         # Override the r10k logger with a proxy to our own logger
         R10K::Logging.instance_variable_set(:@outputter, Bolt::R10KLogProxy.new)

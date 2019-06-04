@@ -32,12 +32,15 @@ module Bolt
 
   class Config
     attr_accessor :concurrency, :format, :trace, :log, :puppetdb, :color, :save_rerun,
-                  :transport, :transports, :inventoryfile, :compile_concurrency, :boltdir
+                  :transport, :transports, :inventoryfile, :compile_concurrency, :boltdir,
+                  :puppetfile_config
     attr_writer :modulepath
 
     TRANSPORT_OPTIONS = %i[password run-as sudo-password extensions
                            private-key tty tmpdir user connect-timeout
                            cacert token-file service-url interpreters file-protocol smb-port].freeze
+
+    PUPPETFILE_OPTIONS = %w[proxy].freeze
 
     def self.default
       new(Bolt::Boltdir.new('.'), {})
@@ -66,6 +69,7 @@ module Bolt
       @puppetdb = {}
       @color = true
       @save_rerun = true
+      @puppetfile_config = {}
 
       # add an entry for the default console logger
       @log = { 'console' => {} }
@@ -144,6 +148,10 @@ module Bolt
       end
 
       @inventoryfile = File.expand_path(data['inventoryfile'], @boltdir.path) if data.key?('inventoryfile')
+
+      if data.key?('puppetfile')
+        @puppetfile_config = data['puppetfile'].select { |k, _| PUPPETFILE_OPTIONS.include?(k) }
+      end
 
       @hiera_config = File.expand_path(data['hiera-config'], @boltdir.path) if data.key?('hiera-config')
       @compile_concurrency = data['compile-concurrency'] if data.key?('compile-concurrency')
