@@ -156,10 +156,12 @@ The Terraform plugin accepts several fields:
 
 `dir`: The directory from which to load Terraform state  
 `resource_type`: The Terraform resources to match, as a regular expression  
-`uri`: The property of the Terraform resource to use as the target URI  
+`uri`: The property of the Terraform resource to use as the target URI (optional)  
 `statefile`: The name of the Terraform state file to load within `dir` (optional, defaults to `terraform.tfstate`)  
 `name`: The property of the Terraform resource to use as the target name (optional)  
 `config`: A Bolt config map where each value is the Terraform property to use for that config setting
+
+One of `uri` or `name` is required. If only `uri` is set, then the value of `uri` will be used as the `name`.
 
 ```
 groups:
@@ -175,7 +177,9 @@ groups:
         uri: public_ip
 ```
 
-The resource and property names correspond to the output of `terraform show`. 
+Multiple resources with the same name are identified <resource>.0, <resource>.1, etc.
+
+The path to nested properties must be separated with `.`: for example, `network_interface.0.access_config.0.nat_ip`.
 
 For example, the following truncated output creates two targets, named `34.83.150.52` and `34.83.16.240`. These targets are created by matching the resources `google_compute_instance.web.0` and `google_compute_instance.web.1`. The `uri` for each target is the value of their `network_interface.0.access_config.0.nat_ip` property, which corresponds to the externally routable IP address in Google Cloud.
 
