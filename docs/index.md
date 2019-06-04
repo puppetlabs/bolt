@@ -10,22 +10,22 @@ This repository contains a step-by-step introduction to [Bolt](https://github.co
 
 These exercises will help you get Bolt installed and make sure you have a few nodes to target with tasks and commands. 
 
-1. [Installing Bolt](01-installing-bolt)
-1. [Acquiring nodes](02-acquiring-nodes)
+1. [Installing Bolt](lab/01-installing-bolt)
+1. [Acquiring nodes](lab/02-acquiring-nodes)
 
 ## Exercises
 
 These step through the basic functionality of Puppet Tasks and focus on simple commands you can copy and paste.
 
-1. [Running Commands](03-running-commands)
-1. [Running Scripts](04-running-scripts)
-1. [Writing Tasks](05-writing-tasks)
-1. [Downloading and running existing Tasks](06-downloading-and-running-existing-tasks)
-1. [Writing Plans](07-writing-plans)
-1. [Writing advanced Tasks](08-writing-advanced-tasks)
-1. [Writing advanced Plans](09-writing-advanced-plans)
-1. [Deploying an Application](10-deploying-an-application)
-1. [Applying manifest code](11-apply-manifest-code)
+1. [Running Commands](lab/03-running-commands)
+1. [Running Scripts](lab/04-running-scripts)
+1. [Writing Tasks](lab/05-writing-tasks)
+1. [Downloading and running existing Tasks](lab/06-downloading-and-running-existing-tasks)
+1. [Writing Plans](lab/07-writing-plans)
+1. [Writing advanced Tasks](lab/08-writing-advanced-tasks)
+1. [Writing advanced Plans](lab/09-writing-advanced-plans)
+1. [Deploying an Application](lab/10-deploying-an-application)
+1. [Applying manifest code](lab/11-apply-manifest-code)
 
 ## Self-Paced Training
 

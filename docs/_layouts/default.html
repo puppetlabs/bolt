@@ -18,20 +18,43 @@
     <meta name="theme-color" content="#157878">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="stylesheet" href="{{ '/assets/css/style.css?v=' | append: site.github.build_revision | relative_url }}">
-    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="{{ '/favicon.ico' | relative_url }}" type="image/x-icon" />
   </head>
-  <body>
+  <body class="container">
+    <nav class="sidebar">
+      <ul class="nav-list">
+        <li>
+          <a href="{{ '/' | relative_url }}">
+            <img src="{{ '/assets/img/bolt-logo.png' | relative_url }}" class="bolt-logo" />
+          </a>
+        </li>
+        <li>
+          <span class="nav-header">Hands-on Lab</span>
+          <ol>
+            <li>
+              <a href="{{ '/' | relative_url }}">Introduction</a>
+            </li>
+            {% for lab in site.lab %}
+              {% if lab.title %}
+              <li><a href="{{ lab.url | remove: "/index.html" | relative_url }}">{{ lab.title }}</a></li>
+              {% endif %}
+            {% endfor %}
+          </ol>
+        </li>
+        <li>
+          <span class="nav-header">Other Resources</span>
+          <ul>
+            <li><a href="https://puppet.com/docs/bolt/latest/bolt.html">Bolt Docs</a></li>
+            <li><a href="https://github.com/puppetlabs/bolt">Bolt GitHub Repo</a></li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+
     <main id="content" class="main-content" role="main">
       <h1>
       {{ page.title }}
       </h1>
-
-      {% if page.difficulty or page.time %}
-      <blockquote>
-        <p><strong>Difficulty</strong>: {{ page.difficulty }}</p>
-        <p><strong>Time</strong>: {{ page.time }}</p>
-      </blockquote>
-      {% endif %}
 
       {{ content }}
 

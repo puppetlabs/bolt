@@ -1,3 +1,15 @@
 theme: jekyll-theme-cayman
 google_analytics: UA-120367942-3
 exclude: [vendor, Boltdir, acceptance, modules, .git, Gemfile, Gemfile.lock]
+
+collections:
+  lab:
+    output: true
+
+# Make sure labs use the lab layout...
+defaults:
+  - scope:
+      type: lab
+    values:
+      layout: lab
+
