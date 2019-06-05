@@ -123,6 +123,7 @@ Finished on node1:
   }
 Successful on 1 node: node1
 Ran on 1 node in 3.84 seconds
+```
 
 Using parameters for the package task, install the vim package across all your nodes:
 
