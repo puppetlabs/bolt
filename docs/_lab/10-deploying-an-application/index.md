@@ -4,7 +4,7 @@ difficulty: Advanced
 time: Approximately 20 minutes
 ---
 
-In this exercise you will further explore Puppet Plans by writing a
+In this exercise you will further explore Bolt Plans by writing a
 multi-stage plan to deploy a sample application.
 
 The sample application for this lesson consists of four nodes. It has a
@@ -353,9 +353,9 @@ true` to the parameters.
 
 # Next steps
 
-Congratulations! You should now have a basic understanding of `bolt` and Puppet Tasks. Here are a few ideas for what to do next:
+Congratulations! You should now have a basic understanding of `bolt` and Bolt Tasks. Here are a few ideas for what to do next:
 
-* Explore content on the [Puppet Tasks Playground](https://github.com/puppetlabs/tasks-playground)
+* Explore content on the [Bolt Tasks Playground](https://github.com/puppetlabs/tasks-playground)
 * Get reusable tasks and plans from the [Task Modules Repo](https://github.com/puppetlabs/task-modules)
 * Search Puppet Forge for [Tasks](https://forge.puppet.com/modules?with_tasks=yes)
 * Start writing Tasks for one of your existing Puppet modules

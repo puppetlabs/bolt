@@ -4,7 +4,7 @@ difficulty: Advanced
 time: Approximately 20 minutes
 ---
 
-In this exercise you will further explore Puppet Plans by using the `apply` keyword to leverage existing content from the [Puppet Forge](https://forge.puppet.com/).
+In this exercise you will further explore Bolt Plans by using the `apply` keyword to leverage existing content from the [Puppet Forge](https://forge.puppet.com/).
 
 You can read more about using bolt `apply` in Masterless Workflows in a [Blog Post](https://puppet.com/blog/introducing-masterless-puppet-bolt) written by Bolt developer Michael Smith. 
 

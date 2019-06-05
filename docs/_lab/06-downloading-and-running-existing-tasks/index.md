@@ -158,7 +158,7 @@ Ran on 3 nodes in 10.03 seconds
 # More tips, tricks and ideas on the Tasks Playground
 
 See the [installing modules](https://puppet.com/docs/bolt/latest/bolt_installing_modules.html) documentation to learn how to install external modules. 
-These exercises introduce you to Puppet tasks. You'll find lots more tips, tricks, examples and hacks on the [Puppet Tasks Playground](https://github.com/puppetlabs/tasks-playground).
+These exercises introduce you to Bolt tasks. You'll find lots more tips, tricks, examples and hacks on the [Bolt Tasks Playground](https://github.com/puppetlabs/tasks-playground).
 
 # Next steps
 

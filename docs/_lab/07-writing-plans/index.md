@@ -4,7 +4,7 @@ difficulty: Intermediate
 time: Approximately 10 minutes
 ---
 
-In this exercise you will discover Puppet Plans and how to run them with Bolt.
+In this exercise you will discover Bolt Plans and how to run them with Bolt.
 
 - [Write a plan using run_command](#write-a-plan-using-run_command)
 - [Write a plan using run_task](#write-a-plan-using-run_task)

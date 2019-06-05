@@ -4,7 +4,7 @@ difficulty: Basic
 time: Approximately 15 minutes
 ---
 
-In this exercise you will write your first Puppet Tasks for use with Bolt. 
+In this exercise you will write your first Bolt Tasks for use with Bolt. 
 
 - [How do tasks work?](#how-do-tasks-work)
 - [Write your first task in Bash](#write-your-first-task-in-bash)
@@ -26,7 +26,7 @@ Tasks are similar to scripts, you can implement them in any language that runs o
 
 Tasks are stored in the `tasks` directory of a module, a module being a directory with a unique name. You can have several tasks per module, but the `init` task is special and runs by default if you do not specify a task name.
 
-By default tasks take arguments as environment variables prefixed with `PT` (short for Puppet Tasks). 
+By default tasks take arguments as environment variables prefixed with `PT`. 
 
 # Write your first task in Bash
 
