@@ -17,10 +17,6 @@ h1 {
 .sidebar {
   padding: 2rem;
   background: $sidebar-background;
-
-  ul {
-    padding: 0px;
-  }
 }
 
 .main-content {
@@ -33,6 +29,8 @@ h1 {
 
 .nav-list {
   list-style: none;
+
+  padding: 0px;
 }
 
 .nav-list li a {
