@@ -144,14 +144,16 @@ PS
   end
 
   context "connecting over SSL", winrm: true, omi: true do
+    # In order to run vagrant and docker targets simultaniously for local dev, use 2498{5,6} to avoid port conflict
+    let(:omi_target) { make_target(port_: 24986, conf: ssl_config) }
     let(:target) { make_target(port_: ssl_port, conf: ssl_config) }
 
     it "can test whether the target is available" do
-      expect(winrm.connected?(target)).to eq(true)
+      expect(winrm.connected?(omi_target)).to eq(true)
     end
 
     it "executes a command on a host" do
-      expect(winrm.run_command(target, command)['stdout']).to eq("#{user}\r\n")
+      expect(winrm.run_command(omi_target, command)['stdout']).to eq("#{user}\r\n")
     end
 
     # winrm gem doesn't fully support OMI server, so disable this test
@@ -178,7 +180,27 @@ PS
       target.options.delete('cacert')
       target.options['ssl-verify'] = false
 
-      expect(winrm.run_command(target, command)['stdout']).to eq("#{user}\r\n")
+      expect(winrm.run_command(omi_target, command)['stdout']).to eq("#{user}\r\n")
+    end
+  end
+
+  context "connecting over SSL to OMI container ", omi: true do
+    # In order to run vagrant and docker targets simultaniously for local dev, use 2498{5,6} to avoid port conflict
+    let(:omi_target) { make_target(port_: 24986, conf: ssl_config) }
+
+    it "can test whether the target is available" do
+      expect(winrm.connected?(omi_target)).to eq(true)
+    end
+
+    it "executes a command on a host" do
+      expect(winrm.run_command(omi_target, command)['stdout']).to eq("#{user}\r\n")
+    end
+
+    it "skips verification with ssl-verify: false" do
+      target.options.delete('cacert')
+      target.options['ssl-verify'] = false
+
+      expect(winrm.run_command(omi_target, command)['stdout']).to eq("#{user}\r\n")
     end
   end
 
