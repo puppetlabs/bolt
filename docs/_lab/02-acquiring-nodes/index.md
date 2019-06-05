@@ -14,8 +14,8 @@ In this exercise you will create nodes that you can use to experiment with Bolt.
 To use an attached configuration file to set up test nodes, you must have one of the following installed on your machine:
 
 - [Vagrant](https://www.vagrantup.com/)
-- [Docker for Mac](https://www.docker.com/docker-mac)
-- [Docker for Windows](https://www.docker.com/docker-windows)
+- [Docker for Mac](https://docs.docker.com/docker-for-mac/install/)
+- [Docker for Windows](https://docs.docker.com/docker-for-windows/install/)
 
 # Existing nodes
 

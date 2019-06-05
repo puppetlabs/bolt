@@ -191,4 +191,4 @@ Ran on 1 node in 0.98 seconds
 
 Now that you know how to write task metadata and include the `--noop` flag you can move on to:
 
-1. [Writing advanced Plans](../09-writing-advanced-plans)
+[Writing advanced Plans](../09-writing-advanced-plans)

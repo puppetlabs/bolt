@@ -6,7 +6,7 @@ time: Approximately 10 minutes
 
 In this exercise you will explore existing tasks, including several tasks that take advantage of Puppet under-the-hood.
 
-- [Install Puppet using Bolt](#install-puppet-using-bolt)
+- [Install Puppet using Bolt](#use-the-puppet_agent-module-to-install-puppet-agent)
 - [The Tasks Playground](#more-tips-tricks-and-ideas-on-the-tasks-playground)
 
 # Prerequisites
