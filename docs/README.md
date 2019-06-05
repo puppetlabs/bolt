@@ -23,16 +23,3 @@ jekyll build
 ### Publishing
 
 To publish the site, create a PR against the master branch of Bolt. Once merged, your changes will be live.
-
-### Modifying CSS
-
-You have to transpile the Sass (`.scss`) files to CSS to see them rendered in a local dev server.
-
-```
-sass input_file.scss output_file.css
-```
-
-To watch the file for changes instead of manually building every time
-```
-sass --watch input_file.scss:output_file.css
-```
