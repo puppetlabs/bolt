@@ -40,6 +40,8 @@ interpreters:
 
 `inventoryfile`: The path to a structured data inventory file used to refer to groups of nodes on the commandline and from plans. The default path for the inventory file is `inventory.yaml` inside the Bolt project directory.
 
+`puppetfile`: A map containing options for the `bolt puppetfile install` command. The only allowed key is `proxy` which specifies the HTTP proxy to use for Git and Puppet Forge operations.
+
 `modulepath`: The module path for loading tasks and plan code. This is either an array of directories or a string containing a list of directories separated by the OS specific PATH separator. The default path for modules is `modules:site-modules:site` inside the Bolt project directory.
 
 `transport`: Specify the default transport to use when the transport for a target is not specified in the url or inventory. The valid options for transport are `docker`, `local`, `pcp`, `ssh`, and `winrm`.
