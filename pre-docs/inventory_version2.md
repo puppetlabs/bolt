@@ -59,21 +59,26 @@ targets:
     uri: 192.168.100.179
 ```
 
-### `target-lookups` and dynamic inventory
+### Plugins and Dynamic Inventory
+
+In order to make target discovery and configuration extensible a plugin framework is being developed. Plugins are expected to eventually be generally plugable but for now Bolt only ships with built in plugins. There are two types of  plugin. The [target-lookups](#target-lookups-plugins) plugin type allows dynamic target discovery when running Bolt. The [config-lookup](#config-lookup-plugins) plugin type allows dynamically looking up values not explicitly stored in an inventoryfile.
+
+#### `target-lookups` plugins
 
 `target-lookups` is a key at the group level that allows you to dynamically
 lookup the targets in the node. `target-lookups` contains an array of target
 lookup objects. Each `target-lookups` entry must include a `plugin` key that
 defines which plugin should be used for the lookup. The rest of the keys are
-specific to the plugin being used.
+specific to the plugin being used. Note that `config-lookup` plugins are not 
+available to set `config` nested under `target-lookups`.
 
 The available lookup methods are expected to eventually be extensible, but
-currently Bolt only ships builtin lookup plugins. The plugins are:
+currently Bolt only ships builtin target-lookup plugins. The plugins are:
 
 * `puppetdb` - Query PuppetDB to populate the targets.
 * `terraform` - Load a Terraform state file to populate the targets.
 
-#### PuppetDB
+##### PuppetDB
 
 The PuppetDB plugin takes a `query` field, which is either a string
 containing a
@@ -104,8 +109,6 @@ groups:
 
 Make sure you have [configured PuppetDB](./bolt_connect_puppetdb.md)
 
-##### Fact Lookups
-
 If target-specific configuration is required the PuppetDB plugin can be used to
 lookup configuration values for the `name`, `uri`, and `config` inventory
 options for each target. The fact lookup values can be either `certname` to
@@ -118,7 +121,9 @@ required for both structured and unstructured facts.
 will **not** set the `uri` to the certname of the target.
 
 For example, to set the user to be the user from the [identity
-fact](https://puppet.com/docs/facter/latest/core_facts.html#identity): ```
+fact](https://puppet.com/docs/facter/latest/core_facts.html#identity): 
+
+```
 version: 2
 groups:
   - name: dynamic_config
@@ -150,7 +155,7 @@ groups:
             hostname: facts.networking.interfaces.en0.ipaddress
 ```
 
-#### Terraform
+##### Terraform
 
 The Terraform plugin accepts several fields:
 
@@ -232,6 +237,33 @@ google_compute_instance.app.1:
   project = cloud-app1
   self_link = https://www.googleapis.com/compute/v1/projects/cloud-app1/zones/us-west1-a/instances/app-1
   zone = us-west1-a
+```
+
+#### `config-lookup` plugins
+
+Config lookup plugins are specified using the `_plugin` key which allows specifying a plugin to use. The value pointed to by `_plugin` should be the name of the plugin to use. Currently the only acceptable use of config-lookup plugins is to set configuration values, using the `_plugin` key nested under non-config settings will result in Validation errors. Also note that the `_plugin` key cannot be used to set config nested under target-lookups.
+
+The available config-lookups plugins specified by `_plugin` names are expected to eventually be extensible, but currently Bolt only ships a single `prompt` `_plugin`.
+
+##### Prompt plugin
+
+The 'prompt' plugin can be used to allow users to interactively enter sensitive configuration information on the CLI instead of storing that data in the inventoryfile. Data will only be looked up when the value is needed for the target and once the value has been stored it will be re-used for the rest of the Bolt run. The `prompt` plugin may only be used when nested under `config` and is not supported when nested under `target-lookups`. The prompt plugin can be used by replacing the config value with a hash that has the following keys:
+
+`_plugin`: The value of `_plugin` must be `prompt` 
+`message`: The value of `message` must be the text to show when prompting the user on the CLI
+
+Example
+```
+version: 2
+targets:
+  - uri: 192.168.100.179
+    config:
+      transport: ssh
+      ssh:
+        user: root
+        password: 
+          _plugin: prompt
+          message: please enter your ssh password
 ```
 
 ## Inventory config

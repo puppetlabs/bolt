@@ -16,11 +16,16 @@ module Bolt
       GROUP_KEYS = DATA_KEYS + %w[groups targets target-lookups]
       CONFIG_KEYS = Bolt::TRANSPORTS.keys.map(&:to_s) + ['transport']
 
-      def initialize(data)
+      def initialize(data, plugins)
         @logger = Logging.logger[self]
-
         raise ValidationError.new("Expected group to be a Hash, not #{data.class}", nil) unless data.is_a?(Hash)
+        raise ValidationError.new("Cannot set group with plugin", nil) if data.key?('_plugin')
         raise ValidationError.new("Group does not have a name", nil) unless data.key?('name')
+        @plugins = plugins
+
+        %w[name vars features facts].each do |key|
+          validate_config_plugin(data[key], key, nil)
+        end
 
         @name = data['name']
         raise ValidationError.new("Group name must be a String, not #{@name.inspect}", nil) unless @name.is_a?(String)
@@ -34,7 +39,8 @@ module Bolt
         @vars = fetch_value(data, 'vars', Hash)
         @facts = fetch_value(data, 'facts', Hash)
         @features = fetch_value(data, 'features', Array)
-        @config = fetch_value(data, 'config', Hash)
+
+        @config = config_only_plugin(fetch_value(data, 'config', Hash))
 
         @target_lookups = fetch_value(data, 'target-lookups', Array)
 
@@ -60,8 +66,40 @@ module Bolt
           end
         end
 
-        @groups = groups.map { |g| Group2.new(g) }
+        @groups = groups.map { |g| Group2.new(g, plugins) }
       end
+
+      def validate_config_plugin(data, key, group_name = nil)
+        if data.is_a?(Hash) && data.include?('_plugin')
+          if group_name
+            raise ValidationError.new("Cannot set target #{key.inspect} with plugin", group_name)
+          else
+            raise ValidationError.new("Cannot set group #{key.inspect} with plugin", nil)
+          end
+        end
+        if data.is_a? Hash
+          data.each do |_k, v|
+            validate_config_plugin(v, key, group_name)
+          end
+        elsif data.is_a? Array
+          data.map { |v| validate_config_plugin(v, key, group_name) }
+        end
+      end
+      private :validate_config_plugin
+
+      def config_only_plugin(data)
+        Bolt::Util.walk_vals(data) do |value|
+          if value.is_a?(Hash) && value.include?('_plugin')
+            unless (plugin = @plugins.by_name(value['_plugin']))
+              raise ValidationError.new("unkown plugin: #{value['_plugin'].inspect}", nil)
+            end
+            plugin.new.inventory_config_lookup(value)
+          else
+            value
+          end
+        end
+      end
+      private :config_only_plugin
 
       def target_data(target_name)
         if (data = @targets[target_name])
@@ -82,6 +120,11 @@ module Bolt
         # they be handled?
         unless target.is_a?(Hash)
           raise ValidationError.new("Node entry must be a String or Hash, not #{target.class}", @name)
+        end
+        raise ValidationError.new("Cannot set target with plugin", @name) if target.key?('_plugin')
+        target.each do |k, v|
+          next if k == 'config'
+          validate_config_plugin(v, k, @name)
         end
 
         target['name'] ||= target['uri']
@@ -113,6 +156,7 @@ module Bolt
           @logger.warn(msg)
         end
 
+        target['config'] = config_only_plugin(target['config'])
         unless target.include?('alias')
           return
         end
@@ -145,7 +189,6 @@ module Bolt
 
           unless (plugin = plugins.by_name(lookup['plugin']))
             raise ValidationError.new("target-lookup specifies an unkown plugin: '#{lookup['plugin']}'", @name)
-
           end
 
           targets = plugin.lookup_targets(lookup)

@@ -3,15 +3,17 @@
 require 'spec_helper'
 require 'bolt/inventory'
 require 'bolt/inventory/group'
+require 'bolt/plugin'
 
 # This is largely internal and probably shouldn't be tested
 describe Bolt::Inventory::Group2 do
   let(:data) { { 'name' => 'all' } }
+  let(:plugins) { Bolt::Plugin.new(nil) }
   let(:group) {
     # Inventory always resolves unknown labels to names or aliases from the top-down when constructed,
     # passing the collection of all aliases in it. Do that manually here to ensure plain target strings
     # are included as targets.
-    g = Bolt::Inventory::Group2.new(data)
+    g = Bolt::Inventory::Group2.new(data, plugins)
     g.resolve_aliases(g.target_aliases, g.target_names)
     g
   }
@@ -608,37 +610,37 @@ describe Bolt::Inventory::Group2 do
 
     it 'fails if the targets list is not an array' do
       data['targets'] = 'foo.example.com,bar.example.com'
-      expect { Bolt::Inventory::Group2.new(data) }.to raise_error(/Expected targets to be of type Array/)
+      expect { Bolt::Inventory::Group2.new(data, plugins) }.to raise_error(/Expected targets to be of type Array/)
     end
 
     it 'fails if a target in the list is not a string or hash' do
       data['targets'] = [['foo.example.com']]
-      expect { Bolt::Inventory::Group2.new(data) }.to raise_error(/Node entry must be a String or Hash/)
+      expect { Bolt::Inventory::Group2.new(data, plugins) }.to raise_error(/Node entry must be a String or Hash/)
     end
 
     it 'fails if the groups list is not an array' do
       data['groups'] = { 'name' => 'foo_group' }
-      expect { Bolt::Inventory::Group2.new(data) }.to raise_error(/Expected groups to be of type Array/)
+      expect { Bolt::Inventory::Group2.new(data, plugins) }.to raise_error(/Expected groups to be of type Array/)
     end
 
     it 'fails if vars is not a hash' do
       data['vars'] = ['foo=bar']
-      expect { Bolt::Inventory::Group2.new(data) }.to raise_error(/Expected vars to be of type Hash/)
+      expect { Bolt::Inventory::Group2.new(data, plugins) }.to raise_error(/Expected vars to be of type Hash/)
     end
 
     it 'fails if facts is not a hash' do
       data['facts'] = ['foo=bar']
-      expect { Bolt::Inventory::Group2.new(data) }.to raise_error(/Expected facts to be of type Hash/)
+      expect { Bolt::Inventory::Group2.new(data, plugins) }.to raise_error(/Expected facts to be of type Hash/)
     end
 
     it 'fails if features is not an array' do
       data['features'] = 'shell'
-      expect { Bolt::Inventory::Group2.new(data) }.to raise_error(/Expected features to be of type Array/)
+      expect { Bolt::Inventory::Group2.new(data, plugins) }.to raise_error(/Expected features to be of type Array/)
     end
 
     it 'fails if config is not a hash' do
       data['config'] = 'transport=ssh'
-      expect { Bolt::Inventory::Group2.new(data) }.to raise_error(/Expected config to be of type Hash/)
+      expect { Bolt::Inventory::Group2.new(data, plugins) }.to raise_error(/Expected config to be of type Hash/)
     end
   end
 
@@ -899,31 +901,124 @@ describe Bolt::Inventory::Group2 do
 
       it 'does not log when no unexpected keys are present' do
         expect(mock_logger).not_to receive(:warn)
-        Bolt::Inventory::Group2.new('name' => 'foo', 'targets' => [{ 'name' => 'bar' }])
+        Bolt::Inventory::Group2.new({ 'name' => 'foo', 'targets' => [{ 'name' => 'bar' }] }, plugins)
       end
 
       it 'logs unexpected group keys' do
         expect(mock_logger).to receive(:warn).with(/in group foo/)
-        Bolt::Inventory::Group2.new('name' => 'foo', 'unexpected' => 1)
+        Bolt::Inventory::Group2.new({ 'name' => 'foo', 'unexpected' => 1 }, plugins)
       end
 
       it 'logs unexpected group config keys' do
         expect(mock_logger).to receive(:warn).with(/in config for group foo/)
-        Bolt::Inventory::Group2.new('name' => 'foo', 'config' => { 'unexpected' => 1 })
+        Bolt::Inventory::Group2.new({ 'name' => 'foo', 'config' => { 'unexpected' => 1 } }, plugins)
       end
 
       it 'logs unexpected target keys' do
         expect(mock_logger).to receive(:warn).with(/in target bar/)
-        Bolt::Inventory::Group2.new('name' => 'foo', 'targets' => [
+        Bolt::Inventory::Group2.new({ 'name' => 'foo', 'targets' => [
                                       { 'name' => 'bar', 'unexpected' => 1 }
-                                    ])
+                                    ] }, plugins)
       end
 
       it 'logs unexpected target config keys' do
         expect(mock_logger).to receive(:warn).with(/in config for target bar/)
-        Bolt::Inventory::Group2.new('name' => 'foo', 'targets' => [
+        Bolt::Inventory::Group2.new({ 'name' => 'foo', 'targets' => [
                                       { 'name' => 'bar', 'config' => { 'unexpected' => 1 } }
-                                    ])
+                                    ] }, plugins)
+      end
+    end
+  end
+
+  describe "with config plugins" do
+    context "when parsing/evaluating config _plugin" do
+      let(:data) do
+        {
+          'name' => 'root',
+          'targets' => ['foo.example.com', 'bar.example.com'],
+          'groups' => [{ 'name' => 'foo_group' }],
+          'vars' => { 'key' => 'value' },
+          'facts' => { 'osfamily' => 'windows' },
+          'features' => ['shell'],
+          'config' => { 'transport' => 'ssh' }
+        }
+      end
+
+      let(:fake_plugin) { { '_plugin' => 'fake' } }
+
+      let(:target) do
+        {
+          'name' => 'foo',
+          'alias' => 'bar',
+          'uri' => 'baz',
+          'vars' => { 'key' => 'value' },
+          'facts' => { 'osfamily' => 'windows' },
+          'features' => ['shell'],
+          'config' => { 'transport' => 'ssh' }
+        }
+      end
+
+      it 'fails if group name is a config plugin' do
+        data['name'] = fake_plugin
+        expect { Bolt::Inventory::Group2.new(data, plugins) }
+          .to raise_error(/Cannot set group "name" with plugin/)
+      end
+
+      it 'fails if group targets is a config plugin' do
+        data['targets'] = [fake_plugin]
+        expect { Bolt::Inventory::Group2.new(data, plugins) }
+          .to raise_error(/Cannot set target with plugin/)
+      end
+
+      it 'fails if group groups is a config plugin' do
+        data['groups'] = [fake_plugin]
+        expect { Bolt::Inventory::Group2.new(data, plugins) }
+          .to raise_error(/Cannot set group with plugin/)
+      end
+
+      it 'fails if group vars is a config plugin' do
+        data['vars']['key'] = fake_plugin
+        expect { Bolt::Inventory::Group2.new(data, plugins) }
+          .to raise_error(/Cannot set group "vars" with plugin/)
+      end
+
+      it 'fails if group facts is a config plugin' do
+        data['facts'] = fake_plugin
+        expect { Bolt::Inventory::Group2.new(data, plugins) }
+          .to raise_error(/Cannot set group "facts" with plugin/)
+      end
+
+      it 'fails if group features is a config plugin' do
+        data['features'] = fake_plugin
+        expect { Bolt::Inventory::Group2.new(data, plugins) }
+          .to raise_error(/Cannot set group "features" with plugin/)
+      end
+
+      it 'fails if target name is config plugin' do
+        target['uri'] = fake_plugin
+        data['targets'] = [target]
+        expect { Bolt::Inventory::Group2.new(data, plugins) }
+          .to raise_error(/Cannot set target "uri" with plugin/)
+      end
+
+      it 'fails if target alias is config plugin' do
+        target['alias'] = fake_plugin
+        data['targets'] = [target]
+        expect { Bolt::Inventory::Group2.new(data, plugins) }
+          .to raise_error(/Cannot set target "alias" with plugin/)
+      end
+
+      it 'fails if target uri is config plugin' do
+        target['uri'] = fake_plugin
+        data['targets'] = [target]
+        expect { Bolt::Inventory::Group2.new(data, plugins) }
+          .to raise_error(/Cannot set target "uri" with plugin/)
+      end
+
+      it 'fails if an unknown plugin is requested' do
+        data['config'] = { 'ssh' => { 'password' => { '_plugin' => 'fake' } } }
+        expect { Bolt::Inventory::Group2.new(data, plugins) }
+          .to raise_error(/unkown plugin: "fake"/)
       end
     end
   end

@@ -2,6 +2,7 @@
 
 require 'bolt/plugin/puppetdb'
 require 'bolt/plugin/terraform'
+require 'bolt/plugin/prompt'
 
 module Bolt
   class Plugin
@@ -9,6 +10,7 @@ module Bolt
       plugins = new(config)
       plugins.add_plugin(Bolt::Plugin::Puppetdb.new(pdb_client))
       plugins.add_plugin(Bolt::Plugin::Terraform.new)
+      plugins.add_plugin(Bolt::Plugin::Prompt)
       plugins
     end
 

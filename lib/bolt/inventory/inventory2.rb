@@ -16,13 +16,12 @@ module Bolt
         @logger = Logging.logger[self]
         # Config is saved to add config options to targets
         @config = config || Bolt::Config.default
-        @data = data ||= {}
-        @groups = Group2.new(data.merge('name' => 'all'))
+        @data = data || {}
+        @groups = Group2.new(@data.merge('name' => 'all'), plugins)
         @group_lookup = {}
         @target_vars = target_vars
         @target_facts = target_facts
         @target_features = target_features
-
         @groups.lookup_targets(plugins)
         @groups.resolve_aliases(@groups.target_aliases, @groups.target_names)
         collect_groups
@@ -103,13 +102,13 @@ module Bolt
 
       def data_hash
         {
-          data: @data,
+          data: {},
           target_hash: {
-            target_vars: @target_vars,
-            target_facts: @target_facts,
-            target_features: @target_features
+            target_vars: {},
+            target_facts: {},
+            target_features: {}
           },
-          config: @config.transport_data_get
+          config: { transports: {} }
         }
       end
 
@@ -120,6 +119,18 @@ module Bolt
         @groups.data_for(target_name)['groups'] || {}
       end
       private :groups_in
+
+      # Look for _plugins
+      def config_plugin(data)
+        Bolt::Util.walk_vals(data) do |val|
+          if val.is_a?(Concurrent::Delay)
+            val.value
+          else
+            val
+          end
+        end
+      end
+      private :config_plugin
 
       # Pass a target to get_targets for a public version of this
       # Should this reconfigure configured targets?
@@ -138,6 +149,7 @@ module Bolt
         set_vars_from_hash(target.name, data['vars']) unless @target_vars[target.name]
         set_facts(target.name, data['facts']) unless @target_facts[target.name]
         data['features']&.each { |feature| set_feature(target, feature) } unless @target_features[target.name]
+        data['config'] = config_plugin(data['config'])
 
         # Use Config object to ensure config section is treated consistently with config file
         conf = @config.deep_clone
