@@ -61,7 +61,9 @@ targets:
 
 ### Plugins and Dynamic Inventory
 
-In order to make target discovery and configuration extensible a plugin framework is being developed. Plugins are expected to eventually be generally plugable but for now Bolt only ships with built in plugins. There are two types of  plugin. The [target-lookups](#target-lookups-plugins) plugin type allows dynamic target discovery when running Bolt. The [config-lookup](#config-lookup-plugins) plugin type allows dynamically looking up values not explicitly stored in an inventoryfile.
+There are two types of  plugins. The target-lookups plugin type allows dynamic target discovery when running Bolt. The config-lookup plugin type allows dynamically looking up values not explicitly stored in an inventoryfile.
+
+In order to make target discovery and configuration extensible a plugin framework is being developed. Plugins are expected to eventually be generally plugable but for now Bolt only ships with built in plugins. 
 
 #### `target-lookups` plugins
 
@@ -72,8 +74,7 @@ defines which plugin should be used for the lookup. The rest of the keys are
 specific to the plugin being used. Note that `config-lookup` plugins are not 
 available to set `config` nested under `target-lookups`.
 
-The available lookup methods are expected to eventually be extensible, but
-currently Bolt only ships builtin target-lookup plugins. The plugins are:
+Currently available plugins are:
 
 * `puppetdb` - Query PuppetDB to populate the targets.
 * `terraform` - Load a Terraform state file to populate the targets.
@@ -242,8 +243,6 @@ google_compute_instance.app.1:
 #### `config-lookup` plugins
 
 Config lookup plugins are specified using the `_plugin` key which allows specifying a plugin to use. The value pointed to by `_plugin` should be the name of the plugin to use. Currently the only acceptable use of config-lookup plugins is to set configuration values, using the `_plugin` key nested under non-config settings will result in Validation errors. Also note that the `_plugin` key cannot be used to set config nested under target-lookups.
-
-The available config-lookups plugins specified by `_plugin` names are expected to eventually be extensible, but currently Bolt only ships a single `prompt` `_plugin`.
 
 ##### Prompt plugin
 
