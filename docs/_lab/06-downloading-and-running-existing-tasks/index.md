@@ -6,7 +6,7 @@ time: Approximately 10 minutes
 
 In this exercise you will explore existing tasks, including several tasks that take advantage of Puppet under-the-hood.
 
-- [Install Puppet using Bolt](#install-puppet-using-bolt)
+- [Install Puppet using Bolt](#use-the-puppet_agent-module-to-install-puppet-agent)
 - [The Tasks Playground](#more-tips-tricks-and-ideas-on-the-tasks-playground)
 
 # Prerequisites
@@ -123,6 +123,7 @@ Finished on node1:
   }
 Successful on 1 node: node1
 Ran on 1 node in 3.84 seconds
+```
 
 Using parameters for the package task, install the vim package across all your nodes:
 
@@ -158,7 +159,7 @@ Ran on 3 nodes in 10.03 seconds
 # More tips, tricks and ideas on the Tasks Playground
 
 See the [installing modules](https://puppet.com/docs/bolt/latest/bolt_installing_modules.html) documentation to learn how to install external modules. 
-These exercises introduce you to Puppet tasks. You'll find lots more tips, tricks, examples and hacks on the [Puppet Tasks Playground](https://github.com/puppetlabs/tasks-playground).
+These exercises introduce you to Bolt tasks. You'll find lots more tips, tricks, examples and hacks on the [Bolt Tasks Playground](https://github.com/puppetlabs/tasks-playground).
 
 # Next steps
 

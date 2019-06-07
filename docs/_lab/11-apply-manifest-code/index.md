@@ -4,7 +4,7 @@ difficulty: Advanced
 time: Approximately 20 minutes
 ---
 
-In this exercise you will further explore Puppet Plans by using the `apply` keyword to leverage existing content from the [Puppet Forge](https://forge.puppet.com/).
+In this exercise you will further explore Bolt Plans by using the `apply` keyword to leverage existing content from the [Puppet Forge](https://forge.puppet.com/).
 
 You can read more about using bolt `apply` in Masterless Workflows in a [Blog Post](https://puppet.com/blog/introducing-masterless-puppet-bolt) written by Bolt developer Michael Smith. 
 
@@ -162,7 +162,7 @@ Plan completed successfully with no result
 In order to verify the deployment is operating as expected use the following `curl` commands to see the load balancer delegating to the different web servers.
 
 ```bash
-curl http://0.0.0.0:20080/`
+curl http://0.0.0.0:20080/
 ```
 
 We expect the result to vary between based on the load balancer

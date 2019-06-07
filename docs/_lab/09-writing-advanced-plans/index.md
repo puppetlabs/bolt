@@ -4,7 +4,7 @@ difficulty: Intermediate
 time: Approximately 10 minutes
 ---
 
-In this exercise you will further explore Puppet Plans:
+In this exercise you will further explore Bolt Plans:
 
 - [Write a plan which uses input and output](#write-a-plan-which-uses-input-and-output)
 - [Write a plan with custom Ruby functions](#write-a-plan-with-custom-ruby-functions)
@@ -192,7 +192,7 @@ Plan completed successfully with no result
 # Next steps
 Now that you have learned about writing advanced plans you can deploy an app with bolt!
 
-[Deploying and Application](../10-deploying-an-application)
+[Deploying an Application](../10-deploying-an-application)
 
 
 [puppetlabs-stdlib]: https://github.com/puppetlabs/puppetlabs-stdlib
