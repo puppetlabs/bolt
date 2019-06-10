@@ -1,4 +1,4 @@
-theme: jekyll-theme-cayman
+title: Bolt Hands-on Lab
 google_analytics: UA-120367942-3
 exclude: [vendor, Boltdir, acceptance, modules, .git, Gemfile, Gemfile.lock]
 
