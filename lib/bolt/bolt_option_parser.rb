@@ -22,7 +22,7 @@ Usage: bolt <subcommand> <action> [options]
 
 Available subcommands:
   bolt command run <command>       Run a command remotely
-  bolt file upload <src> <dest>    Upload a local file
+  bolt file upload <src> <dest>    Upload a local file or directory
   bolt script run <script>         Upload a local script and run it remotely
   bolt task show                   Show list of available tasks
   bolt task show <task>            Show documentation for task
@@ -93,7 +93,7 @@ Available options are:
 Usage: bolt file <action> [options]
 
 Available actions are:
-  upload <src> <dest>              Upload local file <src> to <dest> on each node
+  upload <src> <dest>              Upload local file or directory <src> to <dest> on each node
 
 #{examples('file upload /tmp/source /etc/profile.d/login.sh', 'upload a file to')}
 Available options are:

@@ -13,7 +13,7 @@ Bolt commands use the syntax: `bolt <subcommand> <action> [options]`
 | `bolt task run` | Runs a task on a remote system, passing any specified parameters. | - The task name, in the format `modulename::taskname`.<br>- The nodes on which to run the task.
 | `bolt plan run` | Runs a task plan. | - The plan name, in the format `modulename::planname`.<br>- The nodes on which to run the plan.
 | `bolt apply` | Applies a Puppet manifest file. | - The path to the manifest file.<br>- The nodes on which to run the plan.
-| `bolt file upload` | Uploads a local file to a remote node. | - The path to the source file.<br>- The path to the remote location.<br>- The nodes on which to upload the file.
+| `bolt file upload` | Uploads a local file or directory to a remote node. | - The path to the source file or directory.<br>- The path to the remote location.<br>- The nodes on which to upload the file or directory.
 | `bolt task show` | Lists all the tasks on the modulepath that have not been marked `private`. Will note whether a task supports no-operation mode. | - Adding a specific task name displays details and parameters for the task.<br>- Optionally, the name of a task you want details for: `bolt task show <TASK NAME>`
 | `bolt plan show` | Lists the plans that are installed on the current module path. | - Adding a specific plan name displays details and parameters for the plan.
 | `bolt plan convert` | Converts a YAML plan to a Puppet plan | - The path (relative or absolute) to the YAML plan to be converted.
