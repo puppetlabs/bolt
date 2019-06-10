@@ -65,15 +65,10 @@ describe "devices" do
     context "when running against puppet 6" do
       before(:all) do
         install('puppet_6', inventory: agent_version_inventory)
-        # TODO: remove this once there is a puppet agent release with the new rsapi gem
-        cmd = 'yes | /opt/puppetlabs/puppet/bin/gem uninstall '\
-              '-i /opt/puppetlabs/puppet/lib/ruby/vendor_gems puppet-resource_api'
-        run_command(cmd, 'agent_targets', inventory: agent_version_inventory)
-        cmd = '/opt/puppetlabs/puppet/bin/gem install puppet-resource_api'
-        run_command(cmd, 'agent_targets', inventory: agent_version_inventory)
       end
 
       it 'runs a plan that collects facts' do
+        pending "puppet-resource_api 1.8.3 has incorrect validation that causes these tests to fail"
         with_tempfile_containing('inventory', YAML.dump(device_inventory), '.yaml') do |inv|
           results = run_cli_json(%W[plan run device_test::facts --nodes device_targets
                                     --modulepath #{modulepath} --inventoryfile #{inv.path}])
@@ -87,6 +82,7 @@ describe "devices" do
       end
 
       it 'runs a plan that applies resources' do
+        pending "puppet-resource_api 1.8.3 has incorrect validation that causes these tests to fail"
         with_tempfile_containing('inventory', YAML.dump(device_inventory), '.yaml') do |inv|
           results = run_cli_json(%W[plan run device_test::set_a_val
                                     --nodes device_targets
