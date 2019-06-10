@@ -51,7 +51,7 @@ module Bolt
     end
     private :inventory
 
-    def help?(parser, remaining)
+    def help?(remaining)
       # Set the subcommand
       options[:subcommand] = remaining.shift
 
@@ -60,8 +60,12 @@ module Bolt
         options[:subcommand] = remaining.shift
       end
 
-      # Update the parser for the new subcommand
-      parser.update
+      # This section handles parsing non-flag options which are
+      # subcommand specific rather then part of the config
+      actions = COMMANDS[options[:subcommand]]
+      if actions && !actions.empty?
+        options[:action] = remaining.shift
+      end
 
       options[:help]
     end
@@ -72,17 +76,13 @@ module Bolt
 
       # This part aims to handle both `bolt <mode> --help` and `bolt help <mode>`.
       remaining = handle_parser_errors { parser.permute(@argv) } unless @argv.empty?
-      if @argv.empty? || help?(parser, remaining)
+      if @argv.empty? || help?(remaining)
+        # Update the parser for the subcommand (or lack thereof)
+        parser.update
         puts parser.help
         raise Bolt::CLIExit
       end
 
-      # This section handles parsing non-flag options which are
-      # subcommand specific rather then part of the config
-      actions = COMMANDS[options[:subcommand]]
-      if actions && !actions.empty?
-        options[:action] = remaining.shift
-      end
       options[:object] = remaining.shift
 
       task_options, remaining = remaining.partition { |s| s =~ /.+=/ }
