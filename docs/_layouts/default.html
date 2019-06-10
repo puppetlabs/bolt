@@ -30,9 +30,6 @@
             </a>
           </span>
           <ol>
-            <li>
-              <a href="{{ '/' | relative_url }}">Introduction</a>
-            </li>
             {% for lab in site.lab %}
               {% if lab.title %}
               <li><a href="{{ lab.url | remove: "/index.html" | relative_url }}">{{ lab.title }}</a></li>
