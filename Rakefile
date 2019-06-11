@@ -9,6 +9,10 @@ require "fileutils"
 require "json"
 require "erb"
 
+# Needed for Vanagon component ship job
+require 'packaging'
+Pkg::Util::RakeUtils.load_packaging_tasks
+
 desc "Run all RSpec tests"
 RSpec::Core::RakeTask.new(:spec)
 
