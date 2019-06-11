@@ -98,13 +98,13 @@ winrm:
    extensions: [.py, .pl]
 ```
 
-## Upload files to remote nodes
+## Upload files or directories to remote nodes
 
-Use Bolt to copy files to remote nodes.
+Use Bolt to copy files or directories to remote nodes.
 
 **Note:** Most transports are not optimized for file copying, so this command is best limited to small files.
 
--   To upload a file to a remote node, run the `bolt file upload` command. Specify the local path to the file, the destination location, and the target nodes.
+-   To upload a file or directory to a remote node, run the `bolt file upload` command. Specify the local path to the file or directory, the destination location, and the target nodes.
 
 ```
 bolt file upload <SOURCE> <DESTINATION> --nodes <NODE NAME>,<NODE NAME>

@@ -645,7 +645,7 @@ This function does nothing if the list of targets is empty.
 **NOTE:** Not available in apply block
 
 
-### Upload a file.
+### Upload a file or directory.
 
 ```
 upload_file(String[1] $source, String[1] $destination, Boltlib::TargetSpec $targets, Optional[Hash[String[1], Any]] $options)
@@ -653,8 +653,8 @@ upload_file(String[1] $source, String[1] $destination, Boltlib::TargetSpec $targ
 
 *Returns:* `ResultSet` A list of results, one entry per target.
 
-* **source** `String[1]` A source path, either an absolute path or a modulename/filename selector for a file in
-<moduleroot>/files.
+* **source** `String[1]` A source path, either an absolute path or a modulename/filename selector for a
+file or directory in <moduleroot>/files.
 * **destination** `String[1]` An absolute path on the target(s).
 * **targets** `Boltlib::TargetSpec` A pattern identifying zero or more targets. See [`get_targets`](#get_targets) for accepted patterns.
 * **options** `Optional[Hash[String[1], Any]]` Additional options: '_catch_errors', '_run_as'.
@@ -668,7 +668,7 @@ upload_file('/var/tmp/payload.tgz', '/tmp/payload.tgz', $targets, '_run_as' => '
 upload_file('postgres/default.conf', 'C:/ProgramData/postgres/default.conf', $target)
 ```
 
-### Upload a file, logging the provided description.
+### Upload a file or directory, logging the provided description.
 
 ```
 upload_file(String[1] $source, String[1] $destination, Boltlib::TargetSpec $targets, String $description, Optional[Hash[String[1], Any]] $options)
@@ -676,8 +676,8 @@ upload_file(String[1] $source, String[1] $destination, Boltlib::TargetSpec $targ
 
 *Returns:* `ResultSet` A list of results, one entry per target.
 
-* **source** `String[1]` A source path, either an absolute path or a modulename/filename selector for a file in
-<moduleroot>/files.
+* **source** `String[1]` A source path, either an absolute path or a modulename/filename selector for a
+file or directory in <moduleroot>/files.
 * **destination** `String[1]` An absolute path on the target(s).
 * **targets** `Boltlib::TargetSpec` A pattern identifying zero or more targets. See [`get_targets`](#get_targets) for accepted patterns.
 * **description** `String` A description to be output when calling this function.
