@@ -40,7 +40,7 @@ module Bolt
                            private-key tty tmpdir user connect-timeout
                            cacert token-file service-url interpreters file-protocol smb-port].freeze
 
-    PUPPETFILE_OPTIONS = %w[proxy].freeze
+    PUPPETFILE_OPTIONS = %w[proxy forge].freeze
 
     def self.default
       new(Bolt::Boltdir.new('.'), {})
