@@ -292,7 +292,11 @@ module Bolt
               wait_until(wait_time, retry_interval) { transport.batch_connected?(batch) }
               batch.map { |target| Result.new(target) }
             rescue TimeoutError => e
-              batch.map { |target| Result.from_exception(target, e) }
+              available, unavailable = batch.partition { |target| transport.batch_connected?([target]) }
+              (
+                available.map { |target| Result.new(target) } +
+                unavailable.map { |target| Result.from_exception(target, e) }
+              )
             end
           end
         end
