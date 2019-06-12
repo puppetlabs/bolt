@@ -3,6 +3,7 @@
 require 'json'
 require 'logging'
 require 'uri'
+require 'time'
 
 module Bolt
   module PuppetDB
@@ -89,6 +90,17 @@ module Bolt
         body = JSON.generate(query: query)
         url = "#{uri}/pdb/query/v4"
         url += "/#{path}" if path
+
+        post_with_failover(url, body)
+      end
+
+      def submit_command(cmd, cmd_ver, payload, producer_timestamp = nil)
+        producer_timestamp ||= Time.now.utc.iso8601(3)
+        body = JSON.generate(payload.merge(producer_timestamp: producer_timestamp))
+
+        certname = payload[:certname]
+        uri_params = "command=#{cmd}&version=#{cmd_ver}&certname=#{certname}&producer-timestamp=#{producer_timestamp}"
+        url = CGI.escape "#{uri}/pdb/cmd/v1?#{uri_params}"
 
         post_with_failover(url, body)
       end
