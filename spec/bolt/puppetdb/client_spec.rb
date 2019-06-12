@@ -57,7 +57,7 @@ describe Bolt::PuppetDB::Client do
       allow(response).to receive(:code).and_return(400)
       allow(response).to receive(:body).and_return("something went wrong")
 
-      expect { client.query_certnames('query') }.to raise_error(/Failed to query PuppetDB: something went wrong/)
+      expect { client.query_certnames('query') }.to raise_error(/POST request to .*\/pdb\/query\/v4 failed: something went wrong/)
     end
   end
 

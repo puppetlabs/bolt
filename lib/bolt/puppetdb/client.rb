@@ -58,19 +58,15 @@ module Bolt
         result.group_by { |c| c['certname'] }
       end
 
-      def make_query(query, path = nil)
-        body = JSON.generate(query: query)
-        url = "#{uri}/pdb/query/v4"
-        url += "/#{path}" if path
-
+      def post_with_failover(url, body)
         begin
           response = http_client.post(url, body: body, header: headers)
         rescue StandardError => e
-          raise Bolt::PuppetDBFailoverError, "Failed to query PuppetDB: #{e}"
+          raise Bolt::PuppetDBFailoverError, "POST request to #{url} failed: #{e}"
         end
 
         if response.code != 200
-          msg = "Failed to query PuppetDB: #{response.body}"
+          msg = "POST request to #{url} failed: #{response.body}"
           if response.code == 400
             raise Bolt::PuppetDBError, msg
           else
@@ -86,7 +82,15 @@ module Bolt
       rescue Bolt::PuppetDBFailoverError => e
         @logger.error("Request to puppetdb at #{@current_url} failed with #{e}.")
         reject_url
-        make_query(query, path)
+        post_with_failover(url, body)
+      end
+
+      def make_query(query, path = nil)
+        body = JSON.generate(query: query)
+        url = "#{uri}/pdb/query/v4"
+        url += "/#{path}" if path
+
+        post_with_failover(url, body)
       end
 
       def http_client
