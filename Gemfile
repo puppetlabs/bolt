@@ -21,6 +21,11 @@ gem "puppetlabs_spec_helper",
     git: 'https://github.com/puppetlabs/puppetlabs_spec_helper.git',
     ref: '96a633ebf1a1e88062bf726d4271a3251baf082e'
 
+gem "puppet-resource_api",
+    git: 'https://github.com/DavidS/puppet-resource_api.git',
+    ref: 'pup-9747-bolt-attribute-filtering'
+
+
 group(:test) do
   gem "beaker-hostgenerator"
   gem "gettext-setup", '~> 0.28', require: false
