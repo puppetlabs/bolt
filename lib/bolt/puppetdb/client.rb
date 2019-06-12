@@ -95,7 +95,7 @@ module Bolt
         require 'httpclient'
         @http = HTTPClient.new
         @http.ssl_config.set_client_cert_file(@config.cert, @config.key) if @config.cert
-        @http.ssl_config.add_trust_ca(@config.cacert)
+        @http.ssl_config.add_trust_ca(@config.cacert) if @config.cacert
 
         @http
       end

@@ -91,12 +91,14 @@ describe Bolt::PuppetDB::Config do
       end
 
       it 'fails if the cacert is not set' do
+        allow(File).to receive(:read).with(token).and_return "footoken\n"
         options.delete('cacert')
 
         expect { config.cacert }.to raise_error(Bolt::PuppetDBError, /cacert must be specified/)
       end
 
       it 'fails if the cacert does not exist' do
+        allow(File).to receive(:read).with(token).and_return "footoken\n"
         allow(File).to receive(:exist?).with(cacert).and_return false
 
         expect { config.cacert }.to raise_error(Bolt::PuppetDBError, /cacert file .* does not exist/)

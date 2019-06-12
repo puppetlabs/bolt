@@ -111,7 +111,7 @@ module Bolt
       def cacert
         if @settings['cacert'] && validate_file_exists('cacert')
           @settings['cacert']
-        else
+        elsif token || cert || key
           raise Bolt::PuppetDBError, "cacert must be specified"
         end
       end
