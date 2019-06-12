@@ -68,7 +68,6 @@ describe "devices" do
       end
 
       it 'runs a plan that collects facts' do
-        pending "puppet-resource_api 1.8.3 has incorrect validation that causes these tests to fail"
         with_tempfile_containing('inventory', YAML.dump(device_inventory), '.yaml') do |inv|
           results = run_cli_json(%W[plan run device_test::facts --nodes device_targets
                                     --modulepath #{modulepath} --inventoryfile #{inv.path}])
@@ -82,7 +81,6 @@ describe "devices" do
       end
 
       it 'runs a plan that applies resources' do
-        pending "puppet-resource_api 1.8.3 has incorrect validation that causes these tests to fail"
         with_tempfile_containing('inventory', YAML.dump(device_inventory), '.yaml') do |inv|
           results = run_cli_json(%W[plan run device_test::set_a_val
                                     --nodes device_targets

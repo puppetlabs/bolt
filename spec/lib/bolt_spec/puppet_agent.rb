@@ -39,6 +39,7 @@ module BoltSpec
       task_params = collection ? { 'collection' => collection } : {}
 
       result = run_task('puppet_agent::install', target, task_params, config: config, inventory: inventory)
+      result = run_task('device_test::rsapigem', target, {}, config: config, inventory: inventory)
 
       expect(result.count).to eq(1)
       expect(result[0]).to include('status' => 'success')
