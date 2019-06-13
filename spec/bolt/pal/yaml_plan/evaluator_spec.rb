@@ -341,6 +341,96 @@ describe Bolt::PAL::YamlPlan::Evaluator do
     end
   end
 
+  describe "#resources_step" do
+    let(:step) do
+      { 'resources' => resources,
+        'target' => target }
+    end
+    let(:resources) do
+      [{ 'package' => 'nginx' },
+       { 'service' => 'nginx' }]
+    end
+    let(:target) { ['foo.example.com', 'bar.example.com'] }
+    let(:applicator) { double('applicator') }
+
+    before :each do
+      allow(subject).to receive(:apply_manifest)
+    end
+
+    around :each do |example|
+      begin
+        Puppet.push_context(apply_executor: applicator)
+        example.run
+      ensure
+        Puppet.pop_context
+      end
+    end
+
+    it 'builds and applies a manifest' do
+      expected = [{ 'type' => 'package', 'title' => 'nginx', 'parameters' => {} },
+                  { 'type' => 'service', 'title' => 'nginx', 'parameters' => {} }]
+      expect(subject).to receive(:generate_manifest).with(expected).and_return('mymanifest')
+      expect(subject).to receive(:apply_manifest).with(scope, target, 'mymanifest')
+
+      subject.resources_step(scope, step)
+    end
+
+    it 'uses the type and title keys if specified' do
+      resources.replace([{ 'type' => 'package', 'title' => 'nginx' },
+                         { 'type' => 'service', 'title' => 'nginx' }])
+
+      expected = [{ 'type' => 'package', 'title' => 'nginx', 'parameters' => {} },
+                  { 'type' => 'service', 'title' => 'nginx', 'parameters' => {} }]
+
+      expect(subject).to receive(:generate_manifest).with(expected)
+
+      subject.resources_step(scope, step)
+    end
+
+    it 'fails if the resource type is ambiguous' do
+      resources.replace([{ 'package' => 'nginx', 'service' => 'nginx' }])
+
+      expect { subject.resources_step(scope, step) }
+        .to raise_error(Bolt::Error, /Resource declaration has ambiguous type.*could be package or service/)
+    end
+
+    it 'fails if only type is set and not title' do
+      resources.replace([{ 'type' => 'package' }])
+
+      expect { subject.resources_step(scope, step) }
+        .to raise_error(Bolt::Error, /Resource declaration must include title key if type key is set/)
+    end
+
+    it 'fails if only title is set and not type' do
+      resources.replace([{ 'title' => 'hello world' }])
+
+      expect { subject.resources_step(scope, step) }
+        .to raise_error(Bolt::Error, /Resource declaration must include type key if title key is set/)
+    end
+
+    it 'fails if the resource has only parameters and no type or title' do
+      resources.replace([{ 'parameters' => { 'ensure' => 'present' } }])
+
+      expect { subject.resources_step(scope, step) }
+        .to raise_error(Bolt::Error, /Resource declaration is missing a type/)
+    end
+
+    it 'fails if the resource is empty' do
+      resources.replace([{}])
+
+      expect { subject.resources_step(scope, step) }
+        .to raise_error(Bolt::Error, /Resource declaration is missing a type/)
+    end
+
+    it 'succeeds if no resources are specified' do
+      resources.replace([])
+
+      expect(subject).to receive(:generate_manifest).with([])
+
+      subject.resources_step(scope, step)
+    end
+  end
+
   describe "referring to previous steps" do
     let(:plan) { Bolt::PAL::YamlPlan::Loader.create(loader, plan_name, 'test.yaml', @plan_body) }
 

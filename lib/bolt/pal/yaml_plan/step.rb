@@ -37,6 +37,10 @@ module Bolt
           'eval' => {
             'allowed_keys' => Set['eval', 'name', 'description'],
             'required_keys' => Set.new
+          },
+          'resources' => {
+            'allowed_keys' => Set['resources'].merge(COMMON_STEP_KEYS),
+            'required_keys' => Set['target']
           }
         }.freeze
 

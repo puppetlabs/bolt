@@ -173,6 +173,39 @@ steps:
         - web3.example.com
 ```
 
+#### Resources step
+
+Use a `resources` step to apply a list of Puppet resources. A resource defines the _desired state_ for part of a target. Bolt will ensure each resource is in its desired state.
+
+Like the steps in a plan, if any resource in the list fails, the rest will be skipped.
+
+Resources steps use these fields:
+* `resources`: An array of resources to apply
+* `target`: A target or list of targets to apply the resources on
+
+Each resource is a YAML map with a type and title, and optionally a `parameters` key. The resource type and title can either be specified separately with the `type` and `title` keys, or can be specified in a single line by using the type name as a key with the title as its value.
+
+For example:
+
+```yaml
+steps:
+  - resources:
+    # This resource is type 'package' and title 'nginx'
+    - package: nginx
+      parameters:
+        ensure: latest
+    # This resource is type 'service' and title 'nginx'
+    - type: service
+      title: nginx
+      parameters:
+        ensure: running
+    target:
+      - web1.example.com
+      - web2.example.com
+      - web3.example.com
+    description: "Set up nginx on the webservers"
+```
+
 ### Parameters key
 
 Plans accept parameters with the `parameters` key. The value of `parameters` is a map, where each key is the name of a parameter and the value is a map describing the parameter.

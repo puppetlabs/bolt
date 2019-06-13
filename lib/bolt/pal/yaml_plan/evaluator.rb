@@ -29,6 +29,8 @@ module Bolt
             upload_file_step(scope, step_body)
           when 'eval'
             eval_step(scope, step_body)
+          when 'resources'
+            resources_step(scope, step_body)
           end
         end
 
@@ -95,6 +97,83 @@ module Bolt
 
         def eval_step(_scope, step)
           step['eval']
+        end
+
+        def resources_step(scope, step)
+          resources = step['resources']
+
+          normalized_resources = resources.map do |resource|
+            if resource['type'] || resource['title']
+              if resource['type'] && !resource['title']
+                err = "Resource declaration must include title key if type key is set"
+                raise Bolt::Error.new(err, 'bolt/invalid-plan')
+              elsif resource['title'] && !resource['type']
+                err = "Resource declaration must include type key if title key is set"
+                raise Bolt::Error.new(err, 'bolt/invalid-plan')
+              else
+                type = resource['type']
+                title = resource['title']
+              end
+            else
+              type_keys = (resource.keys - ['parameters'])
+              case type_keys.length
+              when 0
+                err = "Resource declaration is missing a type"
+                raise Bolt::Error.new(err, 'bolt/invalid-plan')
+              when 1
+                type = type_keys.first
+                title = resource[type_keys.first]
+              else
+                err = "Resource declaration has ambiguous type: could be #{type_keys.join(' or ')}"
+                raise Bolt::Error.new(err, 'bolt/invalid-plan')
+              end
+            end
+
+            { 'type' => type.downcase, 'title' => title, 'parameters' => (resource['parameters'] || {}) }
+          end
+
+          manifest = generate_manifest(normalized_resources)
+
+          apply_manifest(scope, step['target'], manifest)
+        end
+
+        def generate_manifest(resources)
+          # inspect returns the Ruby representation of the resource hashes,
+          # which happens to be the same as the Puppet representation
+          puppet_resources = resources.inspect
+
+          # Because the :tasks setting globally controls which mode the parser
+          # is in, we need to make this snippet of non-tasks manifest code
+          # parseable in tasks mode. The way to do that is by putting it in an
+          # apply statement and taking the body.
+          <<~MANIFEST
+          apply('placeholder') {
+            $resources = #{puppet_resources}
+            $resources.each |$res| {
+              Resource[$res['type']] { $res['title']:
+                * => $res['parameters'],
+              }
+            }
+
+            # Add relationships if there is more than one resource
+            if $resources.length > 1 {
+              ($resources.length - 1).each |$index| {
+                $lhs = $resources[$index]
+                $rhs = $resources[$index+1]
+                $lhs_resource = Resource[$lhs['type'] , $lhs['title']]
+                $rhs_resource = Resource[$rhs['type'] , $rhs['title']]
+                $lhs_resource -> $rhs_resource
+              }
+            }
+          }
+          MANIFEST
+        end
+
+        def apply_manifest(scope, target, manifest)
+          ast = @evaluator.parse_string(manifest)
+          apply_block = ast.body.body
+          applicator = Puppet.lookup(:apply_executor)
+          applicator.apply([target], apply_block, scope)
         end
 
         # This is the method that Puppet calls to evaluate the plan. The name
