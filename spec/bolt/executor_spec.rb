@@ -310,6 +310,23 @@ describe "Bolt::Executor" do
         expect(result.error_hash['kind']).to eq('puppetlabs.tasks/exception-error')
       end
     end
+
+    context 'with batched execution with more than one target' do
+      let(:pcp) { executor.transport('pcp') }
+      let(:target_1) { Bolt::Target.new('pcp://node1').update_conf(Bolt::Config.default.transport_conf) }
+      let(:target_2) { Bolt::Target.new('pcp://node2').update_conf(Bolt::Config.default.transport_conf) }
+      let(:targets) { [target_1, target_2] }
+
+      it 'partitions failures and successes by batch' do
+        allow(pcp).to receive(:batch_connected?).with(targets).and_return(false)
+        allow(pcp).to receive(:batch_connected?).with([target_1]).and_return(false)
+        allow(pcp).to receive(:batch_connected?).with([target_2]).and_return(true)
+
+        results = executor.wait_until_available(targets, wait_time: 1, retry_interval: 1)
+        expect(results.error_set.targets).to include(target_1)
+        expect(results.ok_set.targets).to include(target_2)
+      end
+    end
   end
 
   it "returns and notifies an error result" do
