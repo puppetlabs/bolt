@@ -175,7 +175,7 @@ plan mymodule::myplan {
 
 Indicators that a plan has run successfully or failed.
 
-Any plan that completes execution without an error is considered successful. The `bolt` command exits 0 and any calling plans continue execution. If any calls to `run_` functions fail without `_catch_errors` then the plan will halt execution and be considered a failure. Any calling plans will also halt until a `run_plan` call with `_catch_errors` is reached. If one isn't the `bolt` command will exit 2. When writing a plan if you have reason to believe it has failed you can fail the plan with the `fail_plan` function. This causes the bolt command to exit 2 and prevents calling plans executing any further, unless `run_plan` was called with `_catch_errors`.
+Any plan that completes execution without an error is considered successful. The `bolt` command exits 0 and any calling plans continue execution. If any calls to `run_` functions fail **without** `_catch_errors` then the plan will halt execution and be considered a failure. Any calling plans will also halt until a `run_plan` call with `_catch_errors` or a `catch_errors` block is reached. If one isn't the `bolt` command will exit 2. When writing a plan if you have reason to believe it has failed you can fail the plan with the `fail_plan` function. This causes the bolt command to exit 2 and prevents calling plans executing any further, unless `run_plan` was called with `_catch_errors` or in a `catch_errors` block.
 
 ### Failing plans
 
@@ -187,9 +187,9 @@ fail_plan('The plan is failing', 'mymodules/pear-shaped', {'failednodes' => $res
 fail_plan($errorobject)
 ```
 
-### Responding to errors in plans
+### Catching Errors in a Plan
 
-When you call `run_plan` with `_catch_errors` or call the `error` method on a result, you may get an error.
+Bolt includes a `catch_errors` function which executes a block of code and returns the error if an error is raised or the result of the block if no errors are raised. When you call `run_plan` with `_catch_errors`, use a `catch_errors` block, or call the `error` method on a result, you may get an error.
 
 The `Error` data type includes:
 
@@ -216,7 +216,24 @@ plan mymodule::handle_errors {
     Error : { fail_plan($result) } }
   run_plan('mymodule::plan2')
 }
+```
 
+Using the `catch_errors` function:
+```
+plan test (String[1] $role) {
+  $result_or_error = catch_errors(['bolt/puppetdb-error']) || {
+    puppetdb_query("inventory[certname] { app_role == ${role} }")
+  }
+
+  $targets = if $result_or_error =~ Error {
+    # If the PuppetDB query fails
+    warning("Could not fetch from puppet. Using defaults instead")
+    # TargetSpec string
+    "all"
+  } else {
+    $result_or_error
+  }
+}
 ```
 
 ## Puppet and Ruby functions in plans

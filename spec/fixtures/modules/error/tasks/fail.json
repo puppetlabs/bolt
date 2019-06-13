@@ -1,0 +1,12 @@
+{
+  "implementations": [
+    {
+      "name": "fail.sh",
+      "requirements": ["shell"]
+    },
+    {
+      "name": "fail.ps1",
+      "requirements": ["powershell"]
+    }
+  ]
+}

@@ -85,6 +85,43 @@ apply_prep('target1,target2')
 ```
 
 
+## catch_errors
+
+Catches errors in a given block and returns them. This will return the
+output of the block if no errors are raised. Accepts an optional list of
+error kinds to catch.
+
+**NOTE:** Not available in apply block
+
+
+```
+catch_errors(Optional[Array[String[1]]] $error_types, Callable[0, 0] &$block)
+```
+
+*Returns:* `Any` Undef If an error is raised in the block then the error will be
+
+* **error_types** `Optional[Array[String[1]]]` An array of error types to catch
+* **&block** `Callable[0, 0]` The block of steps to catch errors on
+
+**Example:** Catch errors for a block
+```
+catch_errors() || {
+  run_command("whoami", $nodes)
+  run_command("adduser ryan", $nodes)
+}
+```
+**Example:** Catch parse errors for a block of code
+```
+catch_errors(['bolt/parse-error']) || {
+ run_plan('canary', $nodes)
+ run_plan('other_plan)
+ apply($nodes) || {
+   notify { "Hello": }
+ }
+}
+```
+
+
 ## ctrl::do_until
 
 Repeat the block until it returns a truthy value. Returns the value.
