@@ -189,7 +189,7 @@ fail_plan($errorobject)
 
 ### Catching Errors in a Plan
 
-Bolt includes a `catch_errors` function which executes a block of code and returns the error if an error is raised or the result of the block if no errors are raised. When you call `run_plan` with `_catch_errors`, use a `catch_errors` block, or call the `error` method on a result, you may get an error.
+Bolt includes a `catch_errors` function which executes a block of code and returns the error if an error is raised or the result of the block if no errors are raised. You may get an `Error` object returned if you call a function with `_catch_errors`, use a `catch_errors` block, or call the `Error` function.
 
 The `Error` data type includes:
 

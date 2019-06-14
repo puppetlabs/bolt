@@ -8,8 +8,8 @@
 Puppet::Functions.create_function(:catch_errors) do
   # @param error_types An array of error types to catch
   # @param block The block of steps to catch errors on
-  # @return Undef If an error is raised in the block then the error will be
-  # returned, otherwise the result will be returned
+  # @return If an error is raised in the block then the error will be returned,
+  #         otherwise the result will be returned
   # @example Catch errors for a block
   #   catch_errors() || {
   #     run_command("whoami", $nodes)
@@ -26,6 +26,7 @@ Puppet::Functions.create_function(:catch_errors) do
   dispatch :catch_errors do
     optional_param 'Array[String[1]]', :error_types
     block_param 'Callable[0, 0]', :block
+    return_type 'Any'
   end
 
   def catch_errors(error_types = nil)
