@@ -58,26 +58,28 @@ The following example shows node parameters specified as data type `TargetSpec`.
 
 This allows the user to pass, for each parameter, either a simple node name or a URI that describes the protocol to use, the hostname, username and password.
 
-The plan then calls the `run_task` function, specifying which nodes the tasks should be run on.
+The plan then calls the `run_task` function, specifying which nodes the tasks should be run on. Note how the `Target` names are collected and stored in `$webserver_names` by iterating over the list of `Target` objects returned by `get_targets`. It is important to understand that task parameters are serialized to JSON format, so extracting the names into an Array of Strings ensures that the `webservers` parameter is in a format that can be converted to JSON.
 
 ```
 plan mymodule::my_plan(
-  String[1] $load_balancer,
-  TargetSpec  $frontends,
-  TargetSpec  $backends,
+  TargetSpec $load_balancer,
+  TargetSpec  $webservers,
 ) {
 
-  # process frontends
-  run_task('mymodule::lb_remove', $load_balancer, frontends => $frontends)
-  run_task('mymodule::update_frontend_app', $frontends, version => '1.2.3')
-  run_task('mymodule::lb_add', $load_balancer, frontends => $frontends)
+  # Extract the Target name from $webservers
+  $webserver_names = get_targets($nodes).map |$n| { $n.name }
+
+  # process webservers
+  run_task('mymodule::lb_remove', $load_balancer, webservers => $webserver_names)
+  run_task('mymodule::update_frontend_app', $webservers, version => '1.2.3')
+  run_task('mymodule::lb_add', $load_balancer, webservers => $webserver_names)
 }
 ```
 
 To execute this plan from the command line, pass the parameters as `parameter=value`, where complex values like arrays must be encoded as JSON. The `Targetspec` will accept either an array as json or a comma separated string of target names.
 
 ```
-bolt plan run mymodule::myplan --modulepath ./PATH/TO/MODULES load_balancer=lb.myorg.com frontends='["kermit.myorg.com","gonzo.myorg.com"]' backends=waldorf.myorg.com,statler.myorg.com
+bolt plan run mymodule::myplan --modulepath ./PATH/TO/MODULES load_balancer=lb.myorg.com webservers='["kermit.myorg.com","gonzo.myorg.com"]'
 
 ```
 
