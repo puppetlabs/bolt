@@ -18,6 +18,24 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
     return_type 'Boltlib::PlanResult'
   end
 
+  dispatch :run_plan_with_targetspec do
+    scope_param
+    param 'String', :plan_name
+    param 'Boltlib::TargetSpec', :targets
+    optional_param 'Hash', :named_args
+    return_type 'Boltlib::PlanResult'
+  end
+
+  def run_plan_with_targetspec(scope, plan_name, targets, named_args = {})
+    unless named_args['nodes'].nil?
+      raise ArgumentError,
+            "A plan's \"nodes\" parameter may be specified as the second positional argument to " \
+            "run_plan(), but in that case \"nodes\" must not be specified in the named arguments " \
+            "hash."
+    end
+    run_plan(scope, plan_name, named_args.merge('nodes' => targets))
+  end
+
   def run_plan(scope, plan_name, named_args = {})
     unless Puppet[:tasks]
       raise Puppet::ParseErrorWithIssue

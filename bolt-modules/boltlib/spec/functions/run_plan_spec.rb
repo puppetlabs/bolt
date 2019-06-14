@@ -48,6 +48,10 @@ describe 'run_plan' do
 
         is_expected.to run.with_params('test::run_me', '_run_as' => 'bar').and_return('worked2')
       end
+
+      it 'run_plan(name, nodes, hash) where nodes is the "nodes" parameter to the plan' do
+        is_expected.to run.with_params('test::run_me_nodes', 'node1,node2').and_return('node1,node2')
+      end
     end
 
     it 'reports the function call to analytics' do
@@ -77,6 +81,11 @@ describe 'run_plan' do
       it 'failing with type mismatch error if given args does not match parameters' do
         is_expected.to run.with_params('test::run_me_int', 'x' => 'should not work')
                           .and_raise_error(/expects an Integer value/)
+      end
+
+      it 'fails with argument error if given nodes positional argument and nodes named argument' do
+        is_expected.to run.with_params('test::run_me_nodes', 'node1', 'nodes' => 'node2')
+                          .and_raise_error(ArgumentError)
       end
     end
 
