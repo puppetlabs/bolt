@@ -15,15 +15,23 @@ module BoltServer
     # This disables Sinatra's error page generation
     set :show_exceptions, false
 
+    # These partial schemas are reused to build multiple request schemas
+    SHARED_SCHEMAS = %w[target-ssh target-winrm task].freeze
+
+    # These schemas combine shared schemas to describe client requests
+    REQUEST_SCHEMAS = %w[ssh-run_task winrm-run_task].freeze
+
     def initialize(config)
       @config = config
-      @schemas = {
-        "ssh-run_task" => JSON.parse(File.read(File.join(__dir__, 'schemas', 'ssh-run_task.json'))),
-        "winrm-run_task" => JSON.parse(File.read(File.join(__dir__, 'schemas', 'winrm-run_task.json')))
-      }
-      shared_schema = JSON::Schema.new(JSON.parse(File.read(File.join(__dir__, 'schemas', 'task.json'))),
-                                       Addressable::URI.parse("file:task"))
-      JSON::Validator.add_schema(shared_schema)
+      @schemas = Hash[REQUEST_SCHEMAS.map do |basename|
+        [basename, JSON.parse(File.read(File.join(__dir__, ['schemas', "#{basename}.json"])))]
+      end]
+
+      SHARED_SCHEMAS.each do |basename|
+        schema_content = JSON.parse(File.read(File.join(__dir__, ['schemas', "#{basename}.json"])))
+        shared_schema = JSON::Schema.new(schema_content, Addressable::URI.parse("file:#{basename}"))
+        JSON::Validator.add_schema(shared_schema)
+      end
 
       @executor = Bolt::Executor.new(0)
 
