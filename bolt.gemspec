@@ -53,7 +53,7 @@ Gem::Specification.new do |spec|
 
   # there is a bug in puppetlabs_spec_helper for modules without fixtures
   spec.add_development_dependency "bundler", ">= 1.14"
-  spec.add_development_dependency "puppetlabs_spec_helper", "~> 2.6"
+  spec.add_development_dependency "puppetlabs_spec_helper", "~> 2.7"
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "rspec", "~> 3.0"
 end
