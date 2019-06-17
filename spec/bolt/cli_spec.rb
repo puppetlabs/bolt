@@ -161,6 +161,42 @@ describe "Bolt::CLI" do
             }.to raise_error(Bolt::CLIExit)
           }.to output(/Available actions are:.*upload/m).to_stdout
         end
+
+        it 'accepts puppetfile' do
+          cli = Bolt::CLI.new(%w[help puppetfile])
+          expect {
+            expect {
+              cli.parse
+            }.to raise_error(Bolt::CLIExit)
+          }.to output(/Available actions are:.*install.*show-modules/m).to_stdout
+        end
+
+        it 'excludes invalid subcommand flags' do
+          cli = Bolt::CLI.new(%w[help puppetfile])
+          expect {
+            expect {
+              cli.parse
+            }.to raise_error(Bolt::CLIExit)
+          }.not_to output(/--private-key/).to_stdout
+        end
+
+        it 'excludes invalid subcommand action flags and help text' do
+          cli = Bolt::CLI.new(%w[help plan show])
+          expect {
+            expect {
+              cli.parse
+            }.to raise_error(Bolt::CLIExit)
+          }.not_to output(/[parameters].*nodes/m).to_stdout
+        end
+
+        it 'accepts apply' do
+          cli = Bolt::CLI.new(%w[help apply])
+          expect {
+            expect {
+              cli.parse
+            }.to raise_error(Bolt::CLIExit)
+          }.to output(/Usage: bolt apply <manifest.pp>/m).to_stdout
+        end
       end
     end
 
