@@ -48,7 +48,7 @@ plan my_app::deploy(
         server => $server.name,
         _catch_errors => $force
       ).first
-      notice("Deploying to ${server.name}, currently ${stats["status"]} with ${stats["connections"]} open connections.")
+      out::message("Deploying to ${server.name}, currently ${stats["status"]} with ${stats["connections"]} open connections.")
 
       run_task('my_app::lb', $lb_server,
         "Drain connections from ${server.name}",
@@ -84,7 +84,7 @@ plan my_app::deploy(
         server => $server.name,
         _catch_errors => $force
       )
-      notice("Deploy complete on ${server}.")
+      out::message("Deploy complete on ${server}.")
     }
   }
 

@@ -6,32 +6,32 @@ time: Approximately 5 minutes
 
 In this exercise you will run existing scripts against remote nodes using Bolt.
 
-- [Test Linux nodes for ShellShock](#test-linux-nodes-for-shellshock)
-- [Test Windows external connectivity](#test-windows-external-connectivity)
+- [Test Linux Nodes for ShellShock](#test-linux-nodes-for-shellshock)
+- [Test Windows External Connectivity](#test-windows-external-connectivity)
 
-# Prerequisites
+## Prerequisites
 Complete the following before you start this lesson:
 
-1. [Installing Bolt](../01-installing-bolt)
-1. [Setting up test nodes](../02-acquiring-nodes)
-1. [Running Commands](../03-running-commands)
+- [Installing Bolt](../01-installing-bolt)
+- [Setting up test nodes](../02-acquiring-nodes)
+- [Running Commands](../03-running-commands)
 
-# Test Linux nodes for ShellShock
+## Test Linux Nodes for ShellShock
 Run the [bashcheck](https://github.com/hannob/bashcheck) script to check on ShellShock and related vulnerabilities.
 
 **Tip:** You likely already have a set of scripts that you run to accomplish common systems administration tasks. Bolt makes it easy to reuse your scripts without modification and to run them quickly across a large number of nodes. Feel free to replace the bashcheck script in this exercise with one of your own. Just set the shebang line correctly and you can run scripts in Python, Ruby, Perl or another scripting language.
 
 
-[Download `bashcheck`](bashcheck) using `curl`, `wget`,  or similar:
+Download the `bashcheck.sh` script using `curl`, `wget`,  or similar:
 
 ```shell
-curl -O https://puppetlabs.github.io/bolt/lab/04-running-scripts/bashcheck
+curl -O {{ site.url }}{{ site.baseurl }}/lessons/lesson1-10/src/bashcheck.sh
 ```
 
-Run the script using the command `bolt script run <script-name> <script options>`. This uploads the script to the nodes you have specified.
+Run the script using the command `bolt script run <script-name>`. This uploads the script to the nodes you have specified, ensures it's executable, runs it, and returns output to the console.
 
 ```shell
-bolt script run bashcheck --nodes node1
+bolt script run src/bashcheck.sh --nodes node1
 ```
 
 The result:
@@ -54,7 +54,7 @@ Successful on 1 node: node1
 Ran on 1 node in 0.89 seconds
 ```
 
-# Test Windows external connectivity
+## Test Windows External Connectivity
 
 Create a simple PowerShell script to test connectivity to a known website.
 
@@ -63,13 +63,13 @@ Create a simple PowerShell script to test connectivity to a known website.
 Save the following as `testconnection.ps1`:
 
 ```powershell
-{% include_relative testconnection.ps1 -%}
+{% include lesson1-10/src/testconnection.ps1 -%}
 ```
 
-Run the script using the command `bolt script run <script-name> <script options>`. This uploads the script to the nodes you have specified, ensures its executable, runs it, and returns output to the console.
+Run the script using the command `bolt script run <script-name>`. This uploads the script to the nodes you have specified, ensures it's executable, runs it, and returns output to the console.
 
 ```shell
-bolt script run testconnection.ps1 -n $WINNODE --no-ssl
+bolt script run src/testconnection.ps1 --nodes windows
 ```
 
 The result:
@@ -86,11 +86,11 @@ Finished on localhost:
     Nano          example.com                                                               256      5
 
 
-Successful on 1 node: winrm://vagrant:vagrant@localhost:55985
+Successful on 1 node: winrm://localhost:55985
 Ran on 1 node in 8.55 seconds
 ```
 
-# Next steps
+## Next steps
 
 Now that you know how to use Bolt to run existing scripts you can move on to:
 

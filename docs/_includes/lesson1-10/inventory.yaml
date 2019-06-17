@@ -1,0 +1,16 @@
+---
+# Inventory file for Bolt Hands-on Lab Lesson 10
+groups:
+  - name: lb
+    nodes:
+      - node1
+  - name: db
+    nodes:
+      - node2
+  - name: app
+    nodes:
+      - node3
+      - node4
+config:
+  ssh:
+    host-key-check: false

@@ -1,5 +1,5 @@
 ---
-title: Applying Manifest Code With Bolt
+title: Applying Manifest Code
 difficulty: Advanced
 time: Approximately 20 minutes
 ---
@@ -9,21 +9,46 @@ In this exercise you will further explore Bolt Plans by using the `apply` keywor
 You can read more about using bolt `apply` in Masterless Workflows in a [Blog Post](https://puppet.com/blog/introducing-masterless-puppet-bolt) written by Bolt developer Michael Smith. 
 
 You will deploy two web servers and a load balancer to distribute the traffic evenly between them with the following steps:
-1. Build a project specific configuration using a `Boltdir`.
-1. Download useful module content from the Puppet forge. 
-1. Write a Puppet Class to abstract the configuration of an Nginx web server. 
-1. Write a Bolt Plan to `apply` puppet code and orchestrate the deployment of a static website. 
 
-# Prerequisites
+- [Build a Project Specific Configuration Using a `Boltdir`](#build-a-boltdir)
+- [Build an Inventory to Organize Provisioned Nodes](#inventory)
+- [Download Useful Module Content From Puppet Forge](#module-content)
+- [Write a Puppet Class to Abstract Nginx Web Server Configuration](#abstracting-the-server-setup)
+- [Write a Bolt Plan to `apply` Puppet Code and Orchestrate Deployment](#apply-the-puppet-code)
 
-For the following exercises you should have `bolt` Docker and docker-compose installed. The following guides will help:
+## Prerequisites
 
-1. [Acquiring Nodes](../02-acquiring-nodes)
-1. [Writing Advanced Plans](../09-writing-advanced-plans)
+For the following exercises you should have Bolt, Docker, and docker-compose installed. The following guides will help:
 
-# Acquire nodes
+- [Acquiring Nodes](../02-acquiring-nodes)
+- [Writing Advanced Plans](../09-writing-advanced-plans)
 
-This lesson requires three nodes. You can use the [docker-compose.yml](docker-compose.yml) file in this repository to provision the nodes necessary for this exercise. 
+
+## Build a Boltdir
+
+Create a new project directory with a `Boltdir`. If you are using the [files included with this lesson](https://github.com/puppetlabs/bolt/tree/master/docs/_includes) your project directory will end up looking like:
+
+```
+lesson11/
+├── Boltdir
+│   ├── inventory.yaml
+│   ├── Puppetfile
+│   └── site
+│       └── profiles
+│           ├── manifests
+│           |   └── server.pp
+│           └── plans
+│               └── nginx_install.pp
+└── docker-compose.yml
+```
+
+## Acquire nodes
+
+This lesson requires three nodes. Save the following file in your project directory as `docker-compose.yml`.
+
+```yaml
+{% include lesson11/docker-compose.yml -%}
+```
 
 Nodes can be obtained with the `docker-compose up -d` command.
 
@@ -34,27 +59,19 @@ You can verify nodes are created with `docker ps`
 26c47f8c4bad        lab_node            "/usr/sbin/sshd -D"   About an hour ago   Up About an hour    0.0.0.0:20022->22/tcp, 0.0.0.0:20080->80/tcp   lb
 ```
 
-# Build a Boltdir
-
-By default `$HOME/.puppetlabs/bolt/` is the base directory for user-supplied data such as the configuration and inventory files. It is effectively the default `Boltdir`. 
-You may find it useful to maintain a project specific `Boltdir`. When you commit a `Boltdir` to a project you can share Bolt configuration and code between users.
-
-Bolt will search for a `Boltdir` in parent directories of the directory from which it was run.
-
 ## Inventory
 
 Build an inventory to organize provisioned nodes. This will be the first configuration file in our new project specific `Boltdir`. 
 
-**Note**: Example outputs in the lab are for nodes provisioned with Docker. 
+> **Note**: Example outputs in the lab are for nodes provisioned with Docker. 
 
-### Docker nodes
 If you provisioned your nodes with the docker-compose file provided with this exercise save the following in `Boltdir/inventory.yaml`.
 
 ```yaml
-{% include_relative Boltdir/inventory.yaml -%}
+{% include lesson11/Boltdir/inventory.yaml -%}
 ```
 
-Make sure your inventory is configured correctly and you can connect to all nodes. Run from within the project Boltdir:
+Make sure your inventory is configured correctly and you can connect to all nodes. Run from within the project directory:
 
 ```bash
 bolt command run 'echo hi' -n all
@@ -86,10 +103,10 @@ In order to install module content from the forge Bolt uses a `Puppetfile`. See 
 Save the following `Puppetfile` that describes the Puppet Forge content to be installed in the project `Boltdir`. 
 
 ```ruby
-{% include_relative Boltdir/Puppetfile -%}
+{% include lesson11/Boltdir/Puppetfile -%}
 ```
 
-From within the `Boltdir` install the Forge content with the following Bolt command:
+From within the project directory install the Forge content with the following Bolt command:
 
 ```shell
 bolt puppetfile install
@@ -97,21 +114,27 @@ bolt puppetfile install
 
 Confirm that a `modules` directory has been created in the project `Boltdir`. 
 
-## Write profile module
+## Write `profile` Module
 
 Now that you have downloaded existing modules it is time to write your own module content. Custom module content not managed by the project `Puppetfile` belongs in a `site` directory in the `Boltdir`. After creating a `Boltdir/site` directory create a new directory called `profiles`. The `profiles` module will be our own custom module. 
+
+> **Note**: `site` and `site-modules` directories can both be used for custom module content.
+
+### Abstracting the Server Setup
 
 Start by abstracting the Nginx setup by writing a Puppet Class. Puppet code belongs in a subdirectory of our module called `manifests`. Save the following class definition in `Boltdir/site/profiles/manifests/server.pp`. 
 
 If you are new to Puppet writing puppet code check out [these learning resources](https://learn.puppet.com/). The Learning VM is especially helpful for getting up to speed with Puppet.
 
 ```puppet
-{% include_relative Boltdir/site/profiles/manifests/server.pp -%}
+{% include lesson11/Boltdir/site/profiles/manifests/server.pp -%}
 ```
 
-**Note**: Vox Pupuli maintains an [nginx module](https://forge.puppet.com/puppet/nginx/readme) that you could swap in for our simple server class to manage more complex nginx configuration.
+> **Note**: Vox Pupuli maintains an [nginx module](https://forge.puppet.com/puppet/nginx/readme) that you could swap in for our simple server class to manage more complex nginx configuration.
 
 Now we will write a Plan to utilize the server class. 
+
+### Apply the Puppet Code
 
 As we have seen in the lab, plan code belongs in the `plans` subdirectory. Save the following to `Boltdir/site/profiles/plans/nginx_install.pp`.
 
@@ -123,7 +146,7 @@ Take note of the following features of the plan:
 1. The second apply block uses information about the Nginx servers to configure a load balancer to direct traffic between the two servers. 
 
 ```puppet
-{% include_relative Boltdir/site/profiles/plans/nginx_install.pp -%}
+{% include lesson11/Boltdir/site/profiles/plans/nginx_install.pp -%}
 ```
 
 Verify the `nginx_install` plan is available to run using `bolt plan show`. You should see an output similar to: 
@@ -173,8 +196,8 @@ and
 ```
 hello! from 127.0.0.1
 ```
-**Note**: You can also navigate to `http://0.0.0.0:20080/` in a web browser. Just be aware that your browser will likely cache the result and therefore you may not see the oscillation between the two servers behind the load balancer. 
+> **Note**: You can also navigate to `http://0.0.0.0:20080/` in a web browser. Just be aware that your browser will likely cache the result and therefore you may not see the oscillation between the two servers behind the load balancer. 
 
-# Next steps
+## Next steps
 
 Now that you have learned about applying existing module content you can harness the power of the Puppet forge to manage infrastructure and deploy great applications!

@@ -11,6 +11,7 @@ groups:
             port: 20023
       - name: "localhost"
         config:
+          transport: ssh
           ssh:
             port: 20024
 config:

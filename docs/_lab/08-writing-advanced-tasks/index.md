@@ -1,42 +1,42 @@
 ---
-title: Writing advanced tasks
+title: Writing Advanced Tasks
 difficulty: Intermediate
 time: Approximately 10 minutes
 ---
 
 In this exercise you will write a task with metadata.
 
-# Prerequisites
+## Prerequisites
 Complete the following before you start this lesson:
 
-1. [Installing Bolt](../01-installing-bolt)
-1. [Acquiring nodes](../02-acquiring-nodes)
-1. [Writing tasks](../05-writing-tasks)
+- [Installing Bolt](../01-installing-bolt)
+- [Acquiring Nodes](../02-acquiring-nodes)
+- [Writing Tasks](../05-writing-tasks)
 
-# About task metadata
+## About Task Metadata
 Task metadata files describe task parameters, validate input, and control how tasks are executed.  Adding metadata to your tasks helps others use them.  You write metadata for a task in JSON and save it with the same name as your task. For example, if you write a task called `great_metadata.py` its corresponding metadata file is named `great_metadata.json`.
 
-# Writing your first task with metadata
+## Writing Your First Task With Metadata
 Write a simple task that formats the parameters a user gives it.
 
-Save the following file to `modules/exercise8/tasks/great_metadata.py`:
+Save the following file to `Boltdir/site-modules/exercise8/tasks/great_metadata.py`:
 
 ```python
-{% include_relative modules/exercise8/tasks/great_metadata.py -%}
+{% include lesson1-10/Boltdir/site-modules/exercise8/tasks/great_metadata.py -%}
 ```
 
-Write the accompanying metadata and save the file to `modules/exercise8/tasks/great_metadata.json`. Specify the parameters as types such as `"type": "Integer"`  which help validate user input as an `Integer`.
+Write the accompanying metadata and save the file to `Boltdir/site-modules/exercise8/tasks/great_metadata.json`. Specify the parameters as types such as `"type": "Integer"`  which help validate user input as an `Integer`.
 
 ```json
-{% include_relative modules/exercise8/tasks/great_metadata.json -%}
+{% include lesson1-10/Boltdir/site-modules/exercise8/tasks/great_metadata.json -%}
 ```
 
-# Using your task with metadata
+## Using Your Task With Metadata
 
 Run 'bolt task show' to verify that the task you created appears with its description in the list of available tasks.
 
 ```shell
-bolt task show --modulepath ./modules
+bolt task show
 ```
 
 The result:
@@ -52,7 +52,7 @@ install_puppet                Install the puppet 5 agent package
 Run `bolt task show <task-name>` to view the parameters that your task uses.
 
 ```shell
-bolt task show exercise8::great_metadata --modulepath ./modules
+bolt task show exercise8::great_metadata
 ```
 
 The result:
@@ -74,17 +74,17 @@ PARAMETERS:
     The description for the 'timeout' parameter
 
 MODULE:
-tasks-hands-on-lab/08-writing-advanced-tasks/modules/exercise8
+project/Boltdir/site-modules/exercise8
 ```
 
-# Testing your task's metadata validation
+## Testing Your Task's Metadata Validation
 
 Bolt can use the types that you have specified in your metadata to validate parameters passed to your task.  Run your task with an incorrect value for the `action` parameter and see what happens.
 
 Run your task and pass the following parameters as a JSON string.
 
 ```shell
-bolt task run exercise8::great_metadata --nodes all --modulepath ./modules --params '{"name":"poppey","action":"spinach","recursive":true}'
+bolt task run exercise8::great_metadata --nodes linux --params '{"name":"Popeye","action":"spinach","recursive":true}'
 ```
 
 The result:
@@ -97,7 +97,7 @@ Task exercise8::great_metadata:
 Correct the value for the action parameter and run the task again.
 
 ```shell
-bolt task run exercise8::great_metadata --nodes node1 --modulepath ./modules --params '{"name":"poppey","action":"start","recursive":true}'
+bolt task run exercise8::great_metadata --nodes node1 --params '{"name":"Popeye","action":"start","recursive":true}'
 ```
 
 The result:
@@ -120,7 +120,7 @@ Finished on node1:
       },
       {
         "type": "unicode",
-        "value": "poppey",
+        "value": "Popeye",
         "key": "name"
       },
       {
@@ -134,26 +134,26 @@ Successful on 1 node: node1
 Ran on 1 node in 0.97 seconds
 ```
 
-# Creating a task that supports no-operation mode (noop)
+## Creating a Task That Supports no-operation Mode (noop)
 
 You can write tasks that support no-operation mode (noop). You use noop to see what changes a task would make, but without taking any action.
 
-Create the metadata for the new task and save it to `modules/exercise8/tasks/file.json`:
+Create the metadata for the new task and save it to `Boltdir/site-modules/exercise8/tasks/file.json`:
 
 ```json
-{% include_relative modules/exercise8/tasks/file.json -%}
+{% include lesson1-10/Boltdir/site-modules/exercise8/tasks/file.json -%}
 ```
 
-Save the following file to `modules/exercise8/tasks/file.py`. This task uses input from stdin. When a user passes the `--noop` flag, the JSON object from stdin will contain the `_noop` key with a value of True.
+Save the following file to `Boltdir/site-modules/exercise8/tasks/file.py`. This task uses input from stdin. When a user passes the `--noop` flag, the JSON object from stdin will contain the `_noop` key with a value of True.
 
 ```python
-{% include_relative modules/exercise8/tasks/file.py -%}
+{% include lesson1-10/Boltdir/site-modules/exercise8/tasks/file.py -%}
 ```
 
 Test the task with the `--noop` flag.
 
 ```shell
-bolt task run exercise8::file --nodes node1 --modulepath ./modules content=Hello_World filename=/tmp/hello_world --noop
+bolt task run exercise8::file --nodes node1 content=Hello_World filename=/tmp/hello_world --noop
 ```
 
 The result:
@@ -172,7 +172,7 @@ Ran on 1 node in 0.96 seconds
 Run the task again without `--noop` and see the task create the file successfully.
 
 ```shell
-bolt task run exercise8::file --nodes node1 --modulepath ./modules content=Hello_World filename=/tmp/hello_world
+bolt task run exercise8::file --nodes node1 content=Hello_World filename=/tmp/hello_world
 ```
 
 The result:
@@ -187,8 +187,8 @@ Successful on 1 node: node1
 Ran on 1 node in 0.98 seconds
 ```
 
-# Next steps
+## Next Steps
 
 Now that you know how to write task metadata and include the `--noop` flag you can move on to:
 
-[Writing advanced Plans](../09-writing-advanced-plans)
+[Writing Advanced Plans](../09-writing-advanced-plans)
