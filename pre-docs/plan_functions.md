@@ -492,6 +492,8 @@ Runs the `plan` referenced by its name. A plan is autoloaded from `<moduleroot>/
 **NOTE:** Not available in apply block
 
 
+### 
+
 ```
 run_plan(String $plan_name, Optional[Hash] $named_args)
 ```
@@ -505,6 +507,19 @@ run_plan(String $plan_name, Optional[Hash] $named_args)
 ```
 run_plan('canary', 'command' => 'false', 'nodes' => $targets, '_catch_errors' => true)
 ```
+
+### 
+
+```
+run_plan(String $plan_name, Boltlib::TargetSpec $targets, Optional[Hash] $named_args)
+```
+
+*Returns:* `Boltlib::PlanResult` 
+
+* **plan_name** `String` 
+* **targets** `Boltlib::TargetSpec` 
+* **named_args** `Optional[Hash]` 
+
 
 
 ## run_script
