@@ -225,6 +225,13 @@ The Puppet repository for the YUM package management system is [http://yum.puppe
         sudo dnf install puppet-bolt
         ```
 
+    -   Fedora 30
+
+        ```
+        sudo rpm -Uvh https://yum.puppet.com/puppet6/puppet6-release-fedora-30.noarch.rpm
+        sudo dnf install puppet-bolt
+        ```
+
 2.  Run a Bolt command and get started. 
 
     ```
