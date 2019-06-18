@@ -35,6 +35,12 @@ shared_examples 'action tests' do
   it 'fails when not stubbed' do
     expect { run_plan(plan_name, 'nodes' => targets) }.to raise_error(RuntimeError, /Unexpected call to/)
   end
+
+  it 'prints expected parameters when erroring' do
+    params = Regexp.escape(expect_action.parameters.to_s)
+    expect_action.not_be_called
+    expect { run_plan(plan_name, 'nodes' => targets) }.to raise_error(RuntimeError, /#{params}/)
+  end
 end
 
 describe "BoltSpec::Plans" do
