@@ -56,5 +56,5 @@ services:
       args:
         BOLT_PASSWORD: bolt
     ports:
-      - "24985:5985"
-      - "24986:5986"
+      - "45985:5985"
+      - "45986:5986"
