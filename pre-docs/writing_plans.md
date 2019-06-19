@@ -58,7 +58,9 @@ The following example shows node parameters specified as data type `TargetSpec`.
 
 This allows the user to pass, for each parameter, either a simple node name or a URI that describes the protocol to use, the hostname, username and password.
 
-The plan then calls the `run_task` function, specifying which nodes the tasks should be run on. Note how the `Target` names are collected and stored in `$webserver_names` by iterating over the list of `Target` objects returned by `get_targets`. It is important to understand that task parameters are serialized to JSON format, so extracting the names into an Array of Strings ensures that the `webservers` parameter is in a format that can be converted to JSON.
+The plan then calls the `run_task` function, specifying which nodes the tasks should be run on. The `Target` names are collected and stored in `$webserver_names` by iterating over the list of `Target` objects returned by `get_targets`. 
+
+Task parameters are serialized to JSON format, so extracting the names into an array of strings ensures that the `webservers` parameter is in a format that can be converted to JSON.
 
 ```
 plan mymodule::my_plan(
