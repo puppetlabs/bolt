@@ -11,7 +11,7 @@ test_name "bolt apply should apply manifest block on remote hosts via ssh and wi
   targets = ssh_nodes + winrm_nodes
 
   # Puppet 6 doesn't support OSX 10.11, so skip those hosts if present
-  targets -= select_hosts(platform: [/osx-10.11/, /fedora-30/])
+  targets -= select_hosts(platform: [/osx-10.11/])
 
   skip_test('no applicable nodes to test on') if targets.empty?
 
