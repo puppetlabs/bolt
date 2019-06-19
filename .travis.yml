@@ -29,7 +29,7 @@ before_install:
 
 before_script:
 - $TRAVIS_BUILD_DIR/spec/fixtures/samba-ad/kerberos-client-config.sh
-- docker-compose -f spec/docker-compose.yml up -d --build
+- docker-compose -f spec/docker-compose.yml up -d --build omiserver
 - eval `ssh-agent`
 - cat Gemfile.lock
 - bundle exec r10k puppetfile install
@@ -39,39 +39,6 @@ before_script:
 - sudo sh -c "echo 'Defaults authenticate' >> /etc/sudoers"
 - sudo sh -c "echo 'travis  ALL=(ALL) PASSWD:ALL' >> /etc/sudoers"
 script:
-- bundle exec rake travisci
-- bundle exec rubocop
-- |
-  status=0
-  for i in 'boltlib' 'ctrl' 'file' 'out' 'system'; do
-    pushd bolt-modules/$i
-    if ! bundle exec rake spec; then
-      status=1
-    fi
-    popd
-  done
-  if [ $status -eq 1 ]; then
-    false
-  fi
-- |
-  status=0
-  for i in 'canary' 'aggregate' 'puppetdb_fact'; do
-    pushd modules/$i
-    if ! bundle exec rake spec; then
-      status=1
-    fi
-    popd
-  done
-  # fail this step if there were any failures
-  if [ $status -eq 1 ]; then
-    false
-  fi
-- |
-  if ! bundle exec rake docs; then
-    false
-  elif ! git diff --exit-code; then
-    false
-  fi
 - bundle exec rake puppetserver
 after_script:
 - |
