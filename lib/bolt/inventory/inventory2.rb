@@ -124,7 +124,8 @@ module Bolt
       def config_plugin(data)
         Bolt::Util.walk_vals(data) do |val|
           if val.is_a?(Concurrent::Delay)
-            val.value
+            # We should raise any error from the delay now
+            val.value!
           else
             val
           end

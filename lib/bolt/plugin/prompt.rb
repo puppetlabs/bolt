@@ -9,7 +9,7 @@ module Bolt
         @logger = Logging.logger[self]
       end
 
-      def self.name
+      def name
         'prompt'
       end
 
@@ -17,15 +17,15 @@ module Bolt
         ['inventory_config_lookup']
       end
 
-      def inventory_config_lookup(opts)
+      def validate_inventory_config_lookup(opts)
         raise Bolt::ValidationError, "Prompt requires a 'message'" unless opts['message']
-        # Return a delay to only be evaluated when needed
-        Concurrent::Delay.new do
-          STDOUT.print "#{opts['message']}:"
-          value = STDIN.noecho(&:gets).chomp
-          STDOUT.puts
-          value
-        end
+      end
+
+      def inventory_config_lookup(opts)
+        STDOUT.print "#{opts['message']}:"
+        value = STDIN.noecho(&:gets).chomp
+        STDOUT.puts
+        value
       end
     end
   end

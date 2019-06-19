@@ -93,7 +93,10 @@ module Bolt
             unless (plugin = @plugins.by_name(value['_plugin']))
               raise ValidationError.new("unkown plugin: #{value['_plugin'].inspect}", nil)
             end
-            plugin.new.inventory_config_lookup(value)
+            plugin.validate_inventory_config_lookup(value) if plugin.respond_to?(:validate_inventory_config_lookup)
+            Concurrent::Delay.new do
+              plugin.inventory_config_lookup(value)
+            end
           else
             value
           end

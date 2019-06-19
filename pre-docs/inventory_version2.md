@@ -39,9 +39,8 @@ string to a target defined elsewhere in the inventory. If no target has a name
 or alias matching the string bolt will create a new target with the string as
 it's uri.
 
-## Version 2 only features
 
-### Creating a node with a human readable name and ip address
+## Creating a node with a human readable name and ip address
 
 With version 2 of the inventory you can create a node with a human readable
 name even when an ip address is used for connecting. This can be accomplished
@@ -59,19 +58,19 @@ targets:
     uri: 192.168.100.179
 ```
 
-### Plugins and Dynamic Inventory
+## Plugins and Dynamic Inventory
 
 There are two types of  plugins. The target-lookups plugin type allows dynamic target discovery when running Bolt. The config-lookup plugin type allows dynamically looking up values not explicitly stored in an inventoryfile.
 
-In order to make target discovery and configuration extensible a plugin framework is being developed. Plugins are expected to eventually be generally plugable but for now Bolt only ships with built in plugins. 
+In order to make target discovery and configuration extensible a plugin framework is being developed. Plugins are expected to eventually be generally plugable but for now Bolt only ships with built in plugins.
 
-#### `target-lookups` plugins
+### `target-lookups` plugins
 
 `target-lookups` is a key at the group level that allows you to dynamically
 lookup the targets in the node. `target-lookups` contains an array of target
 lookup objects. Each `target-lookups` entry must include a `plugin` key that
 defines which plugin should be used for the lookup. The rest of the keys are
-specific to the plugin being used. Note that `config-lookup` plugins are not 
+specific to the plugin being used. Note that `config-lookup` plugins are not
 available to set `config` nested under `target-lookups`.
 
 Currently available plugins are:
@@ -79,7 +78,7 @@ Currently available plugins are:
 * `puppetdb` - Query PuppetDB to populate the targets.
 * `terraform` - Load a Terraform state file to populate the targets.
 
-##### PuppetDB
+#### PuppetDB
 
 The PuppetDB plugin takes a `query` field, which is either a string
 containing a
@@ -122,7 +121,7 @@ required for both structured and unstructured facts.
 will **not** set the `uri` to the certname of the target.
 
 For example, to set the user to be the user from the [identity
-fact](https://puppet.com/docs/facter/latest/core_facts.html#identity): 
+fact](https://puppet.com/docs/facter/latest/core_facts.html#identity):
 
 ```
 version: 2
@@ -156,15 +155,15 @@ groups:
             hostname: facts.networking.interfaces.en0.ipaddress
 ```
 
-##### Terraform
+#### Terraform
 
 The Terraform plugin accepts several fields:
 
-`dir`: The directory from which to load Terraform state  
-`resource_type`: The Terraform resources to match, as a regular expression  
-`uri`: The property of the Terraform resource to use as the target URI (optional)  
-`statefile`: The name of the Terraform state file to load within `dir` (optional, defaults to `terraform.tfstate`)  
-`name`: The property of the Terraform resource to use as the target name (optional)  
+`dir`: The directory from which to load Terraform state
+`resource_type`: The Terraform resources to match, as a regular expression
+`uri`: The property of the Terraform resource to use as the target URI (optional)
+`statefile`: The name of the Terraform state file to load within `dir` (optional, defaults to `terraform.tfstate`)
+`name`: The property of the Terraform resource to use as the target name (optional)
 `config`: A Bolt config map where each value is the Terraform property to use for that config setting
 
 One of `uri` or `name` is required. If only `uri` is set, then the value of `uri` will be used as the `name`.
@@ -197,9 +196,9 @@ google_compute_instance.web.0:
   name = web-0
   network_interface.# = 1
   network_interface.0.access_config.# = 1
-  network_interface.0.access_config.0.assigned_nat_ip = 
+  network_interface.0.access_config.0.assigned_nat_ip =
   network_interface.0.access_config.0.nat_ip = 34.83.150.52
-  network_interface.0.address = 
+  network_interface.0.address =
   network_interface.0.name = nic0
   network_interface.0.network = https://www.googleapis.com/compute/v1/projects/cloud-app1/global/networks/default
   network_interface.0.network_ip = 10.138.0.22
@@ -213,9 +212,9 @@ google_compute_instance.web.1:
   name = web-1
   network_interface.# = 1
   network_interface.0.access_config.# = 1
-  network_interface.0.access_config.0.assigned_nat_ip = 
+  network_interface.0.access_config.0.assigned_nat_ip =
   network_interface.0.access_config.0.nat_ip = 34.83.16.240
-  network_interface.0.address = 
+  network_interface.0.address =
   network_interface.0.name = nic0
   network_interface.0.network = https://www.googleapis.com/compute/v1/projects/cloud-app1/global/networks/default
   network_interface.0.network_ip = 10.138.0.21
@@ -229,9 +228,9 @@ google_compute_instance.app.1:
   name = app-1
   network_interface.# = 1
   network_interface.0.access_config.# = 1
-  network_interface.0.access_config.0.assigned_nat_ip = 
+  network_interface.0.access_config.0.assigned_nat_ip =
   network_interface.0.access_config.0.nat_ip = 35.197.93.137
-  network_interface.0.address = 
+  network_interface.0.address =
   network_interface.0.name = nic0
   network_interface.0.network = https://www.googleapis.com/compute/v1/projects/cloud-app1/global/networks/default
   network_interface.0.network_ip = 10.138.0.23
@@ -240,15 +239,15 @@ google_compute_instance.app.1:
   zone = us-west1-a
 ```
 
-#### `config-lookup` plugins
+### `config-lookup` plugins
 
 Config lookup plugins are specified using the `_plugin` key which allows specifying a plugin to use. The value pointed to by `_plugin` should be the name of the plugin to use. Currently the only acceptable use of config-lookup plugins is to set configuration values, using the `_plugin` key nested under non-config settings will result in Validation errors. Also note that the `_plugin` key cannot be used to set config nested under target-lookups.
 
-##### Prompt plugin
+#### Prompt plugin
 
 The 'prompt' plugin can be used to allow users to interactively enter sensitive configuration information on the CLI instead of storing that data in the inventoryfile. Data will only be looked up when the value is needed for the target and once the value has been stored it will be re-used for the rest of the Bolt run. The `prompt` plugin may only be used when nested under `config` and is not supported when nested under `target-lookups`. The prompt plugin can be used by replacing the config value with a hash that has the following keys:
 
-`_plugin`: The value of `_plugin` must be `prompt` 
+`_plugin`: The value of `_plugin` must be `prompt`
 `message`: The value of `message` must be the text to show when prompting the user on the CLI
 
 Example
@@ -260,10 +259,66 @@ targets:
       transport: ssh
       ssh:
         user: root
-        password: 
+        password:
           _plugin: prompt
           message: please enter your ssh password
 ```
+
+#### pkcs7 plugin
+
+This plugin allows config values to be stored in encrypted in the inventory
+file and decrypted only as needed.
+
+`_plugin`: The value of `_plugin` must be `pkcs7`
+`encrypted-value`: The encrypted value. Generate encrypted values with `bolt secret encrypt <plaintext>`
+
+Example
+
+```
+version: 2
+targets:
+  - uri: 192.168.100.179
+    config:
+      transport: ssh
+      ssh:
+        user: root
+        password:
+          _plugin: pkcs7
+          encrypted-value: |
+                ENC[PKCS7,MIIBeQYJKoZIhvcNAQcDoIIBajCCAWYCAQAxggEhMIIBHQIBADAFMAACAQEw
+                DQYJKoZIhvcNAQEBBQAEggEAdCVkiddtK8jHz4g1y1pkB27VHCZx7dVzEiyT
+                33BgFv9atk8Ns/WE1tveFvyuEaDpk9y/FKisuh8DsTnR2mfGvHtX+BQdNqV6
+                L8/nIdwoEqYFd5sKFJnOlpdm7BMX4QDoCfGb+b2UB8A/7eJJ5AcgBVtrJLLE
+                VvqSCtqME12ltifdMivMP1hnVJOAhIpib8CwOIIP+Dtv7P7cPaHGTdQpR6Dp
+                jbe+AUDM6kcKGADLOYriPQ1UV6zDz5aeUbrwbr4FicHL/sQBPDcWIJR2elwY
+                bh8hCDe/IIWE7TOiauXOPyMPKohz622KNoJDJbmv5MhBwNFHSjgKAlOAxL3i
+                DK7XXzA8BgkqhkiG9w0BBwEwHQYJYIZIAWUDBAEqBBCvjDMKTjsHloKP04WO
+                Dq0ogBAUjTZMjbKjkndMSqPC5mGC]
+```
+
+Before using the pkcs7 plugin you need to create encryption keys. You can
+create these keys automatically with `bolt secret createkeys` or reuse existing
+hiera-eyaml pkcs7 keys with bolt secret. You can then encrypt values with `bolt
+secret encrypt <plaintext>` command and copy the result into your inventory
+file. If you need to inspect an encrypted value from the inventory you can
+decrypt it with `bolt secret decrypt <encrypted-value>`.
+
+##### Configuration
+
+By default keys are stores in the `keys` directory of bolt project repo. If
+you're sharing your project directory you can move the private key outside the
+project directory by configuring the key location in bolt.yaml
+
+```
+---
+plugins:
+  pkcs7:
+    private-key: ~/bolt_private_key.pem
+```
+
+* `keysize`: They size of the key to generate with `bolt secret createkeys`: default: `2048`
+* `private-key`: The path to the private key file. default: `keys/private_key.pkcs7.pem`
+* `public-key`: The path to the public key file. default: `keys/public_key.pkcs7.pem`
 
 ## Inventory config
 

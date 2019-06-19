@@ -23,6 +23,7 @@ require 'bolt/plugin'
 require 'bolt/pal'
 require 'bolt/target'
 require 'bolt/version'
+require 'bolt/secret'
 
 module Bolt
   class CLIExit < StandardError; end
@@ -33,6 +34,7 @@ module Bolt
                  'plan' => %w[show run convert],
                  'file' => %w[upload],
                  'puppetfile' => %w[install show-modules],
+                 'secret' => %w[encrypt decrypt createkeys],
                  'apply' => %w[] }.freeze
 
     attr_reader :config, :options
@@ -120,6 +122,7 @@ module Bolt
       # options[:target_args] will contain a string/array version of the targetting options this is passed to plans
       # options[:targets] will contain a resolved set of Target objects
       unless options[:subcommand] == 'puppetfile' ||
+             options[:subcommand] == 'secret' ||
              options[:action] == 'show' ||
              options[:action] == 'convert'
 
@@ -311,6 +314,8 @@ module Bolt
         code = run_plan(options[:object], options[:task_options], options[:target_args], options)
       when 'puppetfile'
         code = install_puppetfile(@config.puppetfile_config, @config.puppetfile, @config.modulepath)
+      when 'secret'
+        code = Bolt::Secret.execute(plugins, outputter, options)
       when 'apply'
         if options[:object]
           validate_file('manifest', options[:object])
