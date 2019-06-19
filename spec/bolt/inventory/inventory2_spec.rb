@@ -166,8 +166,7 @@ describe Bolt::Inventory::Inventory2 do
       {
         'connect-timeout' => 10,
         'disconnect-timeout' => 5,
-        'tty' => false,
-        'host-key-check' => true
+        'tty' => false
       }
     }
 
@@ -616,7 +615,7 @@ describe Bolt::Inventory::Inventory2 do
         it 'should not modify existing config' do
           get_target(inventory, 'ssh://target')
           expect(conf.transport).to eq('ssh')
-          expect(conf.transports[:ssh]['host-key-check']).to be true
+          expect(conf.transports[:ssh]['host-key-check']).to be nil
           expect(conf.transports[:winrm]['ssl']).to be true
           expect(conf.transports[:winrm]['ssl-verify']).to be true
         end

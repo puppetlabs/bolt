@@ -56,7 +56,7 @@ to avoid writing them to disk.
 
 `disconnect-timeout`: How long Bolt should wait to force-close an ssh connection.
 
-`host-key-check`: Whether to perform host key validation when connecting over SSH. Default is `true`.
+`host-key-check`: Whether to perform host key validation when connecting over SSH. Default is `true`, which defers to your SSH config. Setting to `false` skips host key checking entirely, which is more extreme than setting `StrictHostKeyChecking=no` in your SSH config: it will accept any key even if a different key is already present in your known hosts file.
 
 `password`: Login password.
 
@@ -92,6 +92,7 @@ In addition to the ssh transport options defined in Bolt-specific configuration 
 - `HostName`: Host name to log.
 - `IdentityFile`: File which user's identity key is stored.
 - `Port`: SSH port.
+- `StrictHostKeyChecking`: If no, will accept unknown keys and add them to `UserKnownHostsFile`. Otherwise rejects unknown keys.
 - `UserKnownHostsFile`: Path to local user's host key database.
 
 **Note**: For OpenSSH configuration options with direct equivalents in Bolt (for example `user` and `port`) the setting in Bolt config take precedence.
@@ -105,7 +106,6 @@ nodes:
     config:
       transport: ssh
       ssh:
-        host-key-check: true
         port: 22
         private-key: /.ssh/id_rsa-example
 ```
@@ -116,7 +116,7 @@ Host *.example.net
   User root
   Port 444
 ```
-The ssh connection will be configured to use the user and known hosts file defined in OpenSSH config and the port defined in Bolt config. Note that `host-key-check` must be set in Bolt config (the `StrictHostKeyChecking` OpenSSH configuration value is ignored).
+The ssh connection will be configured to use the user and known hosts file defined in OpenSSH config and the port defined in Bolt config.
 
 When using the ssh transport Bolt also interacts with the ssh-agent for ssh key management. The most common interaction is to handle password protected private keys. When a private key is password protected it must be added to the ssh-agent in order to be used to authenticate Bolt ssh connections.
 
