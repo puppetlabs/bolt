@@ -6,6 +6,7 @@ require 'bolt/error'
 #
 # **NOTE:** Not available in apply block
 Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction) do
+  # Run a plan
   # @param plan_name The plan to run.
   # @param named_args Arguments to the plan. Can also include additional options: '_catch_errors', '_run_as'.
   # @return [PlanResult] The result of running the plan. Undef if plan does not explicitly return results.
@@ -16,6 +17,31 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
     param 'String', :plan_name
     optional_param 'Hash', :named_args
     return_type 'Boltlib::PlanResult'
+  end
+
+  # Run a plan, specifying $nodes as a positional argument.
+  # @param plan_name The plan to run.
+  # @param named_args Arguments to the plan. Can also include additional options: '_catch_errors', '_run_as'.
+  # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
+  # @return [PlanResult] The result of running the plan. Undef if plan does not explicitly return results.
+  # @example Run a plan
+  #   run_plan('canary', $nodes, 'command' => 'false')
+  dispatch :run_plan_with_targetspec do
+    scope_param
+    param 'String', :plan_name
+    param 'Boltlib::TargetSpec', :targets
+    optional_param 'Hash', :named_args
+    return_type 'Boltlib::PlanResult'
+  end
+
+  def run_plan_with_targetspec(scope, plan_name, targets, named_args = {})
+    unless named_args['nodes'].nil?
+      raise ArgumentError,
+            "A plan's 'nodes' parameter may be specified as the second positional argument to " \
+            "run_plan(), but in that case 'nodes' must not be specified in the named arguments " \
+            "hash."
+    end
+    run_plan(scope, plan_name, named_args.merge('nodes' => targets))
   end
 
   def run_plan(scope, plan_name, named_args = {})
