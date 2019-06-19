@@ -83,9 +83,14 @@ describe 'run_plan' do
                           .and_raise_error(/expects an Integer value/)
       end
 
-      it 'fails with argument error if given nodes positional argument and nodes named argument' do
+      it 'failing with argument error if given nodes positional argument and nodes named argument' do
         is_expected.to run.with_params('test::run_me_nodes', 'node1', 'nodes' => 'node2')
                           .and_raise_error(ArgumentError)
+      end
+
+      it 'failing with parse error if given nodes positional argument for plan without nodes parameter' do
+        is_expected.to run.with_params('test::run_me', 'node1')
+                          .and_raise_error(Puppet::ParseError)
       end
     end
 
