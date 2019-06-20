@@ -471,9 +471,9 @@ describe 'running with an inventory file', reset_puppet_settings: true do
     let(:inventory) do
       {
         version: 2,
-        "target-lookups" => [
+        "targets" => [
           {
-            plugin: 'puppetdb',
+            _plugin: 'puppetdb',
             query: 'inventory { facts.fact1 = true }',
             config: {
               ssh: ssh_config

@@ -13,7 +13,7 @@ module Bolt
 
       DATA_KEYS = %w[name config facts vars features].freeze
       NODE_KEYS = DATA_KEYS + %w[alias uri]
-      GROUP_KEYS = DATA_KEYS + %w[groups targets target-lookups]
+      GROUP_KEYS = DATA_KEYS + %w[groups targets]
       CONFIG_KEYS = Bolt::TRANSPORTS.keys.map(&:to_s) + ['transport']
 
       def initialize(data, plugins)
@@ -31,6 +31,12 @@ module Bolt
         raise ValidationError.new("Group name must be a String, not #{@name.inspect}", nil) unless @name.is_a?(String)
         raise ValidationError.new("Invalid group name #{@name}", @name) unless @name =~ NAME_REGEX
 
+        # DEPRECATION : remove this before finalization
+        if data.key?('target-lookups')
+          msg = "'target-lookups' are no longer a separate key. Merge 'target-lookups' and 'targets' lists and replace 'plugin' with '_plugin'" # rubocop:disable Metrics/LineLength
+          raise ValidationError.new(msg, @name)
+        end
+
         unless (unexpected_keys = data.keys - GROUP_KEYS).empty?
           msg = "Found unexpected key(s) #{unexpected_keys.join(', ')} in group #{@name}"
           @logger.warn(msg)
@@ -41,8 +47,6 @@ module Bolt
         @features = fetch_value(data, 'features', Array)
 
         @config = config_only_plugin(fetch_value(data, 'config', Hash))
-
-        @target_lookups = fetch_value(data, 'target-lookups', Array)
 
         unless (unexpected_keys = @config.keys - CONFIG_KEYS).empty?
           msg = "Found unexpected key(s) #{unexpected_keys.join(', ')} in config for group #{@name}"
@@ -61,8 +65,15 @@ module Bolt
           # resolved, and requires a depth-first traversal to categorize them.
           if target.is_a?(String)
             @name_or_alias << target
+          # Handle plugins at this level so that lookups cannot trigger recursive lookups
+          elsif target.is_a?(Hash)
+            if target.include?('_plugin')
+              lookup_targets(target)
+            else
+              add_target(target)
+            end
           else
-            add_target(target)
+            raise ValidationError.new("Node entry must be a String or Hash, not #{target.class}", @name)
           end
         end
 
@@ -77,12 +88,9 @@ module Bolt
             raise ValidationError.new("Cannot set group #{key.inspect} with plugin", nil)
           end
         end
-        if data.is_a? Hash
-          data.each do |_k, v|
-            validate_config_plugin(v, key, group_name)
-          end
-        elsif data.is_a? Array
-          data.map { |v| validate_config_plugin(v, key, group_name) }
+
+        Bolt::Util.walk_vals(data, true) do |v|
+          validate_config_plugin(v, key, group_name)
         end
       end
       private :validate_config_plugin
@@ -91,11 +99,14 @@ module Bolt
         Bolt::Util.walk_vals(data) do |value|
           if value.is_a?(Hash) && value.include?('_plugin')
             unless (plugin = @plugins.by_name(value['_plugin']))
-              raise ValidationError.new("unkown plugin: #{value['_plugin'].inspect}", nil)
+              raise ValidationError.new("Config lookup specifies an unknown plugin: #{value['_plugin'].inspect}", @name)
             end
-            plugin.validate_inventory_config_lookup(value) if plugin.respond_to?(:validate_inventory_config_lookup)
+            unless plugin.hooks.include?('inventory_config')
+              raise ValidationError.new("#{plugin.name} does not support inventory_config.", @name)
+            end
+            plugin.validate_inventory_config(value) if plugin.respond_to?(:validate_inventory_config)
             Concurrent::Delay.new do
-              plugin.inventory_config_lookup(value)
+              plugin.inventory_config(value)
             end
           else
             value
@@ -119,11 +130,13 @@ module Bolt
       end
 
       def add_target(target)
-        # TODO: Do we want to accept strings from lookup_targets plugins? How should
-        # they be handled?
+        # This check ensures target lookup plugins do not returns bare strings.
+        # Remove it if we decide to allows task plugins to return string node
+        # names.
         unless target.is_a?(Hash)
-          raise ValidationError.new("Node entry must be a String or Hash, not #{target.class}", @name)
+          raise ValidationError.new("Node entry must be a Hash, not #{target.class}", @name)
         end
+        # This check prevents plugins from returning plugins
         raise ValidationError.new("Cannot set target with plugin", @name) if target.key?('_plugin')
         target.each do |k, v|
           next if k == 'config'
@@ -160,6 +173,7 @@ module Bolt
         end
 
         target['config'] = config_only_plugin(target['config'])
+
         unless target.include?('alias')
           return
         end
@@ -181,24 +195,16 @@ module Bolt
         end
       end
 
-      def lookup_targets(plugins)
-        @target_lookups.each do |lookup|
-          unless lookup.is_a?(Hash)
-            raise ValidationError.new("target-lookup is not a hash: #{lookup}", @name)
-          end
-          unless lookup['plugin']
-            raise ValidationError.new("target-lookup does not specify a plugin: #{lookup}", @name)
-          end
-
-          unless (plugin = plugins.by_name(lookup['plugin']))
-            raise ValidationError.new("target-lookup specifies an unkown plugin: '#{lookup['plugin']}'", @name)
-          end
-
-          targets = plugin.lookup_targets(lookup)
-          targets.each { |target| add_target(target) }
+      def lookup_targets(lookup)
+        unless (plugin = @plugins.by_name(lookup['_plugin']))
+          raise ValidationError.new("Target lookup specifies an unknown plugin: '#{lookup['plugin']}'", @name)
+        end
+        unless plugin.hooks.include?('inventory_targets')
+          raise ValidationError.new("#{plugin.name} does not support inventory_targets.", @name)
         end
 
-        @groups.each { |g| g.lookup_targets(plugins) }
+        targets = plugin.inventory_targets(lookup)
+        targets.each { |target| add_target(target) }
       end
 
       def data_merge(data1, data2)

@@ -4,7 +4,7 @@ module Bolt
   class Secret
     class Base
       def hooks
-        %w[inventory_config_lookup encrypt decrypt create_keys]
+        %w[inventory_config secret_encrypt secret_decrypt secret_createkeys]
       end
 
       def encode(raw)
@@ -31,9 +31,9 @@ module Bolt
         raw, _plugin = decode(opts['encrypted-value'])
         decrypt_value(raw)
       end
-      alias inventory_config_lookup secret_decrypt
+      alias inventory_config secret_decrypt
 
-      def validate_inventory_config_lookup(opts)
+      def validate_inventory_config(opts)
         decode(opts['encrypted-value'])
       end
     end

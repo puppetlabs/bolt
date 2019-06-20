@@ -134,8 +134,8 @@ module Bolt
       # Accepts a Data object and returns a copy with all hash and array values
       # Arrays and hashes including the initial object are modified before
       # their descendants are.
-      def walk_vals(data, &block)
-        data = yield(data)
+      def walk_vals(data, skip_top = false, &block)
+        data = yield(data) unless skip_top
         if data.is_a? Hash
           map_vals(data) { |v| walk_vals(v, &block) }
         elsif data.is_a? Array

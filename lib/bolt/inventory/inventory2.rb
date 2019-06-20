@@ -22,7 +22,6 @@ module Bolt
         @target_vars = target_vars
         @target_facts = target_facts
         @target_features = target_features
-        @groups.lookup_targets(plugins)
         @groups.resolve_aliases(@groups.target_aliases, @groups.target_names)
         collect_groups
       end
