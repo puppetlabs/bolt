@@ -33,7 +33,7 @@ module Bolt
   class Config
     attr_accessor :concurrency, :format, :trace, :log, :puppetdb, :color, :save_rerun,
                   :transport, :transports, :inventoryfile, :compile_concurrency, :boltdir,
-                  :puppetfile_config
+                  :puppetfile_config, :plugins
     attr_writer :modulepath
 
     TRANSPORT_OPTIONS = %i[password run-as sudo-password extensions
@@ -70,6 +70,7 @@ module Bolt
       @color = true
       @save_rerun = true
       @puppetfile_config = {}
+      @plugins = {}
 
       # add an entry for the default console logger
       @log = { 'console' => {} }
@@ -157,6 +158,9 @@ module Bolt
       @compile_concurrency = data['compile-concurrency'] if data.key?('compile-concurrency')
 
       @save_rerun = data['save-rerun'] if data.key?('save-rerun')
+
+      # Plugins are only settable from config not inventory so we can overwrite
+      @plugins = data['plugins'] if data.key?('plugins')
 
       %w[concurrency format puppetdb color transport].each do |key|
         send("#{key}=", data[key]) if data.key?(key)

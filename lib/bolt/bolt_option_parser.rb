@@ -58,6 +58,9 @@ module Bolt
       when 'script'
         { flags: ACTION_OPTS + %w[tmpdir],
           banner: SCRIPT_HELP }
+      when 'secret'
+        { flags: OPTIONS[:global] + OPTIONS[:global_config_setters],
+          banner: SECRET_HELP }
       when 'task'
         case action
         when 'show'
@@ -104,6 +107,9 @@ Available subcommands:
   bolt apply <manifest>            Apply Puppet manifest code
   bolt puppetfile install          Install modules from a Puppetfile into a Boltdir
   bolt puppetfile show-modules     List modules available to Bolt
+  bolt secret createkeys           Create new encryption keys
+  bolt secret encrypt <plaintext>  Encrypt a value
+  bolt secret decrypt <encrypted>  Decrypt a value
 
 Run `bolt <subcommand> --help` to view specific examples.
 
@@ -249,6 +255,16 @@ Usage: bolt apply <manifest.pp>
 
 Available options are:
     HELP
+
+    SECRET_HELP = <<~SECRET_HELP
+      Manage secrets for inventory and hiera data.
+
+      Available actions are:
+        createkeys               Create new encryption keys
+        encrypt                  Encrypt a value
+        decrypt                  Decrypt a value
+      Available options are:
+    SECRET_HELP
 
     def initialize(options)
       super()
