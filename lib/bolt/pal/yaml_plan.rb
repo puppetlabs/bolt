@@ -48,19 +48,18 @@ module Bolt
           stringified_step = Bolt::Util.walk_keys(step) { |key| stringify(key) }
           stringified_step['name'] = stringify(stringified_step['name']) if stringified_step.key?('name')
 
-          step = Step.new(stringified_step, index + 1)
-          # Send object instead of just name so that step number is printed
-          duplicate_check(used_names, step)
+          step = Step.create(stringified_step, index + 1)
+          duplicate_check(used_names, stringified_step['name'], index + 1)
           used_names << stringified_step['name'] if stringified_step['name']
           step
         end.freeze
         @return = plan['return']
       end
 
-      def duplicate_check(used_names, step)
-        if used_names.include?(step.name)
-          error_message = "Duplicate step name or parameter detected: #{step.name.inspect}"
-          err = step.step_err_msg(error_message)
+      def duplicate_check(used_names, name, step_number)
+        if used_names.include?(name)
+          error_message = "Duplicate step name or parameter detected: #{name.inspect}"
+          err = Step.step_error(error_message, name, step_number)
           raise Bolt::Error.new(err, "bolt/invalid-plan")
         end
       end
@@ -101,6 +100,10 @@ module Bolt
         attr_reader :value
         def initialize(value)
           @value = value
+        end
+
+        def ==(other)
+          self.class == other.class && @value == other.value
         end
       end
 

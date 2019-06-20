@@ -13,25 +13,13 @@ module Bolt
         end
 
         def dispatch_step(scope, step)
-          step_type = step.type
           step_body = evaluate_code_blocks(scope, step.body)
 
-          case step_type
-          when 'task'
-            task_step(scope, step_body)
-          when 'command'
-            command_step(scope, step_body)
-          when 'plan'
-            plan_step(scope, step_body)
-          when 'script'
-            script_step(scope, step_body)
-          when 'source'
-            upload_file_step(scope, step_body)
-          when 'eval'
-            eval_step(scope, step_body)
-          when 'resources'
-            resources_step(scope, step_body)
-          end
+          # Dispatch based on the step class name
+          step_type = step.class.name.split('::').last.downcase
+          method = "#{step_type}_step"
+
+          send(method, scope, step_body)
         end
 
         def task_step(scope, step)
@@ -84,7 +72,7 @@ module Bolt
           scope.call_function('run_command', args)
         end
 
-        def upload_file_step(scope, step)
+        def upload_step(scope, step)
           source = step['source']
           destination = step['destination']
           target = step['target']
@@ -100,39 +88,7 @@ module Bolt
         end
 
         def resources_step(scope, step)
-          resources = step['resources']
-
-          normalized_resources = resources.map do |resource|
-            if resource['type'] || resource['title']
-              if resource['type'] && !resource['title']
-                err = "Resource declaration must include title key if type key is set"
-                raise Bolt::Error.new(err, 'bolt/invalid-plan')
-              elsif resource['title'] && !resource['type']
-                err = "Resource declaration must include type key if title key is set"
-                raise Bolt::Error.new(err, 'bolt/invalid-plan')
-              else
-                type = resource['type']
-                title = resource['title']
-              end
-            else
-              type_keys = (resource.keys - ['parameters'])
-              case type_keys.length
-              when 0
-                err = "Resource declaration is missing a type"
-                raise Bolt::Error.new(err, 'bolt/invalid-plan')
-              when 1
-                type = type_keys.first
-                title = resource[type_keys.first]
-              else
-                err = "Resource declaration has ambiguous type: could be #{type_keys.join(' or ')}"
-                raise Bolt::Error.new(err, 'bolt/invalid-plan')
-              end
-            end
-
-            { 'type' => type.downcase, 'title' => title, 'parameters' => (resource['parameters'] || {}) }
-          end
-
-          manifest = generate_manifest(normalized_resources)
+          manifest = generate_manifest(step['resources'])
 
           apply_manifest(scope, step['target'], manifest)
         end

@@ -20,6 +20,16 @@ describe "transpiling YAML plans" do
     String $message = 'hello world'
   ) {
     $sample = run_task('sample', $nodes, {'message' => $message})
+    $nodes.apply_prep
+    apply($nodes) {
+      package { 'nginx': }
+      ->
+      file { '/etc/nginx/html/index.html':
+        content => "Hello world!",
+      }
+      ->
+      service { 'nginx': }
+    }
     $eval_output = with() || {
       # TODO: Can blocks handle comments?
       $list = $sample.targets.map |$t| {

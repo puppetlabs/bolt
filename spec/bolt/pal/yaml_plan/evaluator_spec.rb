@@ -307,7 +307,7 @@ describe Bolt::PAL::YamlPlan::Evaluator do
     end
   end
 
-  describe "#upload_file_step" do
+  describe "#upload_step" do
     let(:step) do
       { 'source' => 'mymodule/file.txt',
         'destination' => '/path/to/file.txt',
@@ -318,7 +318,7 @@ describe Bolt::PAL::YamlPlan::Evaluator do
       args = ['mymodule/file.txt', '/path/to/file.txt', 'foo.example.com']
       expect(scope).to receive(:call_function).with('upload_file', args)
 
-      subject.upload_file_step(scope, step)
+      subject.upload_step(scope, step)
     end
 
     it 'supports a description' do
@@ -327,7 +327,7 @@ describe Bolt::PAL::YamlPlan::Evaluator do
       args = ['mymodule/file.txt', '/path/to/file.txt', 'foo.example.com', 'upload the file']
       expect(scope).to receive(:call_function).with('upload_file', args)
 
-      subject.upload_file_step(scope, step)
+      subject.upload_step(scope, step)
     end
   end
 
@@ -367,59 +367,16 @@ describe Bolt::PAL::YamlPlan::Evaluator do
     end
 
     it 'builds and applies a manifest' do
+      # We need to normalize the resources by creating a step instance
+      step_body = Bolt::PAL::YamlPlan::Step::Resources.new(step).body
+
       expected = [{ 'type' => 'package', 'title' => 'nginx', 'parameters' => {} },
                   { 'type' => 'service', 'title' => 'nginx', 'parameters' => {} }]
+
       expect(subject).to receive(:generate_manifest).with(expected).and_return('mymanifest')
       expect(subject).to receive(:apply_manifest).with(scope, target, 'mymanifest')
 
-      subject.resources_step(scope, step)
-    end
-
-    it 'uses the type and title keys if specified' do
-      resources.replace([{ 'type' => 'package', 'title' => 'nginx' },
-                         { 'type' => 'service', 'title' => 'nginx' }])
-
-      expected = [{ 'type' => 'package', 'title' => 'nginx', 'parameters' => {} },
-                  { 'type' => 'service', 'title' => 'nginx', 'parameters' => {} }]
-
-      expect(subject).to receive(:generate_manifest).with(expected)
-
-      subject.resources_step(scope, step)
-    end
-
-    it 'fails if the resource type is ambiguous' do
-      resources.replace([{ 'package' => 'nginx', 'service' => 'nginx' }])
-
-      expect { subject.resources_step(scope, step) }
-        .to raise_error(Bolt::Error, /Resource declaration has ambiguous type.*could be package or service/)
-    end
-
-    it 'fails if only type is set and not title' do
-      resources.replace([{ 'type' => 'package' }])
-
-      expect { subject.resources_step(scope, step) }
-        .to raise_error(Bolt::Error, /Resource declaration must include title key if type key is set/)
-    end
-
-    it 'fails if only title is set and not type' do
-      resources.replace([{ 'title' => 'hello world' }])
-
-      expect { subject.resources_step(scope, step) }
-        .to raise_error(Bolt::Error, /Resource declaration must include type key if title key is set/)
-    end
-
-    it 'fails if the resource has only parameters and no type or title' do
-      resources.replace([{ 'parameters' => { 'ensure' => 'present' } }])
-
-      expect { subject.resources_step(scope, step) }
-        .to raise_error(Bolt::Error, /Resource declaration is missing a type/)
-    end
-
-    it 'fails if the resource is empty' do
-      resources.replace([{}])
-
-      expect { subject.resources_step(scope, step) }
-        .to raise_error(Bolt::Error, /Resource declaration is missing a type/)
+      subject.resources_step(scope, step_body)
     end
 
     it 'succeeds if no resources are specified' do

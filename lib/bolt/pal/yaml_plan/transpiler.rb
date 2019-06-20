@@ -37,8 +37,7 @@ module Bolt
           plan_string << ") {\n"
 
           plan_object.steps&.each do |step|
-            # This only needs the plan path for raising errors
-            plan_string << step.transpile(@plan_path)
+            plan_string << step.transpile
           end
 
           plan_string << "\n  return #{Bolt::Util.to_code(plan_object.return)}\n" if plan_object.return
