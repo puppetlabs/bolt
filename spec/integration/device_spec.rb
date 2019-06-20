@@ -81,7 +81,6 @@ describe "devices" do
       end
 
       it 'runs a plan that applies resources' do
-        pending "puppet-resource_api 1.8.3 has incorrect validation that causes these tests to fail"
         with_tempfile_containing('inventory', YAML.dump(device_inventory), '.yaml') do |inv|
           results = run_cli_json(%W[plan run device_test::set_a_val
                                     --nodes device_targets
@@ -97,11 +96,10 @@ describe "devices" do
           resources = run_cli_json(%W[plan run device_test::resources
                                       --nodes device_targets
                                       --modulepath #{modulepath} --inventoryfile #{inv.path}])
-          # TODO: There is bug in the resource API that prevents resource API
-          # types from working with get_resources. It does not necesarily
-          # prevent transport based device types from working. This test will
-          # break when that bug is fixed and should be updated to check the actual resource
-          expect(resources[0]['result']['resources'][0]).to match(/Puppet::ResourceApi::ResourceShim/)
+          expect(resources[0]['result']['resources'][0]).to eq("key1" =>
+                                                               { "content" => "val1",
+                                                                 "ensure" => "present",
+                                                                 "merge" => false })
         end
       end
     end
