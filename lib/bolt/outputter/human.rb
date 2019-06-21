@@ -37,27 +37,30 @@ module Bolt
       end
 
       def handle_event(event)
-        return unless enabled? || event[:type] == :enable_default_output
-
         case event[:type]
-        when :node_start
-          print_start(event[:target]) if @verbose
-        when :node_result
-          print_result(event[:result]) if @verbose
-        when :step_start
-          print_step_start(event) if plan_logging?
-        when :step_finish
-          print_step_finish(event) if plan_logging?
-        when :plan_start
-          print_plan_start(event)
-        when :plan_finish
-          print_plan_finish(event)
         when :enable_default_output
           @disable_depth -= 1
         when :disable_default_output
           @disable_depth += 1
         when :message
           print_message_event(event)
+        end
+
+        if enabled?
+          case event[:type]
+          when :node_start
+            print_start(event[:target]) if @verbose
+          when :node_result
+            print_result(event[:result]) if @verbose
+          when :step_start
+            print_step_start(event) if plan_logging?
+          when :step_finish
+            print_step_finish(event) if plan_logging?
+          when :plan_start
+            print_plan_start(event)
+          when :plan_finish
+            print_plan_finish(event)
+          end
         end
       end
 

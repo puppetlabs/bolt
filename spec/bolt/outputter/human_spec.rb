@@ -290,4 +290,20 @@ plans/plans/plans/plans
     outputter.print_message_event(message: "hello world")
     expect(output.string).to eq("hello world\n")
   end
+
+  it "handles nested default_output commands" do
+    outputter.instance_variable_set(:@plan_depth, 1)
+    outputter.handle_event(type: :disable_default_output)
+    outputter.handle_event(type: :disable_default_output)
+    outputter.handle_event(type: :enable_default_output)
+    outputter.handle_event(type: :step_start, description: "step", targets: [target])
+    expect(output.string).to eq("")
+  end
+
+  it "prints messages when default_output is disabled" do
+    outputter.instance_variable_set(:@plan_depth, 1)
+    outputter.handle_event(type: :disable_default_output)
+    outputter.handle_event(type: :message, message: "hello!")
+    expect(output.string).to eq("hello!\n")
+  end
 end
