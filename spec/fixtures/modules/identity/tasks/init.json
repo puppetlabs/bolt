@@ -1,0 +1,7 @@
+{
+  "input_method": "stdin",
+  "implementations": [
+    {"name": "win.ps1", "requirements": ["powershell"]},
+    {"name": "linux.sh", "requirements": ["shell"]}
+  ]
+}

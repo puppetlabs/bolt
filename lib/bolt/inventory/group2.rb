@@ -106,7 +106,11 @@ module Bolt
             end
             plugin.validate_inventory_config(value) if plugin.respond_to?(:validate_inventory_config)
             Concurrent::Delay.new do
-              plugin.inventory_config(value)
+              begin
+                plugin.inventory_config(value)
+              rescue StandardError => e
+                raise Bolt::Plugin::PluginError.new(e.message, plugin, "inventory_targets in #{@name}")
+              end
             end
           else
             value
@@ -203,7 +207,12 @@ module Bolt
           raise ValidationError.new("#{plugin.name} does not support inventory_targets.", @name)
         end
 
-        targets = plugin.inventory_targets(lookup)
+        begin
+          targets = plugin.inventory_targets(lookup)
+        rescue StandardError => e
+          raise Bolt::Plugin::PluginError.new(e.message, plugin, "inventory_targets in #{@name}")
+        end
+
         targets.each { |target| add_target(target) }
       end
 

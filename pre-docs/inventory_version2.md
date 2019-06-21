@@ -103,6 +103,93 @@ The Following plugins an be used for config:
 * `prompt`: Prompt a user for a configuration value
 * `pkcs7`: decrypt a pkcs7 encrypted value from the inventory file.
 
+#### Task
+
+The Task plugin will run a task on `localhost` to lookup configuration
+information or target lists for the inventory.
+
+For both use cases the plugin accepts two keys:
+* `task`: The task to run.
+* `parameters`: The parameters to pass to the task.
+
+For example this will run the `my_json_file::targets` task to look up targets
+and the `my_db::secret_lookup` task to look up the ssh password.
+
+```
+---
+version: 2
+targets:
+  - _plugin: task
+    task: my_json_file::targets
+    parameters:
+      # These parameters are specific to the task
+      file: /etc/targets/data.json
+      environment: production
+      app: my_app
+config:
+  ssh:
+    password:
+      _plugin: task
+      task: my_db::secret_lookup
+      parameters:
+        # These parameters are task specific
+        key: ssh_password
+```
+
+##### Inventory Config Tasks
+
+To look up configuration information for the inventory return a `config` key in
+the task result containing the data that will be used in place where the plugin entry is.
+The value of config can be any type of data that is appropriate for the
+specific location in config. For example `host-key-check` for ssh must be a
+boolean, `password` must be a string and `run-as-command` must be an array of
+strings. This result would be appropriate for an entire `ssh` section of config.
+
+```
+{
+  "config": {
+    "host-key-check": true,
+    "password": "hunter2",
+    "run-as-command": [ "sudo", "-k", "-S", "-E", "-u", "user", "-p", "password"]
+  }
+}
+```
+
+This task looks up a password value from a secret database and returns it.
+
+```python
+#!/usr/bin/env python
+import json, sys
+from my_secret import Client
+
+params = json.load(sys.stdin)
+
+client = Client
+secret = client.get_secret(data['key'])
+# secret can be any value that can be dumped to json.
+json.dump({'config': secret}, sys.stdout)
+```
+
+##### Inventory Target Tasks
+
+To look up a list of targets for inventory return a hash or JSON object that
+includes a targets key with an array value from task. Each item in this list
+should be a Target JSON object matching the Object format you would use in a targets
+section of the inventory file. Bare string targets are not valid.
+
+This task reads in a JSON file and looks up a value.
+
+```python
+#!/usr/bin/env python
+import json, sys
+
+params = json.load(sys.stdin)
+with open(params['file']) as fh:
+  data = json.load(fh)
+targets = data[params['environment']][params['app']]
+json.dump({'targets': targets}, sys.stdout)
+```
+
 #### PuppetDB
 
 The PuppetDB plugin supports looking up target object from PuppetDB. It takes a
