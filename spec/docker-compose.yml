@@ -20,7 +20,7 @@ services:
       - "20024:22"
 
   postgres:
-    image: postgres:9.6
+    image: postgres:9.6.13
     environment:
       - POSTGRES_PASSWORD=puppetdb
       - POSTGRES_USER=puppetdb
