@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "run_task request",
+  "description": "POST <transport>/run_task request schema",
+  "type": "object",
+  "properties": {
+    "task": { "$ref": "partial:task" },
+    "parameters": {
+      "type": "object",
+      "description": "JSON formatted parameters to be provided to task"
+    },
+    "target": { "$ref": "partial:target-any" }
+  },
+  "required": ["target", "task"],
+  "additionalProperties": false
+}

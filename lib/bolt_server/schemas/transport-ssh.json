@@ -1,0 +1,10 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "title": "Action request with SSH transport",
+  "description": "POST /ssh/<action> request schema",
+  "type": "object",
+  "properties": {
+    "target": { "$ref": "partial:target-ssh" }
+  },
+  "required": ["target"]
+}

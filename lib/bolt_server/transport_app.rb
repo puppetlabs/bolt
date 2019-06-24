@@ -15,15 +15,23 @@ module BoltServer
     # This disables Sinatra's error page generation
     set :show_exceptions, false
 
+    # These partial schemas are reused to build multiple request schemas
+    PARTIAL_SCHEMAS = %w[target-any target-ssh target-winrm task].freeze
+
+    # These schemas combine shared schemas to describe client requests
+    REQUEST_SCHEMAS = %w[action-run_task transport-ssh transport-winrm].freeze
+
     def initialize(config)
       @config = config
-      @schemas = {
-        "ssh-run_task" => JSON.parse(File.read(File.join(__dir__, 'schemas', 'ssh-run_task.json'))),
-        "winrm-run_task" => JSON.parse(File.read(File.join(__dir__, 'schemas', 'winrm-run_task.json')))
-      }
-      shared_schema = JSON::Schema.new(JSON.parse(File.read(File.join(__dir__, 'schemas', 'task.json'))),
-                                       Addressable::URI.parse("file:task"))
-      JSON::Validator.add_schema(shared_schema)
+      @schemas = Hash[REQUEST_SCHEMAS.map do |basename|
+        [basename, JSON.parse(File.read(File.join(__dir__, ['schemas', "#{basename}.json"])))]
+      end]
+
+      PARTIAL_SCHEMAS.each do |basename|
+        schema_content = JSON.parse(File.read(File.join(__dir__, ['schemas', 'partials', "#{basename}.json"])))
+        shared_schema = JSON::Schema.new(schema_content, Addressable::URI.parse("partial:#{basename}"))
+        JSON::Validator.add_schema(shared_schema)
+      end
 
       @executor = Bolt::Executor.new(0)
 
@@ -48,6 +56,19 @@ module BoltServer
       end
     end
 
+    def run_task(target, body)
+      error = validate_schema(@schemas["action-run_task"], body)
+      return [400, error.to_json] unless error.nil?
+
+      task = Bolt::Task::PuppetServer.new(body['task'], @file_cache)
+      parameters = body['parameters'] || {}
+      results = @executor.run_task(target, task, parameters)
+
+      # Since this will only be on one node we can just return the first result
+      result = scrub_stack_trace(results.first.status_hash)
+      [200, result.to_json]
+    end
+
     get '/' do
       200
     end
@@ -67,14 +88,18 @@ module BoltServer
       raise 'Unexpected error'
     end
 
-    post '/ssh/run_task' do
-      content_type :json
+    ACTIONS = %w[run_task].freeze
 
+    post '/ssh/:action' do
+      not_found unless ACTIONS.include?(params[:action])
+
+      content_type :json
       body = JSON.parse(request.body.read)
-      error = validate_schema(@schemas["ssh-run_task"], body)
+
+      error = validate_schema(@schemas["transport-ssh"], body)
       return [400, error.to_json] unless error.nil?
 
-      opts = body['target']
+      opts = body['target'].clone
       if opts['private-key-content']
         opts['private-key'] = { 'key-data' => opts['private-key-content'] }
         opts.delete('private-key-content')
@@ -83,35 +108,23 @@ module BoltServer
 
       target = [Bolt::Target.new(body['target']['hostname'], opts)]
 
-      task = Bolt::Task::PuppetServer.new(body['task'], @file_cache)
-
-      parameters = body['parameters'] || {}
-
-      # Since this will only be on one node we can just return the first result
-      results = @executor.run_task(target, task, parameters)
-      result = scrub_stack_trace(results.first.status_hash)
-      [200, result.to_json]
+      method(params[:action]).call(target, body)
     end
 
-    post '/winrm/run_task' do
-      content_type :json
+    post '/winrm/:action' do
+      not_found unless ACTIONS.include?(params[:action])
 
+      content_type :json
       body = JSON.parse(request.body.read)
-      error = validate_schema(@schemas["winrm-run_task"], body)
+
+      error = validate_schema(@schemas["transport-winrm"], body)
       return [400, error.to_json] unless error.nil?
 
-      opts = body['target'].merge('protocol' => 'winrm')
+      opts = body['target'].clone.merge('protocol' => 'winrm')
 
       target = [Bolt::Target.new(body['target']['hostname'], opts)]
 
-      task = Bolt::Task::PuppetServer.new(body['task'], @file_cache)
-
-      parameters = body['parameters'] || {}
-
-      # Since this will only be on one node we can just return the first result
-      results = @executor.run_task(target, task, parameters)
-      result = scrub_stack_trace(results.first.status_hash)
-      [200, result.to_json]
+      method(params[:action]).call(target, body)
     end
 
     error 404 do
