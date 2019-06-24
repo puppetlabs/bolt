@@ -14,8 +14,8 @@ describe Bolt::Plugin::Puppetdb do
   let(:opts) do
   end
 
-  it 'has a hook for lookup_targets' do
-    expect(plugin.hooks).to eq(['lookup_targets'])
+  it 'has a hook for inventory_targets' do
+    expect(plugin.hooks).to eq(['inventory_targets'])
   end
 
   context "#fact_path" do
@@ -34,7 +34,7 @@ describe Bolt::Plugin::Puppetdb do
     end
   end
 
-  context "#lookup_targets" do
+  context "#inventory_targets" do
     let(:certname) { 'therealslimcertname' }
     let(:name_fact) { 'thefakeslimcertname' }
     let(:values_hash) do
@@ -49,7 +49,7 @@ describe Bolt::Plugin::Puppetdb do
     end
 
     it "sets uri to certname if uri and name are not configured" do
-      expect(plugin.lookup_targets('query' => ""))
+      expect(plugin.inventory_targets('query' => ""))
         .to eq([{ "uri" => certname }])
     end
 
@@ -60,7 +60,7 @@ describe Bolt::Plugin::Puppetdb do
       end
 
       it "sets the uri to the specified name" do
-        expect(plugin.lookup_targets(opts))
+        expect(plugin.inventory_targets(opts))
           .to eq([{ "name" => "thefakeslimcertname" }])
       end
     end

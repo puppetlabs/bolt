@@ -9,8 +9,8 @@ describe Bolt::Plugin::Terraform do
   let(:resource_type) { 'google_compute_instance.*' }
   let(:uri) { 'network_interface.0.access_config.0.nat_ip' }
 
-  it 'has a hook for lookup_targets' do
-    expect(subject.hooks).to eq(['lookup_targets'])
+  it 'has a hook for inventory_targets' do
+    expect(subject.hooks).to eq(['inventory_targets'])
   end
 
   it 'reads the terraform state file from the given directory' do
@@ -36,19 +36,19 @@ describe Bolt::Plugin::Terraform do
     end
 
     it 'matches resources that start with the given type' do
-      targets = subject.lookup_targets(opts)
+      targets = subject.inventory_targets(opts)
 
       expect(targets).to contain_exactly({ 'uri' => ip0 }, { 'uri' => ip1 })
     end
 
     it 'can filter resources by regex' do
-      targets = subject.lookup_targets(opts.merge('resource_type' => 'google_compute_instance.example.\d+'))
+      targets = subject.inventory_targets(opts.merge('resource_type' => 'google_compute_instance.example.\d+'))
 
       expect(targets).to contain_exactly({ 'uri' => ip0 }, { 'uri' => ip1 })
     end
 
     it 'maps inventory to name' do
-      targets = subject.lookup_targets(opts.merge('name' => 'id'))
+      targets = subject.inventory_targets(opts.merge('name' => 'id'))
 
       expect(targets).to contain_exactly({ 'uri' => ip0, 'name' => 'test-instance-0' },
                                          { 'uri' => ip1, 'name' => 'test-instance-1' })
@@ -56,7 +56,7 @@ describe Bolt::Plugin::Terraform do
 
     it 'sets only name if uri is not specified' do
       opts.delete('uri')
-      targets = subject.lookup_targets(opts.merge('name' => 'id'))
+      targets = subject.inventory_targets(opts.merge('name' => 'id'))
 
       expect(targets).to contain_exactly({ 'name' => 'test-instance-0' },
                                          { 'name' => 'test-instance-1' })
@@ -64,7 +64,7 @@ describe Bolt::Plugin::Terraform do
 
     it 'builds a config map from the inventory' do
       config_template = { 'ssh' => { 'user' => 'metadata.sshUser' } }
-      targets = subject.lookup_targets(opts.merge('config' => config_template))
+      targets = subject.inventory_targets(opts.merge('config' => config_template))
 
       config = { 'ssh' => { 'user' => 'someone' } }
       expect(targets).to contain_exactly({ 'uri' => ip0, 'config' => config },
@@ -72,13 +72,13 @@ describe Bolt::Plugin::Terraform do
     end
 
     it 'returns nothing if there are no matching resources' do
-      targets = subject.lookup_targets(opts.merge('resource_type' => 'aws_instance'))
+      targets = subject.inventory_targets(opts.merge('resource_type' => 'aws_instance'))
 
       expect(targets).to be_empty
     end
 
     it 'fails if the state file does not exist' do
-      expect { subject.lookup_targets(opts.merge('statefile' => 'nonexistent.tfstate')) }
+      expect { subject.inventory_targets(opts.merge('statefile' => 'nonexistent.tfstate')) }
         .to raise_error(Bolt::Error, /Could not load Terraform state file nonexistent.tfstate/)
     end
   end

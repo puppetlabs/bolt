@@ -14,14 +14,14 @@ module Bolt
       end
 
       def hooks
-        ['lookup_targets']
+        ['inventory_targets']
       end
 
       def warn_missing_property(name, property)
         @logger.warn("Could not find property #{property} of terraform resource #{name}")
       end
 
-      def lookup_targets(opts)
+      def inventory_targets(opts)
         state = load_statefile(opts)
 
         resources = extract_resources(state)

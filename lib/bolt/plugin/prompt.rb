@@ -14,14 +14,14 @@ module Bolt
       end
 
       def hooks
-        ['inventory_config_lookup']
+        ['inventory_config']
       end
 
-      def validate_inventory_config_lookup(opts)
+      def validate_inventory_config(opts)
         raise Bolt::ValidationError, "Prompt requires a 'message'" unless opts['message']
       end
 
-      def inventory_config_lookup(opts)
+      def inventory_config(opts)
         STDOUT.print "#{opts['message']}:"
         value = STDIN.noecho(&:gets).chomp
         STDOUT.puts

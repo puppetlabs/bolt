@@ -23,7 +23,7 @@ module Bolt
       end
 
       def hooks
-        ['lookup_targets']
+        ['inventory_targets']
       end
 
       def warn_missing_fact(certname, fact)
@@ -41,7 +41,7 @@ module Bolt
         end
       end
 
-      def lookup_targets(opts)
+      def inventory_targets(opts)
         targets = @puppetdb_client.query_certnames(opts['query'])
         facts = []
 

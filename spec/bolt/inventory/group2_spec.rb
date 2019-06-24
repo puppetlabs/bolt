@@ -958,16 +958,27 @@ describe Bolt::Inventory::Group2 do
         }
       end
 
+      let(:hooks) { [] }
+
+      let(:plugins) do
+        plugins = Bolt::Plugin.new(nil)
+        plugin = double('plugin')
+        allow(plugin).to receive(:name).and_return('fake')
+        allow(plugin).to receive(:hooks).and_return(hooks)
+        plugins.add_plugin(plugin)
+        plugins
+      end
+
       it 'fails if group name is a config plugin' do
         data['name'] = fake_plugin
         expect { Bolt::Inventory::Group2.new(data, plugins) }
           .to raise_error(/Cannot set group "name" with plugin/)
       end
 
-      it 'fails if group targets is a config plugin' do
-        data['targets'] = [fake_plugin]
+      it 'fails if target-lookups is present' do
+        data['target-lookups'] = [fake_plugin]
         expect { Bolt::Inventory::Group2.new(data, plugins) }
-          .to raise_error(/Cannot set target with plugin/)
+          .to raise_error(/'target-lookups' are no longer/)
       end
 
       it 'fails if group groups is a config plugin' do
@@ -1016,9 +1027,21 @@ describe Bolt::Inventory::Group2 do
       end
 
       it 'fails if an unknown plugin is requested' do
-        data['config'] = { 'ssh' => { 'password' => { '_plugin' => 'fake' } } }
+        data['config'] = { 'ssh' => { 'password' => { '_plugin' => 'unknown' } } }
         expect { Bolt::Inventory::Group2.new(data, plugins) }
-          .to raise_error(/unkown plugin: "fake"/)
+          .to raise_error(/unknown plugin: "unknown"/)
+      end
+
+      it 'fails with an unsupported targets plugin' do
+        data['targets'] = [fake_plugin]
+        expect { Bolt::Inventory::Group2.new(data, plugins) }
+          .to raise_error(/fake does not support inventory_targets/)
+      end
+
+      it 'fails with an unsupported config plugin' do
+        data['config'] = fake_plugin
+        expect { Bolt::Inventory::Group2.new(data, plugins) }
+          .to raise_error(/fake does not support inventory_config/)
       end
     end
   end

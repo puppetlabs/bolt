@@ -740,8 +740,8 @@ describe Bolt::Inventory::Inventory2 do
                 'config' => { 'transport' => 'winrm' } }
             ] },
           { 'name' => 'group2',
-            'target-lookups' => [
-              { 'plugin' => 'test_plugin' }
+            'targets' => [
+              { '_plugin' => 'test_plugin' }
             ] },
           { 'name' => 'group3',
             'targets' => [
@@ -761,11 +761,14 @@ describe Bolt::Inventory::Inventory2 do
       ]
     }
 
+    let(:hooks) { ['inventory_targets'] }
+
     let(:plugins) do
       plugins = Bolt::Plugin.new(nil)
       plugin = double('plugin')
       allow(plugin).to receive(:name).and_return('test_plugin')
-      allow(plugin).to receive(:lookup_targets).and_return(lookup)
+      allow(plugin).to receive(:inventory_targets).and_return(lookup)
+      expect(plugin).to receive(:hooks).and_return(hooks)
       plugins.add_plugin(plugin)
       plugins
     end
