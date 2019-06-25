@@ -98,7 +98,8 @@ error kinds to catch.
 catch_errors(Optional[Array[String[1]]] $error_types, Callable[0, 0] &$block)
 ```
 
-*Returns:* `Any` Undef If an error is raised in the block then the error will be
+*Returns:* `Any` If an error is raised in the block then the error will be returned,
+otherwise the result will be returned
 
 * **error_types** `Optional[Array[String[1]]]` An array of error types to catch
 * **&block** `Callable[0, 0]` The block of steps to catch errors on
