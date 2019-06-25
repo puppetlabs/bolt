@@ -1,5 +1,5 @@
 ---
-title: Deploying an application with a plan
+title: Deploying an Application With a Plan
 difficulty: Advanced
 time: Approximately 20 minutes
 ---
@@ -22,39 +22,46 @@ them. When a new version of the application is released the following steps must
 1. Clean up the old version of the application.
 
 
-# Prerequisites
+## Prerequisites
 
-For the following exercises you should have `bolt` installed and have four
+For the following exercises you should have Bolt installed and have four
 Linux nodes available. The following guides will help:
 
-1. [Acquiring Nodes](../02-acquiring-nodes)
-1. [Writing tasks](../05-writing-tasks)
-1. [Writing Advanced Plans](../09-writing-advanced-plans)
+- [Acquiring Nodes](../02-acquiring-nodes)
+- [Writing Tasks](../05-writing-tasks)
+- [Writing Advanced Plans](../09-writing-advanced-plans)
 
 ## Acquire nodes 
 
-This lesson requires four nodes. If you set up nodes in [lesson 2](../02-acquiring-nodes), you need to provision an extra node.
+This lesson requires four nodes. If you set up nodes in [Lesson 2](../02-acquiring-nodes), you need to provision an extra node.
 
-### Provision extra nodes on Vagrant
-If you set up nodes in Vagrant in lesson `02-acquiring-nodes/`, run:
+### Provision Extra Nodes on Vagrant
+If you set up nodes in Vagrant in Lesson 2, run:
 
-```
+```bash
 NODES=4 vagrant up
 ```
 > Note: Vagrantfile looks for environment variable `NODES` for number of centos nodes to provision.
-> Set environmnet variable based on your shell, for example bash shell: `export NODES=4`. 
+> Set environment variable based on your shell, for example in bash: `export NODES=4`. 
 
-### Provision extra nodes on Docker
-If you set up nodes in Docker in lesson `02-acquiring-nodes`, run:
+Update your SSH config to include the new node.
 
+```bash
+vagrant ssh-config --host node4 | sed /StrictHostKeyChecking/d | sed /UserKnownHostsFile/d >> ~/.ssh/config
 ```
+
+### Provision Extra Nodes on Docker
+If you set up nodes in Docker in Lesson 2, run:
+
+```bash
 docker-compose up --scale ssh=4 -d
 ```
 
-When you have four nodes, update your SSH config to include them all.
+Update your SSH config to include the new node.
+
 
 ## Set up inventory file
-Set up an inventory file to more easily map the nodes to their role in the application. 
+Set up an inventory file to more easily map the nodes to their role in the application. Save this file in `Boltdir`'s *parent directory*.
 
 Assign one node to the load balancer (lb) group, one to the database (db) group and the other two to the application (app) group.
 
@@ -79,24 +86,10 @@ config:
     user: root
 ```
 
-**Note**: inventory.yaml for nodes provisioned with vagrant
+If you configured your nodes using Vagrant, your inventory file may look like this:
 
 ```yaml
----
-groups:
-  - name: lb
-    nodes:
-      - node1
-  - name: db
-    nodes:
-      - node2
-  - name: app
-    nodes:
-      - node3
-      - node4
-config:
-  ssh:
-    host-key-check: false
+{% include lesson1-10/inventory.yaml -%}
 ```
 
 Make sure your inventory is configured correctly and you can connect to all nodes. Run:
@@ -105,32 +98,34 @@ Make sure your inventory is configured correctly and you can connect to all node
 bolt command run 'echo hi' -n db,app,lb --inventoryfile ./inventory.yaml
 ```
 
+Using the `--inventoryfile` flag, you can specify the source for your inventory file other than the default location `Boltdir/inventory.yaml`.
+
 ## Write tasks for each stage of the application deployment
 
-The tasks for this plan are code samples to enable us to focus on the plan itself.
+The tasks for this plan are code samples to enable us to focus on the plan itself. Save each of the following files to `Boltdir/site-modules/my_app/tasks/`.
 
 ```python
-{% include_relative modules/my_app/tasks/install.py -%}
+{% include lesson1-10/Boltdir/site-modules/my_app/tasks/install.py -%}
 ```
 
 ```python
-{% include_relative modules/my_app/tasks/migrate.py -%}
+{% include lesson1-10/Boltdir/site-modules/my_app/tasks/migrate.py -%}
 ```
 
 ```python
-{% include_relative modules/my_app/tasks/lb.py -%}
+{% include lesson1-10/Boltdir/site-modules/my_app/tasks/lb.py -%}
 ```
 
 ```python
-{% include_relative modules/my_app/tasks/deploy.py -%}
+{% include lesson1-10/Boltdir/site-modules/my_app/tasks/deploy.py -%}
 ```
 
 ```python
-{% include_relative modules/my_app/tasks/health_check.py -%}
+{% include lesson1-10/Boltdir/site-modules/my_app/tasks/health_check.py -%}
 ```
 
 ```python
-{% include_relative modules/my_app/tasks/uninstall.py -%}
+{% include lesson1-10/Boltdir/site-modules/my_app/tasks/uninstall.py -%}
 ```
 ## Write a plan that uses the tasks
 
@@ -139,15 +134,17 @@ plan performs some validation, installs the application, migrates the
 database, makes the new code available on each application server and, finally, cleans up old
 versions of the application.
 
+Save this file to `Boltdir/site-modules/my_app/plans/deploy.pp`.
+
 ```puppet
-{% include_relative modules/my_app/plans/deploy.pp -%}
+{% include lesson1-10/Boltdir/site-modules/my_app/plans/deploy.pp -%}
 ```
 
 Run this plan with the following command. It will randomly fail 10% of the
 time when the simulated load is high.
 
 ```bash
-bolt plan run my_app::deploy version=1.0.2 app_servers=app db_server=db lb_server=lb --inventoryfile ./inventory.yaml --modulepath=./modules
+bolt plan run my_app::deploy version=1.0.2 app_servers=app db_server=db lb_server=lb --inventoryfile ./inventory.yaml
 ```
 
 The result (when simulated load is below threshold)
@@ -249,7 +246,7 @@ the new code.
       backend => $instance,
       server => $server.name,
     )
-    notice("Deploy complete on ${server}.")
+    out::message("Deploy complete on ${server}.")
   }
 ```
 
@@ -257,7 +254,7 @@ To loop over targets call `get_targets` to expand any groups or globs referenced
 in the `$app_servers` parameter then loop over each server with `each`. For
 each server drain connections from the load balancer, deploy the new version of
 application and then add the server back to the load balancer.  Afterwards log
-a notice message to inform the user that the deploy is complete on that server.
+an out::message to inform the user that the deploy is complete on that server.
 
 ### Perform checks before the deploy
 
@@ -301,7 +298,7 @@ $stats = run_task('my_app::lb', $lb_server,
   server => $server.name,
   _catch_errors => $force
 ).first
-notice("Deploying to ${server.name}, currently ${stats["status"]} with ${stats["connections"]} open connections.")
+out::message("Deploying to ${server.name}, currently ${stats["status"]} with ${stats["connections"]} open connections.")
 ```
 
 Before starting to deploy to a server call the `my_app::lb` task with the stats
@@ -325,7 +322,7 @@ without_default_logging() || {
   # Expand group references or globs before iterating
   get_targets($app_servers).each |$server| {
     # Call deploy actions here
-    notice("Deploy complete on ${server}.")
+    out::message("Deploy complete on ${server}.")
   }
 }
 ```
@@ -353,13 +350,13 @@ true` to the parameters.
 
 # Next steps
 
-Congratulations! You should now have a basic understanding of `bolt` and Bolt Tasks. Here are a few ideas for what to do next:
+Congratulations! You should now have a basic understanding of Bolt and Bolt Tasks. Here are a few ideas for what to do next:
 
 * Explore content on the [Bolt Tasks Playground](https://github.com/puppetlabs/tasks-playground)
 * Get reusable tasks and plans from the [Task Modules Repo](https://github.com/puppetlabs/task-modules)
 * Search Puppet Forge for [Tasks](https://forge.puppet.com/modules?with_tasks=yes)
 * Start writing Tasks for one of your existing Puppet modules
-* Head over to the [Puppet Slack](https://slack.puppet.com/) and talk to the `bolt` developers and other users
+* Head over to the [Puppet Slack](https://slack.puppet.com/) and talk to the Bolt developers and other users
 * Try out the [Puppet Development Kit](https://puppet.com/download-puppet-development-kit) [(docs)](https://docs.puppet.com/pdk/latest/index.html) which has a few features to make authoring tasks even easier
 
 You can also move on to:

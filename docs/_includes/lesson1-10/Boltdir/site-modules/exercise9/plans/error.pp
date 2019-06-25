@@ -1,8 +1,8 @@
 plan exercise9::error (TargetSpec $nodes) {
   $results = run_command('false', $nodes)
   if $results.ok {
-    notice("The command succeeded")
+    out::message("The command succeeded")
   } else {
-    notice("The command failed")
+    out::message("The command failed")
   }
 }

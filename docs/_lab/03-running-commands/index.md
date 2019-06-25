@@ -6,16 +6,16 @@ time: Approximately 5 minutes
 
 You can use Bolt to run arbitrary commands on a set of remote hosts. Let's see that in practice before we move on to more advanced features. Choose the exercise based on the operating system of your test nodes.
 
-- [Running shell commands on Linux nodes](#running-shell-commands-on-linux-nodes)
-- [Running PowerShell commands on Windows nodes](#running-powershell-commands-on-windows-nodes)
+- [Running Shell Commands on Linux Nodes](#running-shell-commands-on-linux-nodes)
+- [Running PowerShell Commands on Windows Nodes](#running-powershell-commands-on-windows-nodes)
 
-# Prerequisites
+## Prerequisites
 Complete the following before you start this lesson:
 
-1. [Installing Bolt](../01-installing-bolt)
-1. [Setting up test nodes](../02-acquiring-nodes)
+- [Installing Bolt](../01-installing-bolt)
+- [Setting Up Test Nodes](../02-acquiring-nodes)
 
-# Running shell commands on Linux nodes
+## Running Shell Commands on Linux Nodes
 
 Bolt by default uses SSH for transport. If you can connect to systems remotely, you can use Bolt to run shell commands. It reuses your existing SSH configuration for authentication, which is typically provided in `~/.ssh/config`.
 
@@ -46,7 +46,7 @@ Ran on 1 node in 0.42 seconds
 
 ```
 
-**Tip:** If you receive the error `Host key verification failed` make sure the correct host keys are in your `known_hosts` file or pass `--no-host-key-check` to future Bolt commands. Bolt will not honor `StrictHostKeyChecking` in your SSH configuration.
+> **Tip:** If you receive the error `Host key verification failed` make sure the correct host keys are in your `known_hosts` file or pass `--no-host-key-check` to future Bolt commands. Bolt will not honor `StrictHostKeyChecking` in your SSH configuration.
 
 Run the 'uptime' command on multiple nodes by passing a comma-separated list. If you are using existing nodes on your system, replace `node1,node2,node3` with addresses for your nodes. If you get an error about `Host key verification` run the rest of the examples with the `--no-host-key-check` flag to disable host key verification.
 
@@ -72,19 +72,7 @@ Successful on 3 nodes: node1,node2,node3
 Ran on 3 nodes in 0.52 seconds
 ```
 
-Create an inventory file to store information about your nodes and refer to them as a group.  Later exercises will refer to the default group `all`. For more information on how to set up other named groups, see the [Inventory File docs](https://puppet.com/docs/bolt/latest/inventory_file.html).
-
-For example, if you are using the provided Vagrant configuration file, save the following to `~/.puppetlabs/bolt/inventory.yaml`:
-
-```yaml
----
-nodes: [node1, node2, node3]
-config:
-  ssh:
-    host-key-check: false
-```
-
-# Running PowerShell commands on Windows nodes
+## Running PowerShell Commands on Windows Nodes
 
 Bolt can communicate over WinRM and execute PowerShell commands when running Windows nodes. To run a command against a remote Windows node, use the following command syntax:
 
@@ -98,31 +86,19 @@ Note the `winrm://` prefix for the node address. Also note the `--username` and 
 bolt command run <command> --no-ssl --nodes winrm://<node>,winrm://<node> --user <user> --password <password>
 ```
 
-Set a variable with the list of nodes.  Later exercises will refer to this variable. You can incorporate the username and password into the node address. For example, if you are using the provided Vagrant configuration file, set the following:
+Run the following command to list all of the processes running on a remote machine. Note that this command uses the `windows` group defined in the `inventory.yaml` file. Since the inventory file is configured to not use SSL, the `--no-ssl` flag is not needed.
 
 ```shell
-WINNODE=winrm://vagrant:vagrant@localhost:55985
+bolt command run "gps | select ProcessName" --nodes windows
 ```
 
-On Windows, you can do the same thing with Powershell:
-
-```powershell
-$WINNODE="winrm://vagrant:vagrant@localhost:55985"
-```
-
-Run the following command to list all of the processes running on a remote machine.
-
-```shell
-bolt command run "gps | select ProcessName" --nodes $WINNODE --no-ssl
-```
-
-Use following syntax to list all of the processes running on multiple remote machines.
+Use the following syntax to list all of the processes running on multiple remote machines.
 
 ```shell
 bolt command run <command> --nodes winrm://<node>,winrm://<node> --user <user> --password <password>
 ```
 
-# Next steps
+## Next Steps
 
 Now that you know how to use Bolt to run adhoc commands you can move on to:
 

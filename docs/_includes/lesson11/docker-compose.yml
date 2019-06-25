@@ -13,4 +13,3 @@ services:
     image: rastasheep/ubuntu-sshd:16.04
     ports:
       - "20024:22"
-    

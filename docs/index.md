@@ -4,14 +4,16 @@ title: Bolt Hands-on Lab
 
 ## Introduction
 
-This repository contains a step-by-step introduction to [Bolt](https://github.com/puppetlabs/bolt) and to the Bolt Tasks ecosystem. It's designed to be followed in order, with each exercise introducing the basic concepts. If you complete all of the exercises you should be well on your way to understanding how you can use Bolt and Bolt Tasks to help manage your infrastructure.  
+This repository contains a step-by-step introduction to [Bolt](https://github.com/puppetlabs/bolt) and to the Bolt Tasks ecosystem. It's designed to be followed in order, with each exercise introducing the basic concepts. If you complete all of the exercises you should be well on your way to understanding how you can use Bolt and Bolt Tasks to help manage your infrastructure.
+
+[Watch Intro Video](https://www.youtube.com/watch?v=9Z7nYlspUJw){: .btn}
 
 ## Prerequisites
 
 These exercises will help you get Bolt installed and make sure you have a few nodes to target with tasks and commands. 
 
-1. [Installing Bolt](lab/01-installing-bolt)
-1. [Acquiring nodes](lab/02-acquiring-nodes)
+- [Installing Bolt](lab/01-installing-bolt)
+- [Acquiring Nodes](lab/02-acquiring-nodes)
 
 ## Exercises
 
