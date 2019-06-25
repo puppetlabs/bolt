@@ -185,21 +185,21 @@ The Puppet repository for the YUM package management system is [http://yum.puppe
     -   Enterprise Linux 6
 
         ```
-        sudo rpm -Uvh https://yum.puppet.com/puppet6/puppet6-release-el-6.noarch.rpm
+        sudo rpm -Uvh https://yum.puppet.com/puppet6-release-el-6.noarch.rpm
         sudo yum install puppet-bolt				
         ```
 
     -   Enterprise Linux 7
 
         ```
-        sudo rpm -Uvh https://yum.puppet.com/puppet6/puppet6-release-el-7.noarch.rpm
+        sudo rpm -Uvh https://yum.puppet.com/puppet6-release-el-7.noarch.rpm
         sudo yum install puppet-bolt
         ```
 
     -   Enterprise Linux 8
 
         ```
-        sudo rpm -Uvh https://yum.puppet.com/puppet6/puppet6-release-el-8.noarch.rpm
+        sudo rpm -Uvh https://yum.puppet.com/puppet6-release-el-8.noarch.rpm
         sudo yum install puppet-bolt
         ```
 
@@ -207,21 +207,28 @@ The Puppet repository for the YUM package management system is [http://yum.puppe
     -   SUSE Linux Enterprise Server 12
 
         ```
-        sudo rpm -Uvh https://yum.puppet.com/puppet6/puppet6-release-sles-12.noarch.rpm
+        sudo rpm -Uvh https://yum.puppet.com/puppet6-release-sles-12.noarch.rpm
         sudo zypper install puppet-bolt
         ```
 
     -   Fedora 28
 
         ```
-        sudo rpm -Uvh https://yum.puppet.com/puppet6/puppet6-release-fedora-28.noarch.rpm
+        sudo rpm -Uvh https://yum.puppet.com/puppet6-release-fedora-28.noarch.rpm
         sudo dnf install puppet-bolt
         ```
 
     -   Fedora 29
 
         ```
-        sudo rpm -Uvh https://yum.puppet.com/puppet6/puppet6-release-fedora-29.noarch.rpm
+        sudo rpm -Uvh https://yum.puppet.com/puppet6-release-fedora-29.noarch.rpm
+        sudo dnf install puppet-bolt
+        ```
+
+    -   Fedora 30
+
+        ```
+        sudo rpm -Uvh https://yum.puppet.com/puppet6-release-fedora-30.noarch.rpm
         sudo dnf install puppet-bolt
         ```
 
