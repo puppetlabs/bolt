@@ -1,5 +1,5 @@
 {
-  "id": "file:task",
+  "id": "partial:task",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Task",
   "description": "Task schema for bolt-server",

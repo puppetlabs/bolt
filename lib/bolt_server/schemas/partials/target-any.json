@@ -1,0 +1,10 @@
+{
+  "id": "partial:target-any",
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "title": "Target information about where to run a bolt action, either over SSH or WinRM",
+  "type": "object",
+  "anyOf": [
+    { "$ref": "partial:target-ssh" },
+    { "$ref": "partial:target-winrm" }
+  ]
+}
