@@ -39,7 +39,7 @@ module BoltSpec
         elsif target.options['private-key']
           req['private-key-content'] = File.read(target.options['private-key'])
         end
-        req['port'] ||= '22'
+        req['port'] ||= 22
         req['user'] ||= 'root'
       when 'winrm'
         req['ssl'] = false
