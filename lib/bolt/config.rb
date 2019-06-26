@@ -286,5 +286,27 @@ module Bolt
         impl.validate(@transports[transport])
       end
     end
+
+    # Check if there is a case-insensitive match to the path
+    def check_path_case(type, paths)
+      return if paths.nil?
+      matches = matching_paths(paths)
+
+      if matches.any?
+        msg = "WARNING: Bolt is case sensitive when specifying a #{type}. Did you mean:\n"
+        matches.each { |path| msg += "         #{path}\n" }
+        @logger.warn msg
+      end
+    end
+
+    def matching_paths(paths)
+      [*paths].map { |p| Dir.glob([p, casefold(p)]) }.flatten.uniq.reject { |p| [*paths].include?(p) }
+    end
+
+    def casefold(path)
+      path.chars.map do |l|
+        l =~ /[A-Za-z]/ ? "[#{l.upcase}#{l.downcase}]" : l
+      end.join
+    end
   end
 end
