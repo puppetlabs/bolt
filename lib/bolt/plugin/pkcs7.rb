@@ -7,7 +7,7 @@ module Bolt
   class Plugin
     class Pkcs7 < Bolt::Secret::Base
       def self.validate_config(config)
-        known_keys = ['private-key', 'public-key', 'keysize']
+        known_keys = %w[private-key public-key keysize]
         known_keys.each do |key|
           unless key.is_a? String
             raise Bolt::ValidationError, "Invalid config for pkcs7 plugin: '#{key}' is not a String"

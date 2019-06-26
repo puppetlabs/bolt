@@ -6,31 +6,31 @@ require 'bolt/error'
 module BoltServer
   class BaseConfig
     def config_keys
-      ['host', 'port', 'ssl-cert', 'ssl-key', 'ssl-ca-cert',
-       'ssl-cipher-suites', 'loglevel', 'logfile', 'whitelist']
+      %w[host port ssl-cert ssl-key ssl-ca-cert
+         ssl-cipher-suites loglevel logfile whitelist]
     end
 
     def env_keys
-      ['ssl-cert', 'ssl-key', 'ssl-ca-cert', 'loglevel']
+      %w[ssl-cert ssl-key ssl-ca-cert loglevel]
     end
 
     def defaults
       { 'host' => '127.0.0.1',
         'loglevel' => 'notice',
-        'ssl-cipher-suites' => ['ECDHE-ECDSA-AES256-GCM-SHA384',
-                                'ECDHE-RSA-AES256-GCM-SHA384',
-                                'ECDHE-ECDSA-CHACHA20-POLY1305',
-                                'ECDHE-RSA-CHACHA20-POLY1305',
-                                'ECDHE-ECDSA-AES128-GCM-SHA256',
-                                'ECDHE-RSA-AES128-GCM-SHA256',
-                                'ECDHE-ECDSA-AES256-SHA384',
-                                'ECDHE-RSA-AES256-SHA384',
-                                'ECDHE-ECDSA-AES128-SHA256',
-                                'ECDHE-RSA-AES128-SHA256'] }
+        'ssl-cipher-suites' => %w[ECDHE-ECDSA-AES256-GCM-SHA384
+                                  ECDHE-RSA-AES256-GCM-SHA384
+                                  ECDHE-ECDSA-CHACHA20-POLY1305
+                                  ECDHE-RSA-CHACHA20-POLY1305
+                                  ECDHE-ECDSA-AES128-GCM-SHA256
+                                  ECDHE-RSA-AES128-GCM-SHA256
+                                  ECDHE-ECDSA-AES256-SHA384
+                                  ECDHE-RSA-AES256-SHA384
+                                  ECDHE-ECDSA-AES128-SHA256
+                                  ECDHE-RSA-AES128-SHA256] }
     end
 
     def ssl_keys
-      ['ssl-cert', 'ssl-key', 'ssl-ca-cert']
+      %w[ssl-cert ssl-key ssl-ca-cert]
     end
 
     def required_keys
