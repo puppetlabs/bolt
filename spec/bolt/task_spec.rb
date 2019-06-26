@@ -63,7 +63,7 @@ describe Bolt::Task do
 
     context 'first implementation requires extra features' do
       let(:implementations) {
-        [{ 'name' => 'foo.rb', 'requirements' => ['powershell', 'puppet-agent'] },
+        [{ 'name' => 'foo.rb', 'requirements' => %w[powershell puppet-agent] },
          { 'name' => 'foo.ps1', 'requirements' => ['powershell'] }]
       }
 
@@ -76,7 +76,7 @@ describe Bolt::Task do
 
     context 'no suitable implementation' do
       let(:implementations) {
-        [{ 'name' => 'foo.rb', 'requirements' => ['powershell', 'puppet-agent'] },
+        [{ 'name' => 'foo.rb', 'requirements' => %w[powershell puppet-agent] },
          { 'name' => 'foo.ps1', 'requirements' => %w[powershell foobar] }]
       }
 
