@@ -80,7 +80,7 @@ module BoltSpec
       JSON.parse(resp.body)
     end
 
-    def build_request(task_name, target, params = {})
+    def build_task_request(task_name, target, params = {})
       {
         'task' => get_task_data(task_name),
         'target' => target2request(target),

@@ -62,11 +62,7 @@ module BoltServer
 
       task = Bolt::Task::PuppetServer.new(body['task'], @file_cache)
       parameters = body['parameters'] || {}
-      results = @executor.run_task(target, task, parameters)
-
-      # Since this will only be on one node we can just return the first result
-      result = scrub_stack_trace(results.first.status_hash)
-      [200, result.to_json]
+      @executor.run_task(target, task, parameters)
     end
 
     get '/' do
@@ -105,10 +101,13 @@ module BoltServer
         opts.delete('private-key-content')
       end
       opts['load-config'] = false
-
       target = [Bolt::Target.new(body['target']['hostname'], opts)]
 
-      method(params[:action]).call(target, body)
+      results = method(params[:action]).call(target, body)
+
+      # Since this will only be on one node we can just return the first result
+      result = scrub_stack_trace(results.first.status_hash)
+      [200, result.to_json]
     end
 
     post '/winrm/:action' do
@@ -121,10 +120,13 @@ module BoltServer
       return [400, error.to_json] unless error.nil?
 
       opts = body['target'].clone.merge('protocol' => 'winrm')
-
       target = [Bolt::Target.new(body['target']['hostname'], opts)]
 
-      method(params[:action]).call(target, body)
+      results = method(params[:action]).call(target, body)
+
+      # Since this will only be on one node we can just return the first result
+      result = scrub_stack_trace(results.first.status_hash)
+      [200, result.to_json]
     end
 
     error 404 do

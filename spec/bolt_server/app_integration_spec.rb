@@ -22,9 +22,9 @@ describe "BoltServer::TransportApp", puppetserver: true do
     let(:path) { '/ssh/run_task' }
 
     it 'runs an echo task with a password' do
-      body = build_request('sample::echo',
-                           conn_target('ssh', include_password: true),
-                           "message": "Hello!")
+      body = build_task_request('sample::echo',
+                                conn_target('ssh', include_password: true),
+                                "message": "Hello!")
 
       post(path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
       expect(last_response).to be_ok
@@ -38,9 +38,9 @@ describe "BoltServer::TransportApp", puppetserver: true do
       private_key = ENV['BOLT_SSH_KEY'] || Dir["spec/fixtures/keys/id_rsa"][0]
       private_key_content = File.read(private_key)
       target = conn_target('ssh', options: { 'private-key-content' => private_key_content })
-      body = build_request('sample::echo',
-                           target,
-                           "message": "Hello!")
+      body = build_task_request('sample::echo',
+                                target,
+                                "message": "Hello!")
 
       post path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json'
       expect(last_response).to be_ok
@@ -51,8 +51,8 @@ describe "BoltServer::TransportApp", puppetserver: true do
     end
 
     it 'runs a shareable task' do
-      body = build_request('shareable',
-                           conn_target('ssh', include_password: true))
+      body = build_task_request('shareable',
+                                conn_target('ssh', include_password: true))
 
       post(path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
       expect(last_response).to be_ok
