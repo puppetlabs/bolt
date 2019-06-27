@@ -30,7 +30,7 @@ module BoltSpec
       end
 
       def parameters
-        @invocation[:arguments] + @invocation[:options] if @invocation.include?(:arguments)
+        @invocation[:params]
       end
 
       # Allow any data.
@@ -43,6 +43,7 @@ module BoltSpec
       # Restricts the stub to only match invocations with certain parameters.
       # All parameters must match exactly.
       def with_params(params)
+        @invocation[:params] = params
         @invocation[:arguments] = params.reject { |k, _v| k.start_with?('_') }
         @invocation[:options] = params.select { |k, _v| k.start_with?('_') }
         self
