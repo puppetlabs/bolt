@@ -1,6 +1,177 @@
 # Bolt Functions
 
 
+## :'ctrl::do_until'
+
+Repeat the block until it returns a truthy value. Returns the value.
+
+
+```
+:'ctrl::do_until'(Callable &$block)
+```
+
+*Returns:* `Any` 
+
+* **&block** `Callable` 
+
+**Example:** Run a task until it succeeds
+```
+ctrl::do_until() || {
+  run_task('test', $target, _catch_errors => true).ok?
+}
+```
+
+
+## :'ctrl::sleep'
+
+Sleeps for specified number of seconds.
+
+
+```
+:'ctrl::sleep'(Numeric $period)
+```
+
+*Returns:* `Undef` 
+
+* **period** `Numeric` Time to sleep (in seconds)
+
+**Example:** Sleep for 5 seconds
+```
+ctrl::sleep(5)
+```
+
+
+## :'file::exists'
+
+check if a file exists
+
+
+```
+:'file::exists'(String $filename)
+```
+
+*Returns:* `Boolean` 
+
+* **filename** `String` Absolute path or Puppet file path.
+
+**Example:** Check a file on disk
+```
+file::exists('/tmp/i_dumped_this_here')
+```
+**Example:** check a file from the modulepath
+```
+file::exists('example/files/VERSION')
+```
+
+
+## :'file::read'
+
+Read a file and return its contents.
+
+
+```
+:'file::read'(String $filename)
+```
+
+*Returns:* `String` 
+
+* **filename** `String` Absolute path or Puppet file path.
+
+**Example:** Read a file from disk
+```
+file::read('/tmp/i_dumped_this_here')
+```
+**Example:** Read a file from the modulepath
+```
+file::read('example/files/VERSION')
+```
+
+
+## :'file::readable'
+
+check if a file is readable
+
+
+```
+:'file::readable'(String $filename)
+```
+
+*Returns:* `Boolean` 
+
+* **filename** `String` Absolute path or Puppet file path.
+
+**Example:** Check a file on disk
+```
+file::readable('/tmp/i_dumped_this_here')
+```
+**Example:** check a file from the modulepath
+```
+file::readable('example/files/VERSION')
+```
+
+
+## :'file::write'
+
+Write a string to a file.
+
+
+```
+:'file::write'(String $filename, String $content)
+```
+
+*Returns:* `Undef` 
+
+* **filename** `String` Absolute path.
+* **content** `String` File content to write.
+
+**Example:** Write a file to disk
+```
+file::write('C:/Users/me/report', $apply_result.first.report)
+```
+
+
+## :'out::message'
+
+Output a message for the user.
+
+This will print a message to stdout when using the human output format.
+
+**NOTE:** Not available in apply block
+
+
+```
+:'out::message'(String $message)
+```
+
+*Returns:* `Undef` 
+
+* **message** `String` The message to output.
+
+**Example:** Print a message
+```
+out::message('Something went wrong')
+```
+
+
+## :'system::env'
+
+Get an environment variable.
+
+
+```
+:'system::env'(String $name)
+```
+
+*Returns:* `String` 
+
+* **name** `String` Environment variable name.
+
+**Example:** Get the USER environment variable
+```
+system::env('USER')
+```
+
+
 ## add_facts
 
 Deep merges a hash of facts with the existing facts on a target.
@@ -123,46 +294,6 @@ catch_errors(['bolt/parse-error']) || {
 ```
 
 
-## ctrl::do_until
-
-Repeat the block until it returns a truthy value. Returns the value.
-
-
-```
-ctrl::do_until(Callable &$block)
-```
-
-*Returns:* `Any` 
-
-* **&block** `Callable` 
-
-**Example:** Run a task until it succeeds
-```
-ctrl::do_until() || {
-  run_task('test', $target, _catch_errors => true).ok?
-}
-```
-
-
-## ctrl::sleep
-
-Sleeps for specified number of seconds.
-
-
-```
-ctrl::sleep(Numeric $period)
-```
-
-*Returns:* `Undef` 
-
-* **period** `Numeric` Time to sleep (in seconds)
-
-**Example:** Sleep for 5 seconds
-```
-ctrl::sleep(5)
-```
-
-
 ## facts
 
 Returns the facts hash for a target.
@@ -226,95 +357,6 @@ fail_plan(Error('We goofed up', 'task-unexpected-result', { 'result' => 'null' }
 ```
 
 
-## file::exists
-
-check if a file exists
-
-
-```
-file::exists(String $filename)
-```
-
-*Returns:* `Boolean` 
-
-* **filename** `String` Absolute path or Puppet file path.
-
-**Example:** Check a file on disk
-```
-file::exists('/tmp/i_dumped_this_here')
-```
-**Example:** check a file from the modulepath
-```
-file::exists('example/files/VERSION')
-```
-
-
-## file::read
-
-Read a file and return its contents.
-
-
-```
-file::read(String $filename)
-```
-
-*Returns:* `String` 
-
-* **filename** `String` Absolute path or Puppet file path.
-
-**Example:** Read a file from disk
-```
-file::read('/tmp/i_dumped_this_here')
-```
-**Example:** Read a file from the modulepath
-```
-file::read('example/files/VERSION')
-```
-
-
-## file::readable
-
-check if a file is readable
-
-
-```
-file::readable(String $filename)
-```
-
-*Returns:* `Boolean` 
-
-* **filename** `String` Absolute path or Puppet file path.
-
-**Example:** Check a file on disk
-```
-file::readable('/tmp/i_dumped_this_here')
-```
-**Example:** check a file from the modulepath
-```
-file::readable('example/files/VERSION')
-```
-
-
-## file::write
-
-Write a string to a file.
-
-
-```
-file::write(String $filename, String $content)
-```
-
-*Returns:* `Undef` 
-
-* **filename** `String` Absolute path.
-* **content** `String` File content to write.
-
-**Example:** Write a file to disk
-```
-file::write('C:/Users/me/report', $apply_result.first.report)
-```
-
-
 ## get_resources
 
 Query the state of resources on a list of targets using resource definitions in Bolt's modulepath.
@@ -373,29 +415,6 @@ get_targets('host1,group1,winrm://host2:54321')
 **Example:** Run on localhost
 ```
 get_targets('localhost')
-```
-
-
-## out::message
-
-Output a message for the user.
-
-This will print a message to stdout when using the human output format.
-
-**NOTE:** Not available in apply block
-
-
-```
-out::message(String $message)
-```
-
-*Returns:* `Undef` 
-
-* **message** `String` The message to output.
-
-**Example:** Print a message
-```
-out::message('Something went wrong')
 ```
 
 
@@ -672,25 +691,6 @@ set_var(Target $target, String $key, Data $value)
 **Example:** Set a variable on a target
 ```
 $target.set_var('ephemeral', true)
-```
-
-
-## system::env
-
-Get an environment variable.
-
-
-```
-system::env(String $name)
-```
-
-*Returns:* `String` 
-
-* **name** `String` Environment variable name.
-
-**Example:** Get the USER environment variable
-```
-system::env('USER')
 ```
 
 
