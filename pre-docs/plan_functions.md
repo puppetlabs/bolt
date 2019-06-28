@@ -1,7 +1,7 @@
 # Bolt Functions
 
 
-## :'ctrl::do_until'
+## ctrl::do_until
 
 Repeat the block until it returns a truthy value. Returns the value.
 
@@ -22,7 +22,7 @@ ctrl::do_until() || {
 ```
 
 
-## :'ctrl::sleep'
+## ctrl::sleep
 
 Sleeps for specified number of seconds.
 
@@ -41,7 +41,7 @@ ctrl::sleep(5)
 ```
 
 
-## :'file::exists'
+## file::exists
 
 check if a file exists
 
@@ -64,7 +64,7 @@ file::exists('example/files/VERSION')
 ```
 
 
-## :'file::read'
+## file::read
 
 Read a file and return its contents.
 
@@ -87,7 +87,7 @@ file::read('example/files/VERSION')
 ```
 
 
-## :'file::readable'
+## file::readable
 
 check if a file is readable
 
@@ -110,7 +110,7 @@ file::readable('example/files/VERSION')
 ```
 
 
-## :'file::write'
+## file::write
 
 Write a string to a file.
 
@@ -130,7 +130,7 @@ file::write('C:/Users/me/report', $apply_result.first.report)
 ```
 
 
-## :'out::message'
+## out::message
 
 Output a message for the user.
 
@@ -153,7 +153,7 @@ out::message('Something went wrong')
 ```
 
 
-## :'system::env'
+## system::env
 
 Get an environment variable.
 

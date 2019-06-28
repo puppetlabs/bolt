@@ -88,7 +88,8 @@ task :docs do
   #       text: example body
   @functions = funcs.map do |func|
     func['text'] = func['docstring']['text']
-
+    # TODO: remove once puppet-strings releases fix for :'file::read'
+    func['name'] = func['name'][1..-1].gsub("'", '') if func['name'].start_with?(':')
     overloads = func['docstring']['tags'].select { |tag| tag['tag_name'] == 'overload' }
     sig_tags = overloads.map { |overload| overload['docstring']['tags'] }
     sig_tags = [func['docstring']['tags']] if sig_tags.empty?
