@@ -136,7 +136,7 @@ module Bolt
 
       options
     rescue Bolt::Error => e
-      warn e.message
+      outputter.fatal_error(e)
       raise e
     end
 

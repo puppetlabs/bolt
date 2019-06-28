@@ -20,16 +20,16 @@ module BoltSpec
       allow(cli).to receive(:outputter).and_return(outputter)
       allow(Bolt::Logger).to receive(:configure)
 
-      opts = cli.parse
-
       if rescue_exec
         begin
+          opts = cli.parse
           cli.execute(opts)
         # rubocop:disable HandleExceptions
         rescue Bolt::Error
         end
         # rubocop:enable HandleExceptions
       else
+        opts = cli.parse
         cli.execute(opts)
       end
       output.string
@@ -41,7 +41,8 @@ module BoltSpec
       begin
         result = JSON.parse(output, quirks_mode: true)
       rescue JSON::ParserError
-        expect(output.string).to eq("Output should be JSON")
+        output = output.string unless output.is_a?(String)
+        expect(output).to eq("Output should be JSON")
       end
       result
     end

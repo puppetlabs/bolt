@@ -240,10 +240,14 @@ module Bolt
       end
     end
 
-    def get_task_info(task_name)
-      task = in_bolt_compiler do |compiler|
+    def task_signature(task_name)
+      in_bolt_compiler do |compiler|
         compiler.task_signature(task_name)
       end
+    end
+
+    def get_task_info(task_name)
+      task = task_signature(task_name)
 
       if task.nil?
         raise Bolt::Error.new(Bolt::Error.unknown_task(task_name), 'bolt/unknown-task')
