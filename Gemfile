@@ -14,6 +14,7 @@ gem "puma", '>= 3.12.0'
 gem "rack", '>= 2.0.5'
 gem "rails-auth", '>= 2.1.4'
 gem "sinatra", '>= 2.0.4'
+gem "yard", "0.9.19"
 
 group(:test) do
   gem "beaker-hostgenerator"
