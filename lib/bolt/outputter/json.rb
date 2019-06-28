@@ -87,6 +87,13 @@ module Bolt
                        "moduledir": moduledir }.to_json)
       end
 
+      def print_targets(options)
+        targets = options[:targets].map(&:name)
+        count = targets.count
+        @stream.puts({ "targets": targets,
+                       "count": count }.to_json)
+      end
+
       def fatal_error(err)
         @stream.puts "],\n" if @items_open
         @stream.puts '"_error": ' if @object_open

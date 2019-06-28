@@ -171,6 +171,15 @@ describe "Bolt::CLI" do
           }.to output(/Available actions are:.*install.*show-modules/m).to_stdout
         end
 
+        it 'accepts inventory' do
+          cli = Bolt::CLI.new(%w[help inventory])
+          expect {
+            expect {
+              cli.parse
+            }.to raise_error(Bolt::CLIExit)
+          }.to output(/Available actions are:.*show/m).to_stdout
+        end
+
         it 'excludes invalid subcommand flags' do
           cli = Bolt::CLI.new(%w[help puppetfile])
           expect {
@@ -2168,11 +2177,17 @@ describe "Bolt::CLI" do
   describe 'inventoryfile' do
     let(:inventorydir) { File.join(__dir__, '..', 'fixtures', 'configs') }
 
-    it 'raises an error if a inventory file is specified and invalid' do
+    it 'raises an error if an inventory file is specified and invalid' do
       cli = Bolt::CLI.new(%W[command run uptime --inventoryfile #{File.join(inventorydir, 'invalid.yml')} --nodes foo])
       expect {
         cli.parse
       }.to raise_error(Bolt::Error, /Could not parse/)
+    end
+
+    it 'lists targets the action would run on' do
+      cli = Bolt::CLI.new(%w[inventory show -t localhost])
+      expect_any_instance_of(Bolt::Outputter::Human).to receive(:print_targets)
+      cli.execute(cli.parse)
     end
 
     context 'with BOLT_INVENTORY set' do

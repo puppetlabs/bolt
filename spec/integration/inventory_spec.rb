@@ -54,6 +54,8 @@ describe 'running with an inventory file', reset_puppet_settings: true do
 
   let(:run_plan) { ['plan', 'run', 'inventory', "command=#{shell_cmd}", "host=#{target}"] + config_flags }
 
+  let(:show_inventory) { ['inventory', 'show', '--nodes', target] + config_flags }
+
   around(:each) do |example|
     with_tempfile_containing('inventory', inventory.to_json, '.yml') do |f|
       @inventoryfile = f.path
@@ -382,6 +384,12 @@ describe 'running with an inventory file', reset_puppet_settings: true do
           end
         end
       end
+    end
+  end
+
+  context 'when showing inventory' do
+    it 'lists targets an action would run on' do
+      expect(run_cli_json(show_inventory)['targets'][0]).to include(target)
     end
   end
 end

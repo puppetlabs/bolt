@@ -35,6 +35,7 @@ module Bolt
                  'file' => %w[upload],
                  'puppetfile' => %w[install show-modules],
                  'secret' => %w[encrypt decrypt createkeys],
+                 'inventory' => %w[show],
                  'apply' => %w[] }.freeze
 
     attr_reader :config, :options
@@ -296,6 +297,8 @@ module Bolt
           else
             list_plans
           end
+        elsif options[:subcommand] == 'inventory'
+          list_targets
         end
         return 0
       elsif options[:action] == 'show-modules'
@@ -391,6 +394,11 @@ module Bolt
 
     def list_plans
       outputter.print_plans(pal.list_plans, pal.list_modulepath)
+    end
+
+    def list_targets
+      update_targets(options)
+      outputter.print_targets(options)
     end
 
     def run_plan(plan_name, plan_arguments, nodes, options)
