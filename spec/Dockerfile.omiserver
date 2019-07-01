@@ -3,6 +3,8 @@
 FROM ubuntu:18.04
 
 ARG BOLT_PASSWORD=bolt
+# NOTE: Only designed to be set at build time, not at run time!
+ENV BOLT_PASSWORD=${BOLT_PASSWORD}
 
 RUN useradd bolt \
  && echo "bolt:${BOLT_PASSWORD}" | chpasswd
@@ -58,4 +60,6 @@ RUN touch /etc/opt/omi/creds/ntlm \
 EXPOSE 5985 5986
 
 ADD fixtures/omiserver/docker-entrypoint.sh /
+ADD fixtures/omiserver/verify-omi-authentication.sh /
+ADD fixtures/omiserver/verify-pwsh-authentication.sh /
 ENTRYPOINT ["/docker-entrypoint.sh"]

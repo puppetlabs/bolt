@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 /opt/omi/bin/omiserver --version
 pwsh --version
@@ -14,6 +15,9 @@ EOF
 /opt/omi/bin/omiserver -d
 # there is a race here which may cause the log to not be created yet
 sync
+
+./verify-omi-authentication.sh
+./verify-pwsh-authentication.sh
 
 cat << EOF
 
