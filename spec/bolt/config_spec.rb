@@ -96,6 +96,12 @@ describe Bolt::Config do
   end
 
   describe "validate" do
+    it "returns suggested paths when path case is incorrect" do
+      modules = File.expand_path('modules')
+      config = Bolt::Config.new(boltdir, 'modulepath' => modules.upcase)
+      expect(config.matching_paths(config.modulepath)).to include(modules)
+    end
+
     it "does not accept invalid log levels" do
       config = {
         'log' => {

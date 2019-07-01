@@ -366,7 +366,8 @@ Available options are:
         @options[:'compile-concurrency'] = concurrency
       end
       define('-m', '--modulepath MODULES',
-             "List of directories containing modules, separated by '#{File::PATH_SEPARATOR}'") do |modulepath|
+             "List of directories containing modules, separated by '#{File::PATH_SEPARATOR}'",
+             'Directories are case-sensitive') do |modulepath|
         # When specified from the CLI, modulepath entries are relative to pwd
         @options[:modulepath] = modulepath.split(File::PATH_SEPARATOR).map do |moduledir|
           File.expand_path(moduledir)
