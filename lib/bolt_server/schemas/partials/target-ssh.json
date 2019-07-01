@@ -28,6 +28,10 @@
       "type": "integer",
       "description": "How long Bolt should wait when establishing connections"
     },
+    "disconnect-timeout": {
+      "type": "integer",
+      "description": "How long Bolt should wait before forcing a disconnect"
+    },
     "run-as-command": {
       "type": "array",
       "description": "Command elevate permissions",

@@ -86,6 +86,7 @@ describe Bolt::Inventory do
   let(:ssh_target_option_defaults) {
     {
       'connect-timeout' => 10,
+      'disconnect-timeout' => 5,
       'tty' => false,
       'host-key-check' => true,
       'load-config' => true
@@ -401,6 +402,19 @@ describe Bolt::Inventory do
         end
       end
 
+      context 'disconnect-timeout' do
+        let(:data) {
+          {
+            'nodes' => ['node'],
+            'config' => { 'ssh' => { 'disconnect-timeout' => '10' } }
+          }
+        }
+
+        it 'fails validation' do
+          expect { inventory.get_targets('node') }.to raise_error(Bolt::ValidationError)
+        end
+      end
+
       context 'ssl' do
         let(:data) {
           {
@@ -552,6 +566,7 @@ describe Bolt::Inventory do
         expect(target.port).to eq('12345ssh')
         expect(target.options).to eq(
           'connect-timeout' => 3,
+          'disconnect-timeout' => 5,
           'tty' => true,
           'load-config' => true,
           'host-key-check' => false,
