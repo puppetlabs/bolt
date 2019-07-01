@@ -3,6 +3,22 @@
 /opt/omi/bin/omiserver --version
 pwsh --version
 
+cat << EOF
+
+************************************************************
+Daemonizing OMI server
+************************************************************
+
+EOF
+
 /opt/omi/bin/omiserver -d
-echo 'Daemonized OMI server'
+
+cat << EOF
+
+************************************************************
+Tailing OMI Server Logs
+************************************************************
+
+EOF
+
 tail -f /var/opt/omi/log/omiserver.log
