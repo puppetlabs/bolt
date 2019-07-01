@@ -69,7 +69,7 @@ module Bolt
     def self.console_layout(color)
       color_scheme = :bolt if color
       Logging.layouts.pattern(
-        pattern: '%m\n',
+        pattern: '%m\e[0m\n',
         color_scheme: color_scheme
       )
     end
