@@ -494,18 +494,36 @@ plan run_with_facts(TargetSpec $nodes) {
 }
 ```
 
-**Related information**  
+### Collect general data from PuppetDB
 
+You can use the `puppetdb_query` function in plans to make direct queries to PuppetDB. For example you can discover nodes from PuppetDB and then run tasks on them. You'll have to configure the [puppetdb client](bolt_connect_puppetdb.md)before running it. You can learn how to [structure pql queries here](https://puppet.com/docs/puppetdb/latest/api/query/tutorial-pql.html), and find [pql reference and examples here](https://puppet.com/docs/puppetdb/latest/api/query/v4/pql.html)
+
+```
+plan pdb_discover {
+  $result = puppetdb_query("inventory[certname] { app_role == 'web_server' }")
+  # extract the certnames into an array
+  $names = $result.map |$r| { $r["certname"] }
+  # wrap in url. You can skip this if the default transport is pcp
+  $nodes = $names.map |$n| { "pcp://${n}" }
+  run_task('my_task', $nodes)
+}
+```
+
+**Related information**  
 
 [Connecting Bolt to PuppetDB](bolt_connect_puppetdb.md)
 
 ## Plan logging
 
-Set up log files to record certain events that occur when you run plans.
+Plan information can be captured in log files or printed to a terminal session. This section details the methods for collecting information about plan runs.
+
+### Outputting message to the terminal
+
+The plan function [`out::message`](plan_functions.md#outmessage) can be used to print message strings to `STDOUT`. These message will always be printed regardless of the log level and will not be logged to the log file.
 
 ### Puppet log functions
 
-To generate log messages from a plan, use the Puppet log function that corresponds to the level you want to track: `error`, `warn`, `notice`, `info`, or `debug`. The default log level for Bolt is `notice` but you can set it to `info` with the `--verbose `flag or `debug` with the `--debug` flag.
+To generate log messages from a plan, use the Puppet log function that corresponds to the level you want to track: `error`, `warn`, `notice`, `info`, or `debug`. You can configure the log level for both log files and console logging in [bolt.yaml](bolt_configuration_options#log-file-configuration-options). The default log level for console is `warn` and for log files `notice`. You can use the `--debug` flag to set the console log level to `debug` for a single run. 
 
 ### Default action logging
 
@@ -540,22 +558,6 @@ not
 without_default_logging { run_command('echo hi', $nodes) }
 ```
 
-### puppetdb\_query
-
-
-
-You can use the `puppetdb_query` function in plans to make direct queries to PuppetDB. For example you can discover nodes from PuppetDB and then run tasks on them. You'll have to configure the [puppetdb client](bolt_connect_puppetdb.md)before running it. You can learn how to [structure pql queries here](https://puppet.com/docs/puppetdb/latest/api/query/tutorial-pql.html), and find [pql reference and examples here](https://puppet.com/docs/puppetdb/latest/api/query/v4/pql.html)
-
-```
-plan pdb_discover {
-  $result = puppetdb_query("inventory[certname] { app_role == 'web_server' }")
-  # extract the certnames into an array
-  $names = $result.map |$r| { $r["certname"] }
-  # wrap in url. You can skip this if the default transport is pcp
-  $nodes = $names.map |$n| { "pcp://${n}" }
-  run_task('my_task', $nodes)
-}
-```
 ### Example plans
 
 Check out some example plans for inspiration writing your own.
