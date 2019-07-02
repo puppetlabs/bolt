@@ -93,7 +93,7 @@ describe "when running over the docker transport", docker: true do
       with_tempfile_containing('conf', YAML.dump(config)) do |conf|
         result = run_failed_node(%W[task run #{interpreter_task} message=somemessage
                                     --configfile #{conf.path}] + single_target_conf)
-        expect(result['_error']['msg']).to match(/interpreter.py’: No such file/)
+        expect(result['_error']['msg']).to be
       end
     end
   end
