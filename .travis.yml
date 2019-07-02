@@ -67,10 +67,3 @@ deploy:
   script: bash scripts/deploy.sh
 notifications:
   email: false
-  hipchat:
-    rooms:
-      secure: j1c64TomsD45XGBnv+0AaLPBFacg3hWAs7p2Qo+AYRrXXT2lLyqYlOCUo4oek9r7+SQ4nHbGjxC59o6g3YTF5obsQosLpb9EdgmVaS14khnBlb2Mvo2fKoRZ3YiKQQ6L+TFE9NiQ3XC4ccvfXrwSjXZsByVJiPaDieXQr83qE6xdsNGN9jSW2fJ+Qt90TXd3TBabu2pTxiAZVVmZYa409jmTsDRpeZXic7Om4jj4MYaFkHWl1sakktIijgN5vvscqxe9cn0JgtcX5ZQo7UoZ1tH+8dko5IB1s04CF1K2AJytb8Jt/tIx1z8khwaGiPNGHJby9lndKGrU1lm1jA9IkqaY8L2iHNN4mivpf5PpvV82QfJcc+JQgVA6xCMYOO/RimeyNGeHcMzd7dQuOneSzMkeLarLZ1k6ayYDxuDwzgjl4P/sM7V0rCsyDfNL/fTNdt9Ix7GBWHyL7aQLeSxksD7RA3et6q8OcwklMVVVt4+xyYR2Ui8hyRc7KTHEH5Ff/NpgpAQmwl47BKMz9nwf6wey8HqWXuoyA+xkwq3fXM6Ifh+RFw12MwoylcKo3TB8hH66hpn19XltHkvfvDNxo+Xc4aScZqZhPPN0dJ6h6P65jUbPM+PdfrZ3V/Nuz59LQ93CmlcQOwcP0a7KUGRq38iqWHDgoauQvp44iGwAHOc=
-    template:
-    - '<a href="https://github.com/%{repository_slug}">%{repository_name}</a>#<a href="%{build_url}">%{build_number}</a>
-      (<a href="%{compare_url}">%{branch} - %{commit} : %{author}</a>): %{message}'
-    format: html
