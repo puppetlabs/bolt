@@ -22,7 +22,7 @@ module Bolt
       attr_writer :plan_context
 
       def self.options
-        %w[host service-url cacert token-file task-environment]
+        %w[host service-url cacert token-file task-environment job-poll-interval job-poll-timeout]
       end
 
       def self.default_options
