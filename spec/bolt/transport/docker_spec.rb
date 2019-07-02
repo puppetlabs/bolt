@@ -49,7 +49,7 @@ describe Bolt::Transport::Docker, docker: true do
       # Test fails differently on Windows due to issues in the docker-api gem.
       expect {
         docker.with_connection(Bolt::Target.new('not_a_target')) {}
-      }.to raise_error(Bolt::Node::ConnectError, /Failed to connect to not_a_target: No such container: not_a_target/)
+      }.to raise_error(Bolt::Node::ConnectError, /Could not find a container with name or ID matching \'not_a_target\'/)
     end
   end
 
@@ -59,17 +59,7 @@ describe Bolt::Transport::Docker, docker: true do
     it 'uses the url' do
       expect {
         docker.with_connection(target) {}
-      }.to raise_error(Bolt::Node::ConnectError, /Connection refused .* 127.0.0.1:55555/)
-    end
-  end
-
-  context 'when options are specified' do
-    let(:transport_conf) { { 'service-options' => { 'read_timeout' => 0 } } }
-
-    it 'uses the options' do
-      expect(Docker::Connection).to receive(:new)
-        .with('unix:///var/run/docker.sock', 'read_timeout' => 0).and_call_original
-      expect(docker.with_connection(target) {}).to eq(nil)
+      }.to raise_error(Bolt::Node::ConnectError, /Could not find a container with name or ID matching/)
     end
   end
 

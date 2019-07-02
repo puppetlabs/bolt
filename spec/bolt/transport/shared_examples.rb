@@ -472,7 +472,15 @@ QUOTED
       around(:each) do |example|
         # Required because the Local transport changes to the tmpdir before running commands.
         safe_target = Bolt::Target.new(target.uri, target.options.reject { |opt| opt == 'tmpdir' })
-        if Bolt::Util.windows?
+        # This assumes that the thing running the tests is the
+        # same platform as the thing we're running the task on
+        use_windows = Bolt::Util.windows?
+        if safe_target.transport == "docker"
+          # Only support linux containers with the docker transport
+          use_windows = false
+        end
+
+        if use_windows
           mkdir = "powershell.exe new-item #{tmpdir} -itemtype directory"
           rmdir = "powershell.exe remove-item #{tmpdir} -Recurse -Force"
         else
