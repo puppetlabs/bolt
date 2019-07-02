@@ -3,14 +3,15 @@
 module Bolt
   class Secret
     def self.execute(plugins, outputter, options)
-      enc = plugins.by_name('pkcs7')
       case options[:action]
       when 'createkeys'
-        enc.secret_createkeys
+        plugins.get_hook('pkcs7', :secret_createkeys).call
       when 'encrypt'
-        outputter.print_message(enc.secret_encrypt('plaintext-value' => options[:object]))
+        encrypted = plugins.get_hook('pkcs7', :secret_encrypt).call('plaintext-value' => options[:object])
+        outputter.print_message(encrypted)
       when 'decrypt'
-        outputter.print_message(enc.secret_decrypt('encrypted-value' => options[:object]))
+        decrypted = plugins.get_hook('pkcs7', :secret_decrypt).call('encrypted-value' => options[:object])
+        outputter.print_message(decrypted)
       end
 
       0

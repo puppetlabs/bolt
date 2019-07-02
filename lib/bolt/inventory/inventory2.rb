@@ -30,6 +30,10 @@ module Bolt
         @groups.validate
       end
 
+      def version
+        2
+      end
+
       def collect_groups
         # Provide a lookup map for finding a group by name
         @group_lookup = @groups.collect_groups

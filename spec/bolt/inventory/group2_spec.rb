@@ -8,7 +8,7 @@ require 'bolt/plugin'
 # This is largely internal and probably shouldn't be tested
 describe Bolt::Inventory::Group2 do
   let(:data) { { 'name' => 'all' } }
-  let(:plugins) { Bolt::Plugin.new(nil) }
+  let(:plugins) { Bolt::Plugin.new(nil, Bolt::Analytics::NoopClient.new) }
   let(:group) {
     # Inventory always resolves unknown labels to names or aliases from the top-down when constructed,
     # passing the collection of all aliases in it. Do that manually here to ensure plain target strings
@@ -961,7 +961,7 @@ describe Bolt::Inventory::Group2 do
       let(:hooks) { [] }
 
       let(:plugins) do
-        plugins = Bolt::Plugin.new(nil)
+        plugins = Bolt::Plugin.new(nil, Bolt::Analytics::NoopClient.new)
         plugin = double('plugin')
         allow(plugin).to receive(:name).and_return('fake')
         allow(plugin).to receive(:hooks).and_return(hooks)
@@ -1030,13 +1030,13 @@ describe Bolt::Inventory::Group2 do
         it 'for config only plugin' do
           data['config'] = { 'ssh' => { 'password' => { '_plugin' => 'unknown' } } }
           expect { Bolt::Inventory::Group2.new(data, plugins) }
-            .to raise_error(/unknown plugin: "unknown"/)
+            .to raise_error(/Unknown plugin: 'unknown'/)
         end
 
         it 'for target plugin' do
           data['targets'] = [{ '_plugin' => 'unknown' }]
           expect { Bolt::Inventory::Group2.new(data, plugins) }
-            .to raise_error(/unknown plugin: "unknown"/)
+            .to raise_error(/Unknown plugin: 'unknown'/)
         end
       end
 

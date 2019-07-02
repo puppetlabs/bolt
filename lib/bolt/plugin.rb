@@ -10,14 +10,28 @@ require 'bolt/plugin/aws'
 module Bolt
   class Plugin
     class PluginError < Bolt::Error
-      def initialize(msg, plugin, hook)
-        mess = "Error executing plugin: #{plugin.name} from #{hook}: #{msg}"
-        super(mess, 'bolt/plugin-error')
+      class ExecutionError < PluginError
+        def initialize(msg, plugin_name, location)
+          mess = "Error executing plugin: #{plugin_name} from #{location}: #{msg}"
+          super(mess, 'bolt/plugin-error')
+        end
+      end
+
+      class Unknown < PluginError
+        def initialize(plugin_name)
+          super("Unknown plugin: '#{plugin_name}'", 'bolt/unknown-plugin')
+        end
+      end
+
+      class UnsupportedHook < PluginError
+        def initialize(plugin_name, hook)
+          super("Plugin #{plugin_name} does not support #{hook}", 'bolt/unsupported-hook')
+        end
       end
     end
 
-    def self.setup(config, pdb_client)
-      plugins = new(config)
+    def self.setup(config, pdb_client, analytics)
+      plugins = new(config, analytics)
       plugins.add_plugin(Bolt::Plugin::Puppetdb.new(pdb_client))
       plugins.add_plugin(Bolt::Plugin::Terraform.new)
       plugins.add_plugin(Bolt::Plugin::Prompt.new)
@@ -27,7 +41,9 @@ module Bolt
       plugins
     end
 
-    def initialize(_config)
+    def initialize(config, analytics)
+      @config = config
+      @analytics = analytics
       @plugins = {}
     end
 
@@ -35,8 +51,13 @@ module Bolt
       @plugins[plugin.name] = plugin
     end
 
-    def for_hook(hook)
-      @plugins.filter { |_n, plug| plug.hooks.include? hook }
+    def get_hook(plugin_name, hook)
+      plugin = by_name(plugin_name)
+      raise PluginError::Unknown, plugin_name unless plugin
+      raise PluginError::UnsupportedHook.new(plugin_name, hook) unless plugin.respond_to?(hook)
+      @analytics.report_bundled_content("Plugin #{hook}", plugin_name)
+
+      plugin.method(hook)
     end
 
     def by_name(plugin_name)

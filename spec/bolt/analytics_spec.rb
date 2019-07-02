@@ -87,6 +87,20 @@ describe Bolt::Analytics::Client do
     end
   end
 
+  describe "#report_bundled_content" do
+    before(:each) { subject.bundled_content = { 'Plan' => ['my_plan'] } }
+
+    it 'reports bundled content' do
+      expect(subject).to receive(:event).with('Bundled Content', 'Plan', label: 'my_plan')
+      subject.report_bundled_content('Plan', 'my_plan')
+    end
+
+    it 'does not report other content' do
+      expect(subject).not_to receive(:event)
+      subject.report_bundled_content('Plan', 'other_plan')
+    end
+  end
+
   describe "#event" do
     it 'properly formats the event' do
       params = base_params.merge(t: 'event', ec: 'run', ea: 'task')

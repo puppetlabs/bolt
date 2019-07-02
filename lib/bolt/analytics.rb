@@ -22,6 +22,7 @@ module Bolt
       resource_mean: :cd7,
       plan_steps: :cd8,
       return_type: :cd9,
+      inventory_version: :cd10,
       boltdir_type: :cd11
     }.freeze
 
@@ -75,7 +76,7 @@ module Bolt
         @user_id = user_id
         @executor = Concurrent.global_io_executor
         @os = compute_os
-        @bundled_content = []
+        @bundled_content = {}
       end
 
       def screen_view(screen, **kwargs)
@@ -91,6 +92,12 @@ module Bolt
         }.merge(custom_dimensions)
 
         submit(base_params.merge(screen_view_params))
+      end
+
+      def report_bundled_content(mode, name)
+        if bundled_content[mode.split.first]&.include?(name)
+          event('Bundled Content', mode, label: name)
+        end
       end
 
       def event(category, action, label: nil, value: nil, **kwargs)
@@ -177,6 +184,8 @@ module Bolt
       def screen_view(screen, **_kwargs)
         @logger.debug "Skipping submission of '#{screen}' screenview because analytics is disabled"
       end
+
+      def report_bundled_content(mode, name); end
 
       def event(category, action, **_kwargs)
         @logger.debug "Skipping submission of '#{category} #{action}' event because analytics is disabled"
