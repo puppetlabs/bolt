@@ -26,12 +26,15 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 
 # Configure ports 5985 and 5986 with OMI
 # and enable the NTLM auth file
+# and set loglevel at DEBUG to make it easier to track down problems
 # write to temp first to avoid writing empty omiserver.conf
 RUN cat /etc/opt/omi/conf/omiserver.conf \
  | /opt/omi/bin/omiconfigeditor httpport --add 5985 \
  | /opt/omi/bin/omiconfigeditor httpsport --add 5986 \
  | /opt/omi/bin/omiconfigeditor NtlmCredsFile --set '/etc/opt/omi/creds/ntlm' \
  | /opt/omi/bin/omiconfigeditor NtlmCredsFile --uncomment \
+ | /opt/omi/bin/omiconfigeditor loglevel --set 'DEBUG' \
+ | /opt/omi/bin/omiconfigeditor loglevel --uncomment \
  >tmp.conf \
  && mv -f tmp.conf /etc/opt/omi/conf/omiserver.conf
 
