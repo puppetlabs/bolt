@@ -1,0 +1,26 @@
+version: "3"
+services:
+  linuxdev:
+    hostname: linuxdev
+    domainname: bolt.test
+    # must use Samba AD for DNS
+    dns:
+      - 172.22.0.100
+      - 8.8.8.8
+    build:
+      context: .
+      dockerfile: Dockerfile.linuxdev
+      args:
+        BOLT_PASSWORD: bolt
+    ports:
+      - "422:22"
+    environment:
+      KRB5_REALM: ${KRB5_REALM:-BOLT.TEST}
+      KRB5_KDC: ${KRB5_KDC:-samba-ad.bolt.test}
+      SMB_DOMAIN: ${SMB_DOMAIN:-BOLT}
+      SMB_ADMIN: Administrator
+      SMB_ADMIN_PASSWORD: ${SMB_ADMIN_PASSWORD:-B0ltrules!}
+    depends_on:
+      - samba-ad
+    networks:
+      BOLT.TEST:
