@@ -153,6 +153,10 @@ When using the ssh transport Bolt also interacts with the ssh-agent for ssh key 
 
 `token-file`: The path to the token file.
 
+`job-poll-interval`: Set interval to poll orchestrator for job status.
+
+`job-poll-timeout`: Set time to wait for orchestrator job status.
+
 
 ## Local transport configuration options
 

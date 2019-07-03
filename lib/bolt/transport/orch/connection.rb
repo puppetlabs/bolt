@@ -19,7 +19,7 @@ module Bolt
         def initialize(opts, plan_context, logger)
           @logger = logger
           @key = self.class.get_key(opts)
-          client_keys = %w[service-url token-file cacert]
+          client_keys = %w[service-url token-file cacert job-poll-interval job-poll-timeout]
           client_opts = client_keys.each_with_object({}) do |k, acc|
             acc[k] = opts[k] if opts.include?(k)
           end
