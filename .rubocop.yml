@@ -89,3 +89,7 @@ Metrics/PerceivedComplexity:
 Lint/HandleExceptions:
   Exclude:
     - lib/bolt/transport/local/shell.rb
+
+# Enforce LF line endings, even when on Windows
+Layout/EndOfLine:
+  EnforcedStyle: lf
