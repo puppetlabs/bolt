@@ -245,3 +245,21 @@ In some cases, OMI server source has to be modified to increase log output, in a
 #define ENABLE_TRACING 1
 # define TRACING_LEVEL 4
 ```
+
+#### Bolt Development Environment
+
+In addition to building OMI from source, it can be useful to run the Bolt source from a Linux agent to iterate on Bolt itself. To really vet Kerberos, this should be performed on a separate container image from the Samba Active Directory controller or the OMI server. This new dev container is defined in `spec/docker-compose-dev.yml` and can be built in addition to the other relevant containers by running `docker-compose`:
+
+> docker-compose -f spec/docker-compose.yml -f spec/docker-compose-dev.yml build --build-arg BUILD_OMI=true samba-ad omiserver linuxdev
+> docker-compose -f spec/docker-compose.yml -f spec/docker-compose-dev.yml up samba-ad omiserver linuxdev
+
+This will:
+
+* Provision Ubuntu 18.04
+* Join the Samba domain just like OMI server
+* Verify pwsh can use all authentication mechanisms against OMI
+* Expose port 422 on the Docker host for SSH access
+* Install vim, git, rbenv / ruby 2.55 / bundler
+* Clone the Bolt source to ~/bolt
+* Install all gems with bundler including pry-byebug and pry-stackexplorer
+* Provide a test script `/bolt-kerberos-test.sh` that can be used for simple test reproductions using Kerberos

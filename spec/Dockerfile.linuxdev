@@ -1,0 +1,90 @@
+FROM ubuntu:18.04
+
+ARG BOLT_PASSWORD=bolt
+ARG RUBY_VERSION=2.5.5
+# NOTE: Only designed to be set at build time, not at run time!
+ENV BOLT_PASSWORD=${BOLT_PASSWORD}
+ENV KRB5_REALM=
+ENV KRB5_KDC=
+ENV KRB5_ADMINSERVER=
+ENV SMB_ADMIN=Administrator
+ENV SMB_ADMIN_PASSWORD=
+
+# rbenv expects bash
+SHELL ["/bin/bash", "-c"]
+RUN useradd bolt \
+ && echo "bolt:${BOLT_PASSWORD}" | chpasswd
+
+# install Microsoft package repo for access to omi and powershell packages
+# gss-ntlmssp is for OMI server NTLM + Kerb support
+# ntp, realmd, sssd, samba-*, adcli are for working with Active Directory
+# krb5-config, krb5-user are Kerberos libraries
+# remaining packages are for .NET Core / PowerShell
+RUN export DEBIAN_FRONTEND=noninteractive \
+ && apt-get update -y \
+ && apt-get install -y wget \
+ && wget http://packages.microsoft.com/config/ubuntu/18.04/packages-microsoft-prod.deb \
+ && dpkg -i packages-microsoft-prod.deb \
+ && apt-get update -y \
+ && apt-get install -y \
+    vim \
+    git \
+    ssh \
+    dnsutils \
+    gettext-base \
+    gss-ntlmssp \
+    libgssapi-krb5-2 \
+    ntp \
+    krb5-config \
+    krb5-user \
+    # TODO: not sure which of these 3 are needed for SSH + Kerberos
+    libpam-krb5 \
+    libpam-ccreds \
+    auth-client-config \
+    realmd \
+    sssd \
+    sssd-tools \
+    samba-common \
+    samba-dsdb-modules \
+    samba-common-bin \
+    samba-libs \
+    adcli \
+    powershell \
+    # rbenv dependencies
+    autoconf \
+    bison \
+    build-essential \
+    libssl-dev \
+    libyaml-dev \
+    libreadline6-dev \
+    zlib1g-dev \
+    libncurses5-dev \
+    libffi-dev \
+    libgdbm5 \
+    libgdbm-dev
+
+# ruby-build standalone
+RUN git clone https://github.com/rbenv/ruby-build.git \
+ && PREFIX=/usr/local ./ruby-build/install.sh \
+ && CONFIGURE_OPTS="--disable-install-doc" ruby-build ${RUBY_VERSION} /usr/local \
+ # gem / bundler setup
+ && echo "gem: --no-document" > ~/.gemrc \
+ && gem update --system \
+ # bolt source
+ && git clone https://github.com/puppetlabs/bolt ~/bolt \
+ && cd ~/bolt \
+ && printf 'gem "pry-byebug"\ngem "pry-stack_explorer"\n' >> ./Gemfile.local \
+ && bundle install --path .bundle/gems
+
+EXPOSE 22
+
+ADD fixtures/linuxdev/docker-entrypoint.sh /
+ADD fixtures/linuxdev/bolt-kerberos-test.sh /
+ADD fixtures/samba-ad/kerberos-client-config.sh /
+ADD fixtures/samba-ad/krb5.conf.tmpl /
+ADD fixtures/omiserver/domain-join.sh /
+ADD fixtures/omiserver/realmd.conf.tmpl /
+ADD fixtures/omiserver/smb.conf.tmpl /
+ADD fixtures/omiserver/sssd.conf.tmpl /
+ADD fixtures/omiserver/verify-pwsh-authentication.sh /
+ENTRYPOINT ["/docker-entrypoint.sh"]
