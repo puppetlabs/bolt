@@ -421,7 +421,7 @@ module Bolt
       plan_context[:description] = options[:description] if options[:description]
 
       executor = Bolt::Executor.new(config.concurrency, @analytics, options[:noop])
-      executor.subscribe(outputter) if options.fetch(:format, 'human') == 'human'
+      executor.subscribe(outputter)
       executor.subscribe(log_outputter)
       executor.start_plan(plan_context)
       result = pal.run_plan(plan_name, plan_arguments, executor, inventory, puppetdb_client)
