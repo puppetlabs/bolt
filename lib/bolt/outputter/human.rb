@@ -311,6 +311,13 @@ module Bolt
         end
       end
 
+      def print_targets(options)
+        targets = options[:targets].map(&:name)
+        count = "#{targets.count} target#{'s' unless targets.count == 1}"
+        @stream.puts targets.join("\n")
+        @stream.puts colorize(:green, count)
+      end
+
       # @param [Bolt::ResultSet] apply_result A ResultSet object representing the result of a `bolt apply`
       def print_apply_result(apply_result, elapsed_time)
         print_summary(apply_result, elapsed_time)

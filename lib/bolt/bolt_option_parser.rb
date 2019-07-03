@@ -28,6 +28,9 @@ module Bolt
       when 'file'
         { flags: ACTION_OPTS + %w[tmpdir],
           banner: FILE_HELP }
+      when 'inventory'
+        { flags: OPTIONS[:inventory] + OPTIONS[:global] + %w[format inventoryfile boltdir configfile],
+          banner: INVENTORY_HELP }
       when 'plan'
         case action
         when 'convert'
@@ -110,6 +113,7 @@ Available subcommands:
   bolt secret createkeys           Create new encryption keys
   bolt secret encrypt <plaintext>  Encrypt a value
   bolt secret decrypt <encrypted>  Decrypt a value
+  bolt inventory show              Show the list of targets an action would run on
 
 Run `bolt <subcommand> --help` to view specific examples.
 
@@ -263,8 +267,18 @@ Available options are:
         createkeys               Create new encryption keys
         encrypt                  Encrypt a value
         decrypt                  Decrypt a value
+
       Available options are:
     SECRET_HELP
+
+    INVENTORY_HELP = <<~INVENTORY_HELP
+      Usage: bolt inventory <action>
+
+      Available actions are:
+        show                     Show the list of targets an action would run on
+
+      Available options are:
+    INVENTORY_HELP
 
     def initialize(options)
       super()
