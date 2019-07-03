@@ -307,7 +307,7 @@ describe Bolt::PAL::YamlPlan::Evaluator do
     end
   end
 
-  describe "#upload_file_step" do
+  describe "#upload_step" do
     let(:step) do
       { 'source' => 'mymodule/file.txt',
         'destination' => '/path/to/file.txt',
@@ -318,7 +318,7 @@ describe Bolt::PAL::YamlPlan::Evaluator do
       args = ['mymodule/file.txt', '/path/to/file.txt', 'foo.example.com']
       expect(scope).to receive(:call_function).with('upload_file', args)
 
-      subject.upload_file_step(scope, step)
+      subject.upload_step(scope, step)
     end
 
     it 'supports a description' do
@@ -327,7 +327,7 @@ describe Bolt::PAL::YamlPlan::Evaluator do
       args = ['mymodule/file.txt', '/path/to/file.txt', 'foo.example.com', 'upload the file']
       expect(scope).to receive(:call_function).with('upload_file', args)
 
-      subject.upload_file_step(scope, step)
+      subject.upload_step(scope, step)
     end
   end
 
@@ -338,6 +338,53 @@ describe Bolt::PAL::YamlPlan::Evaluator do
 
     it 'returns the result of the eval key' do
       expect(subject.eval_step(scope, step)). to eq(55)
+    end
+  end
+
+  describe "#resources_step" do
+    let(:step) do
+      { 'resources' => resources,
+        'target' => target }
+    end
+    let(:resources) do
+      [{ 'package' => 'nginx' },
+       { 'service' => 'nginx' }]
+    end
+    let(:target) { ['foo.example.com', 'bar.example.com'] }
+    let(:applicator) { double('applicator') }
+
+    before :each do
+      allow(subject).to receive(:apply_manifest)
+    end
+
+    around :each do |example|
+      begin
+        Puppet.push_context(apply_executor: applicator)
+        example.run
+      ensure
+        Puppet.pop_context
+      end
+    end
+
+    it 'builds and applies a manifest' do
+      # We need to normalize the resources by creating a step instance
+      step_body = Bolt::PAL::YamlPlan::Step::Resources.new(step).body
+
+      expected = [{ 'type' => 'package', 'title' => 'nginx', 'parameters' => {} },
+                  { 'type' => 'service', 'title' => 'nginx', 'parameters' => {} }]
+
+      expect(subject).to receive(:generate_manifest).with(expected).and_return('mymanifest')
+      expect(subject).to receive(:apply_manifest).with(scope, target, 'mymanifest')
+
+      subject.resources_step(scope, step_body)
+    end
+
+    it 'succeeds if no resources are specified' do
+      resources.replace([])
+
+      expect(subject).to receive(:generate_manifest).with([])
+
+      subject.resources_step(scope, step)
     end
   end
 

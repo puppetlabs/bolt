@@ -13,23 +13,13 @@ module Bolt
         end
 
         def dispatch_step(scope, step)
-          step_type = step.type
           step_body = evaluate_code_blocks(scope, step.body)
 
-          case step_type
-          when 'task'
-            task_step(scope, step_body)
-          when 'command'
-            command_step(scope, step_body)
-          when 'plan'
-            plan_step(scope, step_body)
-          when 'script'
-            script_step(scope, step_body)
-          when 'source'
-            upload_file_step(scope, step_body)
-          when 'eval'
-            eval_step(scope, step_body)
-          end
+          # Dispatch based on the step class name
+          step_type = step.class.name.split('::').last.downcase
+          method = "#{step_type}_step"
+
+          send(method, scope, step_body)
         end
 
         def task_step(scope, step)
@@ -82,7 +72,7 @@ module Bolt
           scope.call_function('run_command', args)
         end
 
-        def upload_file_step(scope, step)
+        def upload_step(scope, step)
           source = step['source']
           destination = step['destination']
           target = step['target']
@@ -95,6 +85,51 @@ module Bolt
 
         def eval_step(_scope, step)
           step['eval']
+        end
+
+        def resources_step(scope, step)
+          manifest = generate_manifest(step['resources'])
+
+          apply_manifest(scope, step['target'], manifest)
+        end
+
+        def generate_manifest(resources)
+          # inspect returns the Ruby representation of the resource hashes,
+          # which happens to be the same as the Puppet representation
+          puppet_resources = resources.inspect
+
+          # Because the :tasks setting globally controls which mode the parser
+          # is in, we need to make this snippet of non-tasks manifest code
+          # parseable in tasks mode. The way to do that is by putting it in an
+          # apply statement and taking the body.
+          <<~MANIFEST
+          apply('placeholder') {
+            $resources = #{puppet_resources}
+            $resources.each |$res| {
+              Resource[$res['type']] { $res['title']:
+                * => $res['parameters'],
+              }
+            }
+
+            # Add relationships if there is more than one resource
+            if $resources.length > 1 {
+              ($resources.length - 1).each |$index| {
+                $lhs = $resources[$index]
+                $rhs = $resources[$index+1]
+                $lhs_resource = Resource[$lhs['type'] , $lhs['title']]
+                $rhs_resource = Resource[$rhs['type'] , $rhs['title']]
+                $lhs_resource -> $rhs_resource
+              }
+            }
+          }
+          MANIFEST
+        end
+
+        def apply_manifest(scope, target, manifest)
+          ast = @evaluator.parse_string(manifest)
+          apply_block = ast.body.body
+          applicator = Puppet.lookup(:apply_executor)
+          applicator.apply([target], apply_block, scope)
         end
 
         # This is the method that Puppet calls to evaluate the plan. The name

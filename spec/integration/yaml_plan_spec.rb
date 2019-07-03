@@ -14,10 +14,13 @@ describe "running YAML plans", ssh: true do
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
 
   let(:modulepath) { fixture_path('modules') }
+  let(:password) { conn_info('ssh')[:password] }
   let(:config_flags) {
     ['--format', 'json',
      '--configfile', fixture_path('configs', 'empty.yml'),
      '--modulepath', modulepath,
+     '--run-as', 'root',
+     '--sudo-password', password,
      '--no-host-key-check']
   }
   let(:target) { conn_uri('ssh', include_password: true) }
@@ -68,6 +71,47 @@ describe "running YAML plans", ssh: true do
     expect(result.first['result']).to eq('_output' => "hello world\n")
   end
 
+  it 'applies resources' do
+    result = run_plan('yaml::resources', nodes: target)
+
+    expect(result.first['node']).to eq(target)
+    expect(result.first['status']).to eq('success')
+
+    resources = result.first['result']['report']['resource_statuses']
+
+    expect(resources['Notify[hello world]']['changed']).to eq(true)
+    expect(resources['Notify[goodbye]']['changed']).to eq(true)
+  end
+
+  it 'skips remaining resources if one resource fails' do
+    result = run_plan('yaml::resource_failure', nodes: target)
+
+    expect(result['kind']).to eq('bolt/apply-failure')
+    node_result = result.dig('details', 'result_set').first
+    expect(node_result['node']).to eq(target)
+    expect(node_result['status']).to eq('failure')
+
+    expect(node_result.dig('result', '_error', 'kind')).to eq('bolt/resource-failure')
+
+    resources = node_result['result']['report']['resource_statuses']
+
+    # The file resource will fail so the second notify is skipped
+    expect(resources['Notify[hello world]']['changed']).to eq(true)
+    expect(resources['File[/tmp/foo/bar/baz]']['failed']).to eq(true)
+    expect(resources['Notify[goodbye]']['changed']).to eq(false)
+    expect(resources['Notify[goodbye]']['skipped']).to eq(true)
+  end
+
+  it 'applies an empty catalog if no resources are specified' do
+    result = run_plan('yaml::empty_resources', nodes: target)
+
+    expect(result.first['node']).to eq(target)
+    expect(result.first['status']).to eq('success')
+
+    resources = result.first['result']['report']['resource_statuses']
+    expect(resources).to be_empty
+  end
+
   it 'does not expose its own variables to a sub-plan' do
     result = run_plan('yaml::plan_with_isolated_subplan', message: 'hello world')
 
@@ -84,7 +128,7 @@ describe "running YAML plans", ssh: true do
     result = run_plan('yaml::bad_puppet')
 
     expect(result['kind']).to eq("bolt/invalid-plan")
-    expect(result['msg']).to match(/Parse error in step number 1 with name \"x_fail\":/)
+    expect(result['msg']).to match(/Parse error in step \"x_fail\":/)
   end
 
   it 'passes information between steps' do

@@ -6,7 +6,7 @@ require 'bolt/pal/yaml_plan'
 describe Bolt::PAL::YamlPlan::Step do
   context '#transpile' do
     let(:step_body) { {} }
-    let(:step) { Bolt::PAL::YamlPlan::Step.new(step_body, 1) }
+    let(:step) { Bolt::PAL::YamlPlan::Step.create(step_body, 1) }
 
     def make_string(str)
       Bolt::PAL::YamlPlan::BareString.new(str)
@@ -20,7 +20,7 @@ describe Bolt::PAL::YamlPlan::Step do
       let(:output) { "  run_command('echo peanut butter', $bread)\n" }
 
       it 'stringifies a command step' do
-        expect(step.transpile('/path/to/happiness')).to eq(output)
+        expect(step.transpile).to eq(output)
       end
     end
 
@@ -33,7 +33,7 @@ describe Bolt::PAL::YamlPlan::Step do
       let(:output) { "  run_script('bananas.pb', $bread, {'arguments' => ['--with cinnamon', '--and honey']})\n" }
 
       it 'stringifies a script step' do
-        expect(step.transpile('/path/to/happiness')).to eq(output)
+        expect(step.transpile).to eq(output)
       end
     end
 
@@ -50,20 +50,19 @@ describe Bolt::PAL::YamlPlan::Step do
       }
 
       it 'stringifies a task step' do
-        expect(step.transpile('/path/to/happiness')).to eq(output)
+        expect(step.transpile).to eq(output)
       end
     end
 
     context 'with plan step' do
       let(:step_body) do
         { "plan" => make_string("sandwich::pbj"),
-          "target" => make_string("$bread"),
-          "parameters" => {} }
+          "parameters" => { make_string("bread") => make_string("wheat") } }
       end
-      let(:output) { "  run_plan('sandwich::pbj', $bread)\n" }
+      let(:output) { "  run_plan('sandwich::pbj', {'bread' => 'wheat'})\n" }
 
       it 'stringifies a plan step' do
-        expect(step.transpile('/path/to/happiness')).to eq(output)
+        expect(step.transpile).to eq(output)
       end
     end
 
@@ -76,7 +75,7 @@ describe Bolt::PAL::YamlPlan::Step do
       let(:output) { "  upload_file('lucys/kitchen/counter', '/lucys/stomach', $sandwich)\n" }
 
       it 'stringifies a upload step' do
-        expect(step.transpile('/path/to/happiness')).to eq(output)
+        expect(step.transpile).to eq(output)
       end
     end
 
@@ -88,7 +87,7 @@ describe Bolt::PAL::YamlPlan::Step do
         let(:output) { "  $count * 2\n" }
 
         it 'stringifies an eval step' do
-          expect(step.transpile('/path/to/happiness')).to eq(output)
+          expect(step.transpile).to eq(output)
         end
       end
 
@@ -118,7 +117,125 @@ describe Bolt::PAL::YamlPlan::Step do
 OUT
 
         it 'stringifies eval step' do
-          expect(step.transpile('/path/to/happiness')).to eq(output)
+          expect(step.transpile).to eq(output)
+        end
+      end
+    end
+
+    context "with resources step" do
+      let(:resources) do
+        [{ 'package' => make_string('nginx') },
+         { 'service' => make_string('nginx') }]
+      end
+
+      let(:step_body) do
+        { 'resources' => resources,
+          'target' => make_string('$bread') }
+      end
+
+      context "#validate" do
+        it 'fails if the resource type is ambiguous' do
+          resources.replace([{ 'package' => 'nginx', 'service' => 'nginx' }])
+
+          expect { Bolt::PAL::YamlPlan::Step::Resources.validate(step_body, 1) }
+            .to raise_error(Bolt::Error, /Resource declaration has ambiguous type.*could be package or service/)
+        end
+
+        it 'fails if only type is set and not title' do
+          resources.replace([{ 'type' => 'package' }])
+
+          expect { Bolt::PAL::YamlPlan::Step::Resources.validate(step_body, 1) }
+            .to raise_error(Bolt::Error, /Resource declaration must include title key if type key is set/)
+        end
+
+        it 'fails if only title is set and not type' do
+          resources.replace([{ 'title' => 'hello world' }])
+
+          expect { Bolt::PAL::YamlPlan::Step::Resources.validate(step_body, 1) }
+            .to raise_error(Bolt::Error, /Resource declaration must include type key if title key is set/)
+        end
+
+        it 'fails if the resource has only parameters and no type or title' do
+          resources.replace([{ 'parameters' => { 'ensure' => 'present' } }])
+
+          expect { Bolt::PAL::YamlPlan::Step::Resources.validate(step_body, 1) }
+            .to raise_error(Bolt::Error, /Resource declaration is missing a type/)
+        end
+
+        it 'fails if the resource is empty' do
+          resources.replace([{}])
+
+          expect { Bolt::PAL::YamlPlan::Step::Resources.validate(step_body, 1) }
+            .to raise_error(Bolt::Error, /Resource declaration is missing a type/)
+        end
+      end
+
+      context "normalizing resources" do
+        it 'uses the type and title keys if specified' do
+          expected = [{ 'type' => 'package', 'title' => make_string('nginx'), 'parameters' => {} },
+                      { 'type' => 'service', 'title' => make_string('nginx'), 'parameters' => {} }]
+
+          expect(step.body['resources']).to eq(expected)
+        end
+      end
+
+      context "transpiling" do
+        it "generates an apply() block" do
+          output = <<-OUT
+  apply($bread) {
+    package { 'nginx': }
+    ->
+    service { 'nginx': }
+  }
+          OUT
+
+          expect(step.transpile).to eq(output)
+        end
+
+        it "generates an empty apply() block if no resources are declared" do
+          resources.replace([])
+
+          output = <<-OUT
+  apply($bread) {
+
+  }
+          OUT
+
+          expect(step.transpile).to eq(output)
+        end
+
+        it "assigns the result of the apply() block to a variable if the step is named" do
+          step_body['name'] = 'test_apply'
+
+          output = <<-OUT
+  $test_apply = apply($bread) {
+    package { 'nginx': }
+    ->
+    service { 'nginx': }
+  }
+          OUT
+
+          expect(step.transpile).to eq(output)
+        end
+
+        it "passes resource parameters if they're set" do
+          resources.replace([{ 'package' => 'nginx', 'parameters' => { 'ensure' => 'latest' } },
+                             { 'service' => 'nginx', 'parameters' => { 'ensure' => 'running', 'enable' => true } }])
+
+          output = <<-OUT
+  apply($bread) {
+    package { 'nginx':
+      ensure => 'latest',
+    }
+    ->
+    service { 'nginx':
+      ensure => 'running',
+      enable => true,
+    }
+  }
+          OUT
+
+          expect(step.transpile).to eq(output)
         end
       end
     end
@@ -132,7 +249,7 @@ OUT
       end
 
       it "raises an error" do
-        expect { step.transpile('/path/to/happiness') }
+        expect { step.transpile }
           .to raise_error(Bolt::Error, /Parameters key must be a hash/)
       end
     end

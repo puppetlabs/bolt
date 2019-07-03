@@ -8,152 +8,89 @@ module Bolt
       class Step
         attr_reader :name, :type, :body, :target
 
+        def self.allowed_keys
+          Set['name', 'description', 'target']
+        end
+
         COMMON_STEP_KEYS = %w[name description target].freeze
-        STEP_KEYS = {
-          'command' => {
-            'allowed_keys' => Set['command'].merge(COMMON_STEP_KEYS),
-            'required_keys' => Set['target']
-          },
-          'script' => {
-            'allowed_keys' => Set['script', 'parameters', 'arguments'].merge(COMMON_STEP_KEYS),
-            'required_keys' => Set['target']
-          },
-          'task' => {
-            'allowed_keys' => Set['task', 'parameters'].merge(COMMON_STEP_KEYS),
-            'required_keys' => Set['target']
-          },
-          'plan' => {
-            'allowed_keys' => Set['plan', 'parameters'].merge(COMMON_STEP_KEYS),
-            'required_keys' => Set.new
-          },
-          'source' => {
-            'allowed_keys' => Set['source', 'destination'].merge(COMMON_STEP_KEYS),
-            'required_keys' => Set['target', 'source', 'destination']
-          },
-          'destination' => {
-            'allowed_keys' => Set['source', 'destination'].merge(COMMON_STEP_KEYS),
-            'required_keys' => Set['target', 'source', 'destination']
-          },
-          'eval' => {
-            'allowed_keys' => Set['eval', 'name', 'description'],
-            'required_keys' => Set.new
-          }
-        }.freeze
+        STEP_KEYS = %w[command script task plan source destination eval resources].freeze
 
-        def initialize(step_body, step_number)
-          @body = step_body
-          @name = @body['name']
-          # For error messages
-          @step_number = step_number
-          validate_step
-
-          @type = STEP_KEYS.keys.find { |key| @body.key?(key) }
-          @target = @body['target']
-        end
-
-        def transpile(plan_path)
-          result = String.new("  ")
-          result << "$#{@name} = " if @name
-
-          description = body.fetch('description', nil)
-          parameters = body.fetch('parameters', {})
-          if @type == 'script' && body.key?('arguments')
-            parameters['arguments'] = body['arguments']
-          end
-
-          case @type
-          when 'command', 'task', 'script', 'plan'
-            result << "run_#{@type}(#{Bolt::Util.to_code(body[@type])}"
-            result << ", #{Bolt::Util.to_code(@target)}" if @target
-            result << ", #{Bolt::Util.to_code(description)}" if description && type != 'plan'
-            result << ", #{Bolt::Util.to_code(parameters)}" unless parameters.empty?
-            result << ")"
-          when 'source'
-            result << "upload_file(#{Bolt::Util.to_code(body['source'])}, #{Bolt::Util.to_code(body['destination'])}"
-            result << ", #{Bolt::Util.to_code(@target)}" if @target
-            result << ", #{Bolt::Util.to_code(description)}" if description
-            result << ")"
-          when 'eval'
-            # We have to do a little extra parsing here, since we only need
-            # with() for eval blocks
-            code = Bolt::Util.to_code(body['eval'])
-            if @name && code.lines.count > 1
-              # A little indented niceness
-              indented = code.gsub(/\n/, "\n    ").chomp("  ")
-              result << "with() || {\n    #{indented}}"
-            else
-              result << code
-            end
+        def self.create(step_body, step_number)
+          type_keys = (STEP_KEYS & step_body.keys)
+          case type_keys.length
+          when 0
+            raise step_error("No valid action detected", step_body['name'], step_number)
+          when 1
+            type = type_keys.first
           else
-            # We should never get here
-            raise Bolt::YamlTranspiler::ConvertError.new("Can't convert unsupported step type #{@name}", plan_path)
+            if type_keys.to_set == Set['source', 'destination']
+              type = 'upload'
+            else
+              raise step_error("Multiple action keys detected: #{type_keys.inspect}", step_body['name'], step_number)
+            end
           end
-          result << "\n"
-          result
+
+          step_class = const_get("Bolt::PAL::YamlPlan::Step::#{type.capitalize}")
+          step_class.validate(step_body, step_number)
+          step_class.new(step_body)
         end
 
-        def validate_step
-          validate_step_keys
+        def initialize(step_body)
+          @name = step_body['name']
+          @description = step_body['description']
+          @target = step_body['target']
+          @body = step_body
+        end
+
+        def transpile
+          raise NotImplementedError, "Step #{@name} does not supported conversion to Puppet plan language"
+        end
+
+        def self.validate(body, step_number)
+          validate_step_keys(body, step_number)
 
           begin
-            @body.each { |k, v| validate_puppet_code(k, v) }
+            body.each { |k, v| validate_puppet_code(k, v) }
           rescue Bolt::Error => e
-            err = step_err_msg(e.msg)
-            raise Bolt::Error.new(err, 'bolt/invalid-plan')
+            raise step_error(e.msg, body['name'], step_number)
           end
 
           unless body.fetch('parameters', {}).is_a?(Hash)
             msg = "Parameters key must be a hash"
-            raise Bolt::Error.new(step_err_msg(msg), "bolt/invalid-plan")
+            raise step_error(msg, body['name'], step_number)
           end
 
-          if @name
-            unless @name.is_a?(String) && @name.match?(Bolt::PAL::YamlPlan::VAR_NAME_PATTERN)
-              error_message = "Invalid step name: #{@name.inspect}"
-              err = step_err_msg(error_message)
-              raise Bolt::Error.new(err, "bolt/invalid-plan")
+          if body.key?('name')
+            name = body['name']
+            unless name.is_a?(String) && name.match?(Bolt::PAL::YamlPlan::VAR_NAME_PATTERN)
+              error_message = "Invalid step name: #{name.inspect}"
+              raise step_error(error_message, body['name'], step_number)
             end
           end
         end
 
-        def validate_step_keys
-          step_keys = @body.keys.to_set
-          action = step_keys.intersection(STEP_KEYS.keys.to_set).to_a
-          unless action.count == 1
-            if action.count > 1
-              # Upload step is special in that it is identified by both `source` and `destination`
-              unless action.to_set == Set['source', 'destination']
-                error_message = "Multiple action keys detected: #{action.inspect}"
-                err = step_err_msg(error_message)
-                raise Bolt::Error.new(err, "bolt/invalid-plan")
-              end
-            else
-              error_message = "No valid action detected"
-              err = step_err_msg(error_message)
-              raise Bolt::Error.new(err, "bolt/invalid-plan")
-            end
-          end
+        def self.validate_step_keys(body, step_number)
+          step_type = name.split('::').last.downcase
 
           # For validated step action, ensure only valid keys
-          unless STEP_KEYS[action.first]['allowed_keys'].superset?(step_keys)
-            illegal_keys = step_keys - STEP_KEYS[action.first]['allowed_keys']
-            error_message = "The #{action.first.inspect} step does not support: #{illegal_keys.to_a.inspect} key(s)"
-            err = step_err_msg(error_message)
+          illegal_keys = body.keys.to_set - allowed_keys
+          if illegal_keys.any?
+            error_message = "The #{step_type.inspect} step does not support: #{illegal_keys.to_a.inspect} key(s)"
+            err = step_error(error_message, body['name'], step_number)
             raise Bolt::Error.new(err, "bolt/invalid-plan")
           end
 
           # Ensure all required keys are present
-          STEP_KEYS[action.first]['required_keys'].each do |k|
-            next if step_keys.include?(k)
-            missing_keys = STEP_KEYS[action.first]['required_keys'] - step_keys
-            error_message = "The #{action.first.inspect} step requires: #{missing_keys.to_a.inspect} key(s)"
-            err = step_err_msg(error_message)
+          missing_keys = required_keys - body.keys
+          if missing_keys.any?
+            error_message = "The #{step_type.inspect} step requires: #{missing_keys.to_a.inspect} key(s)"
+            err = step_error(error_message, body['name'], step_number)
             raise Bolt::Error.new(err, "bolt/invalid-plan")
           end
         end
 
         # Recursively ensure all puppet code can be parsed
-        def validate_puppet_code(step_key, value)
+        def self.validate_puppet_code(step_key, value)
           case value
           when Array
             value.map { |element| validate_puppet_code(step_key, element) }
@@ -180,16 +117,14 @@ module Bolt
           raise Bolt::Error.new("Error parsing #{step_key.inspect}: #{e.basic_message}", "bolt/invalid-plan")
         end
 
-        def step_err_msg(message)
-          if @name
-            "Parse error in step number #{@step_number} with name #{@name.inspect}: \n #{message}"
-          else
-            "Parse error in step number #{@step_number}: \n #{message}"
-          end
+        def self.step_error(message, name, step_number)
+          identifier = name ? name.inspect : "number #{step_number}"
+          error = "Parse error in step #{identifier}: \n #{message}"
+          Bolt::Error.new(error, 'bolt/invalid-plan')
         end
 
         # Parses the an evaluable string, optionally quote it before parsing
-        def parse_code_string(code, quote = false)
+        def self.parse_code_string(code, quote = false)
           if quote
             quoted = Puppet::Pops::Parser::EvaluatingParser.quote(code)
             Puppet::Pops::Parser::EvaluatingParser.new.parse_string(quoted)
@@ -197,7 +132,20 @@ module Bolt
             Puppet::Pops::Parser::EvaluatingParser.new.parse_string(code)
           end
         end
+
+        def function_call(function, args)
+          code_args = args.map { |arg| Bolt::Util.to_code(arg) }
+          "#{function}(#{code_args.join(', ')})"
+        end
       end
     end
   end
 end
+
+require 'bolt/pal/yaml_plan/step/command'
+require 'bolt/pal/yaml_plan/step/eval'
+require 'bolt/pal/yaml_plan/step/plan'
+require 'bolt/pal/yaml_plan/step/resources'
+require 'bolt/pal/yaml_plan/step/script'
+require 'bolt/pal/yaml_plan/step/task'
+require 'bolt/pal/yaml_plan/step/upload'

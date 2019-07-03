@@ -96,7 +96,7 @@ describe Bolt::PAL::YamlPlan do
 
         expect { plan }.to raise_error do |error|
           expect(error.kind).to eq('bolt/invalid-plan')
-          expect(error.message).to match(/Parse error in step number 1 with name \"foo\"/)
+          expect(error.message).to match(/Parse error in step \"foo\"/)
           expect(error.message).to match(/Duplicate step name or parameter detected: \"foo\"/)
         end
       end
@@ -123,7 +123,7 @@ describe Bolt::PAL::YamlPlan do
 
         expect { plan }.to raise_error do |error|
           expect(error.kind).to eq('bolt/invalid-plan')
-          expect(error.message).to match(/Parse error in step number 2 with name \"foo\"/)
+          expect(error.message).to match(/Parse error in step \"foo\"/)
           expect(error.message).to match(/Duplicate step name or parameter detected: \"foo\"/)
         end
       end
@@ -138,7 +138,7 @@ describe Bolt::PAL::YamlPlan do
 
         expect { plan }.to raise_error do |error|
           expect(error.kind).to eq('bolt/invalid-plan')
-          expect(error.message).to match(/Parse error in step number 1 with name \"foo-bar\"/)
+          expect(error.message).to match(/Parse error in step \"foo-bar\"/)
           expect(error.message).to match(/Invalid step name: \"foo-bar\"/)
         end
       end
@@ -154,7 +154,7 @@ describe Bolt::PAL::YamlPlan do
 
         expect { plan }.to raise_error do |error|
           expect(error.kind).to eq('bolt/invalid-plan')
-          expect(error.message).to match(/Parse error in step number 1 with name \"foo-bar\"/)
+          expect(error.message).to match(/Parse error in step \"foo-bar\"/)
           expect(error.message).to match(/Multiple action keys detected: \[\"task\", \"eval\"\]/)
         end
       end
@@ -186,7 +186,7 @@ describe Bolt::PAL::YamlPlan do
 
         expect { plan }.to raise_error do |error|
           expect(error.kind).to eq('bolt/invalid-plan')
-          expect(error.message).to match(/Parse error in step number 1 with name \"foo\"/)
+          expect(error.message).to match(/Parse error in step \"foo\"/)
           expect(error.message).to match(/The \"task\" step requires: \[\"target\"\] key\(s\)/)
         end
       end
