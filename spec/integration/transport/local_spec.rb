@@ -13,6 +13,7 @@ require 'shared_examples/transport'
 describe Bolt::Transport::Local do
   include BoltSpec::Transport
 
+  let(:default_transport_conf) { {} }
   let(:host_and_port) { "localhost" }
   let(:safe_name) { host_and_port }
   let(:user) { 'runner' }

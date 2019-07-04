@@ -11,7 +11,7 @@ env:
   BOLT_WINRM_SSL_PORT: 5986
   BOLT_WINRM_SMB_PORT: 445
   RUBY_VERSION: 25-x64
-  
+
 jobs:
 
   agentful:
@@ -93,7 +93,9 @@ jobs:
         run: bundle exec r10k puppetfile install
       - name: Pre-test setup
         shell: powershell
-        run: '& scripts\ci.ps1'
+        run: |
+          . scripts\ci.ps1
+          . scripts\windows_containers.ps1
       - name: Run tests
         shell: powershell
         run: bundle exec rake windows_ci

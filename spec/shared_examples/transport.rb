@@ -15,6 +15,7 @@ def posix_context
   {
     stdout_command: ['echo hello', /^hello$/],
     stderr_command: ['ssh -V', /OpenSSH/],
+    quotes_command: ["echo 'hello \" world'", /hello " world/],
     destination_dir: '/tmp',
     supported_req: 'shell',
     extension: '.sh',
@@ -40,12 +41,13 @@ def windows_context
   {
     stdout_command: ['echo hello', /^hello$/],
     stderr_command: ['echo oops 1>&2', /oops/],
+    quotes_command: ["echo 'hello \" world'", /hello " world/],
     destination_dir: 'C:/mytmp',
     supported_req: 'powershell',
     extension: '.ps1',
     unsupported_req: 'shell',
     cat_cmd: 'cat',
-    rm_cmd: 'rm -rf',
+    rm_cmd: 'rm -rf', # TODO: This will not work on Windows. Not valid in powershell or cmd.exe
     ls_cmd: 'ls',
     env_task: "Write-Output \"${env:PT_message_one}\n${env:PT_message_two}\"",
     stdin_task: "$line = [Console]::In.ReadLine()\nWrite-Output \"$line\"",
@@ -53,6 +55,77 @@ def windows_context
     identity_script: "echo $PSScriptRoot",
     echo_script: "$args | ForEach-Object { Write-Output $_ }"
   }
+end
+
+def windows_powershell_container_context
+  # Unlike a linux based container, commands like echo are not binaries, they require a shell. Because Windows
+  # Containers could be using either cmd.exe, powershell.exe, or even, pwsh.exe as the shell we can't assume anything
+  # and instead need to be very specific about which shell we're going to use
+  {
+    command_prefix: 'powershell.exe -NoProfile -NonInteractive -NoLogo -ExecutionPolicy Bypass -Command',
+    stdout_command: ['echo hello', /^hello$/],
+    stderr_command: ['echo oops 1>&2', /oops/],
+    # Due to some really weird double handling of quotes, we need three of them
+    quotes_command: ["echo 'hello \"\"\" world'", /hello " world/],
+    destination_dir: 'C:/mytmp',
+    unsupported_req: 'foo-bar-buzz',
+    supported_req: 'shell',
+    extension: '.ps1',
+    cat_cmd: '$content = Get-Content -Raw -Path',
+    # Write-Host will append a newline so instead, use the Console Write method
+    cat_cmd_suffix: '; [Console]::Write($content)',
+    rm_cmd: 'Remove-Item -Force -Confirm:$false -Recurse -Path',
+    ls_cmd: 'Get-ChildItem -Path',
+    ls_cmd_suffix: ' | Sort-Object Name | % { Write-Output $_.Name }',
+    env_task: "Write-Output \"${env:PT_message_one}\n${env:PT_message_two}\"",
+    stdin_task: "$line = [Console]::In.ReadLine()\nWrite-Output \"$line\"",
+    find_task: 'Get-ChildItem -Path $env:PT__installdir -Recurse -File | % { Write-Host $_.Length $_.FullName }',
+    identity_script: "echo $PSScriptRoot",
+    echo_script: "$args | ForEach-Object { Write-Output $_ }"
+  }
+end
+
+def windows_cmd_container_context
+  # Unlike a linux based container, commands like echo are not binaries, they require a shell. Because Windows
+  # Containers could be using either cmd.exe, powershell.exe, or even, pwsh.exe as the shell we can't assume anything
+  # and instead need to be very specific about which shell we're going to use
+  {
+    command_prefix: 'cmd /c',
+    stdout_command: ['echo hello', /^hello$/],
+    stderr_command: ['echo oops 1>&2', /oops/],
+    # Single quotes are not used to wrap command line arguments in cmd.exe, only double quotes
+    quotes_command: ["echo \"hello ' world\"", /hello ' world/],
+    destination_dir: 'C:\\mytmp',
+    unsupported_req: 'foo-bar-buzz',
+    supported_req: 'shell',
+    extension: '.bat',
+    cat_cmd: 'type',
+    rm_cmd: 'rd /s /q',
+    rm_file_cmd: 'del /f /q',
+    ls_cmd: 'dir /B', # Note that cmd.exe dir has a very different output to Linux ls
+    env_task: "@ECHO OFF\r\n" \
+              "IF DEFINED PT_message_one ECHO %PT_message_one%\r\n" \
+              "IF DEFINED PT_message_two ECHO %PT_message_two%",
+    stdin_task: "@ECHO OFF\r\nSET /P LINE=\r\nECHO %LINE%",
+    # There is not way to emulate the Linux output expected so instead we just call the equivalent PowerShell
+    # command using the EncodedCommand parameter
+    find_task: "@ECHO OFF\npowershell.exe -NoProfile -NonInteractive -NoLogo -ExecutionPolicy Bypass -EncodedCommand " +
+      Base64.strict_encode64(windows_powershell_container_context[:find_task].encode('UTF-16LE')),
+    identity_script: "@ECHO OFF\r\necho %~dp0",
+
+    echo_script: <<-BATCH
+@ECHO OFF
+:Loop
+IF [[%1]]==[[]] GOTO :EOF
+  ECHO %~1
+SHIFT
+GOTO Loop
+BATCH
+  }
+end
+
+def build_command(command, os_context)
+  os_context[:command_prefix].nil? ? command : os_context[:command_prefix] + ' ' + command
 end
 
 def mk_config(conf)
@@ -72,6 +145,7 @@ end
 # - target: a valid Target
 # - runner: instantiation of the Transport
 # - os_context: posix_context above
+# - default_transport_conf: a hash that should not be overridden and is required by the transport to test
 # - transport_conf: a hash that can be overridden to specify the 'tmpdir' transport option
 shared_examples 'transport api' do
   include BoltSpec::Files
@@ -79,16 +153,34 @@ shared_examples 'transport api' do
   include BoltSpec::Task
 
   before(:all) do
-    Dir.mkdir('C:\mytmp') if Bolt::Util.windows?
+    if Bolt::Util.windows?
+      FileUtils.rm_r('C:\mytmp', force: true) if Dir.exist?('C:\mytmp')
+      Dir.mkdir('C:\mytmp')
+    end
   end
 
   after(:all) do
     Dir.rmdir('C:\mytmp') if Bolt::Util.windows?
   end
 
+  def platform_path(target, path)
+    windows_target?(target) ? path.gsub('/', '\\') : path
+  end
+
+  def windows_target?(target)
+    if target.transport == "docker"
+      # This test is a little basic but it will do for testing
+      return target.host =~ /windows/
+    end
+    # This assumes that the thing running the tests is the
+    # same platform as the thing we're running the task on
+    Bolt::Util.windows?
+  end
+
   context 'run_command' do
     it "executes a command on a host" do
       command, expected = os_context[:stdout_command]
+      command = build_command(command, os_context)
       result = runner.run_command(target, command)
       expect(result.value['stdout']).to match(expected)
       expect(result.action).to eq('command')
@@ -97,21 +189,24 @@ shared_examples 'transport api' do
 
     it "captures stderr from a host" do
       command, expected = os_context[:stderr_command]
+      command = build_command(command, os_context)
       expect(runner.run_command(target, command).value['stderr']).to match(expected)
     end
 
     it "can execute a command containing quotes" do
-      result = runner.run_command(target, "echo 'hello \" world'").value
+      command, expected = os_context[:quotes_command]
+      command = build_command(command, os_context)
+      result = runner.run_command(target, command)
       expect(result['exit_code']).to eq(0)
       expect(result['stderr']).to eq('')
-      expect(result['stdout']).to match(/hello " world/)
+      expect(result['stdout']).to match(expected)
     end
 
     it "can return a non-zero exit status" do
       command = if target.protocol == 'docker'
-                  # explicitly launch bash for Docker transport because Docker doesn't have
+                  # explicitly launch a shell for Docker transport because Docker doesn't have
                   # a default shell when you perform: docker exec
-                  "/bin/bash -c 'exit 1'"
+                  target.host =~ /windows/ ? "cmd /c exit 1" : "/bin/bash -c 'exit 1'"
                 else
                   "exit 1"
                 end
@@ -124,17 +219,24 @@ shared_examples 'transport api' do
     it "can upload a file to a host" do
       contents = "kljhdfg"
       remote_path = File.join(os_context[:destination_dir], 'upload-test')
+      platform_remote_path = platform_path(target, remote_path)
       with_tempfile_containing('upload-test', contents) do |file|
         result = runner.upload(target, file.path, remote_path)
         expect(result.message).to eq("Uploaded '#{file.path}' to '#{target.host}:#{remote_path}'")
         expect(result.action).to eq('upload')
         expect(result.object).to eq(file.path)
 
+        command = build_command("#{os_context[:cat_cmd]} #{platform_remote_path}#{os_context[:cat_cmd_suffix]}", os_context) # rubocop:disable Metrics/LineLength
         expect(
-          runner.run_command(target, "#{os_context[:cat_cmd]} #{remote_path}").value['stdout']
+          runner.run_command(target, command).value['stdout']
         ).to eq(contents)
 
-        runner.run_command(target, "#{os_context[:rm_cmd]} #{remote_path}")
+        if os_context[:rm_file_cmd].nil? # rubocop:disable Style/ConditionalAssignment
+          command = build_command("#{os_context[:rm_cmd]} #{platform_remote_path}", os_context)
+        else
+          command = build_command("#{os_context[:rm_file_cmd]} #{platform_remote_path}", os_context)
+        end
+        runner.run_command(target, command)
       end
     end
 
@@ -147,49 +249,54 @@ shared_examples 'transport api' do
 
         target_dir = File.join(os_context[:destination_dir], "directory-test")
         runner.upload(target, dir, target_dir)
-
+        platform_dir = platform_path(target, target_dir)
         expect(
-          runner.run_command(target, "#{os_context[:ls_cmd]} #{target_dir}")['stdout'].split("\n")
+          runner.run_command(target, build_command("#{os_context[:ls_cmd]} #{platform_dir}#{os_context[:ls_cmd_suffix]}", os_context))['stdout'].split("\n") # rubocop:disable Metrics/LineLength
         ).to eq(%w[content subdir])
 
+        platform_subdir = platform_path(target, File.join(platform_dir, 'subdir'))
         expect(
-          runner.run_command(target, "#{os_context[:ls_cmd]} #{File.join(target_dir, 'subdir')}")['stdout'].split("\n")
+          runner.run_command(target, build_command("#{os_context[:ls_cmd]} #{platform_subdir}#{os_context[:ls_cmd_suffix]}", os_context))['stdout'].split("\n") # rubocop:disable Metrics/LineLength
         ).to eq(%w[more])
 
-        runner.run_command(target, "#{os_context[:rm_cmd]} #{target_dir}")
+        runner.run_command(target, build_command("#{os_context[:rm_cmd]} #{platform_dir}", os_context))
       end
     end
   end
 
   context 'run_script' do
     it "can run a script remotely" do
-      with_tempfile_containing('script test', os_context[:echo_script]) do |file|
-        result = runner.run_script(target, file.path, [])
+      with_tempfile_containing('script test', os_context[:echo_script], os_context[:extension]) do |file|
+        file_path = platform_path(target, file.path)
+        result = runner.run_script(target, file_path, [])
         expect(result['stdout'].strip).to eq('')
         expect(result.action).to eq('script')
-        expect(result.object).to eq(file.path)
+        expect(result.object).to eq(file_path)
       end
     end
 
     it "can run a script remotely with quoted arguments" do
+      quote_list = [
+        'nospaces',
+        'with spaces',
+        "'double single'",
+        "double 'single' double"
+      ]
+
+      unless os_context[:extension] == '.bat'
+        # cmd.exe has no way of reliably passing in parameters with double quotes, particularly with the
+        # many layers of abstractions within Bolt e.g. Ruby -> docker.exe -> cmd.exe or
+        # Ruby -> over WinRM -> PowerShell -> cmd.exe
+        # Therefore we don't test double quoted arguments for .bat files which are run by cmd.exe
+        quote_list << "\"double double\""
+        quote_list << "double \"double\" double"
+      end
+      expected_list = quote_list.join("\n")
+
       with_tempfile_containing('script-test-docker-quotes', os_context[:echo_script], os_context[:extension]) do |file|
         expect(
-          runner.run_script(target,
-                            file.path,
-                            ['nospaces',
-                             'with spaces',
-                             "\"double double\"",
-                             "'double single'",
-                             "double \"double\" double",
-                             "double 'single' double"])['stdout']
-        ).to eq(<<QUOTED)
-nospaces
-with spaces
-"double double"
-'double single'
-double "double" double
-double 'single' double
-QUOTED
+          runner.run_script(target, file.path, quote_list)['stdout'].chomp
+        ).to eq(expected_list)
       end
     end
 
@@ -204,6 +311,7 @@ QUOTED
     end
 
     it "escapes unsafe shellwords in arguments" do
+      # TODO: Skip this for windows. Unsafe shellwords mean nothing on Win32
       with_tempfile_containing('script-test-docker-escape', os_context[:echo_script], os_context[:extension]) do |file|
         expect(
           runner.run_script(target,
@@ -348,7 +456,7 @@ QUOTED
         end
 
         files = runner.run_task(target, task, arguments).message.split("\n")
-        files = files.each_with_object([]) { |file, acc| acc << file.gsub(/\\\\?/, "/") } if Bolt::Util.windows?
+        files = files.each_with_object([]) { |file, acc| acc << file.gsub(/\\\\?/, "/") } if windows_target?(target)
 
         expected_files = ["tasks/#{File.basename(task.files[0]['path'])}"] + expected_files
         expect(files.count).to eq(expected_files.count)
@@ -372,7 +480,7 @@ QUOTED
         task.files << { 'name' => 'tasks_test/files/no', 'path' => task_path }
 
         files = runner.run_task(target, task, arguments).message.split("\n").sort
-        files = files.each_with_object([]) { |file, acc| acc << file.gsub(/\\\\?/, "/") } if Bolt::Util.windows?
+        files = files.each_with_object([]) { |file, acc| acc << file.gsub(/\\\\?/, "/") } if windows_target?(target)
 
         expect(files.count).to eq(4)
         expect(files[0]).to match(%r{#{contents.size} [^ ]+/other_mod/lib/puppet_x/a.rb$})
@@ -458,13 +566,20 @@ QUOTED
 
   context 'when tmpdir is specified' do
     let(:tmpdir) { File.join(os_context[:destination_dir], 'mytempdir') }
-    let(:transport_conf) { { 'tmpdir' => tmpdir } }
+    let(:transport_conf) { default_transport_conf.merge('tmpdir' => tmpdir) }
 
     it "errors when tmpdir doesn't exist" do
-      with_tempfile_containing('script dir', 'dummy script') do |file|
+      with_tempfile_containing('script dir', os_context[:stdout_command][0], os_context[:extension]) do |file|
+        if target.transport == 'docker'
+          # The docker transport error message will be platform specific due to the use of cmd.exe in Windows containers
+          platform_tmpdir = platform_path(target, tmpdir)
+        else
+          # Whereas on all other transports, the path is normalised
+          platform_tmpdir = tmpdir
+        end
         expect {
           runner.run_script(target, file.path, [])
-        }.to raise_error(Bolt::Node::FileError, /Could not make tempdir.*#{Regexp.escape(tmpdir)}/)
+        }.to raise_error(Bolt::Node::FileError, /Could not make tempdir.*#{Regexp.escape(platform_tmpdir)}/)
       end
     end
 
@@ -472,15 +587,8 @@ QUOTED
       around(:each) do |example|
         # Required because the Local transport changes to the tmpdir before running commands.
         safe_target = Bolt::Target.new(target.uri, target.options.reject { |opt| opt == 'tmpdir' })
-        # This assumes that the thing running the tests is the
-        # same platform as the thing we're running the task on
-        use_windows = Bolt::Util.windows?
-        if safe_target.transport == "docker"
-          # Only support linux containers with the docker transport
-          use_windows = false
-        end
 
-        if use_windows
+        if windows_target?(target)
           mkdir = "powershell.exe new-item #{tmpdir} -itemtype directory"
           rmdir = "powershell.exe remove-item #{tmpdir} -Recurse -Force"
         else
@@ -495,8 +603,7 @@ QUOTED
       it 'uploads a script to the specified tmpdir' do
         with_tempfile_containing('script dir', os_context[:identity_script], os_context[:extension]) do |file|
           output = runner.run_script(target, file.path, [])['stdout']
-          output = output.gsub(/\\\\?/, "/") if Bolt::Util.windows?
-          expect(output).to match(/#{Regexp.escape(tmpdir)}/)
+          expect(output).to match(/#{Regexp.escape(platform_path(target, tmpdir))}/)
         end
       end
     end

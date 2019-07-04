@@ -4,7 +4,8 @@ require 'bolt/util'
 
 module BoltSpec
   module Conn
-    def conn_info(transport)
+    def conn_info(transport_name)
+      transport = transport_name
       default_host = 'localhost'
       default_user = 'bolt'
       default_password = 'bolt'
@@ -13,8 +14,7 @@ module BoltSpec
       default_key = Dir["spec/fixtures/keys/id_rsa"][0]
       default_port = 0
 
-      tu = transport.upcase
-      case transport
+      case transport_name
       when 'ssh'
         default_port = 20022
       when 'winrm'
@@ -23,9 +23,15 @@ module BoltSpec
         default_user = ''
         default_password = ''
         default_host = 'ubuntu_node'
+      when 'docker-windows'
+        default_user = ''
+        default_password = ''
+        default_host = 'windows_node'
+        transport = 'docker'
       else
-        raise Error, "The transport must be either 'ssh' or 'winrm'"
+        raise Error, "The transport must be either 'ssh', 'winrm', 'docker' or 'docker-windows'"
       end
+      tu = transport.upcase
 
       {
         protocol: transport,

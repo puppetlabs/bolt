@@ -1,0 +1,10 @@
+version: "3"
+services:
+  windows_node:
+    # The WINDOWS_TAG env var is the tag name of the image to use e.g. 1909
+    # You can get this via PowerShell
+    # e.g. $ENV:WINDOWS_TAG = (Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion").ReleaseId
+    image: "mcr.microsoft.com/windows/servercore:${WINDOWS_TAG}"
+    # Run forever
+    entrypoint: ['powershell.exe', '-NoLogo', '-NoProfile', '-Command', 'Start-Sleep -Seconds 2147483']
+    container_name: windows_node

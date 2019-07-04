@@ -52,6 +52,7 @@ describe Bolt::Transport::SSH do
   let(:target) { make_target }
 
   context 'with ssh', ssh: true do
+    let(:default_transport_conf) { {} }
     let(:target) { make_target(conf: no_host_key_check) }
     let(:transport) { :ssh }
     let(:os_context) { posix_context }

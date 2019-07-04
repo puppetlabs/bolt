@@ -19,7 +19,7 @@ RSpec::Core::RakeTask.new(:spec)
 
 desc "Run RSpec tests that don't require VM fixtures or a particular shell"
 RSpec::Core::RakeTask.new(:unit) do |t|
-  t.rspec_opts = '--tag ~ssh --tag ~docker --tag ~bash --tag ~winrm ' \
+  t.rspec_opts = '--tag ~ssh --tag ~docker --tag ~docker_wcow --tag ~bash --tag ~winrm ' \
                  '--tag ~windows_agents --tag ~puppetserver --tag ~puppetdb ' \
                  '--tag ~omi --tag ~kerberos'
 end
@@ -33,7 +33,7 @@ end
 
 desc "Run RSpec tests for CI that don't require WinRM"
 RSpec::Core::RakeTask.new(:fast) do |t|
-  t.rspec_opts = '--tag ~winrm --tag ~windows_agents --tag ~puppetserver --tag ~puppetdb ' \
+  t.rspec_opts = '--tag ~winrm --tag ~docker_wcow --tag ~windows_agents --tag ~puppetserver --tag ~puppetdb ' \
   '--tag ~omi --tag ~windows --tag ~kerberos --tag ~expensive'
 end
 
