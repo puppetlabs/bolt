@@ -11,6 +11,7 @@ Bolt server can be configured by defining content in HOCON format at one of the 
 **Plan Executor Config**: `/etc/puppetlabs/plan-executor/conf.d/plan-executor.conf`
 
 **Shared Options**
+
 Most options are shared by the bolt server and plan executor applications
 - `host`: String, *optional* - Hostname for server (default "127.0.0.1").
 - `port`: Integer, *optional* - The port the bolt server will run on (default 62658).
@@ -30,7 +31,7 @@ Most options are shared by the bolt server and plan executor applications
 - `orchestrator-url`: String, *required* - The hostname of the orchestrator service
 - `workers`: Integer, *optional* - The number of worker processes to create (default `1`).
 
-**Environmnet Variable Options**
+**Environment Variable Options**
 The following configuration options can be set with environment variables. 
 - `BOLT_SSL_CERT`
 - `BOLT_SSL_KEY`
@@ -152,8 +153,7 @@ object](https://github.com/puppetlabs/puppetserver/blob/master/documentation/pup
 from [puppetserver](https://github.com/puppetlabs/puppetserver), with an
 additional `file_content` key.
 
-See the [schema](../lib/bolt_server/schemas/task.json)
-The task is a JSON object which includes the following keys:
+See the [schema](../lib/bolt_server/schemas/task.json). The task is a JSON object which includes the following keys:
 
 #### Name
 
@@ -162,7 +162,7 @@ The name of the task
 #### Metadata
 The metadata object is optional, and contains metadata about the task being run. It includes the following keys:
 
-- `description`: String, *optional* - The task description from it's metadata.
+- `description`: String, *optional* - The task description from its metadata.
 - `parameters`: Object, *optional* - A JSON object whose keys are parameter names, and whose values are JSON objects with 2 keys:
     - `description`: String, *optional* - The parameter description.
     - `type`: String, *optional* - The type the parameter should accept.
@@ -180,7 +180,7 @@ The files array is required, and contains details about the files the task needs
 - `size`: Number, *optional* - Size of file in Bytes
 
 ### Response
-If the task runs the response will have status 200.
+If the task runs, the response will have status 200.
 The response will be a standard bolt Result JSON object.
 
 ## Plan Executor API Endpoints
@@ -217,7 +217,7 @@ If successful, this will return
 ## Running Bolt Server in a container
 *Recommended*
 
-From your checkout of bolt start the spec docker-compose to run
+From your checkout of bolt, start the spec docker-compose to run
 puppet-server and some targets then run the top level compose to start
 bolt-server connected to that network.
 
@@ -241,7 +241,7 @@ curl -v --cacert $BOLT_CACERT --cert $BOLT_CERT --key $BOLT_KEY $BOLT_ROOT
 
 ## Running from source
 
-From your checkout of bolt run
+From your checkout of bolt, run
 
 ```
 BOLT_SERVER_CONF=config/local.conf bundle exec puma -C puppet_config.rb
@@ -294,7 +294,7 @@ bundle exec scripts/server_client.rb sample::echo ssh://bolt:bolt@172.20.0.1:200
 
 ### With cURL
 
-The following is an example request body. There are other request examples in the `developer-docs/examples` directory. Note that all tasks in the `bolt/spec/fixtures/modules` are available from the puppetserver container, so a json request can be constructed using those tasks and the json structure below.
+The following is an example request body. There are other request examples in the `developer-docs/examples` directory. Note that all tasks in the `bolt/spec/fixtures/modules` are available from the puppetserver container, so a JSON request can be constructed using those tasks and the JSON structure below.
 
 ```
 {"task":{
