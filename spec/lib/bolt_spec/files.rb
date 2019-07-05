@@ -11,6 +11,7 @@ module BoltSpec
                  name
                end
       Tempfile.open(params) do |file|
+        file.binmode # Stop Ruby implicitly doing CRLF translations and breaking tests
         file.write(contents)
         file.flush
         yield file
