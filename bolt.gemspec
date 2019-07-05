@@ -36,7 +36,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "addressable", '~> 2.5'
   spec.add_dependency "CFPropertyList", "~> 2.2"
   spec.add_dependency "concurrent-ruby", "~> 1.0"
-  spec.add_dependency "docker-api", "~> 1.34"
   spec.add_dependency "hiera-eyaml", "~> 3"
   spec.add_dependency "logging", "~> 2.2"
   spec.add_dependency "minitar", "~> 0.6"

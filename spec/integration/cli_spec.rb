@@ -12,9 +12,6 @@ describe "when loading bolt for CLI invocation" do
     let(:loaded_features) { cli_loaded_features }
 
     [
-      # docker-api + dependencies
-      'docker-api',
-      'excon',
       # ruby_smb + dependencies
       'ruby_smb',
       'bindata',
