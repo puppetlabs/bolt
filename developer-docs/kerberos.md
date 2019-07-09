@@ -214,3 +214,34 @@ Once DNS and the Kerberos client are properly configured, `kinit` can be used to
 To remove the ticket, use:
 
 > kdestroy --credential=krbtgt/BOLT.TEST@BOLT.TEST
+
+### Advanced: Debugging Bolt + OMI
+
+#### Building OMI server from source
+
+When debugging interoperability problems between the winrm gem and OMI server, it may be necessary to build OMI server from source, rather than consuming packages. This makes it easy to modify OMI server code, rebuild and start using it immediately. When starting the containers, add the build arg `BUILD_OMI=true` like:
+
+> docker-compose -f spec/docker-compose.yml build --build-arg BUILD_OMI=true samba-ad omiserver
+> docker-compose -f spec/docker-compose.yml up -d --build samba-ad omiserver
+
+This will:
+
+* install vim
+* install all necessary dev / build tooling
+* clone source from https://github.com/Microsoft/omi to `/tmp/omi`
+* write the script `/build-omi.sh` inside the container
+* increase sssd log output
+* tail sssd logs and OMI messages in addition to OMI logs
+
+##### `/build-omi.sh`
+
+Run this script at any point after making changes to the source in `/tmp/omi` to build and redeploy OMI server. This will also make sure that the OMI `loglevel` config setting is set to `VERBOSE`
+
+##### OMI source notes
+
+In some cases, OMI server source has to be modified to increase log output, in addition to the `loglevel` change thats already been made. One such example is [Unix/sock/sock.c](https://github.com/microsoft/omi/blob/master/Unix/sock/sock.c#L39-L41), where values must be uncommented like:
+
+```
+# define ENABLE_TRACING 1
+# define TRACING_LEVEL 4
+```
