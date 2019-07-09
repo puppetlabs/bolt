@@ -3,6 +3,9 @@ version: 0.1.0.{build}-{branch}
 cache:
   - .bundle
 
+# Build worker image (VM template)
+image: Visual Studio 2017
+
 matrix:
   fast_finish: true
 
