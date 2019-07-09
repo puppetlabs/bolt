@@ -7,7 +7,9 @@
 /pkg/
 /spec/reports/
 /spec/examples.txt
+# Generated during integration tests
 /spec/fixtures/configs/debug.log
+/spec/fixtures/configs/.rerun.json
 /test/tmp/
 /test/version_tmp/
 /tmp/

@@ -25,7 +25,7 @@ end
 
 desc "Run RSpec tests for AppVeyor that don't require SSH, Bash, Appveyor Puppet Agents, or orchestrator"
 RSpec::Core::RakeTask.new(:appveyor) do |t|
-  t.rspec_opts = '--tag ~ssh -tag ~bash --tag ~appveyor_agents ' \
+  t.rspec_opts = '--tag ~ssh --tag ~docker --tag ~bash --tag ~appveyor_agents ' \
          '--tag ~orchestrator --tag ~puppetserver --tag ~puppetdb --tag ~omi'
 end
 
