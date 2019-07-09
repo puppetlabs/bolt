@@ -82,31 +82,31 @@ for:
           if($test_fail) { throw "module tests failed" }
           cd ../..
 
-  -
-    matrix:
-      exclude:
-        - configuration: Agentfull
-          RUBY_VERSION: 23
-        - configuration: Agentfull
-          RUBY_VERSION: 24
+  # -
+  #   matrix:
+  #     exclude:
+  #       - configuration: Agentfull
+  #         RUBY_VERSION: 23
+  #       - configuration: Agentfull
+  #         RUBY_VERSION: 24
 
-    environment:
-      APPVEYOR_AGENTS: true
+  #   environment:
+  #     APPVEYOR_AGENTS: true
 
-    before_test:
-      - ps: |
-          ruby -v
-          gem -v
-          bundle -v
-          type Gemfile.lock
-          . .\ci.ps1
-          Install-Puppetfile
-          $ENV:BOLT_WINRM_PASSWORD = New-RandomPassword
-          $user = @{ UserName = $ENV:BOLT_WINRM_USER; Password = $ENV:BOLT_WINRM_PASSWORD }
-          New-LocalAdmin @user
-          Set-WinRMHostConfiguration
-          Set-ActiveRubyFromPuppet
-          Test-WinRMConfiguration @user | Out-Null
+  #   before_test:
+  #     - ps: |
+  #         ruby -v
+  #         gem -v
+  #         bundle -v
+  #         type Gemfile.lock
+  #         . .\ci.ps1
+  #         Install-Puppetfile
+  #         $ENV:BOLT_WINRM_PASSWORD = New-RandomPassword
+  #         $user = @{ UserName = $ENV:BOLT_WINRM_USER; Password = $ENV:BOLT_WINRM_PASSWORD }
+  #         New-LocalAdmin @user
+  #         Set-WinRMHostConfiguration
+  #         Set-ActiveRubyFromPuppet
+  #         Test-WinRMConfiguration @user | Out-Null
 
-    test_script:
-      - bundle exec rake integration:appveyor_agents
+  #   test_script:
+  #     - bundle exec rake integration:appveyor_agents
