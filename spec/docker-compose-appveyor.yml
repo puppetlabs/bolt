@@ -1,0 +1,60 @@
+version: "3"
+services:
+  ubuntu_node:
+    build: .
+    image: bolt-spec
+    ports:
+      - "20022:22"
+    container_name: ubuntu_node
+  # puppet_5_node:
+  #   image:  bolt-spec
+  #   depends_on:
+  #     - ubuntu_node
+  #   ports:
+  #     - "20023:22"
+  # puppet_6_node:
+  #   image:  bolt-spec
+  #   depends_on:
+  #     - ubuntu_node
+  #   ports:
+  #     - "20024:22"
+
+  # postgres:
+  #   image: postgres:9.6
+  #   environment:
+  #     - POSTGRES_PASSWORD=puppetdb
+  #     - POSTGRES_USER=puppetdb
+  #     - POSTGRES_DB=puppetdb
+  #   volumes:
+  #     - ./fixtures/puppetdb/custom_source:/docker-entrypoint-initdb.d
+  # puppetdb:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.puppetdb
+  #   environment:
+  #     - "USE_PUPPETSERVER=false"
+  #   image: puppetdb
+  #   ports:
+  #     # 8081 is a common port
+  #     - "18081:8081"
+
+  # puppetserver:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.puppetserver
+  #   image: puppet-server
+  #   ports:
+  #     - "8140:8140"
+  #   volumes:
+  #     - ./fixtures/modules:/etc/puppetlabs/code/modules
+
+  # omiserver:
+  #   hostname: omiserver
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.omiserver
+  #     args:
+  #       BOLT_PASSWORD: bolt
+  #   ports:
+  #     - "24985:5985"
+  #     - "24986:5986"

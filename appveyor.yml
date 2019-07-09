@@ -50,9 +50,9 @@ for:
           New-LocalAdmin @user
           Set-WinRMHostConfiguration
           Test-WinRMConfiguration @user | Out-Null
+          docker-compose -f spec/docker-compose-appveyor.yml up -d --build
 
     test_script:
-      - ps: Write-Host "Hello"
       - bundle exec rake appveyor
       # - ps: |
       #     $test_fail = 0
