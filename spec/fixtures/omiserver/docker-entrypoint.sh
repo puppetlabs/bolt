@@ -26,9 +26,17 @@ sync
 cat << EOF
 
 ************************************************************
-Tailing OMI Server Logs
+Tailing OMI Server Logs - Extra Logs: ${OMI_EXTRA_LOGS}
 ************************************************************
 
 EOF
 
-tail -f /var/opt/omi/log/omiserver.log
+if [ "$OMI_EXTRA_LOGS" = "true" ]
+then
+  tail -f /var/opt/omi/log/omiserver.log \
+    /var/log/sssd/sssd.log \
+    /var/opt/omi/log/omiserver-recv.trc \
+    /var/opt/omi/log/omiserver-send.trc
+else
+  tail -f /var/opt/omi/log/omiserver.log
+fi
