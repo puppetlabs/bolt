@@ -52,35 +52,36 @@ for:
           Test-WinRMConfiguration @user | Out-Null
 
     test_script:
+      - ps: Write-Host "Hello"
       - bundle exec rake appveyor
-      - ps: |
-          $test_fail = 0
-          $mods = ("boltlib", "ctrl", "file", "out", "system")
-          Get-ChildItem bolt-modules -Directory -Include $mods | foreach {
-            cd $_.FullName;
-            $test_output = bundle exec rake spec
-            $r = $LASTEXITCODE
-            Write-Output $test_output
-            if($r) {
-              $test_fail = $r
-            }
-          }
-          if($test_fail) { throw "core module tests failed" }
-          cd ../..
-      - ps: |
-          $test_fail = 0
-          $mods = ("canary", "aggregate", "puppetdb_fact")
-          Get-ChildItem modules -Directory -Include $mods | foreach {
-            cd $_.FullName;
-            $test_output = bundle exec rake spec
-            $r = $LASTEXITCODE
-            Write-Output $test_output
-            if($r) {
-              $test_fail = $r
-            }
-          }
-          if($test_fail) { throw "module tests failed" }
-          cd ../..
+      # - ps: |
+      #     $test_fail = 0
+      #     $mods = ("boltlib", "ctrl", "file", "out", "system")
+      #     Get-ChildItem bolt-modules -Directory -Include $mods | foreach {
+      #       cd $_.FullName;
+      #       $test_output = bundle exec rake spec
+      #       $r = $LASTEXITCODE
+      #       Write-Output $test_output
+      #       if($r) {
+      #         $test_fail = $r
+      #       }
+      #     }
+      #     if($test_fail) { throw "core module tests failed" }
+      #     cd ../..
+      # - ps: |
+      #     $test_fail = 0
+      #     $mods = ("canary", "aggregate", "puppetdb_fact")
+      #     Get-ChildItem modules -Directory -Include $mods | foreach {
+      #       cd $_.FullName;
+      #       $test_output = bundle exec rake spec
+      #       $r = $LASTEXITCODE
+      #       Write-Output $test_output
+      #       if($r) {
+      #         $test_fail = $r
+      #       }
+      #     }
+      #     if($test_fail) { throw "module tests failed" }
+      #     cd ../..
 
   # -
   #   matrix:
