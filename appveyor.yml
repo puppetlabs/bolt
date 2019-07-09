@@ -20,6 +20,11 @@ environment:
   BOLT_WINRM_SSL_PORT: 5986
   BOLT_WINRM_SMB_PORT: 445
   RUBY_VERSION: 25
+  APPVEYOR_RDP_PASSWORD: Password01!
+
+on_finish:
+  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+
 
 install:
   - set PATH=C:\Ruby%RUBY_VERSION%\bin;%PATH%
