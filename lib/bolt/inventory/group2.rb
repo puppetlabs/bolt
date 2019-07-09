@@ -201,7 +201,7 @@ module Bolt
 
       def lookup_targets(lookup)
         unless (plugin = @plugins.by_name(lookup['_plugin']))
-          raise ValidationError.new("Target lookup specifies an unknown plugin: '#{lookup['plugin']}'", @name)
+          raise ValidationError.new("Target lookup specifies an unknown plugin: \"#{lookup['_plugin']}\"", @name)
         end
         unless plugin.hooks.include?('inventory_targets')
           raise ValidationError.new("#{plugin.name} does not support inventory_targets.", @name)
