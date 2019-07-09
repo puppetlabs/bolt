@@ -7,7 +7,7 @@ matrix:
   fast_finish: true
 
 configuration:
-  - Agentfull
+  #- Agentfull
   - Agentless
 
 environment:
