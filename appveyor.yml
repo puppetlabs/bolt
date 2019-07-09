@@ -9,9 +9,9 @@ image: Visual Studio 2017
 matrix:
   fast_finish: true
 
-configuration:
+configuration: Agentless
   #- Agentfull
-  - Agentless
+  # - Agentless
 
 environment:
   BOLT_WINRM_USER: roddypiper
