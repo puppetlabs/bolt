@@ -19,6 +19,7 @@ Bolt commands use the syntax: `bolt <subcommand> <action> [options]`
 | `bolt plan convert` | Converts a YAML plan to a Puppet plan | - The path (relative or absolute) to the YAML plan to be converted.
 | `bolt puppetfile install` | Installs the modules listed in the Puppetfile to the current `Boltdir`. | |
 | `bolt puppetfile show-modules` | Lists the modules, and their versions, that are installed in the current `Boltdir`. | |
+| `bolt inventory show` | Show the list of targets an action would run on. | - The inventory targets to show. |
 
 ## Command options
 
