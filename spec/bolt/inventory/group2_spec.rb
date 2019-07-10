@@ -1026,10 +1026,18 @@ describe Bolt::Inventory::Group2 do
           .to raise_error(/Cannot set target "uri" with plugin/)
       end
 
-      it 'fails if an unknown plugin is requested' do
-        data['config'] = { 'ssh' => { 'password' => { '_plugin' => 'unknown' } } }
-        expect { Bolt::Inventory::Group2.new(data, plugins) }
-          .to raise_error(/unknown plugin: "unknown"/)
+      context 'fails if an unknown plugin is requested' do
+        it 'for config only plugin' do
+          data['config'] = { 'ssh' => { 'password' => { '_plugin' => 'unknown' } } }
+          expect { Bolt::Inventory::Group2.new(data, plugins) }
+            .to raise_error(/unknown plugin: "unknown"/)
+        end
+
+        it 'for target plugin' do
+          data['targets'] = [{ '_plugin' => 'unknown' }]
+          expect { Bolt::Inventory::Group2.new(data, plugins) }
+            .to raise_error(/unknown plugin: "unknown"/)
+        end
       end
 
       it 'fails with an unsupported targets plugin' do
