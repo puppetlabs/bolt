@@ -91,7 +91,7 @@ module Bolt
                                   " using '#{execute_options[:interpreter]}' interpreter"
                                 end
             # log the arguments with sensitive data redacted, do NOT log unwrapped_arguments
-            logger.debug("Running '#{executable}' with #{arguments}#{interpreter_debug}")
+            logger.debug("Running '#{executable}' with #{arguments.to_json}#{interpreter_debug}")
             # unpack any Sensitive data
             arguments = unwrap_sensitive_args(arguments)
 
