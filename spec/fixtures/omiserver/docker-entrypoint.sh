@@ -4,6 +4,9 @@ set -e
 /opt/omi/bin/omiserver --version
 pwsh --version
 
+./kerberos-client-config.sh
+./domain-join.sh
+
 cat << EOF
 
 ************************************************************

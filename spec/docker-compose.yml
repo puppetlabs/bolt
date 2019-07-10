@@ -50,6 +50,11 @@ services:
 
   omiserver:
     hostname: omiserver
+    domainname: bolt.test
+    # must use Samba AD for DNS
+    dns:
+      - 172.22.0.100
+      - 8.8.8.8
     build:
       context: .
       dockerfile: Dockerfile.omiserver
@@ -58,6 +63,16 @@ services:
     ports:
       - "45985:5985"
       - "45986:5986"
+    environment:
+      KRB5_REALM: ${KRB5_REALM:-BOLT.TEST}
+      KRB5_KDC: ${KRB5_KDC:-samba-ad.bolt.test}
+      SMB_DOMAIN: ${SMB_DOMAIN:-BOLT}
+      SMB_ADMIN: Administrator
+      SMB_ADMIN_PASSWORD: ${SMB_ADMIN_PASSWORD:-B0ltrules!}
+    depends_on:
+      - samba-ad
+    networks:
+      BOLT.TEST:
 
   samba-ad:
     hostname: samba-ad
@@ -86,6 +101,8 @@ services:
     networks:
       BOLT.TEST:
         ipv4_address: 172.22.0.100
+        aliases:
+          - samba-ad.bolt.test
 
 networks:
   BOLT.TEST:

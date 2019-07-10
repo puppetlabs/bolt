@@ -15,3 +15,24 @@ Verifying HTTPS Basic auth bolt:${BOLT_PASSWORD} with omicli
 EOF
 
 /opt/omi/bin/omicli --hostname omiserver -u bolt -p ${BOLT_PASSWORD} id --auth Basic --encryption https
+
+cat << EOF
+
+************************************************************
+Verifying HTTP SPNEGO auth bolt:${BOLT_PASSWORD} with omicli
+************************************************************
+
+EOF
+
+/opt/omi/bin/omicli --hostname omiserver -u bolt -p ${BOLT_PASSWORD} id --auth NegoWithCreds --encryption http
+
+
+cat << EOF
+
+************************************************************
+Verifying HTTPS SPNEGO auth bolt:${BOLT_PASSWORD} with omicli
+************************************************************
+
+EOF
+
+/opt/omi/bin/omicli --hostname omiserver -u bolt -p ${BOLT_PASSWORD} id --auth NegoWithCreds --encryption https

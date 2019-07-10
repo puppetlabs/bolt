@@ -23,3 +23,31 @@ PS="Invoke-Command -ComputerName omiserver $COMMAND $AUTH $SSL $CREDS"
 /usr/bin/pwsh -Command ''$PS'' | tee /tmp/psversion.txt
 
 cat /tmp/psversion.txt | grep ^OS.*Linux
+
+cat << EOF
+
+************************************************************
+Verifying HTTP SPNEGO auth bolt:${BOLT_PASSWORD} with pwsh
+************************************************************
+
+EOF
+
+AUTH='-Authentication Negotiate'
+PS="Invoke-Command -ComputerName omiserver $COMMAND $AUTH $CREDS"
+/usr/bin/pwsh -Command ''$PS'' | tee /tmp/psversion.txt
+
+cat /tmp/psversion.txt | grep ^OS.*Linux
+
+cat << EOF
+
+************************************************************
+Verifying HTTPS SPNEGO auth bolt:${BOLT_PASSWORD} with pwsh
+************************************************************
+
+EOF
+
+AUTH='-Authentication Negotiate'
+PS="Invoke-Command -ComputerName omiserver $COMMAND $AUTH $SSL $CREDS"
+/usr/bin/pwsh -Command ''$PS'' | tee /tmp/psversion.txt
+
+cat /tmp/psversion.txt | grep ^OS.*Linux

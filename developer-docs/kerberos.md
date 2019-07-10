@@ -81,6 +81,8 @@ winrm:
 
 In Bolt testing atop Docker containers, [Samba server](https://www.samba.org/) is setup on Linux to approximate an Active Directory setup, which also includes DNS and LDAP support. Given Kerberos has very strict requirements around computer identity (via DNS), Docker user-defined networks with custom DNS and subnets are easier to setup than running in an arbitrary network environment. This lends itself well to an automated and reproducable ephemeral Kerberos environment.
 
+[OMI Server](https://github.com/microsoft/omi) requires the additional Active Directory-like features beyond just a KDC to enable Kerberos based authentication. OMI provides a PowerShell WinRM endpoint on Linux that is intended to behave like the equivalent Windows endpoint.
+
 This environment is intended to support multiple environments:
 
 * [TravisCI automated testing](#travisCI-automated-testing)
@@ -88,15 +90,15 @@ This environment is intended to support multiple environments:
 
 #### Container Setup
 
-The current `spec/docker-compose.yml` supports a number of containers, many of which are intended to be built when started. For Kerberos, build / start just the relevant container:
+The current `spec/docker-compose.yml` supports a number of containers, many of which are intended to be built when started. For Kerberos, build / start just the relevant containers:
 
-`docker-compose -f spec/docker-compose.yml up -d --build samba-ad`
+`docker-compose -f spec/docker-compose.yml up -d --build samba-ad omiserver`
 
 ##### Samba AD (KDC)
 
-A Kerberos server is provided by running an Alpine container with Samba as an Active Directory domain controller. The Kerberos realm is `BOLT.TEST`, Active Directory domain is `BOLT.TEST` (short name `BOLT`) and DNS suffix is `bolt.test`
+A Kerberos server is provided by running an Alpine container with Samba as an [Active Directory domain controller](https://wiki.samba.org/index.php/Setting_up_Samba_as_an_Active_Directory_Domain_Controller). The Kerberos realm is `BOLT.TEST`, Active Directory domain is `BOLT.TEST` (short name `BOLT`) and DNS suffix is `bolt.test`
 
-This container provides DNS and LDAP support, and a variety of [other services](https://wiki.samba.org/index.php/Samba_AD_DC_Port_Usage) including:
+This container provides DNS and LDAP support, but does not contain NTP as that is already provided in a Docker environment. It also hosts a variety of [other services](https://wiki.samba.org/index.php/Samba_AD_DC_Port_Usage) including:
 
 ###### External Ports / Services
 
@@ -125,8 +127,40 @@ To access the shell, use `/bin/sh` like:
 
 Useful tooling on the instance for managing Active Directory includes:
 
-* [`samba-tool`](https://www.samba.org/samba/docs/current/man-html/samba-tool.8.html) - primary Samba admin tool 
+* [`samba-tool`](https://www.samba.org/samba/docs/current/man-html/samba-tool.8.html) - primary Samba admin tool
 * [`net`](https://www.samba.org/samba/docs/current/man-html/net.8.html) - designed to work like the `net` tool on Windows
+
+##### OMI Server
+
+An Ubuntu container running OMI server and listening on both the HTTP and HTTPS WinRM endpoints is intended to simulate a Windows host in a non-Windows environment.
+
+On startup, the container is automatically domain joined to the Samba active directory and is reachable inside the UDN as `omiserver.bolt.test`. As with the Samba container, add an entry to `/etc/hosts` to be able to access it via DNS name from the Docker host environment.
+
+On startup, the Docker entrypoint script waits for the domain to be resolved via DNS and accessible before attempting to perform a domain join with `realm join` followed by `net ads join` (after configuring local Kerberos and Samba clients). The [`sssd`](https://docs.pagure.org/SSSD.sssd/) service is setup to use the [`ad provider`](https://docs.pagure.org/SSSD.sssd/users/ad_provider.html) so that it may look up domain accounts locally.
+
+The container performs a basic validation using `getent passwd administrator@BOLT.TEST` to verify the system is properly configured and domain joined. It then uses the `omicli` tool and the PowerShell cmdlet `Invoke-Command` to vet that the `bolt:bolt` account can authenticate properly.
+
+At this stage, OMI server is not yet configured to use Kerberos authentication, so that connectivity is not verified.
+
+###### External Ports
+
+* 45985 (tcp) - WinRM HTTP (internally 5985)
+* 45986 (tcp) - WinRM HTTPS (internally 5986)
+
+###### Interactive Shell Access
+
+To access the shell, use `/bin/bash` like:
+
+> docker-compose -f spec/docker-compose.yml exec omiserver /bin/bash
+
+Useful tooling on the instance includes:
+
+* [`host`](https://linux.die.net/man/1/host) - DNS lookup utility
+* [`klist`](https://web.mit.edu/kerberos/krb5-devel/doc/user/user_commands/klist.html) - check Kerberos tickets
+* [`realm`](https://www.systutorials.com/docs/linux/man/8-realm/) - manages enrollment in Kerberos realms and Active Directory domains
+* [`net`](https://www.samba.org/samba/docs/current/man-html/net.8.html) - designed to work like the `net` tool on Windows
+* [`pwsh`](https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-core-on-linux?view=powershell-6) - PowerShell 6
+* [`omicli`](https://github.com/microsoft/omi/blob/master/Unix/cli/examples.txt) - client tool used to verify basic OMI server functionality
 
 #### TravisCI automated testing
 
@@ -136,7 +170,7 @@ At present, Travis setup will:
 * Install the Kerberos client package
 * Configure the Kerberos client with the approriate server (`samba-ad.bolt.test`) for the realm `BOLT.TEST`
 
-Automated tests (in `spec/bolt/transport/winrm_spec.rb`) simplify verify that the correct TGT can be acquired from the Samba AD using `kinit` using the domain administrator account `Administrator@BOLT.TEST`.
+Automated tests (in `spec/bolt/transport/winrm_spec.rb`) verify that the correct TGT (ticket granting ticket) can be acquired from the Samba AD using `kinit` using the domain administrator account `Administrator@BOLT.TEST`.
 
 Previously added tests are still marked pending until other infrastructure within Docker is configured to use Kerberos.
 

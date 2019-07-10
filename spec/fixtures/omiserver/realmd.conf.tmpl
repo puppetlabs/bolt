@@ -1,0 +1,17 @@
+[users]
+default-home = /home/%D/%U
+default-shell = /bin/bash
+
+[active-directory]
+default-client = sssd
+os-name = Ubuntu Desktop Linux
+os-version = 16.04
+
+[service]
+automatic-install = no
+
+[${KRB5_REALM_LOWER}]
+fully-qualified-names = no
+automatic-id-mapping = yes
+user-principal = yes
+manage-system = no
