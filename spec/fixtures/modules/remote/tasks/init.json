@@ -1,3 +1,7 @@
 {
-  "remote": true
+  "remote": true,
+  "implementations": [
+    {"name": "init.sh", "requirements": ["shell"]},
+    {"name": "init.ps1", "requirements": ["powershell"]}
+  ]
 }

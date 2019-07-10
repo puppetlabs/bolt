@@ -14,7 +14,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
   include BoltSpec::Integration
   include BoltSpec::PuppetDB
 
-  let(:conn) { conn_info('ssh') }
+  let(:conn) { conn_info('winrm') }
   let(:inventory) do
     { version: 2,
       targets: [
@@ -324,7 +324,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
     include_examples 'basic inventory'
   end
 
-  context 'when running over remote', bash: true do
+  context 'when running over remote' do
     let(:inventory) do
       { version: 2,
         targets: [
@@ -346,7 +346,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
   end
 
   context 'when running over local', bash: true do
-    let(:shell_cmd) { "whoami" }
+    let(:shell_cmd) { Bolt::Util.windows? ? "$env:UserName" : "whoami" }
 
     let(:inventory) do
       { version: 2 }
