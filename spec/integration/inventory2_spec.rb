@@ -324,7 +324,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
     include_examples 'basic inventory'
   end
 
-  context 'when running over remote', bash: true do
+  context 'when running over remote with bash shell', bash: true do
     let(:inventory) do
       { version: 2,
         targets: [
@@ -345,7 +345,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
     end
   end
 
-  context 'when running over local', bash: true do
+  context 'when running over local with bash shell', bash: true do
     let(:shell_cmd) { "whoami" }
 
     let(:inventory) do
