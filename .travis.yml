@@ -57,7 +57,11 @@ script:
   fi
 - bundle exec rake puppetserver
 after_script:
-- docker-compose -f spec/docker-compose.yml logs
+- |
+  sync
+  export line_sep=$(printf '%*s' 80 | tr ' ' '#')
+  docker ps --all -q | xargs -L 1 -I % sh -c 'echo "\n${line_sep}\nContainer Logs - $(docker inspect % --format={{.Name}})\n${line_sep}\n"; docker logs %'
+  sleep 3s
 deploy:
   provider: script
   on:
