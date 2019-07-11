@@ -92,6 +92,17 @@ envsubst < smb.conf.tmpl | tee /etc/samba/smb.conf
 cat << EOF
 
 ************************************************************
+Creating /etc/samba/user.map
+************************************************************
+
+EOF
+
+envsubst < user.map.tmpl | tee /etc/samba/user.map
+
+
+cat << EOF
+
+************************************************************
 Joining domain ${KRB5_REALM_LOWER} as ${SMB_ADMIN} using realm
 ************************************************************
 

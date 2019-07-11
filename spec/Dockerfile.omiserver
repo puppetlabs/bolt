@@ -112,6 +112,7 @@ ADD fixtures/samba-ad/krb5.conf.tmpl /
 ADD fixtures/omiserver/domain-join.sh /
 ADD fixtures/omiserver/realmd.conf.tmpl /
 ADD fixtures/omiserver/smb.conf.tmpl /
+ADD fixtures/omiserver/user.map.tmpl /
 ADD fixtures/omiserver/sssd.conf.tmpl /
 ADD fixtures/omiserver/omi-enable-kerberos-auth.sh /
 ADD fixtures/omiserver/verify-omi-authentication.sh /

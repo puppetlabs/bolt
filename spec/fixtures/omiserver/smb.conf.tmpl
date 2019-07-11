@@ -4,6 +4,7 @@ security = ads
 realm = ${KRB5_REALM_LOWER}
 server role = member server
 kerberos method = secrets and keytab
+username map = /etc/samba/user.map
 
 # defaults from Ubuntu smb.conf
 server string = %h server (Samba, Ubuntu)
