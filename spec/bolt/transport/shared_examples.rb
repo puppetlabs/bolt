@@ -180,23 +180,15 @@ shared_examples 'transport api' do
                              'with spaces',
                              "\"double double\"",
                              "'double single'",
-                             '\'single single\'',
-                             '"single double"',
                              "double \"double\" double",
-                             "double 'single' double",
-                             'single "double" single',
-                             'single \'single\' single'])['stdout']
+                             "double 'single' double"])['stdout']
         ).to eq(<<QUOTED)
 nospaces
 with spaces
 "double double"
 'double single'
-'single single'
-"single double"
 double "double" double
 double 'single' double
-single "double" single
-single 'single' single
 QUOTED
       end
     end
