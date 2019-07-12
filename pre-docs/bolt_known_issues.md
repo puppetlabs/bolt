@@ -27,8 +27,8 @@ Workaround: Generate new keys with the ssh-keygen flag `-m PEM`. For existing ke
 
 When passing complex arguments to tasks with `--params`, Bolt may require a JSON string (typically created with the `ConvertTo-Json` cmdlet) to have additional escaping. In some cases, the PowerShell stop parsing symbol `--%` may be used as a workaround, until Bolt provides better PowerShell support [\(BOLT-1130\)](https://tickets.puppet.com/browse/BOLT-1130)
 
-## No Kerberos support
+## Limited Kerberos support
 
 While we would like to support Kerberos over SSH for authentication, a license incompatibility with other components we are distributing means that we cannot recommend using the net-ssh-krb gem for this functionality. [\(BOLT-980\)](https://tickets.puppet.com/browse/BOLT-980)
 
-Note that support for Kerberos over WinRM, both from Windows and non-Windows hosts, is also unimplemented. [\(BOLT-126\)](https://tickets.puppet.com/browse/BOLT-126)
+Support for Kerberos over WinRM from a Linux host is currently experimental and requires the [MIT kerberos library be installed](https://web.mit.edu/Kerberos/www/krb5-latest/doc/admin/install_clients.html). Support from Windows [\(BOLT-1323\)](https://tickets.puppet.com/browse/BOLT-1323) and OSX [\(BOLT-1471\)](https://tickets.puppet.com/browse/BOLT-1471) will be implemented in the future.

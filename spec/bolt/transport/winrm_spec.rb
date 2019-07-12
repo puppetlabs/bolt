@@ -204,6 +204,36 @@ PS
     end
   end
 
+  context "authenticating with Kerberos", kerberos: true do
+    before(:all) do
+      # disable all tests on Windows for now
+      skip('Windows Active Directory tickets are different') if Bolt::Util.windows?
+
+      @kerb_user = 'Administrator'
+      @kerb_realm = 'BOLT.TEST'
+    end
+
+    let(:omi_http_kerb_target) do
+      conf = mk_config(ssl: false, realm: @kerb_realm)
+      make_target(host_: 'omiserver.bolt.test', port_: 45985, conf: conf)
+    end
+
+    let(:omi_https_kerb_target) do
+      conf = mk_config(ssl: true, realm: @kerb_realm, 'ssl-verify': false)
+      make_target(host_: 'omiserver.bolt.test', port_: 45986, conf: conf)
+    end
+
+    it "executes a command on a host over HTTP" do
+      pending("Not yet implemented")
+      expect(winrm.run_command(omi_http_kerb_target, command)['stdout']).to eq("#{@kerb_user}\r\n")
+    end
+
+    it "executes a command on a host over HTTPS" do
+      pending("Not yet implemented")
+      expect(winrm.run_command(omi_https_kerb_target, command)['stdout']).to eq("#{@kerb_user}\r\n")
+    end
+  end
+
   context "with an open connection" do
     it "can test whether the target is available", winrm: true do
       expect(winrm.connected?(target)).to eq(true)

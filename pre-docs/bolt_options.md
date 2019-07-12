@@ -138,7 +138,7 @@ If `localhost` is passed to `--nodes` when invoking Bolt the `local` trans
 
 ## Specify connection credentials
 
-To run Bolt on target nodes that require a username and password, pass credentials as options on the command line.
+To run Bolt on target nodes that require a username and password, pass credentials as options on the command line. For target nodes that use Kerberos authentication, pass a realm instead.
 
 Bolt connects to remote nodes with either SSH or WinRM.
 

@@ -38,7 +38,7 @@ module Bolt
 
     TRANSPORT_OPTIONS = %i[password run-as sudo-password extensions
                            private-key tty tmpdir user connect-timeout
-                           cacert token-file service-url interpreters file-protocol smb-port].freeze
+                           cacert token-file service-url interpreters file-protocol smb-port realm].freeze
 
     PUPPETFILE_OPTIONS = %w[proxy forge].freeze
 

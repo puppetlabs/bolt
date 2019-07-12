@@ -38,13 +38,17 @@ module Bolt
             scheme = 'http'
             transport = :negotiate
           end
+
+          transport = :kerberos if target.options['realm']
           endpoint = "#{scheme}://#{target.host}:#{@port}/wsman"
           options = { endpoint: endpoint,
-                      user: @user,
-                      password: target.password,
+                      # https://github.com/WinRb/WinRM/issues/270
+                      user: target.options['realm'] ? 'dummy' : @user,
+                      password: target.options['realm'] ? 'dummy' : target.password,
                       retry_limit: 1,
                       transport: transport,
                       ca_trust_path: target.options['cacert'],
+                      realm: target.options['realm'],
                       no_ssl_peer_verification: !target.options['ssl-verify'] }
 
           Timeout.timeout(target.options['connect-timeout']) do
