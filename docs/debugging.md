@@ -42,6 +42,14 @@ By default, Bolt tries to connect over the standard SSH port 22. If you need to 
 
 Make sure you've specified the `winrm` protocol for the target. You can either include it in the name of the target (`winrm://hostname.example.com`), pass `--transport winrm` on the CLI, or set the transport in your Bolt config or inventory. By default, Bolt will try to connect over SSH.
 
+## Puppet log functions are not logging to the console
+
+The default log level for the console is `warn`. When a `notice` function is used in a plan, it will not be printed to the console. When you have messages you want to be printed to the console regardless of log level you should use the `out::message` plan function. The [`out::message`](../pre-docs/plan_functions.md#outmessage) function is not available for use in an apply block and only accepts string values.
+
+If you need to send a message that is not a String value or is in an apply block you can use the `warning` Puppet log function. The `notice` Puppet log function could be used when you only wish to see the output in the console when executing your plan with the `--debug` flag which will set the console log level to `debug` for that run.
+
+See the docs for configuring the [Bolt's log level](https://puppet.com/docs/bolt/latest/bolt_configuration_options.html#log-file-configuration-options) for more information about how to configure the log levels.
+
 ## I still need help
 
 Visit the **#bolt** channel in the [Puppet Community Slack](https://slack.puppet.com) and you will find a whole community of people waiting to help!

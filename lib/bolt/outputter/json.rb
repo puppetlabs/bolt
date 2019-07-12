@@ -21,6 +21,8 @@ module Bolt
         case event[:type]
         when :node_result
           print_result(event[:result])
+        when :message
+          print_message_event(event)
         end
       end
 
@@ -106,7 +108,13 @@ module Bolt
         @stream.puts '}' if @object_open
       end
 
-      def print_message(message); end
+      def print_message_event(event)
+        print_message(event[:message])
+      end
+
+      def print_message(message)
+        $stderr.puts(message)
+      end
     end
   end
 end

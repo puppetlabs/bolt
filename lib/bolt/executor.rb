@@ -40,7 +40,7 @@ module Bolt
                          end
       end
       @reported_transports = Set.new
-      @subscribers = Set.new
+      @subscribers = {}
       @publisher = Concurrent::SingleThreadExecutor.new
 
       @noop = noop
@@ -61,13 +61,16 @@ module Bolt
       impl.value
     end
 
-    def subscribe(subscriber)
-      @subscribers << subscriber
+    def subscribe(subscriber, types = nil)
+      @subscribers[subscriber] = types
       self
     end
 
     def publish_event(event)
-      @subscribers.each do |subscriber|
+      @subscribers.each do |subscriber, types|
+        # If types isn't set or if the subscriber is subscribed to
+        # that type of event, publish the event
+        next unless types.nil? || types.include?(event[:type])
         @publisher.post(subscriber) do |sub|
           sub.handle_event(event)
         end
