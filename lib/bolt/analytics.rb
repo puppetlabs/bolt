@@ -21,7 +21,8 @@ module Bolt
       statement_count: :cd6,
       resource_mean: :cd7,
       plan_steps: :cd8,
-      return_type: :cd9
+      return_type: :cd9,
+      boltdir_type: :cd11
     }.freeze
 
     def self.build_client
