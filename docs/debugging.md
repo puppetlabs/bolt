@@ -50,6 +50,17 @@ If you need to send a message that is not a String value or is in an apply block
 
 See the docs for configuring the [Bolt's log level](https://puppet.com/docs/bolt/latest/bolt_configuration_options.html#log-file-configuration-options) for more information about how to configure the log levels.
 
+## 'Extensions are not built' error message
+Either after installation, upgrade, or environmental changes you may receive error messages when launching Bolt.
+
+    Ignoring nokogiri-1.10.2 because its extensions are not built. Try: gem pristine nokogiri --version 1.10.2
+    Ignoring unf_ext-0.0.7.5 because its extensions are not built. Try: gem pristine unf_ext --version 0.0.7.5
+
+To correct this issue you will need to use the Bolt provided gem command to reinstall/install these gems.
+
+    sudo /opt/puppetlabs/bolt/bin/gem pristine nokogiri --version 1.10.2
+    sudo /opt/puppetlabs/bolt/bin/gem pristine unf_ext --version 0.0.7.5
+
 ## I still need help
 
 Visit the **#bolt** channel in the [Puppet Community Slack](https://slack.puppet.com) and you will find a whole community of people waiting to help!
