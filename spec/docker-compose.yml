@@ -58,3 +58,38 @@ services:
     ports:
       - "45985:5985"
       - "45986:5986"
+
+  samba-ad:
+    hostname: samba-ad
+    domainname: bolt.test
+    # must use itself for DNS
+    dns:
+      - 172.22.0.100
+      - 8.8.8.8
+    build:
+      context: .
+      dockerfile: Dockerfile.samba-ad
+    restart: always
+    # SYS_ADMIN necessary for samba-tool domain provision
+    # otherwise set_nt_acl_no_snum: fset_nt_acl returned NT_STATUS_ACCESS_DENIED
+    cap_add:
+      - SYS_ADMIN
+    ports:
+      - "88:88"
+      - "464:464"
+    environment:
+      KRB5_REALM: ${KRB5_REALM:-BOLT.TEST}
+      KRB5_KDC: ${KRB5_KDC:-localhost}
+      KRB5_ADMINSERVER: ${KRB5_ADMINSERVER}
+      SMB_DOMAIN: ${SMB_DOMAIN:-BOLT}
+      SMB_ADMIN_PASSWORD: ${SMB_ADMIN_PASSWORD:-B0ltrules!}
+    networks:
+      BOLT.TEST:
+        ipv4_address: 172.22.0.100
+
+networks:
+  BOLT.TEST:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.22.0.0/16

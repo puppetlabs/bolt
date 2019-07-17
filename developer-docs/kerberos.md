@@ -62,7 +62,7 @@ Important client tools include:
 * `klist` for listing tickets
 * `kdestroy` for destroying tickets (not used on Windows)
 
-### Usage
+#### Example Usage
 
 Manual verification of Bolt can be performed from a Linux node that is domain joined to Active Directory using the following steps:
 
@@ -77,4 +77,97 @@ winrm:
 - `bolt command run 'whoami' --targets winrm://dc.domain.com` to connect over HTTPS (`--no-ssl-verify` may be required if the target uses a self-signed certificate)
 - `bolt command run 'whoami' --targets winrm://dc.domain.com --no-ssl` to connect over HTTP
 
-In the future, this testing will be automated.
+### Testing with Docker
+
+In Bolt testing atop Docker containers, [Samba server](https://www.samba.org/) is setup on Linux to approximate an Active Directory setup, which also includes DNS and LDAP support. Given Kerberos has very strict requirements around computer identity (via DNS), Docker user-defined networks with custom DNS and subnets are easier to setup than running in an arbitrary network environment. This lends itself well to an automated and reproducable ephemeral Kerberos environment.
+
+This environment is intended to support multiple environments:
+
+* [TravisCI automated testing](#travisCI-automated-testing)
+* [Local development](#local-development)
+
+#### Container Setup
+
+The current `spec/docker-compose.yml` supports a number of containers, many of which are intended to be built when started. For Kerberos, build / start just the relevant container:
+
+`docker-compose -f spec/docker-compose.yml up -d --build samba-ad`
+
+##### Samba AD (KDC)
+
+A Kerberos server is provided by running an Alpine container with Samba as an Active Directory domain controller. The Kerberos realm is `BOLT.TEST`, Active Directory domain is `BOLT.TEST` (short name `BOLT`) and DNS suffix is `bolt.test`
+
+This container provides DNS and LDAP support, and a variety of [other services](https://wiki.samba.org/index.php/Samba_AD_DC_Port_Usage) including:
+
+###### External Ports / Services
+
+* 88 (tcp/udp) - Kerberos authentication system
+* 464 (tcp/udp) - Kerberos kpasswd (change / set password)
+
+###### Internal Ports / Services
+
+* 53 (tcp/udp) - DNS
+* 135 (tcp) - End Point Mapper (DCE/RPC locator service) - remote management of DHCP, DNS, WINS
+* 137 (udp) - NetBIOS Name Service
+* 138 (udp) - NetBIOS Datagram
+* 139 (tcp) - NetBIOS Session Service
+* 389 (tcp/udp) - LDAP (Lightweight Directory Access Protocol)
+* 445 (tcp) - Microsoft-DS Active Directory / SMB sharing
+* 636 (tcp) - LDAP over TLS
+* 3268 (tcp) - msft-gc Microsoft Global Catalog (LDAP service for AD forests)
+* 3269 (tcp) - msfg-gc-ssl Microsoft Global Catalog over SSL
+* 49152-65535 - Dynamic RPC ports
+
+###### Interactive Shell Access
+
+To access the shell, use `/bin/sh` like:
+
+> docker-compose -f spec/docker-compose.yml exec samba-ad /bin/sh
+
+Useful tooling on the instance for managing Active Directory includes:
+
+* [`samba-tool`](https://www.samba.org/samba/docs/current/man-html/samba-tool.8.html) - primary Samba admin tool 
+* [`net`](https://www.samba.org/samba/docs/current/man-html/net.8.html) - designed to work like the `net` tool on Windows
+
+#### TravisCI automated testing
+
+At present, Travis setup will:
+
+* Ensure that it can refer to itself as `samba-ad.bolt.test` (the same name that the container refers to itself inside the Docker UDN)
+* Install the Kerberos client package
+* Configure the Kerberos client with the approriate server (`samba-ad.bolt.test`) for the realm `BOLT.TEST`
+
+Automated tests (in `spec/bolt/transport/winrm_spec.rb`) simplify verify that the correct TGT can be acquired from the Samba AD using `kinit` using the domain administrator account `Administrator@BOLT.TEST`.
+
+Previously added tests are still marked pending until other infrastructure within Docker is configured to use Kerberos.
+
+#### Local development
+
+To run tests locally on Linux or OSX requires that the local Kerberos client be configured in the same way that Travis is, which includes:
+
+* making sure `/etc/krb5.conf` is configured for realm
+* the DNS name of `samba-ad.bolt.test` resolves, which requires adding it to `/etc/hosts` as `127.0.0.1 samba-ad.bolt.test`
+
+##### Configuring `krb5.conf`
+
+###### Linux
+
+Use the script `spec/fixtures/samba-ad/kerberos-client.config.sh` to generate a `krb5.conf`, which expects the environment variables:
+
+* `KRB5_CONFIG` - optionally used by Kerberos itself to find the config file. Set to a different path like `/tmp/krb5.conf` to not modify the default existing `/etc/krb5.conf` should it already exist
+* `KRB5_REALM` - should be set to `BOLT.TEST`
+* `KRB5_KDC` - should be set to `samba-ad.bolt.test`
+* `KRB5_ADMINSERVER` (optional) - will use `KRB5_KDC` if not set
+
+###### OSX
+
+OSX is slightly different since Docker network ports are not available over UDP. Rather than using the helper script, a sample configuration file is provided at `spec/fixtures/samba-ad/krb5.osx.conf` that forces Kerberos to use only TCP.
+
+##### Validation
+
+Once DNS and the Kerberos client are properly configured, `kinit` can be used to acquire a ticket from Active Directoy like:
+
+> echo 'B0ltrules!' | kinit Administrator@BOLT.TEST
+
+To remove the ticket, use:
+
+> kdestroy --credential=krbtgt/BOLT.TEST@BOLT.TEST
