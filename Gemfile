@@ -25,7 +25,7 @@ group(:test) do
 end
 
 group(:development) do
-  gem "puppet-strings", "~> 2.0"
+  gem "puppet-strings", "~> 2.2.0"
 end
 
 group(:packaging) do
