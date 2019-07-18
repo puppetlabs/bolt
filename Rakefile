@@ -68,6 +68,7 @@ task :docs do
                                      'bolt-modules/system'])
   json = JSON.parse(File.read(tmpfile))
   funcs = json.delete('puppet_functions')
+  json.delete('data_types')
   json.each { |k, v| raise "Expected #{k} to be empty, found #{v}" unless v.empty? }
 
   # @functions will be a list of function descriptions, structured as
