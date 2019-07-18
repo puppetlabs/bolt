@@ -86,6 +86,7 @@ ADD fixtures/omiserver/domain-join.sh /
 ADD fixtures/omiserver/realmd.conf.tmpl /
 ADD fixtures/omiserver/smb.conf.tmpl /
 ADD fixtures/omiserver/sssd.conf.tmpl /
+ADD fixtures/omiserver/omi-enable-kerberos-auth.sh /
 ADD fixtures/omiserver/verify-omi-authentication.sh /
 ADD fixtures/omiserver/verify-pwsh-authentication.sh /
 ENTRYPOINT ["/docker-entrypoint.sh"]

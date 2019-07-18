@@ -20,6 +20,7 @@ addons:
   # Ensure Travis resolves itself as the Samba KDC hosted in Docker
   hosts:
     - samba-ad.bolt.test
+    - omiserver.bolt.test
 before_install:
 # Kerberos client for use with the Samba KDC in Docker
 - sudo apt-get install -yq krb5-user

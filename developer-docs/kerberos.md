@@ -138,9 +138,9 @@ On startup, the container is automatically domain joined to the Samba active dir
 
 On startup, the Docker entrypoint script waits for the domain to be resolved via DNS and accessible before attempting to perform a domain join with `realm join` followed by `net ads join` (after configuring local Kerberos and Samba clients). The [`sssd`](https://docs.pagure.org/SSSD.sssd/) service is setup to use the [`ad provider`](https://docs.pagure.org/SSSD.sssd/users/ad_provider.html) so that it may look up domain accounts locally.
 
-The container performs a basic validation using `getent passwd administrator@BOLT.TEST` to verify the system is properly configured and domain joined. It then uses the `omicli` tool and the PowerShell cmdlet `Invoke-Command` to vet that the `bolt:bolt` account can authenticate properly.
+To configure OMI server the `HTTP` service SPN is added to the `OMISERVER$` computer account in Active Directory, and the `sssd` service is restarted. The [OMI setup documentation](https://github.com/Microsoft/omi/blob/master/Unix/doc/setup-kerberos-omi.md#on-the-server-add-the-http-principal) covers this, but the actual scripts vary a bit since Samba is being used rather than Active Directory.
 
-At this stage, OMI server is not yet configured to use Kerberos authentication, so that connectivity is not verified.
+The container performs a basic validation using `getent passwd administrator@BOLT.TEST` to verify the system is properly configured and domain joined. It then uses the `omicli` tool and the PowerShell cmdlet `Invoke-Command` to vet that the `bolt:bolt` account can authenticate properly using SPENGO. The domain Administrator account is then tested with the same tools to verify Kerberos authentication is working properly.
 
 ###### External Ports
 
@@ -166,13 +166,13 @@ Useful tooling on the instance includes:
 
 At present, Travis setup will:
 
-* Ensure that it can refer to itself as `samba-ad.bolt.test` (the same name that the container refers to itself inside the Docker UDN)
+* Ensure that it can refer to itself as `samba-ad.bolt.test` and `omiserver.bolt.test` (the same name that the containers refer to themselves inside the Docker UDN)
 * Install the Kerberos client package
 * Configure the Kerberos client with the approriate server (`samba-ad.bolt.test`) for the realm `BOLT.TEST`
 
 Automated tests (in `spec/bolt/transport/winrm_spec.rb`) verify that the correct TGT (ticket granting ticket) can be acquired from the Samba AD using `kinit` using the domain administrator account `Administrator@BOLT.TEST`.
 
-Previously added tests are still marked pending until other infrastructure within Docker is configured to use Kerberos.
+Despite having a correctly setup environment where OMI server can authenticate against Active Directory with Kerberos, the relevant tests are still marked pending due to a bug in interoperability between the winrm gem and OMI server. [BOLT-1476](https://tickets.puppetlabs.com/browse/BOLT-1476) captures the work remaining to get the tests passing.
 
 #### Local development
 
@@ -180,6 +180,15 @@ To run tests locally on Linux or OSX requires that the local Kerberos client be 
 
 * making sure `/etc/krb5.conf` is configured for realm
 * the DNS name of `samba-ad.bolt.test` resolves, which requires adding it to `/etc/hosts` as `127.0.0.1 samba-ad.bolt.test`
+
+#### Connecting to OMI from PowerShell
+
+If the Powershell cmdlets [Invoke-Command](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/invoke-command?view=powershell-6) or [Enter-PSSession](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/enter-pssession?view=powershell-6) are used to connect to OMI server, note that PowerShell has different authentication support based on platform:
+
+* OMI server itself is not setup to support basic authentication over HTTP
+* Windows PowerShell fully supports Kerberos
+* Linux PowerShell appears to support Kerberos, but there is [work to move to a managed library](https://github.com/PowerShell/PowerShell/issues/8233) eventually which is not complete as of PowerShell 6.2
+* [OSX PowerShell does not support Kerberos](https://github.com/PowerShell/PowerShell/issues/3708#issuecomment-487785907)
 
 ##### Configuring `krb5.conf`
 

@@ -19,6 +19,7 @@ EOF
 # there is a race here which may cause the log to not be created yet
 sync
 
+./omi-enable-kerberos-auth.sh
 ./verify-omi-authentication.sh
 ./verify-pwsh-authentication.sh
 

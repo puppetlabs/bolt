@@ -234,12 +234,12 @@ PS
     end
 
     it "executes a command on a host over HTTP" do
-      pending("Not yet implemented")
+      pending("WinRM gem and OMI server have a protocol negotiation bug")
       expect(winrm.run_command(omi_http_kerb_target, command)['stdout']).to eq("#{@kerb_user}\r\n")
     end
 
     it "executes a command on a host over HTTPS" do
-      pending("Not yet implemented")
+      pending("WinRM gem and OMI server have a protocol negotiation bug")
       expect(winrm.run_command(omi_https_kerb_target, command)['stdout']).to eq("#{@kerb_user}\r\n")
     end
   end
