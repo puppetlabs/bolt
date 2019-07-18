@@ -84,6 +84,7 @@ The following plugins can be used for targets
 * `puppetdb` - Query PuppetDB to populate the targets.
 * `terraform` - Load a Terraform state file to populate the targets.
 * `aws::ec2` - Load running AWS EC2 instances to populate the targets.
+* `task` - Run a task to discover targets.
 
 #### Config plugins
 
@@ -103,6 +104,7 @@ The Following plugins an be used for config:
 
 * `prompt`: Prompt a user for a configuration value
 * `pkcs7`: decrypt a pkcs7 encrypted value from the inventory file.
+* `task` : Run a task to lookup a configuration value.
 
 #### Task
 
