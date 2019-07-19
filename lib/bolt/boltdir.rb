@@ -6,10 +6,10 @@ module Bolt
   class Boltdir
     BOLTDIR_NAME = 'Boltdir'
 
-    attr_reader :path, :config_file, :inventory_file, :modulepath, :hiera_config, :puppetfile, :rerunfile
+    attr_reader :path, :config_file, :inventory_file, :modulepath, :hiera_config, :puppetfile, :rerunfile, :type
 
     def self.default_boltdir
-      Boltdir.new(File.join('~', '.puppetlabs', 'bolt'))
+      Boltdir.new(File.join('~', '.puppetlabs', 'bolt'), 'user')
     end
 
     # Search recursively up the directory hierarchy for the Boltdir. Look for a
@@ -19,9 +19,9 @@ module Bolt
     def self.find_boltdir(dir)
       dir = Pathname.new(dir)
       if (dir + BOLTDIR_NAME).directory?
-        new(dir + BOLTDIR_NAME)
+        new(dir + BOLTDIR_NAME, 'embedded')
       elsif (dir + 'bolt.yaml').file?
-        new(dir)
+        new(dir, 'local')
       elsif dir.root?
         default_boltdir
       else
@@ -29,7 +29,7 @@ module Bolt
       end
     end
 
-    def initialize(path)
+    def initialize(path, type = 'option')
       @path = Pathname.new(path).expand_path
       @config_file = @path + 'bolt.yaml'
       @inventory_file = @path + 'inventory.yaml'
@@ -37,6 +37,7 @@ module Bolt
       @hiera_config = @path + 'hiera.yaml'
       @puppetfile = @path + 'Puppetfile'
       @rerunfile = @path + '.rerun.json'
+      @type = type
     end
 
     def to_s

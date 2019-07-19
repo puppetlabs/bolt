@@ -282,9 +282,9 @@ module Bolt
       if options.key?(:targets)
         screen_view_fields.merge!(target_nodes: options[:targets].count,
                                   inventory_nodes: inventory.node_names.count,
-                                  inventory_groups: inventory.group_names.count)
+                                  inventory_groups: inventory.group_names.count,
+                                  boltdir_type: config.boltdir.type)
       end
-
       @analytics.screen_view(screen, screen_view_fields)
 
       if options[:action] == 'show'

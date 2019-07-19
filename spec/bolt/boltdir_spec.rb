@@ -78,6 +78,25 @@ describe Bolt::Boltdir do
       end
     end
 
+    describe 'when setting a type' do
+      it 'sets type to embedded when a Boltdir is used' do
+        pwd = boltdir_path.parent
+        expect(Bolt::Boltdir.find_boltdir(pwd).type).to eq('embedded')
+      end
+
+      it 'sets type to local when a bolt.yaml is used' do
+        pwd = @tmpdir
+        FileUtils.touch(pwd + 'bolt.yaml')
+
+        expect(Bolt::Boltdir.find_boltdir(pwd).type).to eq('local')
+      end
+
+      it 'sets type to user when the default is used' do
+        pwd = @tmpdir
+        expect(Bolt::Boltdir.find_boltdir(pwd).type).to eq('user')
+      end
+    end
+
     it 'returns the default when no Boltdir is found' do
       pwd = @tmpdir
       expect(Bolt::Boltdir.find_boltdir(pwd)).to eq(Bolt::Boltdir.default_boltdir)
