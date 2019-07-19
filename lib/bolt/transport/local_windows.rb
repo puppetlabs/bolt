@@ -101,7 +101,7 @@ module Bolt
       def run_script(target, script, arguments, options = {})
         self.class.validate(options)
         with_tmpscript(File.absolute_path(script), target.options['tmpdir']) do |file, dir|
-          logger.debug "Running '#{file}' with #{arguments}"
+          logger.debug "Running '#{file}' with #{arguments.to_json}"
 
           # unpack any Sensitive data AFTER we log
           arguments = unwrap_sensitive_args(arguments)
@@ -152,7 +152,7 @@ module Bolt
           interpreter = select_interpreter(script, target.options['interpreters'])
           interpreter_debug = interpreter ? " using '#{interpreter}' interpreter" : nil
           # log the arguments with sensitive data redacted, do NOT log unwrapped_arguments
-          logger.debug("Running '#{script}' with #{arguments}#{interpreter_debug}")
+          logger.debug("Running '#{script}' with #{arguments.to_json}#{interpreter_debug}")
           unwrapped_arguments = unwrap_sensitive_args(arguments)
 
           stdin = STDIN_METHODS.include?(input_method) ? JSON.dump(unwrapped_arguments) : nil
