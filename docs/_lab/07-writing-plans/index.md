@@ -103,7 +103,7 @@ ModuleLoader: module 'boltlib' has unknown dependencies - it will have all other
 Did not find config for node1 in inventory
 Starting: task exercise7::write on node1
 Authentication method 'gssapi-with-mic' is not available
-Running task exercise7::write with '{"filename"=>"hello", "content"=>"world"}' via  on ["node1"]
+Running task exercise7::write with '{"filename":"hello", "content":"world"}' via  on ["node1"]
 Started on node1...
 Running task run 'Task({'name' => 'exercise7::write', 'implementations' => [{'name' => 'write.sh', 'path' => '/Users/username/puppetlabs/tasks-hands-on-lab/07-writing-plans/modules/exercise7/tasks/write.sh', 'requirements' => []}], 'input_method' => undef})' on node1
 Opened session
