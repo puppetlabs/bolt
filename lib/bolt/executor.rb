@@ -248,7 +248,7 @@ module Bolt
         options = { '_run_as' => run_as }.merge(options) if run_as
 
         batch_execute(targets) do |transport, batch|
-          with_node_logging("Running script #{script} with '#{arguments}'", batch) do
+          with_node_logging("Running script #{script} with '#{arguments.to_json}'", batch) do
             transport.batch_script(batch, script, arguments, options, &method(:publish_event))
           end
         end
@@ -262,7 +262,7 @@ module Bolt
         arguments['_task'] = task.name
 
         batch_execute(targets) do |transport, batch|
-          with_node_logging("Running task #{task.name} with '#{arguments}'", batch) do
+          with_node_logging("Running task #{task.name} with '#{arguments.to_json}'", batch) do
             transport.batch_task(batch, task, arguments, options, &method(:publish_event))
           end
         end
