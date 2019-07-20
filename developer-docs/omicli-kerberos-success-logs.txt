@@ -1,0 +1,548 @@
+omicli kerberos success logs
+
+DEBUG: ../sock/sock.c(219): EventId=45354 Priority=DEBUG Sock_Accept: sock (12)
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211eeaa8(HttpSocket), action: Initialize Itself
+VERBOSE: strand.c(2241): EventId=55030 Priority=VERBOSE _Strand_EnterStrand: 0x55c9211eeaa8(HttpSocket)
+INFO: ../sock/selector.c(233): EventId=40032 Priority=INFO Selector_AddHandler: selector=0x55c91fdc0348, handler=0x55c9211eeb30, name=null
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211d4208(WsmanConnection), action: Initialize Itself
+VERBOSE: strand.c(2241): EventId=55030 Priority=VERBOSE _Strand_EnterStrand: 0x55c9211d4208(WsmanConnection)
+VERBOSE: strand.c(3039): EventId=55034 Priority=VERBOSE Strand_Leave: 0x55c9211eeaa8(HttpSocket) (strandStealedFlag (nil))
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c9211eeaa8(HttpSocket) Exits, state 1, ToFinish: 0 [-, O t:-- o:-- 0x55c9211d4258]
+VERBOSE: strand.c(2254): EventId=55031 Priority=VERBOSE _Strand_ExitStrand: 0x55c9211d4208(WsmanConnection)
+DEBUG: http.c(489): EventId=50015 Priority=DEBUG HTTP Auth: SupplimentaryInfo: (ethan entering _ReadHeader).
+DEBUG: http.c(262): EventId=50015 Priority=DEBUG HTTP Auth: SupplimentaryInfo: (ethan _Sock_ReadAux entered).
+DEBUG: http.c(266): EventId=50015 Priority=DEBUG HTTP Auth: SupplimentaryInfo: (ethan _Sock_ReadAux calling Sock_Read).
+DEBUG: ../sock/sock.c(340): EventId=50015 Priority=DEBUG HTTP Auth: SupplimentaryInfo: (ethan entering Sock_Read).
+DEBUG: ../sock/sock.c(341): Sock_Read - Begin. socket: 12, size: 16384
+DEBUG: ../sock/sock.c(353): Sock_Read - OK exit. 2002 bytes read
+DEBUG: http.c(627): EventId=50015 Priority=DEBUG HTTP Auth: SupplimentaryInfo: (ethan entering _ReadData).
+DEBUG: httpauth.c(1955): EventId=50010 Priority=DEBUG HTTP: Authorization Complete.
+DEBUG: httpauth.c(895): EventId=50013 Priority=DEBUG HTTP: Send Next Auth Reply.
+DEBUG: ../sock/sock.c(391): Sock_Write - Begin. socket: 12, size: 280
+DEBUG: ../sock/sock.c(403): Sock_Write - OK exit. 280 bytes written
+DEBUG: http.c(489): EventId=50015 Priority=DEBUG HTTP Auth: SupplimentaryInfo: (ethan entering _ReadHeader).
+DEBUG: http.c(262): EventId=50015 Priority=DEBUG HTTP Auth: SupplimentaryInfo: (ethan _Sock_ReadAux entered).
+DEBUG: http.c(266): EventId=50015 Priority=DEBUG HTTP Auth: SupplimentaryInfo: (ethan _Sock_ReadAux calling Sock_Read).
+DEBUG: ../sock/sock.c(340): EventId=50015 Priority=DEBUG HTTP Auth: SupplimentaryInfo: (ethan entering Sock_Read).
+DEBUG: ../sock/sock.c(341): Sock_Read - Begin. socket: 12, size: 16384
+DEBUG: ../sock/sock.c(353): Sock_Read - OK exit. 1873 bytes read
+DEBUG: http.c(627): EventId=50015 Priority=DEBUG HTTP Auth: SupplimentaryInfo: (ethan entering _ReadData).
+DEBUG: httpauth.c(612): EventId=50015 Priority=DEBUG HTTP Auth: SupplimentaryInfo: (ethan Http_DecryptData success).
+VERBOSE: messages.c(362): EventId=55051 Priority=VERBOSE Message_New: httpauth.c(2296): __Message_New(HttpRequestMsg): 0x55c9211ee350: refs=1
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211eeaa8(HttpSocket) state 0(S:), methodBit: 1000(NewRequest)
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211eeaa8(HttpSocket) state 1001(S:*0), bit: 13(NewRequest) [-, O t:-- o:-- 0x55c9211d4258]
+DEBUG: http.c(1361): EventId=45037 Priority=DEBUG HttpSocket: 0x55c9211eeaa8 _HttpSocket_Aux_NewRequest, Request: 0x55c9211ee350
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211eeaa8(HttpSocket), action: PostAndLeaveStrand
+VERBOSE: strand.c(3039): EventId=55034 Priority=VERBOSE Strand_Leave: 0x55c9211eeaa8(HttpSocket) (strandStealedFlag 0x7ffc7e01f786)
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c9211eeaa8(HttpSocket) Exits, state 1, ToFinish: 0 [-, O t:-A o:-- 0x55c9211d4258]
+VERBOSE: messages.c(383): EventId=55052 Priority=VERBOSE Message_Addref: strand.c(394): __Message_AddRef(HttpRequestMsg): 0x55c9211ee350: refs=2
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211d4208(WsmanConnection) state 0(SB:), methodBit: 100(Post_Left)
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211d4208(WsmanConnection) state 101(SB:*P), bit: 9(Post_Left) [-, O t:-- o:-- 0x55c9211eeaf8, - t:-- o:-- (nil)]
+VERBOSE: strand.c(279): EventId=55032 Priority=VERBOSE _Strand_TracePost: 0x55c9211d4208, msg(0x55c9211ee350:18:HttpRequestMsg:0)
+VERBOSE: messages.c(383): EventId=55052 Priority=VERBOSE Message_Addref: wsman.c(3540): __Message_AddRef(HttpRequestMsg): 0x55c9211ee350: refs=3
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211d4208(WsmanConnection) state 101(SB:*P), methodBit: 100000(ProcessRequest)
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: strand.c(545): __Message_Release(HttpRequestMsg): 0x55c9211ee350: refs=2
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211d4208(WsmanConnection) state 100001(SB:*0), bit: 21(ProcessRequest) [-, O t:-- o:-A 0x55c9211eeaf8, - t:-- o:-- (nil)]
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211d3c78(WsmanEnumerationContext), action: Initialize Itself
+VERBOSE: strand.c(2241): EventId=55030 Priority=VERBOSE _Strand_EnterStrand: 0x55c9211d3c78(WsmanEnumerationContext)
+INFO: wsman.c(1363): EventId=40021 Priority=INFO includeClassOrigin = 0 includeInheritanceHierarchy = 0 includeInheritedElements = 0 includeQualifiers = 0 usePreciseArrays = 0
+VERBOSE: messages.c(362): EventId=55051 Priority=VERBOSE Message_New: wsman.c(1491): __Message_New(EnumerateInstancesReq): 0x55c9211f0060: refs=1
+VERBOSE: strand.c(3039): EventId=55034 Priority=VERBOSE Strand_Leave: 0x55c9211d4208(WsmanConnection) (strandStealedFlag 0x7ffc7e01f4b6)
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c9211d4208(WsmanConnection) Exits, state 1, ToFinish: 0 [-, O t:-- o:-A 0x55c9211eeaf8, O t:-- o:-- 0x55c9211d3cc8]
+DEBUG: disp.c(1611): EventId=45031 Priority=DEBUG Disp_HandleInteractionRequest: self (0x55c91fdbf980), interaction(0x55c9211d3d00), msg(0x55c9211f0060:4099:EnumerateInstancesReq:100001)
+INFO: disp.c(881): EventId=40039 Priority=INFO New request received: command=(EnumerateInstancesReq), namespace=(root/omi), class=(OMI_Identify)
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211ee1a8(DispEnumParent), action: Initialize Itself
+VERBOSE: strand.c(2241): EventId=55030 Priority=VERBOSE _Strand_EnterStrand: 0x55c9211ee1a8(DispEnumParent)
+VERBOSE: strand.c(3039): EventId=55034 Priority=VERBOSE Strand_Leave: 0x55c9211d3c78(WsmanEnumerationContext) (strandStealedFlag (nil))
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c9211d3c78(WsmanEnumerationContext) Exits, state 1, ToFinish: 0 [-, O t:-- o:-- 0x55c9211d4290, O t:-A o:-- 0x55c9211ee1f8]
+VERBOSE: messages.c(383): EventId=55052 Priority=VERBOSE Message_Addref: disp.c(538): __Message_AddRef(EnumerateInstancesReq): 0x55c9211f0060: refs=2
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211ee1a8(DispEnumParent), action: Ack
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211d3c78(WsmanEnumerationContext) state 0(SB:), methodBit: 2000(Ack_Right)
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211d3c78(WsmanEnumerationContext) state 2001(SB:*K), bit: 14(Ack_Right) [-, O t:-- o:-- 0x55c9211d4290, O t:-A o:-- 0x55c9211ee1f8]
+DEBUG: wsman.c(4277): EventId=45223 Priority=DEBUG WsmanEnum: Ack on interaction [0x55c9211d3c78]<-0x55c9211ee1f8
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c9211d3c78(WsmanEnumerationContext) Exits, state 1, ToFinish: 0 [-, O t:-- o:-- 0x55c9211d4290, O t:-- o:-- 0x55c9211ee1f8]
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211ee1a8(DispEnumParent), action: Returning from Ack
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c92120dd88(DispEnumEntry), action: Initialize Itself
+VERBOSE: strand.c(2241): EventId=55030 Priority=VERBOSE _Strand_EnterStrand: 0x55c92120dd88(DispEnumEntry)
+VERBOSE: strand.c(3039): EventId=55034 Priority=VERBOSE Strand_Leave: 0x55c9211ee1a8(DispEnumParent) (strandStealedFlag (nil))
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c9211ee1a8(DispEnumParent) Exits, state 1, ToFinish: 0 [1-, O t:-- o:-- 0x55c9211d3d00]
+VERBOSE: messages.c(362): EventId=55051 Priority=VERBOSE Message_New: disp.c(363): __Message_New(EnumerateInstancesReq): 0x55c9211f17d0: refs=1
+DEBUG: disp.c(432): EventId=45023 Priority=DEBUG _DispatchEnumerateInstancesReq() for class: OMI_Identify (Thru Dispatcher Interaction)
+DEBUG: agentmgr.c(1594): EventId=45014 Priority=DEBUG AgentMgr_HandleRequest 0x55c9211f17d0 (tag 4099)
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211f1c38(AgentElem), action: Initialize Itself
+VERBOSE: strand.c(2241): EventId=55030 Priority=VERBOSE _Strand_EnterStrand: 0x55c9211f1c38(AgentElem)
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211f20c0(ProtocolFromSocket), action: Initialize Itself
+VERBOSE: strand.c(2241): EventId=55030 Priority=VERBOSE _Strand_EnterStrand: 0x55c9211f20c0(ProtocolFromSocket)
+VERBOSE: strand.c(3039): EventId=55034 Priority=VERBOSE Strand_Leave: 0x55c9211f1c38(AgentElem) (strandStealedFlag (nil))
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c9211f1c38(AgentElem) Exits, state 1, ToFinish: 0 [0-, O t:-- o:-- 0x55c9211f2110]
+VERBOSE: strand.c(3039): EventId=55034 Priority=VERBOSE Strand_Leave: 0x55c9211f20c0(ProtocolFromSocket) (strandStealedFlag (nil))
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c9211f20c0(ProtocolFromSocket) Exits, state 1, ToFinish: 0 [D, O t:-- o:-- 0x55c9211f1c88]
+DEBUG: protocol.c(3069): EventId=45366 Priority=DEBUG Engine establishing socket with server (0x55c9211f2088, 17)
+VERBOSE: protocol.c(188): EventId=55055 Priority=VERBOSE (E)ProtocolSocket_Addref: protocol.c(212): self 0x55c9211f2088: refs=2
+INFO: ../sock/selector.c(233): EventId=40032 Priority=INFO Selector_AddHandler: selector=0x55c91fdc0348, handler=0x55c9211f2088, name=null
+VERBOSE: messages.c(362): EventId=55051 Priority=VERBOSE Message_New: protocol.c(1138): __Message_New(VerifySocketConn): 0x55c9211f2b30: refs=1
+VERBOSE: messages.c(383): EventId=55052 Priority=VERBOSE Message_Addref: protocol.c(1160): __Message_AddRef(VerifySocketConn): 0x55c9211f2b30: refs=2
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: protocol.c(1802): __Message_Release(VerifySocketConn): 0x55c9211f2b30: refs=1
+DEBUG: ../sock/sock.c(219): EventId=45354 Priority=DEBUG Sock_Accept: sock (9)
+DEBUG: protocol.c(1711): EventId=45154 Priority=DEBUG (E)Socket: 0x55c9211f2088, All send
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: protocol.c(1166): __Message_Release(VerifySocketConn): 0x55c9211f2b30: refs=0
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c81b9ae590(ProtocolSocketServer), action: Initialize Itself
+VERBOSE: strand.c(2241): EventId=55030 Priority=VERBOSE _Strand_EnterStrand: 0x55c81b9ae590(ProtocolSocketServer)
+VERBOSE: messages.c(362): EventId=55051 Priority=VERBOSE Message_New: protocol.c(1182): __Message_New(CreateAgentMsg): 0x55c9211f2b30: refs=1
+VERBOSE: messages.c(383): EventId=55052 Priority=VERBOSE Message_Addref: protocol.c(1206): __Message_AddRef(CreateAgentMsg): 0x55c9211f2b30: refs=2
+VERBOSE: strand.c(3039): EventId=55034 Priority=VERBOSE Strand_Leave: 0x55c81b9ae590(ProtocolSocketServer) (strandStealedFlag (nil))
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c81b9ae590(ProtocolSocketServer) Exits, state 1, ToFinish: 0 [-, - t:-- o:-- (nil)]
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: protocol.c(1802): __Message_Release(CreateAgentMsg): 0x55c9211f2b30: refs=1
+DEBUG: protocol.c(1711): EventId=45154 Priority=DEBUG (E)Socket: 0x55c9211f2088, All send
+VERBOSE: protocol.c(188): EventId=55055 Priority=VERBOSE (S)ProtocolSocket_Addref: protocol.c(212): self 0x55c81b9ae558: refs=2
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: protocol.c(1212): __Message_Release(CreateAgentMsg): 0x55c9211f2b30: refs=0
+INFO: ../sock/selector.c(233): EventId=40032 Priority=INFO Selector_AddHandler: selector=0x55c81b8be388, handler=0x55c81b9ae558, name=BINARY_SERVER_CONNECTION
+DEBUG: agentmgr.c(1114): EventId=45039 Priority=DEBUG AgentItem created: 0x55c9211f1bd8
+VERBOSE: messages.c(362): EventId=55051 Priority=VERBOSE Message_New: agentmgr.c(1240): __Message_New(BinProtocolNotification): 0x55c9211f2b30: refs=1
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c92120db08(IdleRequestItem), action: Initialize Itself
+VERBOSE: strand.c(2241): EventId=55030 Priority=VERBOSE _Strand_EnterStrand: 0x55c92120db08(IdleRequestItem)
+VERBOSE: strand.c(3039): EventId=55034 Priority=VERBOSE Strand_Leave: 0x55c92120db08(IdleRequestItem) (strandStealedFlag (nil))
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c92120db08(IdleRequestItem) Exits, state 1, ToFinish: 0 [D, - t:C- o:C- (nil)]
+VERBOSE: messages.c(383): EventId=55052 Priority=VERBOSE Message_Addref: messages.c(772): __Message_AddRef(BinProtocolNotification): 0x55c9211f2b30: refs=2
+INFO: agentmgr.c(1223): EventId=40005 Priority=INFO _SendRequestToAgent msg(0x55c9211f2b30:15:BinProtocolNotification:1), from original operationId: 0 to 1
+VERBOSE: messages.c(383): EventId=55052 Priority=VERBOSE Message_Addref: strand.c(2649): __Message_AddRef(BinProtocolNotification): 0x55c9211f2b30: refs=3
+VERBOSE: strand.c(2982): EventId=55025 Priority=VERBOSE _Strand_ScheduleParent: 0x55c9211f1c38(AgentElem) state 0(SM:), bit:1(Add) from 0x55c92120db08(IdleRequestItem); methodBit: 4000(EntryOperation)
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211f1c38(AgentElem) state 4001(SM:*#), bit: 15(EntryOperation) [0-, O t:-- o:-- 0x55c9211f2110]
+DEBUG: ../sock/sock.c(340): EventId=50015 Priority=DEBUG HTTP Auth: SupplimentaryInfo: (ethan entering Sock_Read).
+DEBUG: ../sock/sock.c(341): Sock_Read - Begin. socket: 9, size: 32
+VERBOSE: strand.c(1170): EventId=55002 Priority=VERBOSE _StrandEntryOperation_Add: 1 entries 0x55c9211f1bd8(AgentElem): 0x55c92120db08(IdleRequestItem)
+DEBUG: ../sock/sock.c(353): Sock_Read - OK exit. 32 bytes read
+VERBOSE: strand.c(2996): EventId=55026 Priority=VERBOSE _Strand_ScheduleEntry: 0x55c92120db08(IdleRequestItem) state 0(SM:), bit:1(Add) from 0x55c9211f1c38(AgentElem); methodBit: 4000(EntryOperation)
+DEBUG: ../sock/sock.c(340): EventId=50015 Priority=DEBUG HTTP Auth: SupplimentaryInfo: (ethan entering Sock_Read).
+DEBUG: ../sock/sock.c(341): Sock_Read - Begin. socket: 9, size: 16
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c92120db08(IdleRequestItem) state 4001(SM:*#), bit: 15(EntryOperation) [D, - t:C- o:C- (nil)]
+VERBOSE: messages.c(383): EventId=55052 Priority=VERBOSE Message_Addref: strand.c(1540): __Message_AddRef(BinProtocolNotification): 0x55c9211f2b30: refs=4
+DEBUG: ../sock/sock.c(353): Sock_Read - OK exit. 16 bytes read
+VERBOSE: strand.c(2982): EventId=55025 Priority=VERBOSE _Strand_ScheduleParent: 0x55c9211f1c38(AgentElem) state 4001(SM:*#), bit:8(Post) from 0x55c92120db08(IdleRequestItem); methodBit: 4000(EntryOperation)
+DEBUG: messages.c(706): EventId=45005 Priority=DEBUG MessageFromBatch:- msg tag is 36, index: 36
+VERBOSE: strand.c(279): EventId=55032 Priority=VERBOSE _Strand_TracePost: 0x55c92120db08, msg(0x55c9211f2b30:15:BinProtocolNotification:1)
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: strand.c(1958): __Message_Release(BinProtocolNotification): 0x55c9211f2b30: refs=3
+VERBOSE: messages.c(749): EventId=55054 Priority=VERBOSE MessageFromBatch: protocol.c(1858): __MessageFromBatch(VerifySocketConn): 0x55c81b9be010: refs=1
+INFO: protocol.c(1878): EventId=40011 Priority=INFO (S)done with receiving msg(0x55c81b9be010:36:VerifySocketConn:0)
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c92120db08(IdleRequestItem) Exits, state 1, ToFinish: 0 [D, - t:C- o:C- (nil)]
+VERBOSE: strand.c(1280): EventId=55007 Priority=VERBOSE _StrandEntryOperation_Post: 0x55c9211f1bd8(AgentElem) Posting on parent, msg: 0x55c9211f2b30
+DEBUG: protocol.c(1880): EventId=45373 Priority=DEBUG (S)Handle:(0x55c81b9ae558), ClientAuthState = 1, EngineAuthState = 1
+DEBUG: protocol.c(1889): EventId=45365 Priority=DEBUG Server establishing socket with engine (0x55c81b9ae558, 9)
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211f1c38(AgentElem), action: Post
+VERBOSE: messages.c(383): EventId=55052 Priority=VERBOSE Message_Addref: strand.c(355): __Message_AddRef(BinProtocolNotification): 0x55c9211f2b30: refs=4
+DEBUG: protocol.c(1640): EventId=45362 Priority=DEBUG Engine credentials verified (0x55c81b9ae558)
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: protocol.c(2095): __Message_Release(VerifySocketConn): 0x55c81b9be010: refs=0
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211f20c0(ProtocolFromSocket) state 0(S:), methodBit: 40(Post)
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211f20c0(ProtocolFromSocket) state 41(S:*P), bit: 7(Post) [D, O t:-- o:-- 0x55c9211f1c88]
+DEBUG: ../sock/sock.c(340): EventId=50015 Priority=DEBUG HTTP Auth: SupplimentaryInfo: (ethan entering Sock_Read).
+VERBOSE: strand.c(279): EventId=55032 Priority=VERBOSE _Strand_TracePost: 0x55c9211f20c0, msg(0x55c9211f2b30:15:BinProtocolNotification:1)
+DEBUG: ../sock/sock.c(341): Sock_Read - Begin. socket: 9, size: 32
+DEBUG: protocol.c(300): EventId=45148 Priority=DEBUG ProtocolSocket: Posting message for interaction [0x55c9211f2110]<-0x55c9211f1c88
+DEBUG: ../sock/sock.c(353): Sock_Read - OK exit. 32 bytes read
+VERBOSE: protocol.c(188): EventId=55055 Priority=VERBOSE (E)ProtocolSocket_Addref: protocol.c(303): self 0x55c9211f2088: refs=3
+DEBUG: ../sock/sock.c(340): EventId=50015 Priority=DEBUG HTTP Auth: SupplimentaryInfo: (ethan entering Sock_Read).
+DEBUG: ../sock/selector.c(365): EventId=45206 Priority=DEBUG Sending msg(0x55c9211f2b30:15:BinProtocolNotification:1) on own thread
+DEBUG: ../sock/sock.c(341): Sock_Read - Begin. socket: 9, size: 16
+VERBOSE: messages.c(383): EventId=55052 Priority=VERBOSE Message_Addref: protocol.c(3012): __Message_AddRef(BinProtocolNotification): 0x55c9211f2b30: refs=5
+DEBUG: ../sock/sock.c(353): Sock_Read - OK exit. 16 bytes read
+DEBUG: messages.c(706): EventId=45005 Priority=DEBUG MessageFromBatch:- msg tag is 34, index: 34
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: protocol.c(1802): __Message_Release(BinProtocolNotification): 0x55c9211f2b30: refs=4
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211f20c0(ProtocolFromSocket) state 41(S:*P), methodBit: 200(AckOther)
+VERBOSE: messages.c(749): EventId=55054 Priority=VERBOSE MessageFromBatch: protocol.c(1858): __MessageFromBatch(CreateAgentMsg): 0x55c81b9bdf00: refs=1
+INFO: protocol.c(1878): EventId=40011 Priority=INFO (S)done with receiving msg(0x55c81b9bdf00:34:CreateAgentMsg:0)
+DEBUG: protocol.c(1711): EventId=45154 Priority=DEBUG (E)Socket: 0x55c9211f2088, All send
+VERBOSE: protocol.c(158): EventId=55056 Priority=VERBOSE (E)ProtocolSocket_Release: protocol.c(3024): self 0x55c9211f2088: refs=2
+DEBUG: protocol.c(1880): EventId=45373 Priority=DEBUG (S)Handle:(0x55c81b9ae558), ClientAuthState = 1, EngineAuthState = 4
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: strand.c(545): __Message_Release(BinProtocolNotification): 0x55c9211f2b30: refs=3
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211f20c0(ProtocolFromSocket) state 201(S:*a), bit: 10(AckOther) [D, O t:-- o:-A 0x55c9211f1c88]
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211f1c38(AgentElem) state 4001(SM:*#), methodBit: 800(Ack(M))
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211f20c0(ProtocolFromSocket), action: Returning from AckOther
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c9211f20c0(ProtocolFromSocket) Exits, state 1, ToFinish: 0 [D, O t:-- o:-- 0x55c9211f1c88]
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211f1c38(AgentElem), action: Returning from Post
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: strand.c(1290): __Message_Release(BinProtocolNotification): 0x55c9211f2b30: refs=2
+VERBOSE: strand.c(2996): EventId=55026 Priority=VERBOSE _Strand_ScheduleEntry: 0x55c92120db08(IdleRequestItem) state 0(SM:), bit:8(Post) from 0x55c9211f1c38(AgentElem); methodBit: 4000(EntryOperation)
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c92120db08(IdleRequestItem) state 4001(SM:*#), bit: 15(EntryOperation) [D, - t:C- o:C- (nil)]
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c92120db08(IdleRequestItem) Exits, state 1, ToFinish: 0 [D, - t:C- o:C- (nil)]
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211f1c38(AgentElem) state 801(SM:*A), bit: 12(Ack(M)) [1-, O t:-A o:-- 0x55c9211f2110]
+DEBUG: agentmgr.c(221): EventId=45007 Priority=DEBUG AgentElem: Ack on interaction [0x55c9211f1c88]<-0x55c9211f2110
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c9211f1c38(AgentElem) Exits, state 1, ToFinish: 0 [1-, O t:-- o:-- 0x55c9211f2110]
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: agentmgr.c(1227): __Message_Release(BinProtocolNotification): 0x55c9211f2b30: refs=1
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: agentmgr.c(1270): __Message_Release(BinProtocolNotification): 0x55c9211f2b30: refs=0
+DEBUG: agentmgr.c(1284): EventId=45012 Priority=DEBUG _SendMessageToAgent msg tag = 4099
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211ee768(RequestItem), action: Initialize Itself
+VERBOSE: strand.c(2241): EventId=55030 Priority=VERBOSE _Strand_EnterStrand: 0x55c9211ee768(RequestItem)
+VERBOSE: strand.c(3039): EventId=55034 Priority=VERBOSE Strand_Leave: 0x55c92120dd88(DispEnumEntry) (strandStealedFlag (nil))
+VERBOSE: protocol.c(158): EventId=55056 Priority=VERBOSE (S)ProtocolSocket_Release: protocol.c(1289): self 0x55c81b9ae558: refs=1
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c92120dd88(DispEnumEntry) Exits, state 1, ToFinish: 0 [-, O t:-A o:-- 0x55c9211ee7b8]
+VERBOSE: strand.c(2254): EventId=55031 Priority=VERBOSE _Strand_ExitStrand: 0x55c9211ee768(RequestItem)
+DEBUG: ../sock/sock.c(169): EventId=45355 Priority=DEBUG Sock_Close: sock (10)
+VERBOSE: messages.c(383): EventId=55052 Priority=VERBOSE Message_Addref: agentmgr.c(1306): __Message_AddRef(EnumerateInstancesReq): 0x55c9211f17d0: refs=2
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: protocol.c(2095): __Message_Release(CreateAgentMsg): 0x55c81b9bdf00: refs=0
+VERBOSE: messages.c(362): EventId=55051 Priority=VERBOSE Message_New: messages.c(777): __Message_New(EnumerateInstancesReq): 0x55c9211f2b30: refs=1
+DEBUG: protocol.c(2318): EventId=45155 Priority=DEBUG (S)Protocol _RequestCallback: _RequestCallbackRead fails for ProtocolSocket 0x55c81b9ae558
+INFO: agentmgr.c(1223): EventId=40005 Priority=INFO _SendRequestToAgent msg(0x55c9211f2b30:4099:EnumerateInstancesReq:2), from original operationId: 100001 to 2
+INFO: protocol.c(2399): EventId=40012 Priority=INFO (S)Socket: 0x55c81b9ae558, closing connection (mask 2)
+VERBOSE: messages.c(383): EventId=55052 Priority=VERBOSE Message_Addref: strand.c(2649): __Message_AddRef(EnumerateInstancesReq): 0x55c9211f2b30: refs=2
+INFO: ../sock/selector.c(259): EventId=40033 Priority=INFO Selector_RemoveHandler: selector=0x55c81b8be388, handler=0x55c81b9ae558, name=BINARY_SERVER_CONNECTION
+VERBOSE: strand.c(2982): EventId=55025 Priority=VERBOSE _Strand_ScheduleParent: 0x55c9211f1c38(AgentElem) state 0(SM:), bit:1(Add) from 0x55c9211ee768(RequestItem); methodBit: 4000(EntryOperation)
+DEBUG: protocol.c(2373): EventId=45159 Priority=DEBUG (S)Protocol _RequestCallback: removing 0x55c81b9ae558 (mask 20, prev: a)
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211f1c38(AgentElem) state 4001(SM:*#), bit: 15(EntryOperation) [1-, O t:-- o:-- 0x55c9211f2110]
+VERBOSE: strand.c(1170): EventId=55002 Priority=VERBOSE _StrandEntryOperation_Add: 2 entries 0x55c9211f1bd8(AgentElem): 0x55c9211ee768(RequestItem)
+DEBUG: ../sock/sock.c(169): EventId=45355 Priority=DEBUG Sock_Close: sock (9)
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c81b9ae590(ProtocolSocketServer) state 0(S:), methodBit: 800(CloseOther)
+VERBOSE: strand.c(2996): EventId=55026 Priority=VERBOSE _Strand_ScheduleEntry: 0x55c9211ee768(RequestItem) state 0(SM:), bit:1(Add) from 0x55c9211f1c38(AgentElem); methodBit: 4000(EntryOperation)
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211ee768(RequestItem) state 4001(SM:*#), bit: 15(EntryOperation) [-, O t:-- o:-A 0x55c92120ddd8]
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c81b9ae590(ProtocolSocketServer) state 801(S:*c), bit: 12(CloseOther) [-, - t:-- o:-- (nil)]
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c81b9ae590(ProtocolSocketServer), action: Returning from CloseOther
+VERBOSE: messages.c(383): EventId=55052 Priority=VERBOSE Message_Addref: strand.c(1540): __Message_AddRef(EnumerateInstancesReq): 0x55c9211f2b30: refs=3
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c81b9ae590(ProtocolSocketServer) Exits, state 1, ToFinish: 0 [-, - t:C- o:-- (nil)]
+VERBOSE: strand.c(2982): EventId=55025 Priority=VERBOSE _Strand_ScheduleParent: 0x55c9211f1c38(AgentElem) state 4001(SM:*#), bit:8(Post) from 0x55c9211ee768(RequestItem); methodBit: 4000(EntryOperation)
+VERBOSE: strand.c(279): EventId=55032 Priority=VERBOSE _Strand_TracePost: 0x55c9211ee768, msg(0x55c9211f2b30:4099:EnumerateInstancesReq:2)
+VERBOSE: protocol.c(158): EventId=55056 Priority=VERBOSE (S)ProtocolSocket_Release: protocol.c(2378): self 0x55c81b9ae558: refs=0
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: strand.c(1958): __Message_Release(EnumerateInstancesReq): 0x55c9211f2b30: refs=2
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c9211ee768(RequestItem) Exits, state 1, ToFinish: 0 [-, O t:-- o:-A 0x55c92120ddd8]
+VERBOSE: strand.c(1280): EventId=55007 Priority=VERBOSE _StrandEntryOperation_Post: 0x55c9211f1bd8(AgentElem) Posting on parent, msg: 0x55c9211f2b30
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211f1c38(AgentElem), action: Post
+VERBOSE: messages.c(383): EventId=55052 Priority=VERBOSE Message_Addref: strand.c(355): __Message_AddRef(EnumerateInstancesReq): 0x55c9211f2b30: refs=3
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211f20c0(ProtocolFromSocket) state 0(S:), methodBit: 40(Post)
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211f20c0(ProtocolFromSocket) state 41(S:*P), bit: 7(Post) [D, O t:-- o:-- 0x55c9211f1c88]
+VERBOSE: strand.c(279): EventId=55032 Priority=VERBOSE _Strand_TracePost: 0x55c9211f20c0, msg(0x55c9211f2b30:4099:EnumerateInstancesReq:2)
+DEBUG: protocol.c(300): EventId=45148 Priority=DEBUG ProtocolSocket: Posting message for interaction [0x55c9211f2110]<-0x55c9211f1c88
+VERBOSE: protocol.c(188): EventId=55055 Priority=VERBOSE (E)ProtocolSocket_Addref: protocol.c(303): self 0x55c9211f2088: refs=3
+DEBUG: ../sock/selector.c(365): EventId=45206 Priority=DEBUG Sending msg(0x55c9211f2b30:4099:EnumerateInstancesReq:2) on own thread
+VERBOSE: messages.c(383): EventId=55052 Priority=VERBOSE Message_Addref: protocol.c(3012): __Message_AddRef(EnumerateInstancesReq): 0x55c9211f2b30: refs=4
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: protocol.c(1802): __Message_Release(EnumerateInstancesReq): 0x55c9211f2b30: refs=3
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211f20c0(ProtocolFromSocket) state 41(S:*P), methodBit: 200(AckOther)
+DEBUG: protocol.c(1711): EventId=45154 Priority=DEBUG (E)Socket: 0x55c9211f2088, All send
+VERBOSE: protocol.c(158): EventId=55056 Priority=VERBOSE (E)ProtocolSocket_Release: protocol.c(3024): self 0x55c9211f2088: refs=2
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: strand.c(545): __Message_Release(EnumerateInstancesReq): 0x55c9211f2b30: refs=2
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211f20c0(ProtocolFromSocket) state 201(S:*a), bit: 10(AckOther) [D, O t:-- o:-A 0x55c9211f1c88]
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211f1c38(AgentElem) state 4001(SM:*#), methodBit: 800(Ack(M))
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211f20c0(ProtocolFromSocket), action: Returning from AckOther
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c9211f20c0(ProtocolFromSocket) Exits, state 1, ToFinish: 0 [D, O t:-- o:-- 0x55c9211f1c88]
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211f1c38(AgentElem), action: Returning from Post
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: strand.c(1290): __Message_Release(EnumerateInstancesReq): 0x55c9211f2b30: refs=1
+VERBOSE: strand.c(2996): EventId=55026 Priority=VERBOSE _Strand_ScheduleEntry: 0x55c9211ee768(RequestItem) state 0(SM:), bit:8(Post) from 0x55c9211f1c38(AgentElem); methodBit: 4000(EntryOperation)
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211ee768(RequestItem) state 4001(SM:*#), bit: 15(EntryOperation) [-, O t:-- o:-A 0x55c92120ddd8]
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211ee768(RequestItem), action: Ack
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c92120dd88(DispEnumEntry) state 0(SM:), methodBit: 800(Ack(M))
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c92120dd88(DispEnumEntry) state 801(SM:*A), bit: 12(Ack(M)) [-, O t:-A o:-- 0x55c9211ee7b8]
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c92120dd88(DispEnumEntry) Exits, state 1, ToFinish: 0 [-, O t:-- o:-- 0x55c9211ee7b8]
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211ee768(RequestItem), action: Returning from Ack
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c9211ee768(RequestItem) Exits, state 1, ToFinish: 0 [-, O t:-- o:-- 0x55c92120ddd8]
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211f1c38(AgentElem) state 801(SM:*A), bit: 12(Ack(M)) [2-, O t:-A o:-- 0x55c9211f2110]
+DEBUG: agentmgr.c(221): EventId=45007 Priority=DEBUG AgentElem: Ack on interaction [0x55c9211f1c88]<-0x55c9211f2110
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c9211f1c38(AgentElem) Exits, state 1, ToFinish: 0 [2-, O t:-- o:-- 0x55c9211f2110]
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: agentmgr.c(1227): __Message_Release(EnumerateInstancesReq): 0x55c9211f2b30: refs=0
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: disp.c(451): __Message_Release(EnumerateInstancesReq): 0x55c9211f17d0: refs=1
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211ee1a8(DispEnumParent) state 0(SM:), methodBit: 40000(EnumDone)
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211ee1a8(DispEnumParent) state 40001(SM:*0), bit: 19(EnumDone) [1-, O t:-- o:-- 0x55c9211d3d00]
+DEBUG: disp.c(196): EventId=45077 Priority=DEBUG Disp EnumDone (0x55c9211ee148) total: 1 Result: 0
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c9211ee1a8(DispEnumParent) Exits, state 1, ToFinish: 0 [1-, O t:-- o:-- 0x55c9211d3d00]
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: wsman.c(1586): __Message_Release(EnumerateInstancesReq): 0x55c9211f0060: refs=1
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: wsman.c(3819): __Message_Release(HttpRequestMsg): 0x55c9211ee350: refs=1
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211d4208(WsmanConnection) state 0(SB:), methodBit: 4000(AckOther_Left)
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211d4208(WsmanConnection) state 4001(SB:*a), bit: 15(AckOther_Left) [-, O t:-- o:-A 0x55c9211eeaf8, O t:-- o:-- 0x55c9211d3cc8]
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211eeaa8(HttpSocket) state 0(S:), methodBit: 100(Ack)
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211eeaa8(HttpSocket) state 101(S:*A), bit: 9(Ack) [-, O t:-A o:-- 0x55c9211d4258]
+DEBUG: http.c(1330): EventId=45035 Priority=DEBUG HttpSocket: Ack on interaction [0x55c9211eeaf8]<-0x55c9211d4258
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c9211eeaa8(HttpSocket) Exits, state 1, ToFinish: 0 [-, O t:-- o:-- 0x55c9211d4258]
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211d4208(WsmanConnection), action: Returning from AckOther
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c9211d4208(WsmanConnection) Exits, state 1, ToFinish: 0 [-, O t:-- o:-- 0x55c9211eeaf8, O t:-- o:-- 0x55c9211d3cc8]
+VERBOSE: strand.c(2878): EventId=55021 Priority=VERBOSE Strand_ExecLoop: 0x55c9211d4208 LEAVE occurred, previous state 100001, bit: 21 (100000)
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: http.c(1371): __Message_Release(HttpRequestMsg): 0x55c9211ee350: refs=0
+VERBOSE: strand.c(2878): EventId=55021 Priority=VERBOSE Strand_ExecLoop: 0x55c9211eeaa8 LEAVE occurred, previous state 1001, bit: 13 (1000)
+DEBUG: httpauth.c(2319): EventId=50015 Priority=DEBUG HTTP Auth: SupplimentaryInfo: (ethan Process_Authorized_Message returning OK).
+
+
+DEBUG: ../sock/sock.c(340): EventId=50015 Priority=DEBUG HTTP Auth: SupplimentaryInfo: (ethan entering Sock_Read).
+DEBUG: ../sock/sock.c(341): Sock_Read - Begin. socket: 17, size: 32
+DEBUG: ../sock/sock.c(353): Sock_Read - OK exit. 32 bytes read
+DEBUG: ../sock/sock.c(340): EventId=50015 Priority=DEBUG HTTP Auth: SupplimentaryInfo: (ethan entering Sock_Read).
+DEBUG: ../sock/sock.c(341): Sock_Read - Begin. socket: 17, size: 32
+DEBUG: ../sock/sock.c(353): Sock_Read - OK exit. 32 bytes read
+
+
+DEBUG: messages.c(706): EventId=45005 Priority=DEBUG MessageFromBatch:- msg tag is 2, index: 2
+VERBOSE: messages.c(749): EventId=55054 Priority=VERBOSE MessageFromBatch: protocol.c(1858): __MessageFromBatch(PostInstanceMsg): 0x55c92120dca0: refs=1
+INFO: protocol.c(1878): EventId=40011 Priority=INFO (E)done with receiving msg(0x55c92120dca0:2:PostInstanceMsg:2)
+DEBUG: protocol.c(1880): EventId=45373 Priority=DEBUG (E)Handle:(0x55c9211f2088), ClientAuthState = 4, EngineAuthState = 4
+VERBOSE: messages.c(383): EventId=55052 Priority=VERBOSE Message_Addref: protocol.c(2089): __Message_AddRef(PostInstanceMsg): 0x55c92120dca0: refs=2
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211f20c0(ProtocolFromSocket) state 0(S:), methodBit: 1000(PostMsg)
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211f20c0(ProtocolFromSocket) state 1001(S:*0), bit: 13(PostMsg) [D, O t:-- o:-- 0x55c9211f1c88]
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211f20c0(ProtocolFromSocket), action: PostAndLeaveStrand
+VERBOSE: strand.c(3039): EventId=55034 Priority=VERBOSE Strand_Leave: 0x55c9211f20c0(ProtocolFromSocket) (strandStealedFlag 0x7ffc7e01f536)
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c9211f20c0(ProtocolFromSocket) Exits, state 1, ToFinish: 0 [D, O t:-A o:-- 0x55c9211f1c88]
+VERBOSE: messages.c(383): EventId=55052 Priority=VERBOSE Message_Addref: strand.c(472): __Message_AddRef(PostInstanceMsg): 0x55c92120dca0: refs=3
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211f1c38(AgentElem) state 0(SM:), methodBit: 100(Post(M))
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211f1c38(AgentElem) state 101(SM:*P), bit: 9(Post(M)) [2-, O t:-- o:-- 0x55c9211f2110]
+VERBOSE: strand.c(279): EventId=55032 Priority=VERBOSE _Strand_TracePost: 0x55c9211f1c38, msg(0x55c92120dca0:2:PostInstanceMsg:2)
+DEBUG: agentmgr.c(154): EventId=45006 Priority=DEBUG AgentElem: Posting message for interaction [0x55c9211f1c88]<-0x55c9211f2110
+DEBUG: agentmgr.c(986): EventId=45008 Priority=DEBUG _AgentElem_FindRequest, Agent 0x55c9211f1bd8(0x55c9211f1c38), Found key: 2, Request: 0x55c9211ee758(0x55c9211ee768)
+VERBOSE: messages.c(383): EventId=55052 Priority=VERBOSE Message_Addref: strand.c(1441): __Message_AddRef(PostInstanceMsg): 0x55c92120dca0: refs=4
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211ee768(RequestItem) state 0(SM:), methodBit: 400(PostInternal)
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211ee768(RequestItem) state 401(SM:*S), bit: 11(PostInternal) [-, O t:-- o:-- 0x55c92120ddd8]
+VERBOSE: strand.c(2036): EventId=55016 Priority=VERBOSE _StrandMethod_Entry_PostInternal: 0x55c9211ee768(RequestItem) Msg from parent, msg: 0x55c92120dca0
+DEBUG: agentmgr.c(665): EventId=45038 Priority=DEBUG _RequestItem_ParentPost: 0x55c9211ee758, msg: 0x55c92120dca0
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211ee768(RequestItem), action: Post
+VERBOSE: messages.c(383): EventId=55052 Priority=VERBOSE Message_Addref: strand.c(472): __Message_AddRef(PostInstanceMsg): 0x55c92120dca0: refs=5
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c92120dd88(DispEnumEntry) state 0(SM:), methodBit: 100(Post(M))
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c92120dd88(DispEnumEntry) state 101(SM:*P), bit: 9(Post(M)) [-, O t:-- o:-- 0x55c9211ee7b8]
+VERBOSE: strand.c(279): EventId=55032 Priority=VERBOSE _Strand_TracePost: 0x55c92120dd88, msg(0x55c92120dca0:2:PostInstanceMsg:100001)
+VERBOSE: messages.c(383): EventId=55052 Priority=VERBOSE Message_Addref: strand.c(1540): __Message_AddRef(PostInstanceMsg): 0x55c92120dca0: refs=6
+VERBOSE: strand.c(2982): EventId=55025 Priority=VERBOSE _Strand_ScheduleParent: 0x55c9211ee1a8(DispEnumParent) state 0(SM:), bit:8(Post) from 0x55c92120dd88(DispEnumEntry); methodBit: 4000(EntryOperation)
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211ee1a8(DispEnumParent) state 4001(SM:*#), bit: 15(EntryOperation) [1-, O t:-- o:-- 0x55c9211d3d00]
+VERBOSE: strand.c(1280): EventId=55007 Priority=VERBOSE _StrandEntryOperation_Post: 0x55c9211ee148(DispEnumParent) Posting on parent, msg: 0x55c92120dca0
+DEBUG: disp.c(307): EventId=45026 Priority=DEBUG Disp: Posting message for enum/assoc/ref interaction 0x55c9211d3d00<-[0x55c9211ee148]
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211ee1a8(DispEnumParent), action: Post
+VERBOSE: messages.c(383): EventId=55052 Priority=VERBOSE Message_Addref: strand.c(433): __Message_AddRef(PostInstanceMsg): 0x55c92120dca0: refs=7
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211d3c78(WsmanEnumerationContext) state 0(SB:), methodBit: 200(Post_Right)
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211d3c78(WsmanEnumerationContext) state 201(SB:*S), bit: 10(Post_Right) [-, O t:-- o:-- 0x55c9211d4290, O t:-- o:-- 0x55c9211ee1f8]
+VERBOSE: strand.c(279): EventId=55032 Priority=VERBOSE _Strand_TracePost: 0x55c9211d3c78, msg(0x55c92120dca0:2:PostInstanceMsg:100001)
+DEBUG: wsman.c(4236): EventId=45222 Priority=DEBUG WsmanEnum: Posting msg(0x55c92120dca0:2:PostInstanceMsg:100001) on interaction 0x55c9211d4290<-[0x55c9211d3c78]<-0x55c9211ee1f8
+DEBUG: wsman.c(3497): EventId=45216 Priority=DEBUG WsmanEnum: 0x55c9211d3c78 _ProcessInstanceEnumerationContext: compeleted: 0, totalResponses: 0, totalResponseSize: 0
+VERBOSE: messages.c(383): EventId=55052 Priority=VERBOSE Message_Addref: wsman.c(3504): __Message_AddRef(PostInstanceMsg): 0x55c92120dca0: refs=8
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211d3c78(WsmanEnumerationContext) state 201(SB:*S), methodBit: 8000(AckOther_Right)
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: strand.c(545): __Message_Release(PostInstanceMsg): 0x55c92120dca0: refs=7
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211d3c78(WsmanEnumerationContext) state 8001(SB:*k), bit: 16(AckOther_Right) [-, O t:-- o:-- 0x55c9211d4290, O t:-- o:-A 0x55c9211ee1f8]
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211ee1a8(DispEnumParent) state 4001(SM:*#), methodBit: 800(Ack(M))
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211d3c78(WsmanEnumerationContext), action: Returning from AckOther(Right)
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c9211d3c78(WsmanEnumerationContext) Exits, state 1, ToFinish: 0 [-, O t:-- o:-- 0x55c9211d4290, O t:-- o:-- 0x55c9211ee1f8]
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211ee1a8(DispEnumParent), action: Returning from Post
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: strand.c(1290): __Message_Release(PostInstanceMsg): 0x55c92120dca0: refs=6
+VERBOSE: strand.c(2996): EventId=55026 Priority=VERBOSE _Strand_ScheduleEntry: 0x55c92120dd88(DispEnumEntry) state 101(SM:*P), bit:8(Post) from 0x55c9211ee1a8(DispEnumParent); methodBit: 4000(EntryOperation)
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211ee1a8(DispEnumParent) state 801(SM:*A), bit: 12(Ack(M)) [1-, O t:-A o:-- 0x55c9211d3d00]
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c9211ee1a8(DispEnumParent) Exits, state 1, ToFinish: 0 [1-, O t:-- o:-- 0x55c9211d3d00]
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: strand.c(1892): __Message_Release(PostInstanceMsg): 0x55c92120dca0: refs=5
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c92120dd88(DispEnumEntry) state 4001(SM:*#), bit: 15(EntryOperation) [-, O t:-- o:-A 0x55c9211ee7b8]
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c92120dd88(DispEnumEntry), action: Ack
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211ee768(RequestItem) state 401(SM:*S), methodBit: 800(Ack(M))
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c92120dd88(DispEnumEntry), action: Returning from Ack
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c92120dd88(DispEnumEntry) Exits, state 1, ToFinish: 0 [-, O t:-- o:-- 0x55c9211ee7b8]
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211ee768(RequestItem), action: Returning from Post
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: strand.c(2047): __Message_Release(PostInstanceMsg): 0x55c92120dca0: refs=4
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211ee768(RequestItem) state 801(SM:*A), bit: 12(Ack(M)) [-, O t:-A o:-- 0x55c92120ddd8]
+DEBUG: agentmgr.c(398): EventId=45010 Priority=DEBUG RequestItem: Ack on interaction [0x55c9211ee7b8]<-0x55c92120ddd8
+VERBOSE: strand.c(2982): EventId=55025 Priority=VERBOSE _Strand_ScheduleParent: 0x55c9211f1c38(AgentElem) state 101(SM:*P), bit:40(EntryAck) from 0x55c9211ee768(RequestItem); methodBit: 4000(EntryOperation)
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c9211ee768(RequestItem) Exits, state 1, ToFinish: 0 [-, O t:-- o:-- 0x55c92120ddd8]
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: strand.c(1664): __Message_Release(PostInstanceMsg): 0x55c92120dca0: refs=3
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211f1c38(AgentElem) state 4001(SM:*#), bit: 15(EntryOperation) [2-, O t:-- o:-A 0x55c9211f2110]
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211f1c38(AgentElem), action: Ack
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211f20c0(ProtocolFromSocket) state 0(S:), methodBit: 100(Ack)
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211f20c0(ProtocolFromSocket) state 101(S:*A), bit: 9(Ack) [D, O t:-A o:-- 0x55c9211f1c88]
+DEBUG: protocol.c(338): EventId=45151 Priority=DEBUG ProtocolSocket: Ack on interaction [0x55c9211f2110]<-0x55c9211f1c88
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c9211f20c0(ProtocolFromSocket) Exits, state 1, ToFinish: 0 [D, O t:-- o:-- 0x55c9211f1c88]
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211f1c38(AgentElem), action: Returning from Ack
+VERBOSE: strand.c(2996): EventId=55026 Priority=VERBOSE _Strand_ScheduleEntry: 0x55c9211ee768(RequestItem) state 0(SM:), bit:40(EntryAck) from 0x55c9211f1c38(AgentElem); methodBit: 4000(EntryOperation)
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211ee768(RequestItem) state 4001(SM:*#), bit: 15(EntryOperation) [-, O t:-- o:-- 0x55c92120ddd8]
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c9211ee768(RequestItem) Exits, state 1, ToFinish: 0 [-, O t:-- o:-- 0x55c92120ddd8]
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c9211f1c38(AgentElem) Exits, state 1, ToFinish: 0 [2-, O t:-- o:-- 0x55c9211f2110]
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: protocol.c(409): __Message_Release(PostInstanceMsg): 0x55c92120dca0: refs=2
+VERBOSE: strand.c(2878): EventId=55021 Priority=VERBOSE Strand_ExecLoop: 0x55c9211f20c0 LEAVE occurred, previous state 1001, bit: 13 (1000)
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: protocol.c(2095): __Message_Release(PostInstanceMsg): 0x55c92120dca0: refs=1
+DEBUG: ../sock/sock.c(340): EventId=50015 Priority=DEBUG HTTP Auth: SupplimentaryInfo: (ethan entering Sock_Read).
+DEBUG: ../sock/sock.c(341): Sock_Read - Begin. socket: 17, size: 32
+DEBUG: ../sock/sock.c(353): Sock_Read - OK exit. 32 bytes read
+DEBUG: ../sock/sock.c(340): EventId=50015 Priority=DEBUG HTTP Auth: SupplimentaryInfo: (ethan entering Sock_Read).
+DEBUG: ../sock/sock.c(341): Sock_Read - Begin. socket: 17, size: 16
+DEBUG: ../sock/sock.c(353): Sock_Read - OK exit. 16 bytes read
+DEBUG: messages.c(706): EventId=45005 Priority=DEBUG MessageFromBatch:- msg tag is 4, index: 4
+VERBOSE: messages.c(749): EventId=55054 Priority=VERBOSE MessageFromBatch: protocol.c(1858): __MessageFromBatch(PostResultMsg): 0x55c9211ee350: refs=1
+INFO: protocol.c(1878): EventId=40011 Priority=INFO (E)done with receiving msg(0x55c9211ee350:4:PostResultMsg:2)
+DEBUG: protocol.c(1880): EventId=45373 Priority=DEBUG (E)Handle:(0x55c9211f2088), ClientAuthState = 4, EngineAuthState = 4
+VERBOSE: messages.c(383): EventId=55052 Priority=VERBOSE Message_Addref: protocol.c(2089): __Message_AddRef(PostResultMsg): 0x55c9211ee350: refs=2
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211f20c0(ProtocolFromSocket) state 0(S:), methodBit: 1000(PostMsg)
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211f20c0(ProtocolFromSocket) state 1001(S:*0), bit: 13(PostMsg) [D, O t:-- o:-- 0x55c9211f1c88]
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211f20c0(ProtocolFromSocket), action: PostAndLeaveStrand
+VERBOSE: strand.c(3039): EventId=55034 Priority=VERBOSE Strand_Leave: 0x55c9211f20c0(ProtocolFromSocket) (strandStealedFlag 0x7ffc7e01f536)
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c9211f20c0(ProtocolFromSocket) Exits, state 1, ToFinish: 0 [D, O t:-A o:-- 0x55c9211f1c88]
+VERBOSE: messages.c(383): EventId=55052 Priority=VERBOSE Message_Addref: strand.c(472): __Message_AddRef(PostResultMsg): 0x55c9211ee350: refs=3
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211f1c38(AgentElem) state 0(SM:), methodBit: 100(Post(M))
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211f1c38(AgentElem) state 101(SM:*P), bit: 9(Post(M)) [2-, O t:-- o:-- 0x55c9211f2110]
+VERBOSE: strand.c(275): EventId=55033 Priority=VERBOSE _Strand_TracePost: 0x55c9211f1c38, msg(0x55c9211ee350:4:2) PostResultMsg:0
+DEBUG: agentmgr.c(154): EventId=45006 Priority=DEBUG AgentElem: Posting message for interaction [0x55c9211f1c88]<-0x55c9211f2110
+DEBUG: agentmgr.c(986): EventId=45008 Priority=DEBUG _AgentElem_FindRequest, Agent 0x55c9211f1bd8(0x55c9211f1c38), Found key: 2, Request: 0x55c9211ee758(0x55c9211ee768)
+VERBOSE: messages.c(383): EventId=55052 Priority=VERBOSE Message_Addref: strand.c(1441): __Message_AddRef(PostResultMsg): 0x55c9211ee350: refs=4
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211ee768(RequestItem) state 0(SM:), methodBit: 400(PostInternal)
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211ee768(RequestItem) state 401(SM:*S), bit: 11(PostInternal) [-, O t:-- o:-- 0x55c92120ddd8]
+VERBOSE: strand.c(2036): EventId=55016 Priority=VERBOSE _StrandMethod_Entry_PostInternal: 0x55c9211ee768(RequestItem) Msg from parent, msg: 0x55c9211ee350
+DEBUG: agentmgr.c(665): EventId=45038 Priority=DEBUG _RequestItem_ParentPost: 0x55c9211ee758, msg: 0x55c9211ee350
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211ee768(RequestItem), action: Post
+VERBOSE: messages.c(383): EventId=55052 Priority=VERBOSE Message_Addref: strand.c(472): __Message_AddRef(PostResultMsg): 0x55c9211ee350: refs=5
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c92120dd88(DispEnumEntry) state 0(SM:), methodBit: 100(Post(M))
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c92120dd88(DispEnumEntry) state 101(SM:*P), bit: 9(Post(M)) [-, O t:-- o:-- 0x55c9211ee7b8]
+VERBOSE: strand.c(275): EventId=55033 Priority=VERBOSE _Strand_TracePost: 0x55c92120dd88, msg(0x55c9211ee350:4:100001) PostResultMsg:0
+VERBOSE: messages.c(383): EventId=55052 Priority=VERBOSE Message_Addref: strand.c(1540): __Message_AddRef(PostResultMsg): 0x55c9211ee350: refs=6
+VERBOSE: strand.c(2982): EventId=55025 Priority=VERBOSE _Strand_ScheduleParent: 0x55c9211ee1a8(DispEnumParent) state 0(SM:), bit:8(Post) from 0x55c92120dd88(DispEnumEntry); methodBit: 4000(EntryOperation)
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211ee1a8(DispEnumParent) state 4001(SM:*#), bit: 15(EntryOperation) [1-, O t:-- o:-- 0x55c9211d3d00]
+VERBOSE: strand.c(1280): EventId=55007 Priority=VERBOSE _StrandEntryOperation_Post: 0x55c9211ee148(DispEnumParent) Posting on parent, msg: 0x55c9211ee350
+DEBUG: disp.c(307): EventId=45026 Priority=DEBUG Disp: Posting message for enum/assoc/ref interaction 0x55c9211d3d00<-[0x55c9211ee148]
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: strand.c(1290): __Message_Release(PostResultMsg): 0x55c9211ee350: refs=5
+VERBOSE: strand.c(2996): EventId=55026 Priority=VERBOSE _Strand_ScheduleEntry: 0x55c92120dd88(DispEnumEntry) state 101(SM:*P), bit:8(Post) from 0x55c9211ee1a8(DispEnumParent); methodBit: 4000(EntryOperation)
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c9211ee1a8(DispEnumParent) Exits, state 1, ToFinish: 0 [1-, O t:-- o:-- 0x55c9211d3d00]
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: strand.c(1892): __Message_Release(PostResultMsg): 0x55c9211ee350: refs=4
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c92120dd88(DispEnumEntry) state 4001(SM:*#), bit: 15(EntryOperation) [-, O t:-- o:-A 0x55c9211ee7b8]
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c92120dd88(DispEnumEntry), action: Ack
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211ee768(RequestItem) state 401(SM:*S), methodBit: 800(Ack(M))
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c92120dd88(DispEnumEntry), action: Returning from Ack
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c92120dd88(DispEnumEntry) Exits, state 1, ToFinish: 0 [-, O t:-- o:-- 0x55c9211ee7b8]
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211ee768(RequestItem), action: Returning from Post
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211ee768(RequestItem), action: Close
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c92120dd88(DispEnumEntry) state 0(SM:), methodBit: 8000(Close(M))
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c92120dd88(DispEnumEntry) state 8001(SM:*C), bit: 16(Close(M)) [-, O t:-- o:-- 0x55c9211ee7b8]
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c92120dd88(DispEnumEntry), action: Close
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211ee768(RequestItem) state c01(SM:*SA), methodBit: 8000(Close(M))
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c92120dd88(DispEnumEntry), action: Returning from Close
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c92120dd88(DispEnumEntry) Exits, state 1, ToFinish: 1 [-, O t:C- o:C- 0x55c9211ee7b8]
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c92120dd88(DispEnumEntry), action: Scheduling deletion of StrandEntry
+VERBOSE: strand.c(2982): EventId=55025 Priority=VERBOSE _Strand_ScheduleParent: 0x55c9211ee1a8(DispEnumParent) state 0(SM:), bit:400(Deleted) from 0x55c92120dd88(DispEnumEntry); methodBit: 4000(EntryOperation)
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211ee1a8(DispEnumParent) state 4001(SM:*#), bit: 15(EntryOperation) [1-, O t:-- o:-- 0x55c9211d3d00]
+VERBOSE: strand.c(1332): EventId=55010 Priority=VERBOSE _StrandEntryOperation_Deleted: 0x55c9211ee148(DispEnumParent): 0x55c92120dd78(DispEnumEntry)
+VERBOSE: strand.c(2699): EventId=55019 Priority=VERBOSE Strand 0x55c9211ee1a8(DispEnumParent), deleting entry 0x55c92120dd88(DispEnumEntry)
+DEBUG: disp.c(293): EventId=45078 Priority=DEBUG Disp EntryDeleted total: 555671880 Done 0
+VERBOSE: messages.c(362): EventId=55051 Priority=VERBOSE Message_New: errorutil.c(36): __Message_New(PostResultMsg): 0x55c9211f3170: refs=1
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211ee1a8(DispEnumParent), action: Post
+VERBOSE: messages.c(383): EventId=55052 Priority=VERBOSE Message_Addref: strand.c(433): __Message_AddRef(PostResultMsg): 0x55c9211f3170: refs=2
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211d3c78(WsmanEnumerationContext) state 0(SB:), methodBit: 200(Post_Right)
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211d3c78(WsmanEnumerationContext) state 201(SB:*S), bit: 10(Post_Right) [-, O t:-- o:-- 0x55c9211d4290, O t:-- o:-- 0x55c9211ee1f8]
+VERBOSE: strand.c(275): EventId=55033 Priority=VERBOSE _Strand_TracePost: 0x55c9211d3c78, msg(0x55c9211f3170:4:100001) PostResultMsg:0
+DEBUG: wsman.c(4236): EventId=45222 Priority=DEBUG WsmanEnum: Posting msg(0x55c9211f3170:4:PostResultMsg:100001) on interaction 0x55c9211d4290<-[0x55c9211d3c78]<-0x55c9211ee1f8
+DEBUG: wsman.c(3369): EventId=45213 Priority=DEBUG _ProcessResultEnumerationContext: selfEC (0x55c9211d3c78) result (0)
+VERBOSE: messages.c(383): EventId=55052 Priority=VERBOSE Message_Addref: wsman.c(3374): __Message_AddRef(PostResultMsg): 0x55c9211f3170: refs=3
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: wsman.c(2856): __Message_Release(PostInstanceMsg): 0x55c92120dca0: refs=0
+VERBOSE: messages.c(362): EventId=55051 Priority=VERBOSE Message_New: wsman.c(763): __Message_New(HttpResponseMsg): 0x55c9211f35b0: refs=1
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211d3c78(WsmanEnumerationContext), action: PostLeft
+VERBOSE: messages.c(383): EventId=55052 Priority=VERBOSE Message_Addref: strand.c(433): __Message_AddRef(HttpResponseMsg): 0x55c9211f35b0: refs=2
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211d4208(WsmanConnection) state 0(SB:), methodBit: 200(Post_Right)
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211d4208(WsmanConnection) state 201(SB:*S), bit: 10(Post_Right) [-, O t:-- o:-- 0x55c9211eeaf8, O t:-- o:-- 0x55c9211d3cc8]
+VERBOSE: strand.c(279): EventId=55032 Priority=VERBOSE _Strand_TracePost: 0x55c9211d4208, msg(0x55c9211f35b0:19:HttpResponseMsg:0)
+DEBUG: wsman.c(3889): EventId=45217 Priority=DEBUG WsmanConnection: Posting msg(0x55c9211f35b0:19:HttpResponseMsg:0) on interaction 0x55c9211eeaf8<-[0x55c9211d4208]<-0x55c9211d3cc8
+VERBOSE: messages.c(383): EventId=55052 Priority=VERBOSE Message_Addref: wsman.c(3900): __Message_AddRef(HttpResponseMsg): 0x55c9211f35b0: refs=3
+VERBOSE: messages.c(383): EventId=55052 Priority=VERBOSE Message_Addref: wsman.c(722): __Message_AddRef(HttpResponseMsg): 0x55c9211f35b0: refs=4
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: wsman.c(3611): __Message_Release(HttpResponseMsg): 0x55c9211f35b0: refs=3
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211d4208(WsmanConnection) state 201(SB:*S), methodBit: 8000(AckOther_Right)
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: strand.c(545): __Message_Release(HttpResponseMsg): 0x55c9211f35b0: refs=2
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211d4208(WsmanConnection) state 8001(SB:*k), bit: 16(AckOther_Right) [-, O t:-- o:-- 0x55c9211eeaf8, O t:-- o:-A 0x55c9211d3cc8]
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211d3c78(WsmanEnumerationContext) state 201(SB:*S), methodBit: 1000(Ack_Left)
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211d4208(WsmanConnection), action: Returning from AckOther(Right)
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c9211d4208(WsmanConnection) Exits, state 1, ToFinish: 0 [-, O t:-- o:-- 0x55c9211eeaf8, O t:-- o:-- 0x55c9211d3cc8]
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211d3c78(WsmanEnumerationContext), action: Returning from PostLeft
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: wsman.c(793): __Message_Release(HttpResponseMsg): 0x55c9211f35b0: refs=1
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211d3c78(WsmanEnumerationContext), action: CloseLeft
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211d4208(WsmanConnection) state 0(SB:), methodBit: 20000(Close_Right)
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211d4208(WsmanConnection) state 20001(SB:*L), bit: 18(Close_Right) [-, O t:-- o:-- 0x55c9211eeaf8, O t:-- o:-- 0x55c9211d3cc8]
+DEBUG: wsman.c(3928): EventId=45219 Priority=DEBUG WsmanConnection: Close on interaction [0x55c9211d4208]<-0x55c9211d3cc8 outstandingRequest: 1, single_message: 0x55c9211f35b0
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211d4208(WsmanConnection), action: PostLeft
+VERBOSE: messages.c(383): EventId=55052 Priority=VERBOSE Message_Addref: strand.c(355): __Message_AddRef(HttpResponseMsg): 0x55c9211f35b0: refs=2
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211eeaa8(HttpSocket) state 0(S:), methodBit: 40(Post)
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211eeaa8(HttpSocket) state 41(S:*P), bit: 7(Post) [-, O t:-- o:-- 0x55c9211d4258]
+VERBOSE: strand.c(279): EventId=55032 Priority=VERBOSE _Strand_TracePost: 0x55c9211eeaa8, msg(0x55c9211f35b0:19:HttpResponseMsg:0)
+DEBUG: http.c(1296): EventId=45034 Priority=DEBUG HttpSocket: Posting message for interaction [0x55c9211eeaf8]<-0x55c9211d4258
+VERBOSE: messages.c(383): EventId=55052 Priority=VERBOSE Message_Addref: http.c(1302): __Message_AddRef(HttpResponseMsg): 0x55c9211f35b0: refs=3
+DEBUG: ../sock/selector.c(365): EventId=45206 Priority=DEBUG Sending msg(0x55c9211f35b0:19:HttpResponseMsg:0) on own thread
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: http.c(1277): __Message_Release(HttpResponseMsg): 0x55c9211f35b0: refs=2
+DEBUG: ../sock/sock.c(391): Sock_Write - Begin. socket: 12, size: 185
+DEBUG: ../sock/sock.c(403): Sock_Write - OK exit. 185 bytes written
+DEBUG: ../sock/sock.c(391): Sock_Write - Begin. socket: 12, size: 3092
+DEBUG: ../sock/sock.c(403): Sock_Write - OK exit. 3092 bytes written
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211eeaa8(HttpSocket) state 41(S:*P), methodBit: 200(AckOther)
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: strand.c(545): __Message_Release(HttpResponseMsg): 0x55c9211f35b0: refs=1
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211eeaa8(HttpSocket) state 201(S:*a), bit: 10(AckOther) [-, O t:-- o:-A 0x55c9211d4258]
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211d4208(WsmanConnection) state 20001(SB:*L), methodBit: 1000(Ack_Left)
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211eeaa8(HttpSocket), action: Returning from AckOther
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c9211eeaa8(HttpSocket) Exits, state 1, ToFinish: 0 [-, O t:-- o:-- 0x55c9211d4258]
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211d4208(WsmanConnection), action: Returning from PostLeft
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211d4208(WsmanConnection), action: CloseRight
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211d3c78(WsmanEnumerationContext) state 1201(SB:*SA), methodBit: 10000(Close_Left)
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211d4208(WsmanConnection), action: Returning from CloseRight
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211d4208(WsmanConnection) state 1001(SB:*A), bit: 13(Ack_Left) [-, O t:-A o:-- 0x55c9211eeaf8, O t:C- o:C- 0x55c9211d3cc8]
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c9211d4208(WsmanConnection) Exits, state 1, ToFinish: 0 [-, O t:-- o:-- 0x55c9211eeaf8, O t:C- o:C- 0x55c9211d3cc8]
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211d3c78(WsmanEnumerationContext), action: Returning from CloseLeft
+DEBUG: wsman.c(438): EventId=45211 Priority=DEBUG _EC_CheckCloseLeft: Left Closed: 1, activeConnection: (nil)
+DEBUG: wsman.c(459): EventId=45212 Priority=DEBUG _EC_CheckCloseRight: haveTimer: 0, Right Closed: 0
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211d3c78(WsmanEnumerationContext), action: CloseRight
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211ee1a8(DispEnumParent) state 4001(SM:*#), methodBit: 8000(Close(M))
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211d3c78(WsmanEnumerationContext), action: Returning from CloseRight
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211d3c78(WsmanEnumerationContext) state 11201(SB:*SAC), methodBit: 8000(AckOther_Right)
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: strand.c(545): __Message_Release(PostResultMsg): 0x55c9211f3170: refs=2
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211d3c78(WsmanEnumerationContext) state 19001(SB:*AkC), bit: 13(Ack_Left) [-, O t:CA o:-- 0x55c9211d4290, O t:C- o:-A 0x55c9211ee1f8]
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211d3c78(WsmanEnumerationContext) state 18001(SB:*kC), bit: 16(AckOther_Right) [-, O t:C- o:-- 0x55c9211d4290, O t:C- o:-A 0x55c9211ee1f8]
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211ee1a8(DispEnumParent) state c001(SM:*#C), methodBit: 800(Ack(M))
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211d3c78(WsmanEnumerationContext), action: Returning from AckOther(Right)
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211d3c78(WsmanEnumerationContext) state 10001(SB:*C), bit: 17(Close_Left) [-, O t:C- o:-- 0x55c9211d4290, O t:C- o:-- 0x55c9211ee1f8]
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c9211d3c78(WsmanEnumerationContext) Exits, state 1, ToFinish: 0 [-, O t:C- o:C- 0x55c9211d4290, O t:C- o:-- 0x55c9211ee1f8]
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211ee1a8(DispEnumParent), action: Returning from Post
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: disp.c(164): __Message_Release(PostResultMsg): 0x55c9211f3170: refs=1
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211ee1a8(DispEnumParent), action: Close
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211d3c78(WsmanEnumerationContext) state 0(SB:), methodBit: 20000(Close_Right)
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211d3c78(WsmanEnumerationContext) state 20001(SB:*L), bit: 18(Close_Right) [-, O t:C- o:C- 0x55c9211d4290, O t:C- o:-- 0x55c9211ee1f8]
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c9211d3c78(WsmanEnumerationContext) Exits, state 1, ToFinish: 1 [-, O t:C- o:C- 0x55c9211d4290, O t:C- o:C- 0x55c9211ee1f8]
+DEBUG: wsman.c(3983): EventId=45220 Priority=DEBUG WsmanEnum: Finish: 0x55c9211d3c78
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: wsman.c(3986): __Message_Release(PostResultMsg): 0x55c9211f3170: refs=0
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211d3c78(WsmanEnumerationContext), action: Deleting Strand
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211ee1a8(DispEnumParent), action: Returning from Close
+VERBOSE: strand.c(1714): EventId=55013 Priority=VERBOSE Strand_RunPendingOp: 0x55c9211ee1a8(DispEnumParent), deleted entry, bit: 11(Deleted)
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211ee1a8(DispEnumParent) state 8801(SM:*AC), bit: 12(Ack(M)) [0-, O t:CA o:-- 0x55c9211d3d00]
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211ee1a8(DispEnumParent) state 8001(SM:*C), bit: 16(Close(M)) [0-, O t:C- o:-- 0x55c9211d3d00]
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c9211ee1a8(DispEnumParent) Exits, state 1, ToFinish: 1 [0-, O t:C- o:C- 0x55c9211d3d00]
+DEBUG: disp.c(113): EventId=45022 Priority=DEBUG Disp: delete interaction [0x55c9211ee148]
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: disp.c(114): __Message_Release(EnumerateInstancesReq): 0x55c9211f0060: refs=0
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211ee1a8(DispEnumParent), action: Deleting StrandMany
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211ee768(RequestItem), action: Returning from Close
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: strand.c(2047): __Message_Release(PostResultMsg): 0x55c9211ee350: refs=3
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211ee768(RequestItem) state 8801(SM:*AC), bit: 12(Ack(M)) [-, O t:CA o:-- 0x55c92120ddd8]
+DEBUG: agentmgr.c(398): EventId=45010 Priority=DEBUG RequestItem: Ack on interaction [0x55c9211ee7b8]<-0x55c92120ddd8
+VERBOSE: strand.c(2982): EventId=55025 Priority=VERBOSE _Strand_ScheduleParent: 0x55c9211f1c38(AgentElem) state 101(SM:*P), bit:40(EntryAck) from 0x55c9211ee768(RequestItem); methodBit: 4000(EntryOperation)
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211ee768(RequestItem) state 8001(SM:*C), bit: 16(Close(M)) [-, O t:C- o:-- 0x55c92120ddd8]
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c9211ee768(RequestItem) Exits, state 1, ToFinish: 0 [-, O t:C- o:C- 0x55c92120ddd8]
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: strand.c(1664): __Message_Release(PostResultMsg): 0x55c9211ee350: refs=2
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211f1c38(AgentElem) state 4001(SM:*#), bit: 15(EntryOperation) [2-, O t:-- o:-A 0x55c9211f2110]
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211f1c38(AgentElem), action: Ack
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211f20c0(ProtocolFromSocket) state 0(S:), methodBit: 100(Ack)
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211f20c0(ProtocolFromSocket) state 101(S:*A), bit: 9(Ack) [D, O t:-A o:-- 0x55c9211f1c88]
+DEBUG: protocol.c(338): EventId=45151 Priority=DEBUG ProtocolSocket: Ack on interaction [0x55c9211f2110]<-0x55c9211f1c88
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c9211f20c0(ProtocolFromSocket) Exits, state 1, ToFinish: 0 [D, O t:-- o:-- 0x55c9211f1c88]
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211f1c38(AgentElem), action: Returning from Ack
+VERBOSE: strand.c(2996): EventId=55026 Priority=VERBOSE _Strand_ScheduleEntry: 0x55c9211ee768(RequestItem) state 0(SM:), bit:40(EntryAck) from 0x55c9211f1c38(AgentElem); methodBit: 4000(EntryOperation)
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211ee768(RequestItem) state 4001(SM:*#), bit: 15(EntryOperation) [-, O t:C- o:C- 0x55c92120ddd8]
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c9211ee768(RequestItem) Exits, state 1, ToFinish: 1 [-, O t:C- o:C- 0x55c92120ddd8]
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: agentmgr.c(469): __Message_Release(EnumerateInstancesReq): 0x55c9211f17d0: refs=0
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211ee768(RequestItem), action: Scheduling deletion of StrandEntry
+VERBOSE: strand.c(2982): EventId=55025 Priority=VERBOSE _Strand_ScheduleParent: 0x55c9211f1c38(AgentElem) state 4001(SM:*#), bit:400(Deleted) from 0x55c9211ee768(RequestItem); methodBit: 4000(EntryOperation)
+VERBOSE: strand.c(1332): EventId=55010 Priority=VERBOSE _StrandEntryOperation_Deleted: 0x55c9211f1bd8(AgentElem): 0x55c9211ee758(RequestItem)
+VERBOSE: strand.c(2699): EventId=55019 Priority=VERBOSE Strand 0x55c9211f1c38(AgentElem), deleting entry 0x55c9211ee768(RequestItem)
+VERBOSE: strand.c(1714): EventId=55013 Priority=VERBOSE Strand_RunPendingOp: 0x55c9211f1c38(AgentElem), deleted entry, bit: 11(Deleted)
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c9211f1c38(AgentElem) Exits, state 1, ToFinish: 0 [1-, O t:-- o:-- 0x55c9211f2110]
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: protocol.c(409): __Message_Release(PostResultMsg): 0x55c9211ee350: refs=1
+VERBOSE: strand.c(2878): EventId=55021 Priority=VERBOSE Strand_ExecLoop: 0x55c9211f20c0 LEAVE occurred, previous state 1001, bit: 13 (1000)
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: protocol.c(2095): __Message_Release(PostResultMsg): 0x55c9211ee350: refs=0
+
+DEBUG: http.c(489): EventId=50015 Priority=DEBUG HTTP Auth: SupplimentaryInfo: (ethan entering _ReadHeader).
+DEBUG: http.c(262): EventId=50015 Priority=DEBUG HTTP Auth: SupplimentaryInfo: (ethan _Sock_ReadAux entered).
+DEBUG: http.c(266): EventId=50015 Priority=DEBUG HTTP Auth: SupplimentaryInfo: (ethan _Sock_ReadAux calling Sock_Read).
+DEBUG: ../sock/sock.c(340): EventId=50015 Priority=DEBUG HTTP Auth: SupplimentaryInfo: (ethan entering Sock_Read).
+DEBUG: ../sock/sock.c(341): Sock_Read - Begin. socket: 12, size: 16384
+ERROR: ../sock/sock.c(99): _Read - read failed. socket: 12, errno: 0 (Success)
+DEBUG: ../sock/sock.c(353): Sock_Read - OK exit. 0 bytes read
+DEBUG: http.c(503): EventId=50015 Priority=DEBUG HTTP Auth: SupplimentaryInfo: (ethan _ReadHeader connection closed - WTF).
+DEBUG: http.c(1158): EventId=50015 Priority=DEBUG HTTP Auth: SupplimentaryInfo: (ethan failure is here!!).
+DEBUG: http.c(1159): EventId=45155 Priority=DEBUG (E)Protocol _RequestCallback: _RequestCallbackRead fails for ProtocolSocket 0x55c9211eeaa8
+
+INFO: ../sock/selector.c(259): EventId=40033 Priority=INFO Selector_RemoveHandler: selector=0x55c91fdc0348, handler=0x55c9211eeb30, name=null
+INFO: http.c(1204): EventId=40010 Priority=INFO closing socket due to SELECTOR_REMOVE or SELECTOR_DESTROY
+DEBUG: ../sock/sock.c(169): EventId=45355 Priority=DEBUG Sock_Close: sock (12)
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211eeaa8(HttpSocket) state 0(S:), methodBit: 800(CloseOther)
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211eeaa8(HttpSocket) state 801(S:*c), bit: 12(CloseOther) [-, O t:-- o:-- 0x55c9211d4258]
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211d4208(WsmanConnection) state 0(SB:), methodBit: 10000(Close_Left)
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211d4208(WsmanConnection) state 10001(SB:*C), bit: 17(Close_Left) [-, O t:-- o:-- 0x55c9211eeaf8, O t:C- o:C- 0x55c9211d3cc8]
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211d4208(WsmanConnection), action: CloseLeft
+VERBOSE: strand.c(3006): EventId=55027 Priority=VERBOSE _Strand_Schedule: 0x55c9211eeaa8(HttpSocket) state 801(S:*c), methodBit: 400(Close)
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211d4208(WsmanConnection), action: Returning from CloseLeft
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c9211d4208(WsmanConnection) Exits, state 1, ToFinish: 1 [-, O t:C- o:C- 0x55c9211eeaf8, O t:C- o:C- 0x55c9211d3cc8]
+VERBOSE: messages.c(431): EventId=55053 Priority=VERBOSE Message_Release: wsman.c(717): __Message_Release(HttpResponseMsg): 0x55c9211f35b0: refs=0
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211d4208(WsmanConnection), action: Deleting Strand
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211eeaa8(HttpSocket), action: Returning from CloseOther
+VERBOSE: strand.c(2866): EventId=55020 Priority=VERBOSE Strand_ExecLoop: 0x55c9211eeaa8(HttpSocket) state 401(S:*C), bit: 11(Close) [-, O t:C- o:-- 0x55c9211d4258]
+VERBOSE: strand.c(2922): EventId=55023 Priority=VERBOSE Strand_ExecLoop: 0x55c9211eeaa8(HttpSocket) Exits, state 1, ToFinish: 1 [-, O t:C- o:C- 0x55c9211d4258]
+DEBUG: http.c(1346): EventId=45036 Priority=DEBUG HttpSocket: 0x55c9211eeaa8 _HttpSocket_Finish
+VERBOSE: strand.c(236): EventId=55000 Priority=VERBOSE Strand 0x55c9211eeaa8(HttpSocket), action: Deleting Strand

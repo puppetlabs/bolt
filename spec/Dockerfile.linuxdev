@@ -71,7 +71,7 @@ RUN git clone https://github.com/rbenv/ruby-build.git \
  && echo "gem: --no-document" > ~/.gemrc \
  && gem update --system \
  # bolt source
- && git clone https://github.com/puppetlabs/bolt ~/bolt \
+ && git clone --branch BOLT-1476-fix-winrm-omi-interop https://github.com/Iristyle/bolt ~/bolt \
  && cd ~/bolt \
  && printf 'gem "pry-byebug"\ngem "pry-stack_explorer"\n' >> ./Gemfile.local \
  && bundle install --path .bundle/gems

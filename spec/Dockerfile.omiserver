@@ -69,7 +69,7 @@ RUN if [ "$BUILD_OMI" = "true" ]; \
      libkrb5-dev \
      libgssapi-krb5-2 \
      gawk \
-   && git clone https://github.com/Microsoft/omi /tmp/omi \
+   && git clone --branch debugging-winrm-gem-kerberos https://github.com/Iristyle/omi /tmp/omi \
    && /build-omi.sh; \
  fi
 

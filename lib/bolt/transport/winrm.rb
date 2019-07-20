@@ -71,6 +71,8 @@ module Bolt
         begin
           conn&.disconnect
         rescue StandardError => e
+          # TODO: not sure if this is just the HTTPClient::KeepAliveDisconnected problem?
+          require 'pry'; binding.pry if ENV['KRB_DEBUGGING'] == 'true'
           logger.info("Failed to close connection to #{target.uri} : #{e.message}")
         end
       end
@@ -100,6 +102,7 @@ module Bolt
           conn.with_remote_tempdir do |dir|
             remote_path = conn.write_remote_executable(dir, script)
             if Powershell.powershell_file?(remote_path)
+              require 'pry'; binding.pry if ENV['KRB_DEBUGGING'] == 'true'
               output = conn.execute(Powershell.run_script(arguments, remote_path))
             else
               path, args = *Powershell.process_from_extension(remote_path)

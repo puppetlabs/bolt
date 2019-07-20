@@ -97,6 +97,8 @@ module Bolt
         end
 
         def disconnect
+          # TODO: session closing failure seems to propagate from here
+          require 'pry'; binding.pry if ENV['KRB_DEBUGGING'] == 'true'
           @session&.close
           @client&.disconnect!
           @logger.debug { "Closed session" }
@@ -158,6 +160,9 @@ module Bolt
           fs = ::WinRM::FS::FileManager.new(@connection)
           fs.upload(source, destination)
         rescue StandardError => e
+          # TODO: this breakpoint catches file upload errors to OMI
+          # #<WinRM::WinRMSoapFault: [SOAP ERROR CODE: SOAP-ENV:Receiver (wsman:InternalError)]: >
+          require 'pry'; binding.pry if ENV['KRB_DEBUGGING'] == 'true'
           raise Bolt::Node::FileError.new(e.message, 'WRITE_ERROR')
         end
 

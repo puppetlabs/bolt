@@ -20,6 +20,7 @@ services:
       SMB_DOMAIN: ${SMB_DOMAIN:-BOLT}
       SMB_ADMIN: Administrator
       SMB_ADMIN_PASSWORD: ${SMB_ADMIN_PASSWORD:-B0ltrules!}
+      KRB_DEBUGGING: 'true'
     depends_on:
       - samba-ad
     networks:

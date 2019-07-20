@@ -1,0 +1,101 @@
+realm join results:
+
+omiserver_1      |  * Resolving: _ldap._tcp.bolt.test
+omiserver_1      |  * Performing LDAP DSE lookup on: 172.22.0.100
+omiserver_1      |  * Successfully discovered: bolt.test
+omiserver_1      | Password for Administrator:  * Assuming packages are installed
+omiserver_1      |  * LANG=C /usr/sbin/adcli join --verbose --domain bolt.test --domain-realm BOLT.TEST --domain-controller 172.22.0.100 --login-type user --login-user Administrator --stdin-password --user-principal
+omiserver_1      |  * Using domain name: bolt.test
+omiserver_1      |  * Calculated computer account name from fqdn: OMISERVER
+omiserver_1      |  * Using domain realm: bolt.test
+omiserver_1      |  * Sending netlogon pings to domain controller: cldap://172.22.0.100
+omiserver_1      |  * Received NetLogon info from: kdc.bolt.test
+omiserver_1      |  * Wrote out krb5.conf snippet to /var/cache/realmd/adcli-krb5-qEXxTq/krb5.d/adcli-krb5-conf-i5XZ32
+omiserver_1      |  * Authenticated as user: Administrator@BOLT.TEST
+omiserver_1      |  * Looked up short domain name: BOLT
+omiserver_1      |  * Using fully qualified name: omiserver.bolt.test
+omiserver_1      |  * Using domain name: bolt.test
+omiserver_1      |  * Using computer account name: OMISERVER
+omiserver_1      |  * Using domain realm: bolt.test
+omiserver_1      |  * Calculated computer account name from fqdn: OMISERVER
+omiserver_1      |  * With user principal: host/omiserver@BOLT.TEST
+omiserver_1      |  * Generated 120 character computer password
+omiserver_1      |  * Using keytab: FILE:/etc/krb5.keytab
+omiserver_1      |  * Computer account for OMISERVER$ does not exist
+omiserver_1      |  * Found well known computer container at: CN=Computers,DC=bolt,DC=test
+omiserver_1      |  * Calculated computer account: CN=OMISERVER,CN=Computers,DC=bolt,DC=test
+omiserver_1      |  * Created computer account: CN=OMISERVER,CN=Computers,DC=bolt,DC=test
+omiserver_1      |  * Set computer password
+omiserver_1      |  * Retrieved kvno '2' for computer account in directory: CN=OMISERVER,CN=Computers,DC=bolt,DC=test
+omiserver_1      |  * Modifying computer account: dNSHostName
+omiserver_1      |  * Modifying computer account: userAccountControl
+omiserver_1      |  * Modifying computer account: operatingSystem, operatingSystemVersion, operatingSystemServicePack
+omiserver_1      |  * Modifying computer account: userPrincipalName
+omiserver_1      |  * Discovered which keytab salt to use
+omiserver_1      |  * Added the entries to the keytab: OMISERVER$@BOLT.TEST: FILE:/etc/krb5.keytab
+omiserver_1      |  * Added the entries to the keytab: host/omiserver@BOLT.TEST: FILE:/etc/krb5.keytab
+omiserver_1      |  * Added the entries to the keytab: host/OMISERVER@BOLT.TEST: FILE:/etc/krb5.keytab
+omiserver_1      |  * Added the entries to the keytab: host/omiserver.bolt.test@BOLT.TEST: FILE:/etc/krb5.keytab
+omiserver_1      |  * Added the entries to the keytab: RestrictedKrbHost/OMISERVER@BOLT.TEST: FILE:/etc/krb5.keytab
+omiserver_1      |  * Added the entries to the keytab: RestrictedKrbHost/omiserver.bolt.test@BOLT.TEST: FILE:/etc/krb5.keytab
+omiserver_1      |  * /usr/sbin/update-rc.d sssd enable
+omiserver_1      |  * Successfully enrolled machine in realm
+omiserver_1      |
+omiserver_1      | ************************************************************
+omiserver_1      | net ads join Administrator%B0ltrules!
+omiserver_1      | ************************************************************
+omiserver_1      |
+omiserver_1      | Using short domain name -- BOLT
+omiserver_1      | Joined 'OMISERVER' to dns domain 'bolt.test'
+
+
+
+omiserver_1      |
+omiserver_1      | ************************************************************
+omiserver_1      | Verifying realm bolt.test
+omiserver_1      | ************************************************************
+omiserver_1      |
+omiserver_1      |  * Resolving: _ldap._tcp.bolt.test
+omiserver_1      |  * Performing LDAP DSE lookup on: 172.22.0.100
+omiserver_1      |  * Successfully discovered: bolt.test
+omiserver_1      | bolt.test
+omiserver_1      |   type: kerberos
+omiserver_1      |   realm-name: BOLT.TEST
+omiserver_1      |   domain-name: bolt.test
+omiserver_1      |   configured: kerberos-member
+omiserver_1      |   server-software: active-directory
+omiserver_1      |   client-software: sssd
+omiserver_1      |   required-package: sssd-tools
+omiserver_1      |   required-package: sssd
+omiserver_1      |   required-package: libnss-sss
+omiserver_1      |   required-package: libpam-sss
+omiserver_1      |   required-package: adcli
+omiserver_1      |   required-package: samba-common-bin
+omiserver_1      |   login-formats: %U
+omiserver_1      |   login-policy: allow-permitted-logins
+omiserver_1      |   permitted-logins:
+omiserver_1      |   permitted-groups:
+omiserver_1      |
+
+
+
+
+omiserver_1      | ************************************************************
+omiserver_1      | Verifying realm bolt.test
+omiserver_1      | ************************************************************
+omiserver_1      | 
+omiserver_1      |  * Resolving: _ldap._tcp.bolt.test
+omiserver_1      |  * Performing LDAP DSE lookup on: 172.22.0.100
+omiserver_1      |  * Successfully discovered: bolt.test
+omiserver_1      | bolt.test
+omiserver_1      |   type: kerberos
+omiserver_1      |   realm-name: BOLT.TEST
+omiserver_1      |   domain-name: bolt.test
+omiserver_1      |   configured: kerberos-member
+omiserver_1      |   server-software: active-directory
+omiserver_1      |   client-software: winbind
+omiserver_1      |   required-package: winbind
+omiserver_1      |   required-package: libpam-winbind
+omiserver_1      |   required-package: samba-common-bin
+omiserver_1      |   login-formats: BOLT\%U
+omiserver_1      |   login-policy: allow-any-login

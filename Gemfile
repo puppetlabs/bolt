@@ -5,6 +5,10 @@ source ENV['GEM_SOURCE'] || 'https://rubygems.org'
 # Disable analytics when running in development
 ENV['BOLT_DISABLE_ANALYTICS'] = 'true'
 
+# ethan test changes to winrm gem source
+gem 'winrm', git: 'https://github.com/Iristyle/WinRM.git', branch: 'kerb-todo'
+gem 'winrm-fs', git: 'https://github.com/Iristyle/winrm-fs.git', branch: 'omi-debugging'
+
 gemspec
 
 # Bolt server gems are managed here not in the gemspec
