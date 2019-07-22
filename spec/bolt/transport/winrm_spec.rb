@@ -144,8 +144,8 @@ PS
   end
 
   context "connecting over SSL", winrm: true, omi: true do
-    # In order to run vagrant and docker targets simultaniously for local dev, use 2498{5,6} to avoid port conflict
-    let(:omi_target) { make_target(port_: 24986, conf: ssl_config) }
+    # In order to run vagrant and docker targets simultaniously for local dev, use 4598{5,6} to avoid port conflict
+    let(:omi_target) { make_target(port_: 45986, conf: ssl_config) }
     let(:target) { make_target(port_: ssl_port, conf: ssl_config) }
 
     it "can test whether the target is available" do
@@ -185,8 +185,8 @@ PS
   end
 
   context "connecting over SSL to OMI container ", omi: true do
-    # In order to run vagrant and docker targets simultaniously for local dev, use 2498{5,6} to avoid port conflict
-    let(:omi_target) { make_target(port_: 24986, conf: ssl_config) }
+    # In order to run vagrant and docker targets simultaniously for local dev, use 4598{5,6} to avoid port conflict
+    let(:omi_target) { make_target(port_: 45986, conf: ssl_config) }
 
     it "can test whether the target is available" do
       expect(winrm.connected?(omi_target)).to eq(true)
