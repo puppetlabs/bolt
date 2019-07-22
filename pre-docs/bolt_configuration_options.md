@@ -128,7 +128,7 @@ When using the ssh transport Bolt also interacts with the ssh-agent for ssh key 
 
 **Note**: The SMB file protocol is experimental and is currently unsupported in conjunction with SSL given that only SMB2 is currently implemented.
 
-`password`: Login password. Required.
+`password`: Login password. Required unless using Kerberos.
 
 `port`: Connection port. Default is `5986`, or `5985` if `ssl: false`.
 
@@ -140,7 +140,11 @@ When using the ssh transport Bolt also interacts with the ssh-agent for ssh key 
 
 `tmpdir`: The directory to upload and execute temporary files on the target.
 
-`user`: Login user. Required.
+`user`: Login user. Required unless using Kerberos.
+
+`realm`: Kerberos realm (Active Directory domain) to authenticate against.
+
+**Note**: Kerberos client support is experimental and is only supported when Bolt is run on a Linux node. OSX and Windows support will be implemented in the future.
 
 
 ## PCP transport configuration options

@@ -52,8 +52,7 @@ groups:
           - 172.16.219.30
         config:
           winrm:
-            user: vagrant
-            password: vagrant
+            realm: MYDOMAIN
             ssl: false
     config:
       transport: winrm
