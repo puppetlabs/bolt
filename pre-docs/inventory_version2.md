@@ -39,6 +39,43 @@ string to a target defined elsewhere in the inventory. If no target has a name
 or alias matching the string bolt will create a new target with the string as
 it's uri.
 
+### Migrating Plans
+
+In addition to inventory file changes, inventory functions such as `get_targets` might not work as expected when called from an [apply block](applying_manifest_blocks.md) using inventory version 2. `get_targets` returns an empty array when called with `'all'` as an argument. Otherwise, it creates a new Target object for that host. If you want to have the same behavior as the version 1 inventory, you can extract information outside of an apply block into a variable, and use that variable inside the apply block.
+
+For example, the following plan:
+```
+plan setup_lb (
+    TargetSpec $pool,
+    TargetSpec $lb
+) {
+  apply_prep([$pool, $lb])
+
+  apply($lb) {
+    class { 'profile::lb':
+      members => get_targets($pool).map |$targ| { $targ.host }
+    }
+  }
+}
+```
+
+Would need to be converted to:
+```
+plan setup_lb (
+   TargetSpec $pool,
+   TargetSpec $lb
+) {
+   apply_prep([$pool, $lb])
+
+   $members = get_targets($pool).map |$targ| { $targ.host }
+   apply($lb) {
+       class { 'profile::lb':
+          members => $members
+       }
+   }
+}
+```
+
 
 ## Creating a node with a human readable name and ip address
 
