@@ -1,0 +1,6 @@
+---
+tig::telegraf::database: "bolt"
+tig::telegraf::username: "bolt"
+# In the real world encrypt these with hiera eyaml or store externally
+tig::params::influxdb_password: "hunter2"
+tig::params::grafana_password: "boltIsAwesome"
