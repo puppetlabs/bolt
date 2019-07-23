@@ -518,27 +518,15 @@ describe "Bolt::Executor" do
       end
 
       it 'reports an event when bundled plan is used' do
-        expect(analytics).to receive(:event).with('Bundled Content', 'Plan', label: 'canary')
+        expect(analytics).to receive(:report_bundled_content).with('Plan', 'canary')
 
         executor.report_bundled_content('Plan', 'canary')
       end
 
       it 'reports an event when bundled task is used' do
-        expect(analytics).to receive(:event).with('Bundled Content', 'Task', label: 'facts')
+        expect(analytics).to receive(:report_bundled_content).with('Task', 'facts')
 
         executor.report_bundled_content('Task', 'facts')
-      end
-
-      it 'does not report a an event when non-bundled plan is used' do
-        expect(analytics).to receive(:event).never
-
-        executor.report_bundled_content('plan', 'foo')
-      end
-
-      it 'does not report a an event when non-bundled task is used' do
-        expect(analytics).to receive(:event).never
-
-        executor.report_bundled_content('task', 'foo')
       end
     end
   end

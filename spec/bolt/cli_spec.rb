@@ -770,34 +770,40 @@ describe "Bolt::CLI" do
     end
 
     describe "bundled_content" do
+      let(:empty_content) {
+        { "Plan" => [],
+          "Plugin" => %w[puppetdb pkcs7 prompt terraform task],
+          "Task" => [] }
+      }
       it "does not calculate bundled content for a command" do
         cli = Bolt::CLI.new(%w[command run foo --nodes bar])
         cli.parse
-        expect(cli.bundled_content).to eq([])
+        expect(cli.bundled_content).to eq(empty_content)
       end
 
       it "does not calculate bundled content for a script" do
         cli = Bolt::CLI.new(%w[script run foo --nodes bar])
         cli.parse
-        expect(cli.bundled_content).to eq([])
+        expect(cli.bundled_content).to eq(empty_content)
       end
 
       it "does not calculate bundled content for a file" do
         cli = Bolt::CLI.new(%w[file upload /tmp /var foo --nodes bar])
         cli.parse
-        expect(cli.bundled_content).to eq([])
+        expect(cli.bundled_content).to eq(empty_content)
       end
 
       it "calculates bundled content for a task" do
         cli = Bolt::CLI.new(%w[task run foo --nodes bar])
         cli.parse
-        expect(cli.bundled_content).not_to be_empty
+        expect(cli.bundled_content['Task']).not_to be_empty
       end
 
       it "calculates bundled content for a plan" do
         cli = Bolt::CLI.new(%w[plan run foo --nodes bar])
         cli.parse
-        expect(cli.bundled_content).not_to be_empty
+        expect(cli.bundled_content['Plan']).not_to be_empty
+        expect(cli.bundled_content['Task']).not_to be_empty
       end
     end
 

@@ -272,10 +272,12 @@ Bolt collects data about how you use it. You can opt out of providing this data.
 - The number of nodes and groups defined in the Bolt inventory file
 - The number of nodes targeted with a Bolt command
 - The output format selected \(human-readable, JSON\) 
+- How the bolt project directory was determined \(ie from the location a `bolt.yaml` file or with the `--boltdir` flag.\)
 - The number of times Bolt tasks and plans are run \(This does not include user-defined tasks or plans.\)
 - Number of statements in an apply block, and how many resources that produces for each target.
 - Number of steps in a YAML plan
 - Return type (expression vs. value) of a YAML plan
+- Which bundled Bolt plugins are used \(This does not include user-installed plugins.\)
 
 This data is associated with a random, non-identifiable user UUID.
 

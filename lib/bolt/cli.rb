@@ -242,7 +242,7 @@ module Bolt
     end
 
     def plugins
-      @plugins ||= Bolt::Plugin.setup(config, puppetdb_client)
+      @plugins ||= Bolt::Plugin.setup(config, puppetdb_client, analytics)
     end
 
     def query_puppetdb_nodes(query)
@@ -264,9 +264,6 @@ module Bolt
         return 0
       end
 
-      @analytics = Bolt::Analytics.build_client
-      @analytics.bundled_content = bundled_content
-
       screen = "#{options[:subcommand]}_#{options[:action]}"
       # submit a different screen for `bolt task show` and `bolt task show foo`
       if options[:action] == 'show' && options[:object]
@@ -274,7 +271,8 @@ module Bolt
       end
 
       screen_view_fields = {
-        output_format: config.format
+        output_format: config.format,
+        boltdir_type: config.boltdir.type
       }
 
       # Only include target and inventory info for commands that take a targets
@@ -283,9 +281,10 @@ module Bolt
         screen_view_fields.merge!(target_nodes: options[:targets].count,
                                   inventory_nodes: inventory.node_names.count,
                                   inventory_groups: inventory.group_names.count,
-                                  boltdir_type: config.boltdir.type)
+                                  inventory_version: inventory.version)
       end
-      @analytics.screen_view(screen, screen_view_fields)
+
+      analytics.screen_view(screen, screen_view_fields)
 
       if options[:action] == 'show'
         if options[:subcommand] == 'task'
@@ -329,7 +328,7 @@ module Bolt
         end
         code = apply_manifest(options[:code], options[:targets], options[:object], options[:noop])
       else
-        executor = Bolt::Executor.new(config.concurrency, @analytics, options[:noop])
+        executor = Bolt::Executor.new(config.concurrency, analytics, options[:noop])
         targets = options[:targets]
 
         results = nil
@@ -380,7 +379,7 @@ module Bolt
     ensure
       # restore original signal handler
       Signal.trap :INT, handler if handler
-      @analytics&.finish
+      analytics&.finish
     end
 
     def show_task(task_name)
@@ -420,13 +419,14 @@ module Bolt
                        params: params }
       plan_context[:description] = options[:description] if options[:description]
 
-      executor = Bolt::Executor.new(config.concurrency, @analytics, options[:noop])
+      executor = Bolt::Executor.new(config.concurrency, analytics, options[:noop])
       if options.fetch(:format, 'human') == 'human'
         executor.subscribe(outputter)
       else
         # Only subscribe to out::message events for JSON outputter
         executor.subscribe(outputter, [:message])
       end
+
       executor.subscribe(log_outputter)
       executor.start_plan(plan_context)
       result = pal.run_plan(plan_name, plan_arguments, executor, inventory, puppetdb_client)
@@ -443,7 +443,7 @@ module Bolt
     def apply_manifest(code, targets, filename = nil, noop = false)
       ast = pal.parse_manifest(code, filename)
 
-      executor = Bolt::Executor.new(config.concurrency, @analytics, noop)
+      executor = Bolt::Executor.new(config.concurrency, analytics, noop)
       executor.subscribe(outputter) if options.fetch(:format, 'human') == 'human'
       executor.subscribe(log_outputter)
       # apply logging looks like plan logging, so tell the outputter we're in a
@@ -530,20 +530,30 @@ module Bolt
       @log_outputter ||= Bolt::Outputter::Logger.new(options[:verbose], config.trace)
     end
 
+    def analytics
+      @analytics ||= begin
+                       client = Bolt::Analytics.build_client
+                       client.bundled_content = bundled_content
+                       client
+                     end
+    end
+
     def bundled_content
       # We only need to enumerate bundled content when running a task or plan
+      content = { 'Plan' => [],
+                  'Task' => [],
+                  'Plugin' => %w[puppetdb pkcs7 prompt terraform task] }
       if %w[plan task].include?(options[:subcommand]) && options[:action] == 'run'
         default_content = Bolt::PAL.new([], nil)
-        plans = default_content.list_plans.each_with_object([]) do |iter, col|
+        content['Plan'] = default_content.list_plans.each_with_object([]) do |iter, col|
           col << iter&.first
         end
-        tasks = default_content.list_tasks.each_with_object([]) do |iter, col|
+        content['Task'] = default_content.list_tasks.each_with_object([]) do |iter, col|
           col << iter&.first
         end
-        plans.concat tasks
-      else
-        []
       end
+
+      content
     end
   end
 end

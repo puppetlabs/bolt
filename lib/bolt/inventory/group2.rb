@@ -98,18 +98,27 @@ module Bolt
       def config_only_plugin(data)
         Bolt::Util.walk_vals(data) do |value|
           if value.is_a?(Hash) && value.include?('_plugin')
-            unless (plugin = @plugins.by_name(value['_plugin']))
-              raise ValidationError.new("Config lookup specifies an unknown plugin: #{value['_plugin'].inspect}", @name)
+            plugin_name = value['_plugin']
+            begin
+              hook = @plugins.get_hook(plugin_name, :inventory_config)
+            rescue Bolt::Plugin::PluginError => e
+              raise ValidationError.new(e.message, @name)
             end
-            unless plugin.hooks.include?('inventory_config')
-              raise ValidationError.new("#{plugin.name} does not support inventory_config.", @name)
+
+            begin
+              validate_proc = @plugins.get_hook(plugin_name, :validate_inventory_config)
+            rescue Bolt::Plugin::PluginError
+              validate_proc = proc { |*args| }
             end
-            plugin.validate_inventory_config(value) if plugin.respond_to?(:validate_inventory_config)
+
+            validate_proc.call(value)
+
             Concurrent::Delay.new do
               begin
-                plugin.inventory_config(value)
+                hook.call(value)
               rescue StandardError => e
-                raise Bolt::Plugin::PluginError.new(e.message, plugin, "inventory_targets in #{@name}")
+                loc = "inventory_config in #{@name}"
+                raise Bolt::Plugin::PluginError::ExecutionError.new(e.message, plugin_name, loc)
               end
             end
           else
@@ -200,17 +209,17 @@ module Bolt
       end
 
       def lookup_targets(lookup)
-        unless (plugin = @plugins.by_name(lookup['_plugin']))
-          raise ValidationError.new("Target lookup specifies an unknown plugin: \"#{lookup['_plugin']}\"", @name)
-        end
-        unless plugin.hooks.include?('inventory_targets')
-          raise ValidationError.new("#{plugin.name} does not support inventory_targets.", @name)
+        begin
+          hook = @plugins.get_hook(lookup['_plugin'], :inventory_targets)
+        rescue Bolt::Plugin::PluginError => e
+          raise ValidationError.new(e.message, @name)
         end
 
         begin
-          targets = plugin.inventory_targets(lookup)
+          targets = hook.call(lookup)
         rescue StandardError => e
-          raise Bolt::Plugin::PluginError.new(e.message, plugin, "inventory_targets in #{@name}")
+          loc = "inventory_targets in #{@name}"
+          raise Bolt::Plugin::PluginError::ExecutionError.new(e.message, lookup['_plugin'], loc)
         end
 
         targets.each { |target| add_target(target) }

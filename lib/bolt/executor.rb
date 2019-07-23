@@ -189,9 +189,7 @@ module Bolt
     end
 
     def report_bundled_content(mode, name)
-      if @analytics.bundled_content&.include?(name)
-        @analytics&.event('Bundled Content', mode, label: name)
-      end
+      @analytics.report_bundled_content(mode, name)
     end
 
     def report_apply(statement_count, resource_counts)
