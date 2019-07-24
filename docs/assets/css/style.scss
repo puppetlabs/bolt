@@ -38,7 +38,7 @@
   max-width: 100rem;
 
   @include large {
-    grid-template-columns: 20rem auto;
+    grid-template-columns: 22em 1fr;
     grid-template-areas: "sidebar content";
   }
 }
