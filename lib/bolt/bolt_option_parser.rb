@@ -54,6 +54,9 @@ module Bolt
         when 'show-modules'
           { flags: OPTIONS[:global] + OPTIONS[:global_config_setters],
             banner: PUPPETFILE_SHOWMODULES_HELP }
+        when 'generate-types'
+          { flags: OPTIONS[:global] + OPTIONS[:global_config_setters],
+            banner: PUPPETFILE_GENERATETYPES_HELP }
         else
           { flags: OPTIONS[:global] + OPTIONS[:global_config_setters],
             banner: PUPPETFILE_HELP }
@@ -229,6 +232,7 @@ module Bolt
       Available actions are:
         install                          Install modules from a Puppetfile into a Boltdir
         show-modules                     List modules available to Bolt
+        generate-types                   Generate type references to register in Plans
 
       Install modules into the local Boltdir
         bolt puppetfile install
@@ -247,6 +251,18 @@ module Bolt
 
     PUPPETFILE_SHOWMODULES_HELP = <<~HELP
       Usage: bolt puppetfile show-modules
+
+      List modules available to Bolt
+        bolt puppetfile show-modules
+
+      Available options are:
+    HELP
+
+    PUPPETFILE_GENERATETYPES_HELP = <<~HELP
+      Usage: bolt puppetfile generate-types
+
+      Generate type references to register in Plans
+        bolt puppetfile generate-types
 
       Available options are:
     HELP

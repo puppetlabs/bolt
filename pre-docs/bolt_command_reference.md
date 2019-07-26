@@ -328,6 +328,22 @@ List modules available to Bolt.
 | `--boltdir FILEPATH` | Specify what Boltdir to load config from. | Autodiscovered from current working directory. |
 | `--configfile FILEPATH` | Specify where to load config from. | `~/.puppetlabs/bolt/bolt.yaml` |
 
+## `puppetfile generate-types`
+
+Generate type references to register in Plans
+
+### Usage
+
+`bolt puppetfile generate-types`
+
+### Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| **Run Context** |
+| `-m`, `--modulepath FILEPATHS` | List of directories containing modules, separated by `:`. <br> Directories are case-sensitive. |
+| `--boltdir FILEPATH` | Specify what Boltdir to load config from. | Autodiscovered from current working directory. |
+| `--configfile FILEPATH` | Specify where to load config from. | `~/.puppetlabs/bolt/bolt.yaml` |
 
 ## `script run`
 

@@ -5,11 +5,13 @@ require 'bolt_spec/config'
 require 'bolt_spec/conn'
 require 'bolt_spec/files'
 require 'bolt_spec/integration'
+require 'bolt_spec/puppet_agent'
 
 describe "When a plan succeeds" do
   include BoltSpec::Integration
   include BoltSpec::Config
   include BoltSpec::Conn
+  include BoltSpec::PuppetAgent
 
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
 
@@ -46,5 +48,24 @@ describe "When a plan succeeds" do
   it 'runs a yaml plan', ssh: true do
     result = run_cli(['plan', 'run', 'sample::yaml', '--nodes', target] + config_flags)
     expect(JSON.parse(result)).to eq('stdout' => "hello world\n", 'stderr' => '', 'exit_code' => 0)
+  end
+
+  context 'with puppet-agent installed for get_resources' do
+    before(:all) do
+      install(conn_uri('ssh', include_password: true))
+    end
+
+    after(:all) do
+      # Remove .resource_types generated in boltdir
+      FileUtils.rm_rf(fixture_path('configs', '.resource_types'))
+      uninstall(conn_uri('ssh', include_password: true))
+    end
+
+    it 'runs registers types defined in $Boltdir/.resource_types', ssh: true do
+      # generate types based and save in boltdir (based on value of --configfile)
+      run_cli(%w[puppetfile generate-types] + config_flags)
+      result = run_cli(['plan', 'run', 'resource_types', '--nodes', target] + config_flags)
+      expect(JSON.parse(result)).to eq('built-in' => 'success', 'core' => 'success', 'custom' => 'success')
+    end
   end
 end

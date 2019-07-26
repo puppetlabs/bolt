@@ -13,7 +13,7 @@ describe 'ApplyResult DataType' do
   before(:all) { Bolt::PAL.load_puppet }
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
 
-  let(:pal) { Bolt::PAL.new(modulepath, nil) }
+  let(:pal) { Bolt::PAL.new(modulepath, nil, nil) }
   let(:result_code) do
     <<-PUPPET
 $result = results::make_apply_result('pcp://example.com', {'report' => {}})

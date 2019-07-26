@@ -39,7 +39,7 @@ module BoltSpec
     def pal_with_module_content(mods)
       Dir.mktmpdir do |tmpdir|
         mk_files(tmpdir, mods)
-        pal = Bolt::PAL.new(tmpdir, nil)
+        pal = Bolt::PAL.new(tmpdir, nil, nil)
         yield pal
       end
     end

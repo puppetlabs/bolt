@@ -22,7 +22,7 @@ describe 'Facts functions' do
     }
   }
   let(:inv) { Bolt::Inventory.new(data) }
-  let(:pal) { Bolt::PAL.new(modulepath, nil) }
+  let(:pal) { Bolt::PAL.new(modulepath, nil, nil) }
 
   let(:analytics) { Bolt::Analytics::NoopClient.new }
   let(:executor) { Bolt::Executor.new(1, analytics) }
