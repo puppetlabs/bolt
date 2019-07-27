@@ -3,6 +3,7 @@
 # Note this file includes very few 'requires' because it expects to be used from the CLI.
 
 require 'optparse'
+require 'bolt/command/options'
 
 module Bolt
   class BoltOptionParser < OptionParser
@@ -21,270 +22,85 @@ module Bolt
       case subcommand
       when 'apply'
         { flags: ACTION_OPTS + %w[noop execute compile-concurrency],
-          banner: APPLY_HELP }
+          banner: BANNER['apply'] }
       when 'command'
         { flags: ACTION_OPTS,
-          banner: COMMAND_HELP }
+          banner: BANNER['command'] }
       when 'file'
         { flags: ACTION_OPTS + %w[tmpdir],
-          banner: FILE_HELP }
+          banner: BANNER['file'] }
       when 'inventory'
         { flags: OPTIONS[:inventory] + OPTIONS[:global] + %w[format inventoryfile boltdir configfile],
-          banner: INVENTORY_HELP }
+          banner: BANNER['inventory'] }
       when 'plan'
         case action
         when 'convert'
           { flags: OPTIONS[:global] + OPTIONS[:global_config_setters],
-            banner: PLAN_CONVERT_HELP }
+            banner: BANNER['plan convert'] }
         when 'show'
           { flags: OPTIONS[:global] + OPTIONS[:global_config_setters],
-            banner: PLAN_SHOW_HELP }
+            banner: BANNER['plan show'] }
         when 'run'
           { flags: ACTION_OPTS + %w[params compile-concurrency tmpdir],
-            banner: PLAN_RUN_HELP }
+            banner: BANNER['plan run'] }
         else
           { flags: ACTION_OPTS + %w[params compile-concurrency tmpdir],
-            banner: PLAN_HELP }
+            banner: BANNER['plan'] }
         end
       when 'puppetfile'
         case action
         when 'install'
           { flags: OPTIONS[:global] + OPTIONS[:global_config_setters],
-            banner: PUPPETFILE_INSTALL_HELP }
+            banner: BANNER['puppetfile install'] }
         when 'show-modules'
           { flags: OPTIONS[:global] + OPTIONS[:global_config_setters],
-            banner: PUPPETFILE_SHOWMODULES_HELP }
+            banner: BANNER['puppetfile show-modules'] }
         else
           { flags: OPTIONS[:global] + OPTIONS[:global_config_setters],
-            banner: PUPPETFILE_HELP }
+            banner: BANNER['puppetfile'] }
         end
       when 'script'
         { flags: ACTION_OPTS + %w[tmpdir],
-          banner: SCRIPT_HELP }
+          banner: BANNER['script'] }
       when 'secret'
         { flags: OPTIONS[:global] + OPTIONS[:global_config_setters],
-          banner: SECRET_HELP }
+          banner: BANNER['secret'] }
       when 'task'
         case action
         when 'show'
           { flags: OPTIONS[:global] + OPTIONS[:global_config_setters],
-            banner: TASK_SHOW_HELP }
+            banner: BANNER['task show'] }
         when 'run'
           { flags: ACTION_OPTS + %w[params tmpdir],
-            banner: TASK_RUN_HELP }
+            banner: BANNER['task run'] }
         else
           { flags: ACTION_OPTS + %w[params tmpdir],
-            banner: TASK_HELP }
+            banner: BANNER['task'] }
         end
       else
         { flags: OPTIONS[:global],
-          banner: BANNER }
+          banner: BANNER['default'] }
       end
     end
-
-    def self.examples(cmd, desc)
-      <<-EXAMP
-#{desc} a Windows host via WinRM, providing for the password
-  bolt #{cmd} -n winrm://winhost -u Administrator -p
-#{desc} the local machine, a Linux host via SSH, and hosts from a group specified in an inventory file
-  bolt #{cmd} -n localhost,nixhost,node_group
-#{desc} Windows hosts queried from PuppetDB via WinRM as a domain user, prompting for the password
-  bolt #{cmd} -q 'inventory[certname] { facts.os.family = "windows" }' --transport winrm -u 'domain\\Administrator' -p
-EXAMP
-    end
-
-    BANNER = <<-HELP
-Usage: bolt <subcommand> <action>
-
-Available subcommands:
-  bolt command run <command>       Run a command remotely
-  bolt file upload <src> <dest>    Upload a local file or directory
-  bolt script run <script>         Upload a local script and run it remotely
-  bolt task show                   Show list of available tasks
-  bolt task show <task>            Show documentation for task
-  bolt task run <task> [params]    Run a Puppet task
-  bolt plan convert <plan_path>    Convert a YAML plan to a Puppet plan
-  bolt plan show                   Show list of available plans
-  bolt plan show <plan>            Show details for plan
-  bolt plan run <plan> [params]    Run a Puppet task plan
-  bolt apply <manifest>            Apply Puppet manifest code
-  bolt puppetfile install          Install modules from a Puppetfile into a Boltdir
-  bolt puppetfile show-modules     List modules available to Bolt
-  bolt secret createkeys           Create new encryption keys
-  bolt secret encrypt <plaintext>  Encrypt a value
-  bolt secret decrypt <encrypted>  Decrypt a value
-  bolt inventory show              Show the list of targets an action would run on
-
-Run `bolt <subcommand> --help` to view specific examples.
-
-Available options are:
-    HELP
-
-    TASK_HELP = <<-HELP
-Usage: bolt task <action> <task> [parameters]
-
-Available actions are:
-  show                             Show list of available tasks
-  show <task>                      Show documentation for task
-  run <task>                       Run a Puppet task
-
-Parameters are of the form <parameter>=<value>.
-
-#{examples('task run facts', 'run facter on')}
-Available options are:
-    HELP
-
-    TASK_SHOW_HELP = <<-HELP
-Usage: bolt task show <task>
-
-Available actions are:
-  show                             Show list of available tasks
-  show <task>                      Show documentation for task
-
-Available options are:
-    HELP
-
-    TASK_RUN_HELP = <<-HELP
-Usage: bolt task run <task> [parameters]
-
-Parameters are of the form <parameter>=<value>.
-
-#{examples('task run facts', 'run facter on')}
-Available options are:
-    HELP
-
-    COMMAND_HELP = <<-HELP
-Usage: bolt command <action> <command>
-
-Available actions are:
-  run                              Run a command remotely
-
-#{examples('command run hostname', 'run hostname on')}
-Available options are:
-    HELP
-
-    SCRIPT_HELP = <<-HELP
-Usage: bolt script <action> <script> [[arg1] ... [argN]]
-
-Available actions are:
-  run                              Upload a local script and run it remotely
-
-#{examples('script run my_script.ps1 some args', 'run a script on')}
-Available options are:
-    HELP
-
-    PLAN_HELP = <<-HELP
-Usage: bolt plan <action> <plan> [parameters]
-
-Available actions are:
-  convert <plan_path>              Convert a YAML plan to a Puppet plan
-  show                             Show list of available plans
-  show <plan>                      Show details for plan
-  run                              Run a Puppet task plan
-
-Parameters are of the form <parameter>=<value>.
-
-#{examples('plan run canary command=hostname', 'run the canary plan on')}
-Available options are:
-    HELP
-
-    PLAN_CONVERT_HELP = <<-HELP
-Usage: bolt plan convert <plan_path>
-
-Available options are:
-    HELP
-
-    PLAN_SHOW_HELP = <<-HELP
-Usage: bolt plan show <plan>
-
-Available actions are:
-  show                             Show list of available plans
-  show <plan>                      Show details for plan
-
-Available options are:
-    HELP
-
-    PLAN_RUN_HELP = <<-HELP
-Usage: bolt plan run <plan> [parameters]
-
-Parameters are of the form <parameter>=<value>.
-
-#{examples('plan run canary command=hostname', 'run the canary plan on')}
-Available options are:
-    HELP
-
-    FILE_HELP = <<-HELP
-Usage: bolt file <action>
-
-Available actions are:
-  upload <src> <dest>              Upload local file or directory <src> to <dest> on each node
-
-#{examples('file upload /tmp/source /etc/profile.d/login.sh', 'upload a file to')}
-Available options are:
-    HELP
-
-    PUPPETFILE_HELP = <<-HELP
-Usage: bolt puppetfile <action>
-
-Available actions are:
-  install                          Install modules from a Puppetfile into a Boltdir
-  show-modules                     List modules available to Bolt
-
-Install modules into the local Boltdir
-  bolt puppetfile install
-
-Available options are:
-    HELP
-
-    PUPPETFILE_INSTALL_HELP = <<-HELP
-Usage: bolt puppetfile install
-
-Install modules into the local Boltdir
-  bolt puppetfile install
-
-Available options are:
-    HELP
-
-    PUPPETFILE_SHOWMODULES_HELP = <<-HELP
-Usage: bolt puppetfile show-modules
-
-Available options are:
-    HELP
-
-    APPLY_HELP = <<-HELP
-Usage: bolt apply <manifest.pp>
-
-#{examples('apply site.pp', 'apply a manifest on')}
-  bolt apply site.pp --nodes foo.example.com,bar.example.com
-
-Available options are:
-    HELP
-
-    SECRET_HELP = <<~SECRET_HELP
-      Manage secrets for inventory and hiera data.
-
-      Available actions are:
-        createkeys               Create new encryption keys
-        encrypt                  Encrypt a value
-        decrypt                  Decrypt a value
-
-      Available options are:
-    SECRET_HELP
-
-    INVENTORY_HELP = <<~INVENTORY_HELP
-      Usage: bolt inventory <action>
-
-      Available actions are:
-        show                     Show the list of targets an action would run on
-
-      Available options are:
-    INVENTORY_HELP
 
     def initialize(options)
       super()
 
       @options = options
 
+      separator "\nOptions:"
+      define('-h', '--help', 'Display help') do |_|
+        @options[:help] = true
+      end
+      define('--version', 'Display the version') do |_|
+        puts Bolt::VERSION
+        raise Bolt::CLIExit
+      end
+      define('--debug', 'Display debug logging') do |_|
+        @options[:debug] = true
+      end
+
+      separator "\nInventory:"
       define('-n', '--nodes NODES',
              'Alias for --targets') do |nodes|
         @options [:nodes] ||= []
@@ -433,18 +249,6 @@ Available options are:
       end
       define('--trace', 'Display error stack traces') do |_|
         @options[:trace] = true
-      end
-
-      separator "\nGlobal:"
-      define('-h', '--help', 'Display help') do |_|
-        @options[:help] = true
-      end
-      define('--version', 'Display the version') do |_|
-        puts Bolt::VERSION
-        raise Bolt::CLIExit
-      end
-      define('--debug', 'Display debug logging') do |_|
-        @options[:debug] = true
       end
     end
 
