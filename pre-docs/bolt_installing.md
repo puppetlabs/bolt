@@ -18,7 +18,7 @@ Use the MSI installer package to install Bolt on Windows.
 
 1.  Download the Bolt installer package from [https://downloads.puppet.com/windows/puppet6/puppet-bolt-x64-latest.msi](https://downloads.puppet.com/windows/puppet6/puppet-bolt-x64-latest.msi).
 2.  Double-click the MSI file and run the installation.
-3.  Run a Bolt command and get started. 
+3.  Run a Bolt command and get started.
 
     ```
     bolt --help
@@ -31,14 +31,14 @@ Use the package manager Chocolatey to install Bolt on Windows.
 
 You must have the Chocolatey package manager installed.
 
-1.  Download and install the bolt package. 
+1.  Download and install the bolt package.
 
     ```
     choco install puppet-bolt
-    
+
     ```
 
-2.  Run a Bolt command and get started. 
+2.  Run a Bolt command and get started.
 
     ```
     bolt --help
@@ -71,7 +71,7 @@ Use one of the supported macOS installation methods to install Bolt.
 
 Use the Apple Disk Image \(DMG\) to install Bolt on macOS.
 
-1.  Download the Bolt installer package for your macOS version. 
+1.  Download the Bolt installer package for your macOS version.
 
     **Tip:** To find the macOS version number on your Mac, go to the Apple \(\) menu in the corner of your screen and choose **About This Mac**.
 
@@ -82,7 +82,7 @@ Use the Apple Disk Image \(DMG\) to install Bolt on macOS.
     -   10.14 \(Mojave\) [https://downloads.puppet.com/mac/puppet6/10.14/x86\_64/puppet-bolt-latest.dmg](
     https://downloads.puppet.com/mac/puppet6/10.14/x86_64/puppet-bolt-latest.dmg)
 2.  Double-click the `puppet-bolt-latest.dmg` file to mount it and then double-click the `puppet-bolt-[version]-installer.pkg` to run the installation.
-3.  Run a Bolt command and get started. 
+3.  Run a Bolt command and get started.
 
     ```
     bolt --help
@@ -95,14 +95,14 @@ Use the package manager Homebrew to install Bolt on macOS.
 
 You must have the command line tools for macOS and the Homebrew package manager installed.
 
-1.  Download and install the bolt package. 
+1.  Download and install the bolt package.
 
     ```
     brew cask install puppetlabs/puppet/puppet-bolt
-    
+
     ```
 
-2.  Run a Bolt command and get started. 
+2.  Run a Bolt command and get started.
 
     ```
     bolt --help
@@ -113,62 +113,66 @@ You must have the command line tools for macOS and the Homebrew package manager 
 
 Use one of the supported \*nix installation methods to install Bolt.
 
-**Warning:** These instructions include enabling the Puppet 6 Platform repository. Adding the Puppet 6 Platform repository on Puppet Enterprise master nodes can result in unsupported updates to PE packages such as the puppet agent. To install only the Bolt package it is possible to download and install the package directly (from appropriate url path at `{apt,yum}.puppetlabs.com`) as well, however this will require repeating the download and install process to keep up to date with the latest Bolt version.
+**Warning:** These instructions describe enabling the Puppet Tools repository
+to install Bolt.  While Bolt can also be installed from the Puppet 6 or 5
+Platform repositories adding these repositories to a puppet managed node may
+result in an incompatible version of a package like puppet-agent being
+installed. That may cause downtime especially on a Puppet Enterprise Master.
 
-### Install Bolt on Debian or Ubuntu 
+### Install Bolt on Debian or Ubuntu
 
 Packaged versions of Bolt are available for Debian 8 and 9 and Ubuntu 14.04, 16.04 and 18.04.
 
-The Puppet repository for the APT package management system is [https://apt.puppet.com](https://apt.puppet.com). Packages are named using the convention `<PLATFORM_VERSION>-release-<VERSION CODE NAME>.deb`. For example, the release package for Puppet 6 Platform on Debian 8 “Jessie” is `puppet6-release-jessie.deb`.
+The Puppet Tools repository for the APT package management system is [https://apt.puppet.com](https://apt.puppet.com). Packages are named using the convention `puppet-tools-release-<VERSION CODE NAME>.deb`. For example, the release package for Puppet Tools on Debian 8 “Jessie” is `puppet-tools-release-jessie.deb`.
 
-1.   Download and install the software and its dependencies. Use the commands appropriate to your system. 
+1.   Download and install the software and its dependencies. Use the commands appropriate to your system.
     -    Debian 8
 
         ```
-        wget https://apt.puppet.com/puppet6-release-jessie.deb
-        sudo dpkg -i puppet6-release-jessie.deb
-        sudo apt-get update 
+        wget https://apt.puppet.com/puppet-tools-release-jessie.deb
+        sudo dpkg -i puppet-tools-release-jessie.deb
+        sudo apt-get update
         sudo apt-get install puppet-bolt
-        
+
         ```
 
     -    Debian 9
 
         ```
-        wget https://apt.puppet.com/puppet6-release-stretch.deb
-        sudo dpkg -i puppet6-release-stretch.deb
-        sudo apt-get update 
+        wget https://apt.puppet.com/puppet-tools-release-stretch.deb
+        sudo dpkg -i puppet-tools-release-stretch.deb
+        sudo apt-get update
         sudo apt-get install puppet-bolt
         ```
 
     -    Ubuntu 14.04
 
         ```
-        wget https://apt.puppet.com/puppet6-release-trusty.deb
-        sudo dpkg -i puppet6-release-trusty.deb
-        sudo apt-get update 
+        wget https://apt.puppet.com/puppet-tools-release-trusty.deb
+        sudo dpkg -i puppet-tools-release-trusty.deb
+        sudo apt-get update
         sudo apt-get install puppet-bolt
         ```
 
     -    Ubuntu 16.04
 
         ```
-        wget https://apt.puppet.com/puppet6-release-xenial.deb
-        sudo dpkg -i puppet6-release-xenial.deb
-        sudo apt-get update 
+        wget https://apt.puppet.com/puppet-tools-release-xenial.deb
+        sudo dpkg -i puppet-tools-release-xenial.deb
+        sudo apt-get update
         sudo apt-get install puppet-bolt
         ```
 
     -    Ubuntu 18.04
 
         ```
-        wget https://apt.puppet.com/puppet6-release-bionic.deb
-        sudo dpkg -i puppet6-release-bionic.deb
-        sudo apt-get update 
+        wget https://apt.puppet.com/puppet-tools-release-bionic.deb
+        sudo dpkg -i puppet-tools-release-bionic.deb
+        sudo apt-get update
         sudo apt-get install puppet-bolt
         ```
 
-2.  Run a Bolt command and get started. 
+2.  Run a Bolt command and get started.
 
     ```
     bolt --help
@@ -179,27 +183,27 @@ The Puppet repository for the APT package management system is [https://apt.pupp
 
 Packaged versions of Bolt are available for Red Hat Enterprise Linux 6 and 7, SUSE Linux Enterprise Server 12, and Fedora 28 and 29.
 
-The Puppet repository for the YUM package management system is [http://yum.puppet.com/puppet6/](http://yum.puppet.com/puppet6/) Packages are named using the convention `<PLATFORM_NAME>-release-<OS ABBREVIATION>-<OS VERSION>.noarch.rpm`. For example, the release package for Puppet 6 Platform on Linux 7 is `puppet6-release-el-7.noarch.rpm`.
+The Puppet Tools repository for the YUM package management system is [http://yum.puppet.com/puppet-tools/](http://yum.puppet.com/puppet-tools/) Packages are named using the convention `puppet-tools-release-<OS ABBREVIATION>-<OS VERSION>.noarch.rpm`. For example, the release package for Puppet Tools on Linux 7 is `puppet-tools-release-el-7.noarch.rpm`.
 
 1.  Download and install the software and its dependencies. Use the commands appropriate to your system.
     -   Enterprise Linux 6
 
         ```
-        sudo rpm -Uvh https://yum.puppet.com/puppet6-release-el-6.noarch.rpm
-        sudo yum install puppet-bolt				
+        sudo rpm -Uvh https://yum.puppet.com/puppet-tools-release-el-6.noarch.rpm
+        sudo yum install puppet-bolt
         ```
 
     -   Enterprise Linux 7
 
         ```
-        sudo rpm -Uvh https://yum.puppet.com/puppet6-release-el-7.noarch.rpm
+        sudo rpm -Uvh https://yum.puppet.com/puppet-tools-release-el-7.noarch.rpm
         sudo yum install puppet-bolt
         ```
 
     -   Enterprise Linux 8
 
         ```
-        sudo rpm -Uvh https://yum.puppet.com/puppet6-release-el-8.noarch.rpm
+        sudo rpm -Uvh https://yum.puppet.com/puppet-tools-release-el-8.noarch.rpm
         sudo yum install puppet-bolt
         ```
 
@@ -207,32 +211,32 @@ The Puppet repository for the YUM package management system is [http://yum.puppe
     -   SUSE Linux Enterprise Server 12
 
         ```
-        sudo rpm -Uvh https://yum.puppet.com/puppet6-release-sles-12.noarch.rpm
+        sudo rpm -Uvh https://yum.puppet.com/puppet-tools-release-sles-12.noarch.rpm
         sudo zypper install puppet-bolt
         ```
 
     -   Fedora 28
 
         ```
-        sudo rpm -Uvh https://yum.puppet.com/puppet6-release-fedora-28.noarch.rpm
+        sudo rpm -Uvh https://yum.puppet.com/puppet-tools-release-fedora-28.noarch.rpm
         sudo dnf install puppet-bolt
         ```
 
     -   Fedora 29
 
         ```
-        sudo rpm -Uvh https://yum.puppet.com/puppet6-release-fedora-29.noarch.rpm
+        sudo rpm -Uvh https://yum.puppet.com/puppet-tools-release-fedora-29.noarch.rpm
         sudo dnf install puppet-bolt
         ```
 
     -   Fedora 30
 
         ```
-        sudo rpm -Uvh https://yum.puppet.com/puppet6-release-fedora-30.noarch.rpm
+        sudo rpm -Uvh https://yum.puppet.com/puppet-tools-release-fedora-30.noarch.rpm
         sudo dnf install puppet-bolt
         ```
 
-2.  Run a Bolt command and get started. 
+2.  Run a Bolt command and get started.
 
     ```
     bolt --help
