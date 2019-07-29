@@ -1,0 +1,3 @@
+version: 2
+targets:
+  - uri: foo@example.com

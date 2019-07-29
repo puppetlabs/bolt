@@ -280,5 +280,22 @@ describe "passes parsed AST to the apply_catalog task" do
         end
       end
     end
+
+    context 'with version 2 inventoryfile stubbed' do
+      let(:inventory) {
+        {
+          'inventoryfile' => File.join(__dir__, '../fixtures/apply/inventory_2.yaml').to_s
+        }
+      }
+
+      it 'targets in inventory can be queried' do
+        with_tempfile_containing('conf', YAML.dump(inventory)) do |conf|
+          result = run_cli_json(%W[plan run basic::inventory_2_lookup --configfile #{conf.path}] + config_flags)
+          notify = get_notifies(result)
+          expect(notify[0]['title']).to eq("Num Targets: 0")
+          expect(notify[1]['title']).to eq("Target Name: foo")
+        end
+      end
+    end
   end
 end

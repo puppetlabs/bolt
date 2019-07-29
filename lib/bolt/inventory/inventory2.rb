@@ -111,7 +111,7 @@ module Bolt
             target_facts: {},
             target_features: {}
           },
-          config: { transports: {} }
+          config: @config.transport_data_get
         }
       end
 
