@@ -1,0 +1,18 @@
+[global]
+        server role = domain controller
+        workgroup = ${SMB_DOMAIN}
+        realm = ${KRB5_REALM_LOWER}
+        netbios name = SAMBA-AD
+        passdb backend = samba4
+        idmap_ldb:use rfc2307 = yes
+        # NOTE: requests are first forwarded to Docker
+        # then docker-compose config forwards to DNS server in user-defined network
+        dns forwarder = 127.0.0.11
+
+[netlogon]
+        path = /var/lib/samba/sysvol/example.com/scripts
+        read only = No
+
+[sysvol]
+        path = /var/lib/samba/sysvol
+        read only = No

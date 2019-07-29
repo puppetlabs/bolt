@@ -210,7 +210,11 @@ PS
       skip('Windows Active Directory tickets are different') if Bolt::Util.windows?
 
       @kerb_user = 'Administrator'
-      @kerb_realm = 'BOLT.TEST'
+      @kerb_realm = ENV['KRB5_REALM'] || 'BOLT.TEST'
+      @smb_admin_pass = ENV['SMB_ADMIN_PASSWORD'] || 'B0ltrules!'
+
+      # this will renew any stale tickets when testing locally
+      `echo #{@smb_admin_pass} | kinit Administrator@#{@kerb_realm}`
     end
 
     let(:omi_http_kerb_target) do
@@ -223,13 +227,19 @@ PS
       make_target(host_: 'omiserver.bolt.test', port_: 45986, conf: conf)
     end
 
+    # verifies the local setup has already acquired the right Kerberos ticket
+    it "has acquired a ticket granting ticket from the Samba AD / KDC" do
+      esc_realm = Regexp.escape(@kerb_realm)
+      expect(`klist`).to match(%r{krbtgt\/#{esc_realm}@#{esc_realm}})
+    end
+
     it "executes a command on a host over HTTP" do
-      pending("Not yet implemented")
+      pending("WinRM gem and OMI server have a protocol negotiation bug")
       expect(winrm.run_command(omi_http_kerb_target, command)['stdout']).to eq("#{@kerb_user}\r\n")
     end
 
     it "executes a command on a host over HTTPS" do
-      pending("Not yet implemented")
+      pending("WinRM gem and OMI server have a protocol negotiation bug")
       expect(winrm.run_command(omi_https_kerb_target, command)['stdout']).to eq("#{@kerb_user}\r\n")
     end
   end
