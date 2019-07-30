@@ -88,19 +88,21 @@ module Bolt
 
       options[:object] = remaining.shift
 
-      task_options, remaining = remaining.partition { |s| s =~ /.+=/ }
-      if options[:task_options]
-        unless task_options.empty?
-          raise Bolt::CLIError,
-                "Parameters must be specified through either the --params " \
-                "option or param=value pairs, not both"
+      # Only parse task_options for task or plan
+      if %w[task plan].include?(options[:subcommand])
+        task_options, remaining = remaining.partition { |s| s =~ /.+=/ }
+        if options[:task_options]
+          unless task_options.empty?
+            raise Bolt::CLIError,
+                  "Parameters must be specified through either the --params " \
+                  "option or param=value pairs, not both"
+          end
+          options[:params_parsed] = true
+        else
+          options[:params_parsed] = false
+          options[:task_options] = Hash[task_options.map { |a| a.split('=', 2) }]
         end
-        options[:params_parsed] = true
-      else
-        options[:params_parsed] = false
-        options[:task_options] = Hash[task_options.map { |a| a.split('=', 2) }]
       end
-
       options[:leftovers] = remaining
 
       validate(options)
