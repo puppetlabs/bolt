@@ -441,7 +441,7 @@ bolt plan convert path/to/my/plan.yaml
 
 This takes the path (relative or absolute) to the YAML plan to be converted and prints the converted Puppet plan to stdout.
 
-**NOTE:** Converting a YAML plan might result in a Puppet plan which is syntactically correct, but behaviorally different from its YAML plan. Always manually verify a converted Puppet plan's functionality. If you convert a YAML plan to puppet and it does *not* have the same behavior as the YAML plan, please [file an issue in our git repo](https://github.com/puppetlabs/bolt/issues).
+**NOTE:** Converting a YAML plan might result in a Puppet plan which is syntactically correct, but behaviorally different from its YAML plan. Always manually verify a converted Puppet plan's functionality. There are some constructs that do not translate from YAML plans to Puppet plans. These are [listed](#yaml-plan-constructs-that-cannot-be-translated-to-puppet-plans) below. If you convert a YAML plan to Puppet and it does *not* have the same behavior as the YAML plan, please [file an issue in our git repo](https://github.com/puppetlabs/bolt/issues).
 
 For example, with this YAML plan:
 ```yaml
@@ -473,3 +473,134 @@ plan mymodule::yamlplan(
 }
 ```
 
+## YAML plan constructs that cannot be translated to Puppet plans
+
+This section points out some of the quirks and limitations associated with converting a plan expressed as YAML to a Puppet plan. In some cases it is impossible to accurately translate from YAML to Puppet. In others, code that is generated from the conversion is syntactically correct but not idiomatic Puppet 
+
+### Named eval step
+
+The eval step allows snippets of Puppet code to be expressed in YAML plans. When converting a multi-line eval step to Puppet and storing the resulting value in a variable, use the `with` lambda. For example, the following YAML plan:
+```
+parameters:
+  foo:
+    type: Optional[Integer]
+    description: foo
+    default: 0
+
+steps:
+  - eval: |
+      $x = $foo + 1
+      $x * 2
+    name: eval_step
+
+return: $eval_step
+```
+Would be converted to:
+```
+plan yaml_plans::with_lambda(
+  Optional[Integer] $foo = 0
+) {
+  $eval_step = with() || {
+    $x = $foo + 1
+    $x * 2
+  }
+
+  return $eval_step
+}
+```
+If the author were writing the code as a Puppet plan, they would likely not use the lambda. In this example the converted Puppet code is correct, but not natural or readable.
+
+### Resource step variable interpolation
+
+When applying Puppet resources in a resource step, variable interpolation behaves differently in YAML plans and Puppet plans. In order to illustrate an important distinction consider the following yaml plan:
+```
+steps:
+  - description: apply prep
+    eval: >
+      apply_prep('localhost')
+  - target: localhost
+    description: Apply a file resource
+    resources:
+    - type: file
+      title: '/tmp/foo'
+      parameters:
+        content: $facts['os']['family']
+        ensure: present
+  - name: file_contents
+    description: Read contents of file managed with file resource
+    eval: >
+      file::read('/tmp/foo')
+      
+return: $file_contents
+```
+This plan performs `apply_prep` on a localhost target. Then it uses a Puppet `file` resource to write the OS family discovered from the Puppet `$facts` hash to a temporary file. Finally it reads the value written to the file and returns it. Running `bolt plan convert` on this plan produces this Puppet code:
+```
+plan yaml_plans::interpolation_pp() {
+  apply_prep('localhost')
+
+  $interpolation = apply('localhost') {
+    file { '/tmp/foo':
+      content => $facts['os']['family'],
+      ensure => 'present',
+    }
+  }
+  $file_contents = file::read('/tmp/foo')
+
+  return $file_contents
+}
+```
+This Puppet plan works as expected, whereas the YAML plan it was converted from fails. The failure stems from the `$facts` variable being resolved as a plan variable, instead of being evaluated as part of compiling the manifest code in an `apply` block.
+
+The next example also has a somewhat related interpolation issue. 
+
+## Dependency order
+
+The resources in a resource list are applied in order. It is still possible to explicitly set dependencies but it is important to note how to reference them. Consider the following YAML plan:
+```
+parameters:
+  nodes:
+    type: TargetSpec
+steps:
+  - eval: |
+      apply_prep($nodes)
+  - name: pkg
+    target: $nodes
+    resources:
+      - title: openssh-server
+        type: package
+        parameters:
+          ensure: present
+          before: File['/etc/ssh/sshd_config']
+      - title: /etc/ssh/sshd_config
+        type: file
+        parameters:
+          ensure: file
+          mode: '0600'
+          content: ''
+          require: Package['openssh-server']
+```
+Executing this plan will fail during catalog compilation because of how the resources referenced in the `before` and `require` parameters are parsed. Specifically the error will be at `Could not find resource 'File['/etc/ssh/sshd_config']' in parameter 'before'`. The solution for this is to not quote the resource titles. Here is the corrected plan example:
+```
+parameters:
+  nodes:
+    type: TargetSpec
+steps:
+  - eval: |
+      apply_prep($nodes)
+  - name: pkg
+    target: $nodes
+    resources:
+      - title: openssh-server
+        type: package
+        parameters:
+          ensure: present
+          before: File[/etc/ssh/sshd_config]
+      - title: /etc/ssh/sshd_config
+        type: file
+        parameters:
+          ensure: file
+          mode: '0600'
+          content: ''
+          require: Package[openssh-server]
+```
+Note that in general, resources should be declared in order. This example is unusual because it is meant to illustrate a case where parameter parsing can lead to non-intuitive results.
