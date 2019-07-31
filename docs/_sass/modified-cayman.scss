@@ -161,13 +161,13 @@ a {
 
 .main-content {
   word-wrap: break-word;
+  min-width: 0; // Forces the pre blocks inside main-content to be responsive
 
   :first-child {
     margin-top: 0;
   }
 
   @include large {
-    max-width: 64rem;
     padding: 2rem 6rem;
     margin: 0 auto;
     font-size: 1.1rem;

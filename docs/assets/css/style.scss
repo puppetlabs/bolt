@@ -7,20 +7,40 @@
 }
 
 .bolt-logo {
-  height: 1.4rem;
+  height: 2rem;
+  margin-right: 0.5rem;
 }
 
 .sidebar {
   padding: 2rem;
   background: $sidebar-background;
+  grid-area: sidebar;
 }
 
 .main-content {
   margin: 0;
+  grid-area: content;
+}
+
+.main-content h1:first-of-type img {
+  height: 2rem;
+
+  @include large {
+    display: none;
+  }
 }
 
 .container {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-areas: "content" "sidebar";
+  width: 100%;
+  max-width: 100rem;
+
+  @include large {
+    grid-template-columns: 22em 1fr;
+    grid-template-areas: "sidebar content";
+  }
 }
 
 .nav-list {
@@ -31,10 +51,6 @@
 
 .nav-list > li {
   margin-bottom: 1rem;
-}
-
-.nav-list li a {
-  white-space: nowrap;
 }
 
 .nav-header {

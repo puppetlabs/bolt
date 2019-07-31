@@ -5,11 +5,15 @@ exclude: [vendor, Boltdir, acceptance, modules, .git, Gemfile, Gemfile.lock]
 collections:
   lab:
     output: true
+  examples:
+    output: true
 
-# Make sure labs use the lab layout...
 defaults:
   - scope:
       type: lab
     values:
       layout: lab
-
+  - scope:
+      type: examples
+    values:
+      layout: example
