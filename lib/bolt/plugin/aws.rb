@@ -34,12 +34,12 @@ module Bolt
           if opts.key?('profile')
             options[:profile] = opts['profile']
           end
-          if config.aws&.key?('credentials')
-            creds = File.expand_path(config.aws['credentials'])
+          if config['credentials']
+            creds = File.expand_path(config['credentials'])
             if File.exist?(creds)
               options[:credentials] = ::Aws::SharedCredentials.new(path: creds)
             else
-              raise Bolt::ValidationError, "Cannot load credentials file #{config.aws['credentials']}"
+              raise Bolt::ValidationError, "Cannot load credentials file #{config['credentials']}"
             end
           end
 

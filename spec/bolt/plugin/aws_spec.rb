@@ -81,10 +81,10 @@ describe Bolt::Plugin::Aws::EC2 do
   end
 
   it 'raises a validation error when credentials file path does not exist' do
-    config_data = { 'aws' => { 'credentials' => '~/foo/credentials' } }
+    config_data = { 'plugins' => { 'aws' => { 'credentials' => '~/foo/credentials' } } }
     boltdir = Bolt::Boltdir.new(File.join(Dir.tmpdir, rand(1000).to_s))
     config = Bolt::Config.new(boltdir, config_data)
-    plugin = Bolt::Plugin::Aws::EC2.new(config)
+    plugin = Bolt::Plugin::Aws::EC2.new(config.plugins['aws'])
     expect { plugin.config_client(opts) }.to raise_error(Bolt::ValidationError, %r{foo/credentials})
   end
 end

@@ -37,7 +37,7 @@ module Bolt
       plugins.add_plugin(Bolt::Plugin::Prompt.new)
       plugins.add_plugin(Bolt::Plugin::Pkcs7.new(config.boltdir.path, config.plugins['pkcs7'] || {}))
       plugins.add_plugin(Bolt::Plugin::Task.new(config))
-      plugins.add_plugin(Bolt::Plugin::Aws::EC2.new(config))
+      plugins.add_plugin(Bolt::Plugin::Aws::EC2.new(config.plugins['aws'] || {}))
       plugins
     end
 
