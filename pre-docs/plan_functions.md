@@ -345,6 +345,10 @@ get_resources('target1,target2', [Package, File[/etc/puppetlabs]])
 
 Parses common ways of referring to targets and returns an array of Targets.
 
+**NOTE:** Calling `get_targets` inside an `apply` block with a
+version 2 inventory creates a new Target object.
+`get_targets('all')` returns an empty array.
+
 
 ```
 get_targets(Boltlib::TargetSpec $names)
