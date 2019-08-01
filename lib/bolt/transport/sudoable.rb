@@ -120,12 +120,17 @@ module Bolt
 
               if conn.run_as && stdin
                 # Inject interpreter in to wrapper script and remove from execute options
-                wrapper_name = 'wrapper.sh'
-                wrapper_path = File.join(dir.to_s, wrapper_name)
-                wrapper = make_wrapper_stringio(remote_task_path, stdin, wrapper_path, execute_options[:interpreter])
-                execute_options.delete(:interpreter)
-                remote_wrapper_path = conn.write_executable(dir, wrapper, wrapper_name)
-                command << remote_wrapper_path
+                # wrapper_name = 'wrapper.sh'
+                # wrapper_path = File.join(dir.to_s, wrapper_name)
+                # wrapper = make_wrapper_stringio(remote_task_path, stdin, wrapper_path, execute_options[:interpreter])
+                # execute_options.delete(:interpreter)
+                # remote_wrapper_path = conn.write_executable(dir, wrapper, wrapper_name)
+                build_command = if execute_options[:interpreter]
+                                  "sh -c '(cat <<EOF\n#{stdin}\nEOF\n) | #{execute_options[:interpreter]} #{remote_task_path}'"
+                                else
+                                  "sh -c '(cat <<EOF\n#{stdin}\nEOF\n) | #{remote_task_path}'"
+                                end
+                command = build_command
               else
                 command << remote_task_path
                 execute_options[:stdin] = stdin
