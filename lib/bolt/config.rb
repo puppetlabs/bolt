@@ -31,7 +31,7 @@ module Bolt
   end
 
   class Config
-    attr_accessor :aws, :concurrency, :format, :trace, :log, :puppetdb, :color, :save_rerun,
+    attr_accessor :concurrency, :format, :trace, :log, :puppetdb, :color, :save_rerun,
                   :transport, :transports, :inventoryfile, :compile_concurrency, :boltdir,
                   :puppetfile_config, :plugins
     attr_writer :modulepath
@@ -162,7 +162,7 @@ module Bolt
       # Plugins are only settable from config not inventory so we can overwrite
       @plugins = data['plugins'] if data.key?('plugins')
 
-      %w[aws concurrency format puppetdb color transport].each do |key|
+      %w[concurrency format puppetdb color transport].each do |key|
         send("#{key}=", data[key]) if data.key?(key)
       end
 

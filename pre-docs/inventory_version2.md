@@ -459,8 +459,9 @@ region=...
 AWS credential files stored in a non-standard location (`~/.aws/credentials`) can be specified in the Bolt config file:
 
 ```
-aws:
-  credentials: ~/alternate_path/credentials
+plugins:
+  aws:
+    credentials: ~/alternate_path/credentials
 ```
 
 #### Prompt plugin
