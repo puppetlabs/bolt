@@ -9,7 +9,7 @@ This repository contains examples that show how you can use Bolt to automate com
 
 This exercise will help you get Bolt installed on your system. If you are unfamiliar with Bolt or the Bolt Tasks ecosystem, it may be helpful to complete our [Hands-on Lab](/) as well. It walks through the basic concepts, including how to write your own tasks and plans that can be used with Bolt.
 
-- [Installing Bolt](lab/01-installing-bolt)
+- [Installing Bolt](../lab/01-installing-bolt)
 
 ## Examples
 
