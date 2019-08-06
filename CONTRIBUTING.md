@@ -92,6 +92,13 @@ To use `rubocop`, perform the bundle install with no exclusions
     bundle install --path .bundle --with test
     bundle exec rake rubocop
 
+### Run puppetfile install
+
+To install bundled content, run:
+```
+bundle exec r10k puppetfile install Puppetfile
+```
+
 ### Contributing to bundled modules
 
 Some module content is included with the Bolt gem for out-of-the-box use. Some of those modules are included in this repository and others are managed with the Puppetfile included in this repository. All the bundled modules are installed in the `modules` directory.
