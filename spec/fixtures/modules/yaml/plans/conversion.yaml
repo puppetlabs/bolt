@@ -11,7 +11,6 @@ steps:
     target: $nodes
     parameters:
       message: $message
-  - eval: $nodes.apply_prep
   - resources:
     - package: nginx
     - file: /etc/nginx/html/index.html

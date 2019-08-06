@@ -20,7 +20,7 @@ describe "transpiling YAML plans" do
     String $message = 'hello world'
   ) {
     $sample = run_task('sample', $nodes, {'message' => $message})
-    $nodes.apply_prep
+    apply_prep($nodes)
     apply($nodes) {
       package { 'nginx': }
       ->

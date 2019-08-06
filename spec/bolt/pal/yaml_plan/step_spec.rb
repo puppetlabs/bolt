@@ -182,6 +182,7 @@ OUT
       context "transpiling" do
         it "generates an apply() block" do
           output = <<-OUT
+  apply_prep($bread)
   apply($bread) {
     package { 'nginx': }
     ->
@@ -196,6 +197,7 @@ OUT
           resources.replace([])
 
           output = <<-OUT
+  apply_prep($bread)
   apply($bread) {
 
   }
@@ -208,6 +210,7 @@ OUT
           step_body['name'] = 'test_apply'
 
           output = <<-OUT
+  apply_prep($bread)
   $test_apply = apply($bread) {
     package { 'nginx': }
     ->
@@ -223,6 +226,7 @@ OUT
                              { 'service' => 'nginx', 'parameters' => { 'ensure' => 'running', 'enable' => true } }])
 
           output = <<-OUT
+  apply_prep($bread)
   apply($bread) {
     package { 'nginx':
       ensure => 'latest',
