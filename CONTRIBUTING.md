@@ -104,6 +104,11 @@ Some tests require a Windows VM or Linux containers. For Linux tests (recommende
 
 Additional tests may run in a local environment and require certain shell capabilities. For example tests that require a Bash-like environment are tagged with `:bash` in rspec.
 
+Some tests will also require that the [bundled modules](#contributing-to-bundled-modules) described above are installed. Ensure the modules are installed for testing with the following command:
+```
+bundle exec r10k puppetfile install .
+```
+
 To run all tests, run:
 
     $ bundle exec rake test
