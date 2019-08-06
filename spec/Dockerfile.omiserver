@@ -3,8 +3,12 @@
 FROM ubuntu:18.04
 
 ARG BOLT_PASSWORD=bolt
+# Use this argument to build from OMI sources rather than use packages
+ARG BUILD_OMI=
+
 # NOTE: Only designed to be set at build time, not at run time!
 ENV BOLT_PASSWORD=${BOLT_PASSWORD}
+ENV OMI_EXTRA_LOGS=${BUILD_OMI:-false}
 ENV KRB5_REALM=
 ENV KRB5_KDC=
 ENV KRB5_ADMINSERVER=
@@ -45,6 +49,29 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     powershell \
  && wget https://github.com/PowerShell/psl-omi-provider/releases/download/v1.4.2-2/psrp-1.4.2-2.universal.x64.deb \
  && dpkg -i psrp-1.4.2-2.universal.x64.deb
+
+ADD fixtures/omiserver/build-omi.sh /
+RUN if [ "$BUILD_OMI" = "true" ]; \
+ then \
+   DEBIAN_FRONTEND=noninteractive \
+     apt-get install -y \
+     vim \
+     lsb \
+     equivs \
+     git \
+     pkg-config \
+     make \
+     g++ \
+     rpm \
+     librpm-dev \
+     libpam0g-dev \
+     libssl-dev \
+     libkrb5-dev \
+     libgssapi-krb5-2 \
+     gawk \
+   && git clone https://github.com/Microsoft/omi /tmp/omi \
+   && /build-omi.sh; \
+ fi
 
 # Configure ports 5985 and 5986 with OMI
 # and enable the NTLM auth file
