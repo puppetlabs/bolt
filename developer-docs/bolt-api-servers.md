@@ -140,6 +140,41 @@ For example, the following runs 'sample::complex_params' task on localhost:
   }
 }
 ```
+### POST /ssh/run_command
+- `target`: [SSH Target Object](#ssh-target-object), *required* - Target information to run task on.
+- `command`: String, *required* - Command to run on target.
+
+For example, the following runs "echo 'hi'" on linux_target.net:
+```
+{
+  "target": {
+    "hostname": "linux_target.net",
+    "user": "marauder",
+    "password": "I solemnly swear that I am up to no good",
+    "host-key-check": false,
+    "run-as": "george_weasley"
+  },
+  "command": "echo 'hi'"
+}
+```
+
+### POST /winrm/run_command
+- `target`: [WinRM Target Object](#winrm-target-object), *required* - Target information to run task on.
+- `command`: String, *required* - Command to run on target.
+
+For example, the following runs "echo 'hi'" on localhost:
+```
+{
+  "target": {
+    "hostname": "windows_target.net",
+    "user": "Administrator",
+    "password": "Secret",
+    "ssl": false,
+    "ssl-verify": false
+  },
+  "command": "echo 'hi'"
+}
+```
 
 ### SSH Target Object
 The Target is a JSON object. See the [schema](../lib/bolt_server/schemas/ssh-run_task.json)

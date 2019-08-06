@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "run_command request",
+  "description": "POST <transport>/run_command request schema",
+  "type": "object",
+  "properties": {
+    "command": { "type": "string" },
+    "target": { "$ref": "partial:target-any" }
+  },
+  "required": ["command", "target"],
+  "additionalProperties": false
+}

@@ -19,7 +19,7 @@ module BoltServer
     PARTIAL_SCHEMAS = %w[target-any target-ssh target-winrm task].freeze
 
     # These schemas combine shared schemas to describe client requests
-    REQUEST_SCHEMAS = %w[action-run_task transport-ssh transport-winrm].freeze
+    REQUEST_SCHEMAS = %w[action-run_task action-run_command transport-ssh transport-winrm].freeze
 
     def initialize(config)
       @config = config
@@ -65,6 +65,14 @@ module BoltServer
       @executor.run_task(target, task, parameters)
     end
 
+    def run_command(target, body)
+      error = validate_schema(@schemas["action-run_command"], body)
+      return [400, error.to_json] unless error.nil?
+
+      command = body['command']
+      @executor.run_command(target, command)
+    end
+
     get '/' do
       200
     end
@@ -84,7 +92,7 @@ module BoltServer
       raise 'Unexpected error'
     end
 
-    ACTIONS = %w[run_task].freeze
+    ACTIONS = %w[run_task run_command].freeze
 
     post '/ssh/:action' do
       not_found unless ACTIONS.include?(params[:action])

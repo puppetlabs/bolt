@@ -87,5 +87,12 @@ module BoltSpec
         'parameters' => params
       }
     end
+
+    def build_command_request(command, target)
+      {
+        'command' => command,
+        'target' => target2request(target)
+      }
+    end
   end
 end
