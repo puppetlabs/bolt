@@ -84,4 +84,4 @@ For more details about specifying modules in a Puppetfile, see the [Puppetfile d
      directory. To override this location, update the modulepath setting in the
      Bolt config file.
 
-
+NOTE: Bolt uses r10k to download modules, and caches them in `~/.r10k/cache` before unzipping them. If you're a Windows user in an enterprise environment, ensure `HOME` or `HOMEDRIVE + HOMEPATH` is set sensibly.
