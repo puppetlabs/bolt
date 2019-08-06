@@ -1,4 +1,5 @@
 ---
+
 title: Bolt Hands-on Lab
 ---
 
