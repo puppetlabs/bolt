@@ -7,7 +7,7 @@ require 'bolt_spec/files'
 require 'bolt_spec/integration'
 require 'bolt/util'
 
-describe "catch_errors" do
+describe "catch_errors", ssh: true do
   include BoltSpec::Integration
   include BoltSpec::Config
   include BoltSpec::Conn
@@ -15,22 +15,9 @@ describe "catch_errors" do
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
 
   let(:modulepath) { [fixture_path('modules'), fixture_path('apply')].join(File::PATH_SEPARATOR) }
-  let(:target) do
-    if Bolt::Util.windows?
-      conn_uri('winrm')
-    else
-      conn_uri('ssh', include_password: true)
-    end
-  end
-  let(:transport_flags) do
-    if Bolt::Util.windows?
-      ['--password', conn_info('winrm')[:password],
-       '--no-ssl',
-       '--no-ssl-verify']
-    else
-      ['--no-host-key-check']
-    end
-  end
+  let(:target) { conn_uri('ssh', include_password: true) }
+
+  let(:transport_flags) { ['--no-host-key-check'] }
 
   let(:config_flags) {
     ['--format', 'json',
