@@ -175,7 +175,7 @@ steps:
 
 #### Resources step
 
-Use a `resources` step to apply a list of Puppet resources. A resource defines the _desired state_ for part of a target. Bolt will ensure each resource is in its desired state.
+Use a `resources` step to apply a list of Puppet resources. A resource defines the _desired state_ for part of a target. Bolt will ensure each resource is in its desired state. For each `resources` step, Bolt executes the `apply_prep` plan function against the targets specified with the `targets` field. For more information about `apply_prep` see the [How manifest blocks are applied](./applying_manifest_blocks.md#how-manifest-blocks-are-applied) reference.
 
 Like the steps in a plan, if any resource in the list fails, the rest will be skipped.
 
@@ -515,9 +515,6 @@ If the author were writing the code as a Puppet plan, they would likely not use 
 When applying Puppet resources in a resource step, variable interpolation behaves differently in YAML plans and Puppet plans. In order to illustrate an important distinction consider the following yaml plan:
 ```
 steps:
-  - description: apply prep
-    eval: >
-      apply_prep('localhost')
   - target: localhost
     description: Apply a file resource
     resources:
@@ -537,7 +534,6 @@ This plan performs `apply_prep` on a localhost target. Then it uses a Puppet `fi
 ```
 plan yaml_plans::interpolation_pp() {
   apply_prep('localhost')
-
   $interpolation = apply('localhost') {
     file { '/tmp/foo':
       content => $facts['os']['family'],
@@ -561,8 +557,6 @@ parameters:
   nodes:
     type: TargetSpec
 steps:
-  - eval: |
-      apply_prep($nodes)
   - name: pkg
     target: $nodes
     resources:
@@ -585,8 +579,6 @@ parameters:
   nodes:
     type: TargetSpec
 steps:
-  - eval: |
-      apply_prep($nodes)
   - name: pkg
     target: $nodes
     resources:

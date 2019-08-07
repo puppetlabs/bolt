@@ -65,6 +65,13 @@ module Bolt
 
           def transpile
             code = StringIO.new
+
+            code.print "  "
+            fn = 'apply_prep'
+            args = [@target]
+            code << function_call(fn, args)
+            code.print "\n"
+
             code.print "  "
             code.print "$#{@name} = " if @name
 

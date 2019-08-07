@@ -88,6 +88,8 @@ module Bolt
         end
 
         def resources_step(scope, step)
+          # TODO: Only call apply_prep when needed
+          scope.call_function('apply_prep', step['target'])
           manifest = generate_manifest(step['resources'])
 
           apply_manifest(scope, step['target'], manifest)

@@ -3,7 +3,6 @@ parameters:
     type: TargetSpec
 
 steps:
-  - eval: $nodes.apply_prep
   - name: apply_resources
     target: $nodes
     resources:
