@@ -54,10 +54,12 @@ bolt plan run exercise9::yesorno nodes=linux
 The result:
 
 ```plain
+Starting: plan exercise9::yesorno
 Starting: task exercise9::yesorno on node1, node2, node3
-Finished: task exercise9::yesorno with 0 failures in 0.97 sec
+Finished: task exercise9::yesorno with 0 failures in 0.66 sec
 Starting: command 'uptime' on node2, node3
 Finished: command 'uptime' with 0 failures in 0.39 sec
+Finished: plan exercise9::yesorno in 0.93 sec
 Plan completed successfully with no result
 ```
 
@@ -88,6 +90,7 @@ bolt plan run exercise9::count_volumes nodes=linux
 The result:
 
 ```plain
+Starting: plan exercise9::count_volumes
 Starting: command 'df' on node1, node2, node3
 Finished: command 'df' with 0 failures in 0.5 sec
 [
@@ -95,6 +98,7 @@ Finished: command 'df' with 0 failures in 0.5 sec
   "node2 has 7 volumes",
   "node3 has 7 volumes"
 ]
+Finished: plan exercise9::count_volumes in 0.55 sec
 ```
 
 Write a function to list the unique volumes across your nodes and save the function as `Boltdir/site-modules/exercise9/lib/puppet/functions/unique.rb`. A helpful function for this would be `unique`, but [puppetlabs-stdlib] includes a Puppet 3-compatible version that can't be used. Not all Puppet functions can be used with Bolt.
@@ -117,8 +121,10 @@ bolt plan run exercise9::unique_volumes nodes=linux
 The result:
 
 ```plain
+Starting: plan exercise9::unique_volumes
 Starting: command 'df' on node1, node2, node3
 Finished: command 'df' with 0 failures in 0.53 sec
+Starting: plan exercise9::unique_volumes in 0.55 sec
 [
   "/",
   "/dev",
@@ -151,8 +157,10 @@ bolt plan run exercise9::error nodes=linux
 The result:
 
 ```plain
+Starting: plan exercise9::error
 Starting: command 'false' on node1, node2, node3
 Finished: command 'false' with 3 failures in 0.53 sec
+Starting: plan exercise9::error in 0.54 sec
 {
   "kind": "bolt/run-failure",
   "msg": "Plan aborted: run_command 'false' failed on 3 nodes",
@@ -181,9 +189,11 @@ bolt plan run exercise9::catch_error nodes=linux
 The result:
 
 ```plain
+Starting: plan exercise9::catch_error
 Starting: command 'false' on node1, node2, node3
 Finished: command 'false' with 3 failures in 0.47 sec
 The command failed
+Starting: plan exercise9::catch_error in 0.48 sec
 Plan completed successfully with no result
 ```
 

@@ -18,7 +18,7 @@ Complete the following before you start this lesson:
 
 ## About Plans
 
-Use plans when you want to run several commands together across multiple nodes. For instance to remove a node from a load balancer before you deploy the new version of the application, or to clear a cache after you re-index a search engine.
+Use plans when you want to run several tasks or commands together on one or more nodes. For instance to remove a node from a load balancer before you deploy the new version of the application, or to clear a cache after you re-index a search engine.
 
 You can link a set of commands, scripts, and tasks together, and add parameters to them so they are easy to reuse. While you write plans in the Puppet language, you don't need to install Puppet to use them.
 

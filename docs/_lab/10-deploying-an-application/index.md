@@ -150,6 +150,7 @@ bolt plan run my_app::deploy version=1.0.2 app_servers=app db_server=db lb_serve
 The result (when simulated load is below threshold)
 
 ```plain
+Starting: plan my_app::deploy
 Starting: Check load before starting deploy on node1
 Finished: Check load before starting deploy with 0 failures in 0.89 sec
 Starting: Install 1.0.2 of the application on node3, node4, node2
@@ -162,14 +163,17 @@ Deploying to node4, currently ok with 10 open connections.
 Deploy complete on Target('node4', {"connect-timeout"=>10, "tty"=>false, "host-key-check"=>false}).
 Starting: Clean up old versions on node2, node3, node4
 Finished: Clean up old versions with 0 failures in 0.88 sec
+Finished: plan my_app::deploy in 4.35 sec
 Plan completed successfully with no result
 ```
 
 The result (when simulated load is above threshold)
 
 ```plain
+Starting: plan my_app::deploy
 Starting: Check load before starting deploy on node1
 Finished: Check load before starting deploy with 0 failures in 0.89 sec
+Finished: plan my_app::deploy in 0.90 sec
 {
   "kind": "bolt/plan-failure",
   "msg": "The appplication has too many open connections: 10",
@@ -350,15 +354,6 @@ true` to the parameters.
 
 # Next steps
 
-Congratulations! You should now have a basic understanding of Bolt and Bolt Tasks. Here are a few ideas for what to do next:
-
-* Explore content on the [Bolt Tasks Playground](https://github.com/puppetlabs/tasks-playground)
-* Get reusable tasks and plans from the [Task Modules Repo](https://github.com/puppetlabs/task-modules)
-* Search Puppet Forge for [Tasks](https://forge.puppet.com/modules?with_tasks=yes)
-* Start writing Tasks for one of your existing Puppet modules
-* Head over to the [Puppet Slack](https://slack.puppet.com/) and talk to the Bolt developers and other users
-* Try out the [Puppet Development Kit](https://puppet.com/download-puppet-development-kit) [(docs)](https://docs.puppet.com/pdk/latest/index.html) which has a few features to make authoring tasks even easier
-
-You can also move on to:
+Now that you have learned about deploying an app you can learn to apply manifest code with bolt.
 
 [Applying Manifest Code With Bolt](../11-apply-manifest-code)
