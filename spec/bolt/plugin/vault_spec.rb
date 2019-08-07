@@ -41,6 +41,12 @@ describe Bolt::Plugin::Vault do
     expect(plugin.hooks).to eq(['inventory_config'])
   end
 
+  it 'errors when missing cacert and using https' do
+    config['server_url'] = 'https://127.0.0.1:8200'
+    uri = plugin.uri(options)
+    expect { plugin.client(uri, options) }.to raise_error(Bolt::ValidationError, /https/)
+  end
+
   context 'when validating keys' do
     it 'errors with invalid config keys' do
       config['foo'] = 'bar'

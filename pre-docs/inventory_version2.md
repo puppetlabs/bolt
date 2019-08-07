@@ -552,6 +552,7 @@ This plugin allows config values to be set by accessing secrets from a Key/Value
 - `path`: The path to the secrets engine (required)
 - `field`: The specific secret being used (optional, defaults to a Ruby hash of all secrets at the `path`)
 - `version`: The version of the K/V engine (optional, defaults to 1)
+- `cacert`: Path to the CA certificate (required when using `https`, defaults to `ENV['VAULT_CACERT']`)
 
 
 **Authentication Methods**
@@ -604,6 +605,7 @@ config:
 You can also set configuration in the config file (typically `bolt.yaml`) under the `plugins` field. If a field is set in both the inventory file and the config file, Bolt will use the value set in the inventory file. The available fields for the config file are:
 
 - `server_url`
+- `cacert`
 - `auth`
 
 
@@ -611,7 +613,8 @@ You can also set configuration in the config file (typically `bolt.yaml`) under 
 ---
 plugins:
   vault:
-    server_url: http://127.0.0.1:8200
+    server_url: https://127.0.0.1:8200
+    cacert: /path/to/cert
     auth:
       method: token
       token: xxxxx-xxxxx

@@ -25,7 +25,7 @@ module Bolt
 
       # Make sure no unexpected keys are in the config
       def validate_config(config)
-        known_keys = %w[server_url auth]
+        known_keys = %w[server_url auth cacert]
 
         config.each do |key, _v|
           next if known_keys.include?(key)
@@ -36,12 +36,12 @@ module Bolt
       # Make sure no unexpected keys are in the inventory config and
       # that required keys are present
       def validate_options(opts)
-        known_keys = %w[_plugin server_url auth path field version]
+        known_keys = %w[_plugin server_url auth path field version cacert]
         required_keys = %w[path]
 
         opts.each do |key, _v|
           next if known_keys.include?(key)
-          raise Bolt::ValidationError, "Unpexpected key in inventory config: #{key}"
+          raise Bolt::ValidationError, "Unexpected key in inventory config: #{key}"
         end
 
         required_keys.each do |key|
@@ -71,7 +71,7 @@ module Bolt
           TOKEN_HEADER => token(opts)
         }
 
-        response = request(:Get, uri(opts), nil, header)
+        response = request(:Get, uri(opts), opts, nil, header)
 
         parse_response(response, opts)
       end
@@ -82,12 +82,33 @@ module Bolt
 
         # Handle the different versions of the API
         if opts['version'] == 2
-          opts['path'] = opts['path'].split('/').insert(1, 'data').join('/')
+          mount, store = opts['path'].split('/', 2)
+          opts['path'] = [mount, 'data', store].join('/')
         end
 
         path ||= opts['path']
 
         URI.parse(File.join(url, "v1", path))
+      end
+
+      # Configure the http/s client
+      def client(uri, opts)
+        client = Net::HTTP.new(uri.host, uri.port)
+
+        if uri.scheme == 'https'
+          cacert = opts['cacert'] || config['cacert'] || ENV['VAULT_CACERT']
+
+          unless cacert
+            raise Bolt::ValidationError, "Expected cacert to be set when using https"
+          end
+
+          client.use_ssl = true
+          client.ssl_version = :TLSv1_2
+          client.ca_file = cacert
+          client.verify_mode = OpenSSL::SSL::VERIFY_PEER
+        end
+
+        client
       end
 
       # Auth token to vault server
@@ -99,12 +120,12 @@ module Bolt
         end
       end
 
-      def request(verb, uri, data, header = {})
+      def request(verb, uri, opts, data, header = {})
         # Add on any header options
         header = DEFAULT_HEADER.merge(header)
 
         # Create the HTTP request
-        http = Net::HTTP.new(uri.host, uri.port)
+        client = client(uri, opts)
         request = Net::HTTP.const_get(verb).new(uri.request_uri, header)
 
         # Attach any data
@@ -112,7 +133,7 @@ module Bolt
 
         # Send the request
         begin
-          response = http.request(request)
+          response = client.request(request)
         rescue StandardError => e
           raise Bolt::Error.new(
             "Failed to connect to #{uri}: #{e.message}",
@@ -178,7 +199,7 @@ module Bolt
         uri = uri(opts, path)
         data = { "password" => auth['pass'] }.to_json
 
-        request(:Post, uri, data)['auth']['client_token']
+        request(:Post, uri, opts, data)['auth']['client_token']
       end
     end
   end
