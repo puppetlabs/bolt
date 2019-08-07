@@ -6,6 +6,7 @@ require 'bolt/plugin/pkcs7'
 require 'bolt/plugin/prompt'
 require 'bolt/plugin/task'
 require 'bolt/plugin/aws'
+require 'bolt/plugin/vault'
 
 module Bolt
   class Plugin
@@ -38,6 +39,7 @@ module Bolt
       plugins.add_plugin(Bolt::Plugin::Pkcs7.new(config.boltdir.path, config.plugins['pkcs7'] || {}))
       plugins.add_plugin(Bolt::Plugin::Task.new(config))
       plugins.add_plugin(Bolt::Plugin::Aws::EC2.new(config.plugins['aws'] || {}))
+      plugins.add_plugin(Bolt::Plugin::Vault.new(config.plugins['vault'] || {}))
       plugins
     end
 

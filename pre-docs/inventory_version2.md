@@ -541,6 +541,85 @@ plugins:
 * `private-key`: The path to the private key file. default: `keys/private_key.pkcs7.pem`
 * `public-key`: The path to the public key file. default: `keys/public_key.pkcs7.pem`
 
+#### Vault plugin
+
+
+This plugin allows config values to be set by accessing secrets from a Key/Value engine on a Vault server. It supports several fields:
+
+- `_plugin`: The value of `_plugin` must be `vault`
+- `server_url`: The URL of the Vault server (optional, defaults to `ENV['VAULT_ADDR']`)
+- `auth`: The method for authorizing with the Vault server and any necessary parameters (optional, defaults to `ENV['VAULT_TOKEN']`)
+- `path`: The path to the secrets engine (required)
+- `field`: The specific secret being used (optional, defaults to a Ruby hash of all secrets at the `path`)
+- `version`: The version of the K/V engine (optional, defaults to 1)
+- `cacert`: Path to the CA certificate (required when using `https`, defaults to `ENV['VAULT_CACERT']`)
+
+
+**Authentication Methods**
+
+Vault requires a token to assign an identity and set of policies to a user before accessing secrets. The Vault plugin offers 2 authentication methods:
+
+
+`token`
+
+Authenticate using a token. This method requires the following fields:
+
+- `method`: The value of `method` must be `token`
+- `token`: The token to authenticate with
+
+
+`userpass`
+
+Request a token by logging into the Vault server with a username and password. This method requires the following fields:
+
+- `method`: The value of `method` must be `userpass`
+- `user`: The username
+- `pass`: The password
+
+
+You can add any Vault plugin field to the inventory configuration. The following example shows how you would access the `private-key` secret on a KVv2 engine mounted at `secrets/bolt`:
+
+
+```
+---
+version: 2
+targets:
+  - ...
+config:
+  ssh:
+    user: root
+    private-key:
+      key-data:
+        _plugin: vault
+        server_url: http://127.0.0.1:8200
+        auth:
+          method: userpass
+          user: bolt
+          pass: bolt
+        path: secrets/bolt
+        field: private-key
+        version: 2
+```
+
+
+You can also set configuration in the config file (typically `bolt.yaml`) under the `plugins` field. If a field is set in both the inventory file and the config file, Bolt will use the value set in the inventory file. The available fields for the config file are:
+
+- `server_url`
+- `cacert`
+- `auth`
+
+
+```
+---
+plugins:
+  vault:
+    server_url: https://127.0.0.1:8200
+    cacert: /path/to/cert
+    auth:
+      method: token
+      token: xxxxx-xxxxx
+```
+
 ## Inventory config
 
 You can only set transport configuration in the inventory file. This means using a top level `transport` value to assign a transport to the target and all values in the section named for the transport (`ssh`, `winrm`, `remote`, etc.). You can set config on targets or groups in the inventory file. Bolt performs a depth first search of targets, followed by a search of groups, and uses the first value it finds. Nested hashes are merged.
