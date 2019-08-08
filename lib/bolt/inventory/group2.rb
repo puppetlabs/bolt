@@ -102,13 +102,13 @@ module Bolt
           if value.is_a?(Hash) && value.include?('_plugin')
             plugin_name = value['_plugin']
             begin
-              hook = @plugins.get_hook(plugin_name, :inventory_config)
+              hook = @plugins.get_hook(plugin_name, :resolve_reference)
             rescue Bolt::Plugin::PluginError => e
               raise ValidationError.new(e.message, @name)
             end
 
             begin
-              validate_proc = @plugins.get_hook(plugin_name, :validate_inventory_config)
+              validate_proc = @plugins.get_hook(plugin_name, :validate_resolve_reference)
             rescue Bolt::Plugin::PluginError
               validate_proc = proc { |*args| }
             end
@@ -119,7 +119,7 @@ module Bolt
               begin
                 hook.call(value)
               rescue StandardError => e
-                loc = "inventory_config in #{@name}"
+                loc = "resolve_reference in #{@name}"
                 raise Bolt::Plugin::PluginError::ExecutionError.new(e.message, plugin_name, loc)
               end
             end
@@ -213,7 +213,7 @@ module Bolt
 
       def lookup_targets(lookup)
         begin
-          hook = @plugins.get_hook(lookup['_plugin'], :inventory_targets)
+          hook = @plugins.get_hook(lookup['_plugin'], :resolve_reference)
         rescue Bolt::Plugin::PluginError => e
           raise ValidationError.new(e.message, @name)
         end
@@ -221,7 +221,7 @@ module Bolt
         begin
           targets = hook.call(lookup)
         rescue StandardError => e
-          loc = "inventory_targets in #{@name}"
+          loc = "resolve_reference in #{@name}"
           raise Bolt::Plugin::PluginError::ExecutionError.new(e.message, lookup['_plugin'], loc)
         end
 

@@ -9,7 +9,7 @@ module Bolt
                        'config', 'backend']
       REQ_KEYS = Set['dir', 'resource_type']
 
-      def initialize
+      def initialize(*_args)
         @logger = Logging.logger[self]
       end
 
@@ -18,7 +18,7 @@ module Bolt
       end
 
       def hooks
-        ['inventory_targets']
+        [:resolve_reference]
       end
 
       def warn_missing_property(name, property)
@@ -41,7 +41,7 @@ module Bolt
         end
       end
 
-      def inventory_targets(opts)
+      def resolve_reference(opts)
         validate_options(opts)
 
         state = load_statefile(opts)

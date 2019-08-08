@@ -1,0 +1,7 @@
+{
+  "hooks": {
+    "resolve_reference": {
+      "task": "identity"
+    }
+  }
+}

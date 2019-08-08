@@ -1,5 +1,9 @@
 ## BOLT NEXT
 
+#### Deprecations and removals
+
+* **WARNING**: In order to standardize plugin behavior the `aws::ec2` plugin has been renamed `aws_inventory` and the `pkcs7` plugin now expects `encrypted_value` rather `encrypted-value`. The `task` plugin now expects tasks to return both Target lists and config data under the `value` key not `targets` or `values`.
+
 #### Bug fixes
 
 * **Only read path to `cacert` for `winrm` transport when using `ssl`** ([#1232](https://github.com/puppetlabs/bolt/pull/1232))
@@ -9,6 +13,11 @@
 * **Some configuration options would not support file path expansion** ([#1174](https://github.com/puppetlabs/bolt/issues/1174))
 
   The `token-file` and `cacert` file paths for the `pcp` transport now support file expansion. Similarly the `cacert` for the `winrm` transport has been updated to support file expansion.
+
+#### New features
+
+* Modules can ship bolt plugins now by including a `bolt_plugin.json` file at the top level. These plugins are task based and can be configured in `bolt.yaml`.
+
 
 ## 1.30.1
 
@@ -38,7 +47,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 * **Allow users to configure apply_prep plan function** ([#1123](https://github.com/puppetlabs/bolt/issues/1123))
 
   Users can now configure how the Puppet agent gets installed when the `apply_prep` plan function is called. Users can configure 2 plugins:
-  
+
   * `install_agent`, which maintains previous `apply_prep` behavior and is the default
   * `task`, which allows users to either use the `puppet_agent::install` task with non-default parameters, or use their own task.
 
@@ -49,7 +58,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 #### Bug fixes
 
 * **Correct file path separator in task show modulepath** ([#1183](https://github.com/puppetlabs/bolt/issues/1183))
-  
+
   The modulepath listed in `bolt task show` and `bolt plan show` output now uses an OS correct file path separator.
 
 * **bolt-inventory-pdb was not installed on path** ([#1172](https://github.com/puppetlabs/bolt/issues/1172))
@@ -66,7 +75,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 * **Tasks with input method stdin hung with the --tty option** ([#1129](https://github.com/puppetlabs/bolt/issues/1129))
 
-  Tasks no longer hang over the SSH transport when the input method is stdin, the --tty option is set, and the --run-as option is unset. 
+  Tasks no longer hang over the SSH transport when the input method is stdin, the --tty option is set, and the --run-as option is unset.
 
 * **Docker transport was incompatible with the Windows Bolt controller** ([#1060](https://github.com/puppetlabs/bolt/issues/1060))
 
@@ -193,7 +202,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 * **lookups removed from target_lookups**
 
-  We have deprecated the target-lookups key in the experimental inventory file v2. To address this change, migrate any target-lookups entries to targets and move the plugin key in each entry to \_plugin. 
+  We have deprecated the target-lookups key in the experimental inventory file v2. To address this change, migrate any target-lookups entries to targets and move the plugin key in each entry to \_plugin.
 
 ## 1.24.0
 
@@ -240,7 +249,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   You can now specify an HTTP proxy for bolt puppetfile install in bolt.yaml, for example:
   ```
-  puppetfile: 
+  puppetfile:
     proxy: https://proxy.example.com
   ```
 * **Support for version 4 Terraform state files**
@@ -510,7 +519,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 * **Unsecured download of the puppet_agent::install_powershell task**
 
-  The PowerShell implementation of the puppet_agent::install task now downloads Windows .msi files using HTTPS instead of HTTP. This fix ensures the download is authenticated and secures against a man-in-the-middle attack. 
+  The PowerShell implementation of the puppet_agent::install task now downloads Windows .msi files using HTTPS instead of HTTP. This fix ensures the download is authenticated and secures against a man-in-the-middle attack.
 
 ## 1.9.0
 

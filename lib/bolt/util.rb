@@ -184,6 +184,12 @@ module Bolt
         File.stat(File.expand_path(path))
       end
 
+      def class_name_to_file_name(cls_name)
+        # Note this turns Bolt::CLI -> 'bolt/cli' not 'bolt/c_l_i'
+        # this won't handle Bolt::Inventory2Foo
+        cls_name.gsub(/([a-z])([A-Z])/, '\1_\2').gsub('::', '/').downcase
+      end
+
       def validate_file(type, path, allow_dir = false)
         stat = file_stat(path)
 

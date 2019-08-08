@@ -70,9 +70,7 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
 
     # TODO: Why would we not have a private_environment_loader?
     unless loader && (func = loader.load(:plan, plan_name))
-      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
-        Puppet::Pops::Issues.issue(:UNKNOWN_PLAN) { Bolt::Error.unknown_plan(plan_name) }
-      )
+      raise Bolt::Error.unknown_plan(plan_name)
     end
 
     if (run_as = named_args['_run_as'])

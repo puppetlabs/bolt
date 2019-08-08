@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "resolve_reference": {
+      "task": "conf_plug"
+    }
+  },
+  "config": {
+    "optional_key": {
+      "type": "Optional[String]"
+    },
+      "required_key": {
+        "type": "String"
+    }
+  }
+}

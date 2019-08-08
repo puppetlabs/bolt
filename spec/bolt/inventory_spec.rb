@@ -20,7 +20,8 @@ describe Bolt::Inventory do
     targets[0]
   end
 
-  let(:plugins) { Bolt::Plugin.new(config, Bolt::Analytics::NoopClient.new) }
+  let(:pal) { nil } # Not used
+  let(:plugins) { Bolt::Plugin.new(config, pal, Bolt::Analytics::NoopClient.new) }
 
   let(:data) {
     {

@@ -1,0 +1,5 @@
+{ "hooks": {
+    "secret_encrypt": { "task": "identity::value" },
+    "secret_decrypt": { "task": "identity::value" }
+  }
+}

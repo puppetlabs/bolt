@@ -62,7 +62,7 @@ module Bolt
         { flags: ACTION_OPTS + %w[tmpdir],
           banner: SCRIPT_HELP }
       when 'secret'
-        { flags: OPTIONS[:global] + OPTIONS[:global_config_setters],
+        { flags: OPTIONS[:global] + OPTIONS[:global_config_setters] + %w[plugin],
           banner: SECRET_HELP }
       when 'task'
         case action
@@ -261,6 +261,7 @@ module Bolt
     HELP
 
     SECRET_HELP = <<~SECRET_HELP
+      Usage: bolt secret <action> <value>
       Manage secrets for inventory and hiera data.
 
       Available actions are:
@@ -445,6 +446,10 @@ module Bolt
       end
       define('--debug', 'Display debug logging') do |_|
         @options[:debug] = true
+      end
+
+      define('--plugin PLUGIN', 'Select the plugin to use') do |plug|
+        @options[:plugin] = plug
       end
     end
 

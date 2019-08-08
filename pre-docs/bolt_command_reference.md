@@ -496,3 +496,9 @@ Show a list of available tasks or details for a specific task.
 | `-m`, `--modulepath FILEPATHS` | List of directories containing modules, separated by `:`. <br> Directories are case-sensitive. |
 | `--boltdir FILEPATH` | Specify what Boltdir to load config from. | Autodiscovered from current working directory. |
 | `--configfile FILEPATH` | Specify where to load config from. | `~/.puppetlabs/bolt/bolt.yaml` |
+
+## Secret options
+
+|Option|Description|
+|------|-----------|
+| `--plugin` |Which plugin to use.|

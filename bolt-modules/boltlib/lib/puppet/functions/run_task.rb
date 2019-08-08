@@ -77,7 +77,7 @@ Puppet::Functions.create_function(:run_task) do
       # TODO: use the compiler injection once PUP-8237 lands
       task_signature = Puppet::Pal::ScriptCompiler.new(closure_scope.compiler).task_signature(task_name)
       if task_signature.nil?
-        raise with_stack(:UNKNOWN_TASK, Bolt::Error.unknown_task(task_name))
+        raise Bolt::Error.unknown_task(task_name)
       end
 
       task_signature.runnable_with?(use_args) do |mismatch_message|

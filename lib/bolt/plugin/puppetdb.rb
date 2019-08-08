@@ -23,7 +23,7 @@ module Bolt
       end
 
       def hooks
-        ['inventory_targets']
+        [:resolve_reference]
       end
 
       def warn_missing_fact(certname, fact)
@@ -41,7 +41,7 @@ module Bolt
         end
       end
 
-      def inventory_targets(opts)
+      def resolve_reference(opts)
         targets = @puppetdb_client.query_certnames(opts['query'])
         facts = []
 

@@ -120,7 +120,7 @@ The following plugins can be used for targets
 
 * `puppetdb` - Query PuppetDB to populate the targets.
 * `terraform` - Load a Terraform state file to populate the targets.
-* `aws::ec2` - Load running AWS EC2 instances to populate the targets.
+* `aws_inventory` - Load running AWS EC2 instances to populate the targets.
 * `task` - Run a task to discover targets.
 
 #### Config plugins
@@ -207,7 +207,7 @@ params = json.load(sys.stdin)
 client = Client
 secret = client.get_secret(data['key'])
 # secret can be any value that can be dumped to json.
-json.dump({'config': secret}, sys.stdout)
+json.dump({'value': secret}, sys.stdout)
 ```
 
 ##### Inventory Target Tasks
@@ -227,7 +227,7 @@ params = json.load(sys.stdin)
 with open(params['file']) as fh:
   data = json.load(fh)
 targets = data[params['environment']][params['app']]
-json.dump({'targets': targets}, sys.stdout)
+json.dump({'value': targets}, sys.stdout)
 ```
 
 ##### Install library tasks
@@ -464,9 +464,9 @@ google_compute_instance.app.1:
   zone = us-west1-a
 ```
 
-#### AWS EC2
+#### aws_inventory
 
-The AWS EC2 plugin supports looking up running AWS EC2 instances. It supports several fields:
+The AWS inventory plugin supports looking up running AWS EC2 instances. It supports several fields:
 
 - `profile`: The [named profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html) to use when loading from AWS `config` and `credentials` files. (optional, defaults to `default`)
 - `region`: The region to look up EC2 instances from.
@@ -481,7 +481,7 @@ One of `uri` or `name` is required. If only `uri` is set, then the value of `uri
 groups:
   - name: aws
     targets:
-      - _plugin: aws::ec2
+      - _plugin: aws_inventory
         profile: user1
         region: us-west-1
         name: public_dns_name
@@ -532,7 +532,7 @@ AWS credential files stored in a non-standard location (`~/.aws/credentials`) ca
 
 ```
 plugins:
-  aws:
+  aws_inventory:
     credentials: ~/alternate_path/credentials
 ```
 
@@ -563,7 +563,7 @@ This plugin allows config values to be stored in encrypted in the inventory
 file and decrypted only as needed.
 
 `_plugin`: The value of `_plugin` must be `pkcs7`
-`encrypted-value`: The encrypted value. Generate encrypted values with `bolt secret encrypt <plaintext>`
+`encrypted_value`: The encrypted value. Generate encrypted values with `bolt secret encrypt <plaintext>`
 
 Example
 
@@ -577,7 +577,7 @@ targets:
         user: root
         password:
           _plugin: pkcs7
-          encrypted-value: |
+          encrypted_value: |
                 ENC[PKCS7,MIIBeQYJKoZIhvcNAQcDoIIBajCCAWYCAQAxggEhMIIBHQIBADAFMAACAQEw
                 DQYJKoZIhvcNAQEBBQAEggEAdCVkiddtK8jHz4g1y1pkB27VHCZx7dVzEiyT
                 33BgFv9atk8Ns/WE1tveFvyuEaDpk9y/FKisuh8DsTnR2mfGvHtX+BQdNqV6
@@ -594,7 +594,7 @@ create these keys automatically with `bolt secret createkeys` or reuse existing
 hiera-eyaml pkcs7 keys with bolt secret. You can then encrypt values with `bolt
 secret encrypt <plaintext>` command and copy the result into your inventory
 file. If you need to inspect an encrypted value from the inventory you can
-decrypt it with `bolt secret decrypt <encrypted-value>`.
+decrypt it with `bolt secret decrypt <encrypted_value>`.
 
 ##### Configuration
 
