@@ -25,7 +25,7 @@ Run the [bashcheck](https://github.com/hannob/bashcheck) script to check on Shel
 Download the `bashcheck.sh` script using `curl`, `wget`,  or similar:
 
 ```shell
-curl -O {{ site.url }}{{ site.baseurl }}/lessons/lesson1-10/src/bashcheck.sh
+curl -O https://raw.githubusercontent.com/puppetlabs/bolt/master/docs/_includes/lesson1-10/src/bashcheck.sh
 ```
 
 Run the script using the command `bolt script run <script-name>`. This uploads the script to the nodes you have specified, ensures it's executable, runs it, and returns output to the console.
