@@ -17,3 +17,8 @@ defaults:
       type: examples
     values:
       layout: example
+  - scope:
+      type: posts
+    values:
+      layout: post
+      permalink: /:categories/:year-:month-:day-:title
