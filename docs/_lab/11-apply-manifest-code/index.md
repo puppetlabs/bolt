@@ -200,4 +200,12 @@ hello! from 127.0.0.1
 
 ## Next steps
 
-Now that you have learned about applying existing module content you can harness the power of the Puppet forge to manage infrastructure and deploy great applications!
+Congratulations! You should now have a basic understanding of Bolt and Bolt Tasks. Here are a few ideas for what to do next:
+
+* Explore content on the [Bolt Tasks Playground](https://github.com/puppetlabs/tasks-playground)
+* Get reusable tasks and plans from the [Task Modules Repo](https://github.com/puppetlabs/task-modules)
+* Search Puppet Forge for [Tasks](https://forge.puppet.com/modules?with_tasks=yes)
+* Start writing Tasks for one of your existing Puppet modules
+* Head over to the [Puppet Slack](https://slack.puppet.com/) and talk to the Bolt developers and other users
+* Try out the [Puppet Development Kit](https://puppet.com/download-puppet-development-kit) [(docs)](https://docs.puppet.com/pdk/latest/index.html) which has a few features to make authoring tasks even easier
+
