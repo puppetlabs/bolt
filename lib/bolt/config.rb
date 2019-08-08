@@ -37,7 +37,7 @@ module Bolt
     attr_writer :modulepath
 
     TRANSPORT_OPTIONS = %i[password run-as sudo-password extensions
-                           private-key tty tmpdir user connect-timeout
+                           private-key tty tmpdir user connect-timeout disconnect-timeout
                            cacert token-file service-url interpreters file-protocol smb-port realm].freeze
 
     PUPPETFILE_OPTIONS = %w[proxy forge].freeze

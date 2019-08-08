@@ -130,7 +130,11 @@ module Bolt
 
         def disconnect
           if @session && !@session.closed?
-            @session.close
+            begin
+              Timeout.timeout(@target.options['disconnect-timeout']) { @session.close }
+            rescue Timeout::Error
+              @session.shutdown!
+            end
             @logger.debug { "Closed session" }
           end
         end

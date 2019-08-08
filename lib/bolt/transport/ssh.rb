@@ -10,7 +10,7 @@ module Bolt
     class SSH < Sudoable
       def self.options
         %w[host port user password sudo-password private-key host-key-check
-           connect-timeout tmpdir run-as tty run-as-command proxyjump interpreters]
+           connect-timeout disconnect-timeout tmpdir run-as tty run-as-command proxyjump interpreters]
       end
 
       def self.default_options
@@ -18,7 +18,8 @@ module Bolt
           'connect-timeout' => 10,
           'host-key-check' => true,
           'tty' => false,
-          'load-config' => true
+          'load-config' => true,
+          'disconnect-timeout' => 5
         }
       end
 
@@ -42,10 +43,12 @@ module Bolt
           end
         end
 
-        timeout_value = options['connect-timeout']
-        unless timeout_value.is_a?(Integer) || timeout_value.nil?
-          error_msg = "connect-timeout value must be an Integer, received #{timeout_value}:#{timeout_value.class}"
-          raise Bolt::ValidationError, error_msg
+        %w[connect-timeout disconnect-timeout].each do |timeout|
+          timeout_value = options[timeout]
+          unless timeout_value.is_a?(Integer) || timeout_value.nil?
+            error_msg = "#{timeout} value must be an Integer, received #{timeout_value}:#{timeout_value.class}"
+            raise Bolt::ValidationError, error_msg
+          end
         end
       end
 

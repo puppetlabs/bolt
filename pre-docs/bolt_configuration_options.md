@@ -54,6 +54,8 @@ to avoid writing them to disk.
 
 `connect-timeout`: How long Bolt should wait when establishing connections.
 
+`disconnect-timeout`: How long Bolt should wait to force-close an ssh connection.
+
 `host-key-check`: Whether to perform host key validation when connecting over SSH. Default is `true`.
 
 `password`: Login password.
