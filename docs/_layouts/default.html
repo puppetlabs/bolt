@@ -56,6 +56,14 @@
             </ul>
           </li>
           <li>
+            <span class="nav-header">Bolt Developer Updates</span>
+            <ul>
+              {% for post in site.posts limit: 3 %}
+                <li><a href="{{ post.url | remove: "/index.html" | relative_url }}">{{ post.title }}</a><br><small>{{ post.date | date: "%m-%d-%y" }}</small></li>
+              {% endfor %}
+            </ul>
+          </li>
+          <li>
             <span class="nav-header">External Resources</span>
             <ul>
               <li><a href="https://puppet.com/docs/bolt/latest/bolt.html">Bolt Docs</a></li>
