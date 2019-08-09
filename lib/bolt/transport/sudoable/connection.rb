@@ -70,6 +70,33 @@ module Bolt
           message = "#{self.class.name} must implement #{method} to execute commands"
           raise NotImplementedError, message
         end
+
+        def prepend_sudo_success(sudo_id, command_str)
+          "sh -c 'echo #{sudo_id} 1>&2; #{command_str}'"
+        end
+
+        # A helper to build up a single string that contains all of the options
+        # for privilage escalation.
+        def build_sudoable_command_str(command_str, sudo_str, sudo_id, stdin)
+          if stdin
+            "#{sudo_str} #{prepend_sudo_success(sudo_id, command_str)}"
+          else
+            "#{sudo_str} #{command_str}"
+          end
+        end
+
+        # Returns string with the interpreter conditionally prepended
+        def inject_interpreter(interpreter, command)
+          if interpreter
+            if command.is_a?(Array)
+              command.unshift(interpreter)
+            else
+              command = [interpreter, command]
+            end
+          end
+
+          command.is_a?(String) ? command : Shellwords.shelljoin(command)
+        end
       end
     end
   end

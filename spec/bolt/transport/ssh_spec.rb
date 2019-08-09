@@ -245,15 +245,6 @@ describe Bolt::Transport::SSH do
     it "returns false if the target is not available", ssh: true do
       expect(ssh.connected?(Bolt::Target.new('unknownfoo'))).to eq(false)
     end
-
-    it "doesn't generate a task wrapper when not needed", ssh: true do
-      contents = "#!/bin/sh\necho -n ${PT_message_one} ${PT_message_two}"
-      arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-      expect(ssh).not_to receive(:make_wrapper_stringio)
-      with_task_containing('tasks_test', contents, 'environment') do |task|
-        ssh.run_task(target, task, arguments)
-      end
-    end
   end
 
   # Local transport doesn't have concept of 'user'
