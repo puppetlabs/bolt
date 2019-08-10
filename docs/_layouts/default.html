@@ -52,11 +52,12 @@
           <li>
             <span class="nav-header">Tips &amp; Tricks</span>
             <ul>
-              <li><a href="{{ '/debugging.html' | relative_url }}">Debugging common Bolt errors</a></li>
+              <li><a href="{{ '/debugging' | relative_url }}">Debugging common Bolt errors</a></li>
             </ul>
           </li>
           <li>
-            <span class="nav-header">Bolt Developer Updates</span>
+            <span class="nav-header">
+              <a href="{{ '/blog' | relative_url }}" class="center-vertical">Bolt Developer Updates</a></span>
             <ul>
               {% for post in site.posts limit: 3 %}
                 <li><a href="{{ post.url | remove: "/index.html" | relative_url }}">{{ post.title }}</a><br><small>{{ post.date | date: "%m-%d-%y" }}</small></li>

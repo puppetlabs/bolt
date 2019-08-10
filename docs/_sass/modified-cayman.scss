@@ -213,6 +213,16 @@ a {
     color: $section-headings-color;
   }
 
+  article {
+    border-top: solid 1px $hr-border-color;
+    margin-top: 2rem;
+    padding-top: 2rem;
+  }
+
+  article h3 {
+    margin-bottom: 0;
+  }
+
   p {
     margin-bottom: 1em;
   }
@@ -342,7 +352,7 @@ a {
   }
 
   hr {
-    height: 2px;
+    height: 1px;
     padding: 0;
     margin: 1rem 0;
     background-color: $hr-border-color;
