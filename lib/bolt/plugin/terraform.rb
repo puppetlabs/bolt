@@ -111,8 +111,10 @@ module Bolt
             resource_set['instances'].map do |resource|
               instance_name = prefix
               instance_name += ".#{resource['index_key']}" if resource['index_key']
-
-              [instance_name, resource['attributes']]
+              # When using `terraform state pull` with terraform >= 0.12 version 3 statefiles
+              # Will be converted to version 4. When converted attributes is converted to attributes_flat
+              attributes = resource['attributes'] || resource['attributes_flat']
+              [instance_name, attributes]
             end
           end
         else
