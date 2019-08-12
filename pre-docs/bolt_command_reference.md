@@ -2,108 +2,497 @@
 
 Review the subcommands, actions, and options that are available for Bolt.
 
-## Common Bolt commands
+- [apply](#apply)
+- [command run](#command-run)
+- [file upload](#file-upload)
+- [inventory show](#inventory-show)
+- [plan convert](#plan-convert)
+- [plan run](#plan-run)
+- [plan show](#plan-show)
+- [puppetfile install](#puppetfile-install)
+- [puppetfile show-modules](#puppetfile-show-modules)
+- [script run](#script-run)
+- [secret createkeys](#secret-createkeys)
+- [secret decrypt](#secret-decrypt)
+- [secret encrypt](#secret-encrypt)
+- [task run](#task-run)
+- [task show](#task-show)
 
-Bolt commands use the syntax: `bolt <subcommand> <action> [options]`
 
-|Command|Description|Arguments|
-|-------|-----------|---------|
-| `bolt command run` `<COMMAND>` | Runs a command on remote nodes. |- The command, single quoted if it contains spaces or special characters.<br>- The nodes on which to run the command.
-| `bolt script run` | Runs a script in any language that will run on the remote system. |- A path to a local script to run on the remote nodes.<br>- Optionally, arguments to pass to the script.<br>- The nodes on which to run the script.
-| `bolt task run` | Runs a task on a remote system, passing any specified parameters. | - The task name, in the format `modulename::taskname`.<br>- The nodes on which to run the task.
-| `bolt plan run` | Runs a task plan. | - The plan name, in the format `modulename::planname`.<br>- The nodes on which to run the plan.
-| `bolt apply` | Applies a Puppet manifest file. | - The path to the manifest file.<br>- The nodes on which to run the plan.
-| `bolt file upload` | Uploads a local file or directory to a remote node. | - The path to the source file or directory.<br>- The path to the remote location.<br>- The nodes on which to upload the file or directory.
-| `bolt task show` | Lists all the tasks on the modulepath that have not been marked `private`. Will note whether a task supports no-operation mode. | - Adding a specific task name displays details and parameters for the task.<br>- Optionally, the name of a task you want details for: `bolt task show <TASK NAME>`
-| `bolt plan show` | Lists the plans that are installed on the current module path. | - Adding a specific plan name displays details and parameters for the plan.
-| `bolt plan convert` | Converts a YAML plan to a Puppet plan | - The path (relative or absolute) to the YAML plan to be converted.
-| `bolt puppetfile install` | Installs the modules listed in the Puppetfile to the current `Boltdir`. | |
-| `bolt puppetfile show-modules` | Lists the modules, and their versions, that are installed in the current `Boltdir`. | |
-| `bolt inventory show` | Show the list of targets an action would run on. | - The inventory targets to show. |
+## Global options
 
-## Command options
+These options are available for all subcommands and actions:
 
-Options are optional unless marked as required. 
+| Option | Description |
+|--------|-------------|
+| `-h`, `--help` | Display the help text. |
+| `--version` | Display the version of Bolt. |
+| `--debug` | Display debug logging. |
 
-|Option|Description|
-|------|-----------|
-|`--nodes`, `-n` | **Required****when running**. Nodes to connect to.
 
- To connect with WinRM, include the protocol as `winrm://<HOSTNAME>`.
+## `apply`
 
- For an IPv6 address without a port number, encase it brackets `[fe80::34eb:ff1:b584:d7c0]`.
+Apply a Puppet manifest file.
 
- For IPv6 addresses including a port use one of the following formats:  `fe80::34eb:ff1:b584:d7c0:22 ` or  `[fe80::34eb:ff1:b584:d7c0]:22`.
+### Usage
 
- |
-| `--query` `, -q` |Query PuppetDB to determine the targets.|
-|`--rerun`| use the `.rerun.json` file to choose the targets. Requires a single filter options: all, failure, or success.
-| `--noop` |Execute a task that supports it in no-operation mode.|
-| `--description` |Add a description to the run. Used in logging and submitted to Orchestrator with the PCP transport.|
-| `--params` | Parameters, passed as a JSON object on the command line, or as a JSON parameter file, prefaced with `@` like `@params.json`. For Windows PowerShell,  add single quotation marks to define the file: `'@params.json'`
+`bolt apply <MANIFEST> <TARGETS>`
 
- |
+- You must specify one of `--nodes`, `--targets`, `--query`, or `--rerun`.
 
-## Authentication options
+### Options
 
-|Option|Description|
-|------|-----------|
-|`--user`, `-u`|User to authenticate as.|
-|`--password`, `-p`|Password to authenticate with. Pass this flag without any value to securely prompt for the password.|
-| `--private-key` |Private ssh key to authenticate with|
-| `--host-key-check, --no-host-key-check` | Do not require verification of new hosts in the `known_hosts` file.
+| Option | Description | Default |
+|--------|-------------|---------|
+| `-n`, `--nodes NODES` | Alias for `--targets`. |
+| `-t`, `--targets TARGETS` | Identifies the targets of command. |
+| `-q`, `--query QUERY` | Query PuppetDB to determine the targets. <br> Enter a comma-separated list of target URIs or group names. Or read a target list from an input file `@<file>` or stdin `-`. |
+| `--rerun FILTER` | Retry on nodes from the last run. <br> `all` runs on all targets from the last run. <br> `failure` runs on all targets that failed in the last run. <br> `success` runs on all targets that succeeded in the last run. |
+| `--noop` | Execute a task that supports it in noop mode. |
+| `--description DESCRIPTION` | Description to use for the job. |
+| `-e`, `--execute CODE` | Puppet manifest code to apply to the targets. |
+| **Authentication** |
+| `-u`, `--user USER` | User to authenticate as. |
+| `-p`, `--password [PASSWORD]` | Password to authenticate with. <br> Omit the value to prompt for the password. |
+| `--private-key KEY` | Private SSH key to authenticate with. |
+| `--[no-]host-key-check` | Check host keys with SSH. |
+| `--[no-]ssl` | Use SSL with WinRM. |
+| `--[no-]ssl-verify` | Verify remote host SSL certificate with WinRM. |
+| **Escalation** |
+| `--run-as USER` | User to run as using privilege escalation. |
+| `--sudo-password [PASSWORD]` | Password for privilege escalation. <br> Omit the value to prompt for the password. |
+| **Run Context** |
+| `-c`, `--concurrency CONCURRENCY` | Maximum number of simultaneous connections. | 100 |
+| `--compile-concurrency CONCURRENCY` | Maximum number of simultaneous manifest block compiles. | Number of cores |
+| `-m`, `--modulepath FILEPATHS` | List of directories containing modules, separated by `:`. <br> Directories are case-sensitive. |
+| `--boltdir FILEPATH` | Specify what Boltdir to load config from. | Autodiscovered from current working directory. |
+| `--configfile FILEPATH` | Specify where to load config from. | `~/.puppetlabs/bolt/bolt.yaml` |
+| `-i`, `--inventoryfile FILEPATH` | Specify where to load inventory from. | `~/.puppetlabs/bolt/inventory.yaml` |
+| `--[no-]save-rerun` | Whether to update the rerun file after this command. |
+| **Transports** |
+| `--transport TRANSPORT` | Specify a default transport. <br> `ssh`, `winrm`, `pcp`, `local`, `docker`, `remote` |
+| `--connect-timeout TIMEOUT` | Connection timeout. | Varies |
+| `--[no-]tty` | Request a pseudo TTY on nodes that support it. |
+| **Display** |
+| `--format FORMAT` | Output format to use. <br> `human`, `json` |
+| `--[no-]color` | Whether to show output in color. |
+| `-v`, `--[no-]verbose` | Display verbose logging. |
+| `--trace` | Display error trace stacks. |
 
- `host-key-check` and `no-host-key-check` are options for the SSH transport.
 
- |
-|`--ssl`, `--no-ssl`| Do not require verification of new hosts in the `known_hosts` file.
+## `command run`
 
- `ssl` and `no-ssl` are options for WinRM.
+Run a command on remote targets.
 
- |
-| `--ssl-verify`, `--no-ssl-verify` | Do not verify remote host SSL certificate with WinRM
+### Usage
 
- `ssl-verify` and `no-ssl-verify` are options for WinRM.
+`bolt command run <COMMAND> <TARGETS>`
 
- |
+- Single quote the command if it contains spaces or special characters.
+- You must specify one of `--nodes`, `--targets`, `--query`, or `--rerun`.
 
-## Escalation options
+### Options
 
-|Option|Description|
-|------|-----------|
-| `--run-as` |User to run as using privilege escalation.|
-| `--sudo-password` |Password for privilege escalation. Omit the value to prompt for the password.|
+| Option | Description | Default |
+|--------|-------------|---------|
+| `-n`, `--nodes NODES` | Alias for `--targets`. |
+| `-t`, `--targets TARGETS` | Identifies the targets of command. |
+| `-q`, `--query QUERY` | Query PuppetDB to determine the targets. <br> Enter a comma-separated list of target URIs or group names. Or read a target list from an input file `@<file>` or stdin `-`. |
+| `--rerun FILTER` | Retry on nodes from the last run. <br> `all` runs on all targets from the last run. <br> `failure` runs on all targets that failed in the last run. <br> `success` runs on all targets that succeeded in the last run. |
+| `--description DESCRIPTION` | Description to use for the job. |
+| **Authentication** |
+| `-u`, `--user USER` | User to authenticate as. |
+| `-p`, `--password [PASSWORD]` | Password to authenticate with. <br> Omit the value to prompt for the password. |
+| `--private-key KEY` | Private SSH key to authenticate with. |
+| `--[no-]host-key-check` | Check host keys with SSH. |
+| `--[no-]ssl` | Use SSL with WinRM. |
+| `--[no-]ssl-verify` | Verify remote host SSL certificate with WinRM. |
+| **Escalation** |
+| `--run-as USER` | User to run as using privilege escalation. |
+| `--sudo-password [PASSWORD]` | Password for privilege escalation. <br> Omit the value to prompt for the password. |
+| **Run Context** |
+| `-c`, `--concurrency CONCURRENCY` | Maximum number of simultaneous connections. | 100 |
+| `-m`, `--modulepath FILEPATHS` | List of directories containing modules, separated by `:`. <br> Directories are case-sensitive. |
+| `--boltdir FILEPATH` | Specify what Boltdir to load config from. | Autodiscovered from current working directory. |
+| `--configfile FILEPATH` | Specify where to load config from. | `~/.puppetlabs/bolt/bolt.yaml` |
+| `-i`, `--inventoryfile FILEPATH` | Specify where to load inventory from. | `~/.puppetlabs/bolt/inventory.yaml` |
+| `--[no-]save-rerun` | Whether to update the rerun file after this command. |
+| **Transports** |
+| `--transport TRANSPORT` | Specify a default transport. <br> `ssh`, `winrm`, `pcp`, `local`, `docker`, `remote` |
+| `--connect-timeout TIMEOUT` | Connection timeout. | Varies |
+| `--[no-]tty` | Request a pseudo TTY on nodes that support it. |
+| **Display** |
+| `--format FORMAT` | Output format to use. <br> `human`, `json` |
+| `--[no-]color` | Whether to show output in color. |
+| `-v`, `--[no-]verbose` | Display verbose logging. |
+| `--trace` | Display error trace stacks. |
 
-## Run context options
 
-|Option|Description|
-|------|-----------|
-|`--concurrency`, `-c`|Maximum number of simultaneous connections \(default: 100\).|
-| `--modulepath`, `-m` |**Required for tasks and plans**. The path to the module containing the task. Separate multiple paths with a semicolon \(`;`\) on Windows or a colon \(`:`\) on all other platforms.|
-| `--configfile` |Specify where to load config from \(default: `bolt.yaml` inside the `Boltdir`\).|
-| `--boltdir` |Specify what Boltdir to load config from \(default: autodiscovered from current working dir\).|
-| `--inventoryfile`, `-i` |Specify where to load inventory from \(default: `inventory.yaml` inside the `Boltdir`\).|
-| `--save-rerun, --no-save-rerun` | Specify whether bolt should update the `.rerun.json` file (default: save-rerun). |
+## `file upload`
 
-## Transport options
+Upload a local file or directory.
 
-|Option|Description|
-|------|-----------|
-| `--transport` |Specifies the default transport for this command. To override, specify the transport for a given node, such as `ssh://linuxnode`.|
-| `--connect-timeout` |Connection timeout \(defaults vary\).|
-|`--tty`, `--no-tty`|Applicable to SSH transport only. Some commands, such as `sudo`, may require a pseudo TTY to execute. If so, specify `--tty`.|
-| `--tmpdir` | Determines the directory to upload and execute temporary files on the target.
+### Usage
 
- |
+`bolt file upload <SRC> <DEST> <TARGETS>`
 
-## Display options
+- You must specify one of `--nodes`, `--targets`, `--query`, or `--rerun`.
 
-|Option|Description|
-|------|-----------|
-| `--format` |Determines the output format to use: human readable or JSON.|
-|`--color`, `--no-color`|Whether to show output in color.|
-|`--help`, `-h`|Shows help for the `bolt` command.|
-| `--verbose`, `-v` |Shows verbose logging.|
-| `--debug` |Shows debug logging.|
-| `--version` |Shows the Bolt version.|
+### Options
 
+| Option | Description | Default |
+|--------|-------------|---------|
+| `-n`, `--nodes NODES` | Alias for `--targets`. |
+| `-t`, `--targets TARGETS` | Identifies the targets of command. |
+| `-q`, `--query QUERY` | Query PuppetDB to determine the targets. <br> Enter a comma-separated list of target URIs or group names. Or read a target list from an input file `@<file>` or stdin `-`. |
+| `--rerun FILTER` | Retry on nodes from the last run. <br> `all` runs on all targets from the last run. <br> `failure` runs on all targets that failed in the last run. <br> `success` runs on all targets that succeeded in the last run. |
+| `--description DESCRIPTION` | Description to use for the job. |
+| **Authentication** |
+| `-u`, `--user USER` | User to authenticate as. |
+| `-p`, `--password [PASSWORD]` | Password to authenticate with. <br> Omit the value to prompt for the password. |
+| `--private-key KEY` | Private SSH key to authenticate with. |
+| `--[no-]host-key-check` | Check host keys with SSH. |
+| `--[no-]ssl` | Use SSL with WinRM. |
+| `--[no-]ssl-verify` | Verify remote host SSL certificate with WinRM. |
+| **Escalation** |
+| `--run-as USER` | User to run as using privilege escalation. |
+| `--sudo-password [PASSWORD]` | Password for privilege escalation. <br> Omit the value to prompt for the password. |
+| **Run Context** |
+| `-c`, `--concurrency CONCURRENCY` | Maximum number of simultaneous connections. | 100 |
+| `-m`, `--modulepath FILEPATHS` | List of directories containing modules, separated by `:`. <br> Directories are case-sensitive. |
+| `--boltdir FILEPATH` | Specify what Boltdir to load config from. | Autodiscovered from current working directory. |
+| `--configfile FILEPATH` | Specify where to load config from. | `~/.puppetlabs/bolt/bolt.yaml` |
+| `-i`, `--inventoryfile FILEPATH` | Specify where to load inventory from. | `~/.puppetlabs/bolt/inventory.yaml` |
+| `--[no-]save-rerun` | Whether to update the rerun file after this command. |
+| **Transports** |
+| `--transport TRANSPORT` | Specify a default transport. <br> `ssh`, `winrm`, `pcp`, `local`, `docker`, `remote` |
+| `--connect-timeout TIMEOUT` | Connection timeout. | Varies |
+| `--[no-]tty` | Request a pseudo TTY on nodes that support it. |
+| `--tmpdir DIR` | The directory to upload and execute temporary files on the target. |
+| **Display** |
+| `--format FORMAT` | Output format to use. <br> `human`, `json` |
+| `--[no-]color` | Whether to show output in color. |
+| `-v`, `--[no-]verbose` | Display verbose logging. |
+| `--trace` | Display error trace stacks. |
+
+
+## `inventory show`
+
+Show the list of targets an action would run on.
+
+### Usage
+
+`bolt inventory show <TARGETS>`
+
+- You must specify one of `--nodes`, `--targets`, `--query`, or `--rerun`.
+
+### Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `-n`, `--nodes NODES` | Alias for `--targets`. |
+| `-t`, `--targets TARGETS` | Identifies the targets of command. |
+| `-q`, `--query QUERY` | Query PuppetDB to determine the targets. <br> Enter a comma-separated list of target URIs or group names. Or read a target list from an input file `@<file>` or stdin `-`. |
+| `--rerun FILTER` | Retry on nodes from the last run. <br> `all` runs on all targets from the last run. <br> `failure` runs on all targets that failed in the last run. <br> `success` runs on all targets that succeeded in the last run. |
+| **Run Context** |
+| `--boltdir FILEPATH` | Specify what Boltdir to load config from. | Autodiscovered from current working directory. |
+| `--configfile FILEPATH` | Specify where to load config from. | `~/.puppetlabs/bolt/bolt.yaml` |
+| `-i`, `--inventoryfile FILEPATH` | Specify where to load inventory from. | `~/.puppetlabs/bolt/inventory.yaml` |
+| **Display** |
+| `--format FORMAT` | Output format to use. <br> `human`, `json` |
+
+
+## `plan convert`
+
+Convert a YAML plan to a Puppet plan.
+
+### Usage
+
+`bolt plan convert <PLAN>`
+
+### Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| **Run Context** |
+| `-m`, `--modulepath FILEPATHS` | List of directories containing modules, separated by `:`. <br> Directories are case-sensitive. |
+| `--boltdir FILEPATH` | Specify what Boltdir to load config from. | Autodiscovered from current working directory. |
+| `--configfile FILEPATH` | Specify where to load config from. | `~/.puppetlabs/bolt/bolt.yaml` |
+
+
+## `plan run`
+
+Run a Puppet task plan on remote targets.
+
+### Usage
+
+`bolt plan run <PLAN> <TARGETS>`
+
+- Plan parameters are of the form `parameter=value`.
+- You must specify one of `--nodes`, `--targets`, `--query`, or `--rerun`.
+
+### Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `-n`, `--nodes NODES` | Alias for `--targets`. |
+| `-t`, `--targets TARGETS` | Identifies the targets of command. |
+| `-q`, `--query QUERY` | Query PuppetDB to determine the targets. <br> Enter a comma-separated list of target URIs or group names. Or read a target list from an input file `@<file>` or stdin `-`. |
+| `--rerun FILTER` | Retry on nodes from the last run. <br> `all` runs on all targets from the last run. <br> `failure` runs on all targets that failed in the last run. <br> `success` runs on all targets that succeeded in the last run. |
+| `--description DESCRIPTION` | Description to use for the job. |
+| `--params PARAMETERS` | Parameters to a task or plan as json, a json file `@<file>`, or on stdin `-`. |
+| **Authentication** |
+| `-u`, `--user USER` | User to authenticate as. |
+| `-p`, `--password [PASSWORD]` | Password to authenticate with. <br> Omit the value to prompt for the password. |
+| `--private-key KEY` | Private SSH key to authenticate with. |
+| `--[no-]host-key-check` | Check host keys with SSH. |
+| `--[no-]ssl` | Use SSL with WinRM. |
+| `--[no-]ssl-verify` | Verify remote host SSL certificate with WinRM. |
+| **Escalation** |
+| `--run-as USER` | User to run as using privilege escalation. |
+| `--sudo-password [PASSWORD]` | Password for privilege escalation. <br> Omit the value to prompt for the password. |
+| **Run Context** |
+| `-c`, `--concurrency CONCURRENCY` | Maximum number of simultaneous connections. | 100 |
+| `--compile-concurrency CONCURRENCY` | Maximum number of simultaneous manifest block compiles. | Number of cores |
+| `-m`, `--modulepath FILEPATHS` | List of directories containing modules, separated by `:`. <br> Directories are case-sensitive. |
+| `--boltdir FILEPATH` | Specify what Boltdir to load config from. | Autodiscovered from current working directory. |
+| `--configfile FILEPATH` | Specify where to load config from. | `~/.puppetlabs/bolt/bolt.yaml` |
+| `-i`, `--inventoryfile FILEPATH` | Specify where to load inventory from. | `~/.puppetlabs/bolt/inventory.yaml` |
+| `--[no-]save-rerun` | Whether to update the rerun file after this command. |
+| **Transports** |
+| `--transport TRANSPORT` | Specify a default transport. <br> `ssh`, `winrm`, `pcp`, `local`, `docker`, `remote` |
+| `--connect-timeout TIMEOUT` | Connection timeout. | Varies |
+| `--[no-]tty` | Request a pseudo TTY on nodes that support it. |
+| `--tmpdir DIR` | The directory to upload and execute temporary files on the target. |
+| **Display** |
+| `--format FORMAT` | Output format to use. <br> `human`, `json` |
+| `--[no-]color` | Whether to show output in color. |
+| `-v`, `--[no-]verbose` | Display verbose logging. |
+| `--trace` | Display error trace stacks. |
+
+
+## `plan show`
+
+Show a list of available plans or details for a specific plan.
+
+### Usage
+
+`bolt plan show [PLAN]`
+
+- Specify an available plan to show documentation for the plan.
+
+### Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| **Run Context** |
+| `-m`, `--modulepath FILEPATHS` | List of directories containing modules, separated by `:`. <br> Directories are case-sensitive. |
+| `--boltdir FILEPATH` | Specify what Boltdir to load config from. | Autodiscovered from current working directory. |
+| `--configfile FILEPATH` | Specify where to load config from. | `~/.puppetlabs/bolt/bolt.yaml` |
+
+
+## `puppetfile install`
+
+Install modules from a Puppetfile into a Boltdir.
+
+### Usage
+
+`bolt puppetfile install`
+
+- A file named `Puppetfile` must be present in the Boltdir.
+
+### Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| **Run Context** |
+| `-m`, `--modulepath FILEPATHS` | List of directories containing modules, separated by `:`. <br> Directories are case-sensitive. |
+| `--boltdir FILEPATH` | Specify what Boltdir to load config from. | Autodiscovered from current working directory. |
+| `--configfile FILEPATH` | Specify where to load config from. | `~/.puppetlabs/bolt/bolt.yaml` |
+
+
+## `puppetfile show-modules`
+
+List modules available to Bolt.
+
+### Usage
+
+`bolt puppetfile show-modules`
+
+### Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| **Run Context** |
+| `-m`, `--modulepath FILEPATHS` | List of directories containing modules, separated by `:`. <br> Directories are case-sensitive. |
+| `--boltdir FILEPATH` | Specify what Boltdir to load config from. | Autodiscovered from current working directory. |
+| `--configfile FILEPATH` | Specify where to load config from. | `~/.puppetlabs/bolt/bolt.yaml` |
+
+
+## `script run`
+
+Run a local script on remote targets.
+
+### Usage
+
+`bolt script run <SCRIPT> <TARGETS> [ARGS]`
+
+- You must specify one of `--nodes`, `--targets`, `--query`, or `--rerun`.
+
+### Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `-n`, `--nodes NODES` | Alias for `--targets`. |
+| `-t`, `--targets TARGETS` | Identifies the targets of command. |
+| `-q`, `--query QUERY` | Query PuppetDB to determine the targets. <br> Enter a comma-separated list of target URIs or group names. Or read a target list from an input file `@<file>` or stdin `-`. |
+| `--rerun FILTER` | Retry on nodes from the last run. <br> `all` runs on all targets from the last run. <br> `failure` runs on all targets that failed in the last run. <br> `success` runs on all targets that succeeded in the last run. |
+| `--description DESCRIPTION` | Description to use for the job. |
+| **Authentication** |
+| `-u`, `--user USER` | User to authenticate as. |
+| `-p`, `--password [PASSWORD]` | Password to authenticate with. <br> Omit the value to prompt for the password. |
+| `--private-key KEY` | Private SSH key to authenticate with. |
+| `--[no-]host-key-check` | Check host keys with SSH. |
+| `--[no-]ssl` | Use SSL with WinRM. |
+| `--[no-]ssl-verify` | Verify remote host SSL certificate with WinRM. |
+| **Escalation** |
+| `--run-as USER` | User to run as using privilege escalation. |
+| `--sudo-password [PASSWORD]` | Password for privilege escalation. <br> Omit the value to prompt for the password. |
+| **Run Context** |
+| `-c`, `--concurrency CONCURRENCY` | Maximum number of simultaneous connections. | 100 |
+| `-m`, `--modulepath FILEPATHS` | List of directories containing modules, separated by `:`. <br> Directories are case-sensitive. |
+| `--boltdir FILEPATH` | Specify what Boltdir to load config from. | Autodiscovered from current working directory. |
+| `--configfile FILEPATH` | Specify where to load config from. | `~/.puppetlabs/bolt/bolt.yaml` |
+| `-i`, `--inventoryfile FILEPATH` | Specify where to load inventory from. | `~/.puppetlabs/bolt/inventory.yaml` |
+| `--[no-]save-rerun` | Whether to update the rerun file after this command. |
+| **Transports** |
+| `--transport TRANSPORT` | Specify a default transport. <br> `ssh`, `winrm`, `pcp`, `local`, `docker`, `remote` |
+| `--connect-timeout TIMEOUT` | Connection timeout. | Varies |
+| `--[no-]tty` | Request a pseudo TTY on nodes that support it. |
+| `--tmpdir DIR` | The directory to upload and execute temporary files on the target. |
+| **Display** |
+| `--format FORMAT` | Output format to use. <br> `human`, `json` |
+| `--[no-]color` | Whether to show output in color. |
+| `-v`, `--[no-]verbose` | Display verbose logging. |
+| `--trace` | Display error trace stacks. |
+
+
+## `secret createkeys`
+
+Create new encryption keys.
+
+### Usage
+
+`bolt secret createkeys`
+
+- Keys are saved to the `keys` directory in the Boltdir.
+
+### Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| **Run Context** |
+| `--boltdir FILEPATH` | Specify what Boltdir to save keys to. | Autodiscovered from current working directory. |
+
+
+## `secret decrypt`
+
+Decrypt a value.
+
+### Usage
+
+`bolt secret decrypt <CIPHERTEXT>`
+
+### Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| **Run Context** |
+| `--boltdir FILEPATH` | Specify what Boltdir to load keys from. | Autodiscovered from current working directory. |
+
+
+## `secret encrypt`
+
+Encrypt a value.
+
+### Usage
+
+`bolt secret encrypt <PLAINTEXT>`
+
+### Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| **Run Context** |
+| `--boltdir FILEPATH` | Specify what Boltdir to load keys from. | Autodiscovered from current working directory. |
+
+
+## `task run`
+
+Run a Puppet task on remote targets.
+
+### Usage
+
+`bolt task run <TASK> <TARGETS>`
+
+- Task parameters are of the form `parameter=value`.
+- You must specify one of `--nodes`, `--targets`, `--query`, or `--rerun`.
+
+### Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `-n`, `--nodes NODES` | Alias for `--targets`. |
+| `-t`, `--targets TARGETS` | Identifies the targets of command. |
+| `-q`, `--query QUERY` | Query PuppetDB to determine the targets. <br> Enter a comma-separated list of target URIs or group names. Or read a target list from an input file `@<file>` or stdin `-`. |
+| `--rerun FILTER` | Retry on nodes from the last run. <br> `all` runs on all targets from the last run. <br> `failure` runs on all targets that failed in the last run. <br> `success` runs on all targets that succeeded in the last run. |
+| `--description DESCRIPTION` | Description to use for the job. |
+| `--params PARAMETERS` | Parameters to a task or plan as json, a json file `@<file>`, or on stdin `-`. |
+| **Authentication** |
+| `-u`, `--user USER` | User to authenticate as. |
+| `-p`, `--password [PASSWORD]` | Password to authenticate with. <br> Omit the value to prompt for the password. |
+| `--private-key KEY` | Private SSH key to authenticate with. |
+| `--[no-]host-key-check` | Check host keys with SSH. |
+| `--[no-]ssl` | Use SSL with WinRM. |
+| `--[no-]ssl-verify` | Verify remote host SSL certificate with WinRM. |
+| **Escalation** |
+| `--run-as USER` | User to run as using privilege escalation. |
+| `--sudo-password [PASSWORD]` | Password for privilege escalation. <br> Omit the value to prompt for the password. |
+| **Run Context** |
+| `-c`, `--concurrency CONCURRENCY` | Maximum number of simultaneous connections. | 100 |
+| `--compile-concurrency CONCURRENCY` | Maximum number of simultaneous manifest block compiles. | Number of cores |
+| `-m`, `--modulepath FILEPATHS` | List of directories containing modules, separated by `:`. <br> Directories are case-sensitive. |
+| `--boltdir FILEPATH` | Specify what Boltdir to load config from. | Autodiscovered from current working directory. |
+| `--configfile FILEPATH` | Specify where to load config from. | `~/.puppetlabs/bolt/bolt.yaml` |
+| `-i`, `--inventoryfile FILEPATH` | Specify where to load inventory from. | `~/.puppetlabs/bolt/inventory.yaml` |
+| `--[no-]save-rerun` | Whether to update the rerun file after this command. |
+| **Transports** |
+| `--transport TRANSPORT` | Specify a default transport. <br> `ssh`, `winrm`, `pcp`, `local`, `docker`, `remote` |
+| `--connect-timeout TIMEOUT` | Connection timeout. | Varies |
+| `--[no-]tty` | Request a pseudo TTY on nodes that support it. |
+| `--tmpdir DIR` | The directory to upload and execute temporary files on the target. |
+| **Display** |
+| `--format FORMAT` | Output format to use. <br> `human`, `json` |
+| `--[no-]color` | Whether to show output in color. |
+| `-v`, `--[no-]verbose` | Display verbose logging. |
+| `--trace` | Display error trace stacks. |
+
+
+## `task show`
+
+Show a list of available tasks or details for a specific task.
+
+### Usage
+
+`bolt task show [TASK]`
+
+- Specify an available task to show documentation for the task.
+
+### Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| **Run Context** |
+| `-m`, `--modulepath FILEPATHS` | List of directories containing modules, separated by `:`. <br> Directories are case-sensitive. |
+| `--boltdir FILEPATH` | Specify what Boltdir to load config from. | Autodiscovered from current working directory. |
+| `--configfile FILEPATH` | Specify where to load config from. | `~/.puppetlabs/bolt/bolt.yaml` |
