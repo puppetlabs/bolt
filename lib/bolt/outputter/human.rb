@@ -315,7 +315,7 @@ module Bolt
         targets = options[:targets].map(&:name)
         count = "#{targets.count} target#{'s' unless targets.count == 1}"
         @stream.puts targets.join("\n")
-        @stream.puts colorize(:green, count)
+        @stream.puts colorize(:green, count) if @verbose
       end
 
       # @param [Bolt::ResultSet] apply_result A ResultSet object representing the result of a `bolt apply`
