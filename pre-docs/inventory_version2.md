@@ -464,6 +464,67 @@ plugins:
     credentials: ~/alternate_path/credentials
 ```
 
+#### Azure
+
+The Azure plugin supports looking up virtual machines and virtual machine scale sets. It supports several fields:
+
+- `_plugin`: The value of `_plugin` must be `azure`
+- `resource_group`: The resource group to filter by (optional)
+- `scale_set`: The scale set to filter by (optional, requires that `resource_group` also be set)
+- `location`: The location to filter by (optional)
+- `tags`: A list of one or more tags to filter by (optional, tags are `name: value` pairs and instances must match all listed tags)
+
+Accessing Azure resources requires credentials for signing all API requests. Each credential can be set in the inventory config, Bolt config, or as an environment variable, and are searched in this order until a value is found.
+
+- `tenant_id`: The Azure AD tenant ID (defaults to `ENV['AZURE_TENANT_ID']`)
+- `client_id`: The Azure client application ID (defaults to `ENV['AZURE_CLIENT_ID']`)
+- `client_secret`: The Azure client application secret (defaults to `ENV['AZURE_CLIENT_SECRET']`)
+- `subscription_id`: The Azure subscription ID (defaults to `ENV['AZURE_SUBSCRIPTION_ID']`)
+
+You can consult the following documentation to obtain credentials:
+
+**Tenant ID:** https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-create-new-tenant
+
+**Client ID and secret:** https://docs.microsoft.com/en-us/rest/api/azure/#register-your-client-application-with-azure-ad
+
+**Subscription ID:** https://blogs.msdn.microsoft.com/mschray/2016/03/18/getting-your-azure-subscription-guid-new-portal/
+
+Bolt will only target virtual machines and virtual machine scale sets that have either a public IP address or fully qualified domain name set. By default, the `uri` of the target will be set to the public IP address and the `name` will be set to the fully qualified domain name.
+
+```yaml
+# inventory.yaml
+
+groups:
+  - name: azure-vms
+    targets:
+      - _plugin: azure
+        location: eastus
+        resource_group: bolt
+        tags:
+          foo: bar
+          baz: bak
+  - name: azure-scale-sets
+    targets:
+      - _plugin: azure
+        location: eastus2
+        resource_group: puppet
+        scale_set: bolt
+        tags:
+          foo: bar
+```
+
+```yaml
+# bolt.yaml
+
+plugins:
+  azure:
+    tenant_id: xxxx-xxx-xxxx
+    client_id: xxxx-xxx-xxxx
+    client_secret: xxxx-xxx-xxxx
+    subscription_id: xxxx-xxx-xxxx
+```
+
+
 #### Prompt plugin
 
 The 'prompt' plugin can be used to allow users to interactively enter sensitive configuration information on the CLI instead of storing that data in the inventoryfile. Data will only be looked up when the value is needed for the target and once the value has been stored it will be re-used for the rest of the Bolt run. The `prompt` plugin may only be used when nested under `config`. The prompt plugin can be used by replacing the config value with a hash that has the following keys:
