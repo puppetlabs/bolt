@@ -82,11 +82,22 @@ module Bolt
 
       # Uses the Terraform CLI to pull remote state files
       def load_remote_statefile(opts)
-        stdout_str, stderr_str, = Open3.capture3('terraform state pull', chdir: opts['dir'])
+        dir = File.expand_path(opts['dir'])
 
-        unless stderr_str.empty?
-          err = stdout_str.split("\n").first
-          msg = "Could not pull Terraform remote state file for #{opts['dir']}: #{err}"
+        begin
+          stdout_str, stderr_str, status = Open3.capture3('terraform state pull', chdir: dir)
+        rescue Errno::ENOENT
+          reason = if File.directory?(dir)
+                     "Could not find executable 'terraform'"
+                   else
+                     "Could not find directory '#{dir}'"
+                   end
+          raise Bolt::Error.new(reason, 'FILE_ERROR')
+        end
+
+        unless status.success?
+          err = stdout_str + stderr_str
+          msg = "Could not pull Terraform remote state file for #{opts['dir']}:\n#{err}"
           raise Bolt::Error.new(msg, 'bolt/terraform-state-error')
         end
 
