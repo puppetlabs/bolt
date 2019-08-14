@@ -28,8 +28,7 @@ module Bolt
       end
 
       def self.validate(options)
-        logger = Logging.logger[self]
-        validate_sudo_options(options, logger)
+        validate_sudo_options(options)
 
         host_key = options['host-key-check']
         unless !!host_key == host_key

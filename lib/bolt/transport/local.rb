@@ -12,8 +12,7 @@ module Bolt
       end
 
       def self.validate(options)
-        logger = Logging.logger[self]
-        validate_sudo_options(options, logger)
+        validate_sudo_options(options)
       end
 
       def with_connection(target, *_args)
