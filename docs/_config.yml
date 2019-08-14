@@ -1,4 +1,4 @@
-title: Bolt Hands-on Lab
+title: Bolt
 google_analytics: UA-120367942-3
 exclude: [vendor, Boltdir, acceptance, modules, .git, Gemfile, Gemfile.lock]
 
@@ -22,3 +22,6 @@ defaults:
     values:
       layout: post
       permalink: /:categories/:year-:month-:day-:title
+
+plugins:
+  - jekyll-feed
