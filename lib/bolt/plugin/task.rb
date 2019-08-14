@@ -86,6 +86,14 @@ module Bolt
 
         targets
       end
+
+      def puppet_library(opts, target, apply_prep)
+        params = opts['parameters'] || {}
+        task = apply_prep.get_task(opts['task'], params)
+        proc do
+          apply_prep.run_task([target], task, params).first
+        end
+      end
     end
   end
 end

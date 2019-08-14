@@ -50,6 +50,7 @@ describe Bolt::Inventory::Group2 do
       expect(group.target_data('target1')).to eq('config' => {},
                                                  'vars' => {},
                                                  'name' => nil,
+                                                 'plugin_hooks' => {},
                                                  'uri' => 'target1',
                                                  'facts' => {},
                                                  'features' => [],

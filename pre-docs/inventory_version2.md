@@ -230,6 +230,77 @@ targets = data[params['environment']][params['app']]
 json.dump({'targets': targets}, sys.stdout)
 ```
 
+##### Install library tasks
+
+To install a library on the remote system (the Puppet agent). This task
+will be executed when `apply_prep()` is called from a plan to provision
+targets.
+
+You can use an existing task for this, such as `puppet_agent::install` or `bootstrap::linux`:
+
+**bolt.yaml**
+```yaml
+plugin_hooks:
+  puppet_library:
+    plugin: task
+    task: puppet_agent::install
+    params:
+      version: 6.2.0
+      yum_source: yum.customurl.net
+```
+
+**bolt.yaml**
+```yaml
+plugin_hooks:
+  puppet_library:
+    plugin: task
+    task: bootstrap::linux
+    params:
+      master: mymaster.fqdn
+      environment: dev
+```
+
+For example, this task installs the Puppet agent from a custom repository, then
+sets some config and starts the agent service.
+
+**inventory.yaml**
+```yaml
+---
+version: 2
+groups:
+  - name: custom_nodes
+    nodes:
+      - foo
+      - bar
+    plugin_hooks:
+      puppet_library:
+        plugin: task
+        task: custom_agent::install
+        params:
+          version: 6.2.0
+```
+
+**site-modules/custom_agent/tasks/install.sh**
+```sh
+#!/bin/sh
+apt-get -y install wget
+wget http://my.custom.repo.net/puppetlabs-release-precise.deb
+dpkg -i puppetlabs-release-precise.deb
+apt-get update
+apt-get -y install puppet
+
+echo "[main]
+ssldir=/var/lib/puppet/ssl
+factpath=\$vardir/lib/facter
+server=$MASTER_HOSTNAME
+
+[master]
+ssl_client_header = SSL_CLIENT_S_DN
+ssl_client_verify_header = SSL_CLIENT_VERIFY" > /etc/puppet/puppet.conf
+
+puppet resource service puppet ensure=running enable=true
+```
+
 #### PuppetDB
 
 The PuppetDB plugin supports looking up target object from PuppetDB. It takes a

@@ -225,3 +225,25 @@ The `puppetfile` section configures how modules are retrieved when running `bolt
 `proxy`: The HTTP proxy to use for Git and Puppet Forge operations
 
 `forge`: A subsection which can have its own `proxy` setting to set an HTTP proxy for only Puppet Forge operations, and a `baseurl` setting to specify a different Forge host
+
+## Plugin hooks configuration options
+
+The `plugin_hooks` section allows you to configure what plugins a specific hook should use for a specific target. This section is a hash where keys are hook names, and values specify and configure the plugin to use. Currently there are two possible plugins: the `task` plugin runs your own custom task, and the `install_agent` plugin runs the `puppet_agent::install` task.
+
+For now, the only configurable plugin hook is `puppet_library`.
+
+```
+plugin_hooks:
+  puppet_library:
+    plugin: install_agent
+```
+
+```
+plugin_hooks:
+  puppet_library:
+    plugin: task
+    task: 'bootstrap'
+    params:
+      master: 'puppet.example.com'
+      cacert_content: <cert>
+```

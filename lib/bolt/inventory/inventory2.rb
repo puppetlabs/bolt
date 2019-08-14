@@ -12,16 +12,22 @@ module Bolt
         end
       end
 
-      def initialize(data, config = nil, plugins: nil, target_vars: {}, target_facts: {}, target_features: {})
+      attr_reader :plugins, :config
+
+      def initialize(data, config = nil, plugins: nil, target_vars: {},
+                     target_facts: {}, target_features: {},
+                     target_plugin_hooks: {})
         @logger = Logging.logger[self]
         # Config is saved to add config options to targets
         @config = config || Bolt::Config.default
         @data = data || {}
         @groups = Group2.new(@data.merge('name' => 'all'), plugins)
+        @plugins = plugins
         @group_lookup = {}
         @target_vars = target_vars
         @target_facts = target_facts
         @target_features = target_features
+        @target_plugin_hooks = target_plugin_hooks
         @groups.resolve_aliases(@groups.target_aliases, @groups.target_names)
         collect_groups
       end
@@ -103,6 +109,10 @@ module Bolt
         @target_features[target.name] || Set.new
       end
 
+      def plugin_hooks(target)
+        @target_plugin_hooks[target.name] || {}
+      end
+
       def data_hash
         {
           data: {},
@@ -153,6 +163,9 @@ module Bolt
         set_vars_from_hash(target.name, data['vars']) unless @target_vars[target.name]
         set_facts(target.name, data['facts']) unless @target_facts[target.name]
         data['features']&.each { |feature| set_feature(target, feature) } unless @target_features[target.name]
+        unless @target_plugin_hooks[target.name]
+          set_plugin_hooks(target.name, @config.plugin_hooks.merge(data['plugin_hooks'] || {}))
+        end
         data['config'] = config_plugin(data['config'])
 
         # Use Config object to ensure config section is treated consistently with config file
@@ -234,6 +247,14 @@ module Bolt
       end
       private :set_facts
 
+      def set_plugin_hooks(tname, hash)
+        if hash
+          @target_plugin_hooks[tname] ||= {}
+          @target_plugin_hooks[tname].merge!(hash)
+        end
+      end
+      private :set_plugin_hooks
+
       def add_target(current_group, target, desired_group, track = { 'all' => nil })
         if current_group.name == desired_group
           # Group to add to is found
@@ -246,13 +267,21 @@ module Bolt
           # Inherit facts, vars, and features from hierarchy
           current_group_data = { facts: current_group.facts,
                                  vars: current_group.vars,
-                                 features: current_group.features }
+                                 features: current_group.features,
+                                 plugin_hooks: current_group.plugin_hooks }
           data = inherit_data(track, current_group.name, current_group_data)
           set_facts(t_name, @target_facts[t_name] ? data[:facts].merge(@target_facts[t_name]) : data[:facts])
           set_vars_from_hash(t_name, @target_vars[t_name] ? data[:vars].merge(@target_vars[t_name]) : data[:vars])
           data[:features].each do |feature|
             set_feature(target, feature)
           end
+          hook_data = @config.plugin_hooks.merge(data[:plugin_hooks])
+          hash = if @target_plugin_hooks[t_name]
+                   hook_data.merge(@target_plugin_hooks[t_name])
+                 else
+                   hook_data
+                 end
+          set_plugin_hooks(t_name, hash)
           return true
         end
         # Recurse on children Groups if not desired_group
@@ -268,6 +297,7 @@ module Bolt
           data[:facts] = track[name].facts.merge(data[:facts])
           data[:vars] = track[name].vars.merge(data[:vars])
           data[:features].concat(track[name].features)
+          data[:plugin_hooks] = track[name].plugin_hooks.merge(data[:plugin_hooks])
           inherit_data(track, track[name].name, data)
         end
         data

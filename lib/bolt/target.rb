@@ -88,6 +88,14 @@ module Bolt
       end
     end
 
+    def plugin_hooks
+      if @inventory
+        @inventory.plugin_hooks(self)
+      else
+        {}
+      end
+    end
+
     # TODO: WHAT does equality mean here?
     # should we just compare names? is there something else that is meaninful?
     def eql?(other)

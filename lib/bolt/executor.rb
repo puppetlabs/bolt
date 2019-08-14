@@ -16,12 +16,9 @@ module Bolt
     attr_reader :noop, :transports
     attr_accessor :run_as
 
-    # FIXME: There must be a better way
-    # https://makandracards.com/makandra/36011-ruby-do-not-mix-optional-and-keyword-arguments
     def initialize(concurrency = 1,
                    analytics = Bolt::Analytics::NoopClient.new,
                    noop = false)
-
       # lazy-load expensive gem code
       require 'concurrent'
 
