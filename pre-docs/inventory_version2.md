@@ -312,12 +312,13 @@ groups:
 The Terraform plugin supports looking up target object from a Terraform state
 file. It accepts several fields:
 
-`dir`: The directory from which to load Terraform state
+`dir`: The directory containing either a local Terraform state file or Terraform configuration to read remote state from
 `resource_type`: The Terraform resources to match, as a regular expression
 `uri`: The property of the Terraform resource to use as the target URI (optional)
-`statefile`: The name of the Terraform state file to load within `dir` (optional, defaults to `terraform.tfstate`)
+`statefile`: The name of the local Terraform state file to load, relative to `dir` (optional, defaults to `terraform.tfstate`)
 `name`: The property of the Terraform resource to use as the target name (optional)
 `config`: A Bolt config map where each value is the Terraform property to use for that config setting
+`backend`: The type of backend to load the state from, either `remote` or `local` (optional, defaults to `local`)
 
 One of `uri` or `name` is required. If only `uri` is set, then the value of `uri` will be used as the `name`.
 

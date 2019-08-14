@@ -5,6 +5,10 @@ require 'json'
 module Bolt
   class Plugin
     class Terraform
+      KNOWN_KEYS = Set['_plugin', 'dir', 'resource_type', 'uri', 'name', 'statefile',
+                       'config', 'backend']
+      REQ_KEYS = Set['dir', 'resource_type']
+
       def initialize
         @logger = Logging.logger[self]
       end
@@ -21,7 +25,25 @@ module Bolt
         @logger.warn("Could not find property #{property} of terraform resource #{name}")
       end
 
+      # Make sure no unexpected keys are in the inventory config and
+      # that required keys are present
+      def validate_options(opts)
+        opt_keys = opts.keys.to_set
+
+        unless KNOWN_KEYS.superset?(opt_keys)
+          keys = opt_keys - KNOWN_KEYS
+          raise Bolt::ValidationError, "Unexpected key(s) in inventory config: #{keys.to_a.inspect}"
+        end
+
+        unless opt_keys.superset?(REQ_KEYS)
+          keys = REQ_KEYS - opt_keys
+          raise Bolt::ValidationError, "Expected key(s) in inventory config: #{keys.to_a.inspect}"
+        end
+      end
+
       def inventory_targets(opts)
+        validate_options(opts)
+
         state = load_statefile(opts)
 
         resources = extract_resources(state)
@@ -49,11 +71,43 @@ module Bolt
       end
 
       def load_statefile(opts)
+        statefile = if opts['backend'] == 'remote'
+                      load_remote_statefile(opts)
+                    else
+                      load_local_statefile(opts)
+                    end
+
+        JSON.parse(statefile)
+      end
+
+      # Uses the Terraform CLI to pull remote state files
+      def load_remote_statefile(opts)
+        dir = File.expand_path(opts['dir'])
+
+        begin
+          stdout_str, stderr_str, status = Open3.capture3('terraform state pull', chdir: dir)
+        rescue Errno::ENOENT
+          reason = if File.directory?(dir)
+                     "Could not find executable 'terraform'"
+                   else
+                     "Could not find directory '#{dir}'"
+                   end
+          raise Bolt::Error.new(reason, 'FILE_ERROR')
+        end
+
+        unless status.success?
+          err = stdout_str + stderr_str
+          msg = "Could not pull Terraform remote state file for #{opts['dir']}:\n#{err}"
+          raise Bolt::Error.new(msg, 'bolt/terraform-state-error')
+        end
+
+        stdout_str
+      end
+
+      def load_local_statefile(opts)
         dir = opts['dir']
         filename = opts.fetch('statefile', 'terraform.tfstate')
-        statefile = File.expand_path(File.join(dir, filename))
-
-        JSON.parse(File.read(statefile))
+        File.read(File.expand_path(File.join(dir, filename)))
       rescue StandardError => e
         raise Bolt::FileError.new("Could not load Terraform state file #{filename}: #{e}", filename)
       end
@@ -68,8 +122,10 @@ module Bolt
             resource_set['instances'].map do |resource|
               instance_name = prefix
               instance_name += ".#{resource['index_key']}" if resource['index_key']
-
-              [instance_name, resource['attributes']]
+              # When using `terraform state pull` with terraform >= 0.12 version 3 statefiles
+              # Will be converted to version 4. When converted attributes is converted to attributes_flat
+              attributes = resource['attributes'] || resource['attributes_flat']
+              [instance_name, attributes]
             end
           end
         else

@@ -27,6 +27,11 @@ describe Bolt::Plugin::Terraform do
     expect(state).to eq(JSON.parse(File.read(statefile)))
   end
 
+  it 'fails when config is missing a required key' do
+    opts = {}
+    expect { subject.validate_options(opts) }.to raise_error(/Expected key/)
+  end
+
   shared_examples('loading terraform targets') do
     let(:opts) do
       { 'dir' => terraform_dir,
