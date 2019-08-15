@@ -116,9 +116,19 @@ module Bolt
               end
 
               remote_task_path = conn.write_executable(task_dir, executable)
-              execute_options[:stdin] = stdin
+
+              # Avoid the horrors of passing data on stdin via a tty on multiple platforms
+              # by writing a wrapper script that directs stdin to the task.
+              if stdin && target.options['tty']
+                wrapper = make_wrapper_stringio(remote_task_path, stdin, execute_options[:interpreter])
+                execute_options.delete(:interpreter)
+                execute_options[:wrapper] = true
+                remote_task_path = conn.write_executable(dir, wrapper, 'wrapper.sh')
+              end
+
               dir.chown(conn.run_as)
 
+              execute_options[:stdin] = stdin
               execute_options[:sudoable] = true if conn.run_as
               output = conn.execute(remote_task_path, execute_options)
             end
@@ -127,6 +137,24 @@ module Bolt
                                   output.exit_code,
                                   task.name)
           end
+        end
+      end
+
+      def make_wrapper_stringio(task_path, stdin, interpreter = nil)
+        if interpreter
+          StringIO.new(<<~SCRIPT)
+            #!/bin/sh
+            '#{interpreter}' '#{task_path}' <<'EOF'
+            #{stdin}
+            EOF
+            SCRIPT
+        else
+          StringIO.new(<<~SCRIPT)
+            #!/bin/sh
+            '#{task_path}' <<'EOF'
+            #{stdin}
+            EOF
+            SCRIPT
         end
       end
     end

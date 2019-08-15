@@ -131,7 +131,7 @@ module Bolt
             else
               sudo_str = Shellwords.shelljoin(@target.options['run-as-command'] + [run_as])
             end
-            command_str = build_sudoable_command_str(command_str, sudo_str, @sudo_id, options[:stdin])
+            command_str = build_sudoable_command_str(command_str, sudo_str, @sudo_id, options)
           end
 
           command_arr = options[:environment].nil? ? [command_str] : [options[:environment], command_str]

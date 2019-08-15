@@ -139,7 +139,7 @@ module Bolt
         def handled_sudo(channel, data, stdin)
           if data.lines.include?(Sudoable.sudo_prompt)
             if target.options['sudo-password']
-              channel.send_data "#{target.options['sudo-password']}\n"
+              channel.send_data("#{target.options['sudo-password']}\n")
               channel.wait
               return true
             else
@@ -152,7 +152,7 @@ module Bolt
             end
           elsif data =~ /^#{@sudo_id}/
             if stdin
-              channel.send_data "#{stdin}\n"
+              channel.send_data(stdin)
               channel.eof!
             end
             return true
@@ -188,7 +188,7 @@ module Bolt
             else
               sudo_str = Shellwords.shelljoin(@target.options['run-as-command'] + [run_as])
             end
-            command_str = build_sudoable_command_str(command_str, sudo_str, @sudo_id, options[:stdin])
+            command_str = build_sudoable_command_str(command_str, sudo_str, @sudo_id, options)
           end
 
           # Including the environment declarations in the shelljoin will escape
@@ -231,7 +231,8 @@ module Bolt
               channel.on_request("exit-status") do |_, data|
                 result_output.exit_code = data.read_long
               end
-              if options[:stdin] && !use_sudo
+              # A wrapper is used to direct stdin when elevating privilage or using tty
+              if options[:stdin] && !use_sudo && !options[:wrapper]
                 channel.send_data(options[:stdin])
                 channel.eof!
               end
