@@ -347,6 +347,34 @@ get_resources('target1,target2', [Package, File[/etc/puppetlabs]])
 ```
 
 
+## get_target
+
+Get a single target from inventory if it exists, otherwise create a new Target.
+
+**NOTE:** Calling `get_target` inside an `apply` block with a
+version 2 inventory creates a new Target object.
+`get_target('all')` returns an empty array.
+**NOTE:** Only compatible with inventory v2
+
+
+```
+get_target(Boltlib::TargetSpec $name)
+```
+
+*Returns:* `Target` A single target, either new or from inventory.
+
+* **name** `Boltlib::TargetSpec` A Target name.
+
+**Example:** Create a new Target from a URI
+```
+get_target('winrm://host2:54321')
+```
+**Example:** Get an existing Target from inventory
+```
+get_target('existing-target')
+```
+
+
 ## get_targets
 
 Parses common ways of referring to targets and returns an array of Targets.
@@ -634,6 +662,38 @@ run_task('facts', $targets, 'Gather OS facts')
 ```
 
 
+## set_config
+
+Set configuration options on a target
+
+**NOTE:** Not available in apply block
+**NOTE:** Only compatible with inventory v2
+
+
+```
+set_config(Target $target, Variant[String, Array[String]] $key_or_key_path, Any $value)
+```
+
+*Returns:* `Target` The Target with the updated config
+
+* **target** `Target` The Target object to configure. See [`get_targets`](#get_targets).
+* **key_or_key_path** `Variant[String, Array[String]]` The configuration setting to update.
+* **value** `Any` The configuration value
+
+**Example:** Set the transport for a target
+```
+set_config($target, 'transport', 'ssh')
+```
+**Example:** Set the ssh password
+```
+set_config($target, ['ssh', 'password'], 'secret')
+```
+**Example:** Overwrite ssh config
+```
+set_config($target, 'ssh', { user => 'me', password => 'secret' })
+```
+
+
 ## set_feature
 
 Sets a particular feature to present on a target.
@@ -651,7 +711,7 @@ Currently supported features are
 set_feature(Target $target, String $feature, Optional[Boolean] $value)
 ```
 
-*Returns:* `Any` The target with the updated feature
+*Returns:* `Target` The target with the updated feature
 
 * **target** `Target` The Target object to add features to. See [`get_targets`](#get_targets).
 * **feature** `String` The string identifying the feature.
@@ -674,7 +734,7 @@ Sets a variable { key => value } for a target.
 set_var(Target $target, String $key, Data $value)
 ```
 
-*Returns:* `Undef` 
+*Returns:* `Target` The target with the updated feature
 
 * **target** `Target` The Target object to set the variable for. See [`get_targets`](#get_targets).
 * **key** `String` The key for the variable.

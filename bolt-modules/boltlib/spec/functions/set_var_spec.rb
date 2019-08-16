@@ -14,13 +14,14 @@ describe 'set_var' do
   around(:each) do |example|
     Puppet[:tasks] = tasks_enabled
     Puppet.override(bolt_executor: executor, bolt_inventory: inventory) do
+      inventory.stubs(:version).returns(1)
       example.run
     end
   end
 
   it 'should set a variable on a target' do
-    inventory.expects(:set_var).with(target, 'a', 'b').returns(nil)
-    is_expected.to run.with_params(target, 'a', 'b').and_return(nil)
+    inventory.expects(:set_var).with(target, 'a' => 'b').returns(target)
+    is_expected.to run.with_params(target, 'a', 'b').and_return(target)
   end
 
   it 'errors when passed invalid data types' do
@@ -31,9 +32,9 @@ describe 'set_var' do
 
   it 'reports the call to analytics' do
     executor.expects(:report_function_call).with('set_var')
-    inventory.expects(:set_var).with(target, 'a', 'b').returns(nil)
+    inventory.expects(:set_var).with(target, 'a' => 'b').returns(target)
 
-    is_expected.to run.with_params(target, 'a', 'b').and_return(nil)
+    is_expected.to run.with_params(target, 'a', 'b').and_return(target)
   end
 
   context 'without tasks enabled' do

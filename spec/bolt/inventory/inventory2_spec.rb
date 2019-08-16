@@ -8,10 +8,6 @@ require 'bolt/plugin'
 describe Bolt::Inventory::Inventory2 do
   include BoltSpec::Config
 
-  def make_targets(names)
-    names.map { |n| Bolt::Target.new(n) }
-  end
-
   def get_target(inventory, name, alia = nil)
     targets = inventory.get_targets(alia || name)
     expect(targets.size).to eq(1)
@@ -156,7 +152,7 @@ describe Bolt::Inventory::Inventory2 do
             'config' => {
               'ssh' => {
                 'host-key-check' => false,
-                'port' => '2223'
+                'port' => 2223
               }
             } }
         ]
@@ -218,7 +214,8 @@ describe Bolt::Inventory::Inventory2 do
       it 'finds targets in a subgroup' do
         inventory = Bolt::Inventory::Inventory2.new(data)
         targets = inventory.get_targets('group2')
-        expect(targets).to eq(make_targets(%w[target6 target7 ssh://target8 target9]))
+        target_names = targets.map(&:name)
+        expect(target_names).to eq(%w[target6 target7 ssh://target8 target9])
       end
     end
 
@@ -268,22 +265,36 @@ describe Bolt::Inventory::Inventory2 do
 
         it 'should parse a single target URI' do
           name = 'notarget'
-          expect(inventory.get_targets(name)).to eq(make_targets([name]))
+          targets = inventory.get_targets(name).map(&:uri)
+          expect(targets).to eq([name])
         end
 
         it 'should parse an array of target URIs' do
           names = ['pcp://a', 'winrm://b', 'c']
-          expect(inventory.get_targets(names)).to eq(make_targets(names))
+          targets = inventory.get_targets(names).map(&:uri)
+          expect(targets).to eq(names)
         end
 
         it 'should parse a nested array of target URIs and Targets' do
-          names = [['a'], Bolt::Target.new('b'), ['c', 'ssh://d']]
-          expect(inventory.get_targets(names)).to eq(make_targets(['a', 'b', 'c', 'ssh://d']))
+          names = [['a'], inventory.get_target('b'), ['c', 'ssh://d']]
+          uris = ['a', 'b', 'c', 'ssh://d']
+          targets = inventory.get_targets(names).map(&:uri)
+          expect(targets).to eq(uris)
         end
 
         it 'should split a comma-separated list of target URIs' do
-          ts = make_targets(['ssh://a', 'winrm://b:5000', 'u:p@c'])
-          expect(inventory.get_targets('ssh://a, winrm://b:5000, u:p@c')).to eq(ts)
+          ts = ['ssh://a', 'winrm://b:5000', 'u:p@c']
+          names = 'ssh://a, winrm://b:5000, u:p@c'
+          targets = inventory.get_targets(names).map(&:uri)
+          expect(targets).to eq(ts)
+        end
+
+        it 'should always add new targets to the `all` group' do
+          ts = ['ssh://a', 'winrm://b:5000', 'u:p@c']
+          names = 'ssh://a, winrm://b:5000, u:p@c'
+          inventory.get_targets(names)
+          targets = inventory.get_targets(names).map(&:uri)
+          expect(targets).to eq(ts)
         end
 
         it 'should fail for unknown protocols' do
@@ -294,20 +305,17 @@ describe Bolt::Inventory::Inventory2 do
       end
 
       context 'non-empty inventory' do
-        let(:inventory) {
-          inv = Bolt::Inventory::Inventory2.new(data)
-          inv
-        }
+        let(:inventory) { Bolt::Inventory::Inventory2.new(data) }
 
         it 'should parse an array of target URI and group name' do
-          targets = inventory.get_targets(%w[a group1])
-          expect(targets).to eq(make_targets(%w[a target4 target5 target6 target7]))
+          targets = inventory.get_targets(%w[a group1]).map(&:name)
+          expect(targets).to eq(%w[a target4 target5 target6 target7])
         end
 
         it 'should split a comma-separated list of target URI and group name' do
           matched_targets = %w[target4 target5 target6 target7 ssh://target8]
-          targets = inventory.get_targets('group1,ssh://target8')
-          expect(targets).to eq(make_targets(matched_targets))
+          targets = inventory.get_targets('group1,ssh://target8').map(&:name)
+          expect(targets).to eq(matched_targets)
         end
 
         it 'should match wildcard selectors' do
@@ -347,11 +355,12 @@ describe Bolt::Inventory::Inventory2 do
         end
 
         it 'should use values from matching groups' do
-          expect(get_target(inventory, 'ssh://target8').port).to eq('2223')
+          expect(get_target(inventory, 'ssh://target8').port).to eq(2223)
         end
 
         it 'should only return config for exact matches' do
-          expect(inventory.get_targets('target8')).to eq(make_targets(['target8']))
+          target_names = inventory.get_targets('target8').map(&:name)
+          expect(target_names).to eq(['target8'])
         end
       end
 
@@ -389,13 +398,13 @@ describe Bolt::Inventory::Inventory2 do
         it 'should return config for the target' do
           target = get_target(inventory, 'target3')
           expect(target.options).to eq(ssh_target_option_defaults.merge('port' => '2224',
-                                                                        'name' => 'target3',
-                                                                        "load-config" => true))
+                                                                        'load-config' => true))
           expect(target.port).to eq('2224')
         end
 
         it 'should return the raw target for an unknown target' do
-          expect(inventory.get_targets('target5')).to eq(make_targets(['target5']))
+          targets = inventory.get_targets('target5').map(&:uri)
+          expect(targets).to eq(['target5'])
         end
       end
 
@@ -683,6 +692,326 @@ describe Bolt::Inventory::Inventory2 do
         end
       end
     end
+
+    describe 'get_target' do
+      context 'empty inventory' do
+        let(:inventory) { Bolt::Inventory::Inventory2.new({}, config) }
+
+        it 'should parse a single target URI' do
+          name = 'notarget'
+          target = inventory.get_target(name)
+          expect(target.name).to eq(name)
+        end
+
+        it 'should error when an array of targets is requested' do
+          names = ['pcp://a', 'winrm://b', 'c']
+          expect {
+            inventory.get_target(names)
+          }.to raise_error(Bolt::Inventory::ValidationError, "'#{names}' refers to 3 targets")
+        end
+
+        it 'should fail for unknown protocols' do
+          expect {
+            inventory.get_target('z://foo')
+          }.to raise_error(Bolt::UnknownTransportError, %r{Unknown transport z found for z://foo})
+        end
+      end
+
+      context 'non-empty inventory' do
+        let(:inventory) { Bolt::Inventory::Inventory2.new(data) }
+
+        it 'a target that does not exists in inventory is created and added to the all group' do
+          existing_target_names = inventory.get_targets('all').map(&:name)
+          new_target = inventory.get_target('new')
+          updated_target_names = inventory.get_targets('all').map(&:name)
+          expect(new_target.name).to eq('new')
+          expect(updated_target_names - existing_target_names).to eq(%w[new])
+        end
+
+        it 'retrieves an existing target from inventory with its existing data' do
+          existing_target_name = 'target7'
+          existing_target = inventory.get_target(existing_target_name)
+          expect(existing_target.name).to eq(existing_target_name)
+          expect(existing_target.options['port']).to eq(2223)
+        end
+
+        it 'should match wildcard selectors' do
+          existing_target_name = 'target7'
+          target = inventory.get_target('*7')
+          expect(target.name).to eq(existing_target_name)
+        end
+      end
+
+      context 'with data in the group' do
+        let(:inventory) { Bolt::Inventory::Inventory2.new(data) }
+
+        it 'should use value from lowest target definition' do
+          expect(inventory.get_target('target4').user).to eq('me')
+        end
+
+        it 'should use values from the left most group' do
+          expect(inventory.get_target('target4').options).to include('host-key-check' => true)
+        end
+
+        it 'should include values from parents' do
+          expect(inventory.get_target('target4').port).to eq('2222')
+        end
+
+        it 'should use values from the first group' do
+          expect(inventory.get_target('target6').options).to include('host-key-check' => true)
+        end
+
+        it 'should prefer values from a target over an earlier group' do
+          expect(inventory.get_target('target6').user).to eq('someone')
+        end
+
+        it 'should use values from matching groups' do
+          expect(inventory.get_target('ssh://target8').port).to eq(2223)
+        end
+      end
+
+      context 'with targets at the top level' do
+        let(:data) {
+          {
+            'name' => 'group1',
+            'targets' => [
+              'target1',
+              { 'uri' => 'target2' },
+              { 'uri' => 'target3',
+                'config' => {
+                  'ssh' => {
+                    'data' => true,
+                    'port' => '2224'
+                  }
+                } }
+            ]
+          }
+        }
+        let(:inventory) { Bolt::Inventory::Inventory2.new(data) }
+
+        it 'should return {} for a string target' do
+          target = inventory.get_target('target1')
+          expect(target.options).to include(ssh_target_option_defaults)
+          expect(target.config).to eq({})
+        end
+
+        it 'should return {} for a hash target with no config' do
+          target = inventory.get_target('target2')
+          expect(target.options).to include(ssh_target_option_defaults)
+          expect(target.config).to eq({})
+        end
+
+        it 'should return config for the target' do
+          target = inventory.get_target('target3')
+          expect(target.options).to eq(ssh_target_option_defaults.merge('port' => '2224',
+                                                                        "load-config" => true))
+          expect(target.port).to eq('2224')
+          expect(target.config).to eq("ssh" => { "data" => true, "port" => "2224" })
+        end
+      end
+
+      context 'with simple data in the group' do
+        let(:data) {
+          {
+            'targets' => [
+              'target1',
+              { 'name' => 'target2' },
+              { 'name' => 'target3',
+                'config' => {
+                  'ssh' => {
+                    'user' => 'me'
+                  }
+                } }
+            ],
+            'config' => {
+              'ssh' => {
+                'user' => 'you',
+                'host-key-check' => false
+              }
+            }
+          }
+        }
+        let(:inventory) { Bolt::Inventory::Inventory2.new(data) }
+
+        it 'should return group config for string targets' do
+          target = inventory.get_target('target1')
+          expect(target.options).to include('host-key-check' => false)
+          expect(target.user).to eq('you')
+          expect(target.config).to eq("ssh" => { "user" => "you", "host-key-check" => false })
+        end
+
+        it 'should return group config for hash targets' do
+          target = inventory.get_target('target2')
+          expect(target.options).to include('host-key-check' => false)
+          expect(target.user).to eq('you')
+          expect(target.config).to eq("ssh" => { "user" => "you", "host-key-check" => false })
+        end
+
+        it 'should merge config for from targets' do
+          target = inventory.get_target('target3')
+          expect(target.options).to include('host-key-check' => false)
+          expect(target.user).to eq('me')
+          expect(target.config).to eq("ssh" => { "user" => "me", "host-key-check" => false })
+        end
+      end
+
+      context 'with aliases' do
+        let(:data) {
+          {
+            'targets' => [
+              'target1',
+              { 'name' => 'target2', 'alias' => 'alias1' },
+              { 'name' => 'target3',
+                'alias' => %w[alias2 alias3],
+                'config' => {
+                  'ssh' => {
+                    'user' => 'me'
+                  }
+                } }
+            ],
+            'groups' => [
+              { 'name' => 'group1', 'targets' => %w[target1] }
+            ],
+            'config' => {
+              'ssh' => {
+                'user' => 'you',
+                'host-key-check' => false
+              }
+            }
+          }
+        }
+        let(:inventory) { Bolt::Inventory::Inventory2.new(data) }
+
+        it 'should return group config for an alias' do
+          target = inventory.get_target('alias1')
+          expect(target.options).to include('host-key-check' => false)
+          expect(target.user).to eq('you')
+          expect(target.config).to eq("ssh" => { "user" => "you", "host-key-check" => false })
+        end
+
+        it 'should merge config from targets' do
+          target = inventory.get_target('alias3')
+          expect(target.options).to include('host-key-check' => false)
+          expect(target.config).to eq("ssh" => { "user" => "me", "host-key-check" => false })
+        end
+
+        it 'should resolve target labels as long as a single target is returned' do
+          target = inventory.get_target('group1')
+          expect(target.name).to eq('target1')
+          expect(target.user).to eq('you')
+          expect(target.config).to eq("ssh" => { "user" => "you", "host-key-check" => false })
+        end
+      end
+
+      context 'with all options in the config' do
+        def common_data(transport)
+          {
+            'user' => 'me' + transport,
+            'password' => 'you' + transport,
+            'port' => '12345' + transport,
+            'private-key' => 'anything',
+            'ssl' => false,
+            'ssl-verify' => false,
+            'host-key-check' => false,
+            'connect-timeout' => transport.size,
+            'tmpdir' => '/' + transport,
+            'run-as' => 'root',
+            'tty' => true,
+            'sudo-password' => 'nothing',
+            'extensions' => '.py',
+            'service-url' => 'https://master',
+            'cacert' => transport + '.pem',
+            'token-file' => 'token',
+            'task-environment' => 'prod'
+          }
+        end
+
+        let(:data) {
+          {
+            'targets' => ['ssh://target', 'winrm://target', 'pcp://target', 'target'],
+            'config' => {
+              'transport' => 'winrm',
+              'modulepath' => 'nonsense',
+              'ssh' => common_data('ssh'),
+              'winrm' => common_data('winrm'),
+              'pcp' => common_data('pcp')
+            }
+          }
+        }
+        let(:conf) { Bolt::Config.default }
+        let(:inventory) { Bolt::Inventory::Inventory2.new(data, conf) }
+
+        it 'should not modify existing config' do
+          inventory.get_target('ssh://target')
+          expect(conf.transport).to eq('ssh')
+          expect(conf.transports[:ssh]['load-config']).to be true
+          expect(conf.transports[:winrm]['ssl']).to be true
+          expect(conf.transports[:winrm]['ssl-verify']).to be true
+        end
+
+        it 'uses the configured transport' do
+          target = inventory.get_target('target')
+          expect(target.protocol).to eq('winrm')
+          expect(target.config).to eq(data['config'])
+        end
+
+        it 'only uses configured options for ssh' do
+          target = inventory.get_target('ssh://target')
+          expect(target.protocol).to eq('ssh')
+          expect(target.user).to eq('messh')
+          expect(target.password).to eq('youssh')
+          expect(target.port).to eq('12345ssh')
+          expect(target.options).to eq(
+            'connect-timeout' => 3,
+            'disconnect-timeout' => 5,
+            'tty' => true,
+            'host-key-check' => false,
+            'private-key' => "anything",
+            'tmpdir' => "/ssh",
+            'run-as' => "root",
+            'sudo-password' => "nothing",
+            'password' => 'youssh',
+            'port' => '12345ssh',
+            "load-config" => true,
+            'user' => 'messh'
+          )
+        end
+
+        it 'only uses configured options for winrm' do
+          target = inventory.get_target('winrm://target')
+          expect(target.protocol).to eq('winrm')
+          expect(target.user).to eq('mewinrm')
+          expect(target.password).to eq('youwinrm')
+          expect(target.port).to eq('12345winrm')
+          expect(target.options).to eq(
+            'connect-timeout' => 5,
+            'ssl' => false,
+            'ssl-verify' => false,
+            'tmpdir' => "/winrm",
+            'cacert' => "winrm.pem",
+            'extensions' => ".py",
+            'password' => 'youwinrm',
+            'port' => '12345winrm',
+            'user' => 'mewinrm',
+            'file-protocol' => 'winrm'
+          )
+        end
+
+        it 'only uses configured options for pcp' do
+          target = inventory.get_target('pcp://target')
+          expect(target.protocol).to eq('pcp')
+          expect(target.user).to be nil
+          expect(target.password).to be nil
+          expect(target.port).to be nil
+          expect(target.options).to eq(
+            'task-environment' => "prod",
+            'service-url' => "https://master",
+            'cacert' => "pcp.pem",
+            'token-file' => "token"
+          )
+        end
+      end
+    end
   end
 
   context 'with localhost' do
@@ -740,6 +1069,123 @@ describe Bolt::Inventory::Inventory2 do
         expect(target.protocol).to eq('ssh')
         expect(target.options['interpreters']).to include('.rb' => '/foo/ruby')
         expect(target.features).to include('puppet-agent')
+      end
+    end
+  end
+
+  describe 'set_config' do
+    context 'when updating existing values' do
+      let(:data) {
+        { 'groups' => [{
+          'name' => 'test',
+          'targets' => [{
+            'name' => 'target',
+            'config' => {
+              'transport' => 'ssh',
+              'ssh' => {
+                'interpreters' => { '.rb' => '/foo/ruby' },
+                'password' => 'sshpass'
+              }
+            }
+          }],
+          'config' => { 'ssh' => { 'disconnect-timeout' => 11 } }
+        }] }
+      }
+      let(:inventory) { Bolt::Inventory::Inventory2.new(data) }
+      let(:expected_options) {
+        { "connect-timeout" => 10,
+          "tty" => false,
+          "load-config" => true,
+          "disconnect-timeout" => 11,
+          "password" => 'sshpass',
+          "interpreters" => { ".rb" => "/foo/ruby" } }
+      }
+      let(:expected_config) {
+        {
+          "ssh" => {
+            "disconnect-timeout" => 11,
+            "interpreters" => { ".rb" => "/foo/ruby" },
+            "password" => "sshpass"
+          },
+          "transport" => "ssh"
+        }
+      }
+
+      it 'sets config on a target' do
+        target = inventory.get_target('target')
+        expect(target.protocol).to eq('ssh')
+        expect(target.password).to eq('sshpass')
+        expect(target.config).to eq(expected_config)
+        inventory.set_config(target, 'transport', 'local')
+        expect(target.protocol).to eq('local')
+        expect(target.config).to eq(expected_config.merge('transport' => 'local'))
+      end
+
+      it 'overrides a default value not specified in inventory' do
+        target = inventory.get_target('target')
+        expect(target.options).to eq(expected_options)
+        expect(target.config).to eq(expected_config)
+        inventory.set_config(target, %w[ssh tty], true)
+        expected_config['ssh']['tty'] = true
+        expect(target.config).to eq(expected_config)
+      end
+
+      it 'sets a nested config value without disrupting other values' do
+        target = inventory.get_target('target')
+        expect(target.options).to eq(expected_options)
+        expect(target.config).to eq(expected_config)
+        inventory.set_config(target, ['ssh', 'interpreters', '.py'], '/foo/python')
+        expected_options["interpreters"].merge!(".py" => "/foo/python")
+        expected_config['ssh']['interpreters'].merge!(".py" => "/foo/python")
+        expect(target.options).to eq(expected_options)
+        expect(target.config).to eq(expected_config)
+      end
+
+      it 'overrides entire config when an key_or_key_path is an empty string' do
+        target = inventory.get_target('target')
+        expect(target.options).to eq(expected_options)
+        expect(target.config).to eq(expected_config)
+        inventory.set_config(target, '', 'transport' => 'winrm', 'winrm' => { 'password' => 'winrmpass' })
+        expect(target.protocol).to eq('winrm')
+        expect(target.password).to eq('winrmpass')
+        winrm_conf = { "password" => "winrmpass",
+                       "ssl" => true,
+                       "ssl-verify" => true,
+                       "file-protocol" => "winrm",
+                       "connect-timeout" => 10 }
+        expect(target.options).to include(winrm_conf)
+        expected_config['transport'] = 'winrm'
+        expected_config['winrm'] = { 'winrm' => { 'password' => 'winrmpass' } }
+      end
+    end
+  end
+
+  describe 'add_to_group' do
+    context 'when updating existing values' do
+      let(:data) {
+        { 'groups' => [{
+          'name' => 'test',
+          'targets' => [{
+            'name' => 'target',
+            'config' => {
+              'transport' => 'ssh'
+            }
+          }],
+          'config' => { 'ssh' => { 'disconnect-timeout' => 11 } }
+        }] }
+      }
+
+      let(:inventory) { Bolt::Inventory::Inventory2.new(data) }
+
+      it 'adds target to a group and inherets config' do
+        target = inventory.get_target('new-target')
+        expect(target.protocol).to eq('ssh')
+        expect(target.options).to include('disconnect-timeout' => 5)
+        expect(target.config).to eq({})
+        inventory.add_to_group([target], 'test')
+        expect(target.options).to include('disconnect-timeout' => 11)
+        expect(target.config).to eq('ssh' => { 'disconnect-timeout' => 11 })
+        expect(inventory.get_targets('test').map(&:name)).to eq(%w[target new-target])
       end
     end
   end

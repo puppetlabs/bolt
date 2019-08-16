@@ -5,6 +5,7 @@ require 'bolt/inventory/group2'
 module Bolt
   class Inventory
     class Inventory2
+      attr_reader :targets, :plugins, :config
       # This uses "targets" in the message instead of "nodes"
       class WildcardError < Bolt::Error
         def initialize(target)
@@ -12,11 +13,7 @@ module Bolt
         end
       end
 
-      attr_reader :plugins, :config
-
-      def initialize(data, config = nil, plugins: nil, target_vars: {},
-                     target_facts: {}, target_features: {},
-                     target_plugin_hooks: {})
+      def initialize(data, config = nil, plugins: nil)
         @logger = Logging.logger[self]
         # Config is saved to add config options to targets
         @config = config || Bolt::Config.default
@@ -24,10 +21,8 @@ module Bolt
         @groups = Group2.new(@data.merge('name' => 'all'), plugins)
         @plugins = plugins
         @group_lookup = {}
-        @target_vars = target_vars
-        @target_facts = target_facts
-        @target_features = target_features
-        @target_plugin_hooks = target_plugin_hooks
+        # The targets hash is the canonical source for all targets in inventory
+        @targets = {}
         @groups.resolve_aliases(@groups.target_aliases, @groups.target_names)
         collect_groups
       end
@@ -38,6 +33,10 @@ module Bolt
 
       def version
         2
+      end
+
+      def target_implementation_class
+        Bolt::Target2
       end
 
       def collect_groups
@@ -56,13 +55,15 @@ module Bolt
       alias node_names target_names
 
       def get_targets(targets)
-        targets = expand_targets(targets)
-        targets = if targets.is_a? Array
-                    targets.flatten.uniq(&:name)
-                  else
-                    [targets]
-                  end
-        targets.map { |t| update_target(t) }
+        flat_target_list(targets).map { |t| update_target(t) }
+      end
+
+      def get_target(target)
+        target_array = flat_target_list(target)
+        if target_array.count > 1
+          raise ValidationError.new("'#{target}' refers to #{target_array.count} targets", nil)
+        end
+        get_targets(target_array.first).first
       end
 
       def add_to_group(targets, desired_group)
@@ -76,41 +77,6 @@ module Bolt
         else
           raise ValidationError.new("Group #{desired_group} does not exist in inventory", nil)
         end
-      end
-
-      def set_var(target, key, value)
-        data = { key => value }
-        set_vars_from_hash(target.name, data)
-      end
-
-      def vars(target)
-        @target_vars[target.name] || {}
-      end
-
-      def add_facts(target, new_facts = {})
-        @logger.warn("No facts to add") if new_facts.empty?
-        set_facts(target.name, new_facts)
-      end
-
-      def facts(target)
-        @target_facts[target.name] || {}
-      end
-
-      def set_feature(target, feature, value = true)
-        @target_features[target.name] ||= Set.new
-        if value
-          @target_features[target.name] << feature
-        else
-          @target_features[target.name].delete(feature)
-        end
-      end
-
-      def features(target)
-        @target_features[target.name] || Set.new
-      end
-
-      def plugin_hooks(target)
-        @target_plugin_hooks[target.name] || {}
       end
 
       def data_hash
@@ -147,8 +113,13 @@ module Bolt
       private :config_plugin
 
       # Pass a target to get_targets for a public version of this
-      # Should this reconfigure configured targets?
       def update_target(target)
+        # Ensure all targets in inventory are included in the all group.
+        unless @groups.target_names.include?(target.name)
+          add_to_group([target], 'all')
+        end
+
+        # Get merged data between targets and groups
         data = @groups.data_for(target.name)
         data ||= {}
 
@@ -157,23 +128,24 @@ module Bolt
           data['config'] = {}
         end
 
-        data = Bolt::Inventory.localhost_defaults(data) if target.name == 'localhost'
-        # These should only get set from the inventory if they have not yet
-        # been instantiated
-        set_vars_from_hash(target.name, data['vars']) unless @target_vars[target.name]
-        set_facts(target.name, data['facts']) unless @target_facts[target.name]
-        data['features']&.each { |feature| set_feature(target, feature) } unless @target_features[target.name]
-        unless @target_plugin_hooks[target.name]
-          set_plugin_hooks(target.name, @config.plugin_hooks.merge(data['plugin_hooks'] || {}))
+        # Add defaults for special 'localhost' target (currently just config and features)
+        if target.name == 'localhost'
+          data = Bolt::Inventory.localhost_defaults(data)
         end
+
+        # Data from inventory
         data['config'] = config_plugin(data['config'])
+        # Data from set_config (make sure to resolve plugins)
+        resolved_target_config = config_plugin(@targets[target.name]['config'] || {})
+        data['config'] = Bolt::Util.deep_merge(data['config'], resolved_target_config)
 
         # Use Config object to ensure config section is treated consistently with config file
         conf = @config.deep_clone
         conf.update_from_inventory(data['config'])
         conf.validate
 
-        target.update_conf(conf.transport_conf)
+        # Recompute the target cached state with the merged data
+        update_target_state(target, conf.transport_conf, data)
 
         unless target.transport.nil? || Bolt::TRANSPORTS.include?(target.transport.to_sym)
           raise Bolt::UnknownTransportError.new(target.transport, target.uri)
@@ -182,6 +154,17 @@ module Bolt
         target
       end
       private :update_target
+
+      # This algorithm for getting a flat list of targets is used several times.
+      def flat_target_list(targets)
+        target_array = expand_targets(targets)
+        if target_array.is_a? Array
+          target_array.flatten.uniq(&:name)
+        else
+          [target_array]
+        end
+      end
+      private :flat_target_list
 
       # If target is a group name, expand it to the members of that group.
       # Else match against targets in inventory by name or alias.
@@ -209,8 +192,7 @@ module Bolt
       private :resolve_name
 
       def expand_targets(targets)
-        if targets.is_a? Bolt::Target
-          targets.inventory = self
+        if targets.is_a? Bolt::Target2
           targets
         elsif targets.is_a? Array
           targets.map { |tish| expand_targets(tish) }
@@ -219,102 +201,189 @@ module Bolt
           targets.split(/[[:space:],]+/).reject(&:empty?).map do |name|
             ts = resolve_name(name)
             ts.map do |t|
-              target = create_target(t)
-              target.inventory = self
-              target
+              # If the target exists, return it, otherwise create one
+              @targets[t] ? @targets[t]['self'] : create_target(t)
             end
           end
         end
       end
       private :expand_targets
 
-      def set_vars_from_hash(tname, data)
-        if data
-          # Instantiate empty vars hash in case no vars are defined
-          @target_vars[tname] ||= {}
-          # Assign target new merged vars hash
-          # This is essentially a copy-on-write to maintain the immutability of @target_vars
-          @target_vars[tname] = @target_vars[tname].merge(data).freeze
-        end
-      end
-      private :set_vars_from_hash
-
-      def set_facts(tname, hash)
-        if hash
-          @target_facts[tname] ||= {}
-          @target_facts[tname] = Bolt::Util.deep_merge(@target_facts[tname], hash).freeze
-        end
-      end
-      private :set_facts
-
-      def set_plugin_hooks(tname, hash)
-        if hash
-          @target_plugin_hooks[tname] ||= {}
-          @target_plugin_hooks[tname].merge!(hash)
-        end
-      end
-      private :set_plugin_hooks
-
-      def add_target(current_group, target, desired_group, track = { 'all' => nil })
+      def add_target(current_group, target, desired_group)
         if current_group.name == desired_group
-          # Group to add to is found
-          t_name = target.name
-          # Add target to targets hash
-          target_hash = { 'name' => t_name }.merge(target.options)
-          target_hash['uri'] = target.uri if target.uri
-          current_group.targets[t_name] = target_hash
-
-          # Inherit facts, vars, and features from hierarchy
-          current_group_data = { facts: current_group.facts,
-                                 vars: current_group.vars,
-                                 features: current_group.features,
-                                 plugin_hooks: current_group.plugin_hooks }
-          data = inherit_data(track, current_group.name, current_group_data)
-          set_facts(t_name, @target_facts[t_name] ? data[:facts].merge(@target_facts[t_name]) : data[:facts])
-          set_vars_from_hash(t_name, @target_vars[t_name] ? data[:vars].merge(@target_vars[t_name]) : data[:vars])
-          data[:features].each do |feature|
-            set_feature(target, feature)
-          end
-          hook_data = @config.plugin_hooks.merge(data[:plugin_hooks])
-          hash = if @target_plugin_hooks[t_name]
-                   hook_data.merge(@target_plugin_hooks[t_name])
-                 else
-                   hook_data
-                 end
-          set_plugin_hooks(t_name, hash)
+          current_group.add_target(target.target_data_hash)
+          @groups.validate
+          update_target(target)
           return true
         end
         # Recurse on children Groups if not desired_group
         current_group.groups.each do |child_group|
-          track[child_group.name] = current_group
-          add_target(child_group, target, desired_group, track)
+          add_target(child_group, target, desired_group)
         end
       end
       private :add_target
 
-      def inherit_data(track, name, data)
-        unless track[name].nil?
-          data[:facts] = track[name].facts.merge(data[:facts])
-          data[:vars] = track[name].vars.merge(data[:vars])
-          data[:features].concat(track[name].features)
-          data[:plugin_hooks] = track[name].plugin_hooks.merge(data[:plugin_hooks])
-          inherit_data(track, track[name].name, data)
+      # This is effectively the init method for Target2
+      def create_target(target_name, target_hash = nil)
+        # Prefer target hash, then data from inventoryfile, allow for uri only with empty hash
+        data = target_hash || @groups.target_collect(target_name) || {}
+        data = { 'uri' => target_name } if data['uri'].nil? && data['name'].nil?
+        data['uri_obj'] = Bolt::Inventory::Inventory2.parse_uri(data['uri'])
+
+        if data['uri'] && data['name'].nil?
+          data['name'] = data['uri']
+          data['safe_name'] = data['uri_obj'].omit(:password).to_str.sub(%r{^//}, '')
+        elsif data['name']
+          data['safe_name'] = data['name']
+        else
+          data['name'] = target_name
+          data['safe_name'] = if data['uri_obj']
+                                data['uri_obj'].omit(:password).to_str.sub(%r{^//}, '')
+                              else
+                                target_name
+                              end
         end
-        data
+        unless data['name'].ascii_only?
+          raise ValidationError.new("Target name must be ASCII characters: #{data['name']}", nil)
+        end
+        # Data set on target itself (either in inventory, target.new or with set_config)
+        data['config'] ||= {}
+        data['vars'] ||= {}
+        data['facts'] ||= {}
+        data['features'] = data['features'] ? Set.new(data['features']) : Set.new
+        data['groups'] ||= []
+        data['options'] ||= {}
+        data['plugin_hooks'] ||= {}
+        data['target_alias'] ||= []
+
+        # Every call to update_target will rebuild this state based on merging together target, group, and config data
+        data['cached_state'] = {}
+
+        target = Target2.new(nil, data['name'])
+        target.inventory = self
+        data['self'] = target
+        @targets[data['name']] = data
+        target
       end
-      private :inherit_data
+      private :create_target
 
-      def create_target(target_name)
-        data = @groups.data_for(target_name) || {}
-        name_opt = {}
-        name_opt['name'] = data['name'] if data['name']
+      def create_target_from_plan(data)
+        t_name = data['name'] || data['uri']
 
-        # If there is no name then this target was only referred to as a string.
-        uri = data['uri']
-        uri ||= target_name unless data['name']
-
-        Target.new(uri, name_opt)
+        # If target already exists, delete old and replace with new, otherwise add to new to all group
+        if @targets[t_name]
+          @targets.delete(t_name)
+          t = create_target(t_name, data)
+          update_target(t)
+        else
+          t = create_target(t_name, data)
+          update_target(t)
+          add_to_group([t], 'all')
+        end
+        t
       end
+
+      def self.parse_uri(string)
+        require 'addressable/uri'
+        if string.nil?
+          nil
+        # Forbid empty uri
+        elsif string.empty?
+          raise Bolt::ParseError, "Could not parse target URI: URI is empty string"
+        elsif string =~ %r{^[^:]+://}
+          Addressable::URI.parse(string)
+        else
+          # Initialize with an empty scheme to ensure we parse the hostname correctly
+          Addressable::URI.parse("//#{string}")
+        end
+      rescue Addressable::URI::InvalidURIError => e
+        raise Bolt::ParseError, "Could not parse target URI: #{e.message}"
+      end
+
+      def set_var(target, var_hash)
+        @targets[target.name]['vars'] = @targets[target.name]['vars'].merge(var_hash)
+        update_target(target)
+      end
+
+      def vars(target)
+        @targets[target.name]['cached_state']['vars'] || {}
+      end
+
+      def add_facts(target, new_facts = {})
+        @targets[target.name]['facts'] = Bolt::Util.deep_merge(@targets[target.name]['facts'], new_facts)
+        update_target(target)
+        facts(target)
+      end
+
+      def facts(target)
+        @targets[target.name]['cached_state']['facts'] || {}
+      end
+
+      def set_feature(target, feature, value = true)
+        if value
+          @targets[target.name]['features'] << feature
+        else
+          @targets[target.name]['features'].delete(feature)
+        end
+        update_target(target)
+      end
+
+      def features(target)
+        if @targets[target.name]['cached_state']['features']
+          Set.new(@targets[target.name]['cached_state']['features'])
+        else
+          Set.new
+        end
+      end
+
+      def plugin_hooks(target)
+        @targets[target.name]['cached_state']['plugin_hooks'] || {}
+      end
+
+      def set_config(target, key_or_key_path, value)
+        config = key_or_key_path.empty? ? value : build_config_hash([key_or_key_path].flatten, value)
+        @targets[target.name]['config'] = @targets[target.name]['config'].merge(config)
+        update_target(target)
+      end
+
+      def target_config(target)
+        @targets[target.name]['cached_state']['config'] || {}
+      end
+
+      def build_config_hash(key_or_key_path, value)
+        # https://stackoverflow.com/questions/5095077/ruby-convert-array-to-nested-hash
+        key_or_key_path.reverse.inject(value) { |acc, key| { key => acc } }
+      end
+      private :build_config_hash
+
+      def update_target_state(target, conf, merged_data)
+        @targets[target.name]['protocol'] = conf[:transport]
+        t_conf = conf[:transports][target.transport.to_sym] || {}
+        @targets[target.name]['user'] = t_conf['user']
+        @targets[target.name]['password'] = t_conf['password']
+        @targets[target.name]['port'] = t_conf['port']
+        @targets[target.name]['host'] = t_conf['host']
+        @targets[target.name]['options'] = t_conf
+
+        @targets[target.name]['cached_state'] = merged_data
+
+        target_facts = @targets[target.name]['facts'] || {}
+        new_facts = merged_data['facts'] || {}
+        @targets[target.name]['cached_state']['facts'] = Bolt::Util.deep_merge(new_facts, target_facts)
+
+        target_vars = @targets[target.name]['vars'] || {}
+        new_vars = merged_data['vars'] || {}
+        @targets[target.name]['cached_state']['vars'] = new_vars.merge(target_vars)
+
+        target_features = Set.new(@targets[target.name]['features'])
+        new_features = Set.new(merged_data['features'])
+        @targets[target.name]['cached_state']['features'] = new_features.merge(target_features)
+
+        target_plugin_hooks = @targets[target.name]['plugin_hooks'] || {}
+        new_plugin_hooks = merged_data['plugin_hooks'] || {}
+        @targets[target.name]['cached_state']['plugin_hooks'] = new_plugin_hooks.merge(target_plugin_hooks)
+      end
+      private :update_target_state
     end
   end
 end

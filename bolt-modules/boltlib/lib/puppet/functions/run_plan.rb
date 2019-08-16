@@ -83,6 +83,22 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
       executor.report_yaml_plan(closure.model.body)
     end
 
+    # If a TargetSpec parameter is passed, ensure it is in inventory
+    inventory = Puppet.lookup(:bolt_inventory)
+
+    if inventory.version > 1
+      param_types = closure.parameters.each_with_object({}) do |param, param_acc|
+        param_acc[param.name] = extract_parameter_types(param.type_expr).flatten
+      end
+      params.each do |param, value|
+        # Note the safe lookup operator is needed to handle case where a parameter is passed to a
+        # plan that the plan is not expecting
+        if param_types[param]&.include?('TargetSpec') || param_types[param]&.include?('Boltlib::TargetSpec')
+          inventory.get_targets(value)
+        end
+      end
+    end
+
     # wrap plan execution in logging messages
     executor.log_plan(plan_name) do
       result = nil
@@ -114,6 +130,32 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
       end
 
       result
+    end
+  end
+
+  # Recursively examine the type_expr to build a list of types
+  def extract_parameter_types(type_expr)
+    # No type
+    if type_expr.nil?
+      []
+    # Multiple types to extract (ex. Variant[TargetSpec, String])
+    elsif defined?(type_expr.keys)
+      type_expr.keys.flat_map { |param| extract_parameter_types(param) }
+    # Store cased value
+    elsif defined?(type_expr.cased_value)
+      [type_expr.cased_value]
+    # Type alias, able to resolve alias
+    elsif defined?(type_expr.resolved_type.name)
+      [type_expr.resolved_type.name]
+    # Nested type alias, recurse
+    elsif defined?(type_expr.type)
+      extract_parameter_types(type_expr.type)
+    # Array conatins alias types
+    elsif defined?(type_expr.types)
+      type_expr.types.flat_map { |param| extract_parameter_types(param) }
+    # Each element can be handled by a resolver above
+    elsif defined?(type_expr.element_type)
+      extract_parameter_types(type_expr.element_type)
     end
   end
 end

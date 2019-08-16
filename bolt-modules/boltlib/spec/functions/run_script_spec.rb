@@ -15,6 +15,7 @@ describe 'run_script' do
   around(:each) do |example|
     Puppet[:tasks] = tasks_enabled
     Puppet.override(bolt_executor: executor, bolt_inventory: inventory) do
+      inventory.stubs(:version).returns(1)
       example.run
     end
   end

@@ -3,6 +3,7 @@
 require 'spec_helper'
 require 'puppet_pal'
 require 'bolt/executor'
+require 'bolt/plugin'
 
 describe 'run_plan' do
   include PuppetlabsSpec::Fixtures
@@ -109,6 +110,25 @@ describe 'run_plan' do
     it 'fails and reports that run_plan is not available' do
       is_expected.to run.with_params('test::run_me')
                         .and_raise_error(/Plan language function 'run_plan' cannot be used/)
+    end
+  end
+
+  context 'with inventory v2' do
+    let(:config) { Bolt::Config.new(Bolt::Boltdir.new('.'), {}) }
+    let(:pal) { nil }
+    let(:plugins) { Bolt::Plugin.new(config, pal, Bolt::Analytics::NoopClient.new) }
+    let(:inventory) { Bolt::Inventory.create_version({ 'version' => 2 }, config, plugins) }
+
+    it 'parameters with type TargetSpec are added to inventory' do
+      params = { 'ts' => 'ts',
+                 'optional_ts' => 'optional_ts',
+                 'variant_ts' => 'variant_ts',
+                 'array_ts' => ['array_ts'],
+                 'nested_ts' => 'nested_ts',
+                 'string' => 'string',
+                 'typeless' => 'typeless' }
+      expected_targets = %w[ts optional_ts variant_ts array_ts nested_ts]
+      is_expected.to run.with_params('test::targetspec_params', params).and_return(expected_targets)
     end
   end
 end

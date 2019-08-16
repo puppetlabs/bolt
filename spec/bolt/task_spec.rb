@@ -19,7 +19,7 @@ describe Bolt::Task do
     let(:task) { Bolt::Task.new(name: 'foo', files: files, metadata: metadata) }
 
     before :each do
-      allow(target).to receive(:features).and_return(Set.new(['powershell']))
+      allow(target).to receive(:feature_set).and_return(Set.new(['powershell']))
     end
 
     context 'with input_method in metadata' do

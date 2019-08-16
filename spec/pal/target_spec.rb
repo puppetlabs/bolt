@@ -5,6 +5,7 @@ require 'bolt_spec/files'
 require 'bolt_spec/pal'
 
 require 'bolt/pal'
+require 'bolt/inventory'
 
 describe 'Target DataType' do
   include BoltSpec::Files
@@ -19,7 +20,7 @@ describe 'Target DataType' do
 
   def target(attr)
     code = target_code + attr
-    peval(code, pal)
+    peval(code, pal, nil, Bolt::Inventory.new({}))
   end
 
   it 'should expose uri' do

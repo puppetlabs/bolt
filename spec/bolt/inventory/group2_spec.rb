@@ -381,16 +381,29 @@ describe Bolt::Inventory::Group2 do
     end
   end
 
-  context 'where a target uses an invalid name' do
+  context 'where a target uses an invalid uri' do
     let(:data) do
       {
         'name' => 'group1',
-        'targets' => [{ 'name' => 'foo:a/b@neptune"' }]
+        'targets' => [{ 'uri' => 'foo:a/b@neptune"' }]
       }
     end
 
     it 'raises an error' do
-      expect { group.validate }.to raise_error(Bolt::Inventory::ValidationError, /Invalid target name/)
+      expect { group.validate }.to raise_error(Bolt::Inventory::ValidationError, /Invalid target uri/)
+    end
+  end
+
+  context 'where a target uses an invalid name' do
+    let(:data) do
+      {
+        'name' => 'group1',
+        'targets' => [{ 'name' => 'ฒณดตษ๚' }]
+      }
+    end
+
+    it 'raises an error' do
+      expect { group.validate }.to raise_error(Bolt::Inventory::ValidationError, /Target name must be ASCII/)
     end
   end
 
