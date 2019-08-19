@@ -201,5 +201,3 @@ module Bolt
     end
   end
 end
-
-require 'bolt/transport/local/shell'

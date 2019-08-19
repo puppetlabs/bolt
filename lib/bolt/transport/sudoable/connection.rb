@@ -70,6 +70,39 @@ module Bolt
           message = "#{self.class.name} must implement #{method} to execute commands"
           raise NotImplementedError, message
         end
+
+        # In the case where a task is run with elevated privilege and needs stdin
+        # a random string is echoed to stderr indicating that the stdin is available
+        # for task input data because the sudo password has already either been
+        # provided on stdin or was not needed.
+        def prepend_sudo_success(sudo_id, command_str)
+          "sh -c 'echo #{sudo_id} 1>&2; #{command_str}'"
+        end
+
+        # A helper to build up a single string that contains all of the options for
+        # privilege escalation. A wrapper script is used to direct task input to stdin
+        # when a tty is allocated and thus we do not need to prepend_sudo_success when
+        # using the wrapper or when the task does not require stdin data.
+        def build_sudoable_command_str(command_str, sudo_str, sudo_id, options)
+          if options[:stdin] && !options[:wrapper]
+            "#{sudo_str} #{prepend_sudo_success(sudo_id, command_str)}"
+          else
+            "#{sudo_str} #{command_str}"
+          end
+        end
+
+        # Returns string with the interpreter conditionally prepended
+        def inject_interpreter(interpreter, command)
+          if interpreter
+            if command.is_a?(Array)
+              command.unshift(interpreter)
+            else
+              command = [interpreter, command]
+            end
+          end
+
+          command.is_a?(String) ? command : Shellwords.shelljoin(command)
+        end
       end
     end
   end

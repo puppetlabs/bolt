@@ -38,8 +38,12 @@ describe Bolt::Transport::SSH do
   let(:no_host_key_check) { mk_config('host-key-check' => false, user: user, password: password) }
   let(:no_user_config) { mk_config('host-key-check' => false, user: nil, password: password) }
   let(:ssh) { Bolt::Transport::SSH.new }
-
   let(:transport_conf) { {} }
+  let(:task_input_size) { 100000 }
+  let(:big_task_input) { "f" * task_input_size }
+  let(:stdin_task) { "#!/bin/sh\ngrep data" }
+  let(:env_task) { "#!/bin/sh\necho $PT_data" }
+
   def make_target(host_: hostname, port_: port, conf: config)
     Bolt::Target.new("#{host_}:#{port_}", transport_conf).update_conf(conf.transport_conf)
   end
@@ -245,15 +249,6 @@ describe Bolt::Transport::SSH do
     it "returns false if the target is not available", ssh: true do
       expect(ssh.connected?(Bolt::Target.new('unknownfoo'))).to eq(false)
     end
-
-    it "doesn't generate a task wrapper when not needed", ssh: true do
-      contents = "#!/bin/sh\necho -n ${PT_message_one} ${PT_message_two}"
-      arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-      expect(ssh).not_to receive(:make_wrapper_stringio)
-      with_task_containing('tasks_test', contents, 'environment') do |task|
-        ssh.run_task(target, task, arguments)
-      end
-    end
   end
 
   # Local transport doesn't have concept of 'user'
@@ -299,6 +294,45 @@ describe Bolt::Transport::SSH do
 
       ssh.run_command(target, "rm #{dest}", sudoable: true, run_as: 'root')
     end
+
+    it "runs a task that expects big data on stdin" do
+      with_task_containing('tasks_test', stdin_task, 'stdin') do |task|
+        expect(ssh).not_to receive(:make_wrapper_stringio)
+        result = ssh.run_task(target, task, { 'data' => big_task_input }, '_run_as' => 'root')
+        expect(result.value['data'].strip.size).to eq(task_input_size)
+      end
+    end
+
+    it "runs a task that expects big data in environment variable" do
+      expect(ssh).not_to receive(:make_wrapper_stringio)
+      with_task_containing('tasks_test', env_task, 'environment') do |task|
+        result = ssh.run_task(target, task, { 'data' => big_task_input }, '_run_as' => 'root')
+        expect(result.value['_output'].strip.size).to eq(task_input_size)
+      end
+    end
+  end
+
+  context "with sudo with task interpreter set", sudo: true, ssh: true do
+    let(:config) {
+      mk_config('host-key-check' => false, 'sudo-password' => password, 'run-as' => 'root',
+                user: user, password: password, interpreters: { sh: '/bin/sh' })
+    }
+
+    it "runs a task that expects big data on stdin" do
+      expect(ssh).not_to receive(:make_wrapper_stringio)
+      with_task_containing('tasks_test', stdin_task, 'stdin', '.sh') do |task|
+        result = ssh.run_task(target, task, { 'data' => big_task_input }, '_run_as' => 'root')
+        expect(result.value['data'].strip.size).to eq(task_input_size)
+      end
+    end
+
+    it "runs a task that expects big data in environment variable" do
+      expect(ssh).not_to receive(:make_wrapper_stringio)
+      with_task_containing('tasks_test', env_task, 'environment', '.sh') do |task|
+        result = ssh.run_task(target, task, { 'data' => big_task_input }, '_run_as' => 'root')
+        expect(result.value['_output'].strip.size).to eq(task_input_size)
+      end
+    end
   end
 
   context "as bash user with no password", sudo: true do
@@ -333,14 +367,53 @@ describe Bolt::Transport::SSH do
     end
   end
 
-  context "requesting a pty", sudo: true do
+  context "requesting a pty", sudo: true, ssh: true do
     let(:config) {
       mk_config('host-key-check' => false, 'sudo-password' => password, 'run-as' => 'root',
                 tty: true, user: user, password: password)
     }
 
-    it "can execute a command when a tty is requested", ssh: true do
+    it "can execute a command when a tty is requested" do
       expect(ssh.run_command(target, 'whoami')['stdout'].strip).to eq('root')
+    end
+
+    it "runs a task that expects big data on stdin" do
+      expect(ssh).to receive(:make_wrapper_stringio).and_call_original
+      with_task_containing('tasks_test', stdin_task, 'stdin') do |task|
+        result = ssh.run_task(target, task, { 'data' => big_task_input }, '_run_as' => 'root')
+        expect(result.value['data'].strip.size).to eq(task_input_size)
+      end
+    end
+
+    it "runs a task that expects big data in environment variable" do
+      expect(ssh).not_to receive(:make_wrapper_stringio)
+      with_task_containing('tasks_test', env_task, 'environment') do |task|
+        result = ssh.run_task(target, task, { 'data' => big_task_input }, '_run_as' => 'root')
+        expect(result.value['_output'].strip.size).to eq(task_input_size)
+      end
+    end
+  end
+
+  context "when requesting a pty with task interpreter set", sudo: true, ssh: true do
+    let(:config) {
+      mk_config('host-key-check' => false, 'sudo-password' => password, 'run-as' => 'root',
+                tty: true, user: user, password: password, interpreters: { sh: '/bin/sh' })
+    }
+
+    it "runs a task that expects big data on stdin" do
+      expect(ssh).to receive(:make_wrapper_stringio).and_call_original
+      with_task_containing('tasks_test', stdin_task, 'stdin', '.sh') do |task|
+        result = ssh.run_task(target, task, { 'data' => big_task_input }, '_run_as' => 'root')
+        expect(result.value['data'].strip.size).to eq(task_input_size)
+      end
+    end
+
+    it "runs a task that expects big data in environment variable" do
+      expect(ssh).not_to receive(:make_wrapper_stringio)
+      with_task_containing('tasks_test', env_task, 'environment', '.sh') do |task|
+        result = ssh.run_task(target, task, { 'data' => big_task_input }, '_run_as' => 'root')
+        expect(result.value['_output'].strip.size).to eq(task_input_size)
+      end
     end
   end
 

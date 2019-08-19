@@ -38,9 +38,6 @@ test_name "bolt task run should execute tasks on localhost via local transport" 
       #!/bin/sh
       echo "$PT_greetings from $(whoami)"
       FILE
-      # TODO: Use input_method: both (default) once bug BOLT-1283 is fixed
-      conf = { 'input_method' => 'environment' }
-      create_remote_file(bolt, "#{dir}/modules/test/tasks/whoami_nix.json", conf.to_json)
     end
 
     step "execute `bolt task run` on localhost via local transport" do

@@ -74,6 +74,8 @@ to avoid writing them to disk.
 
 `tmpdir`: The directory to upload and execute temporary files on the target.
 
+`tty`: Request a pseudo tty for the ssh session. This option is generally only used in conjunction with the `run_as` option when the sudoers policy requires a `tty`. Default is `false`.
+
 `user`: Login user. Default is the same as the currently logged in user.
 
 ### OpenSSH configuration options 

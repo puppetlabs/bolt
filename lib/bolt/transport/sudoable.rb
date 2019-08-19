@@ -79,7 +79,6 @@ module Bolt
         with_connection(target) do |conn|
           conn.running_as(options['_run_as']) do
             stdin, output = nil
-            command = []
             execute_options = {}
             execute_options[:interpreter] = select_interpreter(executable, target.options['interpreters'])
             interpreter_debug = if execute_options[:interpreter]
@@ -103,8 +102,6 @@ module Bolt
                 end
               end
 
-              remote_task_path = conn.write_executable(task_dir, executable)
-
               if STDIN_METHODS.include?(input_method)
                 stdin = JSON.dump(arguments)
               end
@@ -113,20 +110,22 @@ module Bolt
                 execute_options[:environment] = envify_params(arguments)
               end
 
-              if conn.run_as && stdin
-                # Inject interpreter in to wrapper script and remove from execute options
+              remote_task_path = conn.write_executable(task_dir, executable)
+
+              # Avoid the horrors of passing data on stdin via a tty on multiple platforms
+              # by writing a wrapper script that directs stdin to the task.
+              if stdin && target.options['tty']
                 wrapper = make_wrapper_stringio(remote_task_path, stdin, execute_options[:interpreter])
                 execute_options.delete(:interpreter)
-                remote_wrapper_path = conn.write_executable(dir, wrapper, 'wrapper.sh')
-                command << remote_wrapper_path
-              else
-                command << remote_task_path
-                execute_options[:stdin] = stdin
+                execute_options[:wrapper] = true
+                remote_task_path = conn.write_executable(dir, wrapper, 'wrapper.sh')
               end
+
               dir.chown(conn.run_as)
 
+              execute_options[:stdin] = stdin
               execute_options[:sudoable] = true if conn.run_as
-              output = conn.execute(command, execute_options)
+              output = conn.execute(remote_task_path, execute_options)
             end
             Bolt::Result.for_task(target, output.stdout.string,
                                   output.stderr.string,

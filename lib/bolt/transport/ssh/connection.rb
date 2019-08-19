@@ -20,6 +20,7 @@ module Bolt
           require 'net/ssh/proxy/jump'
 
           raise Bolt::ValidationError, "Target #{target.name} does not have a host" unless target.host
+          @sudo_id = SecureRandom.uuid
 
           @target = target
           @load_config = target.options['load-config']
@@ -139,10 +140,10 @@ module Bolt
           end
         end
 
-        def handled_sudo(channel, data)
+        def handled_sudo(channel, data, stdin)
           if data.lines.include?(Sudoable.sudo_prompt)
             if target.options['sudo-password']
-              channel.send_data "#{target.options['sudo-password']}\n"
+              channel.send_data("#{target.options['sudo-password']}\n")
               channel.wait
               return true
             else
@@ -153,6 +154,12 @@ module Bolt
                 'NO_PASSWORD'
               )
             end
+          elsif data =~ /^#{@sudo_id}/
+            if stdin
+              channel.send_data(stdin)
+              channel.eof!
+            end
+            return true
           elsif data =~ /^#{@user} is not in the sudoers file\./
             @logger.debug { data }
             raise Bolt::Node::EscalateError.new(
@@ -175,21 +182,17 @@ module Bolt
           escalate = sudoable && run_as && @user != run_as
           use_sudo = escalate && @target.options['run-as-command'].nil?
 
-          if options[:interpreter]
-            command.is_a?(Array) ? command.unshift(options[:interpreter]) : [options[:interpreter], command]
-          end
+          command_str = inject_interpreter(options[:interpreter], command)
 
-          command_str = command.is_a?(String) ? command : Shellwords.shelljoin(command)
           if escalate
             if use_sudo
               sudo_flags = ["sudo", "-S", "-u", run_as, "-p", Sudoable.sudo_prompt]
               sudo_flags += ["-E"] if options[:environment]
               sudo_str = Shellwords.shelljoin(sudo_flags)
-              command_str = "#{sudo_str} #{command_str}"
             else
-              run_as_str = Shellwords.shelljoin(@target.options['run-as-command'] + [run_as])
-              command_str = "#{run_as_str} #{command_str}"
+              sudo_str = Shellwords.shelljoin(@target.options['run-as-command'] + [run_as])
             end
+            command_str = build_sudoable_command_str(command_str, sudo_str, @sudo_id, options)
           end
 
           # Including the environment declarations in the shelljoin will escape
@@ -216,14 +219,14 @@ module Bolt
               end
 
               channel.on_data do |_, data|
-                unless use_sudo && handled_sudo(channel, data)
+                unless use_sudo && handled_sudo(channel, data, options[:stdin])
                   result_output.stdout << data
                 end
                 @logger.debug { "stdout: #{data.strip}" }
               end
 
               channel.on_extended_data do |_, _, data|
-                unless use_sudo && handled_sudo(channel, data)
+                unless use_sudo && handled_sudo(channel, data, options[:stdin])
                   result_output.stderr << data
                 end
                 @logger.debug { "stderr: #{data.strip}" }
@@ -232,8 +235,8 @@ module Bolt
               channel.on_request("exit-status") do |_, data|
                 result_output.exit_code = data.read_long
               end
-
-              if options[:stdin]
+              # A wrapper is used to direct stdin when elevating privilage or using tty
+              if options[:stdin] && !use_sudo && !options[:wrapper]
                 channel.send_data(options[:stdin])
                 channel.eof!
               end

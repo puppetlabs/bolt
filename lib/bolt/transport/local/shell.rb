@@ -20,17 +20,18 @@ module Bolt
           @user = ENV['USER'] || Etc.getlogin
           @run_as = target.options['run-as']
           @logger = Logging.logger[self]
+          @sudo_id = SecureRandom.uuid
         end
 
         # If prompted for sudo password, send password to stdin and return an
         # empty string. Otherwise, check for sudo errors and raise Bolt error.
+        # If sudo_id is detected, that means the task needs to have stdin written.
         # If error is not sudo-related, return the stderr string to be added to
         # node output
-        def handle_sudo(stdin, err, pid)
+        def handle_sudo(stdin, err, pid, sudo_stdin)
           if err.include?(Sudoable.sudo_prompt)
             # A wild sudo prompt has appeared!
             if @target.options['sudo-password']
-              # Hopefully no one's sudo-password is > 64kb
               stdin.write("#{@target.options['sudo-password']}\n")
               ''
             else
@@ -39,6 +40,12 @@ module Bolt
                 'NO_PASSWORD'
               )
             end
+          elsif err =~ /^#{@sudo_id}/
+            if sudo_stdin
+              stdin.write("#{sudo_stdin}\n")
+              stdin.close
+            end
+            ''
           else
             handle_sudo_errors(err, pid)
           end
@@ -96,12 +103,12 @@ module Bolt
 
         # See if there's a sudo prompt in the output
         # If not, return the output
-        def check_sudo(out, inp, pid)
+        def check_sudo(out, inp, pid, stdin)
           buffer = out.readpartial(CHUNK_SIZE)
           # Split on newlines, including the newline
           lines = buffer.split(/(?<=[\n])/)
           # handle_sudo will return the line if it is not a sudo prompt or error
-          lines.map! { |line| handle_sudo(inp, line, pid) }
+          lines.map! { |line| handle_sudo(inp, line, pid, stdin) }
           lines.join("")
         # If stream has reached EOF, no password prompt is expected
         # return an empty string
@@ -114,33 +121,25 @@ module Bolt
           escalate = sudoable && run_as && @user != run_as
           use_sudo = escalate && @target.options['run-as-command'].nil?
 
-          if options[:interpreter]
-            if command.is_a?(Array)
-              command.unshift(options[:interpreter])
-            else
-              command = [options[:interpreter], command]
-            end
-          end
-
-          command_str = command.is_a?(String) ? command : Shellwords.shelljoin(command)
+          command_str = inject_interpreter(options[:interpreter], command)
 
           if escalate
             if use_sudo
               sudo_flags = ["sudo", "-k", "-S", "-u", run_as, "-p", Sudoable.sudo_prompt]
               sudo_flags += ["-E"] if options[:environment]
               sudo_str = Shellwords.shelljoin(sudo_flags)
-              command_str = "#{sudo_str} #{command_str}"
             else
-              run_as_str = Shellwords.shelljoin(@target.options['run-as-command'] + [run_as])
-              command_str = "#{run_as_str} #{command_str}"
+              sudo_str = Shellwords.shelljoin(@target.options['run-as-command'] + [run_as])
             end
+            command_str = build_sudoable_command_str(command_str, sudo_str, @sudo_id, options)
           end
 
           command_arr = options[:environment].nil? ? [command_str] : [options[:environment], command_str]
 
           # Prepare the variables!
           result_output = Bolt::Node::Output.new
-          in_buffer = options[:stdin] || ''
+          # Sudo handler will pass stdin if needed.
+          in_buffer = !use_sudo && options[:stdin] ? options[:stdin] : ''
           # Chunks of this size will be read in one iteration
           index = 0
           timeout = 0.1
@@ -153,7 +152,7 @@ module Bolt
           # See if there's a sudo prompt
           if use_sudo
             ready_read = select([err], nil, nil, timeout * 5)
-            read_streams[err] << check_sudo(err, inp, t.pid) if ready_read
+            read_streams[err] << check_sudo(err, inp, t.pid, options[:stdin]) if ready_read
           end
 
           # True while the process is running or waiting for IO input
@@ -166,7 +165,7 @@ module Bolt
               begin
                 # Check for sudo prompt
                 read_streams[stream] << if use_sudo
-                                          check_sudo(stream, inp, t.pid)
+                                          check_sudo(stream, inp, t.pid, options[:stdin])
                                         else
                                           stream.readpartial(CHUNK_SIZE)
                                         end
