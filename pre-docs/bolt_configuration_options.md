@@ -74,10 +74,10 @@ to avoid writing them to disk.
 
 `user`: Login user. Default is the same as the currently logged in user.
 
-### OpenSSH configuration options 
+### OpenSSH configuration options
 
 In addition to the ssh transport options defined in Bolt-specific configuration files some additional ssh options are read from OpenSSH configuration files ( `~/.ssh/config`, `/etc/ssh_config`, and `/etc/ssh/ssh_config`). Not all OpenSSH configuration values have equivalents in Bolt. Below is a list of options configurable in OpenSSH files.
- 
+
 - `Ciphers`: Ciphers allowed in order of preference. Multiple ciphers must be comma-separated.
 - `Compression`: Whether to use compression.
 - `CompressionLevel`: Compression level to use if compression is enabled.
@@ -90,7 +90,7 @@ In addition to the ssh transport options defined in Bolt-specific configuration 
 - `Port`: SSH port.
 - `UserKnownHostsFile`: Path to local user's host key database.
 
-**Note**: For OpenSSH configuration options with direct equivalents in Bolt (for example `user` and `port`) the setting in Bolt config take precedence. 
+**Note**: For OpenSSH configuration options with direct equivalents in Bolt (for example `user` and `port`) the setting in Bolt config take precedence.
 
 In order to illustrate consider the following example:
 
@@ -112,7 +112,7 @@ Host *.example.net
   User root
   Port 444
 ```
-The ssh connection will be configured to use the user and known hosts file defined in OpenSSH config and the port defined in Bolt config. Note that `host-key-check` must be set in Bolt config (the `StrictHostKeyChecking` OpenSSH configuration value is ignored). 
+The ssh connection will be configured to use the user and known hosts file defined in OpenSSH config and the port defined in Bolt config. Note that `host-key-check` must be set in Bolt config (the `StrictHostKeyChecking` OpenSSH configuration value is ignored).
 
 When using the ssh transport Bolt also interacts with the ssh-agent for ssh key management. The most common interaction is to handle password protected private keys. When a private key is password protected it must be added to the ssh-agent in order to be used to authenticate Bolt ssh connections.
 
@@ -174,8 +174,6 @@ When using the ssh transport Bolt also interacts with the ssh-agent for ssh key 
 ## Docker transport configuration options
 
 *The Docker transport is experimental as the capabilities and role of the Docker API may change*
-
-`service-options`: A hash of options to configure the Docker connection. Only necessary if using a non-default URL. See https://github.com/swipely/docker-api for supported options.
 
 `service-url`: URL of the Docker host used for API requests. Defaults to local via a unix socket at `unix:///var/docker.sock`.
 

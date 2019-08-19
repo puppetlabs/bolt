@@ -8,7 +8,7 @@ module Bolt
   module Transport
     class Docker < Base
       def self.options
-        %w[host service-url service-options tmpdir interpreters shell-command tty]
+        %w[host service-url tmpdir interpreters shell-command tty]
       end
 
       def provided_features
@@ -19,12 +19,6 @@ module Bolt
         if (url = options['service-url'])
           unless url.instance_of?(String)
             raise Bolt::ValidationError, 'service-url must be a string'
-          end
-        end
-
-        if (opts = options['service-options'])
-          unless opts.instance_of?(Hash)
-            raise Bolt::ValidationError, 'service-options must be a hash'
           end
         end
       end
