@@ -2,3 +2,4 @@
 * @puppetlabs/bolt
 
 /pre-docs @cwcowellshah @puppetlabs/bolt
+/lib/bolt_server @puppetlabs/skeletor
