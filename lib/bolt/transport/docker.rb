@@ -51,10 +51,8 @@ module Bolt
       end
 
       def run_command(target, command, options = {})
-        if target.options['tty']
-          options[:Tty] = true
-        end
-        options[:wait] = 24 * 60 * 60 # Choose 24 hour as timeout. But needs to be big
+        options[:tty] = target.options['tty']
+
         if target.options['shell-command'] && !target.options['shell-command'].empty?
           # escape any double quotes in command
           command = command.gsub('"', '\"')

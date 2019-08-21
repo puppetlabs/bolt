@@ -51,6 +51,7 @@ module Bolt
           command_options = []
           # Need to be interactive if redirecting STDIN
           command_options << '--interactive' unless options[:stdin].nil?
+          command_options << '--tty' if options[:tty]
           command_options.concat(envs) unless envs.empty?
           command_options << container_id
           command_options.concat(command)
