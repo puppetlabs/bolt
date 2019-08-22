@@ -177,10 +177,10 @@ For example, the following runs "echo 'hi'" on localhost:
 ```
 
 ### SSH Target Object
-The Target is a JSON object. See the [schema](../lib/bolt_server/schemas/ssh-run_task.json)
+The Target is a JSON object. See the [schema](../lib/bolt_server/schemas/partials/target-ssh.json)
 
 ### WinRM Target Object
-The Target is a JSON object. See the [schema](../lib/bolt_server/schemas/winrm-run_task.json)
+The Target is a JSON object. See the [schema](../lib/bolt_server/schemas/partials/target-winrm.json)
 
 ### Task Object
 This is nearly identical to the [task detail JSON
