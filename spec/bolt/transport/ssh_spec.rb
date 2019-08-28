@@ -109,6 +109,30 @@ describe Bolt::Transport::SSH do
       ssh.with_connection(make_target(conf: no_host_key_check)) {}
     end
 
+    it "defers to SSH config if host-key-check is unset" do
+      expect(Net::SSH::Config).to receive(:for).and_return(strict_host_key_checking: false)
+      expect(Net::SSH)
+        .to receive(:start)
+        .with(anything,
+              anything,
+              hash_including(
+                verify_host_key: instance_of(Net::SSH::Verifiers::AcceptNewOrLocalTunnel)
+              ))
+      ssh.with_connection(target) {}
+    end
+
+    it "ignores SSH config if host-key-check is set" do
+      expect(Net::SSH::Config).to receive(:for).and_return(strict_host_key_checking: true)
+      allow(Net::SSH)
+        .to receive(:start)
+        .with(anything,
+              anything,
+              hash_including(
+                verify_host_key: instance_of(Net::SSH::Verifiers::Never)
+              ))
+      ssh.with_connection(make_target(conf: no_host_key_check)) {}
+    end
+
     it "rejects the connection if host key verification fails" do
       expect_node_error(Bolt::Node::ConnectError,
                         'HOST_KEY_ERROR',

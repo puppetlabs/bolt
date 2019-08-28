@@ -53,7 +53,6 @@ describe Bolt::Applicator do
           transports: {
             ssh: {
               'connect-timeout' => 10,
-              'host-key-check' => true,
               'tty' => false,
               'load-config' => true,
               'disconnect-timeout' => 5

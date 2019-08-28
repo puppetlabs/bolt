@@ -46,9 +46,9 @@ Ran on 1 node in 0.42 seconds
 
 ```
 
-> **Tip:** If you receive the error `Host key verification failed` make sure the correct host keys are in your `known_hosts` file or pass `--no-host-key-check` to future Bolt commands. Bolt will not honor `StrictHostKeyChecking` in your SSH configuration.
+> **Tip:** If you receive the error `Host key verification failed` make sure the correct host keys are in your `known_hosts` file, set `StrictHostKeyChecking=no` in your SSH config, or pass `--no-host-key-check` to future Bolt commands.
 
-Run the 'uptime' command on multiple nodes by passing a comma-separated list. If you are using existing nodes on your system, replace `node1,node2,node3` with addresses for your nodes. If you get an error about `Host key verification` run the rest of the examples with the `--no-host-key-check` flag to disable host key verification.
+Run the 'uptime' command on multiple nodes by passing a comma-separated list. If you are using existing nodes on your system, replace `node1,node2,node3` with addresses for your nodes.
 
 ```shell
 bolt command run uptime --nodes node1,node2,node3

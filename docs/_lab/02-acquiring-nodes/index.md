@@ -45,7 +45,7 @@ You can save that so it will be automatically picked up by most SSH clients, inc
 
 ```bash
 mkdir ~/.ssh
-vagrant ssh-config | sed /StrictHostKeyChecking/d | sed /UserKnownHostsFile/d >> ~/.ssh/config
+vagrant ssh-config >> ~/.ssh/config
 ```
 
 By saving this SSH configuration file, you can use the node name, rather than the IP address. When passing nodes to Bolt in the following exercises with Linux you will use `--nodes node1,node2`.

@@ -241,6 +241,7 @@ describe "BoltServer::TransportApp" do
                                    password: target[:password],
                                    port: target[:port]
                                  })
+      body[:target]['host-key-check'] = false if transport == 'ssh'
 
       post(path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
     end

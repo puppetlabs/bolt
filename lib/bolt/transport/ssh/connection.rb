@@ -25,9 +25,10 @@ module Bolt
           @target = target
           @load_config = target.options['load-config']
 
-          ssh_user = @load_config ? Net::SSH::Config.for(target.host)[:user] : nil
-          @user = @target.user || ssh_user || Etc.getlogin
+          ssh_config = @load_config ? Net::SSH::Config.for(target.host) : {}
+          @user = @target.user || ssh_config[:user] || Etc.getlogin
           @run_as = nil
+          @strict_host_key_checking = ssh_config[:strict_host_key_checking]
 
           @logger = Logging.logger[@target.host]
           @transport_logger = transport_logger
@@ -61,7 +62,17 @@ module Bolt
           options[:password] = target.password if target.password
           # Support both net-ssh 4 and 5. We use 5 in packaging, but Beaker pins to 4 so we
           # want the gem to be compatible with version 4.
-          options[:verify_host_key] = if target.options['host-key-check']
+          options[:verify_host_key] = if target.options['host-key-check'].nil?
+                                        # Fall back to SSH behavior. This variable will only be set in net-ssh 5.3+.
+                                        if @strict_host_key_checking.nil? || @strict_host_key_checking
+                                          Net::SSH::Verifiers::Always.new
+                                        else
+                                          # SSH's behavior with StrictHostKeyChecking=no: adds new keys to known_hosts.
+                                          # If known_hosts points to /dev/null, then equivalent to :never where it
+                                          # accepts any key beacuse they're all new.
+                                          Net::SSH::Verifiers::AcceptNewOrLocalTunnel.new
+                                        end
+                                      elsif target.options['host-key-check']
                                         if defined?(Net::SSH::Verifiers::Always)
                                           Net::SSH::Verifiers::Always.new
                                         else

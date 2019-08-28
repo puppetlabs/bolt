@@ -473,10 +473,10 @@ describe "Bolt::CLI" do
         expect(cli.config.transports[:ssh]['host-key-check']).to eq(false)
       end
 
-      it "defaults to true" do
+      it "defaults to nil" do
         cli = Bolt::CLI.new(%w[command run uptime --nodes foo])
         cli.parse
-        expect(cli.config.transports[:ssh]['host-key-check']).to eq(true)
+        expect(cli.config.transports[:ssh]['host-key-check']).to eq(nil)
       end
     end
 

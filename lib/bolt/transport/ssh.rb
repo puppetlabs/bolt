@@ -16,7 +16,6 @@ module Bolt
       def self.default_options
         {
           'connect-timeout' => 10,
-          'host-key-check' => true,
           'tty' => false,
           'load-config' => true,
           'disconnect-timeout' => 5
@@ -31,7 +30,7 @@ module Bolt
         validate_sudo_options(options)
 
         host_key = options['host-key-check']
-        unless !!host_key == host_key
+        unless host_key.nil? || !!host_key == host_key
           raise Bolt::ValidationError, 'host-key-check option must be a Boolean true or false'
         end
 
