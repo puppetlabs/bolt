@@ -103,8 +103,7 @@ describe "BoltServer::TransportApp" do
         body = { target: {
           hostname: target[:host],
           user: target[:user],
-          port: target[:port],
-          'host-key-check': false
+          port: target[:port]
         } }
 
         post(path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
@@ -121,8 +120,7 @@ describe "BoltServer::TransportApp" do
           'hostname': target[:host],
           'user': target[:user],
           'password': target[:password],
-          'port': target[:port],
-          'host-key-check': false
+          'port': target[:port]
         } }
 
         expect_any_instance_of(BoltServer::TransportApp)
@@ -142,8 +140,7 @@ describe "BoltServer::TransportApp" do
           'hostname': target[:host],
           'user': target[:user],
           'private-key-content': private_key_content,
-          'port': target[:port],
-          'host-key-check': false
+          'port': target[:port]
         } }
 
         expect_any_instance_of(BoltServer::TransportApp)
@@ -241,7 +238,6 @@ describe "BoltServer::TransportApp" do
                                    password: target[:password],
                                    port: target[:port]
                                  })
-      body[:target]['host-key-check'] = false if transport == 'ssh'
 
       post(path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
     end
@@ -267,6 +263,32 @@ describe "BoltServer::TransportApp" do
         result = JSON.parse(last_response.body)
         expect(result).to include('status' => 'success')
         expect(result['result']['_output']).to match(/got passed the message: Hello!/)
+      end
+
+      it 'overrides host-key-check default', :ssh do
+        target = conn_info('ssh')
+        body = {
+          target: {
+            hostname: target[:host],
+            user: target[:user],
+            password: target[:password],
+            port: target[:port],
+            'host-key-check': true
+          },
+          task: { name: 'sample::echo',
+                  metadata: {
+                    description: 'Echo a message',
+                    parameters: { message: 'Default message' }
+                  },
+                  files: [{ filename: "echo.sh", sha256: "foo",
+                            uri: { path: 'foo', params: { environment: 'foo' } } }] },
+          parameters: { message: "Hello!" }
+        }
+
+        post('ssh/run_task', JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
+
+        result = last_response.body
+        expect(result).to match(/Host key verification failed for localhost/)
       end
 
       it "runs a simple echo task over WinRM", :winrm do

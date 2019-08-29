@@ -65,23 +65,17 @@ module Bolt
           options[:verify_host_key] = if target.options['host-key-check'].nil?
                                         # Fall back to SSH behavior. This variable will only be set in net-ssh 5.3+.
                                         if @strict_host_key_checking.nil? || @strict_host_key_checking
-                                          Net::SSH::Verifiers::Always.new
+                                          net_ssh_verifier(:always)
                                         else
                                           # SSH's behavior with StrictHostKeyChecking=no: adds new keys to known_hosts.
                                           # If known_hosts points to /dev/null, then equivalent to :never where it
                                           # accepts any key beacuse they're all new.
-                                          Net::SSH::Verifiers::AcceptNewOrLocalTunnel.new
+                                          net_ssh_verifier(:accept_new_or_tunnel_local)
                                         end
                                       elsif target.options['host-key-check']
-                                        if defined?(Net::SSH::Verifiers::Always)
-                                          Net::SSH::Verifiers::Always.new
-                                        else
-                                          Net::SSH::Verifiers::Secure.new
-                                        end
-                                      elsif defined?(Net::SSH::Verifiers::Never)
-                                        Net::SSH::Verifiers::Never.new
+                                        net_ssh_verifier(:always)
                                       else
-                                        Net::SSH::Verifiers::Null.new
+                                        net_ssh_verifier(:never)
                                       end
           options[:timeout] = target.options['connect-timeout'] if target.options['connect-timeout']
 
@@ -277,6 +271,31 @@ module Bolt
           @session.scp.upload!(StringIO.new(content), remote_path)
           make_executable(remote_path)
           remote_path
+        end
+
+        # This handles renaming Net::SSH verifiers between version 4.x and 5.x
+        # of the gem
+        def net_ssh_verifier(verifier)
+          case verifier
+          when :always
+            if defined?(Net::SSH::Verifiers::Always)
+              Net::SSH::Verifiers::Always.new
+            else
+              Net::SSH::Verifiers::Secure.new
+            end
+          when :never
+            if defined?(Net::SSH::Verifiers::Never)
+              Net::SSH::Verifiers::Never.new
+            else
+              Net::SSH::Verifiers::Null.new
+            end
+          when :accept_new_or_tunnel_local
+            if defined?(Net::SSH::Verifiers::AcceptNewOrLocalTunnel)
+              Net::SSH::Verifiers::AcceptNewOrLocalTunnel.new
+            else
+              Net::SSH::Verifiers::Lenient.new
+            end
+          end
         end
       end
     end

@@ -103,7 +103,8 @@ module BoltServer
       error = validate_schema(@schemas["transport-ssh"], body)
       return [400, error.to_json] unless error.nil?
 
-      opts = body['target'].clone
+      defaults = { 'host-key-check' => false }
+      opts = defaults.merge(body['target'])
       if opts['private-key-content']
         opts['private-key'] = { 'key-data' => opts['private-key-content'] }
         opts.delete('private-key-content')
