@@ -55,6 +55,7 @@ Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFuncti
 
     options ||= {}
     options = options.merge('_description' => description) if description
+    options = options.merge('_raw_source' => source)
     executor = Puppet.lookup(:bolt_executor)
     inventory = Puppet.lookup(:bolt_inventory)
 

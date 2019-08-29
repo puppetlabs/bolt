@@ -59,6 +59,7 @@ Puppet::Functions.create_function(:upload_file, Puppet::Functions::InternalFunct
 
     options ||= {}
     options = options.merge('_description' => description) if description
+    options = options.merge('_raw_source' => source)
     executor = Puppet.lookup(:bolt_executor)
     inventory = Puppet.lookup(:bolt_inventory)
 
