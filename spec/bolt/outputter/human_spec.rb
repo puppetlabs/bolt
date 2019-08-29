@@ -185,6 +185,17 @@ built-in module
     TASK_OUTPUT
   end
 
+  it 'prints correct file separator for modulepath' do
+    task = {
+      'name' => 'monkey_bread',
+      'files' => [{ 'name' => 'monkey_bread.rb',
+                    'path' => "#{Bolt::PAL::MODULES_PATH}/monkey/bread" }],
+      'metadata' => {}
+    }
+    outputter.print_tasks([task], %w[path1 path2])
+    expect(output.string).to include("path1#{File::PATH_SEPARATOR}path2")
+  end
+
   it "formats a plan" do
     plan = {
       'name' => 'planity_plan',
