@@ -209,7 +209,7 @@ module Bolt
 
       def print_tasks(tasks, modulepath)
         print_table(tasks)
-        print_message("\nMODULEPATH:\n#{modulepath.join(':')}\n"\
+        print_message("\nMODULEPATH:\n#{modulepath.join(File::PATH_SEPARATOR)}\n"\
                         "\nUse `bolt task show <task-name>` to view "\
                         "details and parameters for a specific task.")
       end
@@ -278,7 +278,7 @@ module Bolt
 
       def print_plans(plans, modulepath)
         print_table(plans)
-        print_message("\nMODULEPATH:\n#{modulepath.join(':')}\n"\
+        print_message("\nMODULEPATH:\n#{modulepath.join(File::PATH_SEPARATOR)}\n"\
                         "\nUse `bolt plan show <plan-name>` to view "\
                         "details and parameters for a specific plan.")
       end
