@@ -27,7 +27,7 @@ describe "Bolt::Outputter::Human" do
   it "allows empty items" do
     outputter.print_head
     outputter.print_summary(Bolt::ResultSet.new([]), 2.0)
-    expect(output.string).to eq("Ran on 0 nodes in 2.00 seconds\n")
+    expect(output.string).to eq("Ran on 0 nodes in 2.0 sec\n")
   end
 
   it "prints status" do
@@ -44,7 +44,7 @@ describe "Bolt::Outputter::Human" do
     summary = lines.split("\n")[-3..-1]
     expect(summary[0]).to eq('Successful on 1 node: node1')
     expect(summary[1]).to eq('Failed on 1 node: node2')
-    expect(summary[2]).to eq('Ran on 2 nodes in 10.00 seconds')
+    expect(summary[2]).to eq('Ran on 2 nodes in 10.0 sec')
   end
 
   context 'with multiple successes' do
@@ -61,7 +61,7 @@ describe "Bolt::Outputter::Human" do
       outputter.print_summary(results, 0.0)
       summary = output.string.split("\n")
       expect(summary[0]).to eq('Successful on 2 nodes: node1,node2')
-      expect(summary[1]).to eq('Ran on 2 nodes in 0.00 seconds')
+      expect(summary[1]).to eq('Ran on 2 nodes in 0.0 sec')
     end
   end
 
@@ -79,7 +79,7 @@ describe "Bolt::Outputter::Human" do
       outputter.print_summary(results, 0.0)
       summary = output.string.split("\n")
       expect(summary[0]).to eq('Failed on 2 nodes: node1,node2')
-      expect(summary[1]).to eq('Ran on 2 nodes in 0.00 seconds')
+      expect(summary[1]).to eq('Ran on 2 nodes in 0.0 sec')
     end
   end
 
@@ -316,5 +316,32 @@ plans/plans/plans/plans
     outputter.handle_event(type: :disable_default_output)
     outputter.handle_event(type: :message, message: "hello!")
     expect(output.string).to eq("hello!\n")
+  end
+
+  context '#duration_to_string' do
+    it 'includes only seconds when the duration is less than a minute' do
+      str = outputter.duration_to_string(34)
+      expect(str).to eq("34 sec")
+    end
+
+    it 'includes up to two decimal places if the duration is less than a minute' do
+      str = outputter.duration_to_string(34.5678)
+      expect(str).to eq("34.57 sec")
+    end
+
+    it 'includes minutes when the duration is more than a minute' do
+      str = outputter.duration_to_string(99)
+      expect(str).to eq("1 min, 39 sec")
+    end
+
+    it 'rounds to the nearest whole second if the duration is more than a minute' do
+      str = outputter.duration_to_string(99.99)
+      expect(str).to eq("1 min, 40 sec")
+    end
+
+    it 'includes hours when the duration is more than an hour' do
+      str = outputter.duration_to_string(3750)
+      expect(str).to eq("1 hr, 2 min, 30 sec")
+    end
   end
 end

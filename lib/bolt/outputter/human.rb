@@ -161,7 +161,7 @@ module Bolt
         @plan_depth -= 1
         plan = event[:plan]
         duration = event[:duration]
-        @stream.puts(colorize(:green, "Finished: plan #{plan} in #{duration.round(2)} sec"))
+        @stream.puts(colorize(:green, "Finished: plan #{plan} in #{duration_to_string(duration)}"))
       end
 
       def print_summary(results, elapsed_time = nil)
@@ -185,7 +185,7 @@ module Bolt
         total_msg = format('Ran on %<size>d node%<plural>s',
                            size: results.size,
                            plural: results.size == 1 ? '' : 's')
-        total_msg += format(' in %<elapsed>.2f seconds', elapsed: elapsed_time) unless elapsed_time.nil?
+        total_msg << " in #{duration_to_string(elapsed_time)}" unless elapsed_time.nil?
         @stream.puts total_msg
       end
 
@@ -365,6 +365,20 @@ module Bolt
 
       def print_message(message)
         @stream.puts(message)
+      end
+
+      def duration_to_string(duration)
+        hrs = (duration / 3600).floor
+        mins = ((duration % 3600) / 60).floor
+        secs = (duration % 60)
+        if hrs > 0
+          "#{hrs} hr, #{mins} min, #{secs.round} sec"
+        elsif mins > 0
+          "#{mins} min, #{secs.round} sec"
+        else
+          # Include 2 decimal places if the duration is under a minute
+          "#{secs.round(2)} sec"
+        end
       end
     end
   end
