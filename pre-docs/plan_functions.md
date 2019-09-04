@@ -59,14 +59,17 @@ add_to_group('foo,bar,baz', 'group1')
 
 ## apply_prep
 
-Installs the puppet-agent package on targets if needed then collects facts, including any custom
-facts found in Bolt's modulepath.
+Installs the puppet-agent package on targets if needed, then collects facts,
+including any custom facts found in Bolt's modulepath. The package is
+installed using either the configured plugin or the `task` plugin with the
+`puppet_agent::install` task.
 
 Agent detection will be skipped if the target includes the 'puppet-agent' feature, either as a
 property of its transport (PCP) or by explicitly setting it as a feature in Bolt's inventory.
 
-If no agent is detected on the target using the 'puppet_agent::version' task, it's installed
-using 'puppet_agent::install' and the puppet service is stopped/disabled using the 'service' task.
+If Bolt does not detect an agent on the target using the 'puppet_agent::version' task,
+it will install the agent using either the configured plugin or the
+task plugin.
 
 **NOTE:** Not available in apply block
 

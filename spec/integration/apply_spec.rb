@@ -53,6 +53,77 @@ describe "apply" do
       ] }
     end
 
+    def lib_plugin_inventory
+      { 'version' => 2,
+        'targets' => [{
+          'uri' => conn_uri('ssh'),
+          'plugin_hooks' => {
+            'puppet_library' => {
+              'plugin' => 'install_agent'
+            }
+          }
+        }] }
+    end
+
+    def error_plugin_inventory
+      { 'version' => 2,
+        'targets' => [{
+          'uri' => conn_uri('ssh'),
+          'name' => 'error',
+          'plugin_hooks' => {
+            'puppet_library' => {
+              'plugin' => 'task',
+              'task' => 'prep::error'
+            }
+          }
+        }, {
+          'uri' => conn_uri('ssh'),
+          'name' => 'success',
+          'plugin_hooks' => {
+            'puppet_library' => {
+              'plugin' => 'install_agent'
+            }
+          }
+        }, {
+          # These fail the puppet_agent::version check if they're fake. Seems
+          # like more effort than it's worth to mock them
+          'uri' => conn_uri('ssh'),
+          'name' => 'badparams',
+          'plugin_hooks' => {
+            'puppet_library' => {
+              'plugin' => 'task',
+              'task' => 'puppet_agent::install',
+              'parameters' => {
+                'collection' => 'The act or process of collecting.'
+              }
+            }
+          }
+        }, {
+          'uri' => conn_uri('ssh'),
+          'name' => 'badplugin',
+          'plugin_hooks' => {
+            'puppet_library' => {
+              'plugin' => 'what plugin?'
+            }
+          }
+        }] }
+    end
+
+    def task_plugin_inventory
+      { 'version' => 2,
+        'targets' => [{
+          'uri' => conn_uri('ssh'),
+          'plugin_hooks' => {
+            'puppet_library' => {
+              'plugin' => 'task',
+              'task' => 'puppet_agent::install',
+              'parameters' => { 'version' => '6.2.0' }
+            }
+          }
+        }],
+        'config' => root_config }
+    end
+
     after(:all) do
       ssh_node = conn_uri('ssh', include_password: true)
       uninstall([ssh_node, 'agent_targets'], inventory: agent_version_inventory)
@@ -132,6 +203,63 @@ describe "apply" do
       before(:each) do
         uninstall = '/opt/puppetlabs/bin/puppet resource package puppet-agent ensure=absent'
         run_cli_json(%W[command run #{uninstall}] + config_flags)
+      end
+
+      context 'with plugin configured' do
+        let(:config_flags) { %W[--format json -n all --password #{password} --modulepath #{modulepath}] + tflags }
+        let(:ssh_node) { conn_uri('ssh', include_password: true) }
+
+        before(:each) do
+          uninstall(ssh_node)
+        end
+
+        it 'with install_agent plugin configured installs the agent' do
+          with_tempfile_containing('inventory', YAML.dump(lib_plugin_inventory), '.yaml') do |inv|
+            result = run_cli_json(%W[plan run prep -i #{inv.path}] + config_flags)
+            expect(result).not_to include('kind')
+            expect(result.count).to eq(1)
+            expect(result[0]['status']).to eq('success')
+            report = result[0]['result']['report']
+            expect(report['resource_statuses']).to include("Notify[Hello #{conn_info('ssh')[:host]}]")
+          end
+        end
+
+        it 'errors appropriately per target' do
+          with_tempfile_containing('inventory', YAML.dump(error_plugin_inventory), '.yaml') do |inv|
+            result = run_cli_json(%W[plan run prep -i #{inv.path}] + config_flags)
+            expect(result['kind']).to eq('bolt/run-failure')
+            expect(result['msg']).to eq("Plan aborted: apply_prep failed on 3 nodes")
+
+            result_set = result['details']['result_set']
+            task_error = result_set.select { |h| h['node'] == 'error' }[0]['result']['_error']
+            expect(task_error['kind']).to eq('puppetlabs.tasks/task-error')
+            expect(task_error['msg']).to include("The task failed with exit code 1")
+
+            param_error = result_set.select { |h| h['node'] == 'badparams' }[0]['result']['_error']
+            expect(param_error['kind']).to eq('bolt/validation-error')
+            expect(param_error['msg']).to include("Invalid parameters for Task puppet_agent::install")
+
+            plugin_error = result_set.select { |h| h['node'] == 'badplugin' }[0]['result']['_error']
+            expect(plugin_error['kind']).to eq('bolt/unknown-plugin')
+            expect(plugin_error['msg']).to include("Unknown plugin: 'what plugin?'")
+          end
+        end
+
+        it 'with task plugin configured installs the agent' do
+          with_tempfile_containing('inventory', YAML.dump(task_plugin_inventory), '.yaml') do |inv|
+            result = run_cli_json(%W[plan run prep -i #{inv.path}] + config_flags)
+            expect(result).not_to include('kind')
+            expect(result.count).to eq(1)
+            expect(result[0]['status']).to eq('success')
+            report = result[0]['result']['report']
+            expect(report['resource_statuses']).to include("Notify[Hello #{conn_info('ssh')[:host]}]")
+
+            result = run_cli_json(%W[task run puppet_agent::version -i #{inv.path}] + config_flags)['items']
+            expect(result.count).to eq(1)
+            expect(result[0]).to include('status' => 'success')
+            expect(result[0]['result']['version']).to match(/^6\.2/)
+          end
+        end
       end
 
       it 'succeeds when run twice' do

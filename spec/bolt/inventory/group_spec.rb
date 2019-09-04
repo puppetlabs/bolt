@@ -49,6 +49,7 @@ describe Bolt::Inventory::Group do
                                              'vars' => {},
                                              'facts' => {},
                                              'features' => [],
+                                             'plugin_hooks' => {},
                                              'groups' => [])
     end
 

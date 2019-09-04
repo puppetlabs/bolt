@@ -5,13 +5,14 @@ require 'bolt/inventory/group'
 module Bolt
   class Inventory
     class Group2
-      attr_accessor :name, :targets, :aliases, :name_or_alias, :groups, :config, :rest, :facts, :vars, :features
+      attr_accessor :name, :targets, :aliases, :name_or_alias, :groups,
+                    :config, :rest, :facts, :vars, :features, :plugin_hooks
 
       # THESE are duplicates with the old groups for now.
       # Regex used to validate group names and target aliases.
       NAME_REGEX = /\A[a-z0-9_][a-z0-9_-]*\Z/.freeze
 
-      DATA_KEYS = %w[name config facts vars features].freeze
+      DATA_KEYS = %w[name config facts vars features plugin_hooks].freeze
       NODE_KEYS = DATA_KEYS + %w[alias uri]
       GROUP_KEYS = DATA_KEYS + %w[groups targets]
       CONFIG_KEYS = Bolt::TRANSPORTS.keys.map(&:to_s) + ['transport']
@@ -23,7 +24,7 @@ module Bolt
         raise ValidationError.new("Group does not have a name", nil) unless data.key?('name')
         @plugins = plugins
 
-        %w[name vars features facts].each do |key|
+        %w[name vars features facts plugin_hooks].each do |key|
           validate_config_plugin(data[key], key, nil)
         end
 
@@ -45,6 +46,7 @@ module Bolt
         @vars = fetch_value(data, 'vars', Hash)
         @facts = fetch_value(data, 'facts', Hash)
         @features = fetch_value(data, 'features', Array)
+        @plugin_hooks = fetch_value(data, 'plugin_hooks', Hash)
 
         @config = config_only_plugin(fetch_value(data, 'config', Hash))
 
@@ -134,6 +136,7 @@ module Bolt
             'vars' => data['vars'] || {},
             'facts' => data['facts'] || {},
             'features' => data['features'] || [],
+            'plugin_hooks' => data['plugin_hooks'] || {},
             # This allows us to determine if a target was found?
             'name' => data['name'] || nil,
             'uri' => data['uri'] || nil,
@@ -240,6 +243,7 @@ module Bolt
           'vars' => data1['vars'].merge(data2['vars']),
           'facts' => Bolt::Util.deep_merge(data1['facts'], data2['facts']),
           'features' => data1['features'] | data2['features'],
+          'plugin_hooks' => data1['plugin_hooks'].merge(data2['plugin_hooks']),
           'groups' => data2['groups'] + data1['groups']
         }
       end
@@ -346,7 +350,8 @@ module Bolt
       end
 
       # The data functions below expect and return nil or a hash of the schema
-      # { 'config' => Hash , 'vars' => Hash, 'facts' => Hash, 'features' => Array, groups => Array }
+      # {'config' => Hash, 'vars' => Hash, 'facts' => Hash, 'features' => Array,
+      #  'plugin_hooks' => Hash, 'groups' => Array}
       def data_for(target_name)
         data_merge(group_collect(target_name), target_collect(target_name))
       end
@@ -356,6 +361,7 @@ module Bolt
           'vars' => @vars,
           'facts' => @facts,
           'features' => @features,
+          'plugin_hooks' => @plugin_hooks,
           'groups' => [@name] }
       end
 
@@ -364,6 +370,7 @@ module Bolt
           'vars' => {},
           'facts' => {},
           'features' => [],
+          'plugin_hooks' => {},
           'groups' => [] }
       end
 
