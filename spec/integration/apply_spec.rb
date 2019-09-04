@@ -201,6 +201,12 @@ describe "apply" do
           raise 'remote pid was not found' if remote_pid.nil?
           expect(local_pid).not_to eq(remote_pid)
         end
+
+        it 'respects _run_as on a plan invocation' do
+          user = conn_info('ssh')[:user]
+          logs = run_cli_json(%W[plan run basic::run_as_apply user=#{user}] + config_flags)
+          expect(logs.first['message']).to eq(conn_info('ssh')[:user])
+        end
       end
 
       context "bolt apply command" do
