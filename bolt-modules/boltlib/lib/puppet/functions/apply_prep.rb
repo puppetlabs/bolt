@@ -104,7 +104,7 @@ Puppet::Functions.create_function(:apply_prep) do
                 hook = inventory.plugins.get_hook(opts['plugin'], :puppet_library)
                 { 'target' => t,
                   'hook_proc' => hook.call(opts, t, self) }
-              rescue Bolt::Error => e
+              rescue StandardError => e
                 Bolt::Result.from_exception(t, e)
               end
             end
