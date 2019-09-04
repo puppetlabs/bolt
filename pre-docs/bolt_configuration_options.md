@@ -243,7 +243,7 @@ plugin_hooks:
   puppet_library:
     plugin: task
     task: 'bootstrap'
-    params:
+    parameters:
       master: 'puppet.example.com'
       cacert_content: <cert>
 ```

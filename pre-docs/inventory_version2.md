@@ -244,7 +244,7 @@ plugin_hooks:
   puppet_library:
     plugin: task
     task: puppet_agent::install
-    params:
+    parameters:
       version: 6.2.0
       yum_source: yum.customurl.net
 ```
@@ -255,7 +255,7 @@ plugin_hooks:
   puppet_library:
     plugin: task
     task: bootstrap::linux
-    params:
+    parameters:
       master: mymaster.fqdn
       environment: dev
 ```
@@ -269,14 +269,14 @@ sets some config and starts the agent service.
 version: 2
 groups:
   - name: custom_nodes
-    nodes:
+    targets:
       - foo
       - bar
     plugin_hooks:
       puppet_library:
         plugin: task
         task: custom_agent::install
-        params:
+        parameters:
           version: 6.2.0
 ```
 
