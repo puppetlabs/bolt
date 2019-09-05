@@ -13,6 +13,10 @@
   * `install_agent`, which maintains previous `apply_prep` behavior and is the default
   * `task`, which allows users to either use the `puppet_agent::install` task with non-default parameters, or use their own task.
 
+* **Add CHANGELOG.md** ([#1138](https://github.com/puppetlabs/bolt/issues/1138))
+
+  Bolt now tracks release notes about new features, bug fixes, and deprecation warnings in a `CHANGELOG.md` in the root of the repo, and gets updated per PR. As the CHANGELOG file, I'd argue it's the best file in the whole repo.
+
 #### Bug fixes
 
 * **Correct file path separator in task show modulepath** ([#1183](https://github.com/puppetlabs/bolt/issues/1183))
@@ -20,9 +24,11 @@
   The modulepath listed in `bolt task show` and `bolt plan show` output now uses an OS correct file path separator.
 
 * **bolt-inventory-pdb was not installed on path** ([#1172](https://github.com/puppetlabs/bolt/issues/1172))
+
   During Bolt installation, the bolt-inventory-pdb tool is now installed on the user's path. This lets the user run it from the command line without knowing the exact location of the tool.
 
 * **Task helpers correctly print errors** ([puppetlabs/puppetlabs-ruby_task_helper#5](https://github.com/puppetlabs/puppetlabs-ruby_task_helper/pull/5) and [puppetlabs/puppetlabs-python_task_helper#](https://github.com/puppetlabs/puppetlabs-python_task_helper/pull/8))
+
   Task helpers now correctly wrap error results in `{ _error: < error >}` so the error message is correctly displayed.
 
 ## 1.29.1
