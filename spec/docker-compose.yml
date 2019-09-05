@@ -84,7 +84,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.samba-ad
-    restart: always
     # SYS_ADMIN necessary for samba-tool domain provision
     # otherwise set_nt_acl_no_snum: fset_nt_acl returned NT_STATUS_ACCESS_DENIED
     cap_add:
