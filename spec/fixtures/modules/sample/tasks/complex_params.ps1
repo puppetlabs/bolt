@@ -46,7 +46,12 @@ param(
 
   [Parameter(Mandatory = $False)]
   [Switch]
-  $ArgSwitch
+  $ArgSwitch,
+
+  # Parameters may have the string `type` in them, but not have the name `type`
+  [Parameter(Mandatory = $False)]
+  [String]
+  $types
 )
 
 function ConvertTo-String

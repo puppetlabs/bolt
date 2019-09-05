@@ -193,7 +193,7 @@ PROCESS{
     return $xml.Objects | ConvertFrom-Xml
   }
   $propbag = @{}
-  foreach ($name in Get-Member -InputObject $xml -MemberType Properties | Where-Object{$_.Name -notmatch "^__|type"} | Select-Object -ExpandProperty name) {
+  foreach ($name in Get-Member -InputObject $xml -MemberType Properties | Where-Object{$_.Name -notmatch "^(__.*|type)$"} | Select-Object -ExpandProperty name) {
     Write-Debug "$Name Type: $($xml.$Name.type)" -Debug:$false
     $propbag."$Name" = Convert-Properties $xml."$name"
   }

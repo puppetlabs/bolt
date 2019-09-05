@@ -45,3 +45,5 @@ hello all
 True
 * ArgTimeSpan (timespan):
 12:34:56
+* types (string):
+foo
