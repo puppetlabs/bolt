@@ -42,7 +42,7 @@ class Client
 
   def run_task(task_name, target_name, params, base_uri: 'https://localhost:62658')
     target = target(target_name)
-    body = build_request(task_name, target, params)
+    body = build_task_request(task_name, target, params)
 
     uri = URI("#{base_uri}/#{target.protocol}/run_task")
     req = Net::HTTP::Post.new(uri)

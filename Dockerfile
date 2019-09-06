@@ -2,7 +2,7 @@
 FROM alpine:3.8 as build
 
 RUN \
-apk --no-cache add build-base ruby-dev ruby-bundler ruby-json ruby-bigdecimal git openssl-dev && \
+apk --no-cache add build-base ruby-dev ruby-bundler ruby-json ruby-bigdecimal git openssl-dev linux-headers && \
 echo 'gem: --no-document' > /etc/gemrc && \
 bundle config --global silence_root_warning 1
 
