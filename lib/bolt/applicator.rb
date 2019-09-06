@@ -195,6 +195,7 @@ module Bolt
               arguments = {
                 'catalog' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(catalog),
                 'plugins' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(plugins),
+                '_task' => catalog_apply_task.name,
                 '_noop' => options['_noop']
               }
 
@@ -204,6 +205,8 @@ module Bolt
                 end
                 @executor.publish_event(event)
               end
+              # Respect the run_as default set on the executor
+              options = { '_run_as' => @executor.run_as }.merge(options) if @executor.run_as
               results = transport.batch_task(batch, catalog_apply_task, arguments, options, &callback)
               Array(results).map { |result| ApplyResult.from_task_result(result) }
             end
