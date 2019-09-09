@@ -202,7 +202,6 @@ hello! from 127.0.0.1
 
 Congratulations! You should now have a basic understanding of Bolt and Bolt Tasks. Here are a few ideas for what to do next:
 
-* Explore content on the [Bolt Tasks Playground](https://github.com/puppetlabs/tasks-playground)
 * Get reusable tasks and plans from the [Task Modules Repo](https://github.com/puppetlabs/task-modules)
 * Search Puppet Forge for [Tasks](https://forge.puppet.com/modules?with_tasks=yes)
 * Start writing Tasks for one of your existing Puppet modules
