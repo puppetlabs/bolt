@@ -295,6 +295,24 @@ describe "BoltServer::TransportApp" do
       post(path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
     end
 
+    describe 'check_node_connections' do
+      it 'checks node connections over SSH', :ssh do
+        post_over_transport('ssh', 'check_node_connections', {}, multiple: true)
+
+        expect(last_response.status).to eq(200)
+        result = JSON.parse(last_response.body)
+        expect(result['status']).to eq('success')
+      end
+
+      it 'checks node connections over WinRM', :winrm do
+        post_over_transport('winrm', 'check_node_connections', {}, multiple: true)
+
+        expect(last_response.status).to eq(200)
+        result = JSON.parse(last_response.body)
+        expect(result['status']).to eq('success')
+      end
+    end
+
     describe 'run_task' do
       describe 'over SSH', :ssh do
         let(:simple_ssh_task) {

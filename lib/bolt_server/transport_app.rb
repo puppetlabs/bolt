@@ -19,7 +19,14 @@ module BoltServer
     PARTIAL_SCHEMAS = %w[target-any target-ssh target-winrm task].freeze
 
     # These schemas combine shared schemas to describe client requests
-    REQUEST_SCHEMAS = %w[action-run_task action-run_command action-upload_file transport-ssh transport-winrm].freeze
+    REQUEST_SCHEMAS = %w[
+      action-check_node_connections
+      action-run_command
+      action-run_task
+      action-upload_file
+      transport-ssh
+      transport-winrm
+    ].freeze
 
     def initialize(config)
       @config = config
@@ -71,6 +78,19 @@ module BoltServer
 
       command = body['command']
       [@executor.run_command(target, command), nil]
+    end
+
+    def check_node_connections(targets, body)
+      error = validate_schema(@schemas["action-check_node_connections"], body)
+      return [], error unless error.nil?
+
+      # Puppet Enterprise's orchestrator service uses the
+      # check_node_connections endpoint to check whether nodes that should be
+      # contacted over SSH or WinRM are responsive. The wait time here is 0
+      # because the endpoint is meant to be used for a single check of all
+      # nodes; External implementations of wait_until_available (like
+      # orchestrator's) should contact the endpoint in their own loop.
+      [@executor.wait_until_available(targets, wait_time: 0), nil]
     end
 
     def upload_file(target, body)
@@ -125,6 +145,7 @@ module BoltServer
     end
 
     ACTIONS = %w[
+      check_node_connections
       run_command
       run_task
       upload_file

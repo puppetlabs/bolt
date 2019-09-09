@@ -134,5 +134,20 @@ describe "BoltServer::TransportApp", puppetserver: true do
         end
       end
     end
+
+    describe "check_node_connections" do
+      let(:path) { '/ssh/check_node_connections' }
+
+      it 'checks connections on multiple targets' do
+        body = build_check_node_connections_request(
+          [conn_target('ssh', include_password: true)]
+        )
+        post(path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
+
+        response_body = JSON.parse(last_response.body)
+        expect(response_body['status']).to eq('success')
+        expect(last_response.status).to eq(200)
+      end
+    end
   end
 end
