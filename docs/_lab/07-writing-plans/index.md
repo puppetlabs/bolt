@@ -27,7 +27,7 @@ You can link a set of commands, scripts, and tasks together, and add parameters 
 Bolt is packaged with useful modules and plan content. Run the `bolt plan show` command to view a list of the plans installed in the project directory.
 
 ```shell
-bolt task show
+bolt plan show
 ```
 
 The result:
