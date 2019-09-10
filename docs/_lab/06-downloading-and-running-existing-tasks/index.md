@@ -7,7 +7,6 @@ time: Approximately 10 minutes
 In this exercise you will explore existing tasks, including several tasks that take advantage of Puppet under-the-hood.
 
 - [Install Puppet Using Bolt](#use-the-puppet_agent-module-to-install-puppet-agent)
-- [The Tasks Playground](#more-tips-tricks-and-ideas-on-the-tasks-playground)
 
 ## Prerequisites
 Complete the following before you start this lesson:
@@ -159,10 +158,10 @@ Successful on 3 nodes: node1,node2,node3
 Ran on 3 nodes in 10.03 seconds
 ```
 
-# More Tips, Tricks and Ideas on the Tasks Playground
+# More Tips, Tricks and Ideas
 
 See the [installing modules](https://puppet.com/docs/bolt/latest/bolt_installing_modules.html) documentation to learn how to install external modules. 
-These exercises introduce you to Bolt tasks. You'll find lots more tips, tricks, examples and hacks on the [Bolt Tasks Playground](https://github.com/puppetlabs/tasks-playground).
+These exercises introduce you to Bolt tasks.
 
 # Next Steps
 
