@@ -69,7 +69,7 @@ plan mymodule::my_plan(
 ) {
 
   # Extract the Target name from $webservers
-  $webserver_names = get_targets($nodes).map |$n| { $n.name }
+  $webserver_names = get_targets($webservers).map |$n| { $n.name }
 
   # process webservers
   run_task('mymodule::lb_remove', $load_balancer, webservers => $webserver_names)
