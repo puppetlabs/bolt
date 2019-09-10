@@ -176,6 +176,78 @@ For example, the following runs "echo 'hi'" on localhost:
 }
 ```
 
+### POST /ssh/upload_file
+- `target`: [SSH Target Object](#ssh-target-object), *required* - Target information to run task on.
+- `files`: Object, *required* - Which file(s) to upload, and where.
+    - `relative_path`: String, *required* - The destination for the file.
+    - `uri`: Object, *required* - The location of where to find the file.
+        - `path`: String, *required* - The endpoint to retrieve the file.
+        - `params`: Object, *required* - The parameters to supply the endpoint.
+    - `sha256`: String, *required* - The SHA256 value for the file.
+    - `kind`: String, *required* - Whether the file is a `file` or `directory`.
+- `job_id`: Integer, *required* - An identifier for the job. If this matches an existing ID, cached files may be returned.
+- `destination`: String, *required* - Where to put the files on the target machine.
+
+For example, the following uploads file 'abc' on linux_target.net:
+```
+{
+  "target": {
+    "hostname": "linux_target.net",
+    "user": "marauder",
+    "password": "I solemnly swear that I am up to no good",
+    "host-key-check": false,
+    "run-as": "george_weasley"
+  },
+  "destination": "/home/bolt/root",
+  "job_id": 1,
+  "files" : [{
+    "relative_path": "file.sh"
+    "uri": {
+      "path": "/puppet/v3/file_content/modules/some_module/file.sh",
+      "params": {}
+    },
+    "sha256": "SHA256VALUE",
+    "kind": "file"
+  }]
+}
+```
+
+### POST /winrm/upload_file
+- `target`: [WinRM Target Object](#winrm-target-object), *required* - Target information to run task on.
+- `files`: Object, *required* - Which file(s) to upload, and where.
+    - `relative_path`: String, *required* - The destination for the file.
+    - `uri`: Object, *required* - The location of where to find the file.
+        - `path`: String, *required* - The endpoint to retrieve the file.
+        - `params`: Object, *required* - The parameters to supply the endpoint.
+    - `sha256`: String, *required* - The SHA256 value for the file.
+    - `kind`: String, *required* - Whether the file is a `file` or `directory`.
+- `job_id`: Integer, *required* - An identifier for the job. If this matches an existing ID, cached files may be returned.
+- `destination`: String, *required* - Where to put the files on the target machine.
+
+For example, the following uploads file 'abc' on windows_target.net:
+```
+{
+  "target": {
+    "hostname": "windows_target.net",
+    "user": "Administrator",
+    "password": "Secret",
+    "ssl": false,
+    "ssl-verify": false
+  },
+  "destination": "C:\\Users\\bolt\\root",
+  "job_id": 1,
+  "files" : [{
+    "relative_path": "file.exe"
+    "uri": {
+      "path": "/puppet/v3/file_content/modules/some_module/file.exe",
+      "params": {}
+    },
+    "sha256": "SHA256VALUE",
+    "kind": "file"
+  }]
+}
+```
+
 ### SSH Target Object
 The Target is a JSON object. See the [schema](../lib/bolt_server/schemas/partials/target-ssh.json)
 

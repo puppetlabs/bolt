@@ -19,7 +19,7 @@ module BoltServer
     PARTIAL_SCHEMAS = %w[target-any target-ssh target-winrm task].freeze
 
     # These schemas combine shared schemas to describe client requests
-    REQUEST_SCHEMAS = %w[action-run_task action-run_command transport-ssh transport-winrm].freeze
+    REQUEST_SCHEMAS = %w[action-run_task action-run_command action-upload_file transport-ssh transport-winrm].freeze
 
     def initialize(config)
       @config = config
@@ -73,6 +73,38 @@ module BoltServer
       @executor.run_command(target, command)
     end
 
+    def upload_file(target, body)
+      error = validate_schema(@schemas["action-upload_file"], body)
+      return [400, error.to_json] unless error.nil?
+
+      files = body['files']
+      destination = body['destination']
+      job_id = body['job_id']
+      cache_dir = @file_cache.create_cache_dir(job_id.to_s)
+      FileUtils.mkdir_p(cache_dir)
+      files.each do |file|
+        relative_path = file['relative_path']
+        uri = file['uri']
+        sha256 = file['sha256']
+        kind = file['kind']
+        path = File.join(cache_dir, relative_path)
+        if kind == 'file'
+          # The parent should already be created by `directory` entries,
+          # but this is to be on the safe side.
+          parent = File.dirname(path)
+          FileUtils.mkdir_p(parent)
+          @file_cache.download_file(path, sha256, uri)
+        elsif kind == 'directory'
+          # Create directory in cache so we can move files in.
+          FileUtils.mkdir_p(path)
+        else
+          return [400, Bolt::Error.new("Invalid `kind` of '#{kind}' supplied. Must be `file` or `directory`.",
+                                       'boltserver/schema-error').to_json]
+        end
+      end
+      @executor.upload_file(target, cache_dir, destination)
+    end
+
     get '/' do
       200
     end
@@ -92,7 +124,7 @@ module BoltServer
       raise 'Unexpected error'
     end
 
-    ACTIONS = %w[run_task run_command].freeze
+    ACTIONS = %w[run_task run_command upload_file].freeze
 
     post '/ssh/:action' do
       not_found unless ACTIONS.include?(params[:action])
