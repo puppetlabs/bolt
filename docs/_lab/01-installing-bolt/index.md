@@ -1,5 +1,5 @@
 ---
-title: Installing Bolt
+title: Installing Bolt and Creating a Project
 difficulty: Basic
 time: Approximately 10 minutes
 ---
