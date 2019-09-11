@@ -32,3 +32,7 @@ When passing complex arguments to tasks with `--params`, Bolt may require a JSON
 While we would like to support Kerberos over SSH for authentication, a license incompatibility with other components we are distributing means that we cannot recommend using the net-ssh-krb gem for this functionality. [\(BOLT-980\)](https://tickets.puppet.com/browse/BOLT-980)
 
 Support for Kerberos over WinRM from a Linux host is currently experimental and requires the [MIT kerberos library be installed](https://web.mit.edu/Kerberos/www/krb5-latest/doc/admin/install_clients.html). Support from Windows [\(BOLT-1323\)](https://tickets.puppet.com/browse/BOLT-1323) and OSX [\(BOLT-1471\)](https://tickets.puppet.com/browse/BOLT-1471) will be implemented in the future.
+
+## Tasks executed with Powershell 2
+
+When executing powershell tasks on targets using a powershell interpreter version 2 or earlier, the task parameter with the name `type` cannot be used. Bolt versions 1.30.0 and earlier contained [a bug](https://github.com/puppetlabs/bolt/issues/1205) where parameters that contain the string `type` in the name (for example `serverType`) were incompatible. With bolt versions 1.31.0 and greater only powershell parameters with the name `type` cannot be used. Note that for newer versions of powershell this is not an issue.
