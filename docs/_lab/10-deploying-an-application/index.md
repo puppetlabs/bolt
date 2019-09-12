@@ -316,7 +316,7 @@ Bolt logs every action on each node which results in 5 messages for each node.
 By default these messages are logged at the `notice` level and can make it hard
 to see the more useful `notice` messages that the plan logs directly. To make the
 automatic messages log at `info` instead so they won't appear on the terminal
-with the `--verbose` flag the plan wraps the loop in a
+without the `--verbose` flag the plan wraps the loop in a
 `without_default_logging` block. All code executed inside a
 `without_default_logging` block including in functions or subplans will log
 actions at `info` instead of `notice`.
@@ -344,6 +344,7 @@ run_task('my_app::lb', $lb_server,
   action => 'drain',
   backend => $instance,
   server => $server.name,
+  _catch_errors => $force
 )
 ```
 
