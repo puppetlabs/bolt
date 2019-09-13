@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "upload_file request",
+  "description": "POST <transport>/upload_file request schema",
+  "type": "object",
+  "properties": {
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "relative_path": {
+            "type": "string"
+          },
+          "uri": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "params": {
+                "type": "object"
+              }
+            },
+            "required": ["path", "params"]
+          },
+          "sha256": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          }
+        },
+        "required": ["relative_path", "uri", "sha256", "kind"]
+      }
+    },
+    "job_id": {
+      "type": "integer"
+    },
+    "destination": {
+      "type": "string"
+    },
+    "target": { "$ref": "partial:target-any" }
+  },
+  "required": ["files", "job_id", "destination", "target"],
+  "additionalProperties": false
+}

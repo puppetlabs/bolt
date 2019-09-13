@@ -99,5 +99,40 @@ describe "BoltServer::TransportApp", puppetserver: true do
         expect(result['result']["stderr"]).to match(/not-a-command/)
       end
     end
+
+    describe "upload_file" do
+      let(:path) { '/ssh/upload_file' }
+
+      it 'copies files' do
+        job_id = Time.now.usec
+        body = build_upload_request(job_id, conn_target('ssh', include_password: true))
+        destination = body['destination']
+
+        begin
+          post(path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
+          expect(last_response).to be_ok
+          expect(last_response.status).to eq(200)
+          result = JSON.parse(last_response.body)
+          expect(result).to include('status' => 'success')
+          expect(result).to include('action' => 'upload')
+          expect(result['result']['_output'])
+            .to match(%r{Uploaded .*cache/#{job_id}' to 'localhost:#{destination}'})
+
+          # Inspect results
+          body = build_command_request("ls #{destination}/*",
+                                       conn_target('ssh', include_password: true))
+
+          post('/ssh/run_command', JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
+          result = JSON.parse(last_response.body)
+          expect(result['result']['stdout']).to match(/test-file.sh/)
+          expect(result['result']['stdout']).to match(/sub-file.sh/)
+        ensure
+          # Cleanup after running
+          body = build_command_request("rm -rf #{destination}",
+                                       conn_target('ssh', include_password: true))
+          post('/ssh/run_command', JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
+        end
+      end
+    end
   end
 end

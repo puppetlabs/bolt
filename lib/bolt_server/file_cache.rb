@@ -83,7 +83,7 @@ module BoltServer
       begin
         client.request(req) do |resp|
           if resp.code != "200"
-            msg = "Failed to download task: #{resp.body}"
+            msg = "Failed to download file: #{resp.body}"
             @logger.warn resp.body
             raise Error, msg
           end
@@ -96,7 +96,7 @@ module BoltServer
           raise e
         else
           @logger.warn e
-          raise Error, "Failed to download task: #{e.message}"
+          raise Error, "Failed to download file: #{e.message}"
         end
       end
     ensure
@@ -157,7 +157,7 @@ module BoltServer
       file_dir = create_cache_dir(file_data['sha256'])
       file_path = File.join(file_dir, File.basename(file_data['filename']))
       if check_file(file_path, sha)
-        @logger.debug("Using prexisting task file: #{file_path}")
+        @logger.debug("Using prexisting file: #{file_path}")
         return file_path
       end
 

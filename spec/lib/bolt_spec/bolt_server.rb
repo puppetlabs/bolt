@@ -94,5 +94,37 @@ module BoltSpec
         'target' => target2request(target)
       }
     end
+
+    def build_upload_request(job_id, target)
+      sha = lambda do |path|
+        Digest::SHA256.file(
+          File.join(File.dirname(__FILE__),
+                    '..', '..', 'fixtures', 'modules', 'upload_file', 'files', path)
+        )
+      end
+
+      {
+        'files' => [
+          { "uri" => { "path" => "/puppet/v3/file_content/modules/upload_file/test-file.sh",
+                       "params" => { "environment" => "production" } },
+            "relative_path" => "test-file.sh",
+            "sha256" => sha['test-file.sh'],
+            "kind" => "file" },
+          { "uri" => { "path" => "/puppet/v3/file_content/modules/upload_file/subdir",
+                       "params" => { "environment" => "production" } },
+            "relative_path" => "subdir",
+            "sha256" => "",
+            "kind" => "directory" },
+          { "uri" => { "path" => "/puppet/v3/file_content/modules/upload_file/subdir/sub-file.sh",
+                       "params" => { "environment" => "production" } },
+            "relative_path" => "subdir/sub-file.sh",
+            "sha256" => sha['subdir/sub-file.sh'],
+            "kind" => "file" }
+        ],
+        'job_id' => job_id,
+        'destination' => '/home/bolt/result-path',
+        'target' => target2request(target)
+      }
+    end
   end
 end
