@@ -11,7 +11,7 @@ plan profiles::nginx_install(
 
   apply($servers) {
     class { 'profiles::server':
-      site_content => "${site_content} from ${$trusted['certname']}",
+      site_content => "${site_content} from ${$trusted['certname']}\n",
     }
   }
 
