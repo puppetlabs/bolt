@@ -124,7 +124,30 @@ module BoltServer
       raise 'Unexpected error'
     end
 
-    ACTIONS = %w[run_task run_command upload_file].freeze
+    ACTIONS = %w[
+      run_command
+      run_task
+      upload_file
+    ].freeze
+
+    def make_ssh_target(target_hash)
+      defaults = {
+        'host-key-check' => false
+      }
+
+      overrides = {
+        'load-config' => false
+      }
+
+      opts = defaults.merge(target_hash.clone).merge(overrides)
+
+      if opts['private-key-content']
+        private_key_content = opts.delete('private-key-content')
+        opts['private-key'] = { 'key-data' => private_key_content }
+      end
+
+      Bolt::Target.new(target_hash['hostname'], opts)
+    end
 
     post '/ssh/:action' do
       not_found unless ACTIONS.include?(params[:action])
@@ -135,20 +158,28 @@ module BoltServer
       error = validate_schema(@schemas["transport-ssh"], body)
       return [400, error.to_json] unless error.nil?
 
-      defaults = { 'host-key-check' => false }
-      opts = defaults.merge(body['target'])
-      if opts['private-key-content']
-        opts['private-key'] = { 'key-data' => opts['private-key-content'] }
-        opts.delete('private-key-content')
+      targets = (body['targets'] || [body['target']]).map do |target|
+        make_ssh_target(target)
       end
-      opts['load-config'] = false
-      target = [Bolt::Target.new(body['target']['hostname'], opts)]
 
-      results = method(params[:action]).call(target, body)
+      json_results = method(params[:action]).call(targets, body).map do |result|
+        scrub_stack_trace(result.status_hash).to_json
+      end
 
-      # Since this will only be on one node we can just return the first result
-      result = scrub_stack_trace(results.first.status_hash)
-      [200, result.to_json]
+      if targets.length == 1
+        [200, json_results.first]
+      else
+        [200, json_results]
+      end
+    end
+
+    def make_winrm_target(target_hash)
+      overrides = {
+        'protocol' => 'winrm'
+      }
+
+      opts = target_hash.clone.merge(overrides)
+      Bolt::Target.new(target_hash['hostname'], opts)
     end
 
     post '/winrm/:action' do
@@ -160,14 +191,19 @@ module BoltServer
       error = validate_schema(@schemas["transport-winrm"], body)
       return [400, error.to_json] unless error.nil?
 
-      opts = body['target'].clone.merge('protocol' => 'winrm')
-      target = [Bolt::Target.new(body['target']['hostname'], opts)]
+      targets = (body['targets'] || [body['target']]).map do |target|
+        make_winrm_target(target)
+      end
 
-      results = method(params[:action]).call(target, body)
+      json_results = method(params[:action]).call(targets, body).map do |result|
+        scrub_stack_trace(result.status_hash).to_json
+      end
 
-      # Since this will only be on one node we can just return the first result
-      result = scrub_stack_trace(results.first.status_hash)
-      [200, result.to_json]
+      if targets.length == 1
+        [200, json_results.first]
+      else
+        [200, json_results]
+      end
     end
 
     error 404 do

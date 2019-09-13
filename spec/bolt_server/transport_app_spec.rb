@@ -151,6 +151,29 @@ describe "BoltServer::TransportApp" do
         expect(last_response).to be_ok
         expect(last_response.status).to eq(200)
       end
+
+      it 'expects either a single target or a set of targets, but not both' do
+        single_target = {
+          hostname: target[:host],
+          user: target[:user],
+          password: target[:password],
+          port: target[:port]
+        }
+        body = { target: single_target }
+
+        post(path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
+        expect(last_response.status).to eq(200)
+
+        body = { targets: [single_target] }
+
+        post(path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
+        expect(last_response.status).to eq(200)
+
+        body = { target: single_target, targets: single_target }
+
+        post(path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
+        expect(last_response.status).to eq(400)
+      end
     end
 
     describe '/winrm/*' do
@@ -221,6 +244,29 @@ describe "BoltServer::TransportApp" do
 
         expect(last_response).to be_ok
         expect(last_response.status).to eq(200)
+      end
+
+      it 'expects either a single target or a set of targets, but not both' do
+        single_target = {
+          hostname: target[:host],
+          user: target[:user],
+          password: target[:password],
+          port: target[:port]
+        }
+        body = { target: single_target }
+
+        post(path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
+        expect(last_response.status).to eq(200)
+
+        body = { targets: [single_target] }
+
+        post(path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
+        expect(last_response.status).to eq(200)
+
+        body = { target: single_target, targets: single_target }
+
+        post(path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
+        expect(last_response.status).to eq(400)
       end
     end
   end

@@ -4,7 +4,16 @@
   "description": "POST /winrm/<action> request schema",
   "type": "object",
   "properties": {
-    "target": { "$ref": "partial:target-winrm" }
+    "target": { "$ref": "partial:target-winrm" },
+    "targets": {
+      "type": "array",
+      "items": {
+        "$ref": "partial:target-winrm"
+      }
+    }
   },
-  "required": ["target"]
+  "oneOf": [
+    { "required":  ["target"] },
+    { "required":  ["targets"] }
+  ]
 }
