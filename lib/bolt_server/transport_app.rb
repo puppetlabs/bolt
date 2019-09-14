@@ -58,24 +58,24 @@ module BoltServer
 
     def run_task(target, body)
       error = validate_schema(@schemas["action-run_task"], body)
-      return [400, error.to_json] unless error.nil?
+      return [], error unless error.nil?
 
       task = Bolt::Task::PuppetServer.new(body['task'], @file_cache)
       parameters = body['parameters'] || {}
-      @executor.run_task(target, task, parameters)
+      [@executor.run_task(target, task, parameters), nil]
     end
 
     def run_command(target, body)
       error = validate_schema(@schemas["action-run_command"], body)
-      return [400, error.to_json] unless error.nil?
+      return [], error unless error.nil?
 
       command = body['command']
-      @executor.run_command(target, command)
+      [@executor.run_command(target, command), nil]
     end
 
     def upload_file(target, body)
       error = validate_schema(@schemas["action-upload_file"], body)
-      return [400, error.to_json] unless error.nil?
+      return [], error unless error.nil?
 
       files = body['files']
       destination = body['destination']
@@ -102,7 +102,7 @@ module BoltServer
                                        'boltserver/schema-error').to_json]
         end
       end
-      @executor.upload_file(target, cache_dir, destination)
+      [@executor.upload_file(target, cache_dir, destination), nil]
     end
 
     get '/' do
@@ -162,7 +162,10 @@ module BoltServer
         make_ssh_target(target)
       end
 
-      json_results = method(params[:action]).call(targets, body).map do |result|
+      resultset, error = method(params[:action]).call(targets, body)
+      return [400, error.to_json] unless error.nil?
+
+      json_results = resultset.map do |result|
         scrub_stack_trace(result.status_hash).to_json
       end
 
@@ -195,7 +198,10 @@ module BoltServer
         make_winrm_target(target)
       end
 
-      json_results = method(params[:action]).call(targets, body).map do |result|
+      resultset, error = method(params[:action]).call(targets, body)
+      return [400, error.to_json] if error
+
+      json_results = resultset.map do |result|
         scrub_stack_trace(result.status_hash).to_json
       end
 
