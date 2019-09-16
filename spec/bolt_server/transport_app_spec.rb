@@ -151,6 +151,29 @@ describe "BoltServer::TransportApp" do
         expect(last_response).to be_ok
         expect(last_response.status).to eq(200)
       end
+
+      it 'expects either a single target or a set of targets, but not both' do
+        single_target = {
+          hostname: target[:host],
+          user: target[:user],
+          password: target[:password],
+          port: target[:port]
+        }
+        body = { target: single_target }
+
+        post(path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
+        expect(last_response.status).to eq(200)
+
+        body = { targets: [single_target] }
+
+        post(path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
+        expect(last_response.status).to eq(200)
+
+        body = { target: single_target, targets: single_target }
+
+        post(path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
+        expect(last_response.status).to eq(400)
+      end
     end
 
     describe '/winrm/*' do
@@ -222,97 +245,173 @@ describe "BoltServer::TransportApp" do
         expect(last_response).to be_ok
         expect(last_response.status).to eq(200)
       end
+
+      it 'expects either a single target or a set of targets, but not both' do
+        single_target = {
+          hostname: target[:host],
+          user: target[:user],
+          password: target[:password],
+          port: target[:port]
+        }
+        body = { target: single_target }
+
+        post(path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
+        expect(last_response.status).to eq(200)
+
+        body = { targets: [single_target] }
+
+        post(path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
+        expect(last_response.status).to eq(200)
+
+        body = { target: single_target, targets: single_target }
+
+        post(path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
+        expect(last_response.status).to eq(400)
+      end
     end
   end
 
-  describe 'action endpoint' do
-    # Helper to set the transport on a body hash, and then post
-    # to an action endpoint (/ssh/<action> or /winrm/<action>)
-    def post_over_transport(transport, action, body_defaults = {})
+  describe 'run_task action endpoint' do
+    # Helper to set the transport on a body hash, and then post to an action
+    # endpoint (/ssh/<action> or /winrm/<action>) Set `:multiple` to send
+    # a list of `targets` rather than a single `target` with the request.
+    def post_over_transport(transport, action, body_content, multiple: false)
       path = "/#{transport}/#{action}"
 
-      target = conn_info(transport)
-      body = body_defaults.merge(target: {
-                                   hostname: target[:host],
-                                   user: target[:user],
-                                   password: target[:password],
-                                   port: target[:port]
-                                 })
+      target_data = conn_info(transport)
+      target = {
+        hostname: target_data[:host],
+        user: target_data[:user],
+        password: target_data[:password],
+        port: target_data[:port]
+      }
+
+      body = if multiple
+               body_content.merge(targets: [target])
+             else
+               body_content.merge(target: target)
+             end
 
       post(path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
     end
 
+    describe 'check_node_connections' do
+      it 'checks node connections over SSH', :ssh do
+        post_over_transport('ssh', 'check_node_connections', {}, multiple: true)
+
+        expect(last_response.status).to eq(200)
+        result = JSON.parse(last_response.body)
+        expect(result['status']).to eq('success')
+      end
+
+      it 'checks node connections over WinRM', :winrm do
+        post_over_transport('winrm', 'check_node_connections', {}, multiple: true)
+
+        expect(last_response.status).to eq(200)
+        result = JSON.parse(last_response.body)
+        expect(result['status']).to eq('success')
+      end
+    end
+
     describe 'run_task' do
-      it 'runs a simple echo task over SSH', :ssh do
-        example_task = {
-          task: { name: 'sample::echo',
-                  metadata: {
-                    description: 'Echo a message',
-                    parameters: { message: 'Default message' }
-                  },
-                  files: [{ filename: "echo.sh", sha256: "foo",
-                            uri: { path: 'foo', params: { environment: 'foo' } } }] },
-          parameters: { message: "Hello!" }
+      describe 'over SSH', :ssh do
+        let(:simple_ssh_task) {
+          {
+            task: { name: 'sample::echo',
+                    metadata: {
+                      description: 'Echo a message',
+                      parameters: { message: 'Default message' }
+                    },
+                    files: [{ filename: "echo.sh", sha256: "foo",
+                              uri: { path: 'foo', params: { environment: 'foo' } } }] },
+            parameters: { message: "Hello!" }
+          }
         }
 
-        post_over_transport('ssh', 'run_task', example_task)
+        it 'runs a simple echo task', :ssh do
+          post_over_transport('ssh', 'run_task', simple_ssh_task)
 
-        expect(last_response).to be_ok
-        expect(last_response.status).to eq(200)
+          expect(last_response).to be_ok
+          expect(last_response.status).to eq(200)
 
-        result = JSON.parse(last_response.body)
-        expect(result).to include('status' => 'success')
-        expect(result['result']['_output']).to match(/got passed the message: Hello!/)
-      end
+          result = JSON.parse(last_response.body)
+          expect(result).to include('status' => 'success')
+          expect(result['result']['_output']).to match(/got passed the message: Hello!/)
+        end
 
-      it 'overrides host-key-check default', :ssh do
-        target = conn_info('ssh')
-        body = {
-          target: {
-            hostname: target[:host],
-            user: target[:user],
-            password: target[:password],
-            port: target[:port],
-            'host-key-check': true
-          },
-          task: { name: 'sample::echo',
-                  metadata: {
-                    description: 'Echo a message',
-                    parameters: { message: 'Default message' }
-                  },
-                  files: [{ filename: "echo.sh", sha256: "foo",
-                            uri: { path: 'foo', params: { environment: 'foo' } } }] },
-          parameters: { message: "Hello!" }
-        }
-
-        post('ssh/run_task', JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
-
-        result = last_response.body
-        expect(result).to match(/Host key verification failed for localhost/)
-      end
-
-      it "runs a simple echo task over WinRM", :winrm do
-        example_task = {
-          task: {
-            name: 'sample::wininput',
-            metadata: {
-              description: 'Echo a message',
-              input_method: 'stdin'
+        it 'overrides host-key-check default', :ssh do
+          target = conn_info('ssh')
+          body = {
+            target: {
+              hostname: target[:host],
+              user: target[:user],
+              password: target[:password],
+              port: target[:port],
+              'host-key-check': true
             },
-            files: [{ filename: 'wininput.ps1', sha256: 'foo',
-                      uri: { path: 'foo', params: { environment: 'foo' } } }]
-          },
-          parameters: { input: 'Hello!' }
+            task: { name: 'sample::echo',
+                    metadata: {
+                      description: 'Echo a message',
+                      parameters: { message: 'Default message' }
+                    },
+                    files: [{ filename: "echo.sh", sha256: "foo",
+                              uri: { path: 'foo', params: { environment: 'foo' } } }] },
+            parameters: { message: "Hello!" }
+          }
+
+          post('ssh/run_task', JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
+
+          result = last_response.body
+          expect(result).to match(/Host key verification failed for localhost/)
+        end
+
+        it 'errors if multiple targets are supplied', :ssh do
+          post_over_transport('ssh', 'run_task', simple_ssh_task, multiple: true)
+
+          expect(last_response.status).to eq(400)
+          expect(last_response.body)
+            .to match(%r{The property '#/' did not contain a required property of 'target'})
+          expect(last_response.body)
+            .to match(%r{The property '#/' contains additional properties \[\\"targets\\"\]})
+        end
+      end
+
+      describe 'over WinRM' do
+        let(:simple_winrm_task) {
+          {
+            task: {
+              name: 'sample::wininput',
+              metadata: {
+                description: 'Echo a message',
+                input_method: 'stdin'
+              },
+              files: [{ filename: 'wininput.ps1', sha256: 'foo',
+                        uri: { path: 'foo', params: { environment: 'foo' } } }]
+            },
+            parameters: { input: 'Hello!' }
+          }
         }
 
-        post_over_transport('winrm', 'run_task', example_task)
+        it 'runs a simple echo task', :winrm do
+          post_over_transport('winrm', 'run_task', simple_winrm_task)
 
-        expect(last_response).to be_ok
-        expect(last_response.status).to eq(200)
+          expect(last_response).to be_ok
+          expect(last_response.status).to eq(200)
 
-        result = JSON.parse(last_response.body)
-        expect(result).to include('status' => 'success')
-        expect(result['result']['_output']).to match(/INPUT.*Hello!/)
+          result = JSON.parse(last_response.body)
+          expect(result).to include('status' => 'success')
+          expect(result['result']['_output']).to match(/INPUT.*Hello!/)
+        end
+
+        it 'errors if multiple targets are supplied', :winrm do
+          post_over_transport('winrm', 'run_task', simple_winrm_task, multiple: true)
+
+          expect(last_response.status).to eq(400)
+          expect(last_response.body)
+            .to match(%r{The property '#/' did not contain a required property of 'target'})
+          expect(last_response.body)
+            .to match(%r{The property '#/' contains additional properties \[\\"targets\\"\]})
+        end
       end
     end
   end

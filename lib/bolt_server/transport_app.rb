@@ -19,7 +19,14 @@ module BoltServer
     PARTIAL_SCHEMAS = %w[target-any target-ssh target-winrm task].freeze
 
     # These schemas combine shared schemas to describe client requests
-    REQUEST_SCHEMAS = %w[action-run_task action-run_command action-upload_file transport-ssh transport-winrm].freeze
+    REQUEST_SCHEMAS = %w[
+      action-check_node_connections
+      action-run_command
+      action-run_task
+      action-upload_file
+      transport-ssh
+      transport-winrm
+    ].freeze
 
     def initialize(config)
       @config = config
@@ -58,24 +65,37 @@ module BoltServer
 
     def run_task(target, body)
       error = validate_schema(@schemas["action-run_task"], body)
-      return [400, error.to_json] unless error.nil?
+      return [], error unless error.nil?
 
       task = Bolt::Task::PuppetServer.new(body['task'], @file_cache)
       parameters = body['parameters'] || {}
-      @executor.run_task(target, task, parameters)
+      [@executor.run_task(target, task, parameters), nil]
     end
 
     def run_command(target, body)
       error = validate_schema(@schemas["action-run_command"], body)
-      return [400, error.to_json] unless error.nil?
+      return [], error unless error.nil?
 
       command = body['command']
-      @executor.run_command(target, command)
+      [@executor.run_command(target, command), nil]
+    end
+
+    def check_node_connections(targets, body)
+      error = validate_schema(@schemas["action-check_node_connections"], body)
+      return [], error unless error.nil?
+
+      # Puppet Enterprise's orchestrator service uses the
+      # check_node_connections endpoint to check whether nodes that should be
+      # contacted over SSH or WinRM are responsive. The wait time here is 0
+      # because the endpoint is meant to be used for a single check of all
+      # nodes; External implementations of wait_until_available (like
+      # orchestrator's) should contact the endpoint in their own loop.
+      [@executor.wait_until_available(targets, wait_time: 0), nil]
     end
 
     def upload_file(target, body)
       error = validate_schema(@schemas["action-upload_file"], body)
-      return [400, error.to_json] unless error.nil?
+      return [], error unless error.nil?
 
       files = body['files']
       destination = body['destination']
@@ -102,7 +122,7 @@ module BoltServer
                                        'boltserver/schema-error').to_json]
         end
       end
-      @executor.upload_file(target, cache_dir, destination)
+      [@executor.upload_file(target, cache_dir, destination), nil]
     end
 
     get '/' do
@@ -124,7 +144,31 @@ module BoltServer
       raise 'Unexpected error'
     end
 
-    ACTIONS = %w[run_task run_command upload_file].freeze
+    ACTIONS = %w[
+      check_node_connections
+      run_command
+      run_task
+      upload_file
+    ].freeze
+
+    def make_ssh_target(target_hash)
+      defaults = {
+        'host-key-check' => false
+      }
+
+      overrides = {
+        'load-config' => false
+      }
+
+      opts = defaults.merge(target_hash.clone).merge(overrides)
+
+      if opts['private-key-content']
+        private_key_content = opts.delete('private-key-content')
+        opts['private-key'] = { 'key-data' => private_key_content }
+      end
+
+      Bolt::Target.new(target_hash['hostname'], opts)
+    end
 
     post '/ssh/:action' do
       not_found unless ACTIONS.include?(params[:action])
@@ -135,20 +179,31 @@ module BoltServer
       error = validate_schema(@schemas["transport-ssh"], body)
       return [400, error.to_json] unless error.nil?
 
-      defaults = { 'host-key-check' => false }
-      opts = defaults.merge(body['target'])
-      if opts['private-key-content']
-        opts['private-key'] = { 'key-data' => opts['private-key-content'] }
-        opts.delete('private-key-content')
+      targets = (body['targets'] || [body['target']]).map do |target|
+        make_ssh_target(target)
       end
-      opts['load-config'] = false
-      target = [Bolt::Target.new(body['target']['hostname'], opts)]
 
-      results = method(params[:action]).call(target, body)
+      resultset, error = method(params[:action]).call(targets, body)
+      return [400, error.to_json] unless error.nil?
 
-      # Since this will only be on one node we can just return the first result
-      result = scrub_stack_trace(results.first.status_hash)
-      [200, result.to_json]
+      json_results = resultset.map do |result|
+        scrub_stack_trace(result.status_hash).to_json
+      end
+
+      if targets.length == 1
+        [200, json_results.first]
+      else
+        [200, json_results]
+      end
+    end
+
+    def make_winrm_target(target_hash)
+      overrides = {
+        'protocol' => 'winrm'
+      }
+
+      opts = target_hash.clone.merge(overrides)
+      Bolt::Target.new(target_hash['hostname'], opts)
     end
 
     post '/winrm/:action' do
@@ -160,14 +215,22 @@ module BoltServer
       error = validate_schema(@schemas["transport-winrm"], body)
       return [400, error.to_json] unless error.nil?
 
-      opts = body['target'].clone.merge('protocol' => 'winrm')
-      target = [Bolt::Target.new(body['target']['hostname'], opts)]
+      targets = (body['targets'] || [body['target']]).map do |target|
+        make_winrm_target(target)
+      end
 
-      results = method(params[:action]).call(target, body)
+      resultset, error = method(params[:action]).call(targets, body)
+      return [400, error.to_json] if error
 
-      # Since this will only be on one node we can just return the first result
-      result = scrub_stack_trace(results.first.status_hash)
-      [200, result.to_json]
+      json_results = resultset.map do |result|
+        scrub_stack_trace(result.status_hash).to_json
+      end
+
+      if targets.length == 1
+        [200, json_results.first]
+      else
+        [200, json_results]
+      end
     end
 
     error 404 do

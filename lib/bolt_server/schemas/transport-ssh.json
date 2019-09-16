@@ -4,7 +4,22 @@
   "description": "POST /ssh/<action> request schema",
   "type": "object",
   "properties": {
-    "target": { "$ref": "partial:target-ssh" }
+    "target": { "$ref": "partial:target-ssh" },
+    "targets": {
+      "type": "array",
+      "items": {
+        "$ref": "partial:target-ssh"
+      }
+    }
   },
-  "required": ["target"]
+  "oneOf": [
+    {
+      "type": "object",
+      "required": ["target"]
+    },
+    {
+      "type": "object",
+      "required": ["targets"]
+    }
+  ]
 }

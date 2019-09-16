@@ -126,5 +126,11 @@ module BoltSpec
         'target' => target2request(target)
       }
     end
+
+    def build_check_node_connections_request(targets)
+      {
+        'targets' => targets.map { |target| target2request(target) }
+      }
+    end
   end
 end
