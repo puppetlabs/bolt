@@ -9,9 +9,8 @@ groups:
         config:
           ssh:
             port: 20023
-      - name: "localhost"
+      - name: "ssh://localhost"
         config:
-          transport: ssh
           ssh:
             port: 20024
 config:
