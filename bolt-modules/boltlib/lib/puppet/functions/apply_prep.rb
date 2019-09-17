@@ -28,7 +28,7 @@ Puppet::Functions.create_function(:apply_prep) do
   end
 
   def inventory
-    Puppet.lookup(:bolt_inventory)
+    @inventory ||= Puppet.lookup(:bolt_inventory)
   end
 
   def get_task(name, params = {})
@@ -61,7 +61,7 @@ Puppet::Functions.create_function(:apply_prep) do
   end
 
   def executor
-    Puppet.lookup(:bolt_executor)
+    @executor ||= Puppet.lookup(:bolt_executor)
   end
 
   def apply_prep(target_spec)
