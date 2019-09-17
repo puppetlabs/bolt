@@ -111,9 +111,17 @@ Puppet::Functions.create_function(:apply_prep) do
 
             hook_errors, ok_hooks = hooks.partition { |h| h.is_a?(Bolt::Result) }
 
+            # Concurrent threads don't have access to the main thread's Puppet
+            # context. This saves those values to local variables, then passes
+            # them in to be overridden in the child thread's Puppet context.
+            thread_exec = executor
+            thread_inv = inventory
             futures = ok_hooks.map do |hash|
               Concurrent::Future.execute(executor: pool) do
-                hash['hook_proc'].call
+                Puppet.override(bolt_executor: thread_exec,
+                                bolt_inventory: thread_inv) do
+                  hash['hook_proc'].call
+                end
               end
             end
 
