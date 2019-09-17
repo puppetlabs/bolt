@@ -63,6 +63,32 @@ module BoltServer
       end
     end
 
+    # Turns a Bolt::ResultSet object into a status hash that is fit
+    # to return to the client in a response.
+    #
+    # If the `result_set` has more than one result, the status hash
+    # will have a `status` value and a list of target `results`.
+    # If the `result_set` contains only one item, it will be returned
+    # as a single result object. Set `aggregate` to treat it as a set
+    # of results with length 1 instead.
+    def result_set_to_status_hash(result_set, aggregate: false)
+      scrubbed_results = result_set.map do |result|
+        scrub_stack_trace(result.status_hash)
+      end
+
+      if aggregate || scrubbed_results.length > 1
+        # For actions that act on multiple targets, construct a status hash for the aggregate result
+        all_succeeded = scrubbed_results.all? { |r| r[:status] == 'success' }
+        {
+          status: all_succeeded ? 'success' : 'failure',
+          result: scrubbed_results
+        }
+      else
+        # If there was only one target, return the first result on its own
+        scrubbed_results.first
+      end
+    end
+
     def run_task(target, body)
       error = validate_schema(@schemas["action-run_task"], body)
       return [], error unless error.nil?
@@ -183,18 +209,11 @@ module BoltServer
         make_ssh_target(target)
       end
 
-      resultset, error = method(params[:action]).call(targets, body)
+      result_set, error = method(params[:action]).call(targets, body)
       return [400, error.to_json] unless error.nil?
 
-      json_results = resultset.map do |result|
-        scrub_stack_trace(result.status_hash).to_json
-      end
-
-      if targets.length == 1
-        [200, json_results.first]
-      else
-        [200, json_results]
-      end
+      aggregate = body['target'].nil?
+      [200, result_set_to_status_hash(result_set, aggregate: aggregate).to_json]
     end
 
     def make_winrm_target(target_hash)
@@ -219,18 +238,11 @@ module BoltServer
         make_winrm_target(target)
       end
 
-      resultset, error = method(params[:action]).call(targets, body)
+      result_set, error = method(params[:action]).call(targets, body)
       return [400, error.to_json] if error
 
-      json_results = resultset.map do |result|
-        scrub_stack_trace(result.status_hash).to_json
-      end
-
-      if targets.length == 1
-        [200, json_results.first]
-      else
-        [200, json_results]
-      end
+      aggregate = body['target'].nil?
+      [200, result_set_to_status_hash(result_set, aggregate: aggregate).to_json]
     end
 
     error 404 do

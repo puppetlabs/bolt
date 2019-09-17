@@ -271,7 +271,7 @@ describe "BoltServer::TransportApp" do
     end
   end
 
-  describe 'run_task action endpoint' do
+  describe 'action endpoints' do
     # Helper to set the transport on a body hash, and then post to an action
     # endpoint (/ssh/<action> or /winrm/<action>) Set `:multiple` to send
     # a list of `targets` rather than a single `target` with the request.
@@ -310,6 +310,36 @@ describe "BoltServer::TransportApp" do
         expect(last_response.status).to eq(200)
         result = JSON.parse(last_response.body)
         expect(result['status']).to eq('success')
+        expect(result['result']).to be_a(Array)
+        expect(result['result'].length).to eq(1)
+        expect(result['result'].first['status']).to eq('success')
+      end
+
+      context 'when the checks succeed, but at least one node failed' do
+        let(:successful_target) {
+          target_data = conn_info('ssh')
+          {
+            hostname: target_data[:host],
+            user: target_data[:user],
+            password: target_data[:password],
+            port: target_data[:port]
+          }
+        }
+
+        let(:failed_target) {
+          target = successful_target.clone
+          target[:hostname] = 'not-a-real-host'
+          target
+        }
+
+        it 'returns 200 but reports a "failure" status', :ssh do
+          body = { targets: [successful_target, failed_target] }
+          post('/ssh/check_node_connections', JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
+
+          expect(last_response.status).to eq(200)
+          response_body = JSON.parse(last_response.body)
+          expect(response_body['status']).to eq('failure')
+        end
       end
     end
 
