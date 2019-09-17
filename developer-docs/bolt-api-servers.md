@@ -248,6 +248,56 @@ For example, the following uploads file 'abc' on windows_target.net:
 }
 ```
 
+### POST /ssh/check_node_connections
+- `targets`: An array of [SSH Target Objects](#ssh-target-object), *required* - A set of targets to check once for connectivity over SSH.
+
+Example request for a single connectivity check on two nodes over SSH:
+```
+{
+  "targets": [
+      {
+        "hostname": "first.ssh_node.net",
+        "user": "marauder",
+        "password": "I solemnly swear that I am up to no good",
+        "host-key-check": false,
+        "run-as": "george_weasley"
+      }, {
+        "hostname": "second.ssh_node.net",
+        "user": "marauder",
+        "password": "I solemnly swear that I am up to no good",
+        "host-key-check": false,
+        "run-as": "fred_weasley"
+      }
+  ]
+}
+```
+
+This returns a JSON object of the shape:
+```
+{
+    "status": "success",
+    "result": [
+        {
+            "status": "success"
+            "target": "first.ssh_node.net"
+            ...
+        }, {
+            "status": "success"
+            "target": "second.ssh_node.net"
+            ...
+        }
+    ]
+}
+```
+
+- This endpoint returns 200 when the checks were successfully conducted, even if some or all of the individual checks failed.
+- If at least one check failed, the parent result `status` will be set to `failure`.
+
+### POST /winrm/check_node_connections
+- `targets`: An array of [WinRM Target Objects](#winrm-target-object), *required* - A set of targets to check once for connectivity over WinRM.
+
+This endpoint behaves identically to the /ssh/check_node_connections endpoint, but acts over WinRM instead.
+
 ### SSH Target Object
 The Target is a JSON object. See the [schema](../lib/bolt_server/schemas/partials/target-ssh.json)
 
