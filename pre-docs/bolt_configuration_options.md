@@ -204,9 +204,7 @@ Capture the results of your plan runs in a log file.
 
 -   `append` add output to an existing log file. Available for only for logs output to a filepath. Your options are `true` \(default\) and `false`.
 -   `console` or `path/to.log`: the location of the log output.
--   `level`: the type of information in the log. Your options are `debug`, `info`, `notice`, `warn`, and `error`.
-
-
+-   `level`: the type of information in the log. Your options are `debug`, `info`, `notice`, `warn`, and `error`. The default for the console destination is `warn`. The default for the file destination is `notice`.
 
 ```
 log:
