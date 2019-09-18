@@ -1096,6 +1096,67 @@ OUTPUT
         end
       end
 
+      context "with intperpreter path containing spaces" do
+        let(:config) { mk_config(ssl: false, interpreters: interpreter, user: user, password: password) }
+        context "with non-quoted interpreter" do
+          let(:interpreter) { { 'py' => 'C:/Program Files/Miniconda3/python.exe' } }
+          it "quotes interpreter and task executable", winrm: true do
+            expect(Bolt::Transport::Powershell)
+              .to receive(:make_tempdir)
+              .and_return('stubbed')
+            expect(Bolt::Transport::Powershell)
+              .to receive(:shell_init)
+              .and_return('stubbed')
+            expect(Bolt::Transport::Powershell)
+              .to receive(:rmdir)
+              .and_return('stubbed')
+            expect_any_instance_of(Bolt::Transport::WinRM::Connection)
+              .to receive(:execute)
+              .with("stubbed")
+              .exactly(3).times
+              .and_return(output)
+            expect_any_instance_of(Bolt::Transport::WinRM::Connection)
+              .to receive(:execute)
+              .with(/'#{interpreter['py']}'/)
+              .and_return(output)
+            with_task_containing('task-py-winrm', 'print(42)', 'stdin', '.py') do |task|
+              expect(
+                winrm.run_task(target, task, {}).message
+              ).to eq('42')
+            end
+          end
+        end
+
+        context "with quoted interpreter" do
+          let(:interpreter) { { 'py' => "'C:/Program Files/Miniconda3/python.exe'" } }
+          it "does not double quote interpreter when quoted and task executable", winrm: true do
+            expect(Bolt::Transport::Powershell)
+              .to receive(:make_tempdir)
+              .and_return('stubbed')
+            expect(Bolt::Transport::Powershell)
+              .to receive(:shell_init)
+              .and_return('stubbed')
+            expect(Bolt::Transport::Powershell)
+              .to receive(:rmdir)
+              .and_return('stubbed')
+            expect_any_instance_of(Bolt::Transport::WinRM::Connection)
+              .to receive(:execute)
+              .with("stubbed")
+              .exactly(3).times
+              .and_return(output)
+            expect_any_instance_of(Bolt::Transport::WinRM::Connection)
+              .to receive(:execute)
+              .with(/#{interpreter['py']}/)
+              .and_return(output)
+            with_task_containing('task-py-winrm', 'print(42)', 'stdin', '.py') do |task|
+              expect(
+                winrm.run_task(target, task, {}).message
+              ).to eq('42')
+            end
+          end
+        end
+      end
+
       it "returns a friendly stderr msg with puppet.bat missing", winrm: true do
         with_task_containing('task-pp-winrm', "notice('hi')", 'stdin', '.pp') do |task|
           result = winrm.run_task(target, task, {})

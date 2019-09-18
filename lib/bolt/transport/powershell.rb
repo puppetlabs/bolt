@@ -52,16 +52,23 @@ module Bolt
           "[Environment]::SetEnvironmentVariable('#{arg}', @'\n#{val}\n'@)"
         end
 
-        def execute_process(path, arguments, stdin = nil)
-          quoted_args = arguments.map do |arg|
-            "'" + arg.gsub("'", "''") + "'"
-          end.join(' ')
+        def quote_string(string)
+          "'" + string.gsub("'", "''") + "'"
+        end
 
+        def execute_process(path, arguments, stdin = nil)
+          quoted_args = arguments.map { |arg| quote_string(arg) }.join(' ')
+
+          quoted_path = if path =~ /^'.*'$/ || path =~ /^".*"$/
+                          path
+                        else
+                          quote_string(path)
+                        end
           exec_cmd =
             if stdin.nil?
-              "& #{path} #{quoted_args}"
+              "& #{quoted_path} #{quoted_args}"
             else
-              "@'\n#{stdin}\n'@ | & #{path} #{quoted_args}"
+              "@'\n#{stdin}\n'@ | & #{quoted_path} #{quoted_args}"
             end
           <<-PS
 $OutputEncoding = [Console]::OutputEncoding
