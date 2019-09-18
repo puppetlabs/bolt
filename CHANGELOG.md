@@ -1,3 +1,16 @@
+## 1.30.1
+
+#### Bug fixes
+
+* **`apply()` blocks would ignore the `_run_as` argument passed to
+their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167))
+
+  Apply blocks in sub-plans now honor the parent plan's `_run_as` argument.
+
+* **Task parameters with `type` in the name are filtered out with powershell v2** ([#1205](https://github.com/puppetlabs/bolt/issues/1205))
+
+  Powershell tasks executed on targets with a Powershell interpreter version less than 3 can now use task parameters with the string `type` in the name (though a parameter named `type` is still uncompatible). *Note*: Powershell interpreters with version 3 or greater do not have this limitation.
+
 ## 1.30.0
 
 #### Deprecations and removals
