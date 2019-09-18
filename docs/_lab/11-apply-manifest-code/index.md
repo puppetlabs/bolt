@@ -81,19 +81,19 @@ Expected output
 
 ```plain
 Started on 0.0.0.0...
-Started on localhost...
 Started on 127.0.0.1...
-Finished on localhost:
-  STDOUT:
-    hi
+Started on localhost...
 Finished on 0.0.0.0:
   STDOUT:
     hi
 Finished on 127.0.0.1:
   STDOUT:
     hi
-Successful on 3 nodes: 0.0.0.0:20022,127.0.0.1,localhost
-Ran on 3 nodes in 0.20 seconds
+Finished on localhost:
+  STDOUT:
+    hi
+Successful on 3 nodes: 0.0.0.0:20022,127.0.0.1:20023,localhost:20024
+Ran on 3 nodes in 0.2 sec
 ```
 
 ## Module Content
@@ -171,15 +171,14 @@ Expected output
 
 ```
 Starting: plan profiles::nginx_install
-Starting: install puppet and gather facts on 127.0.0.1, localhost, 0.0.0.0:20022
-Finished: install puppet and gather facts with 0 failures in 3.84 sec
-Starting: apply catalog on 127.0.0.1, localhost
-Finished: apply catalog with 0 failures in 6.72 sec
+Starting: install puppet and gather facts on 127.0.0.1:20023, localhost:20024, 0.0.0.0:20022
+Finished: install puppet and gather facts with 0 failures in 28.45 sec
+Starting: apply catalog on 127.0.0.1:20023, localhost:20024
+Finished: apply catalog with 0 failures in 32.17 sec
 Starting: apply catalog on 0.0.0.0:20022
 0.0.0.0:20022: Scope(Haproxy::Config[haproxy]): haproxy: The $merge_options parameter will default to true in the next major release. Please review the documentation regarding the implications.
-Finished: apply catalog with 0 failures in 10.85 sec
-Finished: plan profiles::nginx_install in 21.42 sec
-Plan completed successfully with no result
+Finished: apply catalog with 0 failures in 10.01 sec
+Finished: plan profiles::nginx_install in 1 min, 11 sec
 ```
 
 In order to verify the deployment is operating as expected use the following `curl` commands to see the load balancer delegating to the different web servers.

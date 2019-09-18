@@ -24,8 +24,8 @@ plan profiles::nginx_install(
     }
 
     $targets = get_targets($servers)
-    $targets.each |$target| {
-      haproxy::balancermember { $target.name:
+    $targets.each |Integer $index, Target $target| {
+      haproxy::balancermember { "lb_${$index}":
         listening_service => 'nginx',
         server_names      => $target.host,
         ipaddresses       => $target.facts['ipaddress'],
