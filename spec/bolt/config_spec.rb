@@ -217,5 +217,19 @@ describe Bolt::Config do
       }
       expect { Bolt::Config.new(boltdir, config) }.to raise_error(Bolt::ValidationError)
     end
+
+    it "validates cacert file exists when 'ssl' is true" do
+      config = {
+        'winrm' => { 'ssl' => true, 'cacert' => 'does not exist' }
+      }
+      expect { Bolt::Config.new(boltdir, config) }.to raise_error(Bolt::FileError, /'does not exist'/)
+    end
+
+    it "ignores invalid cacert file when 'ssl' is false" do
+      config = {
+        'winrm' => { 'ssl' => false, 'cacert' => 'does not exist' }
+      }
+      expect { Bolt::Config.new(boltdir, config) }.not_to raise_error
+    end
   end
 end

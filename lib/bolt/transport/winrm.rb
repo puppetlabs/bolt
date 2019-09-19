@@ -42,6 +42,10 @@ module Bolt
           raise Bolt::ValidationError, 'SMB file transfers are not allowed with SSL enabled'
         end
 
+        if ssl_flag && (ca_path = options['cacert'])
+          Bolt::Util.validate_file('cacert', ca_path)
+        end
+
         ssl_verify_flag = options['ssl-verify']
         unless !!ssl_verify_flag == ssl_verify_flag
           raise Bolt::ValidationError, 'ssl-verify option must be a Boolean true or false'
