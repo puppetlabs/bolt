@@ -1,3 +1,11 @@
+## BOLT NEXT
+
+#### Bug fixes
+
+* **Only read path to `cacert` for `winrm` transport when using `ssl`** ([#1232](https://github.com/puppetlabs/bolt/pull/1232))
+
+  When using the winrm transport do not try to read the cacert file when not using ssl. This avoids confusing errors when the cacert is not readable but ssl is not being used.
+
 ## 1.30.1
 
 #### Bug fixes
