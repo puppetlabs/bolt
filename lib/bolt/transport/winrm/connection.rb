@@ -41,7 +41,7 @@ module Bolt
 
           transport = :kerberos if target.options['realm']
           endpoint = "#{scheme}://#{target.host}:#{@port}/wsman"
-          cacert = target.options['cacert'] && target.options['ssl'] ? target.options['cacert'] : nil
+          cacert = target.options['cacert'] && target.options['ssl'] ? File.expand_path(target.options['cacert']) : nil
           options = { endpoint: endpoint,
                       # https://github.com/WinRb/WinRM/issues/270
                       user: target.options['realm'] ? 'dummy' : @user,
