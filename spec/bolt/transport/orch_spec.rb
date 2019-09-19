@@ -58,6 +58,22 @@ describe Bolt::Transport::Orch, orchestrator: true do
         expect(c.instance_variable_get(:@client).config.config["User-Agent"]).to eq("Bolt/#{Bolt::VERSION}")
       end
     end
+
+    it "bolt expands file paths for cacert and token-file" do
+      config = {
+        'service-url' => 'https://foo.bar:8143',
+        'cacert' => '~/foo/bar',
+        'token-file' => '~/bar/foo'
+      }
+      expected = {
+        "service-url" => "https://foo.bar:8143",
+        "token-file" => "#{Dir.home}/bar/foo",
+        "cacert" => "#{Dir.home}/foo/bar",
+        "User-Agent" => "Bolt/#{Bolt::VERSION}"
+      }
+      expect(OrchestratorClient).to receive(:new).with(expected, true)
+      Bolt::Transport::Orch::Connection.new(config, nil, orch.logger)
+    end
   end
 
   describe :build_request do

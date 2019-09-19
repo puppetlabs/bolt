@@ -24,8 +24,10 @@ module Bolt
             acc[k] = opts[k] if opts.include?(k)
           end
           client_opts['User-Agent'] = "Bolt/#{VERSION}"
+          %w[token-file cacert].each do |f|
+            client_opts[f] = File.expand_path(client_opts[f]) if client_opts[f]
+          end
           logger.debug("Creating orchestrator client for #{client_opts}")
-
           @client = OrchestratorClient.new(client_opts, true)
           @plan_job = start_plan(plan_context)
           logger.debug("Started plan #{@plan_job}")
