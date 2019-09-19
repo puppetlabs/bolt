@@ -182,6 +182,13 @@ PS
 
       expect(winrm.run_command(omi_target, command)['stdout']).to eq("#{user}\r\n")
     end
+
+    it "ignores invalid cacert when ssl: false" do
+      target.options['cacert'] = 'does not exist'
+      target.options['ssl'] = false
+
+      expect(winrm.run_command(omi_target, command)['stdout']).to eq("#{user}\r\n")
+    end
   end
 
   context "connecting over SSL to OMI container ", omi: true do
