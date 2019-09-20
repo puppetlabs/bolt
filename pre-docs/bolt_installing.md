@@ -145,14 +145,6 @@ The Puppet Tools repository for the APT package management system is [https://ap
         sudo apt-get install puppet-bolt
         ```
 
-    -    Ubuntu 14.04
-
-        ```
-        wget https://apt.puppet.com/puppet-tools-release-trusty.deb
-        sudo dpkg -i puppet-tools-release-trusty.deb
-        sudo apt-get update
-        sudo apt-get install puppet-bolt
-        ```
 
     -    Ubuntu 16.04
 
