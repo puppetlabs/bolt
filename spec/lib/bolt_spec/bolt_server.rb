@@ -127,6 +127,27 @@ module BoltSpec
       }
     end
 
+    def build_script_request(target)
+      sha = lambda do |path|
+        Digest::SHA256.file(
+          File.join(File.dirname(__FILE__),
+                    '..', '..', 'fixtures', 'modules', 'upload_file', 'files', path)
+        )
+      end
+
+      {
+        'script' =>
+            {
+              "filename" => 'test-file.sh',
+              "uri" => { "path" => "/puppet/v3/file_content/modules/upload_file/test-file.sh",
+                         "params" => { "environment" => "production" } },
+              "sha256" => sha['test-file.sh']
+            },
+        'arguments' => '--arg',
+        'target' => target2request(target)
+      }
+    end
+
     def build_check_node_connections_request(targets)
       {
         'targets' => targets.map { |target| target2request(target) }

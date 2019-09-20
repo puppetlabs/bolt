@@ -167,6 +167,38 @@ describe "BoltServer::TransportApp", puppetserver: true do
       end
     end
 
+    describe "run_script" do
+      let(:path) { '/ssh/run_script' }
+
+      it 'copies and runs script' do
+        body = build_script_request(conn_target('ssh', include_password: true))
+        post(path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
+        expect(last_response).to be_ok
+        expect(last_response.status).to eq(200)
+        result = JSON.parse(last_response.body)
+        expect(result).to include('status' => 'success')
+        expect(result).to include('action' => 'script')
+        expect(result['result']['stdout'])
+          .to match(/hi!/)
+          .and match(/test-file\.sh/)
+          .and match(/--arg/)
+      end
+
+      it 'works without arguments' do
+        body = build_script_request(conn_target('ssh', include_password: true))
+        body.delete('arguments')
+        post(path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
+        expect(last_response).to be_ok
+        expect(last_response.status).to eq(200)
+        result = JSON.parse(last_response.body)
+        expect(result).to include('status' => 'success')
+        expect(result).to include('action' => 'script')
+        expect(result['result']['stdout'])
+          .to match(/hi!/)
+          .and match(/test-file\.sh/)
+      end
+    end
+
     describe "check_node_connections" do
       let(:path) { '/ssh/check_node_connections' }
 

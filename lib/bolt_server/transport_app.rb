@@ -23,6 +23,7 @@ module BoltServer
       action-check_node_connections
       action-run_command
       action-run_task
+      action-run_script
       action-upload_file
       transport-ssh
       transport-winrm
@@ -162,6 +163,16 @@ module BoltServer
       [@executor.upload_file(target, upload_source, destination), nil]
     end
 
+    def run_script(target, body)
+      error = validate_schema(@schemas["action-run_script"], body)
+      return [], error unless error.nil?
+
+      # Download the file onto the machine.
+      file_location = @file_cache.update_file(body['script'])
+
+      [@executor.run_script(target, file_location, body['arguments'])]
+    end
+
     get '/' do
       200
     end
@@ -185,6 +196,7 @@ module BoltServer
       check_node_connections
       run_command
       run_task
+      run_script
       upload_file
     ].freeze
 
