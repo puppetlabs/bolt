@@ -8,6 +8,10 @@
 
 ## 1.30.1
 
+#### Deprecations and removals
+
+* **WARNING**: Starting with this release the puppetlabs apt repo for trusty (Ubuntu 1404) no longer contains new puppet-bolt packages.
+
 #### Bug fixes
 
 * **`apply()` blocks would ignore the `_run_as` argument passed to
