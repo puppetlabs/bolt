@@ -6,6 +6,10 @@
 
   When using the winrm transport do not try to read the cacert file when not using ssl. This avoids confusing errors when the cacert is not readable but ssl is not being used.
 
+* **Some configuration options would not support file path expansion** ([#1174](https://github.com/puppetlabs/bolt/issues/1174))
+
+  The `token-file` and `cacert` file paths for the `pcp` transport now support file expansion. Similarly the `cacert` for the `winrm` transport has been updated to support file expansion.
+
 ## 1.30.1
 
 #### Bug fixes
