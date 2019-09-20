@@ -148,7 +148,18 @@ module BoltServer
                                        'boltserver/schema-error').to_json]
         end
       end
-      [@executor.upload_file(target, cache_dir, destination), nil]
+      # We need to special case the scenario where only one file was
+      # included in the request to download. Otherwise, the call to upload_file
+      # will attempt to upload with a directory as a source and potentially a
+      # filename as a destination on the host. In that case the end result will
+      # be the file downloaded to a directory with the same name as the source
+      # filename, rather than directly to the filename set in the destination.
+      upload_source = if files.size == 1 && files[0]['kind'] == 'file'
+                        File.join(cache_dir, files[0]['relative_path'])
+                      else
+                        cache_dir
+                      end
+      [@executor.upload_file(target, upload_source, destination), nil]
     end
 
     get '/' do

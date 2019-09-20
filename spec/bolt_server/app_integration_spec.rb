@@ -133,6 +133,38 @@ describe "BoltServer::TransportApp", puppetserver: true do
           post('/ssh/run_command', JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
         end
       end
+
+      it 'copies a single file' do
+        job_id = Time.now.usec
+        body = build_upload_request(job_id, conn_target('ssh', include_password: true))
+        body['files'] = body['files'].select { |file_entry| file_entry['relative_path'] == 'test-file.sh' }
+        body['destination'] = '/home/bolt/single_file_test.sh'
+        destination = body['destination']
+
+        begin
+          post(path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
+          expect(last_response).to be_ok
+          expect(last_response.status).to eq(200)
+          result = JSON.parse(last_response.body)
+          expect(result).to include('status' => 'success')
+          expect(result).to include('action' => 'upload')
+          expect(result['result']['_output'])
+            .to match(%r{Uploaded .*cache/#{job_id}/test-file.sh' to 'localhost:#{destination}'})
+
+          # Inspect results
+          body = build_command_request("ls #{destination}",
+                                       conn_target('ssh', include_password: true))
+
+          post('/ssh/run_command', JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
+          result = JSON.parse(last_response.body)
+          expect(result['result']['stdout']).to match(/single_file_test.sh/)
+        ensure
+          # Cleanup after running
+          body = build_command_request("rm -rf #{destination}",
+                                       conn_target('ssh', include_password: true))
+          post('/ssh/run_command', JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
+        end
+      end
     end
 
     describe "check_node_connections" do
