@@ -44,7 +44,7 @@ module Bolt
         else
           result = executor.run_task(targets, task, params, options)
 
-          if !result.ok && !options['_catch_errors']
+          if !result.ok && !options[:catch_errors]
             raise Bolt::RunFailure.new(result, 'run_task', task.name)
           end
           result

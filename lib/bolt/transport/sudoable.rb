@@ -19,7 +19,7 @@ module Bolt
 
       def run_command(target, command, options = {})
         with_connection(target) do |conn|
-          conn.running_as(options['_run_as']) do
+          conn.running_as(options[:run_as]) do
             output = conn.execute(command, sudoable: true)
             Bolt::Result.for_command(target,
                                      output.stdout.string,
@@ -32,7 +32,7 @@ module Bolt
 
       def upload(target, source, destination, options = {})
         with_connection(target) do |conn|
-          conn.running_as(options['_run_as']) do
+          conn.running_as(options[:run_as]) do
             conn.with_tempdir do |dir|
               basename = File.basename(destination)
               tmpfile = File.join(dir.to_s, basename)
@@ -55,7 +55,7 @@ module Bolt
         arguments = unwrap_sensitive_args(arguments)
 
         with_connection(target) do |conn|
-          conn.running_as(options['_run_as']) do
+          conn.running_as(options[:run_as]) do
             conn.with_tempdir do |dir|
               path = conn.write_executable(dir.to_s, script)
               dir.chown(conn.run_as)
@@ -77,7 +77,7 @@ module Bolt
         extra_files = implementation['files']
 
         with_connection(target) do |conn|
-          conn.running_as(options['_run_as']) do
+          conn.running_as(options[:run_as]) do
             stdin, output = nil
             execute_options = {}
             execute_options[:interpreter] = select_interpreter(executable, target.options['interpreters'])

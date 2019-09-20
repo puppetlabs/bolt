@@ -47,18 +47,19 @@ Puppet::Functions.create_function(:upload_file, Puppet::Functions::InternalFunct
     return_type 'ResultSet'
   end
 
-  def upload_file(scope, source, destination, targets, options = nil)
+  def upload_file(scope, source, destination, targets, options = {})
     upload_file_with_description(scope, source, destination, targets, nil, options)
   end
 
-  def upload_file_with_description(scope, source, destination, targets, description = nil, options = nil)
+  def upload_file_with_description(scope, source, destination, targets, description = nil, options = {})
     unless Puppet[:tasks]
       raise Puppet::ParseErrorWithIssue
         .from_issue_and_stack(Bolt::PAL::Issues::PLAN_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, action: 'upload_file')
     end
 
-    options ||= {}
-    options = options.merge('_description' => description) if description
+    options = options.select { |opt| opt.start_with?('_') }.map { |k, v| [k.sub(/^_/, '').to_sym, v] }.to_h
+    options[:description] = description if description
+
     executor = Puppet.lookup(:bolt_executor)
     inventory = Puppet.lookup(:bolt_inventory)
 
@@ -80,7 +81,7 @@ Puppet::Functions.create_function(:upload_file, Puppet::Functions::InternalFunct
       r = executor.upload_file(targets, found, destination, options)
     end
 
-    if !r.ok && !options['_catch_errors']
+    if !r.ok && !options[:catch_errors]
       raise Bolt::RunFailure.new(r, 'upload_file', source)
     end
     r

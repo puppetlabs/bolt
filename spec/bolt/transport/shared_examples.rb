@@ -115,7 +115,7 @@ shared_examples 'transport api' do
                 else
                   "exit 1"
                 end
-      result = runner.run_command(target, command, '_catch_errors' => true).value
+      result = runner.run_command(target, command, catch_errors: true).value
       expect(result['exit_code']).to eq(1)
     end
   end

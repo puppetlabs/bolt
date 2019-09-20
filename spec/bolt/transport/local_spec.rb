@@ -44,20 +44,20 @@ describe Bolt::Transport::Local do
       let(:target) { make_target }
 
       it "can override run_as for command via an option" do
-        expect(runner.run_command(target, 'whoami', '_run_as' => user)['stdout']).to eq("#{user}\n")
+        expect(runner.run_command(target, 'whoami', run_as: user)['stdout']).to eq("#{user}\n")
       end
 
       it "can override run_as for script via an option" do
         contents = "#!/bin/sh\nwhoami"
         with_tempfile_containing('script test', contents) do |file|
-          expect(runner.run_script(target, file.path, [], '_run_as' => user)['stdout']).to eq("#{user}\n")
+          expect(runner.run_script(target, file.path, [], run_as: user)['stdout']).to eq("#{user}\n")
         end
       end
 
       it "can override run_as for task via an option" do
         contents = "#!/bin/sh\nwhoami"
         with_task_containing('tasks_test', contents, 'environment') do |task|
-          expect(runner.run_task(target, task, {}, '_run_as' => user).message).to eq("#{user}\n")
+          expect(runner.run_task(target, task, {}, run_as: user).message).to eq("#{user}\n")
         end
       end
 
@@ -65,10 +65,10 @@ describe Bolt::Transport::Local do
         contents = "upload file test as root content"
         dest = '/tmp/root-file-upload-test'
         with_tempfile_containing('tasks test upload as root', contents) do |file|
-          expect(runner.upload(target, file.path, dest, '_run_as' => user).message).to match(/Uploaded/)
-          expect(runner.run_command(target, "cat #{dest}", '_run_as' => user)['stdout']).to eq(contents)
-          expect(runner.run_command(target, "stat -c %U #{dest}", '_run_as' => user)['stdout'].chomp).to eq(user)
-          expect(runner.run_command(target, "stat -c %G #{dest}", '_run_as' => user)['stdout'].chomp).to eq(user)
+          expect(runner.upload(target, file.path, dest, run_as: user).message).to match(/Uploaded/)
+          expect(runner.run_command(target, "cat #{dest}", run_as: user)['stdout']).to eq(contents)
+          expect(runner.run_command(target, "stat -c %U #{dest}", run_as:  user)['stdout'].chomp).to eq(user)
+          expect(runner.run_command(target, "stat -c %G #{dest}", run_as:  user)['stdout'].chomp).to eq(user)
         end
 
         runner.run_command(target, "rm #{dest}", sudoable: true, run_as: user)
@@ -131,7 +131,7 @@ describe Bolt::Transport::Local do
     end
 
     context 'with slow input' do
-      let(:file_size) { 100 }
+      let(:file_size) { 10 }
       let(:ruby_task) do
         <<~TASK
         #!/usr/bin/env ruby
@@ -176,7 +176,7 @@ describe Bolt::Transport::Local do
       let(:target) { make_target }
 
       it "warns when trying to use _run_as" do
-        runner.run_command(target, os_context[:stdout_command][0], '_run_as' => user)
+        runner.run_command(target, os_context[:stdout_command][0], run_as: user)
         logs = @log_output.readlines
         expect(logs).to include(/WARN  Bolt::Transport::LocalWindows : run-as is not supported/)
       end

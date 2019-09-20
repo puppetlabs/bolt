@@ -202,7 +202,7 @@ module BoltSpec
         end
 
         pal.with_bolt_executor(executor, inventory, puppetdb_client) do
-          Puppet.lookup(:apply_executor).apply_ast(ast, targets, '_catch_errors' => true, '_noop' => noop)
+          Puppet.lookup(:apply_executor).apply_ast(ast, targets, catch_errors: true, noop: noop)
         end
       end
     end

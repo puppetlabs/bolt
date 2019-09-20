@@ -78,7 +78,7 @@ module Bolt
         end
 
         def run_task(targets, task, arguments, options)
-          body = build_request(targets, task, arguments, options['_description'])
+          body = build_request(targets, task, arguments, options[:description])
           @client.run_task(body)
         end
 
