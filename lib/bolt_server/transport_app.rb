@@ -139,7 +139,7 @@ module BoltServer
           # but this is to be on the safe side.
           parent = File.dirname(path)
           FileUtils.mkdir_p(parent)
-          @file_cache.download_file(path, sha256, uri)
+          @file_cache.serial_execute { @file_cache.download_file(path, sha256, uri) }
         elsif kind == 'directory'
           # Create directory in cache so we can move files in.
           FileUtils.mkdir_p(path)
