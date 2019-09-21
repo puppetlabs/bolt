@@ -2,6 +2,8 @@
 
 # Uploads the given script to the given set of targets and returns the result of having each target execute the script.
 # This function does nothing if the list of targets is empty.
+#
+# **NOTE:** Not available in apply block
 Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFunction) do
   # Run a script.
   # @param script Path to a script to run on target. May be an absolute path or a modulename/filename selector for a
@@ -46,24 +48,17 @@ Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFuncti
   end
 
   def run_script_with_description(scope, script, targets, description = nil, options = nil)
+    unless Puppet[:tasks]
+      raise Puppet::ParseErrorWithIssue
+        .from_issue_and_stack(Bolt::PAL::Issues::PLAN_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, action: 'run_script')
+    end
+
     options ||= {}
     options = options.merge('_description' => description) if description
+    executor = Puppet.lookup(:bolt_executor)
+    inventory = Puppet.lookup(:bolt_inventory)
 
-    unless Puppet[:tasks]
-      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
-        Puppet::Pops::Issues::TASK_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, operation: 'run_script'
-      )
-    end
-
-    executor = Puppet.lookup(:bolt_executor) { nil }
-    inventory = Puppet.lookup(:bolt_inventory) { nil }
-    unless executor && inventory && Puppet.features.bolt?
-      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
-        Puppet::Pops::Issues::TASK_MISSING_BOLT, action: _('run a script')
-      )
-    end
-
-    executor.report_function_call('run_script')
+    executor.report_function_call(self.class.name)
 
     found = Puppet::Parser::Files.find_file(script, scope.compiler.environment)
     unless found && Puppet::FileSystem.exist?(found)

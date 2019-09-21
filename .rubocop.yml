@@ -5,6 +5,8 @@ AllCops:
     - 'vendored/**/*'
     - 'acceptance/vendor/**/*'
     - 'modules/**/*'
+    - 'docs/**/*'
+    - 'site-modules/**/*'
 
 # Checks for if and unless statements that would fit on one line if written as a
 # modifier if/unless.
@@ -27,6 +29,9 @@ Style/NumericLiterals:
   Enabled: false
 
 Style/NumericPredicate:
+  Enabled: false
+
+Style/StderrPuts:
   Enabled: false
 
 Layout/EmptyLineAfterGuardClause:
@@ -81,3 +86,11 @@ Metrics/ParameterLists:
 
 Metrics/PerceivedComplexity:
   Enabled: false
+
+Lint/HandleExceptions:
+  Exclude:
+    - lib/bolt/transport/local/shell.rb
+
+# Enforce LF line endings, even when on Windows
+Layout/EndOfLine:
+  EnforcedStyle: lf

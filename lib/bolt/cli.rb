@@ -9,30 +9,34 @@ require 'json'
 require 'io/console'
 require 'logging'
 require 'optparse'
-require 'r10k/action/puppetfile/install'
 require 'bolt/analytics'
 require 'bolt/bolt_option_parser'
 require 'bolt/config'
 require 'bolt/error'
 require 'bolt/executor'
 require 'bolt/inventory'
+require 'bolt/rerun'
 require 'bolt/logger'
 require 'bolt/outputter'
 require 'bolt/puppetdb'
+require 'bolt/plugin'
 require 'bolt/pal'
-require 'bolt/r10k_log_proxy'
 require 'bolt/target'
 require 'bolt/version'
+require 'bolt/secret'
 
 module Bolt
   class CLIExit < StandardError; end
   class CLI
-    COMMANDS = { 'command'    => %w[run],
-                 'script'     => %w[run],
-                 'task'       => %w[show run],
-                 'plan'       => %w[show run],
-                 'file'       => %w[upload],
-                 'puppetfile' => %w[install] }.freeze
+    COMMANDS = { 'command' => %w[run],
+                 'script' => %w[run],
+                 'task' => %w[show run],
+                 'plan' => %w[show run convert],
+                 'file' => %w[upload],
+                 'puppetfile' => %w[install show-modules],
+                 'secret' => %w[encrypt decrypt createkeys],
+                 'inventory' => %w[show],
+                 'apply' => %w[] }.freeze
 
     attr_reader :config, :options
 
@@ -41,18 +45,16 @@ module Bolt
       @logger = Logging.logger[self]
       @argv = argv
       @config = Bolt::Config.default
-      @options = {
-        nodes: []
-      }
+      @options = {}
     end
 
     # Only call after @config has been initialized.
     def inventory
-      @inventory ||= Bolt::Inventory.from_config(config)
+      @inventory ||= Bolt::Inventory.from_config(config, plugins)
     end
     private :inventory
 
-    def help?(parser, remaining)
+    def help?(remaining)
       # Set the subcommand
       options[:subcommand] = remaining.shift
 
@@ -61,8 +63,12 @@ module Bolt
         options[:subcommand] = remaining.shift
       end
 
-      # Update the parser for the new subcommand
-      parser.update
+      # This section handles parsing non-flag options which are
+      # subcommand specific rather then part of the config
+      actions = COMMANDS[options[:subcommand]]
+      if actions && !actions.empty?
+        options[:action] = remaining.shift
+      end
 
       options[:help]
     end
@@ -73,29 +79,30 @@ module Bolt
 
       # This part aims to handle both `bolt <mode> --help` and `bolt help <mode>`.
       remaining = handle_parser_errors { parser.permute(@argv) } unless @argv.empty?
-      if @argv.empty? || help?(parser, remaining)
+      if @argv.empty? || help?(remaining)
+        # Update the parser for the subcommand (or lack thereof)
+        parser.update
         puts parser.help
         raise Bolt::CLIExit
       end
 
-      # This section handles parsing non-flag options which are
-      # subcommand specific rather then part of the config
-      options[:action] = remaining.shift
       options[:object] = remaining.shift
 
-      task_options, remaining = remaining.partition { |s| s =~ /.+=/ }
-      if options[:task_options]
-        unless task_options.empty?
-          raise Bolt::CLIError,
-                "Parameters must be specified through either the --params " \
-                "option or param=value pairs, not both"
+      # Only parse task_options for task or plan
+      if %w[task plan].include?(options[:subcommand])
+        task_options, remaining = remaining.partition { |s| s =~ /.+=/ }
+        if options[:task_options]
+          unless task_options.empty?
+            raise Bolt::CLIError,
+                  "Parameters must be specified through either the --params " \
+                  "option or param=value pairs, not both"
+          end
+          options[:params_parsed] = true
+        else
+          options[:params_parsed] = false
+          options[:task_options] = Hash[task_options.map { |a| a.split('=', 2) }]
         end
-        options[:params_parsed] = true
-      else
-        options[:params_parsed] = false
-        options[:task_options] = Hash[task_options.map { |a| a.split('=', 2) }]
       end
-
       options[:leftovers] = remaining
 
       validate(options)
@@ -113,24 +120,50 @@ module Bolt
 
       Bolt::Logger.configure(config.log, config.color)
 
+      # Logger must be configured before checking path case, otherwise warnings will not display
+      @config.check_path_case('modulepath', @config.modulepath)
+
       # After validation, initialize inventory and targets. Errors here are better to catch early.
-      unless options[:subcommand] == 'puppetfile' || options[:action] == 'show'
-        if options[:query]
-          if options[:nodes].any?
-            raise Bolt::CLIError, "Only one of '--nodes' or '--query' may be specified"
-          end
-          nodes = query_puppetdb_nodes(options[:query])
-          options[:targets] = inventory.get_targets(nodes)
-          options[:nodes] = nodes if options[:subcommand] == 'plan'
-        else
-          options[:targets] = inventory.get_targets(options[:nodes])
-        end
+      # After this step
+      # options[:target_args] will contain a string/array version of the targetting options this is passed to plans
+      # options[:targets] will contain a resolved set of Target objects
+      unless options[:subcommand] == 'puppetfile' ||
+             options[:subcommand] == 'secret' ||
+             options[:action] == 'show' ||
+             options[:action] == 'convert'
+
+        update_targets(options)
+      end
+
+      unless options.key?(:verbose)
+        # Default to verbose for everything except plans
+        options[:verbose] = options[:subcommand] != 'plan'
       end
 
       options
     rescue Bolt::Error => e
-      warn e.message
+      outputter.fatal_error(e)
       raise e
+    end
+
+    def update_targets(options)
+      target_opts = options.keys.select { |opt| %i[query rerun nodes targets].include?(opt) }
+      target_string = "'--nodes', '--targets', '--rerun', or '--query'"
+      if target_opts.length > 1
+        raise Bolt::CLIError, "Only one targeting option #{target_string} may be specified"
+      elsif target_opts.empty? && options[:subcommand] != 'plan'
+        raise Bolt::CLIError, "Command requires a targeting option: #{target_string}"
+      end
+
+      nodes = if options[:query]
+                query_puppetdb_nodes(options[:query])
+              elsif options[:rerun]
+                rerun.get_targets(options[:rerun])
+              else
+                options[:targets] || options[:nodes] || []
+              end
+      options[:target_args] = nodes
+      options[:targets] = inventory.get_targets(nodes)
     end
 
     def validate(options)
@@ -140,16 +173,18 @@ module Bolt
               "#{COMMANDS.keys.join(', ')}"
       end
 
-      if options[:action].nil?
-        raise Bolt::CLIError,
-              "Expected an action of the form 'bolt #{options[:subcommand]} <action>'"
-      end
-
       actions = COMMANDS[options[:subcommand]]
-      unless actions.include?(options[:action])
-        raise Bolt::CLIError,
-              "Expected action '#{options[:action]}' to be one of " \
-              "#{actions.join(', ')}"
+      if actions.any?
+        if options[:action].nil?
+          raise Bolt::CLIError,
+                "Expected an action of the form 'bolt #{options[:subcommand]} <action>'"
+        end
+
+        unless actions.include?(options[:action])
+          raise Bolt::CLIError,
+                "Expected action '#{options[:action]}' to be one of " \
+                "#{actions.join(', ')}"
+        end
       end
 
       if options[:subcommand] != 'file' && options[:subcommand] != 'script' &&
@@ -169,21 +204,26 @@ module Bolt
         end
       end
 
-      if !%w[plan puppetfile].include?(options[:subcommand]) && options[:action] != 'show'
-        if options[:nodes].empty? && options[:query].nil?
-          raise Bolt::CLIError, "Targets must be specified with '--nodes' or '--query'"
-        elsif options[:nodes].any? && options[:query]
-          raise Bolt::CLIError, "Only one of '--nodes' or '--query' may be specified"
-        end
-      end
-
       if options[:boltdir] && options[:configfile]
         raise Bolt::CLIError, "Only one of '--boltdir' or '--configfile' may be specified"
       end
 
-      if options[:noop] && (options[:subcommand] != 'task' || options[:action] != 'run')
+      if options[:noop] &&
+         !(options[:subcommand] == 'task' && options[:action] == 'run') && options[:subcommand] != 'apply'
         raise Bolt::CLIError,
-              "Option '--noop' may only be specified when running a task"
+              "Option '--noop' may only be specified when running a task or applying manifest code"
+      end
+
+      if options[:subcommand] == 'apply' && (options[:object] && options[:code])
+        raise Bolt::CLIError, "--execute is unsupported when specifying a manifest file"
+      end
+
+      if options[:subcommand] == 'apply' && (!options[:object] && !options[:code])
+        raise Bolt::CLIError, "a manifest file or --execute is required"
+      end
+
+      if options[:subcommand] == 'command' && (!options[:object] || options[:object].empty?)
+        raise Bolt::CLIError, "Must specify a command to run"
       end
     end
 
@@ -203,6 +243,10 @@ module Bolt
       @puppetdb_client = Bolt::PuppetDB::Client.new(puppetdb_config)
     end
 
+    def plugins
+      @plugins ||= Bolt::Plugin.setup(config, puppetdb_client, analytics)
+    end
+
     def query_puppetdb_nodes(query)
       puppetdb_client.query_certnames(query)
     end
@@ -217,7 +261,10 @@ module Bolt
         exit!
       end
 
-      @analytics = Bolt::Analytics.build_client
+      if options[:action] == 'convert'
+        convert_plan(options[:object])
+        return 0
+      end
 
       screen = "#{options[:subcommand]}_#{options[:action]}"
       # submit a different screen for `bolt task show` and `bolt task show foo`
@@ -225,11 +272,21 @@ module Bolt
         screen += '_object'
       end
 
-      @analytics.screen_view(screen,
-                             output_format: config.format,
-                             target_nodes: options.fetch(:targets, []).count,
-                             inventory_nodes: inventory.node_names.count,
-                             inventory_groups: inventory.group_names.count)
+      screen_view_fields = {
+        output_format: config.format,
+        boltdir_type: config.boltdir.type
+      }
+
+      # Only include target and inventory info for commands that take a targets
+      # list. This avoids loading inventory for commands that don't need it.
+      if options.key?(:targets)
+        screen_view_fields.merge!(target_nodes: options[:targets].count,
+                                  inventory_nodes: inventory.node_names.count,
+                                  inventory_groups: inventory.group_names.count,
+                                  inventory_version: inventory.version)
+      end
+
+      analytics.screen_view(screen, screen_view_fields)
 
       if options[:action] == 'show'
         if options[:subcommand] == 'task'
@@ -244,7 +301,12 @@ module Bolt
           else
             list_plans
           end
+        elsif options[:subcommand] == 'inventory'
+          list_targets
         end
+        return 0
+      elsif options[:action] == 'show-modules'
+        list_modules
         return 0
       end
 
@@ -254,12 +316,21 @@ module Bolt
         options[:task_options] = pal.parse_params(options[:subcommand], options[:object], options[:task_options])
       end
 
-      if options[:subcommand] == 'plan'
-        code = run_plan(options[:object], options[:task_options], options[:nodes], options)
-      elsif options[:subcommand] == 'puppetfile'
-        code = install_puppetfile(@config.puppetfile, @config.modulepath)
+      case options[:subcommand]
+      when 'plan'
+        code = run_plan(options[:object], options[:task_options], options[:target_args], options)
+      when 'puppetfile'
+        code = install_puppetfile(@config.puppetfile_config, @config.puppetfile, @config.modulepath)
+      when 'secret'
+        code = Bolt::Secret.execute(plugins, outputter, options)
+      when 'apply'
+        if options[:object]
+          validate_file('manifest', options[:object])
+          options[:code] = File.read(File.expand_path(options[:object]))
+        end
+        code = apply_manifest(options[:code], options[:targets], options[:object], options[:noop])
       else
-        executor = Bolt::Executor.new(config.concurrency, @analytics, options[:noop], bundled_content: bundled_content)
+        executor = Bolt::Executor.new(config.concurrency, analytics, options[:noop])
         targets = options[:targets]
 
         results = nil
@@ -268,29 +339,23 @@ module Bolt
         elapsed_time = Benchmark.realtime do
           executor_opts = {}
           executor_opts['_description'] = options[:description] if options.key?(:description)
+          executor.subscribe(outputter)
+          executor.subscribe(log_outputter)
           results =
             case options[:subcommand]
             when 'command'
-              executor.run_command(targets, options[:object], executor_opts) do |event|
-                outputter.print_event(event)
-              end
+              executor.run_command(targets, options[:object], executor_opts)
             when 'script'
               script = options[:object]
               validate_file('script', script)
-              executor.run_script(
-                targets, script, options[:leftovers], executor_opts
-              ) do |event|
-                outputter.print_event(event)
-              end
+              executor.run_script(targets, script, options[:leftovers], executor_opts)
             when 'task'
               pal.run_task(options[:object],
                            targets,
                            options[:task_options],
                            executor,
                            inventory,
-                           options[:description]) do |event|
-                outputter.print_event(event)
-              end
+                           options[:description])
             when 'file'
               src = options[:object]
               dest = options[:leftovers].first
@@ -299,11 +364,12 @@ module Bolt
                 raise Bolt::CLIError, "A destination path must be specified"
               end
               validate_file('source file', src, true)
-              executor.upload_file(targets, src, dest, executor_opts) do |event|
-                outputter.print_event(event)
-              end
+              executor.upload_file(targets, src, dest, executor_opts)
             end
         end
+
+        executor.shutdown
+        rerun.update(results)
 
         outputter.print_summary(results, elapsed_time)
         code = results.ok ? 0 : 2
@@ -315,7 +381,7 @@ module Bolt
     ensure
       # restore original signal handler
       Signal.trap :INT, handler if handler
-      @analytics&.finish
+      analytics&.finish
     end
 
     def show_task(task_name)
@@ -323,9 +389,7 @@ module Bolt
     end
 
     def list_tasks
-      outputter.print_table(pal.list_tasks)
-      outputter.print_message("\nUse `bolt task show <task-name>` to view "\
-                              "details and parameters for a specific task.")
+      outputter.print_tasks(pal.list_tasks, pal.list_modulepath)
     end
 
     def show_plan(plan_name)
@@ -333,9 +397,12 @@ module Bolt
     end
 
     def list_plans
-      outputter.print_table(pal.list_plans)
-      outputter.print_message("\nUse `bolt plan show <plan-name>` to view "\
-                              "details and parameters for a specific plan.")
+      outputter.print_plans(pal.list_plans, pal.list_modulepath)
+    end
+
+    def list_targets
+      update_targets(options)
+      outputter.print_targets(options)
     end
 
     def run_plan(plan_name, plan_arguments, nodes, options)
@@ -354,25 +421,74 @@ module Bolt
                        params: params }
       plan_context[:description] = options[:description] if options[:description]
 
-      executor = Bolt::Executor.new(config.concurrency, @analytics, options[:noop], bundled_content: bundled_content)
+      executor = Bolt::Executor.new(config.concurrency, analytics, options[:noop])
+      if options.fetch(:format, 'human') == 'human'
+        executor.subscribe(outputter)
+      else
+        # Only subscribe to out::message events for JSON outputter
+        executor.subscribe(outputter, [:message])
+      end
+
+      executor.subscribe(log_outputter)
       executor.start_plan(plan_context)
       result = pal.run_plan(plan_name, plan_arguments, executor, inventory, puppetdb_client)
 
-      # If a non-bolt exeception bubbles up the plan won't get finished
+      # If a non-bolt exception bubbles up the plan won't get finished
       executor.finish_plan(result)
+      executor.shutdown
+      rerun.update(result)
+
       outputter.print_plan_result(result)
       result.ok? ? 0 : 1
     end
 
-    def install_puppetfile(puppetfile, modulepath)
+    def apply_manifest(code, targets, filename = nil, noop = false)
+      ast = pal.parse_manifest(code, filename)
+
+      executor = Bolt::Executor.new(config.concurrency, analytics, noop)
+      executor.subscribe(outputter) if options.fetch(:format, 'human') == 'human'
+      executor.subscribe(log_outputter)
+      # apply logging looks like plan logging, so tell the outputter we're in a
+      # plan even though we're not
+      executor.publish_event(type: :plan_start, plan: nil)
+
+      results = nil
+      elapsed_time = Benchmark.realtime do
+        pal.in_plan_compiler(executor, inventory, puppetdb_client) do |compiler|
+          compiler.call_function('apply_prep', targets)
+        end
+
+        results = pal.with_bolt_executor(executor, inventory, puppetdb_client) do
+          Puppet.lookup(:apply_executor).apply_ast(ast, targets, '_catch_errors' => true, '_noop' => noop)
+        end
+      end
+
+      executor.shutdown
+      outputter.print_apply_result(results, elapsed_time)
+      rerun.update(results)
+
+      results.ok ? 0 : 1
+    end
+
+    def list_modules
+      outputter.print_module_list(pal.list_modules)
+    end
+
+    def install_puppetfile(config, puppetfile, modulepath)
+      require 'r10k/cli'
+      require 'bolt/r10k_log_proxy'
+
       if puppetfile.exist?
         moduledir = modulepath.first.to_s
-        r10k_config = {
+        r10k_opts = {
           root: puppetfile.dirname.to_s,
           puppetfile: puppetfile.to_s,
           moduledir: moduledir
         }
-        install_action = R10K::Action::Puppetfile::Install.new(r10k_config, nil)
+
+        settings = R10K::Settings.global_settings.evaluate(config)
+        R10K::Initializers::GlobalInitializer.new(settings).call
+        install_action = R10K::Action::Puppetfile::Install.new(r10k_opts, nil)
 
         # Override the r10k logger with a proxy to our own logger
         R10K::Logging.instance_variable_set(:@outputter, Bolt::R10KLogProxy.new)
@@ -392,47 +508,54 @@ module Bolt
       @pal ||= Bolt::PAL.new(config.modulepath, config.hiera_config, config.compile_concurrency)
     end
 
+    def convert_plan(plan)
+      pal.convert_plan(plan)
+    end
+
     def validate_file(type, path, allow_dir = false)
       if path.nil?
         raise Bolt::CLIError, "A #{type} must be specified"
       end
 
-      stat = file_stat(path)
-
-      if !stat.readable?
-        raise Bolt::FileError.new("The #{type} '#{path}' is unreadable", path)
-      elsif !stat.file? && (!allow_dir || !stat.directory?)
-        expected = allow_dir ? 'file or directory' : 'file'
-        raise Bolt::FileError.new("The #{type} '#{path}' is not a #{expected}", path)
-      elsif stat.directory?
-        Dir.foreach(path) do |file|
-          next if %w[. ..].include?(file)
-          validate_file(type, File.join(path, file), allow_dir)
-        end
-      end
-    rescue Errno::ENOENT
-      raise Bolt::FileError.new("The #{type} '#{path}' does not exist", path)
+      Bolt::Util.validate_file(type, path, allow_dir)
     end
 
-    def file_stat(path)
-      File.stat(path)
+    def rerun
+      @rerun ||= Bolt::Rerun.new(@config.rerunfile, @config.save_rerun)
     end
 
     def outputter
-      @outputter ||= Bolt::Outputter.for_format(config.format, config.color, config.trace)
+      @outputter ||= Bolt::Outputter.for_format(config.format, config.color, options[:verbose], config.trace)
+    end
+
+    def log_outputter
+      @log_outputter ||= Bolt::Outputter::Logger.new(options[:verbose], config.trace)
+    end
+
+    def analytics
+      @analytics ||= begin
+                       client = Bolt::Analytics.build_client
+                       client.bundled_content = bundled_content
+                       client
+                     end
     end
 
     def bundled_content
-      if %w[plan task].include?(options[:subcommand])
+      # We only need to enumerate bundled content when running a task or plan
+      content = { 'Plan' => [],
+                  'Task' => [],
+                  'Plugin' => %w[puppetdb pkcs7 prompt terraform task] }
+      if %w[plan task].include?(options[:subcommand]) && options[:action] == 'run'
         default_content = Bolt::PAL.new([], nil)
-        plans = default_content.list_plans.each_with_object([]) do |iter, col|
+        content['Plan'] = default_content.list_plans.each_with_object([]) do |iter, col|
           col << iter&.first
         end
-        tasks = default_content.list_tasks.each_with_object([]) do |iter, col|
+        content['Task'] = default_content.list_tasks.each_with_object([]) do |iter, col|
           col << iter&.first
         end
-        plans.concat tasks
       end
+
+      content
     end
   end
 end

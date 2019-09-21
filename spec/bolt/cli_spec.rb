@@ -6,6 +6,9 @@ require 'bolt_spec/files'
 require 'bolt_spec/task'
 require 'bolt/cli'
 require 'bolt/util'
+require 'concurrent/utility/processor_counter'
+require 'r10k/action/puppetfile/install'
+require 'yaml'
 
 describe "Bolt::CLI" do
   include BoltSpec::Files
@@ -13,7 +16,7 @@ describe "Bolt::CLI" do
   let(:target) { Bolt::Target.new('foo') }
 
   before(:each) do
-    outputter = Bolt::Outputter::Human.new(false, false, StringIO.new)
+    outputter = Bolt::Outputter::Human.new(false, false, false, StringIO.new)
 
     allow_any_instance_of(Bolt::CLI).to receive(:outputter).and_return(outputter)
     allow_any_instance_of(Bolt::CLI).to receive(:warn)
@@ -27,11 +30,11 @@ describe "Bolt::CLI" do
   def stub_file(path)
     stat = double('stat', readable?: true, file?: true, directory?: false)
 
-    allow(cli).to receive(:file_stat).with(path).and_return(stat)
+    allow(Bolt::Util).to receive(:file_stat).with(path).and_return(stat)
   end
 
   def stub_non_existent_file(path)
-    allow(cli).to receive(:file_stat).with(path).and_raise(
+    allow(Bolt::Util).to receive(:file_stat).with(path).and_raise(
       Errno::ENOENT, "No such file or directory @ rb_file_s_stat - #{path}"
     )
   end
@@ -39,13 +42,13 @@ describe "Bolt::CLI" do
   def stub_unreadable_file(path)
     stat = double('stat', readable?: false, file?: true)
 
-    allow(cli).to receive(:file_stat).with(path).and_return(stat)
+    allow(Bolt::Util).to receive(:file_stat).with(path).and_return(stat)
   end
 
   def stub_directory(path)
     stat = double('stat', readable?: true, file?: false, directory?: true)
 
-    allow(cli).to receive(:file_stat).with(path).and_return(stat)
+    allow(Bolt::Util).to receive(:file_stat).with(path).and_return(stat)
   end
 
   def stub_config(file_content = {})
@@ -78,6 +81,20 @@ describe "Bolt::CLI" do
       expect {
         cli.parse
       }.to raise_error(Bolt::CLIError, /Expected action 'oops' to be one of/)
+    end
+
+    it "generates an error message is no action is given and one is expected" do
+      cli = Bolt::CLI.new(%w[-n bolt1 command])
+      expect {
+        cli.parse
+      }.to raise_error(Bolt::CLIError, /Expected an action/)
+    end
+
+    it "works without an action if no action is expected" do
+      cli = Bolt::CLI.new(%w[-n bolt1 apply file.pp])
+      expect {
+        cli.parse
+      }.not_to raise_error
     end
 
     describe "help" do
@@ -144,6 +161,51 @@ describe "Bolt::CLI" do
             }.to raise_error(Bolt::CLIExit)
           }.to output(/Available actions are:.*upload/m).to_stdout
         end
+
+        it 'accepts puppetfile' do
+          cli = Bolt::CLI.new(%w[help puppetfile])
+          expect {
+            expect {
+              cli.parse
+            }.to raise_error(Bolt::CLIExit)
+          }.to output(/Available actions are:.*install.*show-modules/m).to_stdout
+        end
+
+        it 'accepts inventory' do
+          cli = Bolt::CLI.new(%w[help inventory])
+          expect {
+            expect {
+              cli.parse
+            }.to raise_error(Bolt::CLIExit)
+          }.to output(/Available actions are:.*show/m).to_stdout
+        end
+
+        it 'excludes invalid subcommand flags' do
+          cli = Bolt::CLI.new(%w[help puppetfile])
+          expect {
+            expect {
+              cli.parse
+            }.to raise_error(Bolt::CLIExit)
+          }.not_to output(/--private-key/).to_stdout
+        end
+
+        it 'excludes invalid subcommand action flags and help text' do
+          cli = Bolt::CLI.new(%w[help plan show])
+          expect {
+            expect {
+              cli.parse
+            }.to raise_error(Bolt::CLIExit)
+          }.not_to output(/[parameters].*nodes/m).to_stdout
+        end
+
+        it 'accepts apply' do
+          cli = Bolt::CLI.new(%w[help apply])
+          expect {
+            expect {
+              cli.parse
+            }.to raise_error(Bolt::CLIExit)
+          }.to output(/Usage: bolt apply <manifest.pp>/m).to_stdout
+        end
       end
     end
 
@@ -162,39 +224,39 @@ describe "Bolt::CLI" do
       let(:targets) { [target, Bolt::Target.new('bar')] }
 
       it "accepts a single node" do
-        cli = Bolt::CLI.new(%w[command run --nodes foo])
+        cli = Bolt::CLI.new(%w[command run uptime --nodes foo])
         expect(cli.parse).to include(targets: [target])
       end
 
       it "accepts multiple nodes" do
-        cli = Bolt::CLI.new(%w[command run --nodes foo,bar])
+        cli = Bolt::CLI.new(%w[command run uptime --nodes foo,bar])
         expect(cli.parse).to include(targets: targets)
       end
 
       it "accepts multiple nodes across multiple declarations" do
-        cli = Bolt::CLI.new(%w[command run --nodes foo,bar --nodes bar,more,bars])
+        cli = Bolt::CLI.new(%w[command run uptime --nodes foo,bar --nodes bar,more,bars])
         extra_targets = [Bolt::Target.new('more'), Bolt::Target.new('bars')]
         expect(cli.parse).to include(targets: targets + extra_targets)
       end
 
       it "reads from stdin when --nodes is '-'" do
-        nodes = <<-'NODES'
-foo
-bar
+        nodes = <<~'NODES'
+         foo
+         bar
         NODES
-        cli = Bolt::CLI.new(%w[command run --nodes -])
+        cli = Bolt::CLI.new(%w[command run uptime --nodes -])
         allow(STDIN).to receive(:read).and_return(nodes)
         result = cli.parse
         expect(result[:targets]).to eq(targets)
       end
 
       it "reads from a file when --nodes starts with @" do
-        nodes = <<-'NODES'
-foo
-bar
+        nodes = <<~'NODES'
+          foo
+          bar
         NODES
         with_tempfile_containing('nodes-args', nodes) do |file|
-          cli = Bolt::CLI.new(%W[command run --nodes @#{file.path}])
+          cli = Bolt::CLI.new(%W[command run uptime --nodes @#{file.path}])
           result = cli.parse
           expect(result[:targets]).to eq(targets)
         end
@@ -203,7 +265,7 @@ bar
       it "strips leading and trailing whitespace" do
         nodes = "  foo\nbar  \nbaz\nqux  "
         with_tempfile_containing('nodes-args', nodes) do |file|
-          cli = Bolt::CLI.new(%W[command run --nodes @#{file.path}])
+          cli = Bolt::CLI.new(%W[command run uptime --nodes @#{file.path}])
           result = cli.parse
           extra_targets = [Bolt::Target.new('baz'), Bolt::Target.new('qux')]
           expect(result[:targets]).to eq(targets + extra_targets)
@@ -212,41 +274,54 @@ bar
 
       it "expands tilde to a user directory when --nodes starts with @" do
         expect(File).to receive(:read).with(File.join(Dir.home, 'nodes.txt')).and_return("foo\nbar\n")
-        cli = Bolt::CLI.new(%w[command run --nodes @~/nodes.txt])
+        cli = Bolt::CLI.new(%w[command run uptime --nodes @~/nodes.txt])
+        allow(cli).to receive(:puppetdb_client)
         result = cli.parse
         expect(result[:targets]).to eq(targets)
       end
 
       it "generates an error message if no nodes given" do
-        cli = Bolt::CLI.new(%w[command run --nodes])
+        cli = Bolt::CLI.new(%w[command run uptime --nodes])
         expect {
           cli.parse
         }.to raise_error(Bolt::CLIError, /Option '--nodes' needs a parameter/)
       end
 
       it "generates an error message if nodes is omitted" do
-        cli = Bolt::CLI.new(%w[command run])
+        cli = Bolt::CLI.new(%w[command run uptime])
         expect {
           cli.parse
-        }.to raise_error(Bolt::CLIError, /Targets must be specified/)
+        }.to raise_error(Bolt::CLIError, /Command requires a targeting option/)
+      end
+    end
+
+    describe "targets" do
+      let(:targets) { [target, Bolt::Target.new('bar')] }
+
+      it "reads from a file when --nodes starts with @" do
+        nodes = <<~'NODES'
+          foo
+          bar
+        NODES
+        with_tempfile_containing('nodes-args', nodes) do |file|
+          cli = Bolt::CLI.new(%W[command run uptime --targets @#{file.path}])
+          result = cli.parse
+          expect(result[:targets]).to eq(targets)
+        end
       end
 
-      it 'does not list nodes in plan --help' do
-        cli = Bolt::CLI.new(%w[plan --help])
+      it "generates an error message if no targets are given" do
+        cli = Bolt::CLI.new(%w[command run uptime --targets])
         expect {
-          expect {
-            cli.parse
-          }.to raise_error(Bolt::CLIExit)
-        }.not_to output(/--nodes/).to_stdout
+          cli.parse
+        }.to raise_error(Bolt::CLIError, /Option '--targets' needs a parameter/)
       end
 
-      it 'does not list nodes in help plan' do
-        cli = Bolt::CLI.new(%w[help plan])
+      it "generates an error if nodes and targets are specified" do
+        cli = Bolt::CLI.new(%w[command run uptime --nodes foo --targets bar])
         expect {
-          expect {
-            cli.parse
-          }.to raise_error(Bolt::CLIExit)
-        }.not_to output(/--nodes/).to_stdout
+          cli.parse
+        }.to raise_error(Bolt::CLIError, /Only one targeting option/)
       end
     end
 
@@ -288,12 +363,12 @@ bar
 
     describe "user" do
       it "accepts a user" do
-        cli = Bolt::CLI.new(%w[command run --user root --nodes foo])
+        cli = Bolt::CLI.new(%w[command run uptime --user root --nodes foo])
         expect(cli.parse).to include(user: 'root')
       end
 
       it "generates an error message if no user value is given" do
-        cli = Bolt::CLI.new(%w[command run --nodes foo --user])
+        cli = Bolt::CLI.new(%w[command run uptime --nodes foo --user])
         expect {
           cli.parse
         }.to raise_error(Bolt::CLIError, /Option '--user' needs a parameter/)
@@ -302,7 +377,7 @@ bar
 
     describe "password" do
       it "accepts a password" do
-        cli = Bolt::CLI.new(%w[command run --password opensesame --nodes foo])
+        cli = Bolt::CLI.new(%w[command run uptime --password opensesame --nodes foo])
         expect(cli.parse).to include(password: 'opensesame')
       end
 
@@ -310,14 +385,14 @@ bar
         allow(STDIN).to receive(:noecho).and_return('opensesame')
         allow(STDOUT).to receive(:print).with('Please enter your password: ')
         allow(STDOUT).to receive(:puts)
-        cli = Bolt::CLI.new(%w[command run --nodes foo --password])
+        cli = Bolt::CLI.new(%w[command run uptime --nodes foo --password])
         expect(cli.parse).to include(password: 'opensesame')
       end
     end
 
     describe "key" do
       it "accepts a private key" do
-        cli = Bolt::CLI.new(%w[  command run
+        cli = Bolt::CLI.new(%w[  command run uptime
                                  --private-key ~/.ssh/google_compute_engine
                                  --nodes foo])
         expect(cli.parse).to include('private-key': '~/.ssh/google_compute_engine')
@@ -335,18 +410,18 @@ bar
 
     describe "concurrency" do
       it "accepts a concurrency limit" do
-        cli = Bolt::CLI.new(%w[command run --concurrency 10 --nodes foo])
+        cli = Bolt::CLI.new(%w[command run uptime --concurrency 10 --nodes foo])
         expect(cli.parse).to include(concurrency: 10)
       end
 
       it "defaults to 100" do
-        cli = Bolt::CLI.new(%w[command run --nodes foo])
+        cli = Bolt::CLI.new(%w[command run uptime --nodes foo])
         cli.parse
         expect(cli.config.concurrency).to eq(100)
       end
 
       it "generates an error message if no concurrency value is given" do
-        cli = Bolt::CLI.new(%w[command run --nodes foo --concurrency])
+        cli = Bolt::CLI.new(%w[command run uptime --nodes foo --concurrency])
         expect {
           cli.parse
         }.to raise_error(Bolt::CLIError,
@@ -356,18 +431,19 @@ bar
 
     describe "compile-concurrency" do
       it "accepts a concurrency limit" do
-        cli = Bolt::CLI.new(%w[command run --compile-concurrency 2 --nodes foo])
+        cli = Bolt::CLI.new(%w[command run uptime --compile-concurrency 2 --nodes foo])
         expect(cli.parse).to include('compile-concurrency': 2)
       end
 
       it "defaults to unset" do
-        cli = Bolt::CLI.new(%w[command run --nodes foo])
+        cli = Bolt::CLI.new(%w[command run uptime --nodes foo])
         cli.parse
+        # verifies Etc.nprocessors is the same as Concurrent.processor_count
         expect(cli.config.compile_concurrency).to eq(Concurrent.processor_count)
       end
 
       it "generates an error message if no concurrency value is given" do
-        cli = Bolt::CLI.new(%w[command run --nodes foo --compile-concurrency])
+        cli = Bolt::CLI.new(%w[command run uptime --nodes foo --compile-concurrency])
         expect {
           cli.parse
         }.to raise_error(Bolt::CLIError,
@@ -379,39 +455,39 @@ bar
       it "is not sensitive to ordering of debug and verbose" do
         expect(Bolt::Logger).to receive(:configure).with({ 'console' => { level: :debug } }, true)
 
-        cli = Bolt::CLI.new(%w[command run --nodes foo --debug --verbose])
+        cli = Bolt::CLI.new(%w[command run uptime --nodes foo --debug --verbose])
         cli.parse
       end
     end
 
     describe "host-key-check" do
       it "accepts `--host-key-check`" do
-        cli = Bolt::CLI.new(%w[command run --host-key-check --nodes foo])
+        cli = Bolt::CLI.new(%w[command run uptime --host-key-check --nodes foo])
         cli.parse
         expect(cli.config.transports[:ssh]['host-key-check']).to eq(true)
       end
 
       it "accepts `--no-host-key-check`" do
-        cli = Bolt::CLI.new(%w[command run --no-host-key-check --nodes foo])
+        cli = Bolt::CLI.new(%w[command run uptime --no-host-key-check --nodes foo])
         cli.parse
         expect(cli.config.transports[:ssh]['host-key-check']).to eq(false)
       end
 
-      it "defaults to true" do
-        cli = Bolt::CLI.new(%w[command run --nodes foo])
+      it "defaults to nil" do
+        cli = Bolt::CLI.new(%w[command run uptime --nodes foo])
         cli.parse
-        expect(cli.config.transports[:ssh]['host-key-check']).to eq(true)
+        expect(cli.config.transports[:ssh]['host-key-check']).to eq(nil)
       end
     end
 
     describe "connect-timeout" do
       it "accepts a specific timeout" do
-        cli = Bolt::CLI.new(%w[command run --connect-timeout 123 --nodes foo])
+        cli = Bolt::CLI.new(%w[command run uptime --connect-timeout 123 --nodes foo])
         expect(cli.parse).to include('connect-timeout': 123)
       end
 
       it "generates an error message if no timeout value is given" do
-        cli = Bolt::CLI.new(%w[command run --nodes foo --connect-timeout])
+        cli = Bolt::CLI.new(%w[command run uptime --nodes foo --connect-timeout])
         expect {
           cli.parse
         }.to raise_error(Bolt::CLIError,
@@ -423,12 +499,19 @@ bar
       it "treats relative modulepath as relative to pwd" do
         site = File.expand_path('site')
         modulepath = [site, 'modules'].join(File::PATH_SEPARATOR)
-        cli = Bolt::CLI.new(%W[command run --modulepath #{modulepath} --nodes foo])
+        cli = Bolt::CLI.new(%W[command run uptime --modulepath #{modulepath} --nodes foo])
+        expect(cli.parse).to include(modulepath: [site, File.expand_path('modules')])
+      end
+
+      it "accepts shorthand -m" do
+        site = File.expand_path('site')
+        modulepath = [site, 'modules'].join(File::PATH_SEPARATOR)
+        cli = Bolt::CLI.new(%W[command run uptime -m #{modulepath} --nodes foo])
         expect(cli.parse).to include(modulepath: [site, File.expand_path('modules')])
       end
 
       it "generates an error message if no value is given" do
-        cli = Bolt::CLI.new(%w[command run --nodes foo --modulepath])
+        cli = Bolt::CLI.new(%w[command run uptime --nodes foo --modulepath])
         expect {
           cli.parse
         }.to raise_error(Bolt::CLIError,
@@ -445,7 +528,7 @@ bar
 
     describe "sudo-password" do
       it "accepts a password" do
-        cli = Bolt::CLI.new(%w[command run --sudo-password opensez --run-as alibaba --nodes foo])
+        cli = Bolt::CLI.new(%w[command run uptime --sudo-password opensez --run-as alibaba --nodes foo])
         expect(cli.parse).to include('sudo-password': 'opensez')
       end
 
@@ -454,7 +537,7 @@ bar
         pw_prompt = 'Please enter your privilege escalation password: '
         allow(STDOUT).to receive(:print).with(pw_prompt)
         allow(STDOUT).to receive(:puts)
-        cli = Bolt::CLI.new(%w[command run --nodes foo --run-as alibaba --sudo-password])
+        cli = Bolt::CLI.new(%w[command run uptime --nodes foo --run-as alibaba --sudo-password])
         expect(cli.parse).to include('sudo-password': 'opensez')
       end
     end
@@ -495,6 +578,20 @@ bar
         cli = Bolt::CLI.new(%w[command run --nodes foo whoami])
         expect(cli.parse[:object]).to eq('whoami')
       end
+
+      it "errors when a command is not specified" do
+        cli = Bolt::CLI.new(%w[command run --nodes foo])
+        expect {
+          cli.parse
+        }.to raise_error(Bolt::CLIError, /Must specify a command to run/)
+      end
+
+      it "errors when a command is empty string" do
+        cli = Bolt::CLI.new(['command', 'run', '', '--nodes', 'foo'])
+        expect {
+          cli.parse
+        }.to raise_error(Bolt::CLIError, /Must specify a command to run/)
+      end
     end
 
     it "distinguishes subcommands" do
@@ -525,7 +622,7 @@ bar
                                --modulepath .])
         result = cli.parse
         expect(result[:params_parsed]).to eq(false)
-        expect(result[:task_options]).to eq('kj'   => '2hv',
+        expect(result[:task_options]).to eq('kj' => '2hv',
                                             'iuhg' => 'iube',
                                             '2whf' => 'lcv')
       end
@@ -536,7 +633,7 @@ bar
                              '--modulepath', '.'])
         result = cli.parse
         expect(result[:params_parsed]).to eq(true)
-        expect(result[:task_options]).to eq('kj'   => '2hv',
+        expect(result[:task_options]).to eq('kj' => '2hv',
                                             'iuhg' => 'iube',
                                             '2whf' => 'lcv')
       end
@@ -563,7 +660,7 @@ bar
           cli = Bolt::CLI.new(%W[plan run my::plan --params @#{file.path}
                                  --modulepath .])
           result = cli.parse
-          expect(result[:task_options]).to eq('kj'   => '2hv',
+          expect(result[:task_options]).to eq('kj' => '2hv',
                                               'iuhg' => 'iube',
                                               '2whf' => 'lcv')
         end
@@ -584,7 +681,7 @@ bar
         cli = Bolt::CLI.new(%w[plan run my::plan --params - --modulepath .])
         allow(STDIN).to receive(:read).and_return(json_args)
         result = cli.parse
-        expect(result[:task_options]).to eq('kj'   => '2hv',
+        expect(result[:task_options]).to eq('kj' => '2hv',
                                             'iuhg' => 'iube',
                                             '2whf' => 'lcv')
       end
@@ -603,6 +700,14 @@ bar
         expect {
           cli.parse
         }.to raise_error(Bolt::CLIError, /Invalid task/)
+      end
+
+      it "fails show with --noop" do
+        expected = "Option '--noop' may only be specified when running a task or applying manifest code"
+        expect {
+          cli = Bolt::CLI.new(%w[task show foo --nodes bar --noop])
+          cli.parse
+        }.to raise_error(Bolt::CLIError, expected)
       end
     end
 
@@ -629,51 +734,81 @@ bar
         cli.validate(result)
         cli.execute(result)
         expect(result[:targets]).to eq(targets)
-        expect(result[:nodes]).to eq(%w[foo bar])
+        expect(result[:target_args]).to eq(%w[foo bar])
       end
 
       it "fails when --nodes AND --query provided" do
         expect {
           cli = Bolt::CLI.new(%w[plan run foo --query nodes{} --nodes bar])
           cli.parse
-        }.to raise_error(Bolt::CLIError, /'--nodes' or '--query'/)
+        }.to raise_error(Bolt::CLIError, /Only one targeting option/)
+      end
+
+      it "fails with --noop" do
+        expected = "Option '--noop' may only be specified when running a task or applying manifest code"
+        expect {
+          cli = Bolt::CLI.new(%w[plan run foo --nodes bar --noop])
+          cli.parse
+        }.to raise_error(Bolt::CLIError, expected)
+      end
+    end
+
+    describe 'apply' do
+      it "errors without an object or inline code" do
+        expect {
+          cli = Bolt::CLI.new(%w[apply --nodes bar])
+          cli.parse
+        }.to raise_error(Bolt::CLIError, 'a manifest file or --execute is required')
+      end
+
+      it "errors with both an object and inline code" do
+        expect {
+          cli = Bolt::CLI.new(%w[apply foo.pp --execute hello --nodes bar])
+          cli.parse
+        }.to raise_error(Bolt::CLIError, '--execute is unsupported when specifying a manifest file')
       end
     end
 
     describe "bundled_content" do
+      let(:empty_content) {
+        { "Plan" => [],
+          "Plugin" => %w[puppetdb pkcs7 prompt terraform task],
+          "Task" => [] }
+      }
       it "does not calculate bundled content for a command" do
         cli = Bolt::CLI.new(%w[command run foo --nodes bar])
         cli.parse
-        expect(cli.bundled_content).to be_nil
+        expect(cli.bundled_content).to eq(empty_content)
       end
 
       it "does not calculate bundled content for a script" do
         cli = Bolt::CLI.new(%w[script run foo --nodes bar])
         cli.parse
-        expect(cli.bundled_content).to be_nil
+        expect(cli.bundled_content).to eq(empty_content)
       end
 
       it "does not calculate bundled content for a file" do
         cli = Bolt::CLI.new(%w[file upload /tmp /var foo --nodes bar])
         cli.parse
-        expect(cli.bundled_content).to be_nil
+        expect(cli.bundled_content).to eq(empty_content)
       end
 
       it "calculates bundled content for a task" do
         cli = Bolt::CLI.new(%w[task run foo --nodes bar])
         cli.parse
-        expect(cli.bundled_content).to be
+        expect(cli.bundled_content['Task']).not_to be_empty
       end
 
       it "calculates bundled content for a plan" do
         cli = Bolt::CLI.new(%w[plan run foo --nodes bar])
         cli.parse
-        expect(cli.bundled_content).to be
+        expect(cli.bundled_content['Plan']).not_to be_empty
+        expect(cli.bundled_content['Task']).not_to be_empty
       end
     end
 
     describe "execute" do
-      let(:executor) { double('executor', noop: false) }
+      let(:executor) { double('executor', noop: false, subscribe: nil, shutdown: nil) }
       let(:cli) { Bolt::CLI.new({}) }
       let(:targets) { [target] }
       let(:output) { StringIO.new }
@@ -697,7 +832,7 @@ bar
         allow(Bolt::Executor).to receive(:new).and_return(executor)
         allow(executor).to receive(:log_plan) { |_plan_name, &block| block.call }
 
-        outputter = Bolt::Outputter::JSON.new(false, false, output)
+        outputter = Bolt::Outputter::JSON.new(false, false, false, output)
 
         allow(cli).to receive(:outputter).and_return(outputter)
       end
@@ -847,6 +982,7 @@ bar
       context "when showing available tasks", :reset_puppet_settings do
         before :each do
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
+          cli.config.format = 'json'
         end
 
         it "lists tasks with description" do
@@ -855,7 +991,7 @@ bar
             action: 'show'
           }
           cli.execute(options)
-          tasks = JSON.parse(output.string)
+          tasks = JSON.parse(output.string)['tasks']
           [
             ['sample', nil],
             ['sample::echo', nil],
@@ -871,13 +1007,23 @@ bar
           end
         end
 
+        it "lists modulepath" do
+          options = {
+            subcommand: 'task',
+            action: 'show'
+          }
+          cli.execute(options)
+          modulepath = JSON.parse(output.string)['modulepath']
+          expect(modulepath).to include(File.join(__FILE__, '../../fixtures/modules').to_s)
+        end
+
         it "does not list a private task" do
           options = {
             subcommand: 'task',
             action: 'show'
           }
           cli.execute(options)
-          tasks = JSON.parse(output.string)
+          tasks = JSON.parse(output.string)['tasks']
           expect(tasks).not_to include(['sample::private', 'Do not list this task'])
         end
 
@@ -950,11 +1096,23 @@ bar
             }
           )
         end
+
+        it "does not load inventory" do
+          options = {
+            subcommand: 'task',
+            action: 'show'
+          }
+
+          expect(cli).not_to receive(:inventory)
+
+          cli.execute(options)
+        end
       end
 
       context "when available tasks include an error", :reset_puppet_settings do
         before :each do
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/invalid_mods')]
+          cli.config.format = 'json'
         end
 
         it "task show prints a warning but shows other valid tasks" do
@@ -963,12 +1121,10 @@ bar
             action: 'show'
           }
           cli.execute(options)
-          json = JSON.parse(output.string)
+          json = JSON.parse(output.string)['tasks']
           tasks = [
             ["package", "Manage and inspect the state of packages"],
-            ["service", "Manage and inspect the state of services"],
-            ["service::linux", "Manage the state of services (without a puppet agent)"],
-            ["service::windows", "Manage the state of Windows services (without a puppet agent)"]
+            ["service", "Manage and inspect the state of services"]
           ]
           tasks.each do |task|
             expect(json).to include(task)
@@ -1001,6 +1157,7 @@ bar
       context "when showing available plans", :reset_puppet_settings do
         before :each do
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
+          cli.config.format = 'json'
         end
 
         it "lists plans" do
@@ -1009,15 +1166,26 @@ bar
             action: 'show'
           }
           cli.execute(options)
-          plan_list = JSON.parse(output.string)
+          plan_list = JSON.parse(output.string)['plans']
           [
             ['sample'],
             ['sample::single_task'],
             ['sample::three_tasks'],
-            ['sample::two_tasks']
+            ['sample::two_tasks'],
+            ['sample::yaml']
           ].each do |plan|
             expect(plan_list).to include(plan)
           end
+        end
+
+        it "lists modulepath" do
+          options = {
+            subcommand: 'plan',
+            action: 'show'
+          }
+          cli.execute(options)
+          modulepath = JSON.parse(output.string)['modulepath']
+          expect(modulepath).to include(File.join(__FILE__, '../../fixtures/modules').to_s)
         end
 
         it "shows an individual plan data" do
@@ -1046,11 +1214,51 @@ bar
             }
           )
         end
+
+        it "shows an individual yaml plan data" do
+          plan_name = 'sample::yaml'
+          options = {
+            subcommand: 'plan',
+            action: 'show',
+            object: plan_name
+          }
+          cli.execute(options)
+          json = JSON.parse(output.string)
+          expect(json).to eq(
+            "name" => "sample::yaml",
+            "module_dir" => File.absolute_path(File.join(__dir__, "..", "fixtures", "modules", "sample")),
+            "parameters" => {
+              "nodes" => {
+                "type" => "TargetSpec"
+              },
+              "param_optional" => {
+                "type" => "Optional[String]",
+                "default_value" => nil
+              },
+              "param_with_default_value" => {
+                "type" => "String",
+                "default_value" => nil
+              }
+            }
+          )
+        end
+
+        it "does not load inventory" do
+          options = {
+            subcommand: 'plan',
+            action: 'show'
+          }
+
+          expect(cli).not_to receive(:inventory)
+
+          cli.execute(options)
+        end
       end
 
       context "when available plans include an error", :reset_puppet_settings do
         before :each do
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/invalid_mods')]
+          cli.config.format = 'json'
         end
 
         it "plan show prints a warning but shows other valid plans" do
@@ -1060,14 +1268,14 @@ bar
           }
 
           cli.execute(options)
-          json = JSON.parse(output.string)
-          expect(json).to eq([["aggregate::count"],
-                              ["aggregate::nodes"],
-                              ["canary"],
-                              ["facts"],
-                              ["facts::info"],
-                              ["puppetdb_fact"],
-                              ["sample::ok"]])
+          json = JSON.parse(output.string)['plans']
+          expect(json).to include(["aggregate::count"],
+                                  ["aggregate::nodes"],
+                                  ["canary"],
+                                  ["facts"],
+                                  ["facts::info"],
+                                  ["puppetdb_fact"],
+                                  ["sample::ok"])
 
           expect(@log_output.readlines.join).to match(/Syntax error at.*single_task.pp/m)
         end
@@ -1132,7 +1340,7 @@ bar
         it "runs a task given a name" do
           expect(executor)
             .to receive(:run_task)
-            .with(targets, task_t, task_params, '_bolt_api_call' => true)
+            .with(targets, task_t, task_params, kind_of(Hash))
             .and_return(Bolt::ResultSet.new([]))
           expect(cli.execute(options)).to eq(0)
           expect(JSON.parse(output.string)).to be
@@ -1141,7 +1349,7 @@ bar
         it "returns 2 if any node fails" do
           expect(executor)
             .to receive(:run_task)
-            .with(targets, task_t, task_params, '_bolt_api_call' => true)
+            .with(targets, task_t, task_params, kind_of(Hash))
             .and_return(fail_set)
 
           expect(cli.execute(options)).to eq(2)
@@ -1170,7 +1378,7 @@ bar
 
           expect(executor)
             .to receive(:run_task)
-            .with(targets, task_t, {}, '_bolt_api_call' => true)
+            .with(targets, task_t, {}, kind_of(Hash))
             .and_raise("Could not connect to target")
 
           expect { cli.execute(options) }.to raise_error(/Could not connect to target/)
@@ -1182,7 +1390,7 @@ bar
 
           expect(executor)
             .to receive(:run_task)
-            .with(targets, task_t, task_params, '_bolt_api_call' => true)
+            .with(targets, task_t, task_params, kind_of(Hash))
             .and_return(Bolt::ResultSet.new([]))
 
           cli.execute(options)
@@ -1197,7 +1405,7 @@ bar
 
             expect(executor)
               .to receive(:run_task)
-              .with(targets, task_t, task_params, '_bolt_api_call' => true)
+              .with(targets, task_t, task_params, kind_of(Hash))
               .and_return(Bolt::ResultSet.new([]))
 
             cli.execute(options)
@@ -1210,7 +1418,7 @@ bar
 
             expect(executor)
               .to receive(:run_task)
-              .with(targets, task_t, task_params, '_bolt_api_call' => true)
+              .with(targets, task_t, task_params, kind_of(Hash))
               .and_return(Bolt::ResultSet.new([]))
 
             cli.execute(options)
@@ -1221,7 +1429,7 @@ bar
         it "traps SIGINT", :signals_self do
           expect(executor)
             .to receive(:run_task)
-            .with(targets, task_t, task_params, '_bolt_api_call' => true) do
+            .with(targets, task_t, task_params, kind_of(Hash)) do
               Process.kill :INT, Process.pid
               sync_thread.join(1) # give ruby some time to handle the signal
               Bolt::ResultSet.new([])
@@ -1273,11 +1481,11 @@ bar
 
           it "errors when the specified parameter values don't match the expected data types" do
             task_params.merge!(
-              'mandatory_string'  => 'str',
+              'mandatory_string' => 'str',
               'mandatory_integer' => 10,
               'mandatory_boolean' => 'str',
-              'non_empty_string'  => 'foo',
-              'optional_string'   => 10
+              'non_empty_string' => 'foo',
+              'optional_string' => 10
             )
 
             expect { cli.execute(options) }.to raise_error(
@@ -1292,11 +1500,11 @@ bar
 
           it "errors when the specified parameter values are outside of the expected ranges" do
             task_params.merge!(
-              'mandatory_string'  => '0123456789a',
+              'mandatory_string' => '0123456789a',
               'mandatory_integer' => 10,
               'mandatory_boolean' => true,
-              'non_empty_string'  => 'foo',
-              'optional_integer'  => 10
+              'non_empty_string' => 'foo',
+              'optional_integer' => 10
             )
 
             expect { cli.execute(options) }.to raise_error(
@@ -1312,13 +1520,13 @@ bar
           it "runs the task when the specified parameters are successfully validated" do
             expect(executor)
               .to receive(:run_task)
-              .with(targets, task_t, task_params, '_bolt_api_call' => true)
+              .with(targets, task_t, task_params, kind_of(Hash))
               .and_return(Bolt::ResultSet.new([]))
             task_params.merge!(
-              'mandatory_string'  => ' ',
+              'mandatory_string' => ' ',
               'mandatory_integer' => 0,
               'mandatory_boolean' => false,
-              'non_empty_string'  => 'foo'
+              'non_empty_string' => 'foo'
             )
 
             cli.execute(options)
@@ -1365,7 +1573,7 @@ bar
 
                 expect(executor)
                   .to receive(:run_task)
-                  .with(targets, task_t, task_params, '_bolt_api_call' => true)
+                  .with(targets, task_t, task_params, kind_of(Hash))
                   .and_return(Bolt::ResultSet.new([]))
 
                 cli.execute(options)
@@ -1375,7 +1583,7 @@ bar
               it "runs the task even when invalid (according to the local task definition) parameters are specified" do
                 expect(executor)
                   .to receive(:run_task)
-                  .with(targets, task_t, task_params, '_bolt_api_call' => true)
+                  .with(targets, task_t, task_params, kind_of(Hash))
                   .and_return(Bolt::ResultSet.new([]))
 
                 cli.execute(options)
@@ -1391,7 +1599,7 @@ bar
         let(:plan_params) { { 'nodes' => targets.map(&:host).join(',') } }
         let(:options) {
           {
-            nodes: [],
+            target_args: [],
             subcommand: 'plan',
             action: 'run',
             object: plan_name,
@@ -1408,12 +1616,12 @@ bar
 
         it "uses the nodes passed using the --nodes option(s) as the 'nodes' plan parameter" do
           plan_params.clear
-          options[:nodes] = targets.map(&:host)
+          options[:target_args] = targets.map(&:host)
 
           expect(executor)
             .to receive(:run_task)
             .with(targets, task_t, { 'message' => 'hi there' }, kind_of(Hash))
-            .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0)]))
+            .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0, 'some_task')]))
 
           expect(executor).to receive(:start_plan)
           expect(executor).to receive(:log_plan)
@@ -1421,12 +1629,17 @@ bar
 
           cli.execute(options)
           expect(JSON.parse(output.string)).to eq(
-            [{ 'node' => 'foo', 'status' => 'success', 'result' => { '_output' => 'yes' } }]
+            [{ 'node' => 'foo',
+               'target' => 'foo',
+               'status' => 'success',
+               'action' => 'task',
+               'object' => 'some_task',
+               'result' => { '_output' => 'yes' } }]
           )
         end
 
         it "errors when the --nodes option(s) and the 'nodes' plan parameter are both specified" do
-          options[:nodes] = targets.map(&:host)
+          options[:target_args] = targets.map(&:host)
 
           expect { cli.execute(options) }.to raise_error(
             /A plan's 'nodes' parameter may be specified using the --nodes option, (?x:
@@ -1439,7 +1652,7 @@ bar
           expect(executor)
             .to receive(:run_task)
             .with(targets, task_t, { 'message' => 'hi there' }, kind_of(Hash))
-            .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0)]))
+            .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0, 'some_task')]))
 
           expect(executor).to receive(:start_plan)
           expect(executor).to receive(:log_plan)
@@ -1447,7 +1660,12 @@ bar
 
           cli.execute(options)
           expect(JSON.parse(output.string)).to eq(
-            [{ 'node' => 'foo', 'status' => 'success', 'result' => { '_output' => 'yes' } }]
+            [{ 'node' => 'foo',
+               'target' => 'foo',
+               'status' => 'success',
+               'action' => 'task',
+               'object' => 'some_task',
+               'result' => { '_output' => 'yes' } }]
           )
         end
 
@@ -1469,7 +1687,7 @@ bar
           expect(executor)
             .to receive(:run_task)
             .with(targets, task_t, { 'message' => 'hi there' }, kind_of(Hash))
-            .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'no', '', 1)]))
+            .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'no', '', 1, 'some_task')]))
 
           expect(executor).to receive(:start_plan)
           expect(executor).to receive(:log_plan)
@@ -1480,7 +1698,10 @@ bar
             [
               {
                 'node' => 'foo',
+                'target' => 'foo',
                 'status' => 'failure',
+                'action' => 'task',
+                'object' => 'some_task',
                 'result' => {
                   "_output" => "no",
                   "_error" => {
@@ -1612,7 +1833,7 @@ bar
     end
 
     describe "execute with noop" do
-      let(:executor) { double('executor', noop: true) }
+      let(:executor) { double('executor', noop: true, subscribe: nil, shutdown: nil) }
       let(:cli) { Bolt::CLI.new({}) }
       let(:targets) { [target] }
       let(:output) { StringIO.new }
@@ -1622,9 +1843,8 @@ bar
         allow(cli).to receive(:bundled_content).and_return(bundled_content)
         expect(Bolt::Executor).to receive(:new).with(Bolt::Config.default.concurrency,
                                                      anything,
-                                                     true,
-                                                     bundled_content: bundled_content).and_return(executor)
-        outputter = Bolt::Outputter::JSON.new(false, false, output)
+                                                     true).and_return(executor)
+        outputter = Bolt::Outputter::JSON.new(false, false, false, output)
         allow(cli).to receive(:outputter).and_return(outputter)
         allow(executor).to receive(:report_bundled_content)
       end
@@ -1651,7 +1871,7 @@ bar
         it "runs a task that supports noop" do
           expect(executor)
             .to receive(:run_task)
-            .with(targets, task_t, task_params.merge('_noop' => true), '_bolt_api_call' => true)
+            .with(targets, task_t, task_params.merge('_noop' => true), kind_of(Hash))
             .and_return(Bolt::ResultSet.new([]))
 
           cli.execute(options)
@@ -1690,7 +1910,7 @@ bar
       let(:cli) { Bolt::CLI.new({}) }
 
       before :each do
-        allow(cli).to receive(:outputter).and_return(Bolt::Outputter::JSON.new(false, false, output))
+        allow(cli).to receive(:outputter).and_return(Bolt::Outputter::JSON.new(false, false, false, output))
         allow(puppetfile).to receive(:exist?).and_return(true)
 
         # Ensure we never actually install modules.
@@ -1701,7 +1921,7 @@ bar
         allow(puppetfile).to receive(:exist?).and_return(false)
 
         expect do
-          cli.install_puppetfile(puppetfile, modulepath)
+          cli.install_puppetfile({}, puppetfile, modulepath)
         end.to raise_error(Bolt::FileError, /Could not find a Puppetfile/)
       end
 
@@ -1711,13 +1931,13 @@ bar
 
         allow(action_stub).to receive(:call).and_return(true)
 
-        cli.install_puppetfile(puppetfile, modulepath)
+        cli.install_puppetfile({}, puppetfile, modulepath)
       end
 
       it 'returns 0 and prints a result if successful' do
         allow(action_stub).to receive(:call).and_return(true)
 
-        expect(cli.install_puppetfile(puppetfile, modulepath)).to eq(0)
+        expect(cli.install_puppetfile({}, puppetfile, modulepath)).to eq(0)
 
         result = JSON.parse(output.string)
         expect(result['success']).to eq(true)
@@ -1728,7 +1948,7 @@ bar
       it 'returns 1 and prints a result if unsuccessful' do
         allow(action_stub).to receive(:call).and_return(false)
 
-        expect(cli.install_puppetfile(puppetfile, modulepath)).to eq(1)
+        expect(cli.install_puppetfile({}, puppetfile, modulepath)).to eq(1)
 
         result = JSON.parse(output.string)
         expect(result['success']).to eq(false)
@@ -1740,10 +1960,33 @@ bar
         allow(action_stub).to receive(:call).and_raise(R10K::Error.new('everything is terrible'))
 
         expect do
-          cli.install_puppetfile(puppetfile, modulepath)
+          cli.install_puppetfile({}, puppetfile, modulepath)
         end.to raise_error(Bolt::PuppetfileError, /everything is terrible/)
 
         expect(output.string).to be_empty
+      end
+    end
+
+    describe "applying Puppet code" do
+      let(:options) {
+        {
+          subcommand: 'apply'
+        }
+      }
+      let(:output) { StringIO.new }
+      let(:cli) { Bolt::CLI.new([]) }
+
+      before :each do
+        allow(cli).to receive(:outputter).and_return(Bolt::Outputter::JSON.new(false, false, false, output))
+      end
+
+      it 'fails if the code file does not exist' do
+        manifest = Tempfile.new
+        options[:object] = manifest.path
+        manifest.close
+        manifest.delete
+        expect(cli).not_to receive(:apply_manifest)
+        expect { cli.execute(options) }.to raise_error(Bolt::FileError)
       end
     end
   end
@@ -1789,7 +2032,7 @@ bar
 
     it 'reads modulepath' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-host-key-check])
+        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --nodes foo --no-host-key-check])
         cli.parse
         expect(cli.config.modulepath).to eq(modulepath)
       end
@@ -1797,7 +2040,7 @@ bar
 
     it 'reads concurrency' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-host-key-check])
+        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --nodes foo --no-host-key-check])
         cli.parse
         expect(cli.config.concurrency).to eq(14)
       end
@@ -1805,7 +2048,7 @@ bar
 
     it 'reads compile-concurrency' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-host-key-check])
+        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --nodes foo --no-host-key-check])
         cli.parse
         expect(cli.config.compile_concurrency).to eq(2)
       end
@@ -1813,7 +2056,7 @@ bar
 
     it 'reads format' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-host-key-check])
+        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --nodes foo --no-host-key-check])
         cli.parse
         expect(cli.config.format).to eq('json')
       end
@@ -1821,7 +2064,7 @@ bar
 
     it 'reads log file' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-host-key-check])
+        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --nodes foo --no-host-key-check])
         cli.parse
         normalized_path = File.expand_path(File.join(configdir, 'debug.log'))
         expect(cli.config.log).to eq(
@@ -1833,7 +2076,7 @@ bar
 
     it 'reads private-key for ssh' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-host-key-check])
+        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --nodes foo --no-host-key-check])
         cli.parse
         expect(cli.config.transports[:ssh]['private-key']).to eq('/bar/foo')
       end
@@ -1841,7 +2084,7 @@ bar
 
     it 'reads host-key-check for ssh' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo])
+        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --nodes foo])
         cli.parse
         expect(cli.config.transports[:ssh]['host-key-check']).to eq(false)
       end
@@ -1849,7 +2092,7 @@ bar
 
     it 'reads run-as for ssh' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --password bar --no-host-key-check])
+        cli = Bolt::CLI.new(%W[command run r --configfile #{conf.path} --nodes foo --password bar --no-host-key-check])
         cli.parse
         expect(cli.config.transports[:ssh]['run-as']).to eq('Fakey McFakerson')
       end
@@ -1857,7 +2100,7 @@ bar
 
     it 'reads separate connect-timeout for ssh and winrm' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-host-key-check --no-ssl])
+        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --nodes foo --no-host-key-check --no-ssl])
         cli.parse
         expect(cli.config.transports[:ssh]['connect-timeout']).to eq(4)
         expect(cli.config.transports[:winrm]['connect-timeout']).to eq(7)
@@ -1866,7 +2109,7 @@ bar
 
     it 'reads ssl for winrm' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo])
+        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --nodes foo])
         cli.parse
         expect(cli.config.transports[:winrm]['ssl']).to eq(false)
       end
@@ -1874,7 +2117,7 @@ bar
 
     it 'reads ssl-verify for winrm' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo])
+        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --nodes foo])
         cli.parse
         expect(cli.config.transports[:winrm]['ssl-verify']).to eq(false)
       end
@@ -1882,7 +2125,7 @@ bar
 
     it 'reads extensions for winrm' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-ssl])
+        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --nodes foo --no-ssl])
         cli.parse
         expect(cli.config.transports[:winrm]['extensions']).to eq(['.py', '.bat'])
       end
@@ -1890,7 +2133,7 @@ bar
 
     it 'reads task environment for pcp' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo])
+        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --nodes foo])
         cli.parse
         expect(cli.config.transports[:pcp]['task-environment']).to eq('testenv')
       end
@@ -1898,7 +2141,7 @@ bar
 
     it 'reads service url for pcp' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo])
+        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --nodes foo])
         cli.parse
         expect(cli.config.transports[:pcp]['service-url']).to eql('http://foo.org')
       end
@@ -1906,7 +2149,7 @@ bar
 
     it 'reads token file for pcp' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo])
+        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --nodes foo])
         cli.parse
         expect(cli.config.transports[:pcp]['token-file']).to eql('/path/to/token')
       end
@@ -1914,7 +2157,7 @@ bar
 
     it 'reads separate cacert file for pcp and winrm' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --no-host-key-check --no-ssl])
+        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --nodes foo --no-host-key-check --no-ssl])
         cli.parse
         expect(cli.config.transports[:pcp]['cacert']).to eql('/path/to/cacert')
         expect(cli.config.transports[:winrm]['cacert']).to eql('/path/to/winrm-cacert')
@@ -1923,14 +2166,14 @@ bar
 
     it 'CLI flags override config' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run --configfile #{conf.path} --nodes foo --concurrency 12])
+        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --nodes foo --concurrency 12])
         cli.parse
         expect(cli.config.concurrency).to eq(12)
       end
     end
 
     it 'raises an error if a config file is specified and invalid' do
-      cli = Bolt::CLI.new(%W[command run --configfile #{File.join(configdir, 'invalid.yml')} --nodes foo])
+      cli = Bolt::CLI.new(%W[command run uptime --configfile #{File.join(configdir, 'invalid.yml')} --nodes foo])
       expect {
         cli.parse
       }.to raise_error(Bolt::FileError, /Could not parse/)
@@ -1940,11 +2183,17 @@ bar
   describe 'inventoryfile' do
     let(:inventorydir) { File.join(__dir__, '..', 'fixtures', 'configs') }
 
-    it 'raises an error if a inventory file is specified and invalid' do
-      cli = Bolt::CLI.new(%W[command run --inventoryfile #{File.join(inventorydir, 'invalid.yml')} --nodes foo])
+    it 'raises an error if an inventory file is specified and invalid' do
+      cli = Bolt::CLI.new(%W[command run uptime --inventoryfile #{File.join(inventorydir, 'invalid.yml')} --nodes foo])
       expect {
         cli.parse
       }.to raise_error(Bolt::Error, /Could not parse/)
+    end
+
+    it 'lists targets the action would run on' do
+      cli = Bolt::CLI.new(%w[inventory show -t localhost])
+      expect_any_instance_of(Bolt::Outputter::Human).to receive(:print_targets)
+      cli.execute(cli.parse)
     end
 
     context 'with BOLT_INVENTORY set' do
@@ -1952,7 +2201,7 @@ bar
       after(:each) { ENV.delete('BOLT_INVENTORY') }
 
       it 'errors when BOLT_INVENTORY is set' do
-        cli = Bolt::CLI.new(%W[command run --inventoryfile #{File.join(inventorydir, 'invalid.yml')} --nodes foo])
+        cli = Bolt::CLI.new(%W[command run id --inventoryfile #{File.join(inventorydir, 'invalid.yml')} --nodes foo])
         expect {
           cli.parse
         }.to raise_error(Bolt::Error, /BOLT_INVENTORY is set/)

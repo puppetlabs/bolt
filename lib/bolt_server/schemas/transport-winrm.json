@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "title": "Action request with WinRM transport",
+  "description": "POST /winrm/<action> request schema",
+  "type": "object",
+  "properties": {
+    "target": { "$ref": "partial:target-winrm" },
+    "targets": {
+      "type": "array",
+      "items": {
+        "$ref": "partial:target-winrm"
+      }
+    }
+  },
+  "oneOf": [
+    { "required":  ["target"] },
+    { "required":  ["targets"] }
+  ]
+}

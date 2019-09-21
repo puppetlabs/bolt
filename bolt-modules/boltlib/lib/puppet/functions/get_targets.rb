@@ -3,6 +3,10 @@
 require 'bolt/error'
 
 # Parses common ways of referring to targets and returns an array of Targets.
+#
+# **NOTE:** Calling `get_targets` inside an `apply` block with a
+# version 2 inventory creates a new Target object.
+# `get_targets('all')` returns an empty array.
 Puppet::Functions.create_function(:get_targets) do
   # @param names A pattern or array of patterns identifying a set of targets.
   # @return A list of unique Targets resolved from any target URIs and groups.
@@ -22,16 +26,10 @@ Puppet::Functions.create_function(:get_targets) do
   end
 
   def get_targets(names)
-    inventory = Puppet.lookup(:bolt_inventory) { nil }
-
-    unless inventory && Puppet.features.bolt?
-      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
-        Puppet::Pops::Issues::TASK_MISSING_BOLT, action: _('process targets through inventory')
-      )
-    end
-
+    inventory = Puppet.lookup(:bolt_inventory)
+    # Bolt executor not expected when invoked from apply block
     executor = Puppet.lookup(:bolt_executor) { nil }
-    executor&.report_function_call('get_targets')
+    executor&.report_function_call(self.class.name)
 
     inventory.get_targets(names)
   end

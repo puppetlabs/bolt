@@ -34,14 +34,20 @@ Bolt is an open source task runner that automates the manual work that you do to
 
  [Writing tasks](writing_tasks.md#) 
 
- [Writing plans](writing_plans.md#) 
+ [Writing plans in Puppet language](writing_plans.md#) 
+
+ [Writing plans in YAML](writing_yaml_plans.md#) 
+ 
+ [Plan examples](writing_yaml_plans.md#example-plans)
 
  [Applying manifest blocks](applying_manifest_blocks.md#) 
 
 
+
+
  | -   **Learn the basics**
 
-[Hands-on lab](https://github.com/puppetlabs/tasks-hands-on-lab#puppet-tasks-hands-on-lab) - Using a GitHub repository with sample files and code examples, install and run Bolt in a safe environment.
+[Hands-on lab](https://puppetlabs.github.io/bolt/) - Using a GitHub repository with sample files and code examples, install and run Bolt in a safe environment.
 
 [Online training](https://learn.puppet.com/course/puppet-orchestration-bolt-and-tasks?_ga=2.158319738.1526297716.1533055277-261802629.1531434605) - Learn how to use Bolt to run a command, a script, and a task.
 
@@ -55,9 +61,9 @@ Bolt is an open source task runner that automates the manual work that you do to
 
  [Open source Puppet](https://puppet.com/docs/puppet/latest/index.html) 
 
- [ Puppet Enterprise ](https://puppet.com/docs/pe/2018.1/pe_user_guide.html) 
+ [ Puppet Enterprise ](https://puppet.com/docs/pe/latest/pe_user_guide.html) 
 
- [Puppet Development Kit](https://puppet.com/docs/pdk/1.x/pdk.html) 
+ [Puppet Development Kit](https://puppet.com/docs/pdk/latest/pdk.html) 
 
 
  -   **Why and how people are using Bolt**
@@ -68,6 +74,10 @@ Bolt is an open source task runner that automates the manual work that you do to
 
 
  -   **Share and contribute**
+
+[Join us on Slack](https://slack.puppet.com/) - Join the `#bolt` channel.
+
+[Follow us on Twitter](https://twitter.com/puppetize/)
 
 [Engage with the Puppet community](https://puppet.com/community) - Share what you know and get help from other users and employees.
 

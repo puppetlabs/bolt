@@ -23,5 +23,6 @@
   "argtimespan": "12:34:56",
   "argguid": "74be6039-e777-45fe-aa56-3d356443e096",
   "argregex": "^http:\\/\\/",
-  "argswitch": true
+  "argswitch": true,
+  "types": "foo"
 }

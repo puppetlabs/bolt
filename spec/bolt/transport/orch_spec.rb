@@ -8,6 +8,7 @@ require 'bolt/transport/orch'
 require 'bolt/plan_result'
 require 'bolt/target'
 require 'open3'
+require 'orchestrator_client'
 
 describe Bolt::Transport::Orch, orchestrator: true do
   include BoltSpec::Files
@@ -46,13 +47,32 @@ describe Bolt::Transport::Orch, orchestrator: true do
 
   describe "when orchestrator_client-ruby is used" do
     it "bolt sets User-Agent header option to Bolt/${version}" do
+      with_tempfile_containing('token', 'faketoken') do |conf|
+        config = {
+          'service-url' => 'https://foo.bar:8143',
+          'cacert' => 'bar',
+          'token-file' => conf.path
+        }
+        allow(OrchestratorClient).to receive(:new).and_call_original
+        c = Bolt::Transport::Orch::Connection.new(config, nil, orch.logger)
+        expect(c.instance_variable_get(:@client).config.config["User-Agent"]).to eq("Bolt/#{Bolt::VERSION}")
+      end
+    end
+
+    it "bolt expands file paths for cacert and token-file" do
       config = {
-        'service-url' => 'foo',
-        'cacert' => 'bar'
+        'service-url' => 'https://foo.bar:8143',
+        'cacert' => '~/foo/bar',
+        'token-file' => '~/bar/foo'
       }
-      allow(OrchestratorClient).to receive(:new).and_call_original
-      c = Bolt::Transport::Orch::Connection.new(config, nil, orch.logger)
-      expect(c.instance_variable_get(:@client).config.config["User-Agent"]).to eq("Bolt/#{Bolt::VERSION}")
+      expected = {
+        "service-url" => "https://foo.bar:8143",
+        "token-file" => "#{Dir.home}/bar/foo",
+        "cacert" => "#{Dir.home}/foo/bar",
+        "User-Agent" => "Bolt/#{Bolt::VERSION}"
+      }
+      expect(OrchestratorClient).to receive(:new).with(expected, true)
+      Bolt::Transport::Orch::Connection.new(config, nil, orch.logger)
     end
   end
 
@@ -118,7 +138,7 @@ describe Bolt::Transport::Orch, orchestrator: true do
     it "returns a result for every successful node" do
       results = [{ 'name' => 'node1', 'state' => 'finished', 'result' => { '_output' => 'hello' } },
                  { 'name' => 'node2', 'state' => 'finished', 'result' => { '_output' => 'goodbye' } }]
-      node_results = orch.process_run_results(targets, results)
+      node_results = orch.process_run_results(targets, results, 'thetask')
 
       expect(node_results[0]).to be_success
       expect(node_results[1]).to be_success
@@ -132,7 +152,7 @@ describe Bolt::Transport::Orch, orchestrator: true do
       it "returns failure for only the failed node" do
         results = [{ 'name' => 'node1', 'state' => 'finished', 'result' => { '_output' => 'hello' } },
                    { 'name' => 'node2', 'state' => 'failed', 'result' => { '_output' => 'goodbye' } }]
-        node_results = orch.process_run_results(targets, results)
+        node_results = orch.process_run_results(targets, results, 'thetask')
 
         expect(node_results[0]).to be_success
         expect(node_results[1]).not_to be_success
@@ -148,7 +168,7 @@ describe Bolt::Transport::Orch, orchestrator: true do
                                        'details' => {} } }
         results = [{ 'name' => 'node1', 'state' => 'finished', 'result' => { '_output' => 'hello' } },
                    { 'name' => 'node2', 'state' => 'failed', 'result' => error_result }]
-        node_results = orch.process_run_results(targets, results)
+        node_results = orch.process_run_results(targets, results, 'thetask')
 
         expect(node_results[0]).to be_success
         expect(node_results[1]).not_to be_success
@@ -160,7 +180,7 @@ describe Bolt::Transport::Orch, orchestrator: true do
         results = [{ 'name' => 'node1', 'state' => 'finished', 'result' => { '_output' => 'hello' } },
                    # XXX double-check that this is the correct result for a skipped node
                    { 'name' => 'node2', 'state' => 'skipped', 'result' => nil }]
-        node_results = orch.process_run_results(targets, results)
+        node_results = orch.process_run_results(targets, results, 'thetask')
 
         expect(node_results[0]).to be_success
         expect(node_results[1]).not_to be_success
@@ -473,7 +493,7 @@ describe Bolt::Transport::Orch, orchestrator: true do
 
       {
         task: 'bolt_shim::script',
-        params: { 'content' => content, 'arguments' => args }
+        params: { 'content' => content, 'arguments' => args, 'name' => 'success.sh' }
       }
     }
 
@@ -560,6 +580,27 @@ describe Bolt::Transport::Orch, orchestrator: true do
         expect(results[1]['exit_code']).to eq(1)
         expect(results[1]['stderr']).to eq('there')
       end
+    end
+  end
+
+  describe 'batch_connected?' do
+    it 'returns true if all targets are connected' do
+      result = { 'items' => targets.map { |_| { 'connected' => true } } }
+      expect(mock_client).to receive(:post).with('inventory', nodes: targets.map(&:host)).and_return(result)
+      expect(orch.batch_connected?(targets)).to eq(true)
+    end
+
+    it 'returns false if all targets are not connected' do
+      result = { 'items' => targets.map { |_| { 'connected' => false } } }
+      expect(mock_client).to receive(:post).with('inventory', nodes: targets.map(&:host)).and_return(result)
+      expect(orch.batch_connected?(targets)).to eq(false)
+    end
+
+    it 'returns false if any targets are not connected' do
+      result = { 'items' => targets.map { |_| { 'connected' => true } } }
+      result['items'][0]['connected'] = false
+      expect(mock_client).to receive(:post).with('inventory', nodes: targets.map(&:host)).and_return(result)
+      expect(orch.batch_connected?(targets)).to eq(false)
     end
   end
 end

@@ -1,0 +1,27 @@
+title: Bolt
+google_analytics: UA-120367942-3
+exclude: [vendor, Boltdir, acceptance, modules, .git, Gemfile, Gemfile.lock]
+
+collections:
+  lab:
+    output: true
+  examples:
+    output: true
+
+defaults:
+  - scope:
+      type: lab
+    values:
+      layout: lab
+  - scope:
+      type: examples
+    values:
+      layout: example
+  - scope:
+      type: posts
+    values:
+      layout: post
+      permalink: /:categories/:year-:month-:day-:title
+
+plugins:
+  - jekyll-feed

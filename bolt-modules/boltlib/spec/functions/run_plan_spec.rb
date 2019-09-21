@@ -7,10 +7,10 @@ require 'bolt/executor'
 describe 'run_plan' do
   include PuppetlabsSpec::Fixtures
   let(:executor) { Bolt::Executor.new }
+  let(:tasks_enabled) { true }
 
   around(:each) do |example|
-    Puppet[:tasks] = true
-    Puppet.features.stubs(:bolt?).returns(true)
+    Puppet[:tasks] = tasks_enabled
     executor.stubs(:noop).returns(false)
 
     Puppet.override(bolt_executor: executor) do
@@ -48,6 +48,10 @@ describe 'run_plan' do
 
         is_expected.to run.with_params('test::run_me', '_run_as' => 'bar').and_return('worked2')
       end
+
+      it 'run_plan(name, nodes, hash) where nodes is the "nodes" parameter to the plan' do
+        is_expected.to run.with_params('test::run_me_nodes', 'node1,node2').and_return('node1,node2')
+      end
     end
 
     it 'reports the function call to analytics' do
@@ -78,6 +82,16 @@ describe 'run_plan' do
         is_expected.to run.with_params('test::run_me_int', 'x' => 'should not work')
                           .and_raise_error(/expects an Integer value/)
       end
+
+      it 'failing with argument error if given nodes positional argument and nodes named argument' do
+        is_expected.to run.with_params('test::run_me_nodes', 'node1', 'nodes' => 'node2')
+                          .and_raise_error(ArgumentError)
+      end
+
+      it 'failing with parse error if given nodes positional argument for plan without nodes parameter' do
+        is_expected.to run.with_params('test::run_me', 'node1')
+                          .and_raise_error(Puppet::ParseError)
+      end
     end
 
     it 'fails when a plan returns an unexpected result' do
@@ -86,6 +100,14 @@ describe 'run_plan' do
 
     it 'returns undef for plans without explicit return' do
       is_expected.to run.with_params('test::no_return').and_return(nil)
+    end
+  end
+
+  context 'without tasks enabled' do
+    let(:tasks_enabled) { false }
+    it 'fails and reports that run_plan is not available' do
+      is_expected.to run.with_params('test::run_me')
+                        .and_raise_error(/Plan language function 'run_plan' cannot be used/)
     end
   end
 end

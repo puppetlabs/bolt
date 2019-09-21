@@ -30,6 +30,11 @@ module Bolt
       self
     end
 
+    def filter_set
+      filtered = @results.select { |r| yield r }
+      self.class.new(filtered)
+    end
+
     def result_hash
       @result_hash ||= @results.each_with_object({}) do |result, acc|
         acc[result.target.name] = result
@@ -88,6 +93,10 @@ module Bolt
 
     def to_json(opts = nil)
       @results.map(&:status_hash).to_json(opts)
+    end
+
+    def to_data
+      @results.map(&:to_data)
     end
 
     def to_s

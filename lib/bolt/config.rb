@@ -1,21 +1,26 @@
 # frozen_string_literal: true
 
-require 'yaml'
+require 'etc'
 require 'logging'
-require 'concurrent'
 require 'pathname'
 require 'bolt/boltdir'
 require 'bolt/transport/ssh'
 require 'bolt/transport/winrm'
 require 'bolt/transport/orch'
 require 'bolt/transport/local'
+require 'bolt/transport/local_windows'
+require 'bolt/transport/docker'
+require 'bolt/transport/remote'
+require 'bolt/util'
 
 module Bolt
   TRANSPORTS = {
     ssh: Bolt::Transport::SSH,
     winrm: Bolt::Transport::WinRM,
     pcp: Bolt::Transport::Orch,
-    local: Bolt::Transport::Local
+    local: Bolt::Util.windows? ? Bolt::Transport::LocalWindows : Bolt::Transport::Local,
+    docker: Bolt::Transport::Docker,
+    remote: Bolt::Transport::Remote
   }.freeze
 
   class UnknownTransportError < Bolt::Error
@@ -26,32 +31,16 @@ module Bolt
   end
 
   class Config
-    attr_accessor :concurrency, :format, :trace, :log, :puppetdb, :color,
-                  :transport, :transports, :inventoryfile, :compile_concurrency
+    attr_accessor :concurrency, :format, :trace, :log, :puppetdb, :color, :save_rerun,
+                  :transport, :transports, :inventoryfile, :compile_concurrency, :boltdir,
+                  :puppetfile_config, :plugins, :plugin_hooks
     attr_writer :modulepath
 
     TRANSPORT_OPTIONS = %i[password run-as sudo-password extensions
-                           private-key tty tmpdir user connect-timeout
-                           cacert token-file service-url].freeze
+                           private-key tty tmpdir user connect-timeout disconnect-timeout
+                           cacert token-file service-url interpreters file-protocol smb-port realm].freeze
 
-    TRANSPORT_DEFAULTS = {
-      'connect-timeout' => 10,
-      'tty' => false
-    }.freeze
-
-    TRANSPORT_SPECIFIC_DEFAULTS = {
-      ssh: {
-        'host-key-check' => true
-      },
-      winrm: {
-        'ssl' => true,
-        'ssl-verify' => true
-      },
-      pcp: {
-        'task-environment' => 'production'
-      },
-      local: {}
-    }.freeze
+    PUPPETFILE_OPTIONS = %w[proxy forge].freeze
 
     def self.default
       new(Bolt::Boltdir.new('.'), {})
@@ -74,18 +63,23 @@ module Bolt
 
       @boltdir = boltdir
       @concurrency = 100
-      @compile_concurrency = Concurrent.processor_count
+      @compile_concurrency = Etc.nprocessors
       @transport = 'ssh'
       @format = 'human'
       @puppetdb = {}
       @color = true
+      @save_rerun = true
+      @puppetfile_config = {}
+      @plugins = {}
+      @plugin_hooks = { 'puppet_library' => { 'plugin' => 'install_agent' } }
 
       # add an entry for the default console logger
       @log = { 'console' => {} }
 
       @transports = {}
-      TRANSPORTS.each_key do |transport|
-        @transports[transport] = TRANSPORT_DEFAULTS.merge(TRANSPORT_SPECIFIC_DEFAULTS[transport])
+
+      TRANSPORTS.each do |key, transport|
+        @transports[key] = transport.default_options
       end
 
       update_from_file(config_data)
@@ -105,6 +99,12 @@ module Bolt
 
     def deep_clone
       Bolt::Util.deep_clone(self)
+    end
+
+    def normalize_interpreters(interpreters)
+      Bolt::Util.walk_keys(interpreters) do |key|
+        key.chars[0] == '.' ? key : '.' + key
+      end
     end
 
     def normalize_log(target)
@@ -139,15 +139,30 @@ module Bolt
       # Expand paths relative to the Boltdir. Any settings that came from the
       # CLI will already be absolute, so the expand will be skipped.
       if data.key?('modulepath')
-        @modulepath = data['modulepath'].split(File::PATH_SEPARATOR).map do |moduledir|
+        moduledirs = if data['modulepath'].is_a?(String)
+                       data['modulepath'].split(File::PATH_SEPARATOR)
+                     else
+                       data['modulepath']
+                     end
+        @modulepath = moduledirs.map do |moduledir|
           File.expand_path(moduledir, @boltdir.path)
         end
       end
 
       @inventoryfile = File.expand_path(data['inventoryfile'], @boltdir.path) if data.key?('inventoryfile')
 
+      if data.key?('puppetfile')
+        @puppetfile_config = data['puppetfile'].select { |k, _| PUPPETFILE_OPTIONS.include?(k) }
+      end
+
       @hiera_config = File.expand_path(data['hiera-config'], @boltdir.path) if data.key?('hiera-config')
       @compile_concurrency = data['compile-concurrency'] if data.key?('compile-concurrency')
+
+      @save_rerun = data['save-rerun'] if data.key?('save-rerun')
+
+      # Plugins are only settable from config not inventory so we can overwrite
+      @plugins = data['plugins'] if data.key?('plugins')
+      @plugin_hooks.merge!(data['plugin_hooks']) if data.key?('plugin_hooks')
 
       %w[concurrency format puppetdb color transport].each do |key|
         send("#{key}=", data[key]) if data.key?(key)
@@ -155,8 +170,11 @@ module Bolt
 
       TRANSPORTS.each do |key, impl|
         if data[key.to_s]
-          selected = data[key.to_s].select { |k| impl.options.include?(k) }
-          @transports[key].merge!(selected)
+          selected = impl.filter_options(data[key.to_s])
+          @transports[key] = Bolt::Util.deep_merge(@transports[key], selected)
+        end
+        if @transports[key]['interpreters']
+          @transports[key]['interpreters'] = normalize_interpreters(@transports[key]['interpreters'])
         end
       end
     end
@@ -167,10 +185,10 @@ module Bolt
         send("#{key}=", options[key]) if options.key?(key)
       end
 
+      @save_rerun = options[:'save-rerun'] if options.key?(:'save-rerun')
+
       if options[:debug]
         @log['console'][:level] = :debug
-      elsif options[:verbose]
-        @log['console'][:level] = :info
       end
 
       @compile_concurrency = options[:'compile-concurrency'] if options[:'compile-concurrency']
@@ -214,6 +232,10 @@ module Bolt
       [@boltdir.inventory_file]
     end
 
+    def rerunfile
+      @boltdir.rerunfile
+    end
+
     def hiera_config
       @hiera_config || @boltdir.hiera_config
     end
@@ -245,7 +267,7 @@ module Bolt
         raise Bolt::ValidationError, 'Compile concurrency must be a positive integer'
       end
 
-      compile_limit = 2 * Concurrent.processor_count
+      compile_limit = 2 * Etc.nprocessors
       unless @compile_concurrency < compile_limit
         raise Bolt::ValidationError, "Compilation is CPU-intensive, set concurrency less than #{compile_limit}"
       end
@@ -265,6 +287,28 @@ module Bolt
       TRANSPORTS.each do |transport, impl|
         impl.validate(@transports[transport])
       end
+    end
+
+    # Check if there is a case-insensitive match to the path
+    def check_path_case(type, paths)
+      return if paths.nil?
+      matches = matching_paths(paths)
+
+      if matches.any?
+        msg = "WARNING: Bolt is case sensitive when specifying a #{type}. Did you mean:\n"
+        matches.each { |path| msg += "         #{path}\n" }
+        @logger.warn msg
+      end
+    end
+
+    def matching_paths(paths)
+      [*paths].map { |p| Dir.glob([p, casefold(p)]) }.flatten.uniq.reject { |p| [*paths].include?(p) }
+    end
+
+    def casefold(path)
+      path.chars.map do |l|
+        l =~ /[A-Za-z]/ ? "[#{l.upcase}#{l.downcase}]" : l
+      end.join
     end
   end
 end

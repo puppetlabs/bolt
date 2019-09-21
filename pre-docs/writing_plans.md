@@ -1,19 +1,22 @@
-# Writing plans
+# Writing plans in Puppet language
 
 Plans allow you to run more than one task with a single command, compute values for the input to a task, process the results of tasks, or make decisions based on the result of running a task.
 
 Write plans in the Puppet language, giving them a `.pp` extension, and place them in the module's `/plans` directory.
 
-**Related information**  
+Plans can use any combination of [Bolt functions](./plan_functions.html) or [built-in Puppet functions](https://puppet.com/docs/puppet/6.1/function.html).
 
-
-[Plan execution functions](plan_functions.md#)
+**Related information**
+[Converting YAML plans to Puppet plans](writing_yaml_plans.md#converting-yaml-plans-to-puppet-plans)
 
 ## Naming plans
 
 Plan names are named based on the filename of the plan, the name of the module containing the plan, and the path to the plan within the module.
 
-Write plan files in Puppet, give them the extension `.pp` , and place them in your module's `./plans` directory.
+Place plan files in your module's ./plans directory, using these file extensions:
+
+* Puppet plans -- `.pp`
+* YAML plans -- `.yaml`, not `.yml`
 
 Plan names are composed of two or more name segments, indicating:
 
@@ -51,36 +54,77 @@ You can specify parameters in your plan.
 
 Specify each parameter in your plan with its data type. For example, you might want parameters to specify which nodes to run different parts of your plan on.
 
-The following example shows node parameters specified as data type `TargetSpec`. This allows this parameter to be passed as a single url, comma-separated url list, Target data type or Array of either. For more information about these data types, see the common data types table in the related metadata type topic.
+The following example shows node parameters specified as data type `TargetSpec`. This allows this parameter to be passed as a single URL, comma-separated URL list, Target data type or Array of either. For more information about these data types, see the common data types table in the related metadata type topic.
 
 This allows the user to pass, for each parameter, either a simple node name or a URI that describes the protocol to use, the hostname, username and password.
 
-The plan then calls the `run_task` function, specifying which nodes the tasks should be run on.
+The plan then calls the `run_task` function, specifying which nodes the tasks should be run on. The `Target` names are collected and stored in `$webserver_names` by iterating over the list of `Target` objects returned by `get_targets`. 
+
+Task parameters are serialized to JSON format, so extracting the names into an array of strings ensures that the `webservers` parameter is in a format that can be converted to JSON.
 
 ```
 plan mymodule::my_plan(
-  String[1] $load_balancer,
-  TargetSpec  $frontends,
-  TargetSpec  $backends,
+  TargetSpec $load_balancer,
+  TargetSpec  $webservers,
 ) {
 
-  # process frontends
-  run_task('mymodule::lb_remove', $load_balancer, frontends => $frontends)
-  run_task('mymodule::update_frontend_app', $frontends, version => '1.2.3')
-  run_task('mymodule::lb_add', $load_balancer, frontends => $frontends)
+  # Extract the Target name from $webservers
+  $webserver_names = get_targets($webservers).map |$n| { $n.name }
+
+  # process webservers
+  run_task('mymodule::lb_remove', $load_balancer, webservers => $webserver_names)
+  run_task('mymodule::update_frontend_app', $webservers, version => '1.2.3')
+  run_task('mymodule::lb_add', $load_balancer, webservers => $webserver_names)
 }
 ```
 
-To execute this plan from the command line, pass the parameters as `parameter=value`. The `Targetspec` will accept either an array as json or a comma seperated string of target names.
+To execute this plan from the command line, pass the parameters as `parameter=value`, where complex values like arrays must be encoded as JSON. The `Targetspec` will accept either an array as json or a comma separated string of target names.
 
 ```
-bolt plan run mymodule::myplan --modulepath ./PATH/TO/MODULES --params load_balancer=lb.myorg.com frontends='["kermit.myorg.com","gonzo.myorg.com"]' backends=waldorf.myorg.com,statler.myorg.com
+bolt plan run mymodule::myplan --modulepath ./PATH/TO/MODULES load_balancer=lb.myorg.com webservers='["kermit.myorg.com","gonzo.myorg.com"]'
 
 ```
+
+It is important to consider that parameters that are passed to the `run_*` plan functions are serialized to JSON. In order to illustrate this consider the following plan. 
+```
+plan test::parameter_passing (
+  TargetSpec $nodes,
+  Optional[String[1]] $example_nul = undef,
+) {
+  return run_task('test::demo_undef_bash', $nodes, example_nul => $example_nul)
+}
+```
+Note that the default value of `$example_nul` is `undef`. The plan calls the `test::demo_undef_bash` with the `example_nul` parameter. The implementation of the `demo_undef_bash.sh` task is as follows:
+```bash
+#!/bin/bash
+
+example_env=$PT_example_nul
+echo "Environment: $PT_example_nul"
+echo "Stdin:" 
+cat -
+```
+By default the task expects parameters to be passed as a JSON string on `STDIN` be accessible in prefixed environment variables (see [Defining Parameters in Tasks](writing_tasks.md#defining-parameters-in-tasks)). Consider the output of running the plan against localhost:
+```
+bolt@bolt: bolt plan run test::parameter_passing -n localhost
+Starting: plan test::parameter_passing
+Starting: task test::demo_undef_bash on localhost
+Finished: task test::demo_undef_bash with 0 failures in 0.0 sec
+Finished: plan test::parameter_passing in 0.01 sec
+Finished on localhost:
+  Environment: null
+  Stdin:
+  {"example_nul":null,"_task":"test::demo_undef_bash"}
+  {
+  }
+Successful on 1 node: localhost
+Ran on 1 node
+```
+The task demonstrates that the parameters `example_nul` and `_task` metadata are passed to the task as a JSON string over `STDIN`.
+
+Similarly parameters are made available to the task as environment variables where the name of parameter is converted to an environment variable prefixed with `PT_`. The `PT_` prefixed environment variable points to the `String` representation in `JSON` format of the parameter value. Thus the `PT_example_nul` environment variable has the value of `null` of type `String`.
+
 
 **Related information**  
-
-
 [Task metadata types](writing_tasks.md#)
 
 ## Returning results from plans
@@ -119,27 +163,23 @@ Variant[Data, String, Numeric, Boolean, Error, Result, ResultSet, Target, Array[
 
 ## Returning errors in plans
 
-To return an error if your plan fails, include an `Error` object in your plan.
+To return an error if your plan fails, call the `fail_plan` function.
 
-Specify `Error` parameters to provide details about the failure.
+Specify parameters to provide details about the failure.
 
 For example, if called with `run_plan('mymodule::myplan')`, this would return an error to the caller.
 
 ```
 plan mymodule::myplan {
-  Error(
-    message    => "Sorry, this plan does not work yet.",
-    kind       => 'mymodule/error',
-    issue_code => 'NOT_IMPLEMENTED'
-    )
-  }
+  fail_plan("Sorry, this plan does not work yet.", 'mymodule/error')
+}
 ```
 
 ## Success and failure in plans
 
 Indicators that a plan has run successfully or failed.
 
-Any plan that completes execution without an error is considered successful. The `bolt` command exits 0 and any calling plans continue execution. If any calls to `run_` functions fail without `_catch_errors` then the plan will halt execution and be considered a failure. Any calling plans will also halt until a `run_plan` call with `_catch_errors` is reached. If one isn't the `bolt` command will exit 2. When writing a plan if you have reason to believe it has failed you can fail the plan with the `fail_plan` function. This causes the bolt command to exit 2 and prevents calling plans executing any further, unless `run_plan` was called with `_catch_errors`.
+Any plan that completes execution without an error is considered successful. The `bolt` command exits 0 and any calling plans continue execution. If any calls to `run_` functions fail **without** `_catch_errors` then the plan will halt execution and be considered a failure. Any calling plans will also halt until a `run_plan` call with `_catch_errors` or a `catch_errors` block is reached. If one isn't the `bolt` command will exit 2. When writing a plan if you have reason to believe it has failed you can fail the plan with the `fail_plan` function. This causes the bolt command to exit 2 and prevents calling plans executing any further, unless `run_plan` was called with `_catch_errors` or in a `catch_errors` block.
 
 ### Failing plans
 
@@ -151,9 +191,9 @@ fail_plan('The plan is failing', 'mymodules/pear-shaped', {'failednodes' => $res
 fail_plan($errorobject)
 ```
 
-### Responding to errors in plans
+### Catching Errors in a Plan
 
-When you call `run_plan` with `_catch_errors` or call the `error` method on a result, you may get an error.
+Bolt includes a `catch_errors` function which executes a block of code and returns the error if an error is raised or the result of the block if no errors are raised. You may get an `Error` object returned if you call a function with `_catch_errors`, use a `catch_errors` block, or call the `Error` function.
 
 The `Error` data type includes:
 
@@ -180,7 +220,24 @@ plan mymodule::handle_errors {
     Error : { fail_plan($result) } }
   run_plan('mymodule::plan2')
 }
+```
 
+Using the `catch_errors` function:
+```
+plan test (String[1] $role) {
+  $result_or_error = catch_errors(['bolt/puppetdb-error']) || {
+    puppetdb_query("inventory[certname] { app_role == ${role} }")
+  }
+
+  $targets = if $result_or_error =~ Error {
+    # If the PuppetDB query fails
+    warning("Could not fetch from puppet. Using defaults instead")
+    # TargetSpec string
+    "all"
+  } else {
+    $result_or_error
+  }
+}
 ```
 
 ## Puppet and Ruby functions in plans
@@ -241,11 +298,14 @@ A `ResultSet` has the following methods:
 
 -   `error_set()`: A `ResultSet`containing only the results of failed nodes.
 
--   `ok_set()`: A `ResultSet` containing only the sucessful results.
+-   `ok_set()`: A `ResultSet` containing only the successful results.
+-   `filter_set(block)`: Filters a `ResultSet` with the given block and returns a `ResultSet` object (where [Puppet's filter function](https://puppet.com/docs/puppet/6.4/function.html#filter) returns an array or hash)
 
 -   `targets()`: An array of all the `Target` objects from every `Result`in the set.
 
 -   `ok():``Boolean` that is the same as `error_nodes.empty`.
+
+-   `to_data()`: An array of Hashes representing either `Result`s or `ApplyResults`
 
 
 A `Result` has the following methods:
@@ -262,6 +322,10 @@ A `Result` has the following methods:
 
 -   `[]`: Accesses the value hash directly.
 
+-   `to_data()`: Hash representation of `Result`.
+
+-   `action()`: String representation of result type (task, command, etc).
+
 
 An `ApplyResult` has the following methods:
 
@@ -273,6 +337,9 @@ An `ApplyResult` has the following methods:
 
 -   `ok()`: Returns `true` if the `Result` was successful.
 
+-   `to_data()`: Hash representation of `ApplyResult`.
+
+-   `action()`: String representation of result type (apply).
 
 An instance of `ResultSet` is `Iterable` as if it were an `Array[Variant[Result, ApplyResult]]` so that iterative functions such as `each`, `map`, `reduce`, or `filter` work directly on the ResultSet returning each result.
 
@@ -297,6 +364,20 @@ $r.each |$result| {
     notice("${node} errored with a message: ${result.error.message}")
   }
 }
+```
+
+Similarly you can iterate over the array of hashes returned by calling `to_data` on a `ResultSet` and access hash values. For example:
+
+```
+$r = run_command('whoami', 'localhost,local://0.0.0.0')
+$r.to_data.each |$result_hash| { notice($result_hash['result']['stdout']) }
+```
+
+You can also use `filter_set` to filter a ResultSet and apply a ResultSet function such as `targets` to the output:
+```
+$filtered = $result.filter_set |$r| {
+  $r['tag'] == "you're it"
+}.targets
 ```
 
 ## Passing sensitive data to tasks
@@ -380,7 +461,7 @@ The facts plan connects to the target and discovers facts. It then stores these 
 The methods used to collect facts:
 
 -   On `ssh` targets it runs a simple bash script.
--   On `winrm` targets it runs a simple powershell script.
+-   On `winrm` targets it runs a simple PowerShell script.
 -   On `pcp` or targets where the puppet agent is present, it runs facter.
 
 This example collects facts with the facts plan and then uses those facts to decide which task to run on the targets.
@@ -413,18 +494,36 @@ plan run_with_facts(TargetSpec $nodes) {
 }
 ```
 
-**Related information**  
+### Collect general data from PuppetDB
 
+You can use the `puppetdb_query` function in plans to make direct queries to PuppetDB. For example you can discover nodes from PuppetDB and then run tasks on them. You'll have to configure the [puppetdb client](bolt_connect_puppetdb.md) before running it. You can learn how to [structure pql queries here](https://puppet.com/docs/puppetdb/latest/api/query/tutorial-pql.html), and find [pql reference and examples here](https://puppet.com/docs/puppetdb/latest/api/query/v4/pql.html)
+
+```
+plan pdb_discover {
+  $result = puppetdb_query("inventory[certname] { app_role == 'web_server' }")
+  # extract the certnames into an array
+  $names = $result.map |$r| { $r["certname"] }
+  # wrap in url. You can skip this if the default transport is pcp
+  $nodes = $names.map |$n| { "pcp://${n}" }
+  run_task('my_task', $nodes)
+}
+```
+
+**Related information**  
 
 [Connecting Bolt to PuppetDB](bolt_connect_puppetdb.md)
 
 ## Plan logging
 
-Set up log files to record certain events that occur when you run plans.
+Plan information can be captured in log files or printed to a terminal session. This section details the methods for collecting information about plan runs.
+
+### Outputting message to the terminal
+
+The plan function [`out::message`](plan_functions.md#outmessage) can be used to print message strings to `STDOUT`. These message will always be printed regardless of the log level and will not be logged to the log file.
 
 ### Puppet log functions
 
-To generate log messages from a plan, use the puppet log function that corresponds to the level you want to track: `error`, `warn`, `notice`, `info`, or `debug`. The default log level for Bolt is `notice` but you can set it to `info` with the `--verbose `flag or `debug` with the `--debug` flag.
+To generate log messages from a plan, use the Puppet log function that corresponds to the level you want to track: `error`, `warn`, `notice`, `info`, or `debug`. You can configure the log level for both log files and console logging in [bolt.yaml](bolt_configuration_options#log-file-configuration-options). The default log level for console is `warn` and for log files `notice`. You can use the `--debug` flag to set the console log level to `debug` for a single run. 
 
 ### Default action logging
 
@@ -459,20 +558,20 @@ not
 without_default_logging { run_command('echo hi', $nodes) }
 ```
 
-### puppetdb\_query
+### Example plans
 
- 
+Check out some example plans for inspiration writing your own.
 
-You can use the `puppetdb_query` function in plans to make direct queries to PuppetDB. For example you can discover nodes from PuppetDB and then run tasks on them. You'll have to configure the [puppetdb client](bolt_connect_puppetdb.md)before running it.
+| Resource                                                                                                                                               | Description                                                                      | Level           |
+|--------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------|-----------------|
+| [facts module](https://forge.puppet.com/puppetlabs/facts)                                                                                              | Contains tasks and plans to discover facts about target systems.                 | Getting started |
+| [facts plan](https://github.com/puppetlabs/puppetlabs-facts/blob/master/plans/init.pp)                                                                 | Gathers facts using the facts task and sets the facts in inventory.              | Getting started |
+| [facts::info plan](https://github.com/puppetlabs/puppetlabs-facts/blob/master/plans/info.pp)                                                           | Uses the facts task to discover facts and map relevant fact values to targets.   | Getting started |
+| [reboot module](https://forge.puppet.com/puppetlabs/reboot)                                                                                            | Contains tasks and plans for managing system reboots.                            | Intermediate    |
+| [reboot plan](https://github.com/puppetlabs/puppetlabs-reboot/blob/master/plans/init.pp)                                                               | Restarts a target system and waits for it to become available again.             | Intermediate    |
+| [Introducing Masterless Puppet with Bolt](https://puppet.com/blog/introducing-masterless-puppet-bolt)                                                  | Blog post explaining how plans can be used to deploy a load-balanced web server. | Advanced        |
+| [profiles::nginx_install plan](https://github.com/puppetlabs/bolt/blob/master/docs/_includes/lesson11/Boltdir/site/profiles/plans/nginx_install.pp) | Shows an example plan for deploying Nginx and HAProxy.                           | Advanced        |
 
-```
-plan pdb_discover {
-  $result = puppetdb_query("inventory[certname] { app_role == 'web_server' })
-  # extract the certnames into an array
-  $names = $result.map |$r| { $r["certname"] }
-  # wrap in url. You can skip this if the default transport is pcp
-  $nodes = $names.map |$n| { "pcp://${n}" }
-  run_task('my_task', $nodes)
-}
-```
-
+* **Getting started** resources show simple use cases such as running a task and manipulating the results.
+* **Intermediate** resources show more advanced features in the plan language.
+* **Advanced** resources show more complex use cases such as applying puppet code blocks and using external modules.

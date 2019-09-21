@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'terminal-table'
 require 'bolt/pal'
 
 module Bolt
@@ -11,6 +10,14 @@ module Bolt
                  yellow: "33" }.freeze
 
       def print_head; end
+
+      def initialize(color, verbose, trace, stream = $stdout)
+        super
+        # Plans and without_default_logging() calls can both be nested, so we
+        # track each of them with a "stack" consisting of an integer.
+        @plan_depth = 0
+        @disable_depth = 0
+      end
 
       def colorize(color, string)
         if @color && @stream.isatty
@@ -29,13 +36,40 @@ module Bolt
         string.sub(/\s\z/, '')
       end
 
-      def print_event(event)
+      def handle_event(event)
         case event[:type]
-        when :node_start
-          print_start(event[:target])
-        when :node_result
-          print_result(event[:result])
+        when :enable_default_output
+          @disable_depth -= 1
+        when :disable_default_output
+          @disable_depth += 1
+        when :message
+          print_message_event(event)
         end
+
+        if enabled?
+          case event[:type]
+          when :node_start
+            print_start(event[:target]) if @verbose
+          when :node_result
+            print_result(event[:result]) if @verbose
+          when :step_start
+            print_step_start(event) if plan_logging?
+          when :step_finish
+            print_step_finish(event) if plan_logging?
+          when :plan_start
+            print_plan_start(event)
+          when :plan_finish
+            print_plan_finish(event)
+          end
+        end
+      end
+
+      def enabled?
+        @disable_depth == 0
+      end
+
+      def plan_logging?
+        @plan_depth > 0
       end
 
       def print_start(target)
@@ -51,6 +85,15 @@ module Bolt
 
         if result.error_hash
           @stream.puts(colorize(:red, remove_trail(indent(2, result.error_hash['msg']))))
+        end
+
+        if result.is_a?(Bolt::ApplyResult) && @verbose
+          result.resource_logs.each do |log|
+            # Omit low-level info/debug messages
+            next if %w[info debug].include?(log['level'])
+            message = format_log(log)
+            @stream.puts(indent(2, message))
+          end
         end
 
         if result.message
@@ -75,6 +118,52 @@ module Bolt
         end
       end
 
+      def format_log(log)
+        color = case log['level']
+                when 'warn'
+                  :yellow
+                when 'err'
+                  :red
+                end
+        source = "#{log['source']}: " if log['source']
+        message = "#{log['level'].capitalize}: #{source}#{log['message']}"
+        message = colorize(color, message) if color
+        message
+      end
+
+      def print_step_start(description:, targets:, **_kwargs)
+        target_str = if targets.length > 5
+                       "#{targets.count} targets"
+                     else
+                       targets.map(&:uri).join(', ')
+                     end
+        @stream.puts(colorize(:green, "Starting: #{description} on #{target_str}"))
+      end
+
+      def print_step_finish(description:, result:, duration:, **_kwargs)
+        failures = result.error_set.length
+        plural = failures == 1 ? '' : 's'
+        message = "Finished: #{description} with #{failures} failure#{plural} in #{duration.round(2)} sec"
+        @stream.puts(colorize(:green, message))
+      end
+
+      def print_plan_start(event)
+        @plan_depth += 1
+        # We use this event to both mark the start of a plan _and_ to enable
+        # plan logging for `apply`, so only log the message if we were called
+        # with a plan
+        if event[:plan]
+          @stream.puts(colorize(:green, "Starting: plan #{event[:plan]}"))
+        end
+      end
+
+      def print_plan_finish(event)
+        @plan_depth -= 1
+        plan = event[:plan]
+        duration = event[:duration]
+        @stream.puts(colorize(:green, "Finished: plan #{plan} in #{duration_to_string(duration)}"))
+      end
+
       def print_summary(results, elapsed_time = nil)
         ok_set = results.ok_set
         unless ok_set.empty?
@@ -96,11 +185,14 @@ module Bolt
         total_msg = format('Ran on %<size>d node%<plural>s',
                            size: results.size,
                            plural: results.size == 1 ? '' : 's')
-        total_msg += format(' in %<elapsed>.2f seconds', elapsed: elapsed_time) unless elapsed_time.nil?
+        total_msg << " in #{duration_to_string(elapsed_time)}" unless elapsed_time.nil?
         @stream.puts total_msg
       end
 
       def print_table(results)
+        # lazy-load expensive gem code
+        require 'terminal-table'
+
         @stream.puts Terminal::Table.new(
           rows: results,
           style: {
@@ -113,6 +205,13 @@ module Bolt
             border_bottom: false
           }
         )
+      end
+
+      def print_tasks(tasks, modulepath)
+        print_table(tasks)
+        print_message("\nMODULEPATH:\n#{modulepath.join(File::PATH_SEPARATOR)}\n"\
+                        "\nUse `bolt task show <task-name>` to view "\
+                        "details and parameters for a specific task.")
       end
 
       # @param [Hash] task A hash representing the task
@@ -177,6 +276,53 @@ module Bolt
         @stream.puts(plan_info)
       end
 
+      def print_plans(plans, modulepath)
+        print_table(plans)
+        print_message("\nMODULEPATH:\n#{modulepath.join(File::PATH_SEPARATOR)}\n"\
+                        "\nUse `bolt plan show <plan-name>` to view "\
+                        "details and parameters for a specific plan.")
+      end
+
+      def print_module_list(module_list)
+        module_list.each do |path, modules|
+          if (mod = modules.find { |m| m[:internal_module_group] })
+            @stream.puts(mod[:internal_module_group])
+          else
+            @stream.puts(path)
+          end
+
+          if modules.empty?
+            @stream.puts('(no modules installed)')
+          else
+            module_info = modules.map do |m|
+              version = if m[:version].nil?
+                          m[:internal_module_group].nil? ? '(no metadata)' : '(built-in)'
+                        else
+                          m[:version]
+                        end
+
+              [m[:name], version]
+            end
+
+            print_table(module_info)
+          end
+
+          @stream.write("\n")
+        end
+      end
+
+      def print_targets(options)
+        targets = options[:targets].map(&:name)
+        count = "#{targets.count} target#{'s' unless targets.count == 1}"
+        @stream.puts targets.join("\n")
+        @stream.puts colorize(:green, count)
+      end
+
+      # @param [Bolt::ResultSet] apply_result A ResultSet object representing the result of a `bolt apply`
+      def print_apply_result(apply_result, elapsed_time)
+        print_summary(apply_result, elapsed_time)
+      end
+
       # @param [Bolt::PlanResult] plan_result A PlanResult object
       def print_plan_result(plan_result)
         value = plan_result.value
@@ -200,6 +346,10 @@ module Bolt
         end
       end
 
+      def print_message_event(event)
+        print_message(event[:message])
+      end
+
       def fatal_error(err)
         @stream.puts(colorize(:red, err.message))
         if err.is_a? Bolt::RunFailure
@@ -212,10 +362,24 @@ module Bolt
           end
         end
       end
-    end
 
-    def print_message(message)
-      @stream.puts(message)
+      def print_message(message)
+        @stream.puts(message)
+      end
+
+      def duration_to_string(duration)
+        hrs = (duration / 3600).floor
+        mins = ((duration % 3600) / 60).floor
+        secs = (duration % 60)
+        if hrs > 0
+          "#{hrs} hr, #{mins} min, #{secs.round} sec"
+        elsif mins > 0
+          "#{mins} min, #{secs.round} sec"
+        else
+          # Include 2 decimal places if the duration is under a minute
+          "#{secs.round(2)} sec"
+        end
+      end
     end
   end
 end

@@ -12,14 +12,15 @@ module Bolt
         DEFAULT_EXTENSIONS = ['.ps1', '.rb', '.pp'].freeze
 
         def initialize(target, transport_logger)
+          raise Bolt::ValidationError, "Target #{target.name} does not have a host" unless target.host
           @target = target
 
           default_port = target.options['ssl'] ? HTTPS_PORT : HTTP_PORT
           @port = @target.port || default_port
           @user = @target.user
-
-          # Accept a single entry or a list, ensure each is prefixed with '.'
+          # Build set of extensions from extensions config as well as interpreters
           extensions = [target.options['extensions'] || []].flatten.map { |ext| ext[0] != '.' ? '.' + ext : ext }
+          extensions += target.options['interpreters'].keys if target.options['interpreters']
           @extensions = DEFAULT_EXTENSIONS.to_set.merge(extensions)
 
           @logger = Logging.logger[@target.host]
@@ -37,13 +38,18 @@ module Bolt
             scheme = 'http'
             transport = :negotiate
           end
+
+          transport = :kerberos if target.options['realm']
           endpoint = "#{scheme}://#{target.host}:#{@port}/wsman"
+          cacert = target.options['cacert'] && target.options['ssl'] ? File.expand_path(target.options['cacert']) : nil
           options = { endpoint: endpoint,
-                      user: @user,
-                      password: target.password,
+                      # https://github.com/WinRb/WinRM/issues/270
+                      user: target.options['realm'] ? 'dummy' : @user,
+                      password: target.options['realm'] ? 'dummy' : target.password,
                       retry_limit: 1,
                       transport: transport,
-                      ca_trust_path: target.options['cacert'],
+                      ca_trust_path: cacert,
+                      realm: target.options['realm'],
                       no_ssl_peer_verification: !target.options['ssl-verify'] }
 
           Timeout.timeout(target.options['connect-timeout']) do
@@ -58,7 +64,8 @@ module Bolt
           # If we're using the default port with SSL, a timeout probably means the
           # host doesn't support SSL.
           if target.options['ssl'] && @port == HTTPS_PORT
-            the_problem = "\nUse --no-ssl if this host isn't configured to use SSL for WinRM"
+            the_problem = "\nVerify that required WinRM ports are open, " \
+                          "or use --no-ssl if this host isn't configured to use SSL for WinRM."
           end
           raise Bolt::Node::ConnectError.new(
             "Timeout after #{target.options['connect-timeout']} seconds connecting to #{endpoint}#{the_problem}",
@@ -75,7 +82,7 @@ module Bolt
             theres_your_problem = "\nAre you using SSL to connect to a non-SSL port?"
           end
           if target.options['ssl-verify'] && e.message.include?('certificate verify failed')
-            theres_your_problem = "\nIs the remote host using a self-signed SSL"\
+            theres_your_problem = "\nIs the remote host using a self-signed SSL "\
                                   "certificate? Use --no-ssl-verify to disable "\
                                   "remote host SSL verification."
           end
@@ -92,200 +99,13 @@ module Bolt
 
         def disconnect
           @session&.close
+          @client&.disconnect!
           @logger.debug { "Closed session" }
         end
 
         def shell_init
           return nil if @shell_initialized
-          result = execute(<<-PS)
-$ENV:PATH += ";${ENV:ProgramFiles}\\Puppet Labs\\Puppet\\bin\\;" +
-"${ENV:ProgramFiles}\\Puppet Labs\\Puppet\\puppet\\bin;" +
-"${ENV:ProgramFiles}\\Puppet Labs\\Puppet\\sys\\ruby\\bin\\"
-$ENV:RUBYLIB = "${ENV:ProgramFiles}\\Puppet Labs\\Puppet\\puppet\\lib;" +
-"${ENV:ProgramFiles}\\Puppet Labs\\Puppet\\facter\\lib;" +
-"${ENV:ProgramFiles}\\Puppet Labs\\Puppet\\hiera\\lib;" +
-$ENV:RUBYLIB
-
-Add-Type -AssemblyName System.ServiceModel.Web, System.Runtime.Serialization
-$utf8 = [System.Text.Encoding]::UTF8
-
-function Write-Stream {
-PARAM(
-  [Parameter(Position=0)] $stream,
-  [Parameter(ValueFromPipeline=$true)] $string
-)
-PROCESS {
-  $bytes = $utf8.GetBytes($string)
-  $stream.Write( $bytes, 0, $bytes.Length )
-}
-}
-
-function Convert-JsonToXml {
-PARAM([Parameter(ValueFromPipeline=$true)] [string[]] $json)
-BEGIN {
-  $mStream = New-Object System.IO.MemoryStream
-}
-PROCESS {
-  $json | Write-Stream -Stream $mStream
-}
-END {
-  $mStream.Position = 0
-  try {
-    $jsonReader = [System.Runtime.Serialization.Json.JsonReaderWriterFactory]::CreateJsonReader($mStream,[System.Xml.XmlDictionaryReaderQuotas]::Max)
-    $xml = New-Object Xml.XmlDocument
-    $xml.Load($jsonReader)
-    $xml
-  } finally {
-    $jsonReader.Close()
-    $mStream.Dispose()
-  }
-}
-}
-
-Function ConvertFrom-Xml {
-[CmdletBinding(DefaultParameterSetName="AutoType")]
-PARAM(
-  [Parameter(ValueFromPipeline=$true,Mandatory=$true,Position=1)] [Xml.XmlNode] $xml,
-  [Parameter(Mandatory=$true,ParameterSetName="ManualType")] [Type] $Type,
-  [Switch] $ForceType
-)
-PROCESS{
-  if (Get-Member -InputObject $xml -Name root) {
-    return $xml.root.Objects | ConvertFrom-Xml
-  } elseif (Get-Member -InputObject $xml -Name Objects) {
-    return $xml.Objects | ConvertFrom-Xml
-  }
-  $propbag = @{}
-  foreach ($name in Get-Member -InputObject $xml -MemberType Properties | Where-Object{$_.Name -notmatch "^__|type"} | Select-Object -ExpandProperty name) {
-    Write-Debug "$Name Type: $($xml.$Name.type)" -Debug:$false
-    $propbag."$Name" = Convert-Properties $xml."$name"
-  }
-  if (!$Type -and $xml.HasAttribute("__type")) { $Type = $xml.__Type }
-  if ($ForceType -and $Type) {
-    try {
-      $output = New-Object $Type -Property $propbag
-    } catch {
-      $output = New-Object PSObject -Property $propbag
-      $output.PsTypeNames.Insert(0, $xml.__type)
-    }
-  } elseif ($propbag.Count -ne 0) {
-    $output = New-Object PSObject -Property $propbag
-    if ($Type) {
-      $output.PsTypeNames.Insert(0, $Type)
-    }
-  }
-  return $output
-}
-}
-
-Function Convert-Properties {
-PARAM($InputObject)
-switch ($InputObject.type) {
-  "object" {
-    return (ConvertFrom-Xml -Xml $InputObject)
-  }
-  "string" {
-    $MightBeADate = $InputObject.get_InnerText() -as [DateTime]
-    ## Strings that are actually dates (*grumble* JSON is crap)
-    if ($MightBeADate -and $propbag."$Name" -eq $MightBeADate.ToString("G")) {
-      return $MightBeADate
-    } else {
-      return $InputObject.get_InnerText()
-    }
-  }
-  "number" {
-    $number = $InputObject.get_InnerText()
-    if ($number -eq ($number -as [int])) {
-      return $number -as [int]
-    } elseif ($number -eq ($number -as [double])) {
-      return $number -as [double]
-    } else {
-      return $number -as [decimal]
-    }
-  }
-  "boolean" {
-    return [bool]::parse($InputObject.get_InnerText())
-  }
-  "null" {
-    return $null
-  }
-  "array" {
-    [object[]]$Items = $(foreach( $item in $InputObject.GetEnumerator() ) {
-      Convert-Properties $item
-    })
-    return $Items
-  }
-  default {
-    return $InputObject
-  }
-}
-}
-
-Function ConvertFrom-Json2 {
-[CmdletBinding()]
-PARAM(
-  [Parameter(ValueFromPipeline=$true,Mandatory=$true,Position=1)] [string] $InputObject,
-  [Parameter(Mandatory=$true)] [Type] $Type,
-  [Switch] $ForceType
-)
-PROCESS {
-  $null = $PSBoundParameters.Remove("InputObject")
-  [Xml.XmlElement]$xml = (Convert-JsonToXml $InputObject).Root
-  if ($xml) {
-    if ($xml.Objects) {
-      $xml.Objects.Item.GetEnumerator() | ConvertFrom-Xml @PSBoundParameters
-    } elseif ($xml.Item -and $xml.Item -isnot [System.Management.Automation.PSParameterizedProperty]) {
-      $xml.Item | ConvertFrom-Xml @PSBoundParameters
-    } else {
-      $xml | ConvertFrom-Xml @PSBoundParameters
-    }
-  } else {
-    Write-Error "Failed to parse JSON with JsonReader" -Debug:$false
-  }
-}
-}
-
-function ConvertFrom-PSCustomObject
-{
-PARAM([Parameter(ValueFromPipeline = $true)] $InputObject)
-PROCESS {
-  if ($null -eq $InputObject) { return $null }
-
-  if ($InputObject -is [System.Collections.IEnumerable] -and $InputObject -isnot [string]) {
-    $collection = @(
-      foreach ($object in $InputObject) { ConvertFrom-PSCustomObject $object }
-    )
-
-    $collection
-  } elseif ($InputObject -is [System.Management.Automation.PSCustomObject]) {
-    $hash = @{}
-    foreach ($property in $InputObject.PSObject.Properties) {
-      $hash[$property.Name] = ConvertFrom-PSCustomObject $property.Value
-    }
-
-    $hash
-  } else {
-    $InputObject
-  }
-}
-}
-
-function Get-ContentAsJson
-{
-[CmdletBinding()]
-PARAM(
-  [Parameter(Mandatory = $true)] $Text,
-  [Parameter(Mandatory = $false)] [Text.Encoding] $Encoding = [Text.Encoding]::UTF8
-)
-
-# using polyfill cmdlet on PS2, so pass type info
-if ($PSVersionTable.PSVersion -lt [Version]'3.0') {
-  $Text | ConvertFrom-Json2 -Type PSObject | ConvertFrom-PSCustomObject
-} else {
-  $Text | ConvertFrom-Json | ConvertFrom-PSCustomObject
-}
-}
-PS
+          result = execute(Powershell.shell_init)
           if result.exit_code != 0
             raise BaseError.new("Could not initialize shell: #{result.stderr.string}", "SHELL_INIT_ERROR")
           end
@@ -316,26 +136,11 @@ PS
         end
 
         def execute_process(path = '', arguments = [], stdin = nil)
-          quoted_args = arguments.map do |arg|
-            "'" + arg.gsub("'", "''") + "'"
-          end.join(' ')
-
-          exec_cmd =
-            if stdin.nil?
-              "& #{path} #{quoted_args}"
-            else
-              "@'\n#{stdin}\n'@ | & #{path} #{quoted_args}"
-            end
-          execute(<<-PS)
-$OutputEncoding = [Console]::OutputEncoding
-#{exec_cmd}
-if (-not $? -and ($LASTEXITCODE -eq $null)) { exit 1 }
-exit $LASTEXITCODE
-PS
+          execute(Powershell.execute_process(path, arguments, stdin))
         end
 
         def mkdirs(dirs)
-          result = execute("mkdir -Force #{dirs.uniq.sort.join(',')}")
+          result = execute(Powershell.mkdirs(dirs))
           if result.exit_code != 0
             message = "Could not create directories: #{result.stderr}"
             raise Bolt::Node::FileError.new(message, 'MKDIR_ERROR')
@@ -343,21 +148,53 @@ PS
         end
 
         def write_remote_file(source, destination)
+          if target.options['file-protocol'] == 'smb'
+            write_remote_file_smb(source, destination)
+          else
+            write_remote_file_winrm(source, destination)
+          end
+        end
+
+        def write_remote_file_winrm(source, destination)
           fs = ::WinRM::FS::FileManager.new(@connection)
           fs.upload(source, destination)
         rescue StandardError => e
           raise Bolt::Node::FileError.new(e.message, 'WRITE_ERROR')
         end
 
+        def write_remote_file_smb(source, destination)
+          # lazy-load expensive gem code
+          require 'ruby_smb'
+
+          win_dest = destination.tr('/', '\\')
+          if (md = win_dest.match(/^([a-z]):\\(.*)/i))
+            # if drive, use admin share for that drive, so path is '\\host\C$'
+            path = "\\\\#{@target.host}\\#{md[1]}$"
+            dest = md[2]
+          elsif (md = win_dest.match(/^(\\\\[^\\]+\\[^\\]+)\\(.*)/))
+            # if unc, path is '\\host\share'
+            path = md[1]
+            dest = md[2]
+          else
+            raise ArgumentError, "Unknown destination '#{destination}'"
+          end
+
+          client = smb_client_login
+          tree = client.tree_connect(path)
+          begin
+            write_remote_file_smb_recursive(tree, source, dest)
+          ensure
+            tree.disconnect!
+          end
+        rescue ::RubySMB::Error::UnexpectedStatusCode => e
+          raise Bolt::Node::FileError.new("SMB Error: #{e.message}", 'WRITE_ERROR')
+        rescue StandardError => e
+          raise Bolt::Node::FileError.new(e.message, 'WRITE_ERROR')
+        end
+
         def make_tempdir
           find_parent = target.options['tmpdir'] ? "\"#{target.options['tmpdir']}\"" : '[System.IO.Path]::GetTempPath()'
-          result = execute(<<-PS)
-$parent = #{find_parent}
-$name = [System.IO.Path]::GetRandomFileName()
-$path = Join-Path $parent $name
-New-Item -ItemType Directory -Path $path | Out-Null
-$path
-PS
+          result = execute(Powershell.make_tempdir(find_parent))
           if result.exit_code != 0
             raise Bolt::Node::FileError.new("Could not make tempdir: #{result.stderr}", 'TEMPDIR_ERROR')
           end
@@ -368,9 +205,7 @@ PS
           dir = make_tempdir
           yield dir
         ensure
-          execute(<<-PS)
-Remove-Item -Force -Recurse -Path "#{dir}"
-PS
+          execute(Powershell.rmdir(dir))
         end
 
         def validate_extensions(ext)
@@ -393,6 +228,79 @@ PS
           remote_path = "#{dir}\\#{filename}"
           write_remote_file(content, remote_path)
           remote_path
+        end
+
+        private
+
+        def smb_client_login
+          return @client if @client
+
+          dispatcher = RubySMB::Dispatcher::Socket.new(smb_socket_connect)
+          @client = RubySMB::Client.new(dispatcher, smb1: false, smb2: true, username: @user, password: target.password)
+          status = @client.login
+          case status
+          when WindowsError::NTStatus::STATUS_SUCCESS
+            @logger.debug { "Connected to #{@client.dns_host_name}" }
+          when WindowsError::NTStatus::STATUS_LOGON_FAILURE
+            raise Bolt::Node::ConnectError.new(
+              "SMB authentication failed for #{target.host}",
+              'AUTH_ERROR'
+            )
+          else
+            raise Bolt::Node::ConnectError.new(
+              "Failed to connect to #{target.host} using SMB: #{status.description}",
+              'CONNECT_ERROR'
+            )
+          end
+
+          @client
+        end
+
+        SMB_PORT = 445
+
+        def smb_socket_connect
+          # It's lame that TCPSocket doesn't take a connect timeout
+          # Using Timeout.timeout is bad, but is done elsewhere...
+          Timeout.timeout(target.options['connect-timeout']) do
+            TCPSocket.new(target.host, target.options['smb-port'] || SMB_PORT)
+          end
+        rescue Errno::ECONNREFUSED => e
+          # handle this to prevent obscuring error message as SMB problem
+          raise Bolt::Node::ConnectError.new(
+            "Failed to connect to #{target.host} using SMB: #{e.message}",
+            'CONNECT_ERROR'
+          )
+        rescue Timeout::Error
+          raise Bolt::Node::ConnectError.new(
+            "Timeout after #{target.options['connect-timeout']} seconds connecting to #{target.host}",
+            'CONNECT_ERROR'
+          )
+        end
+
+        def write_remote_file_smb_recursive(tree, source, dest)
+          if Dir.exist?(source)
+            tree.open_directory(directory: dest, write: true, disposition: ::RubySMB::Dispositions::FILE_OPEN_IF)
+
+            (Dir.entries(source) - ['.', '..']).each do |child|
+              child_dest = dest + '\\' + child
+              write_remote_file_smb_recursive(tree, File.join(source, child), child_dest)
+            end
+            return
+          end
+
+          file = tree.open_file(filename: dest, write: true, disposition: ::RubySMB::Dispositions::FILE_OVERWRITE_IF)
+          begin
+            # `file` doesn't derive from IO, so can't use IO.copy_stream
+            File.open(source, 'rb') do |f|
+              pos = 0
+              while (buf = f.read(8 * 1024 * 1024))
+                file.write(data: buf, offset: pos)
+                pos += buf.length
+              end
+            end
+          ensure
+            file.close
+          end
         end
       end
     end

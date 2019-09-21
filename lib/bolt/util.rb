@@ -4,6 +4,8 @@ module Bolt
   module Util
     class << self
       def read_config_file(path, default_paths = nil, file_name = 'file')
+        require 'yaml'
+
         logger = Logging.logger[self]
         path_passed = path
         if path.nil? && default_paths
@@ -31,6 +33,70 @@ module Bolt
         raise Bolt::FileError.new("Could not parse #{file_name} file: #{path}", path)
       rescue IOError, SystemCallError
         raise Bolt::FileError.new("Could not read #{file_name} file: #{path}", path)
+      end
+
+      # Accepts a path with either 'plans' or 'tasks' in it and determines
+      # the name of the module
+      def module_name(path)
+        # Remove extra dots and slashes
+        path = Pathname.new(path).cleanpath.to_s
+        fs = File::SEPARATOR
+        regex = Regexp.new("#{fs}plans#{fs}|#{fs}tasks#{fs}")
+
+        # Only accept paths with '/plans/' or '/tasks/'
+        unless path.match?(regex)
+          msg = "Could not determine module from #{path}. "\
+            "The path must include 'plans' or 'tasks' directory"
+          raise Bolt::Error.new(msg, 'bolt/modulepath-error')
+        end
+
+        # Split the path on the first instance of /plans/ or /tasks/
+        parts = path.split(regex, 2)
+        # Module name is the last entry before 'plans' or 'tasks'
+        modulename = parts[0].split(fs)[-1]
+        filename = File.basename(path).split('.')[0]
+        # Remove "/init.*" if filename is init or just remove the file
+        # extension
+        if filename == 'init'
+          parts[1].chomp!(File.basename(path))
+        else
+          parts[1].chomp!(File.extname(path))
+        end
+
+        # The plan or task name is the rest of the path
+        [modulename, parts[1].split(fs)].flatten.join('::')
+      end
+
+      def to_code(string)
+        case string
+        when Bolt::PAL::YamlPlan::DoubleQuotedString
+          string.value.inspect
+        when Bolt::PAL::YamlPlan::BareString
+          if string.value.start_with?('$')
+            string.value.to_s
+          else
+            "'#{string.value}'"
+          end
+        when Bolt::PAL::YamlPlan::EvaluableString, Bolt::PAL::YamlPlan::CodeLiteral
+          string.value.to_s
+        when String
+          "'#{string}'"
+        when Hash
+          formatted = String.new("{")
+          string.each do |k, v|
+            formatted << "#{to_code(k)} => #{to_code(v)}, "
+          end
+          formatted.chomp!(", ")
+          formatted << "}"
+          formatted
+        when Array
+          formatted = String.new("[")
+          formatted << string.map { |str| to_code(str) }.join(', ')
+          formatted << "]"
+          formatted
+        else
+          string
+        end
       end
 
       def deep_merge(hash1, hash2)
@@ -68,8 +134,8 @@ module Bolt
       # Accepts a Data object and returns a copy with all hash and array values
       # Arrays and hashes including the initial object are modified before
       # their descendants are.
-      def walk_vals(data, &block)
-        data = yield(data)
+      def walk_vals(data, skip_top = false, &block)
+        data = yield(data) unless skip_top
         if data.is_a? Hash
           map_vals(data) { |v| walk_vals(v, &block) }
         elsif data.is_a? Array
@@ -111,6 +177,29 @@ module Bolt
 
           return cl
         end
+      end
+
+      # This is stubbed for testing validate_file
+      def file_stat(path)
+        File.stat(File.expand_path(path))
+      end
+
+      def validate_file(type, path, allow_dir = false)
+        stat = file_stat(path)
+
+        if !stat.readable?
+          raise Bolt::FileError.new("The #{type} '#{path}' is unreadable", path)
+        elsif !stat.file? && (!allow_dir || !stat.directory?)
+          expected = allow_dir ? 'file or directory' : 'file'
+          raise Bolt::FileError.new("The #{type} '#{path}' is not a #{expected}", path)
+        elsif stat.directory?
+          Dir.foreach(path) do |file|
+            next if %w[. ..].include?(file)
+            validate_file(type, File.join(path, file), allow_dir)
+          end
+        end
+      rescue Errno::ENOENT
+        raise Bolt::FileError.new("The #{type} '#{path}' does not exist", path)
       end
 
       # Returns true if windows false if not.

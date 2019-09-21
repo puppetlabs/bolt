@@ -1,0 +1,29 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "run_plan request",
+  "description": "POST plan/run request schema",
+  "type": "object",
+  "properties": {
+    "plan_name": {
+      "type": "string",
+      "description": "Name of the plan"
+    },
+    "job_id": {
+      "type": "string",
+      "description": "The job ID initialized in Orchestrator"
+    },
+    "environment": {
+      "type": "string",
+      "description": "Environment used for plan execution"
+    },
+    "description": {
+      "type": "string",
+      "description": "Describes this execution of the plan"
+    },
+    "params": {
+      "type": "object",
+      "description": "JSON formatted parameters to be provided to plan"
+    }
+  },
+  "required": ["plan_name", "job_id", "params"]
+}

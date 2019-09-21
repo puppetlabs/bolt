@@ -54,6 +54,8 @@ describe 'running with an inventory file', reset_puppet_settings: true do
 
   let(:run_plan) { ['plan', 'run', 'inventory', "command=#{shell_cmd}", "host=#{target}"] + config_flags }
 
+  let(:show_inventory) { ['inventory', 'show', '--nodes', target] + config_flags }
+
   around(:each) do |example|
     with_tempfile_containing('inventory', inventory.to_json, '.yml') do |f|
       @inventoryfile = f.path
@@ -61,16 +63,14 @@ describe 'running with an inventory file', reset_puppet_settings: true do
     end
   end
 
-  context 'when running over ssh', ssh: true do
-    let(:shell_cmd) { "whoami" }
-
+  shared_examples 'basic inventory' do
     it 'connects to run a command' do
       result = run_one_node(run_command)
       expect(result).to be
     end
 
     it 'connects to run a plan' do
-      expect(run_cli_json(run_plan)[0]['status']).to eq('success')
+      expect(run_cli_json(run_plan)[0]).to include('status' => 'success')
     end
 
     context 'with a group' do
@@ -84,6 +84,12 @@ describe 'running with an inventory file', reset_puppet_settings: true do
         expect(run_cli_json(run_plan)[0]['status']).to eq('success')
       end
     end
+  end
+
+  context 'when running over ssh', ssh: true do
+    let(:shell_cmd) { "whoami" }
+
+    include_examples 'basic inventory'
 
     context 'with variables set' do
       let(:output) { "Vars for localhost: {daffy => duck, bugs => bunny}" }
@@ -121,7 +127,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
         "foo => bar}, kernel => Linux}"
       }
 
-      def fact_plan(name = 'facts')
+      def fact_plan(name = 'facts_test')
         ['plan', 'run', name, "host=#{target}"] + config_flags
       end
 
@@ -138,7 +144,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
         let(:inventory) { {} }
 
         it 'does not error when facts are retrieved' do
-          expect(run_cli_json(fact_plan('facts::emit'))).to eq("Facts for localhost: {}")
+          expect(run_cli_json(fact_plan('facts_test::emit'))).to eq("Facts for localhost: {}")
         end
 
         it 'does not error when facts are added' do
@@ -148,32 +154,137 @@ describe 'running with an inventory file', reset_puppet_settings: true do
     end
   end
 
+  context 'when adding targets to a group in a plan', ssh: true do
+    let(:conn) { conn_info('ssh') }
+    let(:inventory) do
+      {
+        groups: [
+          {
+            name: 'foo',
+            nodes: [
+              {
+                name: 'foo_1'
+              }
+            ],
+            config: {
+              transport: 'local'
+            },
+            facts: {
+              parent: 'keep',
+              preserve_hierarchy: 'keep',
+              override_parent: 'discard'
+            },
+            vars: {
+              parent: 'keep',
+              preserve_hierarchy: 'keep',
+              override_parent: 'discard'
+            },
+            groups: [
+              {
+                name: 'add_me',
+                nodes: [
+                  {
+                    name: conn[:host]
+                  }
+                ],
+                config: {
+                  transport: conn[:protocol],
+                  conn[:protocol] => {
+                    user: conn[:user],
+                    port: conn[:port]
+                  }
+                },
+                facts: {
+                  added_group: 'keep'
+                },
+                vars: {
+                  added_group: 'keep'
+                }
+              }
+            ]
+          },
+          {
+            name: 'bar',
+            nodes: [
+              {
+                name: 'bar_1',
+                vars: { bar_1_var: 'dont_overwrite' }
+              }
+            ],
+            config: {
+              transport: 'local'
+            },
+            facts: {
+              exclude: 'dont_inherit'
+            },
+            vars: {
+              exclude: 'dont_inherit'
+            }
+          }
+        ],
+        facts: {
+          top_level: 'keep',
+          preserve_hierarchy: 'discard'
+        },
+        vars: {
+          top_level: 'keep',
+          preserve_hierarchy: 'discard'
+        }
+      }
+    end
+
+    it 'computes facts and vars based on group hierarchy' do
+      plan = ['plan', 'run', 'add_group', '--nodes', 'add_me'] + config_flags
+      expected_hash_pre = { 'top_level' => 'keep',
+                            'preserve_hierarchy' => 'keep',
+                            'parent' => 'keep',
+                            'override_parent' => 'discard',
+                            'added_group' => 'keep' }
+      expected_hash_post = expected_hash_pre.merge('override_parent' => 'keep', 'plan_context' => 'keep')
+      result = run_cli_json(plan)
+      expect(result['addme_group'])
+        .to eq(["Target('#{conn[:host]}', {\"user\"=>\"#{conn[:user]}\", \"port\"=>#{conn[:port]}})",
+                "Target('0.0.0.0:20024', {\"user\"=>\"bolt\", \"port\"=>20022})"])
+      expect(result['existing_facts']).to eq(expected_hash_pre)
+      expect(result['existing_vars']).to eq(expected_hash_pre)
+      expect(result['added_facts']).to eq(expected_hash_post)
+      expect(result['added_vars']).to eq(expected_hash_post)
+      expect(result['target_not_overwritten']).to eq("dont_overwrite")
+      expect(result['target_not_duplicated']).to eq(["Target('bar_1', {})"])
+      expect(result['target_to_all_group']).to include("Target('add_to_all', {})")
+    end
+
+    it 'errors when trying to add to non-existent group' do
+      plan = ['plan', 'run', 'add_group::x_fail_non_existent_group', '--nodes', 'add_me'] + config_flags
+      result = run_cli_json(plan)
+      expect(result['kind']).to eq('bolt.inventory/validation-error')
+      expect(result['msg']).to match(/Group does_not_exist does not exist in inventory/)
+    end
+
+    it 'errors when trying to add new target with name that conflicts with group name' do
+      plan = ['plan', 'run', 'add_group::x_fail_group_name_exists', '--nodes', 'add_me'] + config_flags
+      result = run_cli_json(plan)
+      expect(result['kind']).to eq('bolt.inventory/validation-error')
+      expect(result['msg']).to match(/Group foo conflicts with node of the same name for group/)
+      expect(result['details']).to eq("path" => ["foo"])
+    end
+  end
+
   context 'when running over winrm', winrm: true do
     let(:conn) { conn_info('winrm') }
     let(:shell_cmd) { "echo $env:UserName" }
 
-    it 'connects to run a command' do
-      expect(run_one_node(run_command)).to be
-    end
-
-    it 'connects to run a plan' do
-      expect(run_cli_json(run_plan)[0]['status']).to eq('success')
-    end
-
-    context 'with a group' do
-      let(:target) { 'all' }
-
-      it 'connects to run a command' do
-        expect(run_one_node(run_command)).to be
-      end
-
-      it 'connects to run a plan' do
-        expect(run_cli_json(run_plan)[0]['status']).to eq('success')
-      end
-    end
+    include_examples 'basic inventory'
   end
 
-  context 'when running over local', bash: true do
+  context 'when running over docker', docker: true do
+    let(:conn) { conn_info('docker') }
+    let(:shell_cmd) { "whoami" }
+
+    include_examples 'basic inventory'
+  end
+
+  context 'when running over local with bash shell', bash: true do
     let(:shell_cmd) { "whoami" }
 
     let(:inventory) do
@@ -204,12 +315,6 @@ describe 'running with an inventory file', reset_puppet_settings: true do
 
       it 'connects to run a command' do
         expect(run_one_node(run_command)).to be
-      end
-
-      it 'does not set transport local on to windows' do
-        allow(Bolt::Util).to receive(:windows?).and_return(true)
-        result = run_failed_node(run_command)
-        expect(result['_error']['kind']).to eq('puppetlabs.tasks/connect-error')
       end
 
       it 'connects to run a plan' do
@@ -247,7 +352,10 @@ describe 'running with an inventory file', reset_puppet_settings: true do
         after(:each) { `rm -rf #{tmpdir}` }
 
         it 'uses tmpdir' do
-          expect(run_one_node(run_command)['stdout'].strip).to match(/#{Regexp.escape(tmpdir)}/)
+          with_tempfile_containing('script', 'echo "`dirname $0`"', '.sh') do |f|
+            run_script = ['script', 'run', f.path, '--nodes', target] + config_flags
+            expect(run_one_node(run_script)['stdout'].strip).to match(/#{Regexp.escape(tmpdir)}/)
+          end
         end
       end
 
@@ -270,9 +378,18 @@ describe 'running with an inventory file', reset_puppet_settings: true do
         after(:each) { `rm -rf #{tmpdir}` }
 
         it 'uses tmpdir' do
-          expect(run_one_node(run_command)['stdout'].strip).to match(/#{Regexp.escape(tmpdir)}/)
+          with_tempfile_containing('script', 'echo "`dirname $0`"', '.sh') do |f|
+            run_script = ['script', 'run', f.path, '--nodes', target] + config_flags
+            expect(run_one_node(run_script)['stdout'].strip).to match(/#{Regexp.escape(tmpdir)}/)
+          end
         end
       end
+    end
+  end
+
+  context 'when showing inventory' do
+    it 'lists targets an action would run on' do
+      expect(run_cli_json(show_inventory)['targets'][0]).to include(target)
     end
   end
 end

@@ -27,6 +27,12 @@ describe Bolt::Config do
       config = Bolt::Config.new(boltdir, 'modulepath' => module_dirs.join(File::PATH_SEPARATOR))
       expect(config.modulepath).to eq(module_dirs.map { |dir| (boltdir.path + dir).to_s })
     end
+
+    it "accepts an array for modulepath" do
+      module_dirs = %w[site modules]
+      config = Bolt::Config.new(boltdir, 'modulepath' => module_dirs)
+      expect(config.modulepath).to eq(module_dirs.map { |dir| (boltdir.path + dir).to_s })
+    end
   end
 
   describe "deep_clone" do
@@ -90,6 +96,12 @@ describe Bolt::Config do
   end
 
   describe "validate" do
+    it "returns suggested paths when path case is incorrect" do
+      modules = File.expand_path('modules')
+      config = Bolt::Config.new(boltdir, 'modulepath' => modules.upcase)
+      expect(config.matching_paths(config.modulepath)).to include(modules)
+    end
+
     it "does not accept invalid log levels" do
       config = {
         'log' => {
@@ -204,6 +216,20 @@ describe Bolt::Config do
         'winrm' => { 'ssl-verify' => 'false' }
       }
       expect { Bolt::Config.new(boltdir, config) }.to raise_error(Bolt::ValidationError)
+    end
+
+    it "validates cacert file exists when 'ssl' is true" do
+      config = {
+        'winrm' => { 'ssl' => true, 'cacert' => 'does not exist' }
+      }
+      expect { Bolt::Config.new(boltdir, config) }.to raise_error(Bolt::FileError, /'does not exist'/)
+    end
+
+    it "ignores invalid cacert file when 'ssl' is false" do
+      config = {
+        'winrm' => { 'ssl' => false, 'cacert' => 'does not exist' }
+      }
+      expect { Bolt::Config.new(boltdir, config) }.not_to raise_error
     end
   end
 end

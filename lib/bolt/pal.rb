@@ -5,6 +5,7 @@ require 'bolt/executor'
 require 'bolt/error'
 require 'bolt/plan_result'
 require 'bolt/util'
+require 'etc'
 
 module Bolt
   class PAL
@@ -36,7 +37,9 @@ module Bolt
       end
     end
 
-    def initialize(modulepath, hiera_config, max_compiles = Concurrent.processor_count)
+    attr_reader :modulepath
+
+    def initialize(modulepath, hiera_config, max_compiles = Etc.nprocessors)
       # Nothing works without initialized this global state. Reinitializing
       # is safe and in practice only happen in tests
       self.class.load_puppet
@@ -57,6 +60,7 @@ module Bolt
 
     # Puppet logging is global so this is class method to avoid confusion
     def self.configure_logging
+      Puppet::Util::Log.destinations.clear
       Puppet::Util::Log.newdestination(Logging.logger['Puppet'])
       # Defer all log level decisions to the Logging library by telling Puppet
       # to log everything
@@ -79,6 +83,9 @@ module Bolt
       end
 
       require 'bolt/pal/logging'
+      require 'bolt/pal/issues'
+      require 'bolt/pal/yaml_plan/loader'
+      require 'bolt/pal/yaml_plan/transpiler'
 
       # Now that puppet is loaded we can include puppet mixins in data types
       Bolt::ResultSet.include_iterable
@@ -101,13 +108,15 @@ module Bolt
         pal.with_script_compiler do |compiler|
           alias_types(compiler)
           begin
-            yield compiler
-          rescue Bolt::Error => err
-            err
-          rescue Puppet::PreformattedError => err
-            PALError.from_preformatted_error(err)
-          rescue StandardError => err
-            PALError.from_preformatted_error(err)
+            Puppet.override(yaml_plan_instantiator: Bolt::PAL::YamlPlan::Loader) do
+              yield compiler
+            end
+          rescue Bolt::Error => e
+            e
+          rescue Puppet::PreformattedError => e
+            PALError.from_preformatted_error(e)
+          rescue StandardError => e
+            PALError.from_preformatted_error(e)
           end
         end
       end
@@ -119,12 +128,12 @@ module Bolt
       r
     end
 
-    def with_bolt_executor(executor, inventory, pdb_client = nil, &block)
+    def with_bolt_executor(executor, inventory, pdb_client = nil, applicator = nil, &block)
       opts = {
         bolt_executor: executor,
         bolt_inventory: inventory,
         bolt_pdb_client: pdb_client,
-        apply_executor: Applicator.new(
+        apply_executor: applicator || Applicator.new(
           inventory,
           executor,
           @modulepath,
@@ -140,8 +149,8 @@ module Bolt
       Puppet.override(opts, &block)
     end
 
-    def in_plan_compiler(executor, inventory, pdb_client)
-      with_bolt_executor(executor, inventory, pdb_client) do
+    def in_plan_compiler(executor, inventory, pdb_client, applicator = nil)
+      with_bolt_executor(executor, inventory, pdb_client, applicator) do
         # TODO: remove this call and see if anything breaks when
         # settings dirs don't actually exist. Plans shouldn't
         # actually be using them.
@@ -176,6 +185,14 @@ module Bolt
       end
     end
 
+    # Parses a snippet of Puppet manifest code and returns the AST represented
+    # in JSON.
+    def parse_manifest(code, filename)
+      Puppet::Pops::Parser::EvaluatingParser.new.parse_string(code, filename)
+    rescue Puppet::Error => e
+      raise Bolt::PAL::PALError, "Failed to parse manifest: #{e}"
+    end
+
     def list_tasks
       in_bolt_compiler do |compiler|
         tasks = compiler.list_tasks
@@ -186,6 +203,10 @@ module Bolt
           end
         end
       end
+    end
+
+    def list_modulepath
+      @modulepath - [BOLTLIB_PATH, MODULES_PATH]
     end
 
     def parse_params(type, object_name, params)
@@ -219,10 +240,14 @@ module Bolt
       end
     end
 
-    def get_task_info(task_name)
-      task = in_bolt_compiler do |compiler|
+    def task_signature(task_name)
+      in_bolt_compiler do |compiler|
         compiler.task_signature(task_name)
       end
+    end
+
+    def get_task_info(task_name)
+      task = task_signature(task_name)
 
       if task.nil?
         raise Bolt::Error.new(Bolt::Error.unknown_task(task_name), 'bolt/unknown-task')
@@ -233,7 +258,12 @@ module Bolt
 
     def list_plans
       in_bolt_compiler do |compiler|
-        compiler.list_plans.map { |plan| [plan.name] }.sort
+        errors = []
+        plans = compiler.list_plans(nil, errors).map { |plan| [plan.name] }.sort
+        errors.each do |error|
+          @logger.warn(error.details['original_error'])
+        end
+        plans
       end
     end
 
@@ -271,15 +301,51 @@ module Bolt
       plan_info
     end
 
-    def run_task(task_name, targets, params, executor, inventory, description = nil, &eventblock)
-      in_task_compiler(executor, inventory) do |compiler|
-        params = params.merge('_bolt_api_call' => true)
-        compiler.call_function('run_task', task_name, targets, description, params, &eventblock)
+    def convert_plan(plan_path)
+      Puppet[:tasks] = true
+      transpiler = YamlPlan::Transpiler.new
+      transpiler.transpile(plan_path)
+    end
+
+    # Returns a mapping of all modules available to the Bolt compiler
+    #
+    # @return [Hash{String => Array<Hash{Symbol => String,nil}>}]
+    #   A hash that associates each directory on the module path with an array
+    #   containing a hash of information for each module in that directory.
+    #   The information hash provides the name, version, and a string
+    #   indicating whether the module belongs to an internal module group.
+    def list_modules
+      internal_module_groups = { BOLTLIB_PATH => 'Plan Language Modules',
+                                 MODULES_PATH => 'Packaged Modules' }
+
+      in_bolt_compiler do
+        # NOTE: Can replace map+to_h with transform_values when Ruby 2.4
+        #       is the minimum supported version.
+        Puppet.lookup(:current_environment).modules_by_path.map do |path, modules|
+          module_group = internal_module_groups[path]
+
+          values = modules.map do |mod|
+            mod_info = { name: (mod.forge_name || mod.name),
+                         version: mod.version }
+            mod_info[:internal_module_group] = module_group unless module_group.nil?
+
+            mod_info
+          end
+
+          [path, values]
+        end.to_h
       end
     end
 
-    def run_plan(plan_name, params, executor = nil, inventory = nil, pdb_client = nil)
-      in_plan_compiler(executor, inventory, pdb_client) do |compiler|
+    def run_task(task_name, targets, params, executor, inventory, description = nil)
+      in_task_compiler(executor, inventory) do |compiler|
+        params = params.merge('_bolt_api_call' => true, '_catch_errors' => true)
+        compiler.call_function('run_task', task_name, targets, description, params)
+      end
+    end
+
+    def run_plan(plan_name, params, executor = nil, inventory = nil, pdb_client = nil, applicator = nil)
+      in_plan_compiler(executor, inventory, pdb_client, applicator) do |compiler|
         r = compiler.call_function('run_plan', plan_name, params.merge('_bolt_api_call' => true))
         Bolt::PlanResult.from_pcore(r, 'success')
       end

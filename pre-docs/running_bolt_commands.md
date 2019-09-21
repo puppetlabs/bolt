@@ -23,11 +23,11 @@ bolt command run <COMMAND> --nodes winrm://<WINDOWS.NODE> --user <USERNAME> --pa
 -   To run a command that contains spaces or shell special characters, wrap the command in single quotation marks:
 
 ```
-bolt command run 'echo $HOME' --nodes web5.mydomain.edu, web6.mydomain.edu
+bolt command run 'echo $HOME' --nodes web5.mydomain.edu,web6.mydomain.edu
 ```
 
 ```
-bolt command run "netstat -an | grep 'tcp.*LISTEN'" --nodes web5.mydomain.edu, web6.mydomain.edu
+bolt command run "netstat -an | grep 'tcp.*LISTEN'" --nodes web5.mydomain.edu,web6.mydomain.edu
 ```
 
 -   To run a cross-platform command:
@@ -37,6 +37,14 @@ bolt command run "netstat -an | grep 'tcp.*LISTEN'" --nodes web5.mydomain.edu, w
     ```
 
     **Note:** When connecting to Bolt hosts over WinRM that have not configured SSL for port 5986, passing the `--no-ssl` switch is required to connect to the default WinRM port 5985.
+
+## Running commands with redirection or pipes
+
+When you run one-line commands that include redirection or pipes, pass `bash`
+or another shell as the command. Using a shall ensures that the one-liner is
+run as a single command and that it works correctly with `run-as`. For example,
+instead of `bolt command run "echo foo > /root/foo" --run-as root`, use `bolt
+command run "bash -c 'echo foo > /root/foo'" --run-as root`.
 
 
 ## Run a script on remote nodes
@@ -54,7 +62,7 @@ bolt script run <PATH/TO/SCRIPT> --nodes <NODE NAME>,<NODE NAME>,<NODE NAME>
 ```
 
 ```
-bolt script run ../myscript.sh --nodes web5.mydomain.edu, web6.mydomain.edu
+bolt script run ../myscript.sh --nodes web5.mydomain.edu,web6.mydomain.edu
 ```
 
 -   When executing on WinRM nodes, include the WinRM protocol in the nodes string:
@@ -83,27 +91,27 @@ echo hello
 
 ### Requirements for scripts run on remote Windows systems
 
-Bolt supports the extensions `.ps1`, `.rb`, and `.pp`. To enable other file extensions, add them to your Bolt config, as follows:
+Bolt supports the extensions `.ps1`, `.rb`, and `.pp`. To enable other file extensions, add them to your Bolt configuration file, as follows:
 
 ```
 winrm:
    extensions: [.py, .pl]
 ```
 
-## Upload files to remote nodes
+## Upload files or directories to remote nodes
 
-Use Bolt to copy files to remote nodes.
+Use Bolt to copy files or directories to remote nodes.
 
 **Note:** Most transports are not optimized for file copying, so this command is best limited to small files.
 
--   To upload a file to a remote node, run the `bolt file upload` command. Specify the local path to the file, the destination location, and the target nodes.
+-   To upload a file or directory to a remote node, run the `bolt file upload` command. Specify the local path to the file or directory, the destination location, and the target nodes.
 
 ```
 bolt file upload <SOURCE> <DESTINATION> --nodes <NODE NAME>,<NODE NAME>
 ```
 
 ```
-bolt file upload my_file.txt /tmp/remote_file.txt --nodes web5.mydomain.edu, web6.mydomain.edu
+bolt file upload my_file.txt /tmp/remote_file.txt --nodes web5.mydomain.edu,web6.mydomain.edu
 ```
 
 

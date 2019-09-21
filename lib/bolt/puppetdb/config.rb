@@ -20,6 +20,7 @@ module Bolt
       end
 
       def self.load_config(filename, options)
+        config = {}
         global_path = Bolt::Util.windows? ? DEFAULT_CONFIG[:win_global] : DEFAULT_CONFIG[:global]
         if filename
           if File.exist?(filename)
@@ -27,13 +28,20 @@ module Bolt
           else
             raise Bolt::PuppetDBError, "config file #{filename} does not exist"
           end
-        elsif File.exist?(DEFAULT_CONFIG[:user])
-          config = JSON.parse(File.read(DEFAULT_CONFIG[:user]))
-        elsif File.exist?(global_path)
-          config = JSON.parse(File.read(global_path))
         else
-          config = {}
+          if File.exist?(DEFAULT_CONFIG[:user])
+            filepath = DEFAULT_CONFIG[:user]
+          elsif File.exist?(global_path)
+            filepath = global_path
+          end
+
+          begin
+            config = JSON.parse(File.read(filepath)) if filepath
+          rescue StandardError => e
+            Logging.logger[self].error("Could not load puppetdb.conf from #{filepath}: #{e.message}")
+          end
         end
+
         config = config.fetch('puppetdb', {})
         new(config.merge(options))
       end
@@ -45,8 +53,11 @@ module Bolt
 
       def token
         return @token if @token
-        if @settings['token']
-          @token = File.read(@settings['token'])
+        # Allow nil in config to skip loading a token
+        if @settings.include?('token')
+          if @settings['token']
+            @token = File.read(@settings['token'])
+          end
         elsif File.exist?(DEFAULT_TOKEN)
           @token = File.read(DEFAULT_TOKEN)
         end
@@ -64,6 +75,19 @@ module Bolt
           raise Bolt::PuppetDBError, "#{file} file #{@settings[file]} does not exist"
         end
         true
+      end
+
+      def server_urls
+        case @settings['server_urls']
+        when String
+          [@settings['server_urls']]
+        when Array
+          @settings['server_urls']
+        when nil
+          raise Bolt::PuppetDBError, "server_urls must be specified"
+        else
+          raise Bolt::PuppetDBError, "server_urls must be a string or array"
+        end
       end
 
       def uri

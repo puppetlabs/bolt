@@ -65,6 +65,7 @@ module Bolt
     def initialize(target, error: nil, report: nil)
       @target = target
       @value = {}
+      @action = 'apply'
       value['report'] = report if report
       value['_error'] = error if error
       value['_output'] = metrics_message if metrics_message
@@ -76,26 +77,13 @@ module Bolt
       end
     end
 
-    # TODO: We've gotten requests for this type of logging but I'm not sure
-    # what we shold do with it exactly.
-    def log_events
-      logger = Logging.logger[target.name]
-      if (logs = value.dig('report', 'logs'))
-        logs.each do |log|
-          case log["level"]
-          when 'err'
-            logger.error(log['message'])
-          when 'warn'
-            logger.info(log['message'])
-          when 'notice'
-            logger.notice(log['message'])
-          when 'info'
-            logger.info(log['message'])
-          else
-            logger.debug(log["message"])
-          end
-        end
-      end
+    def logs
+      value.dig('report', 'logs') || []
+    end
+
+    # Return only log messages associated with resources
+    def resource_logs
+      logs.reject { |log| log['source'] == 'Puppet' }
     end
 
     def metrics_message

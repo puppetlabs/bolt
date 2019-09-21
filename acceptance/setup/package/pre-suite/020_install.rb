@@ -2,6 +2,10 @@
 
 # Inspired by https://github.com/puppetlabs/pdk/blob/master/package-testing/pre/000_install_package.rb
 # Uses helpers from beaker-puppet to fetch build defaults
+require 'beaker-puppet'
+require 'beaker-pe'
+
+configure_type_defaults_on(hosts)
 
 test_name 'Install Bolt package' do
   if ENV['LOCAL_PKG']

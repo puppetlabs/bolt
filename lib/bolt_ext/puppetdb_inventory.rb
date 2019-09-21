@@ -3,7 +3,6 @@
 
 require 'bolt/puppetdb'
 require 'json'
-require 'httpclient'
 require 'optparse'
 require 'yaml'
 

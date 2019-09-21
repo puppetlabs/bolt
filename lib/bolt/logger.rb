@@ -33,7 +33,7 @@ module Bolt
       root_logger.add_appenders Logging.appenders.stderr(
         'console',
         layout: console_layout(color),
-        level: default_level
+        level: default_console_level
       )
 
       # We set the root logger's level so that it logs everything but we do
@@ -53,7 +53,7 @@ module Bolt
               filename: name[5..-1], # strip the "file:" prefix
               truncate: (params[:append] == false),
               layout: default_layout,
-              level: default_level
+              level: default_file_level
             )
           rescue ArgumentError => e
             raise Bolt::Error.new("Failed to open log #{name}: #{e.message}", 'bolt/log-error')
@@ -69,7 +69,7 @@ module Bolt
     def self.console_layout(color)
       color_scheme = :bolt if color
       Logging.layouts.pattern(
-        pattern: '%m\n',
+        pattern: '%m\e[0m\n',
         color_scheme: color_scheme
       )
     end
@@ -81,7 +81,11 @@ module Bolt
       )
     end
 
-    def self.default_level
+    def self.default_console_level
+      :warn
+    end
+
+    def self.default_file_level
       :notice
     end
 

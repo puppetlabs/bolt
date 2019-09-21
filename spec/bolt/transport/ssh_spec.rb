@@ -2,60 +2,91 @@
 
 require 'spec_helper'
 require 'net/ssh'
+require 'net/ssh/proxy/jump'
+require 'bolt_spec/conn'
 require 'bolt_spec/errors'
-require 'bolt_spec/files'
-require 'bolt_spec/sensitive'
-require 'bolt_spec/task'
+require 'bolt_spec/logger'
+require 'bolt_spec/transport'
 require 'bolt/transport/ssh'
 require 'bolt/config'
 require 'bolt/target'
 require 'bolt/util'
 
+require_relative 'shared_examples'
+
 describe Bolt::Transport::SSH do
+  include BoltSpec::Conn
   include BoltSpec::Errors
   include BoltSpec::Files
-  include BoltSpec::Sensitive
   include BoltSpec::Task
-
-  let(:boltdir) { Bolt::Boltdir.new('.') }
 
   def mk_config(conf)
     conf = Bolt::Util.walk_keys(conf, &:to_s)
-    Bolt::Config.new(boltdir, 'ssh' => conf)
+    Bolt::Config.new(Bolt::Boltdir.new('.'), 'ssh' => conf)
   end
 
-  let(:hostname) { ENV['BOLT_SSH_HOST'] || "localhost" }
-  let(:user) { ENV['BOLT_SSH_USER'] || "bolt" }
-  let(:password) { ENV['BOLT_SSH_PASSWORD'] || "bolt" }
+  let(:hostname) { conn_info('ssh')[:host] }
+  let(:user) { conn_info('ssh')[:user] }
+  let(:password) { conn_info('ssh')[:password] }
   let(:bash_user) { 'test' }
   let(:bash_password) { 'test' }
-  let(:port) { ENV['BOLT_SSH_PORT'] || 20022 }
-  let(:key) { ENV['BOLT_SSH_KEY'] || Dir["spec/fixtures/keys/id_rsa"][0] }
+  let(:port) { conn_info('ssh')[:port] }
+  let(:host_and_port) { "#{hostname}:#{port}" }
+  let(:key) { conn_info('ssh')[:key] }
   let(:command) { "pwd" }
   let(:config) { mk_config(user: user, password: password) }
   let(:no_host_key_check) { mk_config('host-key-check' => false, user: user, password: password) }
   let(:no_user_config) { mk_config('host-key-check' => false, user: nil, password: password) }
   let(:ssh) { Bolt::Transport::SSH.new }
-  let(:echo_script) { <<BASH }
-for var in "$@"
-do
-    echo $var
-done
-BASH
+  let(:transport_conf) { {} }
+  let(:task_input_size) { 100000 }
+  let(:big_task_input) { "f" * task_input_size }
+  let(:stdin_task) { "#!/bin/sh\ngrep data" }
+  let(:env_task) { "#!/bin/sh\necho $PT_data" }
 
   def make_target(host_: hostname, port_: port, conf: config)
-    Bolt::Target.new("#{host_}:#{port_}").update_conf(conf.transport_conf)
+    Bolt::Target.new("#{host_}:#{port_}", transport_conf).update_conf(conf.transport_conf)
   end
 
   let(:target) { make_target }
 
-  def result_value(stdout = nil, stderr = nil, exit_code = 0)
-    { 'stdout' => stdout || '',
-      'stderr' => stderr || '',
-      'exit_code' => exit_code }
+  context 'with ssh', ssh: true do
+    let(:target) { make_target(conf: no_host_key_check) }
+    let(:transport) { :ssh }
+    let(:os_context) { posix_context }
+
+    include BoltSpec::Transport
+
+    include_examples 'transport api'
+    include_examples 'with sudo'
+
+    context 'file errors' do
+      before(:each) do
+        allow_any_instance_of(Bolt::Transport::SSH::Connection).to receive(:copy_file).and_raise(
+          Bolt::Node::FileError.new("no write", "WRITE_ERROR")
+        )
+        allow_any_instance_of(Bolt::Transport::SSH::Connection).to receive(:make_tempdir).and_raise(
+          Bolt::Node::FileError.new("no tmpdir", "TEMDIR_ERROR")
+        )
+      end
+
+      include_examples 'transport failures'
+    end
   end
 
   context "when connecting", ssh: true do
+    it "passes proxyjump options" do
+      allow(Net::SSH)
+        .to receive(:start)
+        .with(anything,
+              anything,
+              hash_including(
+                proxy: instance_of(Net::SSH::Proxy::Jump)
+              ))
+      target = make_target(conf: mk_config(proxyjump: 'jump.example.com'))
+      ssh.with_connection(target) {}
+    end
+
     it "performs secure host key verification by default" do
       allow(Net::SSH)
         .to receive(:start)
@@ -68,6 +99,30 @@ BASH
     end
 
     it "downgrades to lenient if host-key-check is false" do
+      allow(Net::SSH)
+        .to receive(:start)
+        .with(anything,
+              anything,
+              hash_including(
+                verify_host_key: instance_of(Net::SSH::Verifiers::Never)
+              ))
+      ssh.with_connection(make_target(conf: no_host_key_check)) {}
+    end
+
+    it "defers to SSH config if host-key-check is unset" do
+      expect(Net::SSH::Config).to receive(:for).and_return(strict_host_key_checking: false)
+      expect(Net::SSH)
+        .to receive(:start)
+        .with(anything,
+              anything,
+              hash_including(
+                verify_host_key: instance_of(Net::SSH::Verifiers::AcceptNewOrLocalTunnel)
+              ))
+      ssh.with_connection(target) {}
+    end
+
+    it "ignores SSH config if host-key-check is set" do
+      expect(Net::SSH::Config).to receive(:for).and_return(strict_host_key_checking: true)
       allow(Net::SSH)
         .to receive(:start)
         .with(anything,
@@ -161,7 +216,8 @@ BASH
       allow(Etc).to receive(:getlogin).and_return('bolt')
       expect(Net::SSH::Config).not_to receive(:for)
 
-      config_user = ssh.with_connection(make_target(conf: no_user_config), false, &:user)
+      transport_conf['load-config'] = false
+      config_user = ssh.with_connection(make_target(conf: no_user_config), &:user)
       expect(config_user).to be('bolt')
     end
   end
@@ -182,7 +238,7 @@ BASH
         expect(
           ssh.upload(target, file.path, remote_path).value
         ).to eq(
-          '_output' => "Uploaded '#{file.path}' to '#{hostname}:#{remote_path}'"
+          '_output' => "Uploaded '#{file.path}' to '#{target.host}:#{remote_path}'"
         )
 
         expect(
@@ -210,552 +266,186 @@ BASH
   context "when executing" do
     let(:target) { make_target(conf: no_host_key_check) }
 
-    it "executes a command on a host", ssh: true do
-      expect(ssh.run_command(target, command).value).to eq(result_value("/home/#{user}\n"))
+    it "can test whether the target is available", ssh: true do
+      expect(ssh.connected?(target)).to eq(true)
     end
 
-    it "captures stderr from a host", ssh: true do
-      expect(ssh.run_command(target, "ssh -V").value['stderr']).to match(/OpenSSH/)
-    end
-
-    it "can execute a command containing quotes", ssh: true do
-      expect(ssh.run_command(target, "echo 'hello \" world'").value).to eq(result_value("hello \" world\n"))
-    end
-
-    it "can upload a file to a host", ssh: true do
-      contents = "kljhdfg"
-      with_tempfile_containing('upload-test', contents) do |file|
-        ssh.upload(target, file.path, "/home/#{user}/upload-test")
-
-        expect(
-          ssh.run_command(target, "cat /home/#{user}/upload-test")['stdout']
-        ).to eq(contents)
-
-        ssh.run_command(target, "rm /home/#{user}/upload-test")
-      end
-    end
-
-    it "can upload a directory to a host", ssh: true do
-      Dir.mktmpdir do |dir|
-        subdir = File.join(dir, 'subdir')
-        File.write(File.join(dir, 'content'), 'hello world')
-        Dir.mkdir(subdir)
-        File.write(File.join(subdir, 'more'), 'lorem ipsum')
-
-        target_dir = "/home/#{user}/directory-test"
-        ssh.upload(target, dir, target_dir)
-
-        expect(
-          ssh.run_command(target, "ls #{target_dir}")['stdout'].split("\n")
-        ).to eq(%w[content subdir])
-
-        expect(
-          ssh.run_command(target, "ls #{File.join(target_dir, 'subdir')}")['stdout'].split("\n")
-        ).to eq(%w[more])
-
-        ssh.run_command(target, "rm -r #{target_dir}")
-      end
-    end
-
-    it "can run a script remotely", ssh: true do
-      contents = "#!/bin/sh\necho hellote"
-      with_tempfile_containing('script test', contents) do |file|
-        expect(
-          ssh.run_script(target, file.path, [])['stdout']
-        ).to eq("hellote\n")
-      end
-    end
-
-    it "can run a script remotely with quoted arguments", ssh: true do
-      with_tempfile_containing('script-test-ssh-quotes', echo_script) do |file|
-        expect(
-          ssh.run_script(target,
-                         file.path,
-                         ['nospaces',
-                          'with spaces',
-                          "\"double double\"",
-                          "'double single'",
-                          '\'single single\'',
-                          '"single double"',
-                          "double \"double\" double",
-                          "double 'single' double",
-                          'single "double" single',
-                          'single \'single\' single'])['stdout']
-        ).to eq(<<QUOTED)
-nospaces
-with spaces
-"double double"
-'double single'
-'single single'
-"single double"
-double "double" double
-double 'single' double
-single "double" single
-single 'single' single
-QUOTED
-      end
-    end
-
-    it "can run a script with Sensitive arguments", ssh: true do
-      contents = "#!/bin/sh\necho $1\necho $2"
-      arguments = ['non-sensitive-arg',
-                   make_sensitive('$ecret!')]
-      with_tempfile_containing('sensitive_test', contents) do |file|
-        expect(
-          ssh.run_script(target, file.path, arguments)['stdout']
-        ).to eq("non-sensitive-arg\n$ecret!\n")
-      end
-    end
-
-    it "escapes unsafe shellwords in arguments", ssh: true do
-      with_tempfile_containing('script-test-ssh-escape', echo_script) do |file|
-        expect(
-          ssh.run_script(target,
-                         file.path,
-                         ['echo $HOME; cat /etc/passwd'])['stdout']
-        ).to eq(<<SHELLWORDS)
-echo $HOME; cat /etc/passwd
-SHELLWORDS
-      end
-    end
-
-    it "can run a task", ssh: true do
-      contents = "#!/bin/sh\necho -n ${PT_message_one} ${PT_message_two}"
-      arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-      with_task_containing('tasks_test', contents, 'environment') do |task|
-        expect(ssh.run_task(target, task, arguments).message)
-          .to eq('Hello from task Goodbye')
-      end
-    end
-
-    it "doesn't generate a task wrapper when not needed", ssh: true do
-      contents = "#!/bin/sh\necho -n ${PT_message_one} ${PT_message_two}"
-      arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-      expect(ssh).not_to receive(:make_wrapper_stringio)
-      with_task_containing('tasks_test', contents, 'environment') do |task|
-        ssh.run_task(target, task, arguments)
-      end
-    end
-
-    it "can run a task passing input on stdin", ssh: true do
-      contents = "#!/bin/sh\ngrep 'message_one'"
-      arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-      with_task_containing('tasks_test_stdin', contents, 'stdin') do |task|
-        expect(ssh.run_task(target, task, arguments).value)
-          .to eq("message_one" => "Hello from task", "message_two" => "Goodbye")
-      end
-    end
-
-    it "serializes hashes as json in environment input", ssh: true do
-      contents = "#!/bin/sh\nprintenv PT_message"
-      arguments = { message: { key: 'val' } }
-      with_task_containing('tasks_test_hash', contents, 'environment') do |task|
-        expect(ssh.run_task(target, task, arguments).value)
-          .to eq('key' => 'val')
-      end
-    end
-
-    it "can run a task passing input on stdin and environment", ssh: true do
-      contents = <<SHELL
-#!/bin/sh
-echo -n ${PT_message_one} ${PT_message_two}
-grep 'message_one'
-SHELL
-      arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-      with_task_containing('tasks-test-both', contents, 'both') do |task|
-        expect(ssh.run_task(target, task, arguments).message).to eq(<<SHELL)
-Hello from task Goodbye{\"message_one\":\
-\"Hello from task\",\"message_two\":\"Goodbye\"}
-SHELL
-      end
-    end
-
-    it "can run a task with params containing quotes", ssh: true do
-      contents = <<SHELL
-#!/bin/sh
-echo -n ${PT_message}
-SHELL
-
-      arguments = { message: "foo ' bar ' baz" }
-      with_task_containing('tasks_test_quotes', contents, 'both') do |task|
-        expect(ssh.run_task(target, task, arguments).message).to eq "foo ' bar ' baz"
-      end
-    end
-
-    it "can run a task with params containing variable references", ssh: true do
-      contents = <<SHELL
-#!/bin/sh
-cat
-SHELL
-
-      arguments = { message: "$PATH" }
-      with_task_containing('tasks_test_var', contents, 'both') do |task|
-        expect(ssh.run_task(target, task, arguments)['message']).to eq("$PATH")
-      end
-    end
-
-    it "can run a task with Sensitive params via environment", ssh: true do
-      contents = <<SHELL
-#!/bin/sh
-echo ${PT_sensitive_string}
-echo ${PT_sensitive_array}
-echo -n ${PT_sensitive_hash}
-SHELL
-      deep_hash = { 'k' => make_sensitive('v') }
-      arguments = { 'sensitive_string' => make_sensitive('$ecret!'),
-                    'sensitive_array'  => make_sensitive([1, 2, make_sensitive(3)]),
-                    'sensitive_hash'   => make_sensitive(deep_hash) }
-      with_task_containing('tasks_test_sensitive', contents, 'both') do |task|
-        expect(ssh.run_task(target, task, arguments).message).to eq(<<SHELL.strip)
-$ecret!
-[1,2,3]
-{"k":"v"}
-SHELL
-      end
-    end
-
-    it "can run a task with Sensitive params via stdin", ssh: true do
-      contents = <<SHELL
-#!/bin/sh
-cat -
-SHELL
-      arguments = { 'sensitive_string' => make_sensitive('$ecret!') }
-      with_task_containing('tasks_test_sensitive', contents, 'stdin') do |task|
-        expect(ssh.run_task(target, task, arguments).value)
-          .to eq("sensitive_string" => "$ecret!")
-      end
-    end
-
-    context "when it can't upload a file" do
-      before(:each) do
-        allow_any_instance_of(Bolt::Transport::SSH::Connection).to receive(:write_remote_file).and_raise(
-          Bolt::Node::FileError.new("no write", "WRITE_ERROR")
-        )
-      end
-
-      it 'returns an error result for upload', ssh: true do
-        contents = "kljhdfg"
-        with_tempfile_containing('upload-test', contents) do |file|
-          expect {
-            ssh.upload(target, file.path, "/home/#{user}/upload-test")
-          }.to raise_error(Bolt::Node::FileError, 'no write')
-        end
-      end
-
-      it 'returns an error result for run_script', ssh: true do
-        contents = "#!/bin/sh\necho hellote"
-        with_tempfile_containing('script test', contents) do |file|
-          expect {
-            ssh.run_script(target, file.path, [])
-          }.to raise_error(Bolt::Node::FileError, 'no write')
-        end
-      end
-
-      it 'returns an error result for run_task', ssh: true do
-        contents = "#!/bin/sh\necho -n ${PT_message_one} ${PT_message_two}"
-        arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-        with_task_containing('tasks_test', contents, 'environment') do |task|
-          expect {
-            ssh.run_task(target, task, arguments)
-          }.to raise_error(Bolt::Node::FileError, 'no write')
-        end
-      end
-    end
-
-    context "when it can't create a tempfile" do
-      before(:each) do
-        allow_any_instance_of(Bolt::Transport::SSH::Connection).to receive(:make_tempdir).and_raise(
-          Bolt::Node::FileError.new("no tmpdir", "TEMDIR_ERROR")
-        )
-      end
-
-      it 'errors when it tries to run a script', ssh: true do
-        contents = "#!/bin/sh\necho hellote"
-        with_tempfile_containing('script test', contents) do |file|
-          expect {
-            ssh.run_script(target, file.path, []).error_hash['msg']
-          }.to raise_error(Bolt::Node::FileError, 'no tmpdir')
-        end
-      end
-
-      it "errors when it tries to run a task", ssh: true do
-        contents = "#!/bin/sh\necho -n ${PT_message_one} ${PT_message_two}"
-        arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-        with_task_containing('tasks_test', contents, 'environment') do |task|
-          expect {
-            ssh.run_task(target, task, arguments)
-          }.to raise_error(Bolt::Node::FileError, 'no tmpdir')
-        end
-      end
-    end
-
-    context "when implementations are provided", ssh: true do
-      let(:contents) { "#!/bin/sh\necho -n ${PT_message_one} ${PT_message_two}" }
-      let(:arguments) { { message_one: 'Hello from task', message_two: 'Goodbye' } }
-
-      it "runs a task requires 'shell'" do
-        with_task_containing('tasks_test', contents, 'environment') do |task|
-          task['metadata']['implementations'] = [{ 'name' => 'tasks_test', 'requirements' => ['shell'] }]
-          expect(ssh.run_task(target, task, arguments).message)
-            .to eq('Hello from task Goodbye')
-        end
-      end
-
-      it "runs a task with the implementation's input method" do
-        with_task_containing('tasks_test', contents, 'stdin') do |task|
-          task['metadata']['implementations'] = [{
-            'name' => 'tasks_test', 'requirements' => ['shell'], 'input_method' => 'environment'
-          }]
-          expect(ssh.run_task(target, task, arguments).message.chomp)
-            .to eq('Hello from task Goodbye')
-        end
-      end
-
-      it "errors when a task only requires an unsupported requirement" do
-        with_task_containing('tasks_test', contents, 'environment') do |task|
-          task['metadata']['implementations'] = [{ 'name' => 'tasks_test', 'requirements' => ['powershell'] }]
-          expect {
-            ssh.run_task(target, task, arguments)
-          }.to raise_error("No suitable implementation of #{task['name']} for #{target.name}")
-        end
-      end
-
-      it "errors when a task only requires an unknown requirement" do
-        with_task_containing('tasks_test', contents, 'environment') do |task|
-          task['metadata']['implementations'] = [{ 'name' => 'tasks_test', 'requirements' => ['foobar'] }]
-          expect {
-            ssh.run_task(target, task, arguments)
-          }.to raise_error("No suitable implementation of #{task['name']} for #{target.name}")
-        end
-      end
-    end
-
-    context "when files are provided", ssh: true do
-      let(:contents) { "#!/bin/sh\nfind ${PT__installdir} -type f" }
-      let(:arguments) { {} }
-
-      it "puts files at _installdir" do
-        with_task_containing('tasks_test', contents, 'environment') do |task|
-          task['metadata']['files'] = []
-          expected_files = %w[files/foo files/bar/baz lib/puppet_x/file.rb tasks/init]
-          expected_files.each do |file|
-            task['metadata']['files'] << "tasks_test/#{file}"
-            task['files'] << { 'name' => "tasks_test/#{file}", 'path' => task['files'][0]['path'] }
-          end
-
-          files = ssh.run_task(target, task, arguments).message.split("\n")
-          expect(files.count).to eq(expected_files.count)
-          files.sort.zip(expected_files.sort).each do |file, expected_file|
-            expect(file).to match(%r{_installdir/tasks_test/#{expected_file}$})
-          end
-        end
-      end
-
-      it "includes files from the selected implementation" do
-        with_task_containing('tasks_test', contents, 'environment') do |task|
-          task['metadata']['implementations'] = [
-            { 'name' => 'tasks_test.alt', 'requirements' => ['foobar'], 'files' => ['tasks_test/files/no'] },
-            { 'name' => 'tasks_test', 'requirements' => [], 'files' => ['tasks_test/files/yes'] }
-          ]
-          task['metadata']['files'] = ['other_mod/lib/puppet_x/']
-          task['files'] << { 'name' => 'tasks_test/files/yes', 'path' => task['files'][0]['path'] }
-          task['files'] << { 'name' => 'other_mod/lib/puppet_x/a.rb', 'path' => task['files'][0]['path'] }
-          task['files'] << { 'name' => 'other_mod/lib/puppet_x/b.rb', 'path' => task['files'][0]['path'] }
-          task['files'] << { 'name' => 'tasks_test/files/no', 'path' => task['files'][0]['path'] }
-
-          files = ssh.run_task(target, task, arguments).message.split("\n").sort
-          expect(files.count).to eq(3)
-          expect(files[0]).to match(%r{_installdir/other_mod/lib/puppet_x/a.rb$})
-          expect(files[1]).to match(%r{_installdir/other_mod/lib/puppet_x/b.rb$})
-          expect(files[2]).to match(%r{_installdir/tasks_test/files/yes$})
-        end
-      end
+    it "returns false if the target is not available", ssh: true do
+      expect(ssh.connected?(Bolt::Target.new('unknownfoo'))).to eq(false)
     end
   end
 
-  context 'when tmpdir is specified' do
-    let(:tmpdir) { '/tmp/mytempdir' }
-    let(:config) { mk_config('host-key-check' => false, tmpdir: tmpdir, user: user, password: password) }
-
-    after(:each) do
-      ssh.run_command(target, "rm -rf #{tmpdir}")
-    end
-
-    it "errors when tmpdir doesn't exist", ssh: true do
-      contents = "#!/bin/sh\n echo $0"
-      with_tempfile_containing('script dir', contents) do |file|
-        expect {
-          ssh.run_script(target, file.path, [])
-        }.to raise_error(Bolt::Node::FileError, /Could not make tempdir.*#{Regexp.escape(tmpdir)}/)
-      end
-    end
-
-    it 'uploads a script to the specified tmpdir', ssh: true do
-      ssh.run_command(target, "mkdir #{tmpdir}")
-      contents = "#!/bin/sh\n echo $0"
-      with_tempfile_containing('script dir', contents) do |file|
-        expect(ssh.run_script(target, file.path, [])['stdout']).to match(/#{Regexp.escape(tmpdir)}/)
-      end
-    end
-  end
-
-  context "with sudo" do
+  # Local transport doesn't have concept of 'user'
+  # so this test only applies to ssh
+  context "with sudo as non-root", sudo: true do
     let(:config) {
-      mk_config('host-key-check' => false, 'sudo-password' => password, 'run-as' => 'root',
-                user: user, password: password)
+      mk_config('host-key-check' => false, 'sudo-password' => bash_password, 'run-as' => user,
+                user: bash_user, password: bash_password)
     }
+    let(:target) { make_target }
 
-    it "can execute a command", ssh: true do
-      expect(ssh.run_command(target, 'whoami')['stdout']).to eq("root\n")
+    it 'runs as that user' do
+      expect(ssh.run_command(target, 'whoami')['stdout'].chomp).to eq(user)
     end
 
-    it "can run a task passing input on stdin", ssh: true do
-      contents = "#!/bin/sh\ngrep 'message_one'"
-      arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-      with_task_containing('tasks_test_stdin', contents, 'stdin') do |task|
-        expect(ssh.run_task(target, task, arguments).value)
-          .to eq("message_one" => "Hello from task", "message_two" => "Goodbye")
+    it "can override run_as for command via an option" do
+      expect(ssh.run_command(target, 'whoami', '_run_as' => 'root')['stdout']).to eq("root\n")
+    end
+
+    it "can override run_as for script via an option" do
+      contents = "#!/bin/sh\nwhoami"
+      with_tempfile_containing('script test', contents) do |file|
+        expect(ssh.run_script(target, file.path, [], '_run_as' => 'root')['stdout']).to eq("root\n")
       end
     end
 
-    it "can run a task passing input with environment vars", ssh: true do
-      contents = "#!/bin/sh\necho -n ${PT_message_one} then ${PT_message_two}"
-      arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
+    it "can override run_as for task via an option" do
+      contents = "#!/bin/sh\nwhoami"
       with_task_containing('tasks_test', contents, 'environment') do |task|
-        expect(ssh.run_task(target, task, arguments).message)
-          .to eq('Hello from task then Goodbye')
+        expect(ssh.run_task(target, task, {}, '_run_as' => 'root').message).to eq("root\n")
       end
     end
 
-    it "can run a task with params containing variable references", ssh: true do
-      contents = <<SHELL
-#!/bin/sh
-cat
-SHELL
-
-      arguments = { message: "$PATH" }
-      with_task_containing('tasks_test_var', contents, 'both') do |task|
-        expect(ssh.run_task(target, task, arguments)['message']).to eq("$PATH")
-      end
-    end
-
-    it "can upload a file as root", ssh: true do
+    it "can override run_as for file upload via an option" do
       contents = "upload file test as root content"
       dest = '/tmp/root-file-upload-test'
       with_tempfile_containing('tasks test upload as root', contents) do |file|
-        expect(ssh.upload(target, file.path, dest).message).to match(/Uploaded/)
-        expect(ssh.run_command(target, "cat #{dest}")['stdout']).to eq(contents)
-        expect(ssh.run_command(target, "stat -c %U #{dest}")['stdout'].chomp).to eq('root')
-        expect(ssh.run_command(target, "stat -c %G #{dest}")['stdout'].chomp).to eq('root')
+        expect(ssh.upload(target, file.path, dest, '_run_as' => 'root').message).to match(/Uploaded/)
+        expect(ssh.run_command(target, "cat #{dest}", '_run_as' => 'root')['stdout']).to eq(contents)
+        expect(ssh.run_command(target, "stat -c %U #{dest}", '_run_as' => 'root')['stdout'].chomp).to eq('root')
+        expect(ssh.run_command(target, "stat -c %G #{dest}", '_run_as' => 'root')['stdout'].chomp).to eq('root')
       end
 
       ssh.run_command(target, "rm #{dest}", sudoable: true, run_as: 'root')
     end
 
-    context "requesting a pty" do
-      let(:config) {
-        mk_config('host-key-check' => false, 'sudo-password' => password, 'run-as' => 'root',
-                  tty: true, user: user, password: password)
-      }
-
-      it "can execute a command when a tty is requested", ssh: true do
-        expect(ssh.run_command(target, 'whoami')['stdout'].strip).to eq('root')
+    it "runs a task that expects big data on stdin" do
+      with_task_containing('tasks_test', stdin_task, 'stdin') do |task|
+        expect(ssh).not_to receive(:make_wrapper_stringio)
+        result = ssh.run_task(target, task, { 'data' => big_task_input }, '_run_as' => 'root')
+        expect(result.value['data'].strip.size).to eq(task_input_size)
       end
     end
 
-    context "as non-root" do
-      let(:config) {
-        mk_config('host-key-check' => false, 'sudo-password' => bash_password, 'run-as' => user,
-                  user: bash_user, password: bash_password)
-      }
-
-      it 'runs as that user', ssh: true do
-        expect(ssh.run_command(target, 'whoami')['stdout'].chomp).to eq(user)
-      end
-
-      it "can override run_as for command via an option", ssh: true do
-        expect(ssh.run_command(target, 'whoami', '_run_as' => 'root')['stdout']).to eq("root\n")
-      end
-
-      it "can override run_as for script via an option", ssh: true do
-        contents = "#!/bin/sh\nwhoami"
-        with_tempfile_containing('script test', contents) do |file|
-          expect(ssh.run_script(target, file.path, [], '_run_as' => 'root')['stdout']).to eq("root\n")
-        end
-      end
-
-      it "can override run_as for task via an option", ssh: true do
-        contents = "#!/bin/sh\nwhoami"
-        with_task_containing('tasks_test', contents, 'environment') do |task|
-          expect(ssh.run_task(target, task, {}, '_run_as' => 'root').message).to eq("root\n")
-        end
-      end
-
-      it "can override run_as for file upload via an option", ssh: true do
-        contents = "upload file test as root content"
-        dest = '/tmp/root-file-upload-test'
-        with_tempfile_containing('tasks test upload as root', contents) do |file|
-          expect(ssh.upload(target, file.path, dest, '_run_as' => 'root').message).to match(/Uploaded/)
-          expect(ssh.run_command(target, "cat #{dest}", '_run_as' => 'root')['stdout']).to eq(contents)
-          expect(ssh.run_command(target, "stat -c %U #{dest}", '_run_as' => 'root')['stdout'].chomp).to eq('root')
-          expect(ssh.run_command(target, "stat -c %G #{dest}", '_run_as' => 'root')['stdout'].chomp).to eq('root')
-        end
-
-        ssh.run_command(target, "rm #{dest}", sudoable: true, run_as: 'root')
-      end
-    end
-
-    context "with an incorrect password" do
-      let(:config) {
-        mk_config('host-key-check' => false, 'sudo-password' => 'nonsense', 'run-as' => 'root',
-                  user: user, password: password)
-      }
-
-      it "returns a failed result", ssh: true do
-        expect {
-          ssh.run_command(target, 'whoami')
-        }.to raise_error(Bolt::Node::EscalateError,
-                         "Sudo password for user #{user} not recognized on #{hostname}:#{port}")
-      end
-    end
-
-    context "with no password" do
-      let(:config) { mk_config('host-key-check' => false, 'run-as' => 'root', user: user, password: password) }
-
-      it "returns a failed result", ssh: true do
-        expect {
-          ssh.run_command(target, 'whoami')
-        }.to raise_error(Bolt::Node::EscalateError,
-                         "Sudo password for user #{user} was not provided for #{hostname}:#{port}")
-      end
-    end
-
-    context "as bash user with no password" do
-      let(:config) {
-        mk_config('host-key-check' => false, 'run-as' => 'root', user: bash_user, password: bash_password)
-      }
-
-      it "returns a failed result when a temporary directory is created", ssh: true do
-        contents = "#!/bin/sh\nwhoami"
-        with_tempfile_containing('script test', contents) do |file|
-          expect {
-            ssh.run_script(target, file.path, [])
-          }.to raise_error(Bolt::Node::EscalateError,
-                           "Sudo password for user #{bash_user} was not provided for #{hostname}:#{port}")
-        end
+    it "runs a task that expects big data in environment variable" do
+      expect(ssh).not_to receive(:make_wrapper_stringio)
+      with_task_containing('tasks_test', env_task, 'environment') do |task|
+        result = ssh.run_task(target, task, { 'data' => big_task_input }, '_run_as' => 'root')
+        expect(result.value['_output'].strip.size).to eq(task_input_size)
       end
     end
   end
 
-  context "using a custom run-as-command" do
+  context "with sudo with task interpreter set", sudo: true, ssh: true do
     let(:config) {
       mk_config('host-key-check' => false, 'sudo-password' => password, 'run-as' => 'root',
-                user: user, password: password,
-                'run-as-command' => ["sudo", "-nSEu"])
+                user: user, password: password, interpreters: { sh: '/bin/sh' })
     }
 
-    it "can fails to execute with sudo -n", ssh: true do
-      expect(ssh.run_command(target, 'whoami')['stderr']).to match("sudo: a password is required")
+    it "runs a task that expects big data on stdin" do
+      expect(ssh).not_to receive(:make_wrapper_stringio)
+      with_task_containing('tasks_test', stdin_task, 'stdin', '.sh') do |task|
+        result = ssh.run_task(target, task, { 'data' => big_task_input }, '_run_as' => 'root')
+        expect(result.value['data'].strip.size).to eq(task_input_size)
+      end
+    end
+
+    it "runs a task that expects big data in environment variable" do
+      expect(ssh).not_to receive(:make_wrapper_stringio)
+      with_task_containing('tasks_test', env_task, 'environment', '.sh') do |task|
+        result = ssh.run_task(target, task, { 'data' => big_task_input }, '_run_as' => 'root')
+        expect(result.value['_output'].strip.size).to eq(task_input_size)
+      end
+    end
+  end
+
+  context "as bash user with no password", sudo: true do
+    let(:config) {
+      mk_config('host-key-check' => false, 'run-as' => 'root', user: bash_user, password: bash_password)
+    }
+    let(:target) { make_target }
+
+    it "returns a failed result when a temporary directory is created" do
+      contents = "#!/bin/sh\nwhoami"
+      with_tempfile_containing('script test', contents) do |file|
+        expect {
+          ssh.run_script(target, file.path, [])
+        }.to raise_error(Bolt::Node::EscalateError,
+                         "Sudo password for user #{bash_user} was not provided for #{host_and_port}")
+      end
+    end
+  end
+
+  context "with a bad private-key option" do
+    include BoltSpec::Logger
+
+    let(:config) do
+      mk_config('host-key-check' => false, 'private-key' => '/bad/path/to/key',
+                user: user, password: password)
+    end
+
+    it "warns but succeeds when the private-key is missing", ssh: true do
+      stub_logger
+      expect(mock_logger).to receive(:warn)
+      expect(ssh.run_command(target, 'whoami')['exit_code']).to eq(0)
+    end
+  end
+
+  context "requesting a pty", sudo: true, ssh: true do
+    let(:config) {
+      mk_config('host-key-check' => false, 'sudo-password' => password, 'run-as' => 'root',
+                tty: true, user: user, password: password)
+    }
+
+    it "can execute a command when a tty is requested" do
+      expect(ssh.run_command(target, 'whoami')['stdout'].strip).to eq('root')
+    end
+
+    it "runs a task that expects big data on stdin" do
+      expect(ssh).to receive(:make_wrapper_stringio).and_call_original
+      with_task_containing('tasks_test', stdin_task, 'stdin') do |task|
+        result = ssh.run_task(target, task, { 'data' => big_task_input }, '_run_as' => 'root')
+        expect(result.value['data'].strip.size).to eq(task_input_size)
+      end
+    end
+
+    it "runs a task that expects big data in environment variable" do
+      expect(ssh).not_to receive(:make_wrapper_stringio)
+      with_task_containing('tasks_test', env_task, 'environment') do |task|
+        result = ssh.run_task(target, task, { 'data' => big_task_input }, '_run_as' => 'root')
+        expect(result.value['_output'].strip.size).to eq(task_input_size)
+      end
+    end
+  end
+
+  context "when requesting a pty with task interpreter set", sudo: true, ssh: true do
+    let(:config) {
+      mk_config('host-key-check' => false, 'sudo-password' => password, 'run-as' => 'root',
+                tty: true, user: user, password: password, interpreters: { sh: '/bin/sh' })
+    }
+
+    it "runs a task that expects big data on stdin" do
+      expect(ssh).to receive(:make_wrapper_stringio).and_call_original
+      with_task_containing('tasks_test', stdin_task, 'stdin', '.sh') do |task|
+        result = ssh.run_task(target, task, { 'data' => big_task_input }, '_run_as' => 'root')
+        expect(result.value['data'].strip.size).to eq(task_input_size)
+      end
+    end
+
+    it "runs a task that expects big data in environment variable" do
+      expect(ssh).not_to receive(:make_wrapper_stringio)
+      with_task_containing('tasks_test', env_task, 'environment', '.sh') do |task|
+        result = ssh.run_task(target, task, { 'data' => big_task_input }, '_run_as' => 'root')
+        expect(result.value['_output'].strip.size).to eq(task_input_size)
+      end
+    end
+  end
+
+  context 'when there is no host in the target' do
+    let(:target) { Bolt::Target.new(nil, "name" => "hostless") }
+
+    it 'errors' do
+      expect { ssh.run_command(target, 'whoami') }.to raise_error(/does not have a host/)
     end
   end
 end

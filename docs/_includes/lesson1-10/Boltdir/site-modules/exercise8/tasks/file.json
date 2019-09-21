@@ -1,0 +1,14 @@
+{
+    "description": "Write content to a file.",
+    "supports_noop": true,
+    "parameters": {
+        "filename": {
+            "description": "the file to write to",
+            "type": "String[1]"
+        },
+        "content": {
+            "description": "The content to write",
+            "type": "String"
+        }
+    }
+}

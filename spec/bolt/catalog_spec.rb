@@ -14,11 +14,11 @@ describe Bolt::Catalog do
   let(:inventory) { Bolt::Inventory.new(nil) }
   let(:executor) { Bolt::Executor.new }
   let(:pdb_config) do
-    Bolt::PuppetDB::Config.new('server_urls'  => 'https://localhost:8081',
-                               'cacert'       => '/path/to/cacert',
-                               'cert'         => '/path/to/cert',
-                               'key'          => '/path/to/key',
-                               'token'        => 'token')
+    Bolt::PuppetDB::Config.new('server_urls' => 'https://localhost:8081',
+                               'cacert' => '/path/to/cacert',
+                               'cert' => '/path/to/cert',
+                               'key' => '/path/to/key',
+                               'token' => 'token')
   end
   let(:catalog) { Bolt::Catalog.new('warning') }
   let(:notify) { "notify { \"trusted ${trusted}\": }" }

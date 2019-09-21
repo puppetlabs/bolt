@@ -87,6 +87,20 @@ describe Bolt::Analytics::Client do
     end
   end
 
+  describe "#report_bundled_content" do
+    before(:each) { subject.bundled_content = { 'Plan' => ['my_plan'] } }
+
+    it 'reports bundled content' do
+      expect(subject).to receive(:event).with('Bundled Content', 'Plan', label: 'my_plan')
+      subject.report_bundled_content('Plan', 'my_plan')
+    end
+
+    it 'does not report other content' do
+      expect(subject).not_to receive(:event)
+      subject.report_bundled_content('Plan', 'other_plan')
+    end
+  end
+
   describe "#event" do
     it 'properly formats the event' do
       params = base_params.merge(t: 'event', ec: 'run', ea: 'task')
@@ -101,7 +115,7 @@ describe Bolt::Analytics::Client do
 
       expect(subject).to receive(:submit).with params
 
-      subject.event('run', 'task', 'happy')
+      subject.event('run', 'task', label: 'happy')
     end
 
     it 'sends the event metric if supplied' do
@@ -109,7 +123,7 @@ describe Bolt::Analytics::Client do
 
       expect(subject).to receive(:submit).with params
 
-      subject.event('run', 'task', nil, 12)
+      subject.event('run', 'task', value: 12)
     end
   end
 end
@@ -127,11 +141,11 @@ describe Bolt::Analytics::NoopClient do
     end
 
     it 'succeeds with a label' do
-      subject.event('run', 'task', 'happy')
+      subject.event('run', 'task', label: 'happy')
     end
 
     it 'succeeds with a metric' do
-      subject.event('run', 'task', nil, 12)
+      subject.event('run', 'task', value: 12)
     end
   end
 end

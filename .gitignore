@@ -11,6 +11,7 @@
 /test/tmp/
 /test/version_tmp/
 /tmp/
+/spec/tmp/
 
 ## Documentation cache and generated files:
 .yardoc/
@@ -40,6 +41,9 @@ modules/facts
 modules/package
 modules/puppet_agent
 modules/puppet_conf
+modules/python_task_helper
+modules/reboot
+modules/ruby_task_helper
 modules/service
 
 modules/augeas_core/
@@ -52,3 +56,5 @@ modules/sshkeys_core/
 modules/yumrepo_core/
 modules/zfs_core/
 modules/zone_core/
+
+.sass-cache/

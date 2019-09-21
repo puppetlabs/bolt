@@ -41,5 +41,22 @@ module Acceptance
     def git_sha
       ENV['GIT_SHA'] || ''
     end
+
+    def local_user
+      ENV['LOCAL_USER'] || 'local_user'
+    end
+
+    def profile_tracker
+      ENV['PROFILE_TRACKER'] || "C:/ProfileDir/profile_tracker.txt"
+    end
+
+    def local_user_homedir
+      case bolt['platform']
+      when /osx/
+        "/Users/#{local_user}"
+      else
+        "/home/#{local_user}"
+      end
+    end
   end
 end

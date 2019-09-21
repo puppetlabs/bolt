@@ -21,16 +21,17 @@ describe Bolt::Applicator do
   let(:pdb_client) { Bolt::PuppetDB::Client.new(config) }
   let(:modulepath) { [Bolt::PAL::BOLTLIB_PATH, Bolt::PAL::MODULES_PATH] }
   let(:applicator) { Bolt::Applicator.new(inventory, executor, modulepath, [], pdb_client, nil, 2) }
+  let(:ast) { { 'resources' => [] } }
 
   let(:input) {
     {
-      code_ast: :ast,
+      code_ast: ast,
       modulepath: modulepath,
       pdb_config: config.to_hash,
       hiera_config: nil,
       target: {
         name: uri,
-        facts: {},
+        facts: { 'bolt' => true },
         variables: {},
         trusted: {
           authenticated: 'local',
@@ -48,14 +49,21 @@ describe Bolt::Applicator do
           target_features: {}
         },
         config: {
-          transport: "ssh",
+          transport: 'ssh',
           transports: {
-            ssh: { 'connect-timeout' => 10, tty: false, "host-key-check" => true },
-            winrm: { 'connect-timeout' => 10, tty: false, ssl: true, "ssl-verify" => true },
-            pcp: { 'connect-timeout' => 10,
-                   tty: false,
-                   "task-environment" => "production" },
-            local: { 'connect-timeout' => 10, tty: false }
+            ssh: {
+              'connect-timeout' => 10,
+              'tty' => false,
+              'load-config' => true,
+              'disconnect-timeout' => 5
+            },
+            winrm: { 'connect-timeout' => 10, ssl: true, 'ssl-verify' => true, 'file-protocol' => 'winrm' },
+            pcp: {
+              'task-environment' => 'production'
+            },
+            local: {},
+            docker: {},
+            remote: { 'run-on': 'localhost' }
           }
         }
       }
@@ -70,7 +78,7 @@ describe Bolt::Applicator do
     expect(Open3).to receive(:capture3)
       .with('ruby', /bolt_catalog/, 'compile', stdin_data: input.to_json)
       .and_return(['{}', '', double(:status, success?: true)])
-    expect(applicator.compile(target, :ast, {})).to eq({})
+    expect(applicator.compile(target, ast, {})).to eq({})
   end
 
   it 'logs messages returned on stderr' do
@@ -82,7 +90,7 @@ describe Bolt::Applicator do
     expect(Open3).to receive(:capture3)
       .with('ruby', /bolt_catalog/, 'compile', stdin_data: input.to_json)
       .and_return(['{}', logs.map(&:to_json).join("\n"), double(:status, success?: true)])
-    expect(applicator.compile(target, :ast, {})).to eq({})
+    expect(applicator.compile(target, ast, {})).to eq({})
     expect(@log_output.readlines).to eq(
       [
         " DEBUG  Bolt::Executor : Started with 1 max thread(s)\n",
@@ -98,11 +106,12 @@ describe Bolt::Applicator do
       allow(Puppet).to receive(:lookup).with(:pal_script_compiler).and_return(double(:script_compiler, type: nil))
       allow(Puppet).to receive(:lookup).with(:current_environment).and_return(env)
       allow(Puppet::Pal).to receive(:assert_type)
-      allow(Puppet::Pops::Serialization::ToDataConverter).to receive(:convert).and_return(:ast)
+      allow(Puppet::Pops::Serialization::ToDataConverter).to receive(:convert).and_return(ast)
+      allow(applicator).to receive(:count_statements)
     end
 
     it 'replaces failures to find Puppet' do
-      expect(applicator).to receive(:compile).and_return(:ast)
+      expect(applicator).to receive(:compile).and_return(ast)
       result = Bolt::Result.new(target)
       allow_any_instance_of(Bolt::Transport::SSH).to receive(:batch_task).and_return(result)
 
@@ -123,7 +132,7 @@ describe Bolt::Applicator do
     end
 
     it 'fails if the report signals failure' do
-      expect(applicator).to receive(:compile).and_return(:ast)
+      expect(applicator).to receive(:compile).and_return(ast)
       allow_any_instance_of(Bolt::Transport::SSH).to receive(:batch_task).and_return(
         Bolt::Result.new(target, value:
           {
@@ -152,7 +161,7 @@ describe Bolt::Applicator do
         Bolt::Result.new(target, value: { 'status' => status, 'resource_statuses' => res })
       end
 
-      allow(applicator).to receive(:compile).and_return(:ast)
+      allow(applicator).to receive(:compile).and_return(ast)
       allow_any_instance_of(Bolt::Transport::SSH).to receive(:batch_task).and_return(*results)
 
       expect {
@@ -172,17 +181,17 @@ MSG
         count = running.increment
         if count <= 2
           # Only first two will block, simplifying cleanup at the end
-          delay = Concurrent::Promise.new { {} }
+          delay = Concurrent::Promise.new { ast }
           promises << delay
           delay.value
         else
-          {}
+          ast
         end
       end
 
       targets = [Bolt::Target.new('node1'), Bolt::Target.new('node2'), Bolt::Target.new('node3')]
       allow_any_instance_of(Bolt::Transport::SSH).to receive(:batch_task) do |_, batch|
-        Bolt::Result.new(batch.first)
+        Bolt::ApplyResult.new(batch.first)
       end
 
       t = Thread.new {

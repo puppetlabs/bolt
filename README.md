@@ -4,6 +4,13 @@
 [![Appveyor Status](https://ci.appveyor.com/api/projects/status/m7dhiwxk455mkw2d/branch/master?svg=true)](https://ci.appveyor.com/project/puppetlabs/bolt/branch/master)
 [![Gem Version](https://badge.fury.io/rb/bolt.svg)](https://badge.fury.io/rb/bolt)
 
+<div name="logo">
+  <img src="resources/bolt-logo-dark.png"
+  style="display: block; margin-left: auto; margin-right: auto;"
+  width="50%"
+  alt="bolt logo">
+</div>
+
 Bolt is a Ruby command-line tool for executing commands, scripts, and tasks on remote systems using SSH and WinRM.
 
 * Executes commands on remote *nix and Windows systems.
@@ -11,11 +18,11 @@ Bolt is a Ruby command-line tool for executing commands, scripts, and tasks on r
 * Scales to more than 1000 concurrent connections.
 * Supports industry standard protocols (SSH/SCP, WinRM/PSRP) and authentication methods (password, publickey).
 
-> For a step-by-step introduction to Bolt, see our [hands-on-lab](https://github.com/puppetlabs/tasks-hands-on-lab).
+> For a step-by-step introduction to Bolt, see our [hands-on-lab](https://puppetlabs.github.io/bolt/).
 
 Additionally the Bolt project includes:
 
-* [bolt-server](developer-documentation/bolt-server.md), an experimental HTTP API for executing tasks over SSH and WinRM.
+* [bolt-server](developer-docs/bolt-api-servers.md), an experimental HTTP API for executing tasks over SSH and WinRM.
 * bolt-inventory-pdb, a command-line tool for generating an inventory file from a template containing PuppetDB queries.
 
 > Installing bolt from a gem is not recommended since core modules will not be available. Please [install bolt](https://puppet.com/docs/bolt/latest/bolt_installing.md) as a package
@@ -42,6 +49,10 @@ Additionally the Bolt project includes:
     * [Writing Tasks](https://puppet.com/docs/bolt/latest/writing_tasks.html)
     * [Writing Plans](https://puppet.com/docs/bolt/latest/writing_plans.html)
 * [Applying Manifest Blocks in Plans](https://puppet.com/docs/bolt/latest/applying_manifest_blocks.html)
+
+## Getting Help
+
+* [#bolt on Slack](https://slack.puppet.com/) - Join the Bolt developers and community
 
 ## Kudos
 

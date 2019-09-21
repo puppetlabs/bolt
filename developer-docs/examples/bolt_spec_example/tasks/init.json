@@ -1,0 +1,13 @@
+{
+  "description": "Task to write content to a given filepath",
+  "parameters": {
+    "file": {
+      "description": "Path to file to write content to",
+      "type": "String[1]"
+    },
+    "content": {
+      "description": "Content to write to a file",
+      "type": "String[1]" 
+    }
+  }
+}

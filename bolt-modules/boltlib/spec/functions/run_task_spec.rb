@@ -28,11 +28,10 @@ describe 'run_task' do
   include PuppetlabsSpec::Fixtures
   let(:executor) { Bolt::Executor.new }
   let(:inventory) { mock('Bolt::Inventory') }
+  let(:tasks_enabled) { true }
 
   around(:each) do |example|
-    Puppet[:tasks] = true
-    Puppet.features.stubs(:bolt?).returns(true)
-
+    Puppet[:tasks] = tasks_enabled
     executor.stubs(:noop).returns(false)
 
     Puppet.override(bolt_executor: executor, bolt_inventory: inventory) do
@@ -125,6 +124,15 @@ describe 'run_task' do
 
       is_expected.to run.with_params('Test::Echo', hostname, default_args.merge('_bolt_api_call' => true))
                         .and_return(result_set)
+    end
+
+    context 'without tasks enabled' do
+      let(:tasks_enabled) { false }
+
+      it 'fails and reports that run_task is not available' do
+        is_expected.to run
+          .with_params('Test::Echo', hostname).and_raise_error(/Plan language function 'run_task' cannot be used/)
+      end
     end
 
     context 'with description' do
@@ -258,14 +266,14 @@ describe 'run_task' do
         executable = File.join(tasks_root, 'sensitive_meta.sh')
         input_params = {
           'sensitive_string' => sensitive_string,
-          'sensitive_array'  => sensitive_array,
-          'sensitive_hash'   => sensitive_hash
+          'sensitive_array' => sensitive_array,
+          'sensitive_hash' => sensitive_hash
         }
 
         expected_params = {
           'sensitive_string' => Sensitive.new(sensitive_string),
-          'sensitive_array'  => Sensitive.new(sensitive_array),
-          'sensitive_hash'   => Sensitive.new(sensitive_hash)
+          'sensitive_array' => Sensitive.new(sensitive_array),
+          'sensitive_hash' => Sensitive.new(sensitive_hash)
         }
 
         Sensitive.expects(:new).with(input_params['sensitive_string'])
@@ -321,10 +329,10 @@ describe 'run_task' do
 
     it "errors when the specified parameter values don't match the expected data types" do
       task_params.merge!(
-        'mandatory_string'  => 'str',
+        'mandatory_string' => 'str',
         'mandatory_integer' => 10,
         'mandatory_boolean' => 'str',
-        'optional_string'   => 10
+        'optional_string' => 10
       )
 
       is_expected.to run.with_params(task_name, hostname, task_params).and_raise_error(
@@ -338,10 +346,10 @@ describe 'run_task' do
 
     it 'errors when the specified parameter values are outside of the expected ranges' do
       task_params.merge!(
-        'mandatory_string'  => '0123456789a',
+        'mandatory_string' => '0123456789a',
         'mandatory_integer' => 10,
         'mandatory_boolean' => true,
-        'optional_integer'  => 10
+        'optional_integer' => 10
       )
 
       is_expected.to run.with_params(task_name, hostname, task_params).and_raise_error(
@@ -355,10 +363,10 @@ describe 'run_task' do
 
     it "errors when a specified parameter value is not Data" do
       task_params.merge!(
-        'mandatory_string'  => 'str',
+        'mandatory_string' => 'str',
         'mandatory_integer' => 10,
         'mandatory_boolean' => true,
-        'optional_hash'     => { now: Time.now }
+        'optional_hash' => { now: Time.now }
       )
 
       is_expected.to run.with_params(task_name, hostname, task_params).and_raise_error(

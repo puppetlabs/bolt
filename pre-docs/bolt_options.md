@@ -21,7 +21,7 @@ When targeting systems with the `--nodes` flag, you can specify the transport ei
 -   To generate a node list with brace expansion, specify the node list with an equals sign \(`=`\), such as `--nodes=web{1,2}`.
 
     ```
-     bolt command run --nodes={web{5,6,7},elasticsearch{1,2,3}.subdomain}.mydomain.edu  
+     bolt command run --nodes={web{5,6,7},elasticsearch{1,2,3}.subdomain}.mydomain.edu
     ```
 
     This command runs Bolt on the following hosts:
@@ -83,7 +83,7 @@ To specify nodes from an inventory file, reference nodes by node name, a glob ma
 -   To match all the nodes that start with elasticsearch in the inventory file example:
 
 ```
---nodes 'elasticsearch*' 
+--nodes 'elasticsearch*'
 ```
 
 
@@ -103,14 +103,22 @@ groups:
       - web7.mydomain.edu
 ```
 
-**Related information**  
+**Related information**
 
 
 [Inventory file](inventory_file.md)
 
-### Set a default transport
+
+## Set a default transport
 
 To set a default transport protocol, pass it with the command with the `--transport` option.
+
+Available transports are:
+- `ssh`
+- `winrm`
+- `local`
+- `docker`
+- `pcp`
 
 Pass the `--transport` option after the nodes list:
 
@@ -126,11 +134,11 @@ This is useful on Windows, so that you do not have to include the `winrm` transp
 bolt command run facter --nodes win1,ssh://linux --transport winrm
 ```
 
-If `localhost` is passed to `--nodes` when invoking Bolt on a non-Windows operating system the `local` transport is used automatically. To avoid this behavior prepend the target with the desired transport, for example `ssh://localhost`.
+If `localhost` is passed to `--nodes` when invoking Bolt the `local` transport is used automatically. To avoid this behavior prepend the target with the desired transport, for example `ssh://localhost`.
 
 ## Specify connection credentials
 
-To run Bolt on target nodes that require a username and password, pass credentials as options on the command line.
+To run Bolt on target nodes that require a username and password, pass credentials as options on the command line. For target nodes that use Kerberos authentication, pass a realm instead.
 
 Bolt connects to remote nodes with either SSH or WinRM.
 
@@ -144,3 +152,31 @@ bolt command run 'gpupdate /force' --nodes winrm://pluto --user Administrator --
 
 To have Bolt securely prompt for a password, use the `--password` or `-p` flag without supplying any value. Bolt will then prompt for the password, so that it does not appear in a process listing or on the console. 
 
+## Rerunning commands based on the last result
+
+After every execution, Bolt writes information about the result of that run
+to a `.rerun.json` file inside the Bolt project
+directory. That file can then be used to
+specify nodes for future commands.
+
+To attempt to retry a failed action on target nodes, use `--rerun failure`. To continue targeting those nodes,
+pass `--no-save-rerun` to prevent updating the file.
+
+```
+bolt command run false --nodes all
+bolt command run whoami --rerun failure --no-save-rerun
+```
+
+If one command is dependant on the success of a previous command, you can target
+the successful nodes with `--rerun success`.
+
+```
+bolt task run package action=install name=httpd --nodes all
+bolt task run server action=restart name=httpd --rerun success
+```
+
+**Note**: When a plan does not return a `ResultSet` object, Bolt can't save
+information for reruns and `.rerun.json` is deleted.
+
+**Related Information**
+[Bolt project directory](./bolt_project_directory.md)

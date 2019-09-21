@@ -51,7 +51,7 @@ plan test::winrm_retry_plan($nodes) {
     bolt_command = "bolt plan run test::winrm_retry_plan nodes=winrm_nodes"
     flags = {
       '--modulepath' => "#{dir}/modules",
-      '--format'     => 'json'
+      '--format' => 'json'
     }
 
     result = bolt_command_on(bolt, bolt_command, flags)
@@ -60,7 +60,7 @@ plan test::winrm_retry_plan($nodes) {
 
     begin
       json = JSON.parse(result.stdout)
-    rescue JSON.ParserError
+    rescue JSON::ParserError
       assert_equal("Output should be JSON", result.string,
                    "Output should be JSON")
     end
@@ -96,7 +96,7 @@ plan test::winrm_retry_plan($nodes) {
     bolt_command = "bolt plan run test::winrm_retry_plan nodes=winrm_nodes"
     flags = {
       '--modulepath' => "#{dir}/modules",
-      '--verbose'    => nil
+      '--verbose' => nil
     }
 
     result = bolt_command_on(bolt, bolt_command, flags)

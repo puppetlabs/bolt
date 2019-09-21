@@ -1,0 +1,63 @@
+{
+  "id": "partial:target-winrm",
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "title": "Target information about where to run a bolt action over WinRM",
+  "type": "object",
+  "properties": {
+    "hostname": {
+      "type": "string",
+      "description": "Target identifier"
+    },
+    "user": {
+      "type": "string",
+      "description": "Login user"
+    },
+    "password": {
+      "type": "string",
+      "description": "Password for WinRM transport authentication"
+    },
+    "port": {
+      "type": "integer",
+      "description": "Connection port"
+    },
+    "connect-timeout": {
+      "type": "integer",
+      "description": "How long Bolt should wait when establishing connections"
+    },
+    "tmpdir": {
+      "type": "string",
+      "description": "The directory to upload and execute temporary files on the target"
+    },
+    "ssl": {
+      "type": "boolean",
+      "description": "When true, Bolt will use https connections for WinRM"
+    },
+    "ssl-verify": {
+      "type": "boolean",
+      "description": "When true, verifies the targets certificate matches the cacert"
+    },
+    "cacert": {
+      "type": "string",
+      "description": "The path to the CA certificate"
+    },
+    "extensions": {
+      "type": "array",
+      "description": "List of file extensions that are accepted for scripts or tasks"
+    },
+    "interpreters": {
+      "type": "object",
+      "description": "Map of file extensions to remote executable"
+    },
+    "file-protocol": {
+      "type": "string",
+      "enum": ["winrm", "smb"],
+      "description": "Protocol for file transfer, WinRM or SMB"
+    },
+    "smb-port": {
+      "type": "integer",
+      "description": "Port for SMB protocol"
+    }
+  },
+  "required": ["hostname", "user", "password"],
+  "additionalProperties": false
+}

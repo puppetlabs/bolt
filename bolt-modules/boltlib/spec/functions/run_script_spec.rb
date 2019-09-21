@@ -167,20 +167,13 @@ describe 'run_script' do
     end
   end
 
-  context 'without bolt feature present' do
-    it 'fails and reports that bolt library is required' do
-      Puppet.features.stubs(:bolt?).returns(false)
-      is_expected.to run
-        .with_params('test/uploads/nonesuch.sh', []).and_raise_error(/The 'bolt' library is required to run a script/)
-    end
-  end
-
   context 'without tasks enabled' do
     let(:tasks_enabled) { false }
 
     it 'fails and reports that run_script is not available' do
       is_expected.to run
-        .with_params('test/uploads/nonesuch.sh', []).and_raise_error(/The task operation 'run_script' is not available/)
+        .with_params('test/uploads/nonesuch.sh', [])
+        .and_raise_error(/Plan language function 'run_script' cannot be used/)
     end
   end
 end

@@ -34,12 +34,12 @@ describe Bolt::Result do
 
   describe :for_command do
     it 'exposes value' do
-      result = Bolt::Result.for_command(target, "stout", "sterr", 0)
+      result = Bolt::Result.for_command(target, "stout", "sterr", 0, 'command', 'command')
       expect(result.value).to eq('stdout' => 'stout', 'stderr' => 'sterr', 'exit_code' => 0)
     end
 
     it 'creates errors' do
-      result = Bolt::Result.for_command(target, "stout", "sterr", 1)
+      result = Bolt::Result.for_command(target, "stout", "sterr", 1, 'command', 'command')
       expect(result.error_hash['kind']).to eq('puppetlabs.tasks/command-error')
     end
   end
@@ -47,27 +47,27 @@ describe Bolt::Result do
   describe :for_task do
     it 'parses json objects' do
       obj = { "key" => "val" }
-      result = Bolt::Result.for_task(target, obj.to_json, '', 0)
+      result = Bolt::Result.for_task(target, obj.to_json, '', 0, 'atask')
       expect(result.value).to eq(obj)
     end
 
     it 'doesnt include _ keys in generic_value' do
       obj = { "key" => "val" }
       special = { "_error" => {}, "_output" => "output" }
-      result = Bolt::Result.for_task(target, obj.merge(special).to_json, '', 0)
+      result = Bolt::Result.for_task(target, obj.merge(special).to_json, '', 0, 'atask')
       expect(result.generic_value).to eq(obj)
     end
 
     it "doesn't parse arrays" do
       stdout = '[1, 2, 3]'
-      result = Bolt::Result.for_task(target, stdout, '', 0)
+      result = Bolt::Result.for_task(target, stdout, '', 0, 'atask')
       expect(result.value).to eq('_output' => stdout)
     end
 
     it 'handles errors' do
       obj = { "key" => "val",
               "_error" => { "kind" => "error" } }
-      result = Bolt::Result.for_task(target, obj.to_json, '', 1)
+      result = Bolt::Result.for_task(target, obj.to_json, '', 1, 'atask')
       expect(result.value).to eq(obj)
       expect(result.error_hash).to eq(obj['_error'])
     end

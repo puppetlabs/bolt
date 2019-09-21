@@ -1,0 +1,13 @@
+parameters:
+  nodes:
+    type: TargetSpec
+
+steps:
+  - name: apply_resources
+    target: $nodes
+    resources:
+      - notify: "hello world"
+      - notify: "goodbye"
+
+return: $apply_resources
+

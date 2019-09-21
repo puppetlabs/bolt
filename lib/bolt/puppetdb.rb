@@ -10,4 +10,6 @@ module Bolt
       super(msg, "bolt/puppetdb-error")
     end
   end
+
+  class PuppetDBFailoverError < PuppetDBError; end
 end

@@ -19,9 +19,12 @@ Gem::Specification.new do |spec|
                        Dir['lib/**/*.rb'] +
                        Dir['lib/**/*.json'] +
                        Dir['libexec/*'] +
-                       Dir['bolt-modules/boltlib/lib/**/*.rb'] +
-                       Dir['bolt-modules/boltlib/types/**/*.pp'] +
+                       Dir['bolt-modules/*/lib/**/*.rb'] +
+                       Dir['bolt-modules/*/types/**/*.pp'] +
+                       Dir['modules/*/metadata.json'] +
+                       Dir['modules/*/files/**/*'] +
                        Dir['modules/*/lib/**/*.rb'] +
+                       Dir['modules/*/locales/**/*'] +
                        Dir['modules/*/plans/**/*.pp'] +
                        Dir['modules/*/tasks/**/*']
   spec.bindir        = "exe"
@@ -31,21 +34,26 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = "~> 2.3"
 
   spec.add_dependency "addressable", '~> 2.5'
+  spec.add_dependency "aws-sdk-ec2", '~> 1'
+  spec.add_dependency "CFPropertyList", "~> 2.2"
   spec.add_dependency "concurrent-ruby", "~> 1.0"
+  spec.add_dependency "hiera-eyaml", "~> 3"
   spec.add_dependency "logging", "~> 2.2"
   spec.add_dependency "minitar", "~> 0.6"
   spec.add_dependency "net-scp", "~> 1.2"
   spec.add_dependency "net-ssh", ">= 4.0"
-  spec.add_dependency "orchestrator_client", "~> 0.3.1"
-  spec.add_dependency "puppet", [">= 6.0.1", "< 7"]
-  spec.add_dependency "r10k", "~> 2.6"
+  spec.add_dependency "orchestrator_client", "~> 0.4"
+  spec.add_dependency "puppet", [">= 6.4.0", "< 7"]
+  spec.add_dependency "puppet-resource_api", ">= 1.8.1"
+  spec.add_dependency "r10k", "~> 3.1"
+  spec.add_dependency "ruby_smb", "~> 1.0"
   spec.add_dependency "terminal-table", "~> 1.8"
   spec.add_dependency "winrm", "~> 2.0"
   spec.add_dependency "winrm-fs", "~> 1.3"
 
   # there is a bug in puppetlabs_spec_helper for modules without fixtures
-  spec.add_development_dependency "bundler", "~> 1.14"
-  spec.add_development_dependency "puppetlabs_spec_helper", "~> 2.6"
-  spec.add_development_dependency "rake", "~> 10.0"
+  spec.add_development_dependency "bundler", ">= 1.14"
+  spec.add_development_dependency "puppetlabs_spec_helper", "~> 2.7"
+  spec.add_development_dependency "rake", "~> 12.0"
   spec.add_development_dependency "rspec", "~> 3.0"
 end

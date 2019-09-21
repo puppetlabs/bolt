@@ -1,0 +1,10 @@
+---
+groups:
+  - name: dashboard
+    nodes: [ node0 ]
+  - name: agents
+    nodes: [ node0, node1 ]
+config:
+  ssh:
+    host-key-check: false
+    run-as: root

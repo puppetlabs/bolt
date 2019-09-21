@@ -13,10 +13,10 @@ describe Bolt::PuppetDB::Config do
     let(:options) do
       {
         'server_urls' => ['https://puppetdb:8081'],
-        'cacert'      => cacert,
-        'token'       => token,
-        'cert'        => cert,
-        'key'         => key
+        'cacert' => cacert,
+        'token' => token,
+        'cert' => cert,
+        'key' => key
       }
     end
 
@@ -177,6 +177,14 @@ describe Bolt::PuppetDB::Config do
       allow(Bolt::Util).to receive(:windows?).and_return(true)
       expect(File).to receive(:exist?).with(Bolt::PuppetDB::Config::DEFAULT_CONFIG[:user])
       expect(File).to receive(:exist?).with(Bolt::PuppetDB::Config::DEFAULT_CONFIG[:win_global])
+      Bolt::PuppetDB::Config.load_config(nil, {})
+    end
+
+    it "Does not error if puppetdb.conf fails to load" do
+      allow(Bolt::Util).to receive(:windows?).and_return(false)
+      expect(File).to receive(:exist?).with(Bolt::PuppetDB::Config::DEFAULT_CONFIG[:user]).and_return true
+      expect(File).to receive(:read).with(Bolt::PuppetDB::Config::DEFAULT_CONFIG[:user]).and_return 'bad"json'
+      expect(JSON).to receive(:parse).and_raise(JSON::ParserError.new("unexpected token"))
       Bolt::PuppetDB::Config.load_config(nil, {})
     end
   end

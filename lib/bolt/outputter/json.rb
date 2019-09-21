@@ -3,11 +3,11 @@
 module Bolt
   class Outputter
     class JSON < Bolt::Outputter
-      def initialize(color, trace, stream = $stdout)
+      def initialize(color, verbose, trace, stream = $stdout)
+        super
         @items_open = false
         @object_open = false
         @preceding_item = false
-        super(color, trace, stream)
       end
 
       def print_head
@@ -17,10 +17,12 @@ module Bolt
         @object_open = true
       end
 
-      def print_event(event)
+      def handle_event(event)
         case event[:type]
         when :node_result
           print_result(event[:result])
+        when :message
+          print_message_event(event)
         end
       end
 
@@ -42,6 +44,7 @@ module Bolt
       def print_table(results)
         @stream.puts results.to_json
       end
+      alias print_module_list print_table
 
       def print_task_info(task)
         path = task['files'][0]['path'].chomp("/tasks/#{task['files'][0]['name']}")
@@ -51,6 +54,10 @@ module Bolt
                                path
                              end
         @stream.puts task.to_json
+      end
+
+      def print_tasks(tasks, modulepath)
+        print_table('tasks' => tasks, 'modulepath' => modulepath)
       end
 
       def print_plan_info(plan)
@@ -63,6 +70,14 @@ module Bolt
         @stream.puts plan.to_json
       end
 
+      def print_plans(plans, modulepath)
+        print_table('plans' => plans, 'modulepath' => modulepath)
+      end
+
+      def print_apply_result(apply_result, _elapsed_time)
+        @stream.puts apply_result.to_json
+      end
+
       def print_plan_result(result)
         # Ruby JSON patches most objects to have a to_json method.
         @stream.puts result.to_json
@@ -72,6 +87,13 @@ module Bolt
         @stream.puts({ "success": success,
                        "puppetfile": puppetfile,
                        "moduledir": moduledir }.to_json)
+      end
+
+      def print_targets(options)
+        targets = options[:targets].map(&:name)
+        count = targets.count
+        @stream.puts({ "targets": targets,
+                       "count": count }.to_json)
       end
 
       def fatal_error(err)
@@ -86,7 +108,13 @@ module Bolt
         @stream.puts '}' if @object_open
       end
 
-      def print_message(message); end
+      def print_message_event(event)
+        print_message(event[:message])
+      end
+
+      def print_message(message)
+        $stderr.puts(message)
+      end
     end
   end
 end

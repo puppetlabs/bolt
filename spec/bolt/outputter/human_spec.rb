@@ -7,7 +7,7 @@ require 'bolt/plan_result'
 
 describe "Bolt::Outputter::Human" do
   let(:output) { StringIO.new }
-  let(:outputter) { Bolt::Outputter::Human.new(false, false, output) }
+  let(:outputter) { Bolt::Outputter::Human.new(false, false, false, output) }
   let(:target) { Bolt::Target.new('node1') }
   let(:target2) { Bolt::Target.new('node2') }
   let(:results) {
@@ -27,7 +27,7 @@ describe "Bolt::Outputter::Human" do
   it "allows empty items" do
     outputter.print_head
     outputter.print_summary(Bolt::ResultSet.new([]), 2.0)
-    expect(output.string).to eq("Ran on 0 nodes in 2.00 seconds\n")
+    expect(output.string).to eq("Ran on 0 nodes in 2.0 sec\n")
   end
 
   it "prints status" do
@@ -44,7 +44,7 @@ describe "Bolt::Outputter::Human" do
     summary = lines.split("\n")[-3..-1]
     expect(summary[0]).to eq('Successful on 1 node: node1')
     expect(summary[1]).to eq('Failed on 1 node: node2')
-    expect(summary[2]).to eq('Ran on 2 nodes in 10.00 seconds')
+    expect(summary[2]).to eq('Ran on 2 nodes in 10.0 sec')
   end
 
   context 'with multiple successes' do
@@ -61,7 +61,7 @@ describe "Bolt::Outputter::Human" do
       outputter.print_summary(results, 0.0)
       summary = output.string.split("\n")
       expect(summary[0]).to eq('Successful on 2 nodes: node1,node2')
-      expect(summary[1]).to eq('Ran on 2 nodes in 0.00 seconds')
+      expect(summary[1]).to eq('Ran on 2 nodes in 0.0 sec')
     end
   end
 
@@ -79,7 +79,7 @@ describe "Bolt::Outputter::Human" do
       outputter.print_summary(results, 0.0)
       summary = output.string.split("\n")
       expect(summary[0]).to eq('Failed on 2 nodes: node1,node2')
-      expect(summary[1]).to eq('Ran on 2 nodes in 0.00 seconds')
+      expect(summary[1]).to eq('Ran on 2 nodes in 0.0 sec')
     end
   end
 
@@ -185,6 +185,17 @@ built-in module
     TASK_OUTPUT
   end
 
+  it 'prints correct file separator for modulepath' do
+    task = {
+      'name' => 'monkey_bread',
+      'files' => [{ 'name' => 'monkey_bread.rb',
+                    'path' => "#{Bolt::PAL::MODULES_PATH}/monkey/bread" }],
+      'metadata' => {}
+    }
+    outputter.print_tasks([task], %w[path1 path2])
+    expect(output.string).to include("path1#{File::PATH_SEPARATOR}path2")
+  end
+
   it "formats a plan" do
     plan = {
       'name' => 'planity_plan',
@@ -217,7 +228,7 @@ plans/plans/plans/plans
   end
 
   it "prints CommandResults" do
-    outputter.print_result(Bolt::Result.for_command(target, "stout", "sterr", 2))
+    outputter.print_result(Bolt::Result.for_command(target, "stout", "sterr", 2, 'command', "executed"))
     lines = output.string
     expect(lines).to match(/STDOUT:\n    stout/)
     expect(lines).to match(/STDERR:\n    sterr/)
@@ -227,7 +238,7 @@ plans/plans/plans/plans
     result = { 'key' => 'val',
                '_error' => { 'msg' => 'oops' },
                '_output' => 'hello' }
-    outputter.print_result(Bolt::Result.for_task(target, result.to_json, "", 2))
+    outputter.print_result(Bolt::Result.for_task(target, result.to_json, "", 2, 'atask'))
     lines = output.string
     expect(lines).to match(/^  oops\n  hello$/)
     expect(lines).to match(/^    "key": "val"$/)
@@ -284,5 +295,53 @@ plans/plans/plans/plans
   it "handles fatal errors" do
     outputter.fatal_error(Bolt::CLIError.new("oops"))
     expect(output.string).to eq("oops\n")
+  end
+
+  it "handles message events" do
+    outputter.print_message_event(message: "hello world")
+    expect(output.string).to eq("hello world\n")
+  end
+
+  it "handles nested default_output commands" do
+    outputter.instance_variable_set(:@plan_depth, 1)
+    outputter.handle_event(type: :disable_default_output)
+    outputter.handle_event(type: :disable_default_output)
+    outputter.handle_event(type: :enable_default_output)
+    outputter.handle_event(type: :step_start, description: "step", targets: [target])
+    expect(output.string).to eq("")
+  end
+
+  it "prints messages when default_output is disabled" do
+    outputter.instance_variable_set(:@plan_depth, 1)
+    outputter.handle_event(type: :disable_default_output)
+    outputter.handle_event(type: :message, message: "hello!")
+    expect(output.string).to eq("hello!\n")
+  end
+
+  context '#duration_to_string' do
+    it 'includes only seconds when the duration is less than a minute' do
+      str = outputter.duration_to_string(34)
+      expect(str).to eq("34 sec")
+    end
+
+    it 'includes up to two decimal places if the duration is less than a minute' do
+      str = outputter.duration_to_string(34.5678)
+      expect(str).to eq("34.57 sec")
+    end
+
+    it 'includes minutes when the duration is more than a minute' do
+      str = outputter.duration_to_string(99)
+      expect(str).to eq("1 min, 39 sec")
+    end
+
+    it 'rounds to the nearest whole second if the duration is more than a minute' do
+      str = outputter.duration_to_string(99.99)
+      expect(str).to eq("1 min, 40 sec")
+    end
+
+    it 'includes hours when the duration is more than an hour' do
+      str = outputter.duration_to_string(3750)
+      expect(str).to eq("1 hr, 2 min, 30 sec")
+    end
   end
 end

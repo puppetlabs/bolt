@@ -23,6 +23,10 @@ module Bolt
           cli << "--#{setting}" << dir
         end
         Puppet.settings.send(:clear_everything_for_tests)
+        # Override module locations, Bolt includes vendored modules in its internal modulepath.
+        Puppet.settings.override_default(:basemodulepath, '')
+        Puppet.settings.override_default(:vendormoduledir, '')
+
         Puppet.initialize_settings(cli)
         Puppet.settings[:hiera_config] = hiera_config
 
@@ -33,11 +37,11 @@ module Bolt
       end
     end
 
-    def generate_ast(code)
+    def generate_ast(code, filename = nil)
       with_puppet_settings do
         Puppet::Pal.in_tmp_environment("bolt_parse") do |pal|
           pal.with_catalog_compiler do |compiler|
-            ast = compiler.parse_string(code)
+            ast = compiler.parse_string(code, filename)
             Puppet::Pops::Serialization::ToDataConverter.convert(ast,
                                                                  rich_data: true,
                                                                  symbol_to_string: true)
@@ -61,7 +65,6 @@ module Bolt
       target = request['target']
       pdb_client = Bolt::PuppetDB::Client.new(Bolt::PuppetDB::Config.new(request['pdb_config']))
       options = request['puppet_config'] || {}
-
       with_puppet_settings(request['hiera_config']) do
         Puppet[:rich_data] = true
         Puppet[:node_name_value] = target['name']

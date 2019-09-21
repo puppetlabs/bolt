@@ -5,26 +5,51 @@ services:
 - docker
 rvm:
 - 2.5
-- 2.4
-- 2.3
+env:
+  global:
+    - REGISTRY_HOST=pcr-internal.puppet.net
+    - DOCKER_REGISTRY=pe-and-platform
+    - BOLT_SUDO_USER=true
+    - secure: Gk8LaACXYEVpv5LIWEMOuH3sJP4CzB2aSvE1BUcfDWkI+Hdgr2by3w/nGbKpyVD+v2H8r0zXyVrbCJ/qzx2gCRxqKJ2GKJEsrStT+8z3BXRRRzwkThIBVyWKk9b9bTt8AE0G94I3BE4gJyIPfbX5XxnKcg7nJZGOmubZpUPQX+2SXSfy9EbtY9iismwK7LGtWv6l90cK2eSLZGvdsSKPo7cylOldXfdYIyeBtvsIL1juBaiINX52Zgt371+nX53fDSYOKdIDLuhNqX3zpNOuIJ9DUj4E7IJA7+XhHy77zL98VjHtPo5H4fmKyZ2k+xbYqOydc5OPGguKequsnyDo5npktDrkbswnjWMXNDu+wImAd+IwHG2lTamsAnOGQ+E6g2oK0R5fUL26XJ3lBnTRrsLDnlrvqYqFxt3MCR+o5+DnTirSVQJfrRVsIKTucWHlYLTOUWkVDrLavJqIbWHytEbMf/BXUcovlQzSgfu5/Y1GkUJBnthtbiZfTImmBLcrqKDD4PnDmvC1v9Z5KR78MYu7lFTe5C4STj2aR6bwvqjiPKm6kYG5etOFEyRJ+CbqD2QsdF2N6Ww/RFWovqVqQIWuGdhumDUTdmQAiiPxl12M0+kIH6NugpBD3gt4RT0sni/T+booDw6b3Ts4WJ8FW1/LPWdy7gVo9yOCL4FhjOw=
+    # specify explicitly, even though docker-compose.yml has same defaults
+    - KRB5_REALM=BOLT.TEST
+    - KRB5_KDC=samba-ad.bolt.test
+    - SMB_ADMIN_PASSWORD=B0ltrules!
+    - KRB5_CONFIG=/tmp/krb5.conf
+addons:
+  # Ensure Travis resolves itself as the Samba KDC hosted in Docker
+  hosts:
+    - samba-ad.bolt.test
+    - omiserver.bolt.test
+before_install:
+# Kerberos client for use with the Samba KDC in Docker
+- sudo apt-get install -yq krb5-user
+# Build / start Samba before other containers, since its fast
+- docker-compose -f spec/docker-compose.yml up -d --build samba-ad
+
 before_script:
+- $TRAVIS_BUILD_DIR/spec/fixtures/samba-ad/kerberos-client-config.sh
+- docker-compose -f spec/docker-compose.yml up -d --build
 - eval `ssh-agent`
 - cat Gemfile.lock
 - bundle exec r10k puppetfile install
-- pushd spec
-- docker-compose up -d --build
-- popd
-
+  # Add users to test sudo on localhost
+- echo 'travis:travis' | sudo chpasswd
+  # Undo travis sudoers config
+- sudo sh -c "echo 'Defaults authenticate' >> /etc/sudoers"
+- sudo sh -c "echo 'travis  ALL=(ALL) PASSWD:ALL' >> /etc/sudoers"
 script:
 - bundle exec rake travisci
 - bundle exec rubocop
 - |
   status=0
-  pushd bolt-modules/boltlib
-  if ! bundle exec rake spec; then
-    status=1
-  fi
-  popd
+  for i in 'boltlib' 'ctrl' 'file' 'out' 'system'; do
+    pushd bolt-modules/$i
+    if ! bundle exec rake spec; then
+      status=1
+    fi
+    popd
+  done
   if [ $status -eq 1 ]; then
     false
   fi
@@ -41,12 +66,25 @@ script:
   if [ $status -eq 1 ]; then
     false
   fi
+- |
+  if ! bundle exec rake docs; then
+    false
+  elif ! git diff --exit-code; then
+    false
+  fi
+- bundle exec rake puppetserver
+after_script:
+- |
+  sync
+  export line_sep=$(printf '%*s' 80 | tr ' ' '#')
+  docker ps --all -q | xargs -L 1 -I % sh -c 'echo "\n${line_sep}\nContainer Logs - $(docker inspect % --format={{.Name}})\n${line_sep}\n"; docker logs %'
+  sleep 3s
+deploy:
+  provider: script
+  on:
+    repo: puppetlabs/bolt
+    # deploy the master branch or tag pushes
+    condition: $TRAVIS_BRANCH == "master" || -n $TRAVIS_TAG
+  script: bash scripts/deploy.sh
 notifications:
   email: false
-  hipchat:
-    rooms:
-      secure: j1c64TomsD45XGBnv+0AaLPBFacg3hWAs7p2Qo+AYRrXXT2lLyqYlOCUo4oek9r7+SQ4nHbGjxC59o6g3YTF5obsQosLpb9EdgmVaS14khnBlb2Mvo2fKoRZ3YiKQQ6L+TFE9NiQ3XC4ccvfXrwSjXZsByVJiPaDieXQr83qE6xdsNGN9jSW2fJ+Qt90TXd3TBabu2pTxiAZVVmZYa409jmTsDRpeZXic7Om4jj4MYaFkHWl1sakktIijgN5vvscqxe9cn0JgtcX5ZQo7UoZ1tH+8dko5IB1s04CF1K2AJytb8Jt/tIx1z8khwaGiPNGHJby9lndKGrU1lm1jA9IkqaY8L2iHNN4mivpf5PpvV82QfJcc+JQgVA6xCMYOO/RimeyNGeHcMzd7dQuOneSzMkeLarLZ1k6ayYDxuDwzgjl4P/sM7V0rCsyDfNL/fTNdt9Ix7GBWHyL7aQLeSxksD7RA3et6q8OcwklMVVVt4+xyYR2Ui8hyRc7KTHEH5Ff/NpgpAQmwl47BKMz9nwf6wey8HqWXuoyA+xkwq3fXM6Ifh+RFw12MwoylcKo3TB8hH66hpn19XltHkvfvDNxo+Xc4aScZqZhPPN0dJ6h6P65jUbPM+PdfrZ3V/Nuz59LQ93CmlcQOwcP0a7KUGRq38iqWHDgoauQvp44iGwAHOc=
-    template:
-    - '<a href="https://github.com/%{repository_slug}">%{repository_name}</a>#<a href="%{build_url}">%{build_number}</a>
-      (<a href="%{compare_url}">%{branch} - %{commit} : %{author}</a>): %{message}'
-    format: html

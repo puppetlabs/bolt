@@ -13,6 +13,9 @@ describe 'set_features function' do
   before(:all) { Bolt::PAL.load_puppet }
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
 
+  let(:analytics) { Bolt::Analytics::NoopClient.new }
+  let(:executor) { Bolt::Executor.new(1, analytics) }
+
   let(:data) {
     {
       'nodes' => %w[example],
@@ -24,7 +27,7 @@ describe 'set_features function' do
   let(:target) { inventory.get_targets('example')[0] }
 
   it 'adds the feature to the target' do
-    peval(<<-CODE, pal, nil, inventory)
+    peval(<<-CODE, pal, executor, inventory)
     $t = get_targets('example')[0]
     $t.set_feature('shell')
     CODE
@@ -32,7 +35,7 @@ describe 'set_features function' do
   end
 
   it 'only adds the feature once' do
-    peval(<<-CODE, pal, nil, inventory)
+    peval(<<-CODE, pal, executor, inventory)
     $t = get_targets('example')[0]
     $t.set_feature('shell').set_feature('shell')
     CODE
@@ -40,14 +43,14 @@ describe 'set_features function' do
   end
 
   it 'deletes the feature if false is passed' do
-    peval(<<-CODE, pal, nil, inventory)
+    peval(<<-CODE, pal, executor, inventory)
     $t = get_targets('example')[0]
     $t.set_feature('shell')
     CODE
 
     expect(inventory.features(target).to_a).to eq(['shell'])
 
-    peval(<<-CODE, pal, nil, inventory)
+    peval(<<-CODE, pal, executor, inventory)
     $t = get_targets('example')[0]
     $t.set_feature('shell', false)
     CODE
@@ -56,7 +59,7 @@ describe 'set_features function' do
   end
 
   it "does nothing if false is passed for a feature that isn't present" do
-    peval(<<-CODE, pal, nil, inventory)
+    peval(<<-CODE, pal, executor, inventory)
     $t = get_targets('example')[0]
     $t.set_feature('shell', false)
     CODE
@@ -65,7 +68,7 @@ describe 'set_features function' do
   end
 
   it 'sets separate features for different nodes' do
-    peval(<<-CODE, pal, nil, inventory)
+    peval(<<-CODE, pal, executor, inventory)
     $targets = get_targets('example1,example2')
     $targets[0].set_feature('shell')
     $targets[1].set_feature('powershell')

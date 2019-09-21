@@ -6,6 +6,8 @@ require 'bolt/error'
 #
 # Plan authors should call this function when their plan is not successful. The
 # error may then be caught by another plans run_plan function or in bolt itself
+#
+# **NOTE:** Not available in apply block
 Puppet::Functions.create_function(:fail_plan) do
   # Fail a plan, generating an exception from the parameters.
   # @param msg An error message.
@@ -32,8 +34,13 @@ Puppet::Functions.create_function(:fail_plan) do
   end
 
   def from_args(msg, kind = nil, details = nil, issue_code = nil)
-    executor = Puppet.lookup(:bolt_executor) { nil }
-    executor&.report_function_call('fail_plan')
+    unless Puppet[:tasks]
+      raise Puppet::ParseErrorWithIssue
+        .from_issue_and_stack(Bolt::PAL::Issues::PLAN_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, action: 'fail_plan')
+    end
+
+    executor = Puppet.lookup(:bolt_executor)
+    executor.report_function_call(self.class.name)
 
     raise Bolt::PlanFailure.new(msg, kind || 'bolt/plan-failure', details, issue_code)
   end

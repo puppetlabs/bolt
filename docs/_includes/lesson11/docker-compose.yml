@@ -1,0 +1,15 @@
+version: '3'
+services:
+  lb:
+    image: rastasheep/ubuntu-sshd:16.04
+    ports:
+      - "20022:22"
+      - "20080:80"
+  server_1:
+    image: rastasheep/ubuntu-sshd:16.04
+    ports:
+      - "20023:22"
+  server_2:
+    image: rastasheep/ubuntu-sshd:16.04
+    ports:
+      - "20024:22"

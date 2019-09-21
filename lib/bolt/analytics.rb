@@ -2,9 +2,7 @@
 
 require 'bolt/util'
 require 'bolt/version'
-require 'httpclient'
 require 'json'
-require 'locale'
 require 'logging'
 require 'securerandom'
 
@@ -19,13 +17,19 @@ module Bolt
       inventory_nodes: :cd2,
       inventory_groups: :cd3,
       target_nodes: :cd4,
-      output_format: :cd5
+      output_format: :cd5,
+      statement_count: :cd6,
+      resource_mean: :cd7,
+      plan_steps: :cd8,
+      return_type: :cd9,
+      inventory_version: :cd10,
+      boltdir_type: :cd11
     }.freeze
 
     def self.build_client
       logger = Logging.logger[self]
       config_file = File.expand_path('~/.puppetlabs/bolt/analytics.yaml')
-      config = load_config(config_file)
+      config = load_config(config_file, logger)
 
       if config['disabled'] || ENV['BOLT_DISABLE_ANALYTICS']
         logger.debug "Analytics opt-out is set, analytics will be disabled"
@@ -43,10 +47,22 @@ module Bolt
       NoopClient.new
     end
 
-    def self.load_config(filename)
+    def self.load_config(filename, logger)
       if File.exist?(filename)
         YAML.load_file(filename)
       else
+        unless ENV['BOLT_DISABLE_ANALYTICS']
+          logger.warn <<~ANALYTICS
+            Bolt collects data about how you use it. You can opt out of providing this data.
+
+            To disable analytics data collection, add this line to ~/.puppetlabs/bolt/analytics.yaml :
+              disabled: true
+
+            Read more about what data Bolt collects and why here:
+              https://puppet.com/docs/bolt/latest/bolt_installing.html#concept-8242
+            ANALYTICS
+        end
+
         {}
       end
     end
@@ -58,13 +74,21 @@ module Bolt
 
     class Client
       attr_reader :user_id
+      attr_accessor :bundled_content
 
       def initialize(user_id)
+        # lazy-load expensive gem code
+        require 'concurrent/configuration'
+        require 'concurrent/future'
+        require 'httpclient'
+        require 'locale'
+
         @logger = Logging.logger[self]
         @http = HTTPClient.new
         @user_id = user_id
         @executor = Concurrent.global_io_executor
         @os = compute_os
+        @bundled_content = {}
       end
 
       def screen_view(screen, **kwargs)
@@ -82,7 +106,17 @@ module Bolt
         submit(base_params.merge(screen_view_params))
       end
 
-      def event(category, action, label = nil, value = nil)
+      def report_bundled_content(mode, name)
+        if bundled_content[mode.split.first]&.include?(name)
+          event('Bundled Content', mode, label: name)
+        end
+      end
+
+      def event(category, action, label: nil, value: nil, **kwargs)
+        custom_dimensions = Bolt::Util.walk_keys(kwargs) do |k|
+          CUSTOM_DIMENSIONS[k] || raise("Unknown analytics key '#{k}'")
+        end
+
         event_params = {
           # Type
           t: 'event',
@@ -90,7 +124,7 @@ module Bolt
           ec: category,
           # Event Action
           ea: action
-        }
+        }.merge(custom_dimensions)
 
         # Event Label
         event_params[:el] = label if label
@@ -152,15 +186,20 @@ module Bolt
     end
 
     class NoopClient
+      attr_accessor :bundled_content
+
       def initialize
         @logger = Logging.logger[self]
+        @bundled_content = []
       end
 
       def screen_view(screen, **_kwargs)
         @logger.debug "Skipping submission of '#{screen}' screenview because analytics is disabled"
       end
 
-      def event(category, action, _label = nil, _value = nil)
+      def report_bundled_content(mode, name); end
+
+      def event(category, action, **_kwargs)
         @logger.debug "Skipping submission of '#{category} #{action}' event because analytics is disabled"
       end
 

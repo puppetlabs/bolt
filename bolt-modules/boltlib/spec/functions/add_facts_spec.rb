@@ -9,11 +9,10 @@ describe 'add_facts' do
   let(:executor) { Bolt::Executor.new }
   let(:inventory) { mock('inventory') }
   let(:target) { Bolt::Target.new('example') }
+  let(:tasks_enabled) { true }
 
   around(:each) do |example|
-    Puppet[:tasks] = true
-    Puppet.features.stubs(:bolt?).returns(true)
-
+    Puppet[:tasks] = tasks_enabled
     Puppet.override(bolt_executor: executor, bolt_inventory: inventory) do
       example.run
     end
@@ -36,5 +35,13 @@ describe 'add_facts' do
     inventory.expects(:add_facts).returns({})
 
     is_expected.to run.with_params(target, {})
+  end
+
+  context 'without tasks enabled' do
+    let(:tasks_enabled) { false }
+    it 'fails and reports that add_facts is not available' do
+      is_expected.to run.with_params(target, {})
+                        .and_raise_error(/Plan language function 'add_facts' cannot be used/)
+    end
   end
 end

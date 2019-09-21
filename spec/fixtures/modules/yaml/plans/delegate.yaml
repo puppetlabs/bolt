@@ -1,0 +1,11 @@
+parameters:
+  nodes:
+    type: TargetSpec
+
+steps:
+  - name: run_plan
+    plan: yaml::task
+    parameters:
+      nodes: $nodes
+
+return: $run_plan

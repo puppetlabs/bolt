@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "check_node_connections request",
+  "description": "POST <transport>/check_node_connections request schema",
+  "type": "object",
+  "properties": {
+    "targets": {
+      "type": "array",
+      "items": { "$ref": "partial:target-any" }
+    }
+  },
+  "required": ["targets"],
+  "additionalProperties": false
+}

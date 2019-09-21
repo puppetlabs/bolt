@@ -1,0 +1,17 @@
+parameters:
+  nodes:
+    type: TargetSpec
+
+steps:
+  - name: apply_resources
+    target: $nodes
+    resources:
+      - notify: "hello world"
+      - file: "/tmp/foo/bar/baz"
+        parameters:
+          ensure: present
+      - notify: "goodbye"
+
+return: $apply_resources
+
+

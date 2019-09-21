@@ -1,0 +1,11 @@
+---
+layout: default
+---
+{% if page.difficulty or page.time %}
+<blockquote>
+  <p><strong>Difficulty</strong>: {{ page.difficulty }}</p>
+  <p><strong>Time</strong>: {{ page.time }}</p>
+</blockquote>
+{% endif %}
+
+{{ content }}

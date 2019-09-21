@@ -45,43 +45,43 @@ describe Bolt::Target do
     it "rejects unescaped special characters" do
       expect {
         Bolt::Target.new("#{user}:a/b@neptune")
-      }.to raise_error(Addressable::URI::InvalidURIError,
+      }.to raise_error(Bolt::ParseError,
                        /Invalid port number/)
     end
 
     it "accepts escaped special characters in password" do
       table = {
         "\n" => '%0A',
-        ' '  => '%20',
-        '!'  => '!',
-        '"'  => '%22',
-        '#'  => '%23',
-        '$'  => '$',
-        '%'  => '%25',
-        '&'  => '&',
+        ' ' => '%20',
+        '!' => '!',
+        '"' => '%22',
+        '#' => '%23',
+        '$' => '$',
+        '%' => '%25',
+        '&' => '&',
         '\'' => '\'',
-        '('  => '(',
-        ')'  => ')',
-        '*'  => '*',
-        '+'  => '+',
-        '-'  => '-',
-        '.'  => '.',
-        '/'  => '%2F',
-        '0'  => '0',
-        ':'  => '%3A',
-        ';'  => ';',
-        '<'  => '%3C',
-        '='  => '=',
-        '>'  => '%3E',
-        '?'  => '%3F',
-        '@'  => '@',
-        'A'  => 'A',
-        '['  => '%5B',
+        '(' => '(',
+        ')' => ')',
+        '*' => '*',
+        '+' => '+',
+        '-' => '-',
+        '.' => '.',
+        '/' => '%2F',
+        '0' => '0',
+        ':' => '%3A',
+        ';' => ';',
+        '<' => '%3C',
+        '=' => '=',
+        '>' => '%3E',
+        '?' => '%3F',
+        '@' => '@',
+        'A' => 'A',
+        '[' => '%5B',
         '\\' => '%5C',
-        ']'  => '%5D',
-        '^'  => '%5E',
-        '_'  => '%5F',
-        '`'  => '%60'
+        ']' => '%5D',
+        '^' => '%5E',
+        '_' => '%5F',
+        '`' => '%60'
       }
       unencoded = +''
       encoded = +''
@@ -100,6 +100,16 @@ describe Bolt::Target do
     uri = Bolt::Target.new('pluto')
     expect(uri.host).to eq('pluto')
     expect(uri.port).to be_nil
+  end
+
+  it "does not print password when converted to string" do
+    opts = { 'user' => 'person',
+             'password' => 'secret',
+             'host' => 'machine',
+             'protocol' => 'ssh' }
+    target = Bolt::Target.new('example.com', opts)
+    expect(target.to_s).to eq("Target('example.com', "\
+                              "#{opts.reject { |k, _| k == 'password' }})")
   end
 
   describe "with winrm" do
@@ -168,5 +178,16 @@ describe Bolt::Target do
     uri1 = Bolt::Target.new('http://pluto:666')
     uri2 = Bolt::Target.new(uri1.uri)
     expect(uri1).to eq(uri2)
+  end
+
+  it 'can have an empty uri' do
+    t1 = Bolt::Target.new(nil, 'name' => 'name1')
+    expect(t1.host).to be(nil)
+    expect(t1.name).to be('name1')
+    expect(t1.uri).to be(nil)
+    expect(t1.password).to be(nil)
+    expect(t1.user).to be(nil)
+    expect(t1.protocol).to be(nil)
+    expect(t1.port).to be(nil)
   end
 end

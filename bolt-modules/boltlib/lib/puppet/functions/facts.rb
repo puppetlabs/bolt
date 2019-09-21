@@ -14,16 +14,10 @@ Puppet::Functions.create_function(:facts) do
   end
 
   def facts(target)
-    inventory = Puppet.lookup(:bolt_inventory) { nil }
-
-    unless inventory
-      raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
-        Puppet::Pops::Issues::TASK_MISSING_BOLT, action: _('get facts for a target')
-      )
-    end
-
+    inventory = Puppet.lookup(:bolt_inventory)
+    # Bolt executor not expected when invoked from apply block
     executor = Puppet.lookup(:bolt_executor) { nil }
-    executor&.report_function_call('facts')
+    executor&.report_function_call(self.class.name)
 
     inventory.facts(target)
   end

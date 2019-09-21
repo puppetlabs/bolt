@@ -4,6 +4,7 @@ require 'spec_helper'
 require 'bolt_spec/conn'
 require 'bolt_spec/files'
 require 'bolt_spec/integration'
+require 'bolt_spec/puppetdb'
 require 'bolt/catalog'
 require 'bolt/task'
 
@@ -11,6 +12,7 @@ describe "passes parsed AST to the apply_catalog task" do
   include BoltSpec::Conn
   include BoltSpec::Files
   include BoltSpec::Integration
+  include BoltSpec::PuppetDB
 
   let(:modulepath) { File.join(__dir__, '../fixtures/apply') }
   let(:config_flags) { %W[--format json --nodes #{uri} --password #{password} --modulepath #{modulepath}] + tflags }
@@ -140,40 +142,35 @@ describe "passes parsed AST to the apply_catalog task" do
       expect(error['kind']).to eq('bolt/apply-error')
       expect(error['msg']).to match(/Apply failed to compile for #{uri}/)
       expect(@log_output.readlines)
-        .to include(/The task operation 'run_task' is not available when compiling a catalog/)
+        .to include(/Plan language function 'run_task' cannot be used from declarative manifest code/)
     end
 
-    context 'with puppetdb stubbed' do
-      let(:config) {
+    context 'with puppetdb misconfigured' do
+      let(:pdb_conf) {
         {
-          'puppetdb' => {
-            'server_urls' => 'https://localhost:99999',
-            'cacert' => File.join(Gem::Specification.find_by_name('bolt').gem_dir, 'resources', 'ca.pem')
-
-          }
+          'server_urls' => 'https://puppetdb.example.com',
+          'cacert' => '/path/to/cacert'
         }
       }
 
+      let(:config) { {} }
+
       it 'calls puppetdb_query' do
-        with_tempfile_containing('conf', YAML.dump(config)) do |conf|
-          result = run_cli_json(%W[plan run basic::pdb_query --configfile #{conf.path}] + config_flags)
-          expect(result['kind']).to eq('bolt/apply-failure')
-          error = result['details']['result_set'][0]['result']['_error']
-          expect(error['kind']).to eq('bolt/apply-error')
-          expect(error['msg']).to match(/Apply failed to compile for #{uri}/)
-          expect(@log_output.readlines).to include(/Failed to query PuppetDB: /)
-        end
+        result = run_cli_json(%w[plan run basic::pdb_query] + config_flags)
+        expect(result['kind']).to eq('bolt/apply-failure')
+        error = result['details']['result_set'][0]['result']['_error']
+        expect(error['kind']).to eq('bolt/apply-error')
+        expect(error['msg']).to match(/Apply failed to compile for #{uri}/)
+        expect(@log_output.readlines).to include(/Failed to connect to all PuppetDB server_urls/)
       end
 
       it 'calls puppetdb_fact' do
-        with_tempfile_containing('conf', YAML.dump(config)) do |conf|
-          result = run_cli_json(%W[plan run basic::pdb_fact --configfile #{conf.path}] + config_flags)
-          expect(result['kind']).to eq('bolt/apply-failure')
-          error = result['details']['result_set'][0]['result']['_error']
-          expect(error['kind']).to eq('bolt/apply-error')
-          expect(error['msg']).to match(/Apply failed to compile for #{uri}/)
-          expect(@log_output.readlines).to include(/Failed to query PuppetDB: /)
-        end
+        result = run_cli_json(%w[plan run basic::pdb_fact] + config_flags)
+        expect(result['kind']).to eq('bolt/apply-failure')
+        error = result['details']['result_set'][0]['result']['_error']
+        expect(error['kind']).to eq('bolt/apply-error')
+        expect(error['msg']).to match(/Apply failed to compile for #{uri}/)
+        expect(@log_output.readlines).to include(/Failed to connect to all PuppetDB server_urls/)
       end
     end
 
@@ -193,6 +190,21 @@ describe "passes parsed AST to the apply_catalog task" do
           'hiera-config' => File.join(__dir__, '../fixtures/apply/hiera_invalid.yaml').to_s
         }
       }
+      let(:eyaml_config) {
+        {
+          "version" => 5,
+          "defaults" => { "data_hash" => "yaml_data", "datadir" => File.join(__dir__, '../fixtures/apply/data').to_s },
+          "hierarchy" => [{
+            "name" => "Encrypted Data",
+            "lookup_key" => "eyaml_lookup_key",
+            "paths" => ["secure.eyaml"],
+            "options" => {
+              "pkcs7_private_key" => File.join(__dir__, '../fixtures/keys/private_key.pkcs7.pem').to_s,
+              "pkcs7_public_key" => File.join(__dir__, '../fixtures/keys/public_key.pkcs7.pem').to_s
+            }
+          }]
+        }
+      }
 
       it 'default datadir is accessible' do
         with_tempfile_containing('conf', YAML.dump(default_datadir)) do |conf|
@@ -207,6 +219,17 @@ describe "passes parsed AST to the apply_catalog task" do
           result = run_cli_json(%W[plan run basic::hiera_lookup --configfile #{conf.path}] + config_flags)
           notify = get_notifies(result)
           expect(notify[0]['title']).to eq("hello custom datadir")
+        end
+      end
+
+      it 'hiera eyaml can be decoded' do
+        with_tempfile_containing('yaml', YAML.dump(eyaml_config)) do |yaml_data|
+          config = { 'hiera-config' => yaml_data.path.to_s }
+          with_tempfile_containing('conf', YAML.dump(config)) do |conf|
+            result = run_cli_json(%W[plan run basic::hiera_lookup --configfile #{conf.path}] + config_flags)
+            notify = get_notifies(result)
+            expect(notify[0]['title']).to eq("hello encrypted value")
+          end
         end
       end
 
@@ -234,7 +257,9 @@ describe "passes parsed AST to the apply_catalog task" do
           expect(notify[0]['title']).to eq("Num Targets: 3")
           expect(notify[1]['title']).to eq("Target 1 Facts: {operatingsystem => Ubuntu, added => fact}")
           expect(notify[2]['title']).to eq("Target 1 Vars: {environment => production, features => [puppet-agent]}")
-          res = "Target 0 Config: Target('foo', {\"connect-timeout\"=>11, \"tty\"=>false, \"host-key-check\"=>false})"
+          res = "Target 0 Config: {connect-timeout => 11, " \
+                "tty => false, load-config => true, disconnect-timeout => 5, password => bolt, " \
+                "host-key-check => false}"
           expect(notify[3]['title']).to eq(res)
           expect(notify[4]['title']).to eq("Target 1 Password: secret")
         end
@@ -253,6 +278,23 @@ describe "passes parsed AST to the apply_catalog task" do
           result = run_cli_json(%W[plan run basic::xfail_set_feature --configfile #{conf.path}] + config_flags)
           expect(result['kind']).to eq('bolt/apply-failure')
           expect(result['msg']).to match(/Apply failed to compile for/)
+        end
+      end
+    end
+
+    context 'with version 2 inventoryfile stubbed' do
+      let(:inventory) {
+        {
+          'inventoryfile' => File.join(__dir__, '../fixtures/apply/inventory_2.yaml').to_s
+        }
+      }
+
+      it 'targets in inventory can be queried' do
+        with_tempfile_containing('conf', YAML.dump(inventory)) do |conf|
+          result = run_cli_json(%W[plan run basic::inventory_2_lookup --configfile #{conf.path}] + config_flags)
+          notify = get_notifies(result)
+          expect(notify[0]['title']).to eq("Num Targets: 0")
+          expect(notify[1]['title']).to eq("Target Name: foo")
         end
       end
     end

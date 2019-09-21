@@ -1,0 +1,11 @@
+version: 5
+defaults:
+  datadir: data
+  data_hash: yaml_data
+
+hierarchy:
+  - name: "Node Data"
+    path: "nodes/%{trusted.certname}.yaml"
+  - name: "Common Data"
+    path: "common.yaml"
+

@@ -5,7 +5,7 @@ require 'bolt/error'
 
 module Bolt
   class Result
-    attr_reader :target, :value
+    attr_reader :target, :value, :action, :object
 
     def self.from_exception(target, exception)
       @exception = exception
@@ -23,7 +23,7 @@ module Bolt
       Result.new(target, error: error)
     end
 
-    def self.for_command(target, stdout, stderr, exit_code)
+    def self.for_command(target, stdout, stderr, exit_code, action, command)
       value = {
         'stdout' => stdout,
         'stderr' => stderr,
@@ -37,10 +37,10 @@ module Bolt
           'details' => { 'exit_code' => exit_code }
         }
       end
-      new(target, value: value)
+      new(target, value: value, action: action, object: command)
     end
 
-    def self.for_task(target, stdout, stderr, exit_code)
+    def self.for_task(target, stdout, stderr, exit_code, task)
       begin
         value = JSON.parse(stdout)
         unless value.is_a? Hash
@@ -61,11 +61,11 @@ module Bolt
                             'msg' => msg,
                             'details' => { 'exit_code' => exit_code } }
       end
-      new(target, value: value)
+      new(target, value: value, action: 'task', object: task)
     end
 
     def self.for_upload(target, source, destination)
-      new(target, message: "Uploaded '#{source}' to '#{target.host}:#{destination}'")
+      new(target, message: "Uploaded '#{source}' to '#{target.host}:#{destination}'", action: 'upload', object: source)
     end
 
     # Satisfies the Puppet datatypes API
@@ -73,9 +73,11 @@ module Bolt
       new(target, value: value)
     end
 
-    def initialize(target, error: nil, message: nil, value: nil)
+    def initialize(target, error: nil, message: nil, value: nil, action: nil, object: nil)
       @target = target
       @value = value || {}
+      @action = action
+      @object = object
       @value_set = !value.nil?
       if error && !error.is_a?(Hash)
         raise "TODO: how did we get a string error"
@@ -89,13 +91,15 @@ module Bolt
     end
 
     def status_hash
+      # DEPRECATION: node in status hashes is deprecated and should be removed in 2.0
       { node: @target.name,
+        target: @target.name,
+        action: action,
+        object: object,
         status: ok? ? 'success' : 'failure',
         result: @value }
     end
 
-    # TODO: what to call this it's the value minus special keys
-    # This should be {} if a value was set otherwise it's nil
     def generic_value
       if @value_set
         value.reject { |k, _| %w[_error _output].include? k }
@@ -124,15 +128,15 @@ module Bolt
       to_json
     end
 
-    # TODO: remove in favor of ok?
-    def success?
-      ok?
+    def to_data
+      Bolt::Util.walk_keys(status_hash, &:to_s)
     end
 
     def ok?
       error_hash.nil?
     end
     alias ok ok?
+    alias success? ok?
 
     # This allows access to errors outside puppet compilation
     # it should be prefered over error in bolt code

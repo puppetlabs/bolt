@@ -1,0 +1,14 @@
+# https://linux.die.net/man/5/sssd-ad
+[sssd]
+services = nss, pam
+config_file_version = 2
+domains = ${KRB5_REALM}
+
+[nss]
+debug_level = 6
+
+[domain/${KRB5_REALM}]
+id_provider = ad
+access_provider = ad
+fallback_homedir = /home/%u@%d
+debug_level = 6

@@ -44,7 +44,16 @@ module Bolt
 
       # Returns options this transport supports
       def self.options
-        raise NotImplementedError, "self.options() must be implemented by the transport class"
+        raise NotImplementedError,
+              "self.options() or self.filter_options(unfiltered) must be implemented by the transport class"
+      end
+
+      def self.default_options
+        {}
+      end
+
+      def self.filter_options(unfiltered)
+        unfiltered.select { |k| options.include?(k) }
       end
 
       def self.validate(_options)
@@ -60,20 +69,30 @@ module Bolt
 
         result = begin
                    yield
-                 rescue StandardError, NotImplementedError => ex
-                   Bolt::Result.from_exception(target, ex)
+                 rescue StandardError, NotImplementedError => e
+                   Bolt::Result.from_exception(target, e)
                  end
 
         callback&.call(type: :node_result, result: result)
         result
       end
 
-      def filter_options(target, options)
-        if target.options['run-as']
-          options.reject { |k, _v| k == '_run_as' }
-        else
-          options
-        end
+      def provided_features
+        []
+      end
+
+      def default_input_method(_executable)
+        'both'
+      end
+
+      def select_implementation(target, task)
+        impl = task.select_implementation(target, provided_features)
+        impl['input_method'] ||= default_input_method(impl['path'])
+        impl
+      end
+
+      def select_interpreter(executable, interpreters)
+        interpreters[Pathname(executable).extname] if interpreters
       end
 
       # Transform a parameter map to an environment variable map, with parameter names prefixed
@@ -107,7 +126,7 @@ module Bolt
         target = targets.first
         with_events(target, callback) do
           @logger.debug { "Running task run '#{task}' on #{target.uri}" }
-          run_task(target, task, arguments, filter_options(target, options))
+          run_task(target, task, arguments, options)
         end
       end
 
@@ -121,7 +140,7 @@ module Bolt
         target = targets.first
         with_events(target, callback) do
           @logger.debug("Running command '#{command}' on #{target.uri}")
-          run_command(target, command, filter_options(target, options))
+          run_command(target, command, options)
         end
       end
 
@@ -135,7 +154,7 @@ module Bolt
         target = targets.first
         with_events(target, callback) do
           @logger.debug { "Running script '#{script}' on #{target.uri}" }
-          run_script(target, script, arguments, filter_options(target, options))
+          run_script(target, script, arguments, options)
         end
       end
 
@@ -149,8 +168,13 @@ module Bolt
         target = targets.first
         with_events(target, callback) do
           @logger.debug { "Uploading: '#{source}' to #{destination} on #{target.uri}" }
-          upload(target, source, destination, filter_options(target, options))
+          upload(target, source, destination, options)
         end
+      end
+
+      def batch_connected?(targets)
+        assert_batch_size_one("connected?()", targets)
+        connected?(targets.first)
       end
 
       # Split the given list of targets into a list of batches. The default
@@ -160,10 +184,6 @@ module Bolt
       # methods, to implement their own batch processing.
       def batches(targets)
         targets.map { |target| [target] }
-      end
-
-      def from_api?(task)
-        !task.file.nil?
       end
 
       # Transports should override this method with their own implementation of running a command.
@@ -184,6 +204,11 @@ module Bolt
       # Transports should override this method with their own implementation of file upload.
       def upload(*_args)
         raise NotImplementedError, "upload() must be implemented by the transport class"
+      end
+
+      # Transports should override this method with their own implementation of a connection test.
+      def connected?(_targets)
+        raise NotImplementedError, "connected?() must be implemented by the transport class"
       end
 
       # Unwraps any Sensitive data in an arguments Hash, so the plain-text is passed

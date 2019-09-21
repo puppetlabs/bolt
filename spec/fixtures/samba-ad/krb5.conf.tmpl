@@ -1,0 +1,18 @@
+[libdefaults]
+dns_lookup_kdc = true
+dns_lookup_realm = false
+ticket_lifetime = 24h
+renew_lifetime = 7d
+forwardable = true
+rdns = false
+default_realm = ${KRB5_REALM}
+
+[realms]
+${KRB5_REALM} = {
+    kdc = ${KRB5_KDC}
+    admin_server = ${KRB5_ADMINSERVER}
+}
+
+[domain_realm]
+${KRB5_REALM_LOWER} = ${KRB5_REALM}
+.${KRB5_REALM_LOWER} = ${KRB5_REALM}

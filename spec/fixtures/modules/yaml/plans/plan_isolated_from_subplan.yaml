@@ -1,0 +1,4 @@
+steps:
+  - plan: yaml::define_foo
+
+return: $foo

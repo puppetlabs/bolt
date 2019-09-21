@@ -1,0 +1,14 @@
+---
+groups:
+  - name: lb
+    nodes:
+      - 0.0.0.0:20022
+  - name: servers
+    nodes:
+      - 127.0.0.1:20023
+      - localhost:20024
+config:
+  ssh:
+    host-key-check: false
+    password: root
+    user: root

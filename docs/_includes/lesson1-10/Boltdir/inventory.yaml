@@ -1,0 +1,18 @@
+---
+# Inventory file for Bolt Hands-on Lab
+groups:
+  - name: linux
+    nodes:
+    - node1
+    - node2
+    - node3
+  - name: windows
+    nodes:
+    - winrm://localhost:55985
+config:
+  ssh:
+    host-key-check: false
+  winrm:
+    user: vagrant
+    password: vagrant
+    ssl: false

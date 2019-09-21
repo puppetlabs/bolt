@@ -1,0 +1,84 @@
+{
+  "id": "partial:target-ssh",
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "title": "Target information about where to run a bolt action over SSH",
+  "type": "object",
+  "properties": {
+    "hostname": {
+      "type": "string",
+      "description": "Target identifier"
+    },
+    "user": {
+      "type": "string",
+      "description": "Login user"
+    },
+    "password": {
+      "type": "string",
+      "description": "Password for SSH transport authentication"
+    },
+    "private-key-content": {
+      "type": "string",
+      "description": "Contents of private key for SSH"
+    },
+    "port": {
+      "type": "integer",
+      "description": "Connection port"
+    },
+    "connect-timeout": {
+      "type": "integer",
+      "description": "How long Bolt should wait when establishing connections"
+    },
+    "disconnect-timeout": {
+      "type": "integer",
+      "description": "How long Bolt should wait before forcing a disconnect"
+    },
+    "run-as-command": {
+      "type": "array",
+      "description": "Command elevate permissions",
+      "items": {
+        "type": "string"
+      }
+    },
+    "run-as": {
+      "type": "string",
+      "description": "A different user to run commands as after login"
+    },
+    "tmpdir": {
+      "type": "string",
+      "description": "The directory to upload and execute temporary files on the target"
+    },
+    "tty": {
+      "type": "boolean",
+      "description": "Should bolt use pseudo tty to meet sudoer restrictions"
+    },
+    "host-key-check": {
+      "type": "boolean",
+      "description": "Whether to perform host key validation when connecting over SSH"
+    },
+    "sudo-password": {
+      "type": "string",
+      "description": "Password to use when changing users via run-as"
+    },
+    "interpreters": {
+      "type": "object",
+      "description": "Map of file extensions to remote executable"
+    }
+  },
+  "oneOf": [
+    {
+      "required": [
+        "password"
+      ]
+    },
+    {
+      "required": [
+        "private-key-content"
+      ]
+    }
+  ],
+  "required": [
+    "hostname",
+    "user"
+  ],
+  "additionalProperties": false
+}

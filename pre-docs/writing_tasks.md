@@ -48,7 +48,7 @@ Use secure coding practices when you write tasks and help protect your system.
 
 **Note:** The information in this topic covers basic coding practices for writing secure tasks. It is not an exhaustive list.
 
-One of the methods attackers use to gain access to your systems is remote code execution, where by running an allowed script they gain access to other parts of the system and can make arbitrary changes. Because Puppet Bolt executes scripts across your infrastructure, it is important to be aware of certain vulnerabilities, and to code tasks in a way that guards against remote code execution.
+One of the methods attackers use to gain access to your systems is remote code execution, where by running an allowed script they gain access to other parts of the system and can make arbitrary changes. Because Bolt executes scripts across your infrastructure, it is important to be aware of certain vulnerabilities, and to code tasks in a way that guards against remote code execution.
 
 Adding task metadata that validates input is one way to reduce vulnerability. When you require an enumerated \(`enum`\) or other non-string types, you prevent improper data from being entered. An arbitrary string parameter does not have this assurance.
 
@@ -80,7 +80,7 @@ Pattern[/\A[^\/\\]*\z/] $path
 
 In addition to these task restrictions, different scripting languages each have their own ways to validate user input.
 
-###  PowerShell 
+###  PowerShell
 
 In PowerShell, code injection exploits calls that specifically evaluate code. Do not call `Invoke-Expression` or `Add-Type` with user input. These commands evaluate strings as C\# code.
 
@@ -129,7 +129,7 @@ Resolve file paths with `os.realpath` and confirm them to be within another path
 
 For more information on the vulnerabilities of Python or how to escape variables, see Kevin London's blog post on [Dangerous Python Functions](https://www.kevinlondon.com/2015/07/26/dangerous-python-functions.html).
 
-###  Ruby 
+###  Ruby
 
 In Ruby, command injection is introduced through commands like `eval`, `exec`, `system`, backtick \(\`\`\) or `%x()` execution, or the Open3 module. You can safely call these functions with user input by passing the input as additional arguments instead of a single string.
 
@@ -174,45 +174,59 @@ Each task or plan name segment must begin with a lowercase letter and:
 
 -   May include underscores.
 
--   Namespace segments must match the following regular expression `\A[a-z][a-z0-9_]*\Z` 
+-   Namespace segments must match the following regular expression `\A[a-z][a-z0-9_]*\Z`
 
 -   The file extension must not use the reserved extensions .md or .json.
 
-### Tasks with a single implementation
+### Single-platform tasks
 
 A task can consist of a single executable with or without a corresponding metadata file. For instance, `./mysql/tasks/sql.rb` and `./mysql/tasks/sql.json`. In this case, no other `./mysql/tasks/sql.*` files can exist.
 
-### Tasks with multiple implementations
+### Cross-platform tasks
 
 A task can also have multiple implementations, with metadata that explains when to use each one. A primary use case for this is to support different implementations for different target platforms, referred to as `cross-platform tasks`. For instance, consider a module with the following files:
 
 ```
 - tasks
-  - sql.sh
-  - sql.ps1
+  - sql_linux.sh
+  - sql_linux.json
+  - sql_windows.ps1
+  - sql_windows.json
   - sql.json
 ```
 
-This task has two executables \(sql.sh and sql.ps1\) with a metadata file. The metadata file contains an implementations section:
+This task has two executables \(`sql_linux.sh` and `sql_windows.ps1`\), each with an implementation metadata file and a task metadata file. The executables have distinct names and are compatible with older task runners such as Puppet Enterprise 2018.1 and earlier. Each implementation has it's own metadata which documents how to use the implementation directly or marks it as private to hide it from UI lists.
+
+An implementation metadata example:
+
+```
+{
+  "name": "SQL Linux",
+  "description": "A task to perform sql operations on linux targets",
+  "private": true
+}
+```
+
+The task metadata file contains an implementations section:
 
 ```
 {
   "implementations": [
-    {"name": "sql.sh", "requirements": ["shell"]},
-    {"name": "sql.ps1", "requirements": ["powershell"]}
+    {"name": "sql_linux.sh", "requirements": ["shell"]},
+    {"name": "sql_windows.ps1", "requirements": ["powershell"]}
   ]
 }
 ```
 
-Each implementations has a `name` and a list of `requirements`. The requirements are the set of *features* which must be available on the target in order for that implementation to be used. In this case, the `sql.sh` implementation requires the `shell` feature, and the `sql.ps1` implementations requires the powershell feature.
+Each implementations has a `name` and a list of `requirements`. The requirements are the set of *features* which must be available on the target in order for that implementation to be used. In this case, the `sql_linux.sh` implementation requires the `shell` feature, and the `sql_windows.ps1` implementations requires the PowerShell feature.
 
 The set of features available on the target is determined by the task runner. You can specify additional features for a target via `set_feature` or by adding `features` in the inventory. The task runner will choose the *first *implementation whose requirements are satisfied.
 
 The following features are defined by default:
 
--    `puppet-agent`: present if the target has the puppet agent package installed
--    `shell`: present if the target has a posix shell
--    `powershell`: present if the target has powershell
+-   `puppet-agent`: present if the target has the puppet agent package installed. This is automatically added to hosts with name `localhost`.
+-   `shell`: present if the target has a posix shell
+-   `powershell`: present if the target has powershell
 
 ## Sharing executables
 
@@ -278,105 +292,67 @@ myservice/tasks/stop.json
 
 Multiple tasks can share common files between them. Tasks can additionally pull library code from other modules.
 
-To create a task that includes additional files pulled from modules, include the `files` property in your metadata as an array of paths. A path consists of
-- the module name
-- one of `lib`, `files`, or `tasks` for the directory within the module
-- the remaining path to a file or directory; directories must include a trailing slash `/`
+To create a task that includes additional files pulled from modules, include the files property in your metadata as an array of paths. A path consists of:
 
-All path separators must be forward slashes. An example would be `stdlib/lib/puppet/`.
+-   the module name
+-   one of the following directories within the module:
+    - `files` -- Most helper files. This prevents the file from being treated as a task or added to the Puppet Ruby loadpath.
+    - `tasks` -- Helper files that can be called as tasks on their own.
+    - `lib` -- Ruby code that might be reused by types, providers, or Puppet functions.
+-   the remaining path to a file or directory; directories must include a trailing slash `/`
 
-The `files` property can be included both as a top-level metadata property, and as a property of an implementation, for example
+All path separators must be forward slashes. An example would be `stdlib/lib/puppet/`.
+
+The `files` property can be included both as a top-level metadata property, and as a property of an implementation, for example:
+
 ```
 {
   "implementations": [
-    {"name": "sql.sh", "requirements": ["shell"], "files": ["mymodule/files/lib.sh"]},
-    {"name": "sql.ps1", "requirements": ["powershell"], "files": ["mymodule/files/lib.ps1"]}
+    {"name": "sql_linux.sh", "requirements": ["shell"], "files": ["mymodule/files/lib.sh"]},
+    {"name": "sql_windows.ps1", "requirements": ["powershell"], "files": ["mymodule/files/lib.ps1"]}
   ],
   "files": ["emoji/files/emojis/"]
 }
 ```
 
-When a task includes the `files` property, all files listed in the top-level property and in the specific implementation chosen for a target will be copied to a temporary directory on that target. The directory structure of the specified files will be preserved such that paths specified with the `files` metadata option will be available to tasks prefixed with `_installdir`.
+When a task includes the `files` property, all files listed in the top-level property and in the specific implementation chosen for a target will be copied to a temporary directory on that target. The directory structure of the specified files will be preserved such that paths specified with the `files` metadata option will be available to tasks prefixed with `_installdir`. The task executable itself will be located in its module location under the `_installdir` as well, so other files can be found at `../../mymodule/files/` relative to the task executable's location.
 
-### Python Example
 
-#### Metadata
+For example, you can create a task and metadata in a new module at `~/.puppetlabs/bolt/site-modules/mymodule/tasks/task.{json,rb}`.
 
-```json
+ **Metadata**
+
+```
 {
-  "files": ["multi_task/files/py_util/py_helper.py"]
+  "files": ["multi_task/files/rb_helper.rb"]
 }
 ```
 
-#### Files
+ **File Resource**
 
-`multi_task/files/py_util/py_helper.py`
-
-```python
-def useful_python():
-  return dict(helper="python")
-```
-
-#### Task
-
-```python
-#!/usr/bin/env python
-import sys
-import os
-import json
-
-params = json.load(sys.stdin)
-sys.path.append(os.path.join(params['_installdir'], 'python_helpers', 'files'))
-import py_helper
-
-print(json.dumps(py_helper.useful_python()))
-```
-
-#### Output
+`multi_task/files/rb_helper.rb`
 
 ```
-Started on localhost...
-Finished on localhost:
-  {
-    "helper": "python"
-  }
-Successful on 1 node: localhost
-Ran on 1 node in 0.12 seconds
-```
-
-### Ruby Example
-
-#### Metadata
-
-```json
-{
-  "files": ["multi_task/files/rb_util/rb_helper.rb"]
-}
-```
-
-#### File Resource
-
-`multi_task/files/rb_util/rb_helper.rb`
-
-```ruby
 def useful_ruby
   { helper: "ruby" }
 end
 ```
 
-#### Task
+ **Task**
 
-```ruby
+```
 #!/usr/bin/env ruby
 require 'json'
 
 params = JSON.parse(STDIN.read)
-require_relative File.join(params['_installdir'], '/ruby_helpers/files/rb_helper.rb')
+require_relative File.join(params['_installdir'], 'multi_task', 'files', 'rb_helper.rb')
+# Alternatively use relative path
+# require_relative File.join(__dir__, '..', '..', 'multi_task', 'files', 'rb_helper.rb')
 
 puts useful_ruby.to_json
 ```
 
-#### Output
+ **Output**
 
 ```
 Started on localhost...
@@ -388,6 +364,154 @@ Successful on 1 node: localhost
 Ran on 1 node in 0.12 seconds
 ```
 
+
+
+### Task Helpers
+
+To simplify writing tasks, Bolt includes [python\_task\_helper](https://github.com/puppetlabs/puppetlabs-python_task_helper) and [ruby\_task\_helper](https://github.com/puppetlabs/puppetlabs-ruby_task_helper). It also makes a useful demonstration of including code from another module.
+
+#### Python Example
+
+Create task and metadata in a module at `~/.puppetlabs/bolt/site-modules/mymodule/tasks/task.{json,py}`.
+
+ **Metadata**
+
+```
+{
+  "files": ["python_task_helper/files/task_helper.py"],
+  "input_method": "stdin"
+}
+```
+
+ **Task**
+
+```
+#!/usr/bin/env python
+
+import os, sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'python_task_helper', 'files'))
+from task_helper import TaskHelper
+
+class MyTask(TaskHelper):
+    def task(self, args):
+        return {'greeting': 'Hi, my name is '+args['name']}
+
+if __name__ == '__main__':
+    MyTask().run()
+```
+
+ **Output**
+
+```
+$ bolt task run mymodule::task -n localhost name='Julia'
+Started on localhost...
+Finished on localhost:
+  {
+    "greeting": "Hi, my name is Julia"
+  }
+Successful on 1 node: localhost
+Ran on 1 node in 0.12 seconds
+```
+
+#### Ruby Example
+
+Create task and metadata in a new module at `~/.puppetlabs/bolt/site-modules/mymodule/tasks/mytask.{json,rb}`.
+
+ **Metadata**
+
+```
+{
+  "files": ["ruby_task_helper/files/task_helper.rb"],
+  "input_method": "stdin"
+}
+```
+
+ **Task**
+
+```
+#!/usr/bin/env ruby
+require_relative '../../ruby_task_helper/files/task_helper.rb'
+
+class MyTask < TaskHelper
+  def task(name: nil, **kwargs)
+    { greeting: "Hi, my name is #{name}" }
+  end
+end
+
+MyTask.run if __FILE__ == $0
+```
+
+ **Output**
+
+```
+$ bolt task run mymodule::mytask -n localhost name="Robert'); DROP TABLE Students;--"
+Started on localhost...
+Finished on localhost:
+  {
+    "greeting": "Hi, my name is Robert'); DROP TABLE Students;--"
+  }
+Successful on 1 node: localhost
+Ran on 1 node in 0.12 seconds
+```
+
+## Writing remote tasks
+
+Some targets are hard or impossible to execute tasks on directly. In these cases, you can write a task that runs on a proxy target and remotely interacts with the real target.
+
+For example, a network device might have a limited shell environment or a cloud service might be driven only by HTTP APIs. By writing a remote task, Bolt allows you to specify connection information for remote targets in their inventory file and injects them into the `_target` metaparam.
+
+This example shows how to write a task that posts messages to Slack and reads connection information from `inventory.yaml`:
+
+```ruby
+#!/usr/bin/env ruby
+# modules/slack/tasks/message.rb
+
+require 'json'
+require 'net/http'
+
+params = JSON.parse(STDIN.read)
+# the slack API token is passed in from inventory
+token = params['_target']['token']
+
+uri = URI('https://slack.com/api/chat.postMessage')
+http = Net::HTTP.new(uri.host, uri.port)
+http.use_ssl = true
+
+req = Net::HTTP::Post.new(uri, 'Content-type' => 'application/json')
+req['Authorization'] = "Bearer #{params['_target']['token']}"
+req.body = { channel: params['channel'], text: params['message'] }.to_json
+
+resp = http.request(req)
+
+puts resp.body
+```
+
+To prevent accidentally running a normal task on a remote target and breaking its configuration, Bolt won't run a task on a remote target unless its metadata defines it as remote:
+
+```json
+{
+  "remote": true
+}
+```
+
+Add Slack as a remote target in your inventory file:
+
+```yaml
+---
+nodes:
+  - name: my_slack
+    config:
+      transport: remote
+      remote:
+        token: <slack API token goes here>
+```
+
+Finally, make `my_slack` a target that can run the `slack::message`:
+
+```bash
+bolt task run slack::message --nodes my_slack message="hello" channel=<slack channel id>
+```
+
 ## Defining parameters in tasks
 
 Allow your task to accept parameters as either environment variables or as a JSON hash on standard input.
@@ -396,7 +520,7 @@ Tasks can receive input as either environment variables, a JSON hash on standard
 
 If your task should receive parameters only in a certain way, such as `stdin` only, you can set the input method in your task metadata. For Windows tasks, it's usually better to use tasks written in PowerShell. See the related topic about task metadata for information about setting the input method.
 
-Environment variables are the easiest way to implement parameters, and they work well for simple JSON types such as strings and numbers. For arrays and hashes, use structured input instead. See the related topic about structured input and output for more information.
+Environment variables are the easiest way to implement parameters, and they work well for simple JSON types such as strings and numbers. Note that when a parameter with an undefined value ('nil', 'undef', etc) is passed as an environment variable it will have the 'String' value 'null' (see [example](writing_plans.md#related-information)). For arrays and hashes, use structured input instead. See the related topic about structured input and output for more information.
 
 To add parameters to your task as environment variables, pass the argument prefixed with the Puppet task prefix `PT_` .
 
@@ -407,7 +531,7 @@ For example, to add a `message` parameter to your task, read it from the environ
 echo your message is $PT_message
 ```
 
-### Defining parameters in Windows 
+### Defining parameters in Windows
 
 For Windows tasks, you can pass parameters as environment variables, but it's easier to write your task in PowerShell and use named arguments. By default tasks with a `.ps1` extension use PowerShell standard argument handling.
 
@@ -436,7 +560,7 @@ if ($Name -eq $null -or $Name -eq "") {
   if ($result.Count -eq 1) {
     ConvertTo-Json -InputObject $result[0] -Compress
   } elseif ($result.Count -gt 1) {
-    ConvertTo-Json -InputObject @{"_items" = $result} -Compress
+    ConvertTo-Json -InputObject @{"items" = $result} -Compress
   }
 }
 ```
@@ -583,6 +707,51 @@ else
   filename=~/myfile
 fi
 ```
+
+If you intend to use this task with PE and assign RBAC permissions for it make
+sure the script safely handles parameters or validate them to prevent shell
+injection vulnerabilities.
+
+### Wrapping an existing script
+
+If the script is not already installed on targets and you do not want to edit
+it, for example if it's a script someone else maintains, you can wrap the
+script in a small task without modifying it.
+
+Given a script, `myscript.sh`, that accepts 2 positional args, `filename` and `version`:
+
+1. Copy the script to the module's `files/` directory.
+
+2. Create a metadata file for the task that includes the parameters and file dependency.
+
+   ```
+   {
+     "input_method": "environment",
+     "parameters": {
+       "filename": { "type": "String[1]" },
+       "version": { "type": "String[1]" }
+     },
+     "files": [ "script_example/files/myscript.sh" ]
+   }
+   ```
+
+3. Create a small wrapper task that reads environment variables and calls the task.
+
+   ```
+   #!/usr/bin/env bash
+   set -e
+
+   script_file="$PT__installdir/script_example/files/myscript.sh"
+   # If this task is going to be run from windows nodes the wrapper must make sure it's exectutable
+   chmod +x $script_file
+   commandline=("$script_file" "$PT_filename" "$PT_version")
+   # If the stderr output of the script is important redirect it to stdout.
+   "${commandline[@]}" 2>&1
+   ```
+
+If you intend to use this task with PE and assign RBAC permissions for it make
+sure the script safely handles parameters or validate them to prevent shell
+injection vulnerabilities.
 
 ## Supporting no-op in tasks
 
@@ -743,15 +912,26 @@ To define a parameter as sensitive within the JSON metadata, add the `"sensitive
 
 The following table shows task metadata keys, values, and default values.
 
-####  **Task metadata** 
+####  **Task metadata**
 
 |Metadata key|Description|Value|Default|
 |------------|-----------|-----|-------|
 |"description"|A description of what the task does.|String|None|
-|"input\_method"|What input method the task runner should use to pass parameters to the task.| `environment`, `stdin`, `powershell`| Both `environment` and `stdin` unless `.ps1` tasks in which case `powershell`. |
-|"parameters"|The parameters or input the task accepts listed with a puppet type string and optional description. See [adding parameters to metadata](writing_tasks.md#) for usage information.|String describing the parameter |None|
+|"input\_method"|What input method the task runner should use to pass parameters to the task.| -    `environment`
+
+-    `stdin`
+
+-    `powershell`
+
+
+ | Both `environment` and `stdin` unless `.ps1` tasks, in which case `powershell`
+
+ |
+|"parameters"|The parameters or input the task accepts listed with a puppet type string and optional description. See [adding parameters to metadata](writing_tasks.md#) for usage information.|Array of Objects describing each parameter|None|
 |"puppet\_task\_version"|The version of the spec used.|Integer|1 \(This is the only valid value.\)|
 |"supports\_noop"|Whether the task supports no-op mode. Required for the task to accept the `--noop` option on the command line.|Boolean|False|
+|"implementations"|A list of task implementations and the requirements used to select one to run. See [tasks with multiple implementations](writing_tasks.md#) for usage information.|Array of Objects describing each implementation|None|
+|"files"|A list of files to be provided when running the task, addressed by module. See [sharing task code](writing_tasks.md#) for usage information.|Array of Strings|None|
 |"private"|Do not display task by default when listing for UI.|Boolean|False|
 
 ### Task metadata types
@@ -760,7 +940,7 @@ Task metadata can accept most Puppet data types.
 
 #### Common task data types
 
-**Restriction:** 
+**Restriction:**
 
 Some types supported by Puppet can not be represented as JSON, such as `Hash[Integer, String]`, `Object`, or `Resource`. These should not be used in tasks, because they can never be matched.
 
@@ -777,7 +957,7 @@ Some types supported by Puppet can not be represented as JSON, such as `Hash[Int
 | `Variant[Integer, Pattern[/\A\d+\Z/]]` |Matches an integer or a String of an integer|
 | `Boolean` |Accepts Boolean values.|
 
-**Related information**  
+**Related information**
 
 
 [Data type syntax](https://puppet.com/docs/puppet/latest/lang_data_type.html)

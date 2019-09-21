@@ -1,12 +1,11 @@
 # frozen_string_literal: true
 
 require 'base64'
-require 'concurrent'
 require 'find'
 require 'json'
 require 'logging'
-require 'minitar'
 require 'open3'
+require 'bolt/error'
 require 'bolt/task'
 require 'bolt/apply_result'
 require 'bolt/util/puppet_log_level'
@@ -14,6 +13,9 @@ require 'bolt/util/puppet_log_level'
 module Bolt
   class Applicator
     def initialize(inventory, executor, modulepath, plugin_dirs, pdb_client, hiera_config, max_compiles)
+      # lazy-load expensive gem code
+      require 'concurrent'
+
       @inventory = inventory
       @executor = executor
       @modulepath = modulepath
@@ -42,22 +44,45 @@ module Bolt
       @custom_facts_task ||= begin
         path = File.join(libexec, 'custom_facts.rb')
         file = { 'name' => 'custom_facts.rb', 'path' => path }
-        metadata = { 'supports_noop' => true, 'input_method' => 'stdin' }
+        metadata = { 'supports_noop' => true, 'input_method' => 'stdin',
+                     'implementations' => [
+                       { 'name' => 'custom_facts.rb' },
+                       { 'name' => 'custom_facts.rb', 'remote' => true }
+                     ] }
         Bolt::Task.new(name: 'apply_helpers::custom_facts', files: [file], metadata: metadata)
       end
     end
 
     def catalog_apply_task
       @catalog_apply_task ||= begin
-        path = File.join(libexec, 'apply_catalog.rb')
-        file = { 'name' => 'apply_catalog.rb', 'path' => path }
-        metadata = { 'supports_noop' => true, 'input_method' => 'stdin' }
-        Bolt::Task.new(name: 'apply_helpers::apply_catalog', files: [file], metadata: metadata)
+                                path = File.join(libexec, 'apply_catalog.rb')
+                                file = { 'name' => 'apply_catalog.rb', 'path' => path }
+                                metadata = { 'supports_noop' => true, 'input_method' => 'stdin',
+                                             'implementations' => [
+                                               { 'name' => 'apply_catalog.rb' },
+                                               { 'name' => 'apply_catalog.rb', 'remote' => true }
+                                             ] }
+                                Bolt::Task.new(name: 'apply_helpers::apply_catalog', files: [file], metadata: metadata)
+                              end
+    end
+
+    def query_resources_task
+      @query_resources_task ||= begin
+        path = File.join(libexec, 'query_resources.rb')
+        file = { 'name' => 'query_resources.rb', 'path' => path }
+        metadata = { 'supports_noop' => true, 'input_method' => 'stdin',
+                     'implementations' => [
+                       { 'name' => 'query_resources.rb' },
+                       { 'name' => 'query_resources.rb', 'remote' => true }
+                     ] }
+
+        Bolt::Task.new(name: 'apply_helpers::query_resources', files: [file], metadata: metadata)
       end
     end
 
     def compile(target, ast, plan_vars)
       trusted = Puppet::Context::TrustedInformation.new('local', target.host, {})
+      facts = @inventory.facts(target).merge('bolt' => true)
 
       catalog_input = {
         code_ast: ast,
@@ -66,7 +91,7 @@ module Bolt
         hiera_config: @hiera_config,
         target: {
           name: target.host,
-          facts: @inventory.facts(target),
+          facts: facts,
           variables: @inventory.vars(target).merge(plan_vars),
           trusted: trusted.to_h
         },
@@ -133,8 +158,24 @@ module Bolt
       %w[trusted server_facts facts].each { |k| plan_vars.delete(k) }
 
       targets = @inventory.get_targets(args[0])
-      ast = Puppet::Pops::Serialization::ToDataConverter.convert(apply_body, rich_data: true, symbol_to_string: true)
-      notify = proc { |_| nil }
+
+      apply_ast(apply_body, targets, options, plan_vars)
+    end
+
+    # Count the number of top-level statements in the AST.
+    def count_statements(ast)
+      case ast
+      when Puppet::Pops::Model::Program
+        count_statements(ast.body)
+      when Puppet::Pops::Model::BlockExpression
+        ast.statements.count
+      else
+        1
+      end
+    end
+
+    def apply_ast(raw_ast, targets, options, plan_vars = {})
+      ast = Puppet::Pops::Serialization::ToDataConverter.convert(raw_ast, rich_data: true, symbol_to_string: true)
 
       r = @executor.log_action('apply catalog', targets) do
         futures = targets.map do |target|
@@ -148,13 +189,25 @@ module Bolt
         result_promises = targets.zip(futures).flat_map do |target, future|
           @executor.queue_execute([target]) do |transport, batch|
             @executor.with_node_logging("Applying manifest block", batch) do
+              catalog = future.value
+              raise future.reason if future.rejected?
+
               arguments = {
-                'catalog' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(future.value),
+                'catalog' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(catalog),
                 'plugins' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(plugins),
+                '_task' => catalog_apply_task.name,
                 '_noop' => options['_noop']
               }
-              raise future.reason if future.rejected?
-              results = transport.batch_task(batch, catalog_apply_task, arguments, options, &notify)
+
+              callback = proc do |event|
+                if event[:type] == :node_result
+                  event = event.merge(result: ApplyResult.from_task_result(event[:result]))
+                end
+                @executor.publish_event(event)
+              end
+              # Respect the run_as default set on the executor
+              options = { '_run_as' => @executor.run_as }.merge(options) if @executor.run_as
+              results = transport.batch_task(batch, catalog_apply_task, arguments, options, &callback)
               Array(results).map { |result| ApplyResult.from_task_result(result) }
             end
           end
@@ -162,6 +215,10 @@ module Bolt
 
         @executor.await_results(result_promises)
       end
+
+      # Allow for report to exclude event metrics (apply_result doesn't require it to be present)
+      resource_counts = r.ok_set.map { |result| result.event_metrics&.fetch('total') }.compact
+      @executor.report_apply(count_statements(raw_ast), resource_counts)
 
       if !r.ok && !options['_catch_errors']
         raise Bolt::ApplyFailure, r
@@ -175,6 +232,10 @@ module Bolt
     end
 
     def build_plugin_tarball
+      # lazy-load expensive gem code
+      require 'minitar'
+      require 'zlib'
+
       start_time = Time.now
       sio = StringIO.new
       output = Minitar::Output.new(Zlib::GzipWriter.new(sio))

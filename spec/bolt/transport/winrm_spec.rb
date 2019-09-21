@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'bolt_spec/conn'
 require 'bolt_spec/errors'
 require 'bolt_spec/files'
 require 'bolt_spec/sensitive'
@@ -8,10 +9,10 @@ require 'bolt_spec/task'
 require 'bolt/transport/winrm'
 require 'bolt/config'
 require 'bolt/target'
-require 'httpclient'
 require 'winrm'
 
 describe Bolt::Transport::WinRM do
+  include BoltSpec::Conn
   include BoltSpec::Errors
   include BoltSpec::Files
   include BoltSpec::Sensitive
@@ -26,14 +27,16 @@ describe Bolt::Transport::WinRM do
     Bolt::Config.new(boltdir, 'transport' => 'winrm', 'winrm' => stringified)
   end
 
-  let(:host) { ENV['BOLT_WINRM_HOST'] || 'localhost' }
-  let(:port) { ENV['BOLT_WINRM_PORT'] || 25985 }
+  let(:host) { conn_info('winrm')[:host] }
+  let(:port) { conn_info('winrm')[:port] }
   let(:ssl_port) { ENV['BOLT_WINRM_SSL_PORT'] || 25986 }
-  let(:user) { ENV['BOLT_WINRM_USER'] || "bolt" }
-  let(:password) { ENV['BOLT_WINRM_PASSWORD'] || "bolt" }
-  let(:command) { "echo $env:UserName" }
+  let(:smb_port) { ENV['BOLT_WINRM_SMB_PORT'] || 2445 }
+  let(:user) { conn_info('winrm')[:user] }
+  let(:password) { conn_info('winrm')[:password] }
+  let(:command) { "[Environment]::UserName" }
   let(:config) { mk_config(ssl: false, user: user, password: password) }
-  let(:ssl_config) { mk_config(cacert: 'resources/ca.pem', user: user, password: password) }
+  let(:cacert_path) { 'spec/fixtures/ssl/ca.pem' }
+  let(:ssl_config) { mk_config(cacert: cacert_path, user: user, password: password) }
   let(:winrm) { Bolt::Transport::WinRM.new }
   let(:winrm_ssl) { Bolt::Transport::WinRM.new }
   let(:echo_script) { <<PS }
@@ -140,14 +143,22 @@ PS
     end
   end
 
-  context "connecting over SSL", winrm: true do
+  context "connecting over SSL", winrm: true, omi: true do
+    # In order to run vagrant and docker targets simultaniously for local dev, use 4598{5,6} to avoid port conflict
+    let(:omi_target) { make_target(port_: 45986, conf: ssl_config) }
     let(:target) { make_target(port_: ssl_port, conf: ssl_config) }
 
-    it "executes a command on a host" do
-      expect(winrm.run_command(target, command)['stdout']).to eq("#{user}\r\n")
+    it "can test whether the target is available" do
+      expect(winrm.connected?(omi_target)).to eq(true)
     end
 
-    it "can upload a file to a host" do
+    it "executes a command on a host" do
+      expect(winrm.run_command(omi_target, command)['stdout']).to eq("#{user}\r\n")
+    end
+
+    # winrm gem doesn't fully support OMI server, so disable this test
+    # refactor into other file upload tests when SMB gem adds SMB v3 support
+    it "can upload a file to a host", omi: false do
       contents = "kadejtw89894"
       remote_path = 'C:\Windows\Temp\upload-test-winrm-ssl'
       with_tempfile_containing('upload-test-winrm-ssl', contents, '.ps1') do |file|
@@ -169,11 +180,86 @@ PS
       target.options.delete('cacert')
       target.options['ssl-verify'] = false
 
-      expect(winrm.run_command(target, command)['stdout']).to eq("#{user}\r\n")
+      expect(winrm.run_command(omi_target, command)['stdout']).to eq("#{user}\r\n")
+    end
+
+    it "ignores invalid cacert when ssl: false" do
+      target.options['cacert'] = 'does not exist'
+      target.options['ssl'] = false
+
+      expect(winrm.run_command(omi_target, command)['stdout']).to eq("#{user}\r\n")
+    end
+  end
+
+  context "connecting over SSL to OMI container ", omi: true do
+    # In order to run vagrant and docker targets simultaniously for local dev, use 4598{5,6} to avoid port conflict
+    let(:omi_target) { make_target(port_: 45986, conf: ssl_config) }
+
+    it "can test whether the target is available" do
+      expect(winrm.connected?(omi_target)).to eq(true)
+    end
+
+    it "executes a command on a host" do
+      expect(winrm.run_command(omi_target, command)['stdout']).to eq("#{user}\r\n")
+    end
+
+    it "skips verification with ssl-verify: false" do
+      target.options.delete('cacert')
+      target.options['ssl-verify'] = false
+
+      expect(winrm.run_command(omi_target, command)['stdout']).to eq("#{user}\r\n")
+    end
+  end
+
+  context "authenticating with Kerberos", kerberos: true do
+    before(:all) do
+      # disable all tests on Windows for now
+      skip('Windows Active Directory tickets are different') if Bolt::Util.windows?
+
+      @kerb_user = 'Administrator'
+      @kerb_realm = ENV['KRB5_REALM'] || 'BOLT.TEST'
+      @smb_admin_pass = ENV['SMB_ADMIN_PASSWORD'] || 'B0ltrules!'
+
+      # this will renew any stale tickets when testing locally
+      `echo #{@smb_admin_pass} | kinit Administrator@#{@kerb_realm}`
+    end
+
+    let(:omi_http_kerb_target) do
+      conf = mk_config(ssl: false, realm: @kerb_realm)
+      make_target(host_: 'omiserver.bolt.test', port_: 45985, conf: conf)
+    end
+
+    let(:omi_https_kerb_target) do
+      conf = mk_config(ssl: true, realm: @kerb_realm, 'ssl-verify': false)
+      make_target(host_: 'omiserver.bolt.test', port_: 45986, conf: conf)
+    end
+
+    # verifies the local setup has already acquired the right Kerberos ticket
+    it "has acquired a ticket granting ticket from the Samba AD / KDC" do
+      esc_realm = Regexp.escape(@kerb_realm)
+      expect(`klist`).to match(%r{krbtgt\/#{esc_realm}@#{esc_realm}})
+    end
+
+    it "executes a command on a host over HTTP" do
+      pending("WinRM gem and OMI server have a protocol negotiation bug")
+      expect(winrm.run_command(omi_http_kerb_target, command)['stdout']).to eq("#{@kerb_user}\r\n")
+    end
+
+    it "executes a command on a host over HTTPS" do
+      pending("WinRM gem and OMI server have a protocol negotiation bug")
+      expect(winrm.run_command(omi_https_kerb_target, command)['stdout']).to eq("#{@kerb_user}\r\n")
     end
   end
 
   context "with an open connection" do
+    it "can test whether the target is available", winrm: true do
+      expect(winrm.connected?(target)).to eq(true)
+    end
+
+    it "returns false if the target is not available", winrm: true do
+      expect(winrm.connected?(Bolt::Target.new('winrm://unknownfoo'))).to eq(false)
+    end
+
     it "executes a command on a host", winrm: true do
       expect(winrm.run_command(target, command)['stdout']).to eq("#{user}\r\n")
     end
@@ -215,22 +301,34 @@ PS
       expect(outputs2).to eq(outs)
     end
 
-    it "can upload a file to a host", winrm: true do
-      contents = "934jklnvf"
-      remote_path = 'C:\Windows\Temp\upload-test-winrm'
-      with_tempfile_containing('upload-test-winrm', contents, '.ps1') do |file|
-        expect(
-          winrm.upload(target, file.path, remote_path).value
-        ).to eq(
-          '_output' => "Uploaded '#{file.path}' to '#{target.host}:#{remote_path}'"
-        )
+    %w[winrm smb].each do |protocol|
+      it "can upload a file to a host using #{protocol}", winrm: true do
+        conf = mk_config(ssl: false, user: user, password: password, 'file-protocol': protocol, 'smb-port': smb_port)
+        target = make_target(conf: conf)
+        contents = SecureRandom.uuid
+        remote_path = "C:\\Windows\\Temp\\upload-test-#{protocol}"
+        with_tempfile_containing("upload-test-winrm-#{protocol}", contents, '.ps1') do |file|
+          expect(
+            winrm.upload(target, file.path, remote_path).value
+          ).to eq(
+            '_output' => "Uploaded '#{file.path}' to '#{target.host}:#{remote_path}'"
+          )
 
-        expect(
-          winrm.run_command(target, "type #{remote_path}")['stdout']
-        ).to eq("#{contents}\r\n")
+          expect(
+            winrm.run_command(target, "type #{remote_path}")['stdout']
+          ).to eq("#{contents}\r\n")
 
-        winrm.run_command(target, "del #{remote_path}")
+          winrm.run_command(target, "del #{remote_path}")
+        end
       end
+    end
+
+    # when ruby_smb gem adds SMB v3 support, this will pass
+    # test should be refactored to supply an SSL flag for winrm + smb and remove other SSL test
+    it "will fail to upload a file with SMB with a host that requires SSL", winrm: true do
+      expect {
+        mk_config(ssl: true, user: user, password: password, 'file-protocol': 'smb', 'smb-port': smb_port)
+      }.to raise_error(Bolt::ValidationError)
     end
 
     it "catches winrm-fs upload error", winrm: true do
@@ -241,25 +339,30 @@ PS
       end
     end
 
-    it "can upload a directory to a host", winrm: true do
-      Dir.mktmpdir do |dir|
-        subdir = File.join(dir, 'subdir')
-        File.write(File.join(dir, 'content'), 'hello world')
-        Dir.mkdir(subdir)
-        File.write(File.join(subdir, 'more'), 'lorem ipsum')
+    %w[winrm smb].each do |protocol|
+      it "can upload a directory to a host using #{protocol}", winrm: true do
+        conf = mk_config(ssl: false, user: user, password: password, 'file-protocol': protocol, 'smb-port': smb_port)
+        target = make_target(conf: conf)
 
-        target_dir = 'C:\Windows\Temp\directory-test'
-        winrm.upload(target, dir, target_dir)
+        Dir.mktmpdir do |dir|
+          subdir = File.join(dir, 'subdir')
+          File.write(File.join(dir, 'content'), 'hello world')
+          Dir.mkdir(subdir)
+          File.write(File.join(subdir, 'more'), 'lorem ipsum')
 
-        expect(
-          winrm.run_command(target, "Get-ChildItem -Name #{target_dir}")['stdout'].split("\r\n")
-        ).to eq(%w[subdir content])
+          target_dir = "C:\\Windows\\Temp\\directory-test-#{protocol}"
+          winrm.upload(target, dir, target_dir)
 
-        expect(
-          winrm.run_command(target, "Get-ChildItem -Name #{File.join(target_dir, 'subdir')}")['stdout'].split("\r\n")
-        ).to eq(%w[more])
+          expect(
+            winrm.run_command(target, "Get-ChildItem -Name #{target_dir}")['stdout'].split("\r\n")
+          ).to eq(%w[subdir content])
 
-        winrm.run_command(target, "rm -r #{target_dir}")
+          expect(
+            winrm.run_command(target, "Get-ChildItem -Name #{File.join(target_dir, 'subdir')}")['stdout'].split("\r\n")
+          ).to eq(%w[more])
+
+          winrm.run_command(target, "rm -r #{target_dir}")
+        end
       end
     end
 
@@ -602,8 +705,8 @@ Write-Host "$env:PT_sensitive_hash"
 PS
       deep_hash = { 'k' => make_sensitive('v') }
       arguments = { 'sensitive_string' => make_sensitive('$ecret!'),
-                    'sensitive_array'  => make_sensitive([1, 2, make_sensitive(3)]),
-                    'sensitive_hash'   => make_sensitive(deep_hash) }
+                    'sensitive_array' => make_sensitive([1, 2, make_sensitive(3)]),
+                    'sensitive_hash' => make_sensitive(deep_hash) }
       with_task_containing('tasks_test_sensitive', contents, 'both', '.ps1') do |task|
         expect(winrm.run_task(target, task, arguments).message).to eq(<<QUOTED)
 $ecret!\r
@@ -680,7 +783,9 @@ PS
     end
 
     context "when files are provided", winrm: true do
-      let(:contents) { 'Get-ChildItem -Path $env:PT__installdir -Recurse -File -Name' }
+      let(:contents) {
+        'Get-ChildItem -Path $env:PT__installdir -Recurse -File | Select-Object Length, FullName | ft -hidetableheaders'
+      }
       let(:arguments) { {} }
 
       it "puts files at _installdir" do
@@ -692,10 +797,11 @@ PS
             task['files'] << { 'name' => "tasks_test/#{file}", 'path' => task['files'][0]['path'] }
           end
 
-          files = winrm.run_task(target, task, arguments).message.split("\n")
+          files = winrm.run_task(target, task, arguments).message.split("\n").map(&:strip).reject(&:empty?)
+          expected_files = ["tasks/#{File.basename(task['files'][0]['path'])}"] + expected_files
           expect(files.count).to eq(expected_files.count)
           files.sort.zip(expected_files.sort).each do |file, expected_file|
-            expect(file.strip).to eq("tasks_test\\#{expected_file.gsub(%r{/}, '\\')}")
+            expect(file).to match(/\\tasks_test\\#{expected_file.gsub(%r{/}, '\\\\\\')}$/)
           end
         end
       end
@@ -707,16 +813,18 @@ PS
             { 'name' => 'tasks_test', 'requirements' => [], 'files' => ['tasks_test/files/yes'] }
           ]
           task['metadata']['files'] = ['other_mod/lib/puppet_x/']
-          task['files'] << { 'name' => 'tasks_test/files/yes', 'path' => task['files'][0]['path'] }
-          task['files'] << { 'name' => 'other_mod/lib/puppet_x/a.rb', 'path' => task['files'][0]['path'] }
-          task['files'] << { 'name' => 'other_mod/lib/puppet_x/b.rb', 'path' => task['files'][0]['path'] }
-          task['files'] << { 'name' => 'tasks_test/files/no', 'path' => task['files'][0]['path'] }
+          task_path = task['files'][0]['path']
+          task['files'] << { 'name' => 'tasks_test/files/yes', 'path' => task_path }
+          task['files'] << { 'name' => 'other_mod/lib/puppet_x/a.rb', 'path' => task_path }
+          task['files'] << { 'name' => 'other_mod/lib/puppet_x/b.rb', 'path' => task_path }
+          task['files'] << { 'name' => 'tasks_test/files/no', 'path' => task_path }
 
-          files = winrm.run_task(target, task, arguments).message.split("\n").sort
-          expect(files.count).to eq(3)
-          expect(files[0].strip).to eq("other_mod\\lib\\puppet_x\\a.rb")
-          expect(files[1].strip).to eq("other_mod\\lib\\puppet_x\\b.rb")
-          expect(files[2].strip).to eq("tasks_test\\files\\yes")
+          files = winrm.run_task(target, task, arguments).message.split("\n").map(&:strip).reject(&:empty?).sort
+          expect(files.count).to eq(4)
+          expect(files[0]).to match(/#{contents.size} [^ ]+\\other_mod\\lib\\puppet_x\\a.rb$/)
+          expect(files[1]).to match(/#{contents.size} [^ ]+\\other_mod\\lib\\puppet_x\\b.rb$/)
+          expect(files[2]).to match(/#{contents.size} [^ ]+\\tasks_test\\files\\yes$/)
+          expect(files[3]).to match(/#{contents.size} [^ ]+\\tasks_test\\tasks\\#{File.basename(task_path)}$/)
         end
       end
     end
@@ -995,6 +1103,14 @@ OUTPUT
           expect(stderr).to match(/^The term 'puppet.bat' is not recognized as the name of a cmdlet/)
         end
       end
+    end
+  end
+
+  context 'when there is no host in the target' do
+    let(:target) { Bolt::Target.new(nil, "name" => "hostless") }
+
+    it 'errors' do
+      expect { winrm.run_command(target, 'whoami') }.to raise_error(/does not have a host/)
     end
   end
 end

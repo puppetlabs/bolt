@@ -1,422 +1,204 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'bolt_spec/errors'
-require 'bolt_spec/files'
-require 'bolt_spec/sensitive'
-require 'bolt_spec/task'
 require 'bolt/transport/local'
-require 'bolt/config'
 require 'bolt/target'
+require 'bolt/inventory'
+require 'bolt/util'
+require 'bolt_spec/transport'
+require 'bolt_spec/conn'
+
+require_relative 'shared_examples'
 
 describe Bolt::Transport::Local do
-  include BoltSpec::Errors
-  include BoltSpec::Files
-  include BoltSpec::Sensitive
-  include BoltSpec::Task
+  include BoltSpec::Transport
 
-  let(:local) { Bolt::Transport::Local.new }
-  let(:echo_script) { <<BASH }
-for var do
-    echo $var
-done
-BASH
+  let(:host_and_port) { "localhost" }
+  let(:user) { 'travis' }
+  let(:password) { 'travis' }
+  let(:transport) { :local }
+  let(:os_context) { Bolt::Util.windows? ? windows_context : posix_context }
+  let(:target) { Bolt::Target.new('local://localhost', transport_conf) }
 
-  let(:target) { Bolt::Target.new('local://localhost') }
-
-  def result_value(stdout = nil, stderr = nil, exit_code = 0)
-    { 'stdout' => stdout || '',
-      'stderr' => stderr || '',
-      'exit_code' => exit_code }
+  it 'is always connected' do
+    expect(runner.connected?(target)).to eq(true)
   end
 
-  context "when executing", bash: true do
-    it "executes a command" do
-      expect(local.run_command(target, 'echo $HOME').value['stdout'].strip).to eq(ENV['HOME'])
+  it 'provides platform specific features' do
+    if Bolt::Util.windows?
+      expect(runner.provided_features).to eq(['powershell'])
+    else
+      expect(runner.provided_features).to eq(['shell'])
     end
+  end
 
-    it "captures stderr from a host" do
-      expect(local.run_command(target, 'expr 1 / 0').value['stderr']).to match(/division by zero/)
-    end
+  include_examples 'transport api'
 
-    it "can execute a command containing quotes" do
-      expect(local.run_command(target, "echo 'hello \" world'").value).to eq(result_value("hello \" world\n"))
-    end
+  context 'running as another user', sudo: true do
+    include_examples 'with sudo'
 
-    it "can upload a file to a host" do
-      contents = "kljhdfg"
-      with_tempfile_containing('upload-test', contents) do |file|
-        local.upload(target, file.path, "/tmp/upload-test")
+    context "overriding with '_run_as'" do
+      let(:config) {
+        mk_config('sudo-password' => password, 'run-as' => 'root')
+      }
+      let(:target) { make_target }
 
-        expect(
-          local.run_command(target, "cat /tmp/upload-test")['stdout']
-        ).to eq(contents)
-
-        local.run_command(target, "rm /tmp/upload-test")
+      it "can override run_as for command via an option" do
+        expect(runner.run_command(target, 'whoami', '_run_as' => user)['stdout']).to eq("#{user}\n")
       end
-    end
 
-    it "can upload a directory to a host" do
-      Dir.mktmpdir do |dir|
-        subdir = File.join(dir, 'subdir')
-        File.write(File.join(dir, 'content'), 'hello world')
-        Dir.mkdir(subdir)
-        File.write(File.join(subdir, 'more'), 'lorem ipsum')
-
-        target_dir = "/tmp/directory-test"
-        local.upload(target, dir, target_dir)
-
-        expect(
-          local.run_command(target, "ls #{target_dir}")['stdout'].split("\n")
-        ).to eq(%w[content subdir])
-
-        expect(
-          local.run_command(target, "ls #{File.join(target_dir, 'subdir')}")['stdout'].split("\n")
-        ).to eq(%w[more])
-
-        local.run_command(target, "rm -r #{target_dir}")
+      it "can override run_as for script via an option" do
+        contents = "#!/bin/sh\nwhoami"
+        with_tempfile_containing('script test', contents) do |file|
+          expect(runner.run_script(target, file.path, [], '_run_as' => user)['stdout']).to eq("#{user}\n")
+        end
       end
-    end
 
-    it "can run a script remotely" do
-      contents = "#!/bin/sh\necho hellote"
-      with_tempfile_containing('script test', contents) do |file|
-        expect(
-          local.run_script(target, file.path, [])['stdout']
-        ).to eq("hellote\n")
-      end
-    end
-
-    it "can run a script remotely with quoted arguments" do
-      with_tempfile_containing('script-test-ssh-quotes', echo_script) do |file|
-        expect(
-          local.run_script(target,
-                           file.path,
-                           ['nospaces',
-                            'with spaces',
-                            "\"double double\"",
-                            "'double single'",
-                            '\'single single\'',
-                            '"single double"',
-                            "double \"double\" double",
-                            "double 'single' double",
-                            'single "double" single',
-                            'single \'single\' single'])['stdout']
-        ).to eq(<<QUOTED)
-nospaces
-with spaces
-"double double"
-'double single'
-'single single'
-"single double"
-double "double" double
-double 'single' double
-single "double" single
-single 'single' single
-QUOTED
-      end
-    end
-
-    it "can run a script with Sensitive arguments" do
-      contents = "#!/bin/sh\necho $1\necho $2"
-      arguments = ['non-sensitive-arg',
-                   make_sensitive('$ecret!')]
-      with_tempfile_containing('sensitive_test', contents) do |file|
-        expect(
-          local.run_script(target, file.path, arguments)['stdout']
-        ).to eq("non-sensitive-arg\n$ecret!\n")
-      end
-    end
-
-    it "escapes unsafe shellwords in arguments" do
-      with_tempfile_containing('script-test-ssh-escape', echo_script) do |file|
-        expect(
-          local.run_script(target,
-                           file.path,
-                           ['echo $HOME; cat /etc/passwd'])['stdout']
-        ).to eq(<<SHELLWORDS)
-echo $HOME; cat /etc/passwd
-SHELLWORDS
-      end
-    end
-
-    it "can run a task" do
-      contents = "#!/bin/sh\necho ${PT_message_one} ${PT_message_two}"
-      arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-      with_task_containing('tasks_test', contents, 'environment') do |task|
-        expect(local.run_task(target, task, arguments).message.strip)
-          .to eq('Hello from task Goodbye')
-      end
-    end
-
-    it "can run a task passing input on stdin" do
-      contents = "#!/bin/sh\ncat"
-      arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-      with_task_containing('tasks_test_stdin', contents, 'stdin') do |task|
-        expect(local.run_task(target, task, arguments).value)
-          .to eq("message_one" => "Hello from task", "message_two" => "Goodbye")
-      end
-    end
-
-    it "serializes hashes as json in environment input" do
-      contents = "#!/bin/sh\nprintenv PT_message"
-      arguments = { message: { key: 'val' } }
-      with_task_containing('tasks_test_hash', contents, 'environment') do |task|
-        expect(local.run_task(target, task, arguments).value)
-          .to eq('key' => 'val')
-      end
-    end
-
-    it "can run a task passing input on stdin and environment" do
-      contents = <<SHELL
-#!/bin/sh
-echo ${PT_message_one} ${PT_message_two}
-cat
-SHELL
-      arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-      with_task_containing('tasks-test-both', contents, 'both') do |task|
-        expect(local.run_task(target, task, arguments).message).to eq(<<SHELL.strip)
-Hello from task Goodbye
-{\"message_one\":\"Hello from task\",\"message_two\":\"Goodbye\"}
-SHELL
-      end
-    end
-
-    it "can run a task with non-string parameters" do
-      contents = <<SHELL
-#!/bin/sh
-echo ${PT_message} ${PT_number}
-cat
-SHELL
-      arguments = { message: 'Hello from task', number: 12 }
-      with_task_containing('tasks-test-both', contents, 'both') do |task|
-        expect(local.run_task(target, task, arguments).message).to eq(<<SHELL.strip)
-Hello from task 12
-{\"message\":\"Hello from task\",\"number\":12}
-SHELL
-      end
-    end
-
-    it "can run a task with params containing quotes" do
-      contents = <<SHELL
-#!/bin/sh
-echo ${PT_message}
-SHELL
-
-      arguments = { message: "foo ' bar ' baz" }
-      with_task_containing('tasks_test_quotes', contents, 'both') do |task|
-        expect(local.run_task(target, task, arguments).message.strip).to eq "foo ' bar ' baz"
-      end
-    end
-
-    it "can run a task with Sensitive params via environment" do
-      contents = <<SHELL
-#!/bin/sh
-echo ${PT_sensitive_string}
-echo ${PT_sensitive_array}
-echo ${PT_sensitive_hash}
-SHELL
-      deep_hash = { 'k' => make_sensitive('v') }
-      arguments = { 'sensitive_string' => make_sensitive('$ecret!'),
-                    'sensitive_array'  => make_sensitive([1, 2, make_sensitive(3)]),
-                    'sensitive_hash'   => make_sensitive(deep_hash) }
-      with_task_containing('tasks_test_sensitive', contents, 'both') do |task|
-        expect(local.run_task(target, task, arguments).message.strip).to eq(<<SHELL.strip)
-$ecret!
-[1,2,3]
-{"k":"v"}
-SHELL
-      end
-    end
-
-    it "can run a task with Sensitive params via stdin" do
-      contents = <<SHELL
-#!/bin/sh
-cat -
-SHELL
-      arguments = { 'sensitive_string' => make_sensitive('$ecret!') }
-      with_task_containing('tasks_test_sensitive', contents, 'stdin') do |task|
-        expect(local.run_task(target, task, arguments).value)
-          .to eq("sensitive_string" => "$ecret!")
-      end
-    end
-
-    context "when implementations are provided" do
-      let(:contents) { "#!/bin/sh\necho ${PT_message_one} ${PT_message_two}" }
-      let(:arguments) { { message_one: 'Hello from task', message_two: 'Goodbye' } }
-
-      it "runs a task requires 'shell'" do
+      it "can override run_as for task via an option" do
+        contents = "#!/bin/sh\nwhoami"
         with_task_containing('tasks_test', contents, 'environment') do |task|
-          task['metadata']['implementations'] = [{ 'name' => 'tasks_test', 'requirements' => ['shell'] }]
-          expect(local.run_task(target, task, arguments).message.chomp)
-            .to eq('Hello from task Goodbye')
+          expect(runner.run_task(target, task, {}, '_run_as' => user).message).to eq("#{user}\n")
         end
       end
 
-      it "runs a task with the implementation's input method" do
-        with_task_containing('tasks_test', contents, 'stdin') do |task|
-          task['metadata']['implementations'] = [{
-            'name' => 'tasks_test', 'requirements' => ['shell'], 'input_method' => 'environment'
-          }]
-          expect(local.run_task(target, task, arguments).message.chomp)
-            .to eq('Hello from task Goodbye')
+      it "can override run_as for file upload via an option" do
+        contents = "upload file test as root content"
+        dest = '/tmp/root-file-upload-test'
+        with_tempfile_containing('tasks test upload as root', contents) do |file|
+          expect(runner.upload(target, file.path, dest, '_run_as' => user).message).to match(/Uploaded/)
+          expect(runner.run_command(target, "cat #{dest}", '_run_as' => user)['stdout']).to eq(contents)
+          expect(runner.run_command(target, "stat -c %U #{dest}", '_run_as' => user)['stdout'].chomp).to eq(user)
+          expect(runner.run_command(target, "stat -c %G #{dest}", '_run_as' => user)['stdout'].chomp).to eq(user)
         end
-      end
 
-      it "errors when a task only requires an unsupported requirement" do
-        with_task_containing('tasks_test', contents, 'environment') do |task|
-          task['metadata']['implementations'] = [{ 'name' => 'tasks_test', 'requirements' => ['powershell'] }]
-          expect {
-            local.run_task(target, task, arguments)
-          }.to raise_error("No suitable implementation of #{task.name} for #{target.name}")
-        end
-      end
-
-      it "errors when a task only requires an unknown requirement" do
-        with_task_containing('tasks_test', contents, 'environment') do |task|
-          task['metadata']['implementations'] = [{ 'name' => 'tasks_test', 'requirements' => ['foobar'] }]
-          expect {
-            local.run_task(target, task, arguments)
-          }.to raise_error("No suitable implementation of #{task.name} for #{target.name}")
-        end
+        runner.run_command(target, "rm #{dest}", sudoable: true, run_as: user)
       end
     end
 
-    context "when files are provided" do
-      let(:contents) { "#!/bin/sh\nfind ${PT__installdir} -type f" }
-      let(:arguments) { {} }
+    context "as user with no password" do
+      let(:config) {
+        mk_config('run-as' => 'root')
+      }
+      let(:target) { make_target }
 
-      it "puts files at _installdir" do
-        with_task_containing('tasks_test', contents, 'environment') do |task|
-          task['metadata']['files'] = []
-          expected_files = %w[files/foo files/bar/baz lib/puppet_x/file.rb tasks/init]
-          expected_files.each do |file|
-            task['metadata']['files'] << "tasks_test/#{file}"
-            task['files'] << { 'name' => "tasks_test/#{file}", 'path' => task['files'][0]['path'] }
-          end
-
-          files = local.run_task(target, task, arguments).message.split("\n")
-          expect(files.count).to eq(expected_files.count)
-          files.sort.zip(expected_files.sort).each do |file, expected_file|
-            expect(file).to match(%r{_installdir/tasks_test/#{expected_file}$})
-          end
-        end
-      end
-
-      it "includes files from the selected implementation" do
-        with_task_containing('tasks_test', contents, 'environment') do |task|
-          task['metadata']['implementations'] = [
-            { 'name' => 'tasks_test.alt', 'requirements' => ['foobar'], 'files' => ['tasks_test/files/no'] },
-            { 'name' => 'tasks_test', 'requirements' => [], 'files' => ['tasks_test/files/yes'] }
-          ]
-          task['metadata']['files'] = ['other_mod/lib/puppet_x/']
-          task['files'] << { 'name' => 'tasks_test/files/yes', 'path' => task['files'][0]['path'] }
-          task['files'] << { 'name' => 'other_mod/lib/puppet_x/a.rb', 'path' => task['files'][0]['path'] }
-          task['files'] << { 'name' => 'other_mod/lib/puppet_x/b.rb', 'path' => task['files'][0]['path'] }
-          task['files'] << { 'name' => 'tasks_test/files/no', 'path' => task['files'][0]['path'] }
-
-          files = local.run_task(target, task, arguments).message.split("\n").sort
-          expect(files.count).to eq(3)
-          expect(files[0]).to match(%r{_installdir/other_mod/lib/puppet_x/a.rb$})
-          expect(files[1]).to match(%r{_installdir/other_mod/lib/puppet_x/b.rb$})
-          expect(files[2]).to match(%r{_installdir/tasks_test/files/yes$})
-        end
-      end
-    end
-
-    context "when it can't upload a file" do
-      it 'returns an error result for upload' do
-        contents = "kljhdfg"
-        with_tempfile_containing('upload-test', contents) do |file|
-          expect {
-            local.upload(target, file.path, "/tmp/a/non/existent/dir/upload-test")
-          }.to raise_error(Bolt::Node::FileError, /No such file or directory/)
-        end
-      end
-
-      it 'returns an error result for run_script' do
-        contents = "#!/bin/sh\necho hellote"
-        expect(FileUtils).to receive(:cp_r).and_raise('no write')
+      it "returns a failed result when a temporary directory is created" do
+        contents = "#!/bin/sh\nwhoami"
         with_tempfile_containing('script test', contents) do |file|
           expect {
-            local.run_script(target, file.path, [])
-          }.to raise_error(Bolt::Node::FileError, /no write/)
+            runner.run_script(target, file.path, [])
+          }.to raise_error(Bolt::Node::EscalateError,
+                           "Sudo password for user #{user} was not provided for #{host_and_port}")
         end
       end
+    end
+  end
 
-      it 'returns an error result for run_task' do
-        contents = "#!/bin/sh\necho -n ${PT_message_one} ${PT_message_two}"
-        arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-        expect(FileUtils).to receive(:cp_r).and_raise('no write')
-        with_task_containing('tasks_test', contents, 'environment') do |task|
-          expect {
-            local.run_task(target, task, arguments)
-          }.to raise_error(Bolt::Node::FileError, /no write/)
+  context 'with large input and output' do
+    let(:file_size) { 1011 }
+    let(:str) { (0...1024).map { rand(65..90).chr }.join }
+    let(:arguments) { { 'input' => str * file_size } }
+    let(:ruby_task) do
+      <<~TASK
+      #!/usr/bin/env ruby
+      input = STDIN.read
+      STDERR.print input
+      STDOUT.print input
+      TASK
+    end
+
+    it "runs with large input and captures large output" do
+      with_task_containing('big_kahuna', ruby_task, 'stdin', '.rb') do |task|
+        result = runner.run_task(target, task, arguments).value
+        expect(result['input'].bytesize).to eq(file_size * 1024)
+        # Ensure the strings are the same
+        expect(result['input'][-1024..-1]).to eq(str)
+      end
+    end
+
+    context 'with run-as', sudo: true do
+      let(:config) {
+        mk_config('sudo-password' => password, 'run-as' => 'root')
+      }
+      let(:target) { make_target }
+
+      it "runs with large input and output" do
+        with_task_containing('big_kahuna', ruby_task, 'stdin', '.rb') do |task|
+          result = runner.run_task(target, task, arguments).value
+          expect(result['input'].bytesize).to eq(file_size * 1024)
+          expect(result['input'][-1024..-1]).to eq(str)
         end
       end
     end
 
-    context "when it can't create a tempdir" do
-      before(:each) do
-        expect(Dir).to receive(:mktmpdir).with(no_args).and_raise('no tmpdir')
-      end
-
-      it 'errors when it tries to run a command' do
-        expect {
-          local.run_command(target, 'echo hello')
-        }.to raise_error(/no tmpdir/)
-      end
-
-      it 'errors when it tries to run a script' do
-        contents = "#!/bin/sh\necho hellote"
-        with_tempfile_containing('script test', contents) do |file|
-          expect {
-            local.run_script(target, file.path, []).error_hash['msg']
-          }.to raise_error(/no tmpdir/)
+    context 'with slow input' do
+      let(:file_size) { 100 }
+      let(:ruby_task) do
+        <<~TASK
+        #!/usr/bin/env ruby
+        while true
+          begin
+            input = STDIN.readpartial(1024)
+            sleep(0.2)
+            STDERR.print input
+            STDOUT.print input
+          rescue EOFError
+            break
+          end
         end
+        TASK
       end
 
-      it "can run a task" do
-        contents = "#!/bin/sh\necho -n ${PT_message_one} ${PT_message_two}"
-        arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
-        with_task_containing('tasks_test', contents, 'environment') do |task|
-          expect {
-            local.run_task(target, task, arguments)
-          }.to raise_error(/no tmpdir/)
+      it "runs with large input and captures large output" do
+        with_task_containing('slow_and_steady', ruby_task, 'stdin', '.rb') do |task|
+          result = runner.run_task(target, task, arguments).value
+          expect(result['input'].bytesize).to eq(file_size * 1024)
+          # Ensure the strings are the same
+          expect(result['input'][-1024..-1]).to eq(str)
         end
       end
     end
+  end
 
-    context 'when tmpdir is specified' do
-      let(:tmpdir) { '/tmp/mytempdir' }
-      let(:target2) { Bolt::Target.new('local://anything', 'tmpdir' => tmpdir) }
+  context 'on windows hosts', windows: true do
+    context 'with run-as configured' do
+      let(:config) { mk_config('run-as' => 'root') }
+      let(:target) { make_target }
 
-      after(:each) do
-        local.run_command(target, "rm -rf #{tmpdir}")
-      end
-
-      it "run_command errors when tmpdir doesn't exist" do
-        expect {
-          local.run_command(target2, 'echo hello')
-        }.to raise_error(Errno::ENOENT, /No such file or directory.*#{Regexp.escape(tmpdir)}/)
-      end
-
-      it "run_script errors when tmpdir doesn't exist" do
-        contents = "#!/bin/sh\n echo $0"
-        with_tempfile_containing('script dir', contents) do |file|
-          expect {
-            local.run_script(target2, file.path, [])
-          }.to raise_error(Errno::ENOENT, /No such file or directory.*#{Regexp.escape(tmpdir)}/)
-        end
-      end
-
-      it 'uploads a script to the specified tmpdir' do
-        local.run_command(target, "mkdir #{tmpdir}")
-        contents = "#!/bin/sh\n echo $0"
-        with_tempfile_containing('script dir', contents) do |file|
-          expect(local.run_script(target2, file.path, [])['stdout']).to match(/#{Regexp.escape(tmpdir)}/)
-        end
+      it "warns when trying to use run-as" do
+        runner.run_command(target, os_context[:stdout_command][0])
+        logs = @log_output.readlines
+        expect(logs).to include(/WARN  Bolt::Transport::LocalWindows : run-as is not supported/)
       end
     end
+
+    context 'with empty config' do
+      let(:config) { mk_config({}) }
+      let(:target) { make_target }
+
+      it "warns when trying to use _run_as" do
+        runner.run_command(target, os_context[:stdout_command][0], '_run_as' => user)
+        logs = @log_output.readlines
+        expect(logs).to include(/WARN  Bolt::Transport::LocalWindows : run-as is not supported/)
+      end
+    end
+  end
+
+  context 'file errors' do
+    before(:each) do
+      allow_any_instance_of(Bolt::Transport::Local).to receive(:upload).and_raise(
+        Bolt::Node::FileError.new("no write", "WRITE_ERROR")
+      )
+      allow_any_instance_of(Bolt::Transport::LocalWindows).to receive(:upload).and_raise(
+        Bolt::Node::FileError.new("no write", "WRITE_ERROR")
+      )
+      allow_any_instance_of(Bolt::Transport::LocalWindows).to receive(:in_tmpdir).and_raise(
+        Bolt::Node::FileError.new("no write", "WRITE_ERROR")
+      )
+      allow_any_instance_of(Bolt::Transport::Local::Shell).to receive(:with_tempdir).and_raise(
+        Bolt::Node::FileError.new("no tmpdir", "TEMDIR_ERROR")
+      )
+    end
+
+    include_examples 'transport failures'
   end
 end

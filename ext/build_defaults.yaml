@@ -1,0 +1,3 @@
+---
+build_gem: TRUE
+project: puppet-bolt

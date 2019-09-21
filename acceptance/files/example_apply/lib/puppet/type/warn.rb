@@ -13,7 +13,7 @@ Puppet::Type.newtype(:warn) do
       :absent
     end
 
-    def insync?(_is)
+    def insync?(_is_value)
       false
     end
 
