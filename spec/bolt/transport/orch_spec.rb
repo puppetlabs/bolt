@@ -50,7 +50,7 @@ describe Bolt::Transport::Orch, orchestrator: true do
       with_tempfile_containing('token', 'faketoken') do |conf|
         config = {
           'service-url' => 'https://foo.bar:8143',
-          'cacert' => 'bar',
+          'cacert' => conf.path,
           'token-file' => conf.path
         }
         allow(OrchestratorClient).to receive(:new).and_call_original
