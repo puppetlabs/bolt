@@ -114,4 +114,45 @@ describe BoltServer::FileCache, puppetserver: true do
 
     expect { file_cache.update_file(data) }.to raise_error(/did not match checksum/)
   end
+
+  context 'When do_purge is false' do
+    let(:file_cache) do
+      BoltServer::FileCache.new(config, do_purge: false)
+    end
+
+    it 'will not set up purge timer' do
+      expect(file_cache.instance_variable_get(:@purge)).to be_nil
+    end
+  end
+
+  context 'When do_purge is true' do
+    let(:file_cache) do
+      BoltServer::FileCache.new(config, do_purge: true)
+    end
+
+    it 'will create and run the purge timer' do
+      expect(file_cache.instance_variable_get(:@purge)).to be_a(Concurrent::TimerTask)
+    end
+  end
+
+  context 'When do_purge is true and cache_dir_mutex is specified' do
+    let(:other_mutex) { double('other_mutex') }
+    let(:file_cache) do
+      BoltServer::FileCache.new(config,
+                                purge_interval: 1,
+                                purge_timeout: 1,
+                                purge_ttl: 1,
+                                cache_dir_mutex: other_mutex,
+                                do_purge: true)
+    end
+
+    it 'will create and run the purge timer' do
+      expect(file_cache.instance_variable_get(:@purge)).to be_a(Concurrent::TimerTask)
+      expect(file_cache.instance_variable_get(:@cache_dir_mutex)).to eq(other_mutex)
+      expect(other_mutex).to receive(:with_write_lock)
+
+      file_cache
+      sleep 2 # allow time for the purge timer to fire
+    end
+  end
 end

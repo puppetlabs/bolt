@@ -27,17 +27,21 @@ module BoltServer
                    executor: Concurrent::SingleThreadExecutor.new,
                    purge_interval: PURGE_INTERVAL,
                    purge_timeout: PURGE_TIMEOUT,
-                   purge_ttl: PURGE_TTL)
+                   purge_ttl: PURGE_TTL,
+                   cache_dir_mutex: Concurrent::ReadWriteLock.new,
+                   do_purge: true)
       @executor = executor
       @cache_dir = config['cache-dir']
       @config = config
       @logger = Logging.logger[self]
-      @cache_dir_mutex = Concurrent::ReadWriteLock.new
+      @cache_dir_mutex = cache_dir_mutex
 
-      @purge = Concurrent::TimerTask.new(execution_interval: purge_interval,
-                                         timeout_interval: purge_timeout,
-                                         run_now: true) { expire(purge_ttl) }
-      @purge.execute
+      if do_purge
+        @purge = Concurrent::TimerTask.new(execution_interval: purge_interval,
+                                           timeout_interval: purge_timeout,
+                                           run_now: true) { expire(purge_ttl) }
+        @purge.execute
+      end
     end
 
     def tmppath
