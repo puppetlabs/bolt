@@ -1,3 +1,9 @@
+## BOLT NEXT
+
+#### Bug fixes
+
+* A plan apply() incorrectly returns successful if the report is unparseable([#1241](https://github.com/puppetlabs/bolt/issues/1241))
+
 ## 1.31.1
 
 #### Bug fixes

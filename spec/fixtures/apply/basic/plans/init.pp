@@ -12,6 +12,6 @@ plan basic(TargetSpec $nodes) {
       content => "hi there I'm ${$facts['os']['family']}\n",
     }
   }.map |$r| {
-    $r.report['resources']
+    $r.report['catalog']['resources']
   }
 }
