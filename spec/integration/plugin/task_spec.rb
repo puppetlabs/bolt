@@ -32,7 +32,7 @@ describe 'using the task plugin' do
         '_plugin' => 'task',
         'task' => 'identity',
         'parameters' => {
-          'config' => 'ssshhh'
+          'value' => 'ssshhh'
         }
       }
     }
@@ -67,7 +67,7 @@ describe 'using the task plugin' do
           '_plugin' => 'task',
           'task' => 'sample::params',
           'parameters' => {
-            'config' => 'ssshhh'
+            'value' => 'ssshhh'
           }
         }
       }
@@ -80,7 +80,7 @@ describe 'using the task plugin' do
           result = run_cli_json(['plan', 'run', 'passw', '--boltdir', boltdir], rescue_exec: true)
 
           expect(result).to include('kind' => "bolt/validation-error")
-          expect(result['msg']).to match(/Invalid parameters for Task sample::params:\n/)
+          expect(result['msg']).to match(/expects a value for parameter/)
         end
       end
     end
@@ -91,7 +91,7 @@ describe 'using the task plugin' do
           '_plugin' => 'task',
           'task' => 'identity',
           'parameters' => {
-            'not_config' => 'ssshhh'
+            'not_value' => 'ssshhh'
           }
         }
       }
@@ -104,7 +104,7 @@ describe 'using the task plugin' do
           result = run_cli_json(['plan', 'run', 'passw', '--boltdir', boltdir], rescue_exec: true)
 
           expect(result).to include('kind' => "bolt/plugin-error")
-          expect(result['msg']).to match(/Task result did not return 'config'/)
+          expect(result['msg']).to match(/Task result did not return 'value'/)
         end
       end
     end
@@ -116,7 +116,7 @@ describe 'using the task plugin' do
         '_plugin' => 'task',
         'task' => 'identity',
         'parameters' => {
-          'targets' => [
+          'value' => [
             {
               'uri' => 'node1',
               'config' => {
@@ -152,7 +152,7 @@ describe 'using the task plugin' do
           '_plugin' => 'task',
           'task' => 'identity',
           'parameters' => {
-            'not_targets' => []
+            'not_value' => []
           }
         }
       }
@@ -165,20 +165,20 @@ describe 'using the task plugin' do
           result = run_cli_json(['plan', 'run', 'passw', '--boltdir', boltdir], rescue_exec: true)
 
           expect(result).to include('kind' => "bolt/plugin-error")
-          expect(result['msg']).to match(/Task result did not return a targets array/)
+          expect(result['msg']).to match(/Task result did not return 'value'/)
         end
       end
 
       it 'errors when targets are strings' do
-        inventory['targets'][0]['parameters']['targets'] = %w[foo bar]
+        inventory['targets'][0]['parameters']['value'] = %w[foo bar]
         with_boltdir(inventory: inventory, config: config) do |boltdir|
           plan_dir = File.join(boltdir, 'modules', 'passw', 'plans')
           FileUtils.mkdir_p(plan_dir)
           File.write(File.join(plan_dir, 'init.pp'), plan)
           result = run_cli_json(['plan', 'run', 'passw', '--boltdir', boltdir], rescue_exec: true)
 
-          expect(result).to include('kind' => "bolt/plugin-error")
-          expect(result['msg']).to match(/All targets returned/)
+          expect(result).to include('kind' => "bolt.inventory/validation-error")
+          expect(result['msg']).to match(/Node entry must be a Hash, not String/)
         end
       end
 

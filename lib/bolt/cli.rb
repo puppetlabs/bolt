@@ -244,7 +244,7 @@ module Bolt
     end
 
     def plugins
-      @plugins ||= Bolt::Plugin.setup(config, puppetdb_client, analytics)
+      @plugins ||= Bolt::Plugin.setup(config, pal, puppetdb_client, analytics)
     end
 
     def query_puppetdb_nodes(query)

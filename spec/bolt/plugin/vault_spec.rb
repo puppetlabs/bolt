@@ -35,11 +35,7 @@ describe Bolt::Plugin::Vault do
     }
   end
 
-  let(:plugin) { Bolt::Plugin::Vault.new(config) }
-
-  it 'has a hook for inventory_targets' do
-    expect(plugin.hooks).to eq(['inventory_config'])
-  end
+  let(:plugin) { Bolt::Plugin::Vault.new(config: config) }
 
   it 'errors when missing cacert and using https' do
     config['server_url'] = 'https://127.0.0.1:8200'

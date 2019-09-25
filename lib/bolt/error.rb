@@ -33,11 +33,15 @@ module Bolt
     end
 
     def self.unknown_task(task)
-      "Could not find a task named \"#{task}\". For a list of available tasks, run \"bolt task show\""
+      new("Could not find a task named \"#{task}\". For a list of available tasks, run \"bolt task show\"",
+          'bolt/unknown-task')
     end
 
     def self.unknown_plan(plan)
-      "Could not find a plan named \"#{plan}\". For a list of available plans, run \"bolt plan show\""
+      new(
+        "Could not find a plan named \"#{plan}\". For a list of available plans, run \"bolt plan show\"",
+        'bolt/unknown-plan'
+      )
     end
   end
 

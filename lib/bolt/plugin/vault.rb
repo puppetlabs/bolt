@@ -55,16 +55,16 @@ module Bolt
       end
 
       def hooks
-        ['inventory_config']
+        [:resolve_reference]
       end
 
-      def initialize(config)
+      def initialize(config:, **_opts)
         validate_config(config)
         @config = config
         @logger = Logging.logger[self]
       end
 
-      def inventory_config(opts)
+      def resolve_reference(opts)
         validate_options(opts)
 
         header = {

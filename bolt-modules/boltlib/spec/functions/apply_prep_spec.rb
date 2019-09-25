@@ -5,6 +5,7 @@ require 'bolt/analytics'
 require 'bolt/executor'
 require 'bolt/inventory'
 require 'bolt/plugin'
+require 'bolt/plugin/install_agent'
 require 'bolt/result'
 require 'bolt/result_set'
 require 'bolt/target'
@@ -14,7 +15,7 @@ describe 'apply_prep' do
   include PuppetlabsSpec::Fixtures
   let(:applicator) { mock('Bolt::Applicator') }
   let(:executor) { Bolt::Executor.new(1, Bolt::Analytics::NoopClient.new) }
-  let(:plugins) { Bolt::Plugin.new(nil, Bolt::Analytics::NoopClient.new) }
+  let(:plugins) { Bolt::Plugin.new(nil, nil, Bolt::Analytics::NoopClient.new) }
   let(:agent_plugin) { Bolt::Plugin::InstallAgent.new }
   let(:task_hook) { agent_plugin.method(:puppet_library) }
   let(:inventory) { Bolt::Inventory.create_version({}, nil, plugins) }

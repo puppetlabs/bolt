@@ -4,7 +4,7 @@ module Bolt
   class Secret
     class Base
       def hooks
-        %w[inventory_config secret_encrypt secret_decrypt secret_createkeys]
+        %i[resolve_reference secret_encrypt secret_decrypt secret_createkeys validate_resolve_reference]
       end
 
       def encode(raw)
@@ -23,18 +23,22 @@ module Bolt
       end
 
       def secret_encrypt(opts)
-        encrypted = encrypt_value(opts['plaintext-value'])
+        encrypted = encrypt_value(opts['plaintext_value'])
         encode(encrypted)
       end
 
       def secret_decrypt(opts)
-        raw, _plugin = decode(opts['encrypted-value'])
+        raw, _plugin = decode(opts['encrypted_value'])
         decrypt_value(raw)
       end
-      alias inventory_config secret_decrypt
+      alias resolve_reference secret_decrypt
 
-      def validate_inventory_config(opts)
-        decode(opts['encrypted-value'])
+      def validate_resolve_reference(opts)
+        # TODO: Remove deprecation warning
+        if opts.include?('encrypted-value')
+          raise Bolt::ValidationError, "The 'encrypted-value' key is deprecated migrate to to 'encrypted_value'"
+        end
+        decode(opts['encrypted_value'])
       end
     end
   end

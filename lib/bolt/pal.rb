@@ -41,11 +41,8 @@ module Bolt
 
     def initialize(modulepath, hiera_config, max_compiles = Etc.nprocessors)
       # Nothing works without initialized this global state. Reinitializing
-      # is safe and in practice only happen in tests
+      # is safe and in practice only happens in tests
       self.class.load_puppet
-
-      # This makes sure we don't accidentally create puppet dirs
-      with_puppet_settings { |_| nil }
 
       @original_modulepath = modulepath
       @modulepath = [BOLTLIB_PATH, *modulepath, MODULES_PATH]
@@ -56,6 +53,8 @@ module Bolt
       if modulepath && !modulepath.empty?
         @logger.info("Loading modules from #{@modulepath.join(File::PATH_SEPARATOR)}")
       end
+
+      @loaded = false
     end
 
     # Puppet logging is global so this is class method to avoid confusion
@@ -91,6 +90,17 @@ module Bolt
       Bolt::ResultSet.include_iterable
     end
 
+    def setup
+      unless @loaded
+        # This is slow so don't do it until we have to
+        Bolt::PAL.load_puppet
+
+        # Make sure we don't create the puppet directories
+        with_puppet_settings { |_| nil }
+        @loaded = true
+      end
+    end
+
     # Create a top-level alias for TargetSpec and PlanResult so that users don't have to
     # namespace it with Boltlib, which is just an implementation detail. This
     # allows them to feel like a built-in type in bolt, rather than
@@ -104,6 +114,8 @@ module Bolt
     # exceptions thrown by the block and re-raises them ensuring they are
     # Bolt::Errors since the script compiler block will squash all exceptions.
     def in_bolt_compiler
+      # TODO: If we always call this inside a bolt_executor we can remove this here
+      setup
       r = Puppet::Pal.in_tmp_environment('bolt', modulepath: @modulepath, facts: {}) do |pal|
         pal.with_script_compiler do |compiler|
           alias_types(compiler)
@@ -129,6 +141,7 @@ module Bolt
     end
 
     def with_bolt_executor(executor, inventory, pdb_client = nil, applicator = nil, &block)
+      setup
       opts = {
         bolt_executor: executor,
         bolt_inventory: inventory,
@@ -188,6 +201,7 @@ module Bolt
     # Parses a snippet of Puppet manifest code and returns the AST represented
     # in JSON.
     def parse_manifest(code, filename)
+      setup
       Puppet::Pops::Parser::EvaluatingParser.new.parse_string(code, filename)
     rescue Puppet::Error => e
       raise Bolt::PAL::PALError, "Failed to parse manifest: #{e}"
@@ -250,7 +264,7 @@ module Bolt
       task = task_signature(task_name)
 
       if task.nil?
-        raise Bolt::Error.new(Bolt::Error.unknown_task(task_name), 'bolt/unknown-task')
+        raise Bolt::Error.unknown_task(task_name)
       end
 
       task.task_hash.reject { |k, _| k == 'parameters' }
@@ -296,7 +310,7 @@ module Bolt
       end
 
       if plan_info.nil?
-        raise Bolt::Error.new(Bolt::Error.unknown_plan(plan_name), 'bolt/unknown-plan')
+        raise Bolt::Error.unknown_plan(plan_name)
       end
       plan_info
     end

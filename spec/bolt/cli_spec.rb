@@ -1359,7 +1359,7 @@ describe "Bolt::CLI" do
           task_name.replace 'dne::task1'
 
           expect { cli.execute(options) }.to raise_error(
-            Bolt::PAL::PALError, /Could not find a task named "dne::task1"/
+            Bolt::Error, /Could not find a task named "dne::task1"/
           )
           expect(JSON.parse(output.string)).to be
         end
@@ -1368,7 +1368,7 @@ describe "Bolt::CLI" do
           task_name.replace 'sample::dne'
 
           expect { cli.execute(options) }.to raise_error(
-            Bolt::PAL::PALError, /Could not find a task named "sample::dne"/
+            Bolt::Error, /Could not find a task named "sample::dne"/
           )
           expect(JSON.parse(output.string)).to be
         end
@@ -1548,7 +1548,7 @@ describe "Bolt::CLI" do
                 task_name.replace 'unknown::task'
 
                 expect { cli.execute(options) }.to raise_error(
-                  Bolt::PAL::PALError, /Could not find a task named "unknown::task"/
+                  Bolt::Error, /Could not find a task named "unknown::task"/
                 )
                 expect(JSON.parse(output.string)).to be
               end
@@ -1844,6 +1844,10 @@ describe "Bolt::CLI" do
         expect(Bolt::Executor).to receive(:new).with(Bolt::Config.default.concurrency,
                                                      anything,
                                                      true).and_return(executor)
+
+        plugins = Bolt::Plugin.new(nil, nil, nil)
+        allow(cli).to receive(:plugins).and_return(plugins)
+
         outputter = Bolt::Outputter::JSON.new(false, false, false, output)
         allow(cli).to receive(:outputter).and_return(outputter)
         allow(executor).to receive(:report_bundled_content)
