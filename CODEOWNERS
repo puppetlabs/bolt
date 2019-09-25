@@ -3,3 +3,4 @@
 
 /pre-docs @cwcowellshah @puppetlabs/bolt
 /lib/bolt_server @puppetlabs/skeletor
+CHANGELOG.md @cwcowellshah @puppetlabs/bolt
