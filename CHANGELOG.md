@@ -1,8 +1,10 @@
-## BOLT NEXT
+## 1.31.0
 
 #### Deprecations and removals
 
-* **WARNING**: In order to standardize plugin behavior the `aws::ec2` plugin has been renamed `aws_inventory` and the `pkcs7` plugin now expects `encrypted_value` rather `encrypted-value`. The `task` plugin now expects tasks to return both Target lists and config data under the `value` key not `targets` or `values`.
+* **WARNING**: Changes to `aws::ec2`, `pkcs7`, and `task` plugins.
+
+  To improve consistency of plugin behavior, there are three changes to plugins. The `aws::ec2` plugin is now named `aws_inventory`. The `pkcs7` plugin now expects a field called `encrypted_value` rather than `encrypted-value`. The task plugin now expects tasks to return both Target lists and config data under the `value` key instead of the `targets` or `values` keys.
 
 #### Bug fixes
 
@@ -16,7 +18,9 @@
 
 #### New features
 
-* Modules can ship bolt plugins now by including a `bolt_plugin.json` file at the top level. These plugins are task based and can be configured in `bolt.yaml`.
+* **Introduction of Task based plugin implementations available in modules** ([#1133](https://github.com/puppetlabs/bolt/issues/1133))
+
+  Modules can ship bolt plugins now by including a `bolt_plugin.json` file at the top level. These plugins are task based and can be configured in `bolt.yaml`.
 
 
 ## 1.30.1
